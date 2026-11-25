@@ -58,6 +58,12 @@ EVENTS_FILE = "events.txt"
 SOUND_LOGS: dict[str, str | None] = {}
 UI_LOGS: dict[str, str | None] = {}
 EVENT_LOGS: dict[str, str | None] = {}
+DISPLAYS = ROOT / "reference/display"
+DISPLAY_FILE = "display.txt"
+DISPLAY_LISTS = ROOT / "reference/displaylists"
+DISPLAY_LIST_FILE = "displaylist.txt"
+DISPLAY_LOGS: dict[str, str | None] = {}
+DISPLAY_LIST_LOGS: dict[str, str | None] = {}
 SAVES = ROOT / "reference/saves"
 SAVE_FILE = tracediff.SAVE_FILES[0]
 SAVE_BYTES: dict[str, bytes | None] = {}
@@ -270,7 +276,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {"collect": (SOUND_FILE, UI_FILE, EVENTS_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
+            extra: dict = {"collect": (SOUND_FILE, UI_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAY_LIST_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
                                 *dict.fromkeys((*(tracediff.SAVE_FILES if save_to is not None else ()),
                                                 *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if load_from is not None:
@@ -295,6 +301,10 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         UI_LOGS[scenario.stem] = ui_log.read_text() if ui_log.is_file() else None
         events_log = run / EVENTS_FILE
         EVENT_LOGS[scenario.stem] = events_log.read_text() if events_log.is_file() else None
+        display_log = run / DISPLAY_FILE
+        DISPLAY_LOGS[scenario.stem] = display_log.read_text() if display_log.is_file() else None
+        display_list = run / DISPLAY_LIST_FILE
+        DISPLAY_LIST_LOGS[scenario.stem] = display_list.read_text() if display_list.is_file() else None
         if scenario_saves(scenario):
             saved = run / SAVE_FILE
             SAVE_BYTES[scenario.stem] = saved.read_bytes() if saved.is_file() else None
@@ -413,6 +423,11 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
         if EVENT_LOGS.get(name) is None:
             fail(f"{name}: the run wrote no {EVENTS_FILE}; the stored event logs are untouched")
     for name in results:
+        if DISPLAY_LOGS.get(name) is None:
+            fail(f"{name}: the run wrote no {DISPLAY_FILE}; the stored display digests are untouched")
+        if scenario_frames(scenarios[name]) and DISPLAY_LIST_LOGS.get(name) is None:
+            fail(f"{name}: the run wrote no {DISPLAY_LIST_FILE}; the stored display lists are untouched")
+    for name in results:
         for tick, dump in FRAME_DUMPS.get(name, {}).items():
             if dump is None:
                 fail(f"{name}: the run wrote no {frame_path(tick)}; the stored frames are untouched")
@@ -437,6 +452,20 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
     for name in results:
         (EVENTS / f"{name}.txt").write_text(EVENT_LOGS[name])
     print(f"{len(results)} event logs written to {EVENTS.relative_to(ROOT)}")
+    DISPLAYS.mkdir(parents=True, exist_ok=True)
+    for old in DISPLAYS.glob("*.txt"):
+        old.unlink()
+    for name in results:
+        (DISPLAYS / f"{name}.txt").write_text(DISPLAY_LOGS[name])
+    print(f"{len(results)} display digests written to {DISPLAYS.relative_to(ROOT)}")
+    shutil.rmtree(DISPLAY_LISTS, ignore_errors=True)
+    lists = 0
+    for name in results:
+        if scenario_frames(scenarios[name]):
+            DISPLAY_LISTS.mkdir(parents=True, exist_ok=True)
+            (DISPLAY_LISTS / f"{name}.txt").write_text(DISPLAY_LIST_LOGS[name])
+            lists += 1
+    print(f"{lists} display lists written to {DISPLAY_LISTS.relative_to(ROOT)}")
     shutil.rmtree(SAVES, ignore_errors=True)
     saved = 0
     for name in results:

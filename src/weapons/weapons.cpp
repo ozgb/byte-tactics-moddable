@@ -3122,6 +3122,7 @@ int __stdcall GetGafFrameCount(void* gaf);
 int __stdcall IsPointVisible(PlayerInfo_0049be60* pi, Vec3* pos);
 int HarnessViewRand();
 
+#include "../harness/display_hook.h"
 // The projectile render pass: it walks the projectile array and draws every
 // live projectile (counter 0) that the local player can see, by the shot kind
 // (0 to 7). With map-flags bit 2 set the visibility test reads the player's
@@ -3240,6 +3241,7 @@ void __stdcall DrawProjectiles(void* surface)
                     int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
                     DrawFrameBlended(surface, frame0, sx, sy);
                     Angles16 rot3;
+                    DlNote(DL_NO_ANGLES);
                     DrawModel3doProjected(surface, &sp, type->model, &rot3);
                 } else if (type->shotKind == 4) {
                     if (type->colour < 0xff) {

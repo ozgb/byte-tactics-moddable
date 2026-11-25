@@ -479,6 +479,8 @@ class Instance:
         args = ["-testmode", "testmode.txt"] if self.run.testmode else []
         if self.run.testmode and self.run.testdump is not None:
             args += ["-testdump", str(self.run.testdump)]
+        if self.run.testmode and self.run.testdisplay is not None:
+            args += ["-testdisplay", self.run.testdisplay]
         if self.run.testmode:
             args += [POISON_SWITCH if self.run.poison else ZERO_FILL_SWITCH]
         self.wine = subprocess.Popen(["wine", exe, *args], cwd=self.game, env=env, start_new_session=True,
@@ -864,7 +866,7 @@ class Run:
     def __init__(self, number: int, name: str, scenario: Scenario, exes: list[Path], exe_tag: str, session: Path,
                  screens: dict[str, Screen], debug: str, window: bool = False, testmode: Path | None = None,
                  testdump: int | None = None, poison: bool = False, put: list[tuple[str, Path]] | None = None,
-                 collect: list[str] | None = None):
+                 collect: list[str] | None = None, testdisplay: str | None = None):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -876,6 +878,7 @@ class Run:
         self.debug = debug
         self.window = window         # a visible Xephyr window instead of an invisible Xvfb display
         self.testmode = testmode     # a reference/ scenario file to run the exe on
+        self.testdisplay = testdisplay
         self.testdump = testdump     # the tick to dump the state of, with testmode
         self.poison = poison
         self.put = put or []
@@ -1352,6 +1355,8 @@ def main() -> None:
                     help="--testmode: fail when the game runs longer (default 900)")
     ap.add_argument("--testdump", type=int, metavar="TICK",
                     help="--testmode: also run with -testdump TICK, which writes dump.txt")
+    ap.add_argument("--testdisplay", metavar="TICK|all",
+                    help="--testmode: also run with -testdisplay TICK (or all), which writes that frame's items (every frame's) to displaylist.txt")
     ap.add_argument("--poison", action="store_true",
                     help="--testmode: fill new game allocations with 0xCD (the game's -memset switch)")
     ap.add_argument("--put", nargs=2, action="append", default=[], metavar=("DEST", "SRC"),
@@ -1402,6 +1407,10 @@ def main() -> None:
             ap.error(f"{path} must be a path inside the game directory")
     if args.testdump is not None and args.testdump < 0:
         ap.error("--testdump takes a tick of 0 or more")
+    if args.testdisplay is not None and not args.testmode:
+        ap.error("--testdisplay needs --testmode")
+    if args.testdisplay is not None and args.testdisplay != "all" and not args.testdisplay.isdigit():
+        ap.error("--testdisplay takes a tick of 0 or more, or all")
     if args.testmode and not Path(args.testmode).is_file():
         ap.error(f"{args.testmode} is not a file")
     for tool in ("Xephyr" if args.window else "Xvfb", "xdotool", "import", "wine", "pactl", "parec"):
@@ -1450,7 +1459,8 @@ def main() -> None:
                                 Path(args.testmode).resolve() if sc is testmode else None,
                                 args.testdump if sc is testmode else None,
                                 args.poison and sc is testmode, put if sc is testmode else None,
-                                args.collect if sc is testmode else None))
+                                args.collect if sc is testmode else None,
+                                args.testdisplay if sc is testmode else None))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

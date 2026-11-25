@@ -136,6 +136,7 @@ void __cdecl BlitRectKeyed(Surface* dst, Surface* src, Rect* rect, Rect* pos,
 void __cdecl BlitRect(Surface* dst, Surface* src, Rect* rect, Rect* pos);
 
 
+#include "../harness/display_hook.h"
 // Draws into `surface`, or into the screen (locked with LockScreen and
 // unlocked with UnlockScreen) when `surface` is null. ClipLine clips the
 // rectangle and BlitLine fills it. Returns the lock result on the screen
@@ -147,6 +148,7 @@ void __cdecl BlitRect(Surface* dst, Surface* src, Rect* rect, Rect* pos);
 int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1,
                            int color)
 {
+    DlScope displayScope(DL_LINE, surface, x0, y0, x1, y1, color);
     int ret;
     if (surface == 0) {
         Surface screen;
@@ -332,6 +334,7 @@ Surface* __stdcall DrawBlendedLine(Surface* surface, int x0, int y0,
 // FUNCTION: 0x4bee60
 int __stdcall DrawPixel(Surface* surface, int x, int y, int ch)
 {
+    DlScope displayScope(DL_PIXEL, surface, x, y, ch);
     int ret;
     if (surface == 0) {
         Surface screen;
@@ -560,6 +563,7 @@ int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts,
 // FUNCTION: 0x4bf4d0
 int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
 {
+    DlScope displayScope(DL_FADE, surface, rect, level);
     Engine_004bf4d0* engine = (Engine_004bf4d0*)GetDisplay();
     Surface screen;
     Rect r;
@@ -656,6 +660,7 @@ int __stdcall ClipRectangle(Surface* surface, Rect* r)
 // FUNCTION: 0x4bf6f0
 int __stdcall FillRectangle(Surface* surface, Rect* rect, int color)
 {
+    DlScope displayScope(DL_FILL, surface, rect, color);
     Rect r = *rect;
     int result;
     if (surface == 0) {
@@ -686,6 +691,7 @@ int __stdcall FillRectangle(Surface* surface, Rect* rect, int color)
 Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect,
                                          int color)
 {
+    DlScope displayScope(DL_OUTLINE_LIT, surface, rect, color);
     Surface* ret = 0;
     if (surface == 0) {
         Surface screen;
@@ -718,6 +724,7 @@ Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect,
 // FUNCTION: 0x4bf8c0
 int __stdcall DrawRectangle(Surface* surface, Rect* r, int color)
 {
+    DlScope displayScope(DL_OUTLINE, surface, r, color);
 #ifdef __clang__
     int result = 0;
 #else
@@ -907,6 +914,7 @@ int __stdcall XorRectangle(Surface* surface, Rect* rect, int value)
 // FUNCTION: 0x4bfe10
 int __stdcall GrayRectangle(Surface* surface, Rect* rect)
 {
+    DlScope displayScope(DL_GRAY, surface, rect);
     Surface screen;
     Rect r = *rect;
     Game_004bfe10* g = (Game_004bfe10*)GetDisplay();
@@ -957,6 +965,7 @@ int __stdcall GrayRectangle(Surface* surface, Rect* rect)
 // FUNCTION: 0x4bff20
 int __stdcall DitherRectangle(Surface* surface, Rect* rect, int phase)
 {
+    DlScope displayScope(DL_DITHER, surface, rect, phase);
     Surface screen;
     if (surface == 0) {
         if (LockScreen(&screen))
@@ -1040,6 +1049,7 @@ static inline void Draw_004c0070(Surface* surface, int x0, int y0,
 void __stdcall DrawCircle(Surface* surface, int xc, int yc, int radius,
                             int color)
 {
+    DlScope displayScope(DL_CIRCLE, surface, xc, yc, radius, color);
     int x0 = xc + radius;
     int y0 = yc;
     for (int angle = 0x800; angle <= 0x10000; angle += 0x800) {
@@ -1079,6 +1089,7 @@ void __stdcall DrawCircle(Surface* surface, int xc, int yc, int radius,
 void __stdcall DrawDashedCircle(Surface* surface, int cx, int cy, int radius,
                             int color, int n, int start)
 {
+    DlScope displayScope(DL_DASHED, surface, cx, cy, radius, color, n, start);
     Surface screen;
     int px = cx + radius;
     int py = cy;
@@ -1118,6 +1129,7 @@ void __stdcall DrawDashedCircle(Surface* surface, int cx, int cy, int radius,
 // FUNCTION: 0x4c0310
 void __stdcall FillPolygon(Surface* surface, Point* points, int n, unsigned char color)
 {
+    DlScope displayScope(DL_POLYGON, surface, points, n, color);
     ScanFillPolygon(surface, points, n, color);
 }
 
@@ -1257,6 +1269,7 @@ int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count,
 
 
 
+extern int dlpad4c0b10_0, dlpad4c0b10_1, dlpad4c0b10_2, dlpad4c0b10_3, dlpad4c0b10_4, dlpad4c0b10_5, dlpad4c0b10_6, dlpad4c0b10_7, dlpad4c0b10_8, dlpad4c0b10_9, dlpad4c0b10_10, dlpad4c0b10_11, dlpad4c0b10_12, dlpad4c0b10_13, dlpad4c0b10_14, dlpad4c0b10_15, dlpad4c0b10_16, dlpad4c0b10_17, dlpad4c0b10_18, dlpad4c0b10_19, dlpad4c0b10_20, dlpad4c0b10_21, dlpad4c0b10_22, dlpad4c0b10_23, dlpad4c0b10_24, dlpad4c0b10_25, dlpad4c0b10_26, dlpad4c0b10_27, dlpad4c0b10_28, dlpad4c0b10_29, dlpad4c0b10_30, dlpad4c0b10_31, dlpad4c0b10_32, dlpad4c0b10_33, dlpad4c0b10_34, dlpad4c0b10_35, dlpad4c0b10_36, dlpad4c0b10_37, dlpad4c0b10_38, dlpad4c0b10_39, dlpad4c0b10_40, dlpad4c0b10_41, dlpad4c0b10_42, dlpad4c0b10_43, dlpad4c0b10_44, dlpad4c0b10_45, dlpad4c0b10_46, dlpad4c0b10_47, dlpad4c0b10_48, dlpad4c0b10_49, dlpad4c0b10_50, dlpad4c0b10_51, dlpad4c0b10_52, dlpad4c0b10_53, dlpad4c0b10_54, dlpad4c0b10_55, dlpad4c0b10_56, dlpad4c0b10_57, dlpad4c0b10_58, dlpad4c0b10_59, dlpad4c0b10_60, dlpad4c0b10_61, dlpad4c0b10_62, dlpad4c0b10_63, dlpad4c0b10_64, dlpad4c0b10_65, dlpad4c0b10_66, dlpad4c0b10_67, dlpad4c0b10_68, dlpad4c0b10_69, dlpad4c0b10_70, dlpad4c0b10_71, dlpad4c0b10_72, dlpad4c0b10_73, dlpad4c0b10_74, dlpad4c0b10_75, dlpad4c0b10_76, dlpad4c0b10_77, dlpad4c0b10_78, dlpad4c0b10_79, dlpad4c0b10_80, dlpad4c0b10_81, dlpad4c0b10_82, dlpad4c0b10_83, dlpad4c0b10_84, dlpad4c0b10_85;
 // Sibling of 0x4c0a90 (which plots the two end points). Fills the pixels
 // between the span ends: walks the depth ramp at +0x18 and the shade ramp at
 // +0x20 (both 16.16) one step per pixel, does the depth test against the

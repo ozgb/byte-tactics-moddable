@@ -19,6 +19,7 @@
 #include "../../interfaces/seams.h"
 #include "harness_events.h"
 #include "share_packets.h"
+#include "display_log.h"
 
 extern Game* g_game;
 
@@ -115,6 +116,12 @@ static unsigned s_frameCount = 0;
 static unsigned s_frameNext = 0;
 static int s_frameLine = 0;
 static unsigned s_dumpTick = 0;
+static int s_displayAll = 0;
+static int s_displayTickLine = 0;
+static unsigned s_displayTick = 0;
+static int s_displayTickDone = 0;
+static unsigned s_displayFrames = 0;
+static unsigned s_displaySteps = 0;
 static char s_loadName[64];
 static int s_loadLine = 0;
 static char s_decidedKey[32];
@@ -805,10 +812,17 @@ unsigned __stdcall HarnessInputTime(unsigned live)
     return s_injecting ? s_injectMs : live;
 }
 
+int __stdcall HarnessDropsHostInput(unsigned msg)
+{
+    if (!s_testMode || s_injecting)
+        return 0;
+    return (msg >= WM_KEYFIRST && msg <= WM_KEYLAST) || (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST);
+}
+
 int __stdcall HarnessKeyState(int vk)
 {
     int state;
-    if (!InputScenario())
+    if (!s_testMode)
         return GetAsyncKeyState(vk);
     if (vk < 0 || vk >= 256)
         return 0;
@@ -819,7 +833,7 @@ int __stdcall HarnessKeyState(int vk)
 
 BOOL __stdcall HarnessGetCursorPos(POINT* pt)
 {
-    if (!InputScenario())
+    if (!s_testMode)
         return GetCursorPos(pt);
     pt->x = s_cursorX;
     pt->y = s_cursorY;
@@ -828,7 +842,7 @@ BOOL __stdcall HarnessGetCursorPos(POINT* pt)
 
 BOOL __stdcall HarnessSetCursorPos(int x, int y)
 {
-    if (!InputScenario())
+    if (!s_testMode)
         return SetCursorPos(x, y);
     s_cursorX = x;
     s_cursorY = y;
@@ -1479,6 +1493,31 @@ static void ParseTestDump(char* cmdLine)
     }
 }
 
+static void ParseTestDisplay(char* cmdLine)
+{
+    for (char* p = cmdLine; *p != '\0'; p++) {
+        if ((p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "testdisplay", 11) == 0
+            && (p[12] == '\0' || isspace((unsigned char)p[12])) && (p == cmdLine || isspace((unsigned char)p[-1]))) {
+            char* q = p + 12;
+            while (*q == ' ' || *q == '\t')
+                q++;
+            char* end;
+            if (_strnicmp(q, "all", 3) == 0 && (q[3] == '\0' || isspace((unsigned char)q[3]))) {
+                s_displayAll = 1;
+                end = q + 3;
+            } else {
+                unsigned tick = strtoul(q, &end, 0);
+                if (end == q || (*end != '\0' && !isspace((unsigned char)*end)) || tick == 0)
+                    Fail("testmode: -testdisplay needs a tick number or all\n");
+                s_displayTickLine = 1;
+                s_displayTick = tick;
+            }
+            memset(p, ' ', end - p);
+            return;
+        }
+    }
+}
+
 void HarnessInit(char* cmdLine)
 {
     InstallNativeSeams();
@@ -1497,6 +1536,7 @@ void HarnessInit(char* cmdLine)
         return;
     }
     ParseTestDump(cmdLine);
+    ParseTestDisplay(cmdLine);
 
     char* q = flag + 9;
     while (*q == ' ' || *q == '\t')
@@ -1627,6 +1667,7 @@ static int s_stepEnded = 0;
 void HarnessAfterStep()
 {
     s_eventPhase = -1;
+    s_displaySteps++;
     if (s_testMode && s_trace != NULL)
         VisitSharePackets();
     if (s_testMode && s_saveLine != 0 && (unsigned)g_game->ticks == s_saveTick) {
@@ -1675,6 +1716,11 @@ void HarnessEndOfTick()
     if (s_ui != NULL)
         fclose(s_ui);
     s_ui = NULL;
+    DlClose();
+    if (!gameOver && s_displayTickLine != 0 && !s_displayTickDone) {
+        sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_displayTick);
+        Fail(msg);
+    }
     if (!gameOver && s_frameNext < s_frameCount) {
         sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_frameTicks[s_frameNext]);
         Fail(msg);
@@ -4829,6 +4875,47 @@ void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int wid
     }
 }
 
+const char* HarnessMapName()
+{
+    return s_map;
+}
+
+void HarnessCursorPosition(int* x, int* y)
+{
+    POINT pt;
+    pt.x = 0;
+    pt.y = 0;
+    HarnessGetCursorPos(&pt);
+    *x = pt.x;
+    *y = pt.y;
+}
+
+void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY)
+{
+    if (!s_testMode || DlIsOn() == 0)
+        return;
+    unsigned tick = GameU32(GAME_TICK);
+    int list = s_displayAll;
+    for (unsigned i = 0; i < s_frameCount; i++) {
+        if (s_frameTicks[i] == tick)
+            list = 1;
+    }
+    if (s_displayTickLine != 0) {
+        if (tick == s_displayTick) {
+            list = 1;
+            s_displayTickDone = 1;
+        } else if (tick > s_displayTick && !s_displayTickDone) {
+            char msg[100];
+            sprintf(msg, "testmode: tick %u is not the last tick of a frame\n", s_displayTick);
+            Fail(msg);
+            return;
+        }
+    }
+    s_displayFrames++;
+    DlFrameEnd(s_displayFrames, tick, s_displaySteps, palette, list, cursor, cursorX, cursorY);
+    s_displaySteps = 0;
+}
+
 void HarnessPhase(int phase)
 {
     if (!s_testMode || s_trace == NULL)
@@ -4875,6 +4962,7 @@ void HarnessPhase(int phase)
             fflush(s_events);
         if (s_ui != NULL)
             fflush(s_ui);
+        DlFlush();
         if (s_dumpNow)
             fflush(s_dump);
     }
@@ -4957,6 +5045,7 @@ static void OpenTrace(unsigned controlWord)
         Fail("testmode: cannot write ui.txt\n");
     setvbuf(s_ui, s_uiBuffer, _IOFBF, sizeof s_uiBuffer);
     fprintf(s_ui, "bt-ui 1\n");
+    DlOpen(s_displayAll);
     s_events = fopen("events.txt", "wb");
     if (s_events == NULL)
         Fail("testmode: cannot write events.txt\n");

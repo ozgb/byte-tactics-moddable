@@ -106,6 +106,7 @@ static int DrawFlags()
             DrawFrame(dest, frame, x, y); \
     } while (0)
 
+#include "../harness/display_hook.h"
 // FUNCTION: 0x46a610
 void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
 {
@@ -137,7 +138,9 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
             st->unit = unit;
             unit->angles = spot->rot;
             unit->pos = spot->pos;
+            DlNote(DL_FEATURE_TYPE, f->name);
             DrawUnit(dest, unit);
+            DlNote(DL_FEATURE_TYPE, 0);
         }
     } else {
         if (f->over) {

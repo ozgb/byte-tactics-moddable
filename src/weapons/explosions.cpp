@@ -425,6 +425,7 @@ void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int fl
     }
 }
 
+#include "../harness/display_hook.h"
 // FUNCTION: 0x420b00
 void __stdcall DrawExplosions(void* surface)
 {
@@ -451,7 +452,10 @@ void __stdcall DrawExplosions(void* surface)
         int x = pos.x.parts.whole + 128;
         int y = pos.z.parts.whole - (pos.y.parts.whole >> 1) + 32;
         if (PointInRect(g_game->viewport, x, y)) {
-            if (d->obj) DrawModel3doProjected(surface, &pos, d->obj, &d->angle_x);
+            if (d->obj) {
+                DlScope shardScope(DL_SHARD, surface, &pos, d->obj, &d->angle_x);
+                DrawModel3doProjected(surface, &pos, d->obj, &d->angle_x);
+            }
             if (d->ref1.src) DrawFrame(surface, GetGafSequenceFrame(&d->ref1), x, y);
         }
     }
@@ -500,6 +504,7 @@ void __stdcall ExplodeUnitPieces(Unit* unit)
     }
 }
 
+extern int dlpad420f30_0, dlpad420f30_1, dlpad420f30_2, dlpad420f30_3, dlpad420f30_4, dlpad420f30_5, dlpad420f30_6, dlpad420f30_7, dlpad420f30_8, dlpad420f30_9;
 // MATCH: use a local int pointer for the gravity subtraction so MSVC reloads vel.y after the position updates.
 // FUNCTION: 0x420f30
 void UpdateExplosions()
@@ -610,6 +615,7 @@ void __stdcall DrawExplodedPieces(void* surface)
     }
 }
 
+extern int dlpad4211d0_0, dlpad4211d0_1, dlpad4211d0_2, dlpad4211d0_3, dlpad4211d0_4, dlpad4211d0_5, dlpad4211d0_6, dlpad4211d0_7, dlpad4211d0_8, dlpad4211d0_9, dlpad4211d0_10, dlpad4211d0_11, dlpad4211d0_12, dlpad4211d0_13, dlpad4211d0_14, dlpad4211d0_15, dlpad4211d0_16, dlpad4211d0_17, dlpad4211d0_18, dlpad4211d0_19, dlpad4211d0_20, dlpad4211d0_21, dlpad4211d0_22, dlpad4211d0_23, dlpad4211d0_24, dlpad4211d0_25, dlpad4211d0_26, dlpad4211d0_27, dlpad4211d0_28, dlpad4211d0_29, dlpad4211d0_30, dlpad4211d0_31, dlpad4211d0_32, dlpad4211d0_33, dlpad4211d0_34, dlpad4211d0_35, dlpad4211d0_36, dlpad4211d0_37, dlpad4211d0_38, dlpad4211d0_39, dlpad4211d0_40, dlpad4211d0_41, dlpad4211d0_42, dlpad4211d0_43, dlpad4211d0_44, dlpad4211d0_45, dlpad4211d0_46, dlpad4211d0_47, dlpad4211d0_48, dlpad4211d0_49, dlpad4211d0_50, dlpad4211d0_51, dlpad4211d0_52, dlpad4211d0_53, dlpad4211d0_54, dlpad4211d0_55, dlpad4211d0_56, dlpad4211d0_57, dlpad4211d0_58, dlpad4211d0_59, dlpad4211d0_60, dlpad4211d0_61, dlpad4211d0_62, dlpad4211d0_63, dlpad4211d0_64, dlpad4211d0_65, dlpad4211d0_66, dlpad4211d0_67, dlpad4211d0_68, dlpad4211d0_69, dlpad4211d0_70, dlpad4211d0_71, dlpad4211d0_72, dlpad4211d0_73, dlpad4211d0_74, dlpad4211d0_75, dlpad4211d0_76, dlpad4211d0_77, dlpad4211d0_78, dlpad4211d0_79, dlpad4211d0_80, dlpad4211d0_81, dlpad4211d0_82, dlpad4211d0_83, dlpad4211d0_84, dlpad4211d0_85, dlpad4211d0_86, dlpad4211d0_87, dlpad4211d0_88, dlpad4211d0_89, dlpad4211d0_90, dlpad4211d0_91, dlpad4211d0_92, dlpad4211d0_93, dlpad4211d0_94, dlpad4211d0_95, dlpad4211d0_96, dlpad4211d0_97, dlpad4211d0_98, dlpad4211d0_99, dlpad4211d0_100, dlpad4211d0_101, dlpad4211d0_102, dlpad4211d0_103, dlpad4211d0_104, dlpad4211d0_105, dlpad4211d0_106, dlpad4211d0_107, dlpad4211d0_108, dlpad4211d0_109, dlpad4211d0_110, dlpad4211d0_111, dlpad4211d0_112, dlpad4211d0_113, dlpad4211d0_114, dlpad4211d0_115, dlpad4211d0_116, dlpad4211d0_117, dlpad4211d0_118, dlpad4211d0_119, dlpad4211d0_120, dlpad4211d0_121, dlpad4211d0_122, dlpad4211d0_123, dlpad4211d0_124, dlpad4211d0_125, dlpad4211d0_126, dlpad4211d0_127, dlpad4211d0_128, dlpad4211d0_129, dlpad4211d0_130, dlpad4211d0_131, dlpad4211d0_132, dlpad4211d0_133, dlpad4211d0_134, dlpad4211d0_135, dlpad4211d0_136, dlpad4211d0_137, dlpad4211d0_138, dlpad4211d0_139, dlpad4211d0_140, dlpad4211d0_141, dlpad4211d0_142, dlpad4211d0_143, dlpad4211d0_144, dlpad4211d0_145, dlpad4211d0_146, dlpad4211d0_147, dlpad4211d0_148, dlpad4211d0_149, dlpad4211d0_150, dlpad4211d0_151, dlpad4211d0_152, dlpad4211d0_153, dlpad4211d0_154, dlpad4211d0_155, dlpad4211d0_156, dlpad4211d0_157, dlpad4211d0_158, dlpad4211d0_159, dlpad4211d0_160, dlpad4211d0_161, dlpad4211d0_162, dlpad4211d0_163, dlpad4211d0_164, dlpad4211d0_165, dlpad4211d0_166, dlpad4211d0_167, dlpad4211d0_168, dlpad4211d0_169, dlpad4211d0_170, dlpad4211d0_171, dlpad4211d0_172, dlpad4211d0_173, dlpad4211d0_174, dlpad4211d0_175, dlpad4211d0_176, dlpad4211d0_177, dlpad4211d0_178, dlpad4211d0_179, dlpad4211d0_180, dlpad4211d0_181, dlpad4211d0_182, dlpad4211d0_183, dlpad4211d0_184, dlpad4211d0_185, dlpad4211d0_186, dlpad4211d0_187, dlpad4211d0_188, dlpad4211d0_189, dlpad4211d0_190, dlpad4211d0_191, dlpad4211d0_192, dlpad4211d0_193, dlpad4211d0_194, dlpad4211d0_195, dlpad4211d0_196, dlpad4211d0_197, dlpad4211d0_198, dlpad4211d0_199, dlpad4211d0_200, dlpad4211d0_201, dlpad4211d0_202, dlpad4211d0_203, dlpad4211d0_204, dlpad4211d0_205, dlpad4211d0_206, dlpad4211d0_207, dlpad4211d0_208, dlpad4211d0_209, dlpad4211d0_210, dlpad4211d0_211, dlpad4211d0_212, dlpad4211d0_213, dlpad4211d0_214, dlpad4211d0_215, dlpad4211d0_216, dlpad4211d0_217, dlpad4211d0_218, dlpad4211d0_219, dlpad4211d0_220, dlpad4211d0_221, dlpad4211d0_222, dlpad4211d0_223, dlpad4211d0_224, dlpad4211d0_225, dlpad4211d0_226, dlpad4211d0_227, dlpad4211d0_228, dlpad4211d0_229, dlpad4211d0_230, dlpad4211d0_231, dlpad4211d0_232, dlpad4211d0_233, dlpad4211d0_234, dlpad4211d0_235, dlpad4211d0_236, dlpad4211d0_237, dlpad4211d0_238, dlpad4211d0_239, dlpad4211d0_240, dlpad4211d0_241, dlpad4211d0_242, dlpad4211d0_243, dlpad4211d0_244, dlpad4211d0_245;
 // FUNCTION: 0x4211d0
 void __stdcall DrawExplodedPieceFaces(void* surface, ExplodedPiece* obj, PieceRec* inner)
 {
@@ -782,6 +788,7 @@ int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj)
         RotateByAngles(&inner->desc->verts[i], &inner->verts[i], angles);
     }
 
+    DlScope displayScope(DL_DEBRIS, surface, inner, obj, angles);
     DrawExplodedPieceFaces(surface, obj, inner);
     return 1;
 }

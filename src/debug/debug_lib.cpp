@@ -337,6 +337,7 @@ void __cdecl GameFreeThunk(int* p)
 
 void __cdecl FreeDebugBlock(void* p, int flags);
 
+#include "../harness/display_hook.h"
 // The game's free(): under the allocator lock, either hands the block to the
 // "memfussy" debug heap or updates the allocation counters and frees it.
 // The original calls this out of line from GameFreeThunk.
@@ -344,6 +345,7 @@ void __cdecl FreeDebugBlock(void* p, int flags);
 // FUNCTION: 0x4d85b0
 void __cdecl GameFree(void* p)
 {
+    DlNote(DL_FREE, p);
     if (p) {
         CRITICAL_SECTION* cs = (CRITICAL_SECTION*)GetAllocLock();
         EnterCriticalSection(cs);

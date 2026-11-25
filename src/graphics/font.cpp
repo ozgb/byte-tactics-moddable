@@ -69,6 +69,7 @@ static inline int WidthTextGlyphs(Font* font, unsigned char* text)
     return width;
 }
 
+#include "../harness/display_hook.h"
 // Draws `text` (a bitmap font string ended by NUL or newline) at x, y into
 // `dst`, or into the locked screen when `dst` is null. When `maxWidth` is not
 // -1 and the text is wider, a copy is cut back one character at a time until
@@ -104,6 +105,7 @@ void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int m
     r.right = x + width;
     // From r.top, not y: r is address-taken, so the original reloads it.
     r.bottom = r.top + GetDisplay()->font->glyphs[0];
+    DlScope displayScope(DL_TEXT, dst, text, x, y, width);
     if (dst == 0) {
         Surface screen;
         if (LockScreen(&screen) != 0) {

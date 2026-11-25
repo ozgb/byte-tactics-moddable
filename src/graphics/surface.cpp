@@ -495,6 +495,7 @@ struct Desc {
     char fields[68];
 };
 
+#include "../harness/display_hook.h"
 // Presents a frame. With flag bit 1 clear it blits the cached bitmap through
 // GDI. Otherwise, when +0xdc is set, it copies the bitmap at +0xbc (if its
 // size matches GetScreenWidth/GetScreenHeight) into the locked primary surface;
@@ -503,6 +504,7 @@ struct Desc {
 // FUNCTION: 0x4c63a0
 void FlipScreen(void)
 {
+    DlScope displayScope(DL_NONE);
     Display* d = GetDisplay();
     unsigned short flags = d->flags.word;
 
@@ -512,6 +514,7 @@ void FlipScreen(void)
         DrawSurface(p, d->overrideSurface, 0, 0);
         HarnessFrameDrawn(p->pixels, p->pitch, p->width, p->height, d->entries);
         DrawCursor(d, p);
+        DlNote(DL_FRAME_END, d);
         HDC hdc = GetDC(d->hwnd);
         SelectPalette(hdc, d->hpalette, 0);
         RealizePalette(hdc);
@@ -540,6 +543,7 @@ void FlipScreen(void)
             out.pixels = (unsigned char*)desc.lpSurface;
             HarnessFrameDrawn(bmp->pixels, bmp->pitch, bmp->width, bmp->height, d->entries);
             DrawCursor(d, bmp);
+            DlNote(DL_FRAME_END, d);
             BlitSurface(&out, bmp, 0, 0);
             if (d->cursorThreadEnabled != 0 && d->cursorOverlayEnabled != 0)
                 DrawSurface(bmp, d->saveMouse1, d->x, d->y);
@@ -655,6 +659,7 @@ static void clear_screen(Display* o, int colour)
 // FUNCTION: 0x4c6890
 int __stdcall FillSurface(Surface* surface, int colour)
 {
+    DlScope displayScope(DL_CLEAR, surface, colour);
     Display* obj = GetDisplay();
     int ret = 1;
     if (surface == 0) {
@@ -733,6 +738,7 @@ Surface* __stdcall AllocSurface(char* name, int width, int height)
 {
     Surface* s = (Surface*)GameAllocIgnoreTag(name, height * width + 0x30);
     Init(s, width, height, width, (int)(s + 1));
+    DlNote(DL_ALLOC_SURFACE, s, name);
     return s;
 }
 
@@ -805,6 +811,7 @@ int GetDisplayFieldE4()
 // FUNCTION: 0x4c6b70
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y)
 {
+    DlScope displayScope(DL_BLIT, dst, bmp, x, y);
     // Two flat top-level ifs, each ending in its own unlock and return.
     if (dst == 0) {
         if (bmp == 0)
@@ -866,6 +873,7 @@ void __cdecl BlitTile32x32(Surface* dst, Surface* src, Rect* rect, Point* pos);
 // FUNCTION: 0x4c6d20
 void __stdcall CopySurfaceRect(Surface* dst, Surface* src, Rect* rect, Point* pos)
 {
+    DlScope displayScope(DL_COPY, dst, src, rect, pos);
     if (dst == 0) {
         Surface screen;
         if (LockScreen(&screen)) {
@@ -954,6 +962,7 @@ static inline Surface* NewSurface(char* name, int w, int h)
     r.right = w - 1;
     r.bottom = h - 1;
     s->clip = r;
+    DlNote(DL_ALLOC_SURFACE, s, name);
     return s;
 }
 
@@ -1223,6 +1232,7 @@ void __stdcall DrawQuadRow(int y, int* rect, void* surf, void* info);
 void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
                             Quad_004c7580* dst, Quad_004c7580* src)
 {
+    DlScope displayScope(DL_QUAD, surf, bmp, dst != 0 ? dst->p : 0, src != 0 ? src->p : 0);
     if (bmp == 0)
         return;
     if (dst == 0)
@@ -1423,6 +1433,7 @@ void __stdcall BuildEntryGuiName(char* dest, unsigned short index, int n);
 int __stdcall AddNetPlayer(int id);
 void ApplyBrightnessAndVolume();
 
+extern int dlpad4c7a20_0, dlpad4c7a20_1, dlpad4c7a20_2, dlpad4c7a20_3, dlpad4c7a20_4, dlpad4c7a20_5;
 // FUNCTION: 0x4c7a20
 void __stdcall DrawTexturedSpan(int row, int* span, GafFrame* surf, GafFrame* info)
 {
@@ -1575,6 +1586,7 @@ void __stdcall DrawTexturedSpan(int row, int* span, GafFrame* surf, GafFrame* in
 // the symbol count (docs/c2-regalloc.md, "Symbol ids").
 #include <float.h>
 
+extern int dlpad4c8020_0;
 // Blits one textured span with a depth (Z) buffer. For each pixel it compares
 // the interpolated Z against the depth buffer and, when it passes, writes the
 // palette-mapped texel and the new depth value. Source coordinates are 16.16

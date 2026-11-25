@@ -1285,9 +1285,11 @@ void FreeMapResources()
     g_game->overflowBucket = 0;
 }
 
+#include "../harness/display_hook.h"
 // FUNCTION: 0x483fa0
 void __stdcall DrawMapTiles(void* surface)
 {
+    DlScope displayScope(DL_TERRAIN, surface);
     // Declared together: tilesX/tilesY before tileX/tileY, offX/offY before
     // viewW/viewH.
     int tilesX, tilesY;
@@ -1564,6 +1566,7 @@ inline int Lod(SightQuery* params)
     return v < 0 ? 0 : v;
 }
 
+extern int dlpad481930_0, dlpad481930_1, dlpad481930_2, dlpad481930_3, dlpad481930_4, dlpad481930_5, dlpad481930_6, dlpad481930_7, dlpad481930_8, dlpad481930_9, dlpad481930_10, dlpad481930_11, dlpad481930_12, dlpad481930_13, dlpad481930_14;
 // FUNCTION: 0x481930
 void __stdcall RevealAroundUnit(SightQuery* params)
 {

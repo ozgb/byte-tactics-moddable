@@ -157,6 +157,7 @@ void __cdecl BlitCompressed(unsigned char* pixels, int pitch, Rect* rect,
                             void* plane, Rect* other);
 void __stdcall DrawFrameBlended(Surface* dst, GafFrame* bmp, int x, int y);
 
+#include "../harness/display_hook.h"
 // Draws a bitmap (or a list of nested bitmaps) into `dst`, or into the screen
 // when `dst` is null: the screen is then locked with LockScreen and unlocked
 // with UnlockScreen at the end (which is why the unlock is guarded by a
@@ -170,6 +171,7 @@ void __stdcall DrawFrameBlended(Surface* dst, GafFrame* bmp, int x, int y);
 // FUNCTION: 0x4b7f90
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y)
 {
+    DlScope displayScope(DL_SPRITE, dst, bmp, x, y);
     Surface screen;
     if (dst == 0) {
         int ok = LockScreen(&screen);
@@ -232,6 +234,7 @@ void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y)
 // FUNCTION: 0x4b8150
 void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
 {
+    DlScope displayScope(DL_SPRITE_OPAQUE, dst, bmp, x, y);
     Surface screen;
     if (dst == 0) {
         int locked = LockScreen(&screen);
@@ -357,6 +360,7 @@ void __cdecl BlitCompressedBlended(unsigned char* pixels, int pitch, Rect* drect
 // FUNCTION: 0x4b8500
 void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y)
 {
+    DlScope displayScope(DL_SPRITE_BLEND, surface, frame, x, y);
     Display_004b8310* d = GetDisplay();
     if ((d->flags.byte & 0x20) != 0) {
         Screen_004b8310 screen;
@@ -423,6 +427,7 @@ void __stdcall ResetClipRect(int* surface);
 // FUNCTION: 0x4b86e0
 void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 {
+    DlScope displayScope(DL_SPRITE_GRAY, surface, frame, x, y);
     Display_004b8310* d = GetDisplay();
     // Flag tested as bit 0x100 of the word: fuses into a byte test at +0xf1.
     if ((d->flags.word & 0x100) != 0 && frame->flag9 == 0) {
@@ -492,6 +497,7 @@ void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 // FUNCTION: 0x4b88d0
 void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int parity)
 {
+    DlScope displayScope(DL_SPRITE_ERASE, dst, bmp, x, y, parity);
     Surface screen;
     if (bmp->flag9 == 0) {
         if (dst == 0) {
@@ -751,6 +757,7 @@ void* __stdcall LoadGaf(char* name)
             } while (j < (int)p->count);
         }
     }
+    DlNote(DL_GAF, name, base);
     return base;
 }
 
@@ -800,6 +807,7 @@ GafFrame* __stdcall AllocFrame(const char* name, int width, int height)
     p->flag9 = 0;
     p->count = 0;
     p->kind = 0;
+    DlNote(DL_ALLOC_FRAME, p, name);
     return p;
 }
 // FUNCTION: 0x4b8e00 ?AllocDepthFrame@@YGPAUGafFrame@@IHH@Z
@@ -818,11 +826,13 @@ GafFrame* __stdcall AllocDepthFrame(unsigned int heap, int width, int height)
     b->flag9 = 0;
     b->count = 0;
     b->kind = 0;
+    DlNote(DL_ALLOC_FRAME, b, heap);
     return b;
 }
 // FUNCTION: 0x4b8e50
 void __stdcall ClearFrame(GafFrame* b, int color)
 {
+    DlScope displayScope(DL_CLEAR_FRAME, b, color);
     if (b->flag9 == 0) {
         memset(b->plane0, color, b->width * b->height);
         if (b->plane1 != 0) {
@@ -852,6 +862,7 @@ void __cdecl BlitCompressedShadow(unsigned char* pixels, int pitch, Rect* rect,
 // FUNCTION: 0x4b8ec0
 void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
 {
+    DlScope displayScope(DL_SPRITE_SHADOW, dst, bmp, x, y);
     Display_004b8310* d = GetDisplay();
     if (d->flags.bits.has_obj_c8 == 1) {
         Surface screen;
@@ -920,6 +931,7 @@ GafFrame* __stdcall AllocDepthFrame(const char* name, int width, int height)
     b->flag9 = 0;
     b->count = 0;
     b->kind = 0;
+    DlNote(DL_ALLOC_FRAME, b, name);
     return b;
 }
 
@@ -977,6 +989,7 @@ static void SwapPtr(unsigned char*& a, unsigned char*& b)
 // FUNCTION: 0x4b9360
 void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y)
 {
+    DlScope displayScope(DL_LENS, dst, sprite, x, y);
     SwapPtr(sprite->plane0, sprite->plane1);
 
     Surface surface;
@@ -1096,6 +1109,7 @@ void __stdcall TintFrameBelow(GafFrame* image, unsigned char level)
     }
 }
 
+extern int dlpad4b9740_0, dlpad4b9740_1, dlpad4b9740_2, dlpad4b9740_3, dlpad4b9740_4, dlpad4b9740_5;
 // Draws a bitmap tree scaled by (sx, sy) at x, y into `dst`, or into the
 // locked screen when `dst` is null. A record with a child count draws every
 // child by recursion. A leaf scales its size and origin, clips the
@@ -1241,6 +1255,7 @@ void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double
         UnlockScreen(&screen);
 }
 
+extern int dlpad4b9d70_0, dlpad4b9d70_1, dlpad4b9d70_2;
 // Suspected bugs:
 //  - The horizontal copy count `n` is clamped to dst->width but dstCol is not
 //    subtracted from it, so when dstCol > 0 the inner loop writes up to dstCol
@@ -1517,6 +1532,7 @@ void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
 // FUNCTION: 0x4b8310
 void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int paletteRow)
 {
+    DlScope displayScope(DL_SPRITE_LIT, surface, frame, x, y, paletteRow);
     Display_004b8310* d = GetDisplay();
     if ((d->flags.byte & 0x80) == 0x80) {
         Screen_004b8310 screen;
@@ -1597,6 +1613,7 @@ void __stdcall DrawFrameDepth(GafFrame* src, GafFrame* dst, int x, int y, int le
 // Declared ahead of the definition, as the other files declare it: these
 // symbol ids put the registers on the window DownsampleFrame matches in.
 void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst);
+extern int dlpad4b95a0_0, dlpad4b95a0_1, dlpad4b95a0_2, dlpad4b95a0_3, dlpad4b95a0_4, dlpad4b95a0_5, dlpad4b95a0_6, dlpad4b95a0_7, dlpad4b95a0_8, dlpad4b95a0_9, dlpad4b95a0_10, dlpad4b95a0_11, dlpad4b95a0_12, dlpad4b95a0_13, dlpad4b95a0_14, dlpad4b95a0_15, dlpad4b95a0_16, dlpad4b95a0_17, dlpad4b95a0_18, dlpad4b95a0_19, dlpad4b95a0_20, dlpad4b95a0_21, dlpad4b95a0_22, dlpad4b95a0_23, dlpad4b95a0_24, dlpad4b95a0_25, dlpad4b95a0_26, dlpad4b95a0_27, dlpad4b95a0_28, dlpad4b95a0_29;
 // FUNCTION: 0x4b95a0
 void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst)
 {

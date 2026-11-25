@@ -525,9 +525,26 @@ struct RegionBinding {
 RegionBinding g_region;
 ReplayRegionView g_regionView;
 
-void* AllocRegion(unsigned size)
+void* PlaceRegion(unsigned offset, unsigned size, char* why)
 {
-    return AllocObject(size);
+    void* p = SimAllocAt(offset, size);
+    if (p != nullptr)
+        return p;
+    unsigned block = SimBlockSize();
+    if (offset > block || size > block - offset)
+        sprintf(why, "block offset %u (%u bytes) is past the block's end at %u", offset, size, block);
+    else
+        sprintf(why, "block offset %u (%u bytes) is not free: it clashes with another allocation, or is not 8-byte aligned", offset, size);
+    return nullptr;
+}
+
+void* AllocRegion(unsigned offset, unsigned size)
+{
+    char why[160];
+    void* p = PlaceRegion(offset, size, why);
+    if (p == nullptr)
+        Fatal(g_file, g_callIndex, "a region that cannot be placed at its recorded offset", why);
+    return p;
 }
 
 void RegionBind(void* ptr, unsigned size)
@@ -7134,6 +7151,19 @@ void RegionSelfTest()
     now.Free();
     scratch.Free();
     delete table;
+
+    printf("a region at its recorded offset\n");
+    ResetBlock();
+    char why[160];
+    unsigned offset = 0x200000;
+    unsigned char* placed = (unsigned char*)PlaceRegion(offset, 4096, why);
+    Check(placed == (unsigned char*)SimBlockBase() + offset, "the region is placed at the offset the recording names");
+    RegionBind(placed, 4096);
+    BlockBase(f);
+    Check(g_regionView.data == offset && g_regionView.size == 4096, "the region's block offset is the recorded one");
+    Check(PlaceRegion(offset + 1024, 64, why) == nullptr && strstr(why, "block offset 2098176 (64 bytes) is not free") != nullptr, "a second region that clashes with it is refused, naming its offset");
+    Check(PlaceRegion((unsigned)((unsigned char*)g_game - (unsigned char*)SimBlockBase()), 64, why) == nullptr && strstr(why, "is not free") != nullptr, "a region at the offset of the replayer's own Game is refused");
+    Check(PlaceRegion(SimBlockSize() - 32, 64, why) == nullptr && strstr(why, "is past the block's end") != nullptr, "a region that passes the block's end is refused, naming its offset");
 }
 
 int SelfTest(const char* file)

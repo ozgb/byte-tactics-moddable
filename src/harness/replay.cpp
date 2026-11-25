@@ -565,6 +565,11 @@ void ImportEffect(ReplayText& t, unsigned table, const void* p, unsigned size)
     ReplayAddEffect(t, table, p, size, Table());
 }
 
+void ArgRegionOffset(ReplayText& t, const char* name, const void* region)
+{
+    ArgValue(t, name, (unsigned)((const unsigned char*)region - (const unsigned char*)SimBlockBase()));
+}
+
 void ArgRegionResult(ReplayText& t, const void* result)
 {
     t.Add(result != nullptr && result == s_regions[s_sub].ptr ? "  o result region\n" : "  o result null\n");

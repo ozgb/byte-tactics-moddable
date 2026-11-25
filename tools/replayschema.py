@@ -2678,7 +2678,11 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
         if phase == "i":
             return ["ImportInOutScalar(line, %s);" % var]
         return ['ArgInOutScalarExit(s_tail, "%s", %s);' % (line, var)]
-    elif mode in ("region", "world"):
+    elif mode == "region":
+        if phase == "a":
+            return ['ArgRegionOffset(s_call, "%s", %s);' % (line, var)]
+        return []
+    elif mode == "world":
         return []
     elif mode == "effect":
         if phase == "i":
@@ -3116,7 +3120,7 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             call.append(v)
         elif m == "region":
             size_line = s["args"][i + 1]["line"]
-            L.append('    void* %s = AllocRegion(ArgScalar<unsigned>("%s"));' % (v, size_line))
+            L.append('    void* %s = AllocRegion(ArgScalar<unsigned>("%s"), ArgScalar<unsigned>("%s"));' % (v, line, size_line))
             L.append('    RegionBind(%s, ArgScalar<unsigned>("%s"));' % (v, size_line))
             call.append(v)
         elif m == "world":

@@ -159,6 +159,7 @@ void __stdcall RecEconomyInit(const EconMapInfo* a0, const EconomyWorldView* a1,
     RegionBind(SUB_ECONOMY, a2, a3);
     if (scope.Open()) {
         ArgValueStruct(s_call, "a", "map", ROK_ECONMAPINFO, a0);
+        ArgRegionOffset(s_call, "region", a2);
         ArgValue(s_call, "size", a3);
     }
     s_inner_economy->Init(a0, a1, a2, a3);
@@ -1376,6 +1377,7 @@ void __stdcall RecLosRadarInit(const LosRadarMapInfo* a0, void* a1, unsigned int
     RegionBind(SUB_LOS_RADAR, a1, a2);
     if (scope.Open()) {
         ArgValueStruct(s_call, "a", "map", ROK_LOSRADARMAPINFO, a0);
+        ArgRegionOffset(s_call, "region", a1);
         ArgValue(s_call, "size", a2);
     }
     s_inner_los_radar->Init(a0, a1, a2);
@@ -1777,6 +1779,7 @@ void __stdcall RecPlayersInit(const PlayersMapInfo* a0, void* a1, unsigned int a
     RegionBind(SUB_PLAYERS, a1, a2);
     if (scope.Open()) {
         ArgValueStruct(s_call, "a", "info", ROK_PLAYERSMAPINFO, a0);
+        ArgRegionOffset(s_call, "region", a1);
         ArgValue(s_call, "size", a2);
     }
     s_inner_players->Init(a0, a1, a2);

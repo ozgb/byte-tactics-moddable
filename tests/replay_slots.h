@@ -1153,7 +1153,7 @@ void Run_economy_Init()
     EconMapInfo p0 = EconMapInfo();
     ParseValueArg("map", ROK_ECONMAPINFO, &p0);
     EconomyWorldView* p1 = &g_import_econworld;
-    void* p2 = AllocRegion(ArgScalar<unsigned>("size"));
+    void* p2 = AllocRegion(ArgScalar<unsigned>("region"), ArgScalar<unsigned>("size"));
     RegionBind(p2, ArgScalar<unsigned>("size"));
     unsigned int p3 = ArgScalar<unsigned int>("size");
     SetClosing(nullptr);
@@ -1952,7 +1952,7 @@ void Run_los_radar_Init()
 {
     LosRadarMapInfo p0 = LosRadarMapInfo();
     ParseValueArg("map", ROK_LOSRADARMAPINFO, &p0);
-    void* p1 = AllocRegion(ArgScalar<unsigned>("size"));
+    void* p1 = AllocRegion(ArgScalar<unsigned>("region"), ArgScalar<unsigned>("size"));
     RegionBind(p1, ArgScalar<unsigned>("size"));
     unsigned int p2 = ArgScalar<unsigned int>("size");
     SetClosing(nullptr);
@@ -2169,7 +2169,7 @@ void Run_players_Init()
 {
     PlayersMapInfo p0 = PlayersMapInfo();
     ParseValueArg("info", ROK_PLAYERSMAPINFO, &p0);
-    void* p1 = AllocRegion(ArgScalar<unsigned>("size"));
+    void* p1 = AllocRegion(ArgScalar<unsigned>("region"), ArgScalar<unsigned>("size"));
     RegionBind(p1, ArgScalar<unsigned>("size"));
     unsigned int p2 = ArgScalar<unsigned int>("size");
     SetClosing(nullptr);

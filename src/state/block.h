@@ -32,6 +32,9 @@ __declspec(noinline) inline void* __cdecl SimAllocTagged(const char* tag, unsign
 // Allocates the region of a module's private state, whose size the module asked for; the tag names the site for the analysis tools.
 void* __cdecl SimAllocRegion(const char* tag, unsigned int size);
 
+// Allocates size zeroed bytes whose first byte is offset bytes from the block base, or returns null when those bytes, or the chunk header before them, are not free or not 8-byte aligned.
+void* __cdecl SimAllocAt(unsigned int offset, unsigned int size);
+
 // Resizes a sim block like realloc, zeroing the bytes beyond the old size.
 void* __cdecl SimRealloc(void* p, unsigned int size);
 

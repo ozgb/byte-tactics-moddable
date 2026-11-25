@@ -4027,7 +4027,7 @@ static void ReachQuirkGuard()
     Fail("quirks_reach: no unit of player 0 at the reach tick\n");
 }
 
-enum { COMMAND_TEXT_BYTES = 65536 };
+enum { COMMAND_TEXT_BYTES = 1 << 22 };
 static char s_commandText[COMMAND_TEXT_BYTES];
 static unsigned s_commandLength = 0;
 static unsigned s_commandEvents = 0;

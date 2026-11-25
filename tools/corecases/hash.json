@@ -8,5 +8,45 @@
     "trace_schema.json"
    ]
   ]
+ },
+ {
+  "name": "orders-attack-nomove-1",
+  "calls": [
+   [
+    "rows",
+    "hash/orders-attack-nomove-1.txt",
+    "trace_schema.json"
+   ]
+  ]
+ },
+ {
+  "name": "orders-air-fights-700",
+  "calls": [
+   [
+    "rows",
+    "hash/orders-air-fights-700.txt",
+    "trace_schema.json"
+   ]
+  ]
+ },
+ {
+  "name": "orders-guard-attacked-300",
+  "calls": [
+   [
+    "rows",
+    "hash/orders-guard-attacked-300.txt",
+    "trace_schema.json"
+   ]
+  ]
+ },
+ {
+  "name": "meteors-earthquake-102",
+  "calls": [
+   [
+    "rows",
+    "hash/meteors-earthquake-102.txt",
+    "trace_schema.json"
+   ]
+  ]
  }
 ]

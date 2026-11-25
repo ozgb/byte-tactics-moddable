@@ -2,10 +2,11 @@
 
 The core gate judges an engine core by what it does itself, before any module of the game exists: the hash of the
 state, the random streams, the sim event queue, the delivery of commands, the module loader, fuel, hosting a module
-against its recordings, and the files service. It does not play a scenario. The same gate judges a core on scenarios
+against its recordings, the files service, the console lines a core reads alone, and the results of the runtime. It does not play a scenario. The same gate judges a core on scenarios
 later (the scenario mode, below), with the same command line and the same result.
 
-The vectors are in `reference/core/` and `reference/files/`. Each was made by the in-repo engine, and a vector the
+The vectors are in `reference/core/` and `reference/files/`, and the runtime's in `tests/runtime/vectors/` (the kit's
+`runtime/vectors/`). Each was made by the in-repo engine, and a vector the
 in-repo engine can't pass is wrong.
 
 ## Running a core
@@ -47,6 +48,8 @@ the wrong call, or a missing one, is `differs`.
 | `fuel` | the fuel of section 11: the budget set for each tick, the fuel left, and the call at which a module runs out |
 | `host` | hosting a module: the recordings of `tests/replay/wind_meteors/` replayed against a wind_meteors module, as `docs/replay-format.md` states ("Replaying") |
 | `files` | the files gate (`docs/files-gate.md`), with its own groups |
+| `console` | reading a console line (`docs/commands.md`, section 3) and the events of the commands of section 4.2 that need nothing but a stated match setup |
+| `runtime` | the results of the runtime calls of the game logic: the entries of the runtime vectors, one call per record |
 
 A vector file is `reference/core/<group>.json`: `{"format", "group", "vectors"}`, where each vector is `{"name",
 "calls", "results"}`: the calls, each a list of strings, and the `[call, value]` the in-repo engine wrote for each.
@@ -180,6 +183,59 @@ run with an error of the loader classes.
 The gate never gives the core the in-repo engine's wind_meteors module. The module is the one that comes with the
 core's submission (below): the clean room's own, which the module gate has judged.
 
+### console
+
+A vector states a match, then gives console lines, and each line is run as a `console` line of a scenario is when it is
+delivered (`docs/commands.md`, section 3). The events a line publishes are not delivered to any module: no state but bit
+0x2 of `uiOptionFlags` changes between lines.
+
+| Call | Arguments | Value |
+| --- | --- | --- |
+| `match` | game type, local player, viewing player, code | `null`: the game type (1, 2 or 3), `localPlayer`, `playerIndex`, and bit 0x2 of `uiOptionFlags` (1 set, 0 clear) |
+| `slot` | slot, active, type, side, index | `null`: the player of that slot (0 to 9): whether its record is active (1) or not (0), its type, the side of its player info (0 Arm, 1 Core) and its index |
+| `line` | text | `{"events": [[kind, payload], ...], "code": bit}`: the events the line publishes, in publication order, and bit 0x2 of `uiOptionFlags` after it |
+
+The setup is the whole match: a vector gives `match` and then a `slot` for each of the ten slots before its first line,
+and nothing else of a match is stated. The text is the line's bytes as lowercase hex (so that a tab in it is not a
+separator): at most 79 bytes, each from 0x01 to 0x7f. An event is written as a line of `commands.txt` holds it
+(`docs/commands.md`, section 2): the kind's name, and the event's bytes as lowercase hex.
+
+A line's first word is one of `give`, `meteor`, `atm`, `nometal`, `noenergy`, `sealevel`, `iwin`, `ilose`, `ai`, `kill`,
+`burnall` and `now`, in any case, or the line has no word. The other commands need what the setup does not state (the
+cursor, the units, the unit and feature types) or are not events (section 4.3), and the scenario mode judges them.
+
+For example, with the code set, the local player 0 and its side 0:
+
+```text
+line	6977696e
+line	{"events": [["PLAYERS_KILL_UNITS", "c10000000000000001000000"], ["PLAYERS_END_GAME", "c70000000000000001000000"]], "code": 1}
+```
+
+The first line is the call (`iwin`), the second what the core writes for it.
+
+### runtime
+
+The vectors are the runtime vectors (the kit's `runtime/vectors/`; its `README.md` states each entry and the record
+format). Each entry is one vector, named after the entry, and each of its records is one call, its edge records first
+and then its random ones:
+
+| Call | Arguments | Value |
+| --- | --- | --- |
+| the entry's name | the record's inputs, as one JSON array | the record's outputs, as a JSON array |
+
+The fields of both are in the order and of the types of `layouts.txt`: an `i32` is a signed integer, a `u32` an unsigned
+one (a float stored as a `u32` stays its 32-bit pattern), an `f64` its 64-bit pattern as an unsigned integer, and a `str`
+or `bytes<N>` its bytes as lowercase hex (a `str` without its length). The gate gives the core only the inputs and
+compares what it writes with the record's outputs. A vector that differs names the entry, and its `line` is the first
+record that differs, counted from 1.
+
+For example, a record of `atoi`:
+
+```text
+atoi	["202d3132"]
+atoi	[-12]
+```
+
 ### files
 
 The gate judges the core as `tools/filesgate.py check --loader CORE` does (`docs/files-gate.md`), so the core answers
@@ -274,7 +330,10 @@ could not run (the vectors can't be read, or neither `--sandbox` nor `--trusted`
 - **Translating a scripted line into events** is judged only by the scenario mode: a `spawn` or `order` line can't
   become events without the map (its ground height and footprint snapping) and the orders (`GetOrderType`). The
   `commands` group judges what the core itself does with them: the order of delivery, the tick each command precedes,
-  and that only outermost publications are logged and counted.
+  and that only outermost publications are logged and counted. The `console` group judges the console lines that need
+  nothing but the match setup it states; the others wait for the scenario mode too.
+- **The limit of 20 words** of a console line changes nothing any command of the `console` group reads (none reads
+  past word 5, and none compares the count of words with a number above 6), so no vector can tell it apart.
 - **The radar arena** of `docs/sim-events.md` is not called: its snapshots are written by the logic of los_radar.
 - **The services a module imports** (`docs/module-abi.md`, section 9.3), and the import refusals and glue errors of
   section 13, are judged by the `host` group only as far as the recordings call them; the loader's fixture modules import

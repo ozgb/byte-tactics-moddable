@@ -21,10 +21,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import coregate
 
 BUILD = coregate.ROOT / "build" / "modern"
-ENGINE = all((BUILD / n).exists() for n in ("core_state_adapter.exe", "core_wasm_adapter.exe",
-                                            "replay_native_test.exe", "files_adapter.exe", "wind_meteors.wasm"))
+ENGINE = all((BUILD / n).exists() for n in ("core_state_adapter.exe", "core_wasm_adapter.exe", "core_console_adapter.exe",
+                                            "core_runtime_adapter.exe", "replay_native_test.exe", "files_adapter.exe",
+                                            "wind_meteors.wasm"))
 FAKE = """
 import json, os, sys
+sys.path.insert(0, %(tools)r)
+import coregate
 mode = os.environ.get("FAKE_MODE", "")
 group, calls_path, out_path = sys.argv[1:4]
 if mode == "crash":
@@ -47,7 +50,7 @@ if mode == "plant" and first:
             os.remove(os.path.join(runs, name))
             os.symlink(os.environ["FAKE_TARGET"], os.path.join(runs, name))
 calls = [l.rstrip("\\n").split("\\t") for l in open(calls_path, newline="")]
-for v in json.load(open(%(dir)r + "/" + group + ".json"))["vectors"]:
+for v in coregate.stored([group])[group]["vectors"]:
     if v["calls"] == calls:
         res = v["results"]
         if mode == "runslink" and first:
@@ -59,6 +62,8 @@ for v in json.load(open(%(dir)r + "/" + group + ".json"))["vectors"]:
             if mode == "short":
                 res = res[:-1]
             if mode == "wrong":
+                res = [[res[0][0], "something else"]] + res[1:]
+            if mode == "wrongfirst" and first:
                 res = [[res[0][0], "something else"]] + res[1:]
             for op, value in res:
                 f.write(op + "\\t" + json.dumps(value) + "\\n")
@@ -74,7 +79,7 @@ class Fake(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.tmp = Path(tempfile.mkdtemp(prefix="test-coregate-"))
         cls.script = cls.tmp / "fake.py"
-        cls.script.write_text(FAKE % {"dir": str(coregate.VECTORS)})
+        cls.script.write_text(FAKE % {"tools": str(coregate.ROOT / "tools")})
         cls.module = cls.tmp / "m.wasm"
         cls.module.write_bytes(b"\0asm\1\0\0\0")
 
@@ -153,6 +158,26 @@ class Fake(unittest.TestCase):
             result = self.run_fake("hang")
         self.assertEqual(next(iter(result["vectors"].values()))["reason"], "timed out after 1 s")
 
+    def test_runtime_names_the_entry_and_record(self) -> None:
+        result = self.run_fake("wrongfirst", "runtime")
+        bad = {k: v for k, v in result["vectors"].items() if v["status"] != "equal"}
+        first = coregate.runtime_vectors()["vectors"][0]
+        self.assertEqual(list(bad), ["runtime/" + first["name"]])
+        self.assertEqual(bad["runtime/" + first["name"]]["line"], 1)
+        self.assertEqual(len(result["vectors"]), len(coregate.runtime_layouts()))
+
+    def test_runtime_records(self) -> None:
+        data = bytes.fromhex("feffffff") + bytes.fromhex("0300000061620a") + bytes.fromhex("000000000000f03f")
+        value, pos = coregate.read_field(data, 0, "i32")
+        self.assertEqual((value, pos), (-2, 4))
+        value, pos = coregate.read_field(data, pos, "str")
+        self.assertEqual((value, pos), ("61620a", 11))
+        value, pos = coregate.read_field(data, pos, "f64")
+        self.assertEqual(value, 0x3FF0000000000000)
+        self.assertEqual(coregate.read_field(data, 0, "bytes2"), ("feff", 2))
+        with self.assertRaises(ValueError):
+            coregate.read_field(data, 4, "bytes16")
+
     def test_stored_value_not_in_result(self) -> None:
         result = self.run_fake("wrong", "hash")
         self.assertNotIn("b9da8a7f2d638968", json.dumps(result))
@@ -223,11 +248,30 @@ class Engine(unittest.TestCase):
 
     def test_faults(self) -> None:
         faults = {"hash": "hash_step", "rand": "rand_skip", "events": "events_continuation",
-                  "commands": "commands_swap", "loader": "loader_class", "fuel": "fuel_budget", "host": "host_write"}
+                  "commands": "commands_swap", "loader": "loader_class", "fuel": "fuel_budget", "host": "host_write",
+                  "console": "console_byte"}
         for group, fault in faults.items():
             result = self.judge((group,), fault)
             self.assertEqual(result["groups"][group]["status"], "differs", fault)
             self.assertTrue(any(v["status"] == "differs" and v["line"] >= 1 for v in result["vectors"].values()))
+
+    def test_console_byte_names_the_vector(self) -> None:
+        result = self.judge(("console",), "console_byte")
+        bad = {k for k, v in result["vectors"].items() if v["status"] != "equal"}
+        self.assertIn("console/give-numbers", bad)
+
+    def test_runtime_faults(self) -> None:
+        """A wrong first result of each entry makes that entry differ at its first record, and leaves another equal."""
+        layouts = coregate.runtime_layouts()
+        names = list(layouts)
+        for i, entry in enumerate(names):
+            other = names[(i + 1) % len(names)]
+            with self.subTest(entry=entry), mock.patch.object(
+                    coregate, "runtime_layouts", return_value={entry: layouts[entry], other: layouts[other]}):
+                result = self.judge(("runtime",), "runtime:" + entry)
+                self.assertEqual(result["groups"]["runtime"]["status"], "differs")
+                self.assertEqual(result["vectors"]["runtime/" + entry]["line"], 1)
+                self.assertEqual(result["vectors"]["runtime/" + other]["status"], "equal")
 
 
 if __name__ == "__main__":

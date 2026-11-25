@@ -10,7 +10,8 @@ module as `module.wasm`, and the files gate's fixtures), writes every vector's C
 once for each vector. It writes nothing into that directory once the core has run, and reads each OUT through
 descriptors taken before, following no link: a core shares the directory read-write, and a link it makes must not
 lead the host to a file of its own. Each line of OUT is compared with the stored result on the host. The `files` group
-is the files gate's vectors (tools/filesgate.py), run the same way.
+is the files gate's vectors (tools/filesgate.py), run the same way. The `runtime` group's vectors are the entries of
+tests/runtime/vectors/, one call per record: the core gets the record's inputs, and the gate compares its outputs.
 
 A submitted core runs only inside a machine of the clean-room image with no network (tools/cleanroom/coresandbox.py);
 nothing of the stored values enters it. `--trusted` runs the in-repo engine, tools/coreadapter.py, directly, and takes
@@ -26,8 +27,10 @@ import hashlib
 import json
 import lzma
 import os
+import re
 import shutil
 import stat
+import struct
 import subprocess
 import sys
 import tempfile
@@ -41,13 +44,17 @@ from filesgate import CouldNotRun, compare, kit_tag, parse_out, same
 ROOT = Path(__file__).resolve().parent.parent
 VECTORS = ROOT / "reference" / "core"
 CASES = ROOT / "tools" / "corecases"
+RUNTIME = ROOT / "tests" / "runtime" / "vectors"
 ADAPTER = ROOT / "tools" / "coreadapter.py"
 SCHEMA = ROOT / "data" / "trace_schema.json"
 TRUSTED_MODULE = ROOT / "build" / "modern" / "wind_meteors.wasm"
 FORMAT = 1
 TIMEOUT = 120
 OUT_LIMIT = 256 << 20
-JUDGED = ("hash", "rand", "events", "commands", "loader", "fuel", "host")
+JUDGED = ("hash", "rand", "events", "commands", "loader", "fuel", "host", "console", "runtime")
+RECORDED = tuple(g for g in JUDGED if g != "runtime")
+FIXED = {"i32": "<i", "u32": "<I", "f64": "<Q"}
+BYTES = re.compile(r"bytes([1-9][0-9]*)")
 GROUPS = (*JUDGED, "files", "play")
 
 
@@ -141,9 +148,60 @@ def run_all(core, inputs: Path, jobs: list[tuple[str, list[str], list[list[str]]
         os.close(inputs_fd)
 
 
+def runtime_layouts() -> dict[str, tuple[list[str], list[str]]]:
+    """Each entry of tests/runtime/vectors/layouts.txt: its input types and its output types."""
+    layouts = {}
+    for line in (RUNTIME / "layouts.txt").read_text().splitlines():
+        if line.strip():
+            entry, ins, outs = line.split()
+            layouts[entry] = (ins.split(","), outs.split(","))
+    return layouts
+
+
+def read_field(data: bytes, pos: int, kind: str):
+    """One field of a runtime record at pos: (value, next pos); integers stay integers, str and bytes<N> are hex."""
+    if kind in FIXED:
+        return struct.unpack_from(FIXED[kind], data, pos)[0], pos + struct.calcsize(FIXED[kind])
+    if kind == "str":
+        n = struct.unpack_from("<I", data, pos)[0]
+        start, pos = pos + 4, pos + 4 + n
+    else:
+        m = BYTES.fullmatch(kind)
+        if m is None:
+            raise ValueError("unknown field type %s" % kind)
+        start, pos = pos, pos + int(m.group(1))
+    if pos > len(data):
+        raise ValueError("a record runs past the end of the file")
+    return data[start:pos].hex(), pos
+
+
+def runtime_vectors() -> dict:
+    """The runtime group: one vector per entry, one call per record, its inputs as the call and its outputs as the result."""
+    vectors = []
+    for entry, (ins, outs) in runtime_layouts().items():
+        data = (RUNTIME / (entry + ".bin")).read_bytes()
+        calls, results, pos = [], [], 0
+        try:
+            while pos < len(data):
+                inputs, outputs = [], []
+                for kind in ins:
+                    value, pos = read_field(data, pos, kind)
+                    inputs.append(value)
+                for kind in outs:
+                    value, pos = read_field(data, pos, kind)
+                    outputs.append(value)
+                calls.append([entry, json.dumps(inputs)])
+                results.append([entry, outputs])
+        except (struct.error, ValueError) as e:
+            raise ValueError("%s.bin: %s" % (entry, e))
+        vectors.append({"name": entry, "calls": calls, "results": results})
+    return {"format": FORMAT, "group": "runtime", "vectors": vectors}
+
+
 def stored(groups) -> dict[str, dict]:
     try:
-        return {g: json.loads((VECTORS / (g + ".json")).read_text()) for g in groups}
+        return {g: runtime_vectors() if g == "runtime" else json.loads((VECTORS / (g + ".json")).read_text())
+                for g in groups}
     except (OSError, ValueError) as e:
         raise CouldNotRun("coregate: could not read the stored vectors: %s" % e)
 
@@ -257,10 +315,10 @@ def record() -> None:
         inputs = Path(tmp)
         (inputs / "runs").mkdir()
         make_inputs(inputs, TRUSTED_MODULE)
-        cases = {g: json.loads((CASES / (g + ".json")).read_text()) for g in JUDGED}
-        work = [(g, c) for g in JUDGED for c in cases[g] for _ in range(2)]
+        cases = {g: json.loads((CASES / (g + ".json")).read_text()) for g in RECORDED}
+        work = [(g, c) for g in RECORDED for c in cases[g] for _ in range(2)]
         runs = run_all(trusted_core, inputs, [(g, [g], c["calls"]) for g, c in work])
-        vectors: dict[str, list] = {g: [] for g in JUDGED}
+        vectors: dict[str, list] = {g: [] for g in RECORDED}
         for k in range(0, len(work), 2):
             g, case = work[k]
             pair = runs[k:k + 2]
@@ -270,7 +328,7 @@ def record() -> None:
             if not same(pair[0]["lines"], pair[1]["lines"]):
                 raise SystemExit("coregate: %s/%s differs between two runs" % (g, case["name"]))
             vectors[g].append({"name": case["name"], "calls": case["calls"], "results": pair[0]["lines"]})
-        for g in JUDGED:
+        for g in RECORDED:
             (VECTORS / (g + ".json")).write_text(dump({"format": FORMAT, "group": g, "vectors": vectors[g]}))
             print("coregate: wrote %s (%d vectors)" % (g, len(vectors[g])))
 

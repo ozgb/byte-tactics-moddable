@@ -50,6 +50,16 @@ inline void MapPublishSetSeaLevel(int outbox, int level)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void MapPublishSetEdge(int outbox, int x, int z)
+{
+    MapSetEdge event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = MAP_SET_EDGE;
+    event.x = x;
+    event.z = z;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 template <class C, class S>
 inline MapPassMaps MapPassMapsOf(C cell, S size)
 {

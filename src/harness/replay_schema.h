@@ -334,6 +334,7 @@ enum ReplayObjectKindId {
     ROK_MAPPASSMAPS,
     ROK_MAPPATHLOCKSTAMP,
     ROK_MAPSETSEALEVEL,
+    ROK_MAPSETEDGE,
     ROK_MAPCELLSCHANGED,
     ROK_WEAPONSEVENTHEADER,
     ROK_WEAPONSDAMAGE,
@@ -855,6 +856,7 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 168, ROK_MAPPASSMAPS },
     { 169, ROK_MAPPATHLOCKSTAMP },
     { 170, ROK_MAPSETSEALEVEL },
+    { 171, ROK_MAPSETEDGE },
     { 176, ROK_MAPCELLSCHANGED },
     { 256, ROK_WEAPONSDAMAGE },
     { 257, ROK_WEAPONSDAMAGE },
@@ -1007,16 +1009,16 @@ static const ReplayEventTable kReplayEventTables[] = {
     { ROK_WINDMETEORSEVENTHEADER, 0, 7 },
     { ROK_TARGETINGEVENTHEADER, 7, 6 },
     { ROK_LOSRADAREVENTHEADER, 13, 11 },
-    { ROK_MAPEVENTHEADER, 24, 11 },
-    { ROK_WEAPONSEVENTHEADER, 35, 25 },
-    { ROK_ORDERSEVENTHEADER, 60, 25 },
-    { ROK_AIEVENTHEADER, 85, 10 },
-    { ROK_MOVEMENTEVENTHEADER, 95, 23 },
-    { ROK_UNITSEVENTHEADER, 118, 30 },
-    { ROK_SCRIPTSEVENTHEADER, 148, 4 },
-    { ROK_ECONOMYEVENTHEADER, 152, 8 },
-    { ROK_PLAYERSEVENTHEADER, 160, 12 },
-    { ROK_FEATURESEVENTHEADER, 172, 9 },
+    { ROK_MAPEVENTHEADER, 24, 12 },
+    { ROK_WEAPONSEVENTHEADER, 36, 25 },
+    { ROK_ORDERSEVENTHEADER, 61, 25 },
+    { ROK_AIEVENTHEADER, 86, 10 },
+    { ROK_MOVEMENTEVENTHEADER, 96, 23 },
+    { ROK_UNITSEVENTHEADER, 119, 30 },
+    { ROK_SCRIPTSEVENTHEADER, 149, 4 },
+    { ROK_ECONOMYEVENTHEADER, 153, 8 },
+    { ROK_PLAYERSEVENTHEADER, 161, 12 },
+    { ROK_FEATURESEVENTHEADER, 173, 9 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
@@ -1038,6 +1040,7 @@ static_assert(sizeof(MapSetYard) <= REPLAY_EVENT_MAX, "MapSetYard fits the event
 static_assert(sizeof(MapPassMaps) <= REPLAY_EVENT_MAX, "MapPassMaps fits the event buffer");
 static_assert(sizeof(MapPathLockStamp) <= REPLAY_EVENT_MAX, "MapPathLockStamp fits the event buffer");
 static_assert(sizeof(MapSetSeaLevel) <= REPLAY_EVENT_MAX, "MapSetSeaLevel fits the event buffer");
+static_assert(sizeof(MapSetEdge) <= REPLAY_EVENT_MAX, "MapSetEdge fits the event buffer");
 static_assert(sizeof(MapCellsChanged) <= REPLAY_EVENT_MAX, "MapCellsChanged fits the event buffer");
 static_assert(sizeof(WeaponsDamage) <= REPLAY_EVENT_MAX, "WeaponsDamage fits the event buffer");
 static_assert(sizeof(WeaponsDetonate) <= REPLAY_EVENT_MAX, "WeaponsDetonate fits the event buffer");
@@ -1314,6 +1317,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "MapPassMaps", sizeof(MapPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapPathLockStamp", sizeof(MapPathLockStamp), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapSetSeaLevel", sizeof(MapSetSeaLevel), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MapSetEdge", sizeof(MapSetEdge), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapCellsChanged", sizeof(MapCellsChanged), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WeaponsEventHeader", sizeof(WeaponsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WeaponsDamage", sizeof(WeaponsDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -1444,7 +1448,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FeaturesPassMaps", sizeof(FeaturesPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FeaturesAreaDamage", sizeof(FeaturesAreaDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 259;
+static const unsigned kReplayObjectKindCount = 260;
 
 static const unsigned short kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_VICTORYKILLENEMYCOMMANDER, ROK_VICTORYDESTROYALLUNITS, ROK_VICTORYKILLALLMOBILEUNITS, ROK_VICTORYBUILDUNITTYPE, ROK_VICTORYCAPTUREUNITTYPE, ROK_VICTORYKILLALLOFTYPE, ROK_VICTORYKILLUNITTYPE, ROK_VICTORYUNITTYPEPASSESX, ROK_VICTORYUNITTYPEPASSESZ, ROK_VICTORYTIMERRUNSOUT, ROK_DEFEATCOMMANDERKILLED, ROK_DEFEATALLUNITSKILLED, ROK_DEFEATALLUNITSKILLEDOFTYPE, ROK_DEFEATUNITTYPEKILLED, ROK_DEFEATDEATHTIMERRUNSOUT, ROK_DEFEATANYUNITPASSESX, ROK_DEFEATANYUNITPASSESZ, ROK_PLAINTIMER, ROK_ASSAULTTIMER, ROK_ESCORTTIMER, ROK_SQUADSCOUTTIMER, ROK_SCOUTTIMER, ROK_BUILDTIMER, ROK_SPATIALTIMER };
 
@@ -2364,6 +2368,10 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "kind", offsetof(MapSetSeaLevel, h.kind), sizeof(((MapSetSeaLevel*)nullptr)->h.kind), ROK_MAPSETSEALEVEL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MapSetSeaLevel, h.unit), sizeof(((MapSetSeaLevel*)nullptr)->h.unit), ROK_MAPSETSEALEVEL, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "level", offsetof(MapSetSeaLevel, level), sizeof(((MapSetSeaLevel*)nullptr)->level), ROK_MAPSETSEALEVEL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(MapSetEdge, h.kind), sizeof(((MapSetEdge*)nullptr)->h.kind), ROK_MAPSETEDGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(MapSetEdge, h.unit), sizeof(((MapSetEdge*)nullptr)->h.unit), ROK_MAPSETEDGE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "x", offsetof(MapSetEdge, x), sizeof(((MapSetEdge*)nullptr)->x), ROK_MAPSETEDGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "z", offsetof(MapSetEdge, z), sizeof(((MapSetEdge*)nullptr)->z), ROK_MAPSETEDGE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MapCellsChanged, h.kind), sizeof(((MapCellsChanged*)nullptr)->h.kind), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MapCellsChanged, h.unit), sizeof(((MapCellsChanged*)nullptr)->h.unit), ROK_MAPCELLSCHANGED, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "rect0", offsetof(MapCellsChanged, rect[0]), sizeof(((MapCellsChanged*)nullptr)->rect[0]), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -3026,8 +3034,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos1", offsetof(FeaturesAreaDamage, pos[1]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[1]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos2", offsetof(FeaturesAreaDamage, pos[2]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[2]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 1551;
-static const unsigned kReplayWalkableFieldCount = 246;
+static const unsigned kReplayObjectFieldCount = 1555;
+static const unsigned kReplayWalkableFieldCount = 247;
 
 static const unsigned short kReplayReachFields[] = { 46, 100, 246, 247, 248, 89, 98, 0, 22, 100, 249, 39, 42, 43, 44, 45, 47, 66, 89, 95, 97, 98, 99, 101, 102, 103, 104, 105, 59, 131, 136, 146, 150, 160, 174, 161, 162, 145, 163, 0, 22, 89, 97, 39, 46, 101, 103, 136 };
 
@@ -3926,6 +3934,10 @@ static_assert(sizeof(((MapPathLockStamp*)nullptr)->stamp) == 4, "MapPathLockStam
 static_assert(sizeof(((MapSetSeaLevel*)nullptr)->h.kind) == 4, "MapSetSeaLevel::kind has the size the schema says");
 static_assert(sizeof(((MapSetSeaLevel*)nullptr)->h.unit) == 4, "MapSetSeaLevel::unit has the size the schema says");
 static_assert(sizeof(((MapSetSeaLevel*)nullptr)->level) == 4, "MapSetSeaLevel::level has the size the schema says");
+static_assert(sizeof(((MapSetEdge*)nullptr)->h.kind) == 4, "MapSetEdge::kind has the size the schema says");
+static_assert(sizeof(((MapSetEdge*)nullptr)->h.unit) == 4, "MapSetEdge::unit has the size the schema says");
+static_assert(sizeof(((MapSetEdge*)nullptr)->x) == 4, "MapSetEdge::x has the size the schema says");
+static_assert(sizeof(((MapSetEdge*)nullptr)->z) == 4, "MapSetEdge::z has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->h.kind) == 4, "MapCellsChanged::kind has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->h.unit) == 4, "MapCellsChanged::unit has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->rect[0]) == 4, "MapCellsChanged::rect0 has the size the schema says");
@@ -5268,8 +5280,8 @@ static const unsigned short kReplayPlayersUpdatePlayersFinishObjReads[] = { 0, 2
 static const unsigned char kReplayPlayersInitWrites[] = { 88 };
 static const unsigned char kReplayPlayersShutdownReads[] = { 88 };
 static const unsigned short kReplayMapApplyAllOf[] = { ROK_UNIT, ROK_SPATIALBUCKET, ROK_CELL, ROK_PASSMAP, ROK_FEATURE };
-static const unsigned char kReplayMapApplyReads[] = { 0, 1, 2, 17, 19, 23, 24, 26, 27 };
-static const unsigned char kReplayMapApplyWrites[] = { 17 };
+static const unsigned char kReplayMapApplyReads[] = { 0, 1, 2, 17, 19, 23, 24, 26, 27, 31, 32 };
+static const unsigned char kReplayMapApplyWrites[] = { 17, 41, 42 };
 static const unsigned short kReplayMapApplyObjReads[] = { 0, 22, 42, 43, 45, 62, 63, 64, 89, 90, 91, 97, 98, 100, 101, 102, 103, 124, 231, 232, 234, 235, 237, 238, 239, 240, 241, 242, 243, 244, 249, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 427 };
 static const unsigned short kReplayMapApplyObjWrites[] = { 62, 64, 89, 90, 231, 232, 234, 235, 242, 249, 308 };
 static const unsigned short kReplayMapGetCellMeanHeightAllOf[] = { ROK_CELL };
@@ -5456,7 +5468,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "RegionSize", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Init", SUB_PLAYERS, nullptr, 0, kReplayPlayersInitWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Shutdown", SUB_PLAYERS, kReplayPlayersShutdownReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Apply", SUB_MAP, kReplayMapApplyReads, 9, kReplayMapApplyWrites, 1, kReplayMapApplyObjReads, 45, kReplayMapApplyObjWrites, 11, kReplayMapApplyAllOf, 5 },
+    { "Apply", SUB_MAP, kReplayMapApplyReads, 11, kReplayMapApplyWrites, 3, kReplayMapApplyObjReads, 45, kReplayMapApplyObjWrites, 11, kReplayMapApplyAllOf, 5 },
     { "GetCellMeanHeight", SUB_MAP, kReplayMapGetCellMeanHeightReads, 2, nullptr, 0, kReplayMapGetCellMeanHeightObjReads, 2, nullptr, 0, kReplayMapGetCellMeanHeightAllOf, 1 },
     { "CanBuildAt", SUB_MAP, kReplayMapCanBuildAtReads, 9, kReplayMapCanBuildAtWrites, 2, kReplayMapCanBuildAtObjReads, 22, nullptr, 0, kReplayMapCanBuildAtAllOf, 2 },
     { "CanPlaceUnitFootprint", SUB_MAP, kReplayMapCanPlaceUnitFootprintReads, 9, kReplayMapCanPlaceUnitFootprintWrites, 2, kReplayMapCanPlaceUnitFootprintObjReads, 24, nullptr, 0, kReplayMapCanPlaceUnitFootprintAllOf, 2 },
@@ -5645,7 +5657,7 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "orders", 6, 2, 0, 88, 7, RET_ORDERS },
     { "units", 7, 1, 1, 95, 8, RET_UNITS },
     { "players", 5, 1, 1, 103, 9, RET_PLAYERS },
-    { "map", 9, 1, 1, 112, 11, RET_MAP },
+    { "map", 9, 2, 1, 112, 11, RET_MAP },
     { "scripts", 3, 0, 0, 123, 24, RET_SCRIPTS },
     { "movement", 5, 0, 0, 147, 20, RET_MOVEMENT },
     { "mission", 2, 0, 1, 167, 12, RET_COUNT },

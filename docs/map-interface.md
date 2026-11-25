@@ -1,6 +1,6 @@
 # The map interface
 
-Map sits behind `interfaces/map.h` (version 9.1; 9.0 passes the cell of `CanBuildAt` and `CanPlaceUnitFootprint` by pointer; 9.1 adds the console's kind SET_SEA_LEVEL), the fifth module on the scheduler after economy
+Map sits behind `interfaces/map.h` (version 9.2; 9.0 passes the cell of `CanBuildAt` and `CanPlaceUnitFootprint` by pointer; 9.1 adds the console's kind SET_SEA_LEVEL; 9.2 adds the console's kind SET_EDGE), the fifth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`) and
 los_radar (`docs/los-radar-interface.md`) (#966). It is the map's units and terrain as the simulation sees them: which
 unit stands on each cell (the footprints), the height of the ground, the spatial grid of units (the buckets), the pass
@@ -22,7 +22,7 @@ last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's o
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
-to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 166, 168, 169 and 176 (167 was
+to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 166, 168 to 171 and 176 (167 was
 REFRESH_PASS_MAP, which map 5.0 removed).
 
 Map's place in it:
@@ -30,7 +30,9 @@ Map's place in it:
   and PASS_MAPS, published by units and orders, and PASS_MAPS from features' effect of the same name; and since 7.1
   LOAD_PATH_LOCK_STAMP, published by units while a saved game loads; and since 9.1 SET_SEA_LEVEL,
   published by the engine's console (`sealevel`) from `SCHED_ENGINE` through a route that follows the tick's
-  rule (queued inside it, delivered at once outside it), in place of its direct write to the game's sea level.
+  rule (queued inside it, delivered at once outside it), in place of its direct write to the game's sea level; and since
+  9.2 SET_EDGE, published by the console's `edge` the same way, in place of its direct write to the playable width and
+  height.
   Map's handler (`MapInbox`, `src/seams/map_world.cpp`) passes each to `Apply`; features' PASS_MAPS reaches it through
   `MapOnFeaturesPassMaps`, the route #971 added, which now builds a PASS_MAPS event and hands it to the same handler;
   it moved from map's files into the same glue, as it is the engine's adapter.
@@ -223,6 +225,7 @@ same update (the `immediate` rows of section 4), and would only move the write.
 | PASS_MAPS 168 | `MapPassMaps` | `cell[2]` (the rectangle's first cell), `size[2]` (width and height in cells) |
 | LOAD_PATH_LOCK_STAMP 169 | `MapPathLockStamp` | `stamp`: the path lock stamp (a tick) a saved game keeps |
 | SET_SEA_LEVEL 170 | `MapSetSeaLevel` | `level`: the sea level, truncated to a byte; names no unit, outcome 1 |
+| SET_EDGE 171 | `MapSetEdge` | `x`, `z`: the world units cut from the map's width and height to give the playable width and height; names no unit, outcome 1 |
 | CELLS_CHANGED 176 | `MapCellsChanged` | `rect[4]` (left, top, right, bottom), `classes` (a bit for each movement class whose pass maps changed), `cause` (a `PathChange`) |
 
 ## 4. Views

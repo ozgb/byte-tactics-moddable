@@ -1639,6 +1639,7 @@ delivery to the same subscriber. No inbox holds an effect when the tick ends.
 | units | `MAP_RECLAIM_FOOTPRINT` | map | synchronous |
 | units | `MAP_LOAD_PATH_LOCK_STAMP` | map | queued |
 | engine | `MAP_SET_SEA_LEVEL` | map | queued |
+| engine | `MAP_SET_EDGE` | map | queued |
 | units | `MAP_SET_YARD` | map | synchronous |
 | scripts | `MAP_SET_YARD` | map | synchronous |
 | units | `MAP_BUCKET_UNLINK` | map | synchronous |

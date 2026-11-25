@@ -13,7 +13,7 @@ class HapiBank;
 // Major version of the map interface, changed when a slot is removed or its signature changes.
 #define MAP_VERSION_MAJOR 9
 // Minor version of the map interface, changed when a slot is added.
-#define MAP_VERSION_MINOR 1
+#define MAP_VERSION_MINOR 2
 
 // A movement class's footprint and limits, as units reads them from the game data; map copies them when it builds the pass maps.
 struct MapMoveLimits {
@@ -41,11 +41,11 @@ struct MapMoveLimits {
 struct MapEventHeader {
     // A MapEventKind or a MapEffectKind.
     int kind;
-    // The unit, as its block offset (an offset from the block base, 0 for none: PASS_MAPS, SET_SEA_LEVEL and CELLS_CHANGED name none), as economy's events give a unit.
+    // The unit, as its block offset (an offset from the block base, 0 for none: PASS_MAPS, SET_SEA_LEVEL, SET_EDGE and CELLS_CHANGED name none), as economy's events give a unit.
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to map's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event smaller than its payload, one that names a null unit (but PASS_MAPS and SET_SEA_LEVEL, which name none), a bucket change the unit's bucket does not allow, or a rectangle of negative size changes nothing; outcome 0.
+// The kinds of event other modules publish to map's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event smaller than its payload, one that names a null unit (but PASS_MAPS, SET_SEA_LEVEL and SET_EDGE, which name none), a bucket change the unit's bucket does not allow, or a rectangle of negative size changes nothing; outcome 0.
 enum MapEventKind {
     // Puts unit on the cells its footprint covers at its cell and in the spatial grid bucket of its position, or in the bucket of units off the map; the header alone; outcome 1.
     MAP_ADD_UNIT = 160,
@@ -66,7 +66,9 @@ enum MapEventKind {
     // unit's movement takes the path lock stamp a saved game keeps (MapPathLockStamp); outcome 1, or 0 when unit has no movement.
     MAP_LOAD_PATH_LOCK_STAMP = 169,
     // The sea level of the map is set (MapSetSeaLevel), truncated to a byte; outcome 1.
-    MAP_SET_SEA_LEVEL = 170
+    MAP_SET_SEA_LEVEL = 170,
+    // The playable width of the map becomes its width in world units minus x, and its playable height its height in world units minus z (MapSetEdge); outcome 1.
+    MAP_SET_EDGE = 171
 };
 
 // The kinds of effect map publishes to its outbox, for the modules that subscribe to them.
@@ -107,6 +109,16 @@ struct MapSetSeaLevel {
     MapEventHeader h;
     // The new sea level.
     int level;
+};
+
+// The payload of SET_EDGE.
+struct MapSetEdge {
+    // The kind; the unit is 0.
+    MapEventHeader h;
+    // The world units cut from the map's width.
+    int x;
+    // The world units cut from the map's height.
+    int z;
 };
 
 // The payload of CELLS_CHANGED.

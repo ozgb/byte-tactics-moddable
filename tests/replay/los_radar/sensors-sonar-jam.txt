@@ -91582,10 +91582,63 @@ call 0 Init
   a size 12505
   w region [12505]
 call 0 CreateUnitIndex
+  r SimGlobals.g_losUnitIndex null
   a player 0
   i services.SimAlloc 440 = alloc#1
+  w SimGlobals.g_losUnitIndex LosUnitIndex#1
+  w LosUnitIndex#1.players[0].live 1
+  w LosUnitIndex#1.players[0].lastTick 0
+  w LosUnitIndex#1.players[0].hasSpecial 0
+  w LosUnitIndex#1.players[0].visible [0/0]
+  w LosUnitIndex#1.players[0].known [0/0]
+  w LosUnitIndex#1.players[1].live 0
+  w LosUnitIndex#1.players[1].lastTick 0
+  w LosUnitIndex#1.players[1].hasSpecial 0
+  w LosUnitIndex#1.players[1].visible [0/0]
+  w LosUnitIndex#1.players[1].known [0/0]
+  w LosUnitIndex#1.players[2].live 0
+  w LosUnitIndex#1.players[2].lastTick 0
+  w LosUnitIndex#1.players[2].hasSpecial 0
+  w LosUnitIndex#1.players[2].visible [0/0]
+  w LosUnitIndex#1.players[2].known [0/0]
+  w LosUnitIndex#1.players[3].live 0
+  w LosUnitIndex#1.players[3].lastTick 0
+  w LosUnitIndex#1.players[3].hasSpecial 0
+  w LosUnitIndex#1.players[3].visible [0/0]
+  w LosUnitIndex#1.players[3].known [0/0]
+  w LosUnitIndex#1.players[4].live 0
+  w LosUnitIndex#1.players[4].lastTick 0
+  w LosUnitIndex#1.players[4].hasSpecial 0
+  w LosUnitIndex#1.players[4].visible [0/0]
+  w LosUnitIndex#1.players[4].known [0/0]
+  w LosUnitIndex#1.players[5].live 0
+  w LosUnitIndex#1.players[5].lastTick 0
+  w LosUnitIndex#1.players[5].hasSpecial 0
+  w LosUnitIndex#1.players[5].visible [0/0]
+  w LosUnitIndex#1.players[5].known [0/0]
+  w LosUnitIndex#1.players[6].live 0
+  w LosUnitIndex#1.players[6].lastTick 0
+  w LosUnitIndex#1.players[6].hasSpecial 0
+  w LosUnitIndex#1.players[6].visible [0/0]
+  w LosUnitIndex#1.players[6].known [0/0]
+  w LosUnitIndex#1.players[7].live 0
+  w LosUnitIndex#1.players[7].lastTick 0
+  w LosUnitIndex#1.players[7].hasSpecial 0
+  w LosUnitIndex#1.players[7].visible [0/0]
+  w LosUnitIndex#1.players[7].known [0/0]
+  w LosUnitIndex#1.players[8].live 0
+  w LosUnitIndex#1.players[8].lastTick 0
+  w LosUnitIndex#1.players[8].hasSpecial 0
+  w LosUnitIndex#1.players[8].visible [0/0]
+  w LosUnitIndex#1.players[8].known [0/0]
+  w LosUnitIndex#1.players[9].live 0
+  w LosUnitIndex#1.players[9].lastTick 0
+  w LosUnitIndex#1.players[9].hasSpecial 0
+  w LosUnitIndex#1.players[9].visible [0/0]
+  w LosUnitIndex#1.players[9].known [0/0]
 call 0 CreateUnitIndex
   a player 1
+  w LosUnitIndex#1.players[1].live 1
 call 0 Apply
   r Game.flags_2a44 4
   r Game.seaLevel 0
@@ -174484,6 +174537,8 @@ call 29 GetMapCell
 call 30 RefreshUnitIndex
   a player 0
   i services.SimAlloc 4 = alloc#2
+  w LosUnitIndex#1.players[0].lastTick 30
+  w LosUnitIndex#1.players[0].visible [1/1] Unit#252
 call 30 UpdateUnitLineOfSight
   r Game.flags_142f1 1
   a unit Unit#1
@@ -174504,6 +174559,9 @@ call 30 RefreshUnitIndex
   a player 1
   i services.SimAlloc 4 = alloc#3
   i services.SimAlloc 4 = alloc#4
+  w LosUnitIndex#1.players[1].lastTick 30
+  w LosUnitIndex#1.players[1].visible [1/1] Unit#1
+  w LosUnitIndex#1.players[1].known [1/1] Unit#1
 call 30 UpdateUnitLineOfSight
   a unit Unit#251
 call 30 UpdateUnitLineOfSight
@@ -175908,6 +175966,8 @@ call 59 GetMapCell
 call 60 RefreshUnitIndex
   a player 0
   i services.SimAlloc 4 = alloc#5
+  w LosUnitIndex#1.players[0].lastTick 60
+  w LosUnitIndex#1.players[0].known [1/1] Unit#252
 call 60 UpdateUnitLineOfSight
   r Game.flags_142f1 1
   a unit Unit#1
@@ -175923,6 +175983,7 @@ call 60 UpdateSensorRadarAndCloak
 call 60 RecordRadarMapped
 call 60 RefreshUnitIndex
   a player 1
+  w LosUnitIndex#1.players[1].lastTick 60
 call 60 UpdateUnitLineOfSight
   a unit Unit#251
 call 60 UpdateUnitLineOfSight
@@ -177389,6 +177450,7 @@ call 89 GetMapCell
   o result Cell#467
 call 90 RefreshUnitIndex
   a player 0
+  w LosUnitIndex#1.players[0].lastTick 90
 call 90 UpdateUnitLineOfSight
   r Game.flags_142f1 1
   a unit Unit#1
@@ -177406,6 +177468,7 @@ call 90 UpdateSensorRadarAndCloak
 call 90 RecordRadarMapped
 call 90 RefreshUnitIndex
   a player 1
+  w LosUnitIndex#1.players[1].lastTick 90
 call 90 UpdateUnitLineOfSight
   a unit Unit#251
 call 90 UpdateUnitLineOfSight
@@ -178885,6 +178948,7 @@ call 119 GetMapCell
   o result Cell#467
 call 120 RefreshUnitIndex
   a player 0
+  w LosUnitIndex#1.players[0].lastTick 120
 call 120 UpdateUnitLineOfSight
   r Game.flags_142f1 0
   a unit Unit#1
@@ -178902,6 +178966,7 @@ call 120 UpdateSensorRadarAndCloak
 call 120 RecordRadarMapped
 call 120 RefreshUnitIndex
   a player 1
+  w LosUnitIndex#1.players[1].lastTick 120
 call 120 UpdateUnitLineOfSight
   a unit Unit#251
 call 120 UpdateUnitLineOfSight
@@ -180414,6 +180479,7 @@ call 150 GetMapCellAtPosition
   o result Cell#3846
 call 150 RefreshUnitIndex
   a player 0
+  w LosUnitIndex#1.players[0].lastTick 150
 call 150 UpdateUnitLineOfSight
   r Game.flags_142f1 0
   a unit Unit#1
@@ -180434,6 +180500,7 @@ call 150 UpdateSensorRadarAndCloak
 call 150 RecordRadarMapped
 call 150 RefreshUnitIndex
   a player 1
+  w LosUnitIndex#1.players[1].lastTick 150
 call 150 UpdateUnitLineOfSight
   a unit Unit#251
 call 150 UpdateUnitLineOfSight

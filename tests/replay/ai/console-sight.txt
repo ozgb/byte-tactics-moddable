@@ -113797,7 +113797,7 @@ call 90 UpdateSquads
   i mission.GetGameType = 2
   i mission.GetMissionParams = (3,100,3000,112,f32:0x00000000,0,0,0,0,f32:0x42480000,f32:0x00000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000,x:00007a4400007a440000000000000000000000000000000000000000000000000000000000000000)
   i services.RandomInt 255 = 94
-  i services.ScheduleMapCanBuildAt 0 = 1
+  i services.ScheduleMapCanBuildAt UnitDef#208 (185,78) 0 null = 1
   o SimGlobals.g_lastPlaceMetalSum 2007
   i orders.GetOrderType 14 Unit#251 null (195559424,0,83361792) = 25
   i services.SchedPublish 10 44

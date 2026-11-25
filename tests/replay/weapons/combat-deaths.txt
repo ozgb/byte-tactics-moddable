@@ -14579,10 +14579,19 @@ call 877 UpdateExplosions
   w Debris#19.posX 39268483
   w Debris#19.posY 101486
   w Debris#19.posZ 14096725
+  w Debris#19.sizeX 0
+  w Debris#19.sizeY 0
+  w Debris#19.sizeZ 0
+  w Debris#19.velX 0
   w Debris#19.velY 0
+  w Debris#19.velZ 0
+  w Debris#19.spinX 0
+  w Debris#19.spinY 0
+  w Debris#19.spinZ 0
   w Debris#19.angle_x 0
   w Debris#19.angle_y 0
   w Debris#19.angle_z 0
+  w Debris#19.flags 0
   w ExplodedSlot#3.piece null
   w Debris#19.ref1.src FrameTable#3
   w Debris#19.ref2.src FrameTable#4
@@ -14639,15 +14648,6 @@ call 878 UpdateUnitWeapons
 call 878 UpdateUnitWeapons
   a unit Unit#252
 call 878 UpdateExplosions
-  r Debris#19.sizeX 0
-  r Debris#19.sizeY 0
-  r Debris#19.sizeZ 0
-  r Debris#19.velX 0
-  r Debris#19.velZ 0
-  r Debris#19.spinX 0
-  r Debris#19.spinY 0
-  r Debris#19.spinZ 0
-  r Debris#19.flags 0
   i map.GetCellMeanHeight pos=(41310491,19644795) = 1
   i map.GetCellMeanHeight pos=(38846364,16210680) = 1
   i map.GetCellMeanHeight pos=(44892792,12626415) = 1
@@ -16554,15 +16554,26 @@ call 886 UpdateExplosions
   w Debris#3.posX 38840868
   w Debris#3.posY 3642571
   w Debris#3.posZ 17481834
+  w Debris#3.velX -120882
   w Debris#3.velY -7168
+  w Debris#3.velZ 6011
+  w Debris#3.spinX 717
+  w Debris#3.spinY 23
+  w Debris#3.spinZ -689
   w Debris#3.angle_x 21510
   w Debris#3.angle_y 690
   w Debris#3.angle_z -20670
+  w Debris#3.flags 1
   w Debris#4.obj DebrisPiece#1
   w Debris#4.posX 41519958
   w Debris#4.posY 4533451
   w Debris#4.posZ 18801984
+  w Debris#4.velX -31579
   w Debris#4.velY 22528
+  w Debris#4.velZ 50016
+  w Debris#4.spinX -717
+  w Debris#4.spinY 46
+  w Debris#4.spinZ 300
   w Debris#4.angle_x -21510
   w Debris#4.angle_y 1380
   w Debris#4.angle_z 9000
@@ -16570,7 +16581,12 @@ call 886 UpdateExplosions
   w Debris#5.posX 42715248
   w Debris#5.posY 2767051
   w Debris#5.posZ 16068144
+  w Debris#5.velX 8264
   w Debris#5.velY -36352
+  w Debris#5.velZ -41112
+  w Debris#5.spinX 479
+  w Debris#5.spinY 341
+  w Debris#5.spinZ -103
   w Debris#5.angle_x 14370
   w Debris#5.angle_y 10230
   w Debris#5.angle_z -3090
@@ -16578,7 +16594,12 @@ call 886 UpdateExplosions
   w Debris#6.posX 42751068
   w Debris#6.posY 5086411
   w Debris#6.posZ 15860034
+  w Debris#6.velX 9458
   w Debris#6.velY 40960
+  w Debris#6.velZ -48049
+  w Debris#6.spinX 471
+  w Debris#6.spinY 466
+  w Debris#6.spinZ -84
   w Debris#6.angle_x 14130
   w Debris#6.angle_y 13980
   w Debris#6.angle_z -2520
@@ -16586,7 +16607,12 @@ call 886 UpdateExplosions
   w Debris#7.posX 43481088
   w Debris#7.posY 3704011
   w Debris#7.posZ 16840704
+  w Debris#7.velX 33792
   w Debris#7.velY -5120
+  w Debris#7.velZ -15360
+  w Debris#7.spinX -310
+  w Debris#7.spinY 114
+  w Debris#7.spinZ -494
   w Debris#7.angle_x -9300
   w Debris#7.angle_y 3420
   w Debris#7.angle_z -14820
@@ -16594,7 +16620,12 @@ call 886 UpdateExplosions
   w Debris#8.posX 42373728
   w Debris#8.posY 4379851
   w Debris#8.posZ 16252224
+  w Debris#8.velX -3120
   w Debris#8.velY 17408
+  w Debris#8.velZ -34976
+  w Debris#8.spinX -640
+  w Debris#8.spinY 385
+  w Debris#8.spinZ 750
   w Debris#8.angle_x -19200
   w Debris#8.angle_y 11550
   w Debris#8.angle_z 22500
@@ -16602,7 +16633,12 @@ call 886 UpdateExplosions
   w Debris#9.posX 42326448
   w Debris#9.posY 4994251
   w Debris#9.posZ 17260164
+  w Debris#9.velX -4696
   w Debris#9.velY 37888
+  w Debris#9.velZ -1378
+  w Debris#9.spinX -293
+  w Debris#9.spinY 736
+  w Debris#9.spinZ 449
   w Debris#9.angle_x -8790
   w Debris#9.angle_y 22080
   w Debris#9.angle_z 13470
@@ -16610,7 +16646,12 @@ call 886 UpdateExplosions
   w Debris#10.posX 41248638
   w Debris#10.posY 2720971
   w Debris#10.posZ 17815434
+  w Debris#10.velX -40623
   w Debris#10.velY -37888
+  w Debris#10.velZ 17131
+  w Debris#10.spinX -266
+  w Debris#10.spinY -543
+  w Debris#10.spinZ 365
   w Debris#10.angle_x -7980
   w Debris#10.angle_y -16290
   w Debris#10.angle_z 10950
@@ -16618,7 +16659,12 @@ call 886 UpdateExplosions
   w Debris#11.posX 41316978
   w Debris#11.posY 3565771
   w Debris#11.posZ 17197044
+  w Debris#11.velX -38345
   w Debris#11.velY -9728
+  w Debris#11.velZ -3482
+  w Debris#11.spinX -274
+  w Debris#11.spinY -40
+  w Debris#11.spinZ 566
   w Debris#11.angle_x -8220
   w Debris#11.angle_y -1200
   w Debris#11.angle_z 16980
@@ -16626,7 +16672,12 @@ call 886 UpdateExplosions
   w Debris#12.posX 42995748
   w Debris#12.posY 2874571
   w Debris#12.posZ 17199504
+  w Debris#12.velX 17614
   w Debris#12.velY -32768
+  w Debris#12.velZ -3400
+  w Debris#12.spinX -533
+  w Debris#12.spinY -113
+  w Debris#12.spinZ 132
   w Debris#12.angle_x -15990
   w Debris#12.angle_y -3390
   w Debris#12.angle_z 3960
@@ -16634,7 +16685,12 @@ call 886 UpdateExplosions
   w Debris#13.posX 43482888
   w Debris#13.posY 3197131
   w Debris#13.posZ 18345954
+  w Debris#13.velX 33852
   w Debris#13.velY -22016
+  w Debris#13.velZ 34815
+  w Debris#13.spinX 52
+  w Debris#13.spinY -705
+  w Debris#13.spinZ 667
   w Debris#13.angle_x 1560
   w Debris#13.angle_y -21150
   w Debris#13.angle_z 20010
@@ -16642,7 +16698,12 @@ call 886 UpdateExplosions
   w Debris#14.posX 43016388
   w Debris#14.posY 4041931
   w Debris#14.posZ 16087524
+  w Debris#14.velX 18302
   w Debris#14.velY 6144
+  w Debris#14.velZ -40466
+  w Debris#14.spinX 267
+  w Debris#14.spinY 273
+  w Debris#14.spinZ 185
   w Debris#14.angle_x 8010
   w Debris#14.angle_y 8190
   w Debris#14.angle_z 5550
@@ -16650,7 +16711,12 @@ call 886 UpdateExplosions
   w Debris#15.posX 42732018
   w Debris#15.posY 3811531
   w Debris#15.posZ 16801824
+  w Debris#15.velX 8823
   w Debris#15.velY -1536
+  w Debris#15.velZ -16656
+  w Debris#15.spinX 126
+  w Debris#15.spinY -358
+  w Debris#15.spinZ 504
   w Debris#15.angle_x 3780
   w Debris#15.angle_y -10740
   w Debris#15.angle_z 15120
@@ -16658,7 +16724,12 @@ call 886 UpdateExplosions
   w Debris#16.posX 43173888
   w Debris#16.posY 2951371
   w Debris#16.posZ 17117184
+  w Debris#16.velX 23552
   w Debris#16.velY -30208
+  w Debris#16.velZ -6144
+  w Debris#16.spinX 40
+  w Debris#16.spinY -343
+  w Debris#16.spinZ -443
   w Debris#16.angle_x 1200
   w Debris#16.angle_y -10290
   w Debris#16.angle_z -13290
@@ -16666,10 +16737,16 @@ call 886 UpdateExplosions
   w Debris#17.posX 39268483
   w Debris#17.posY 101486
   w Debris#17.posZ 14096725
+  w Debris#17.velX 0
   w Debris#17.velY 0
+  w Debris#17.velZ 0
+  w Debris#17.spinX 0
+  w Debris#17.spinY 0
+  w Debris#17.spinZ 0
   w Debris#17.angle_x 0
   w Debris#17.angle_y 0
   w Debris#17.angle_z 0
+  w Debris#17.flags 0
   w Debris#0.ref2.src null
   w Debris#1.ref2.src null
   w Debris#2.ref2.src null
@@ -16730,83 +16807,6 @@ call 887 UpdateUnitWeapons
 call 887 UpdateUnitWeapons
   a unit Unit#252
 call 887 UpdateExplosions
-  r Debris#3.velX -120882
-  r Debris#3.velZ 6011
-  r Debris#3.spinX 717
-  r Debris#3.spinY 23
-  r Debris#3.spinZ -689
-  r Debris#3.flags 1
-  r Debris#4.velX -31579
-  r Debris#4.velZ 50016
-  r Debris#4.spinX -717
-  r Debris#4.spinY 46
-  r Debris#4.spinZ 300
-  r Debris#5.velX 8264
-  r Debris#5.velZ -41112
-  r Debris#5.spinX 479
-  r Debris#5.spinY 341
-  r Debris#5.spinZ -103
-  r Debris#6.velX 9458
-  r Debris#6.velZ -48049
-  r Debris#6.spinX 471
-  r Debris#6.spinY 466
-  r Debris#6.spinZ -84
-  r Debris#7.velX 33792
-  r Debris#7.velZ -15360
-  r Debris#7.spinX -310
-  r Debris#7.spinY 114
-  r Debris#7.spinZ -494
-  r Debris#8.velX -3120
-  r Debris#8.velZ -34976
-  r Debris#8.spinX -640
-  r Debris#8.spinY 385
-  r Debris#8.spinZ 750
-  r Debris#9.velX -4696
-  r Debris#9.velZ -1378
-  r Debris#9.spinX -293
-  r Debris#9.spinY 736
-  r Debris#9.spinZ 449
-  r Debris#10.velX -40623
-  r Debris#10.velZ 17131
-  r Debris#10.spinX -266
-  r Debris#10.spinY -543
-  r Debris#10.spinZ 365
-  r Debris#11.velX -38345
-  r Debris#11.velZ -3482
-  r Debris#11.spinX -274
-  r Debris#11.spinY -40
-  r Debris#11.spinZ 566
-  r Debris#12.velX 17614
-  r Debris#12.velZ -3400
-  r Debris#12.spinX -533
-  r Debris#12.spinY -113
-  r Debris#12.spinZ 132
-  r Debris#13.velX 33852
-  r Debris#13.velZ 34815
-  r Debris#13.spinX 52
-  r Debris#13.spinY -705
-  r Debris#13.spinZ 667
-  r Debris#14.velX 18302
-  r Debris#14.velZ -40466
-  r Debris#14.spinX 267
-  r Debris#14.spinY 273
-  r Debris#14.spinZ 185
-  r Debris#15.velX 8823
-  r Debris#15.velZ -16656
-  r Debris#15.spinX 126
-  r Debris#15.spinY -358
-  r Debris#15.spinZ 504
-  r Debris#16.velX 23552
-  r Debris#16.velZ -6144
-  r Debris#16.spinX 40
-  r Debris#16.spinY -343
-  r Debris#16.spinZ -443
-  r Debris#17.velX 0
-  r Debris#17.velZ 0
-  r Debris#17.spinX 0
-  r Debris#17.spinY 0
-  r Debris#17.spinZ 0
-  r Debris#17.flags 0
   i map.GetCellMeanHeight pos=(40868123,20234619) = 1
   i map.GetCellMeanHeight pos=(37224348,16210680) = 1
   i map.GetCellMeanHeight pos=(46367352,10709487) = 1
@@ -18246,15 +18246,26 @@ call 894 UpdateExplosions
   w Debris#2.posX 37873812
   w Debris#2.posY 3356887
   w Debris#2.posZ 17529922
+  w Debris#2.velX -120882
   w Debris#2.velY -72408
+  w Debris#2.velZ 6011
+  w Debris#2.spinX 717
+  w Debris#2.spinY 23
+  w Debris#2.spinZ -689
   w Debris#2.angle_x 27246
   w Debris#2.angle_y 874
   w Debris#2.angle_z -26182
+  w Debris#2.flags 1
   w Debris#3.obj DebrisPiece#1
   w Debris#3.posX 41267326
   w Debris#3.posY 4485335
   w Debris#3.posZ 19202112
+  w Debris#3.velX -31579
   w Debris#3.velY -42712
+  w Debris#3.velZ 50016
+  w Debris#3.spinX -717
+  w Debris#3.spinY 46
+  w Debris#3.spinZ 300
   w Debris#3.angle_x -27246
   w Debris#3.angle_y 1748
   w Debris#3.angle_z 11400
@@ -18262,7 +18273,12 @@ call 894 UpdateExplosions
   w Debris#4.posX 42781360
   w Debris#4.posY 2247895
   w Debris#4.posZ 15739248
+  w Debris#4.velX 8264
   w Debris#4.velY -101592
+  w Debris#4.velZ -41112
+  w Debris#4.spinX 479
+  w Debris#4.spinY 341
+  w Debris#4.spinZ -103
   w Debris#4.angle_x 18202
   w Debris#4.angle_y 12958
   w Debris#4.angle_z -3914
@@ -18270,7 +18286,12 @@ call 894 UpdateExplosions
   w Debris#5.posX 42826732
   w Debris#5.posY 5185751
   w Debris#5.posZ 15475642
+  w Debris#5.velX 9458
   w Debris#5.velY -24280
+  w Debris#5.velZ -48049
+  w Debris#5.spinX 471
+  w Debris#5.spinY 466
+  w Debris#5.spinZ -84
   w Debris#5.angle_x 17898
   w Debris#5.angle_y 17708
   w Debris#5.angle_z -3192
@@ -18278,7 +18299,12 @@ call 894 UpdateExplosions
   w Debris#6.posX 43751424
   w Debris#6.posY 3434711
   w Debris#6.posZ 16717824
+  w Debris#6.velX 33792
   w Debris#6.velY -70360
+  w Debris#6.velZ -15360
+  w Debris#6.spinX -310
+  w Debris#6.spinY 114
+  w Debris#6.spinZ -494
   w Debris#6.angle_x -11780
   w Debris#6.angle_y 4332
   w Debris#6.angle_z -18772
@@ -18286,7 +18312,12 @@ call 894 UpdateExplosions
   w Debris#7.posX 42348768
   w Debris#7.posY 4290775
   w Debris#7.posZ 15972416
+  w Debris#7.velX -3120
   w Debris#7.velY -47832
+  w Debris#7.velZ -34976
+  w Debris#7.spinX -640
+  w Debris#7.spinY 385
+  w Debris#7.spinZ 750
   w Debris#7.angle_x -24320
   w Debris#7.angle_y 14630
   w Debris#7.angle_z 28500
@@ -18294,7 +18325,12 @@ call 894 UpdateExplosions
   w Debris#8.posX 42288880
   w Debris#8.posY 5069015
   w Debris#8.posZ 17249140
+  w Debris#8.velX -4696
   w Debris#8.velY -27352
+  w Debris#8.velZ -1378
+  w Debris#8.spinX -293
+  w Debris#8.spinY 736
+  w Debris#8.spinZ 449
   w Debris#8.angle_x -11134
   w Debris#8.angle_y 27968
   w Debris#8.angle_z 17062
@@ -18302,7 +18338,12 @@ call 894 UpdateExplosions
   w Debris#9.posX 40923654
   w Debris#9.posY 2189527
   w Debris#9.posZ 17952482
+  w Debris#9.velX -40623
   w Debris#9.velY -103128
+  w Debris#9.velZ 17131
+  w Debris#9.spinX -266
+  w Debris#9.spinY -543
+  w Debris#9.spinZ 365
   w Debris#9.angle_x -10108
   w Debris#9.angle_y -20634
   w Debris#9.angle_z 13870
@@ -18310,7 +18351,12 @@ call 894 UpdateExplosions
   w Debris#10.posX 41010218
   w Debris#10.posY 3259607
   w Debris#10.posZ 17169188
+  w Debris#10.velX -38345
   w Debris#10.velY -74968
+  w Debris#10.velZ -3482
+  w Debris#10.spinX -274
+  w Debris#10.spinY -40
+  w Debris#10.spinZ 566
   w Debris#10.angle_x -10412
   w Debris#10.angle_y -1520
   w Debris#10.angle_z 21508
@@ -18318,7 +18364,12 @@ call 894 UpdateExplosions
   w Debris#11.posX 43136660
   w Debris#11.posY 2384087
   w Debris#11.posZ 17172304
+  w Debris#11.velX 17614
   w Debris#11.velY -98008
+  w Debris#11.velZ -3400
+  w Debris#11.spinX -533
+  w Debris#11.spinY -113
+  w Debris#11.spinZ 132
   w Debris#11.angle_x -20254
   w Debris#11.angle_y -4294
   w Debris#11.angle_z 5016
@@ -18326,7 +18377,12 @@ call 894 UpdateExplosions
   w Debris#12.posX 43753704
   w Debris#12.posY 2792663
   w Debris#12.posZ 18624474
+  w Debris#12.velX 33852
   w Debris#12.velY -87256
+  w Debris#12.velZ 34815
+  w Debris#12.spinX 52
+  w Debris#12.spinY -705
+  w Debris#12.spinZ 667
   w Debris#12.angle_x 1976
   w Debris#12.angle_y -26790
   w Debris#12.angle_z 25346
@@ -18334,7 +18390,12 @@ call 894 UpdateExplosions
   w Debris#13.posX 43162804
   w Debris#13.posY 3862743
   w Debris#13.posZ 15763796
+  w Debris#13.velX 18302
   w Debris#13.velY -59096
+  w Debris#13.velZ -40466
+  w Debris#13.spinX 267
+  w Debris#13.spinY 273
+  w Debris#13.spinZ 185
   w Debris#13.angle_x 10146
   w Debris#13.angle_y 10374
   w Debris#13.angle_z 7030
@@ -18342,7 +18403,12 @@ call 894 UpdateExplosions
   w Debris#14.posX 42802602
   w Debris#14.posY 3570903
   w Debris#14.posZ 16668576
+  w Debris#14.velX 8823
   w Debris#14.velY -66776
+  w Debris#14.velZ -16656
+  w Debris#14.spinX 126
+  w Debris#14.spinY -358
+  w Debris#14.spinZ 504
   w Debris#14.angle_x 4788
   w Debris#14.angle_y -13604
   w Debris#14.angle_z 19152
@@ -18350,7 +18416,12 @@ call 894 UpdateExplosions
   w Debris#15.posX 43362304
   w Debris#15.posY 2481367
   w Debris#15.posZ 17068032
+  w Debris#15.velX 23552
   w Debris#15.velY -95448
+  w Debris#15.velZ -6144
+  w Debris#15.spinX 40
+  w Debris#15.spinY -343
+  w Debris#15.spinZ -443
   w Debris#15.angle_x 1520
   w Debris#15.angle_y -13034
   w Debris#15.angle_z -16834
@@ -18358,10 +18429,16 @@ call 894 UpdateExplosions
   w Debris#16.posX 39268483
   w Debris#16.posY 101486
   w Debris#16.posZ 14096725
+  w Debris#16.velX 0
   w Debris#16.velY 0
+  w Debris#16.velZ 0
+  w Debris#16.spinX 0
+  w Debris#16.spinY 0
+  w Debris#16.spinZ 0
   w Debris#16.angle_x 0
   w Debris#16.angle_y 0
   w Debris#16.angle_z 0
+  w Debris#16.flags 0
   w Debris#17.posX 47186552
   w Debris#17.posY 71174
   w Debris#17.posZ 9644527
@@ -18414,83 +18491,6 @@ call 895 UpdateUnitWeapons
 call 895 UpdateUnitWeapons
   a unit Unit#252
 call 895 UpdateExplosions
-  r Debris#2.velX -120882
-  r Debris#2.velZ 6011
-  r Debris#2.spinX 717
-  r Debris#2.spinY 23
-  r Debris#2.spinZ -689
-  r Debris#2.flags 1
-  r Debris#3.velX -31579
-  r Debris#3.velZ 50016
-  r Debris#3.spinX -717
-  r Debris#3.spinY 46
-  r Debris#3.spinZ 300
-  r Debris#4.velX 8264
-  r Debris#4.velZ -41112
-  r Debris#4.spinX 479
-  r Debris#4.spinY 341
-  r Debris#4.spinZ -103
-  r Debris#5.velX 9458
-  r Debris#5.velZ -48049
-  r Debris#5.spinX 471
-  r Debris#5.spinY 466
-  r Debris#5.spinZ -84
-  r Debris#6.velX 33792
-  r Debris#6.velZ -15360
-  r Debris#6.spinX -310
-  r Debris#6.spinY 114
-  r Debris#6.spinZ -494
-  r Debris#7.velX -3120
-  r Debris#7.velZ -34976
-  r Debris#7.spinX -640
-  r Debris#7.spinY 385
-  r Debris#7.spinZ 750
-  r Debris#8.velX -4696
-  r Debris#8.velZ -1378
-  r Debris#8.spinX -293
-  r Debris#8.spinY 736
-  r Debris#8.spinZ 449
-  r Debris#9.velX -40623
-  r Debris#9.velZ 17131
-  r Debris#9.spinX -266
-  r Debris#9.spinY -543
-  r Debris#9.spinZ 365
-  r Debris#10.velX -38345
-  r Debris#10.velZ -3482
-  r Debris#10.spinX -274
-  r Debris#10.spinY -40
-  r Debris#10.spinZ 566
-  r Debris#11.velX 17614
-  r Debris#11.velZ -3400
-  r Debris#11.spinX -533
-  r Debris#11.spinY -113
-  r Debris#11.spinZ 132
-  r Debris#12.velX 33852
-  r Debris#12.velZ 34815
-  r Debris#12.spinX 52
-  r Debris#12.spinY -705
-  r Debris#12.spinZ 667
-  r Debris#13.velX 18302
-  r Debris#13.velZ -40466
-  r Debris#13.spinX 267
-  r Debris#13.spinY 273
-  r Debris#13.spinZ 185
-  r Debris#14.velX 8823
-  r Debris#14.velZ -16656
-  r Debris#14.spinX 126
-  r Debris#14.spinY -358
-  r Debris#14.spinZ 504
-  r Debris#15.velX 23552
-  r Debris#15.velZ -6144
-  r Debris#15.spinX 40
-  r Debris#15.spinY -343
-  r Debris#15.spinZ -443
-  r Debris#16.velX 0
-  r Debris#16.velZ 0
-  r Debris#16.spinX 0
-  r Debris#16.spinY 0
-  r Debris#16.spinZ 0
-  r Debris#16.flags 0
   i map.GetCellMeanHeight pos=(40474907,20758907) = 1
   i map.GetCellMeanHeight pos=(35782556,16210680) = 1
   i services.StepGafSequence Debris#0.ref1 = 0
@@ -19883,23 +19883,40 @@ call 902 UpdateExplosions
   w Debris#0.posX 36906756
   w Debris#0.posY 2549283
   w Debris#0.posZ 17578010
+  w Debris#0.velX -120882
   w Debris#0.velY -137648
+  w Debris#0.velZ 6011
+  w Debris#0.spinX 717
+  w Debris#0.spinY 23
+  w Debris#0.spinZ -689
   w Debris#0.angle_x -32554
   w Debris#0.angle_y 1058
   w Debris#0.angle_z -31694
+  w Debris#0.flags 1
   w Debris#1.obj DebrisPiece#1
   w Debris#1.posX 41014694
   w Debris#1.posY 3915299
   w Debris#1.posZ 19602240
+  w Debris#1.velX -31579
   w Debris#1.velY -107952
+  w Debris#1.velZ 50016
+  w Debris#1.spinX -717
+  w Debris#1.spinY 46
+  w Debris#1.spinZ 300
   w Debris#1.angle_x 32554
   w Debris#1.angle_y 2116
   w Debris#1.angle_z 13800
+  w Debris#1.flags 1
   w Debris#2.obj DebrisPiece#2
   w Debris#2.posX 42847472
   w Debris#2.posY 1206819
   w Debris#2.posZ 15410352
+  w Debris#2.velX 8264
   w Debris#2.velY -166832
+  w Debris#2.velZ -41112
+  w Debris#2.spinX 479
+  w Debris#2.spinY 341
+  w Debris#2.spinZ -103
   w Debris#2.angle_x 22034
   w Debris#2.angle_y 15686
   w Debris#2.angle_z -4738
@@ -19907,7 +19924,12 @@ call 902 UpdateExplosions
   w Debris#3.posX 42902396
   w Debris#3.posY 4763171
   w Debris#3.posZ 15091250
+  w Debris#3.velX 9458
   w Debris#3.velY -89520
+  w Debris#3.velZ -48049
+  w Debris#3.spinX 471
+  w Debris#3.spinY 466
+  w Debris#3.spinZ -84
   w Debris#3.angle_x 21666
   w Debris#3.angle_y 21436
   w Debris#3.angle_z -3864
@@ -19915,7 +19937,12 @@ call 902 UpdateExplosions
   w Debris#4.posX 44021760
   w Debris#4.posY 2643491
   w Debris#4.posZ 16594944
+  w Debris#4.velX 33792
   w Debris#4.velY -135600
+  w Debris#4.velZ -15360
+  w Debris#4.spinX -310
+  w Debris#4.spinY 114
+  w Debris#4.spinZ -494
   w Debris#4.angle_x -14260
   w Debris#4.angle_y 5244
   w Debris#4.angle_z -22724
@@ -19923,7 +19950,12 @@ call 902 UpdateExplosions
   w Debris#5.posX 42323808
   w Debris#5.posY 3679779
   w Debris#5.posZ 15692608
+  w Debris#5.velX -3120
   w Debris#5.velY -113072
+  w Debris#5.velZ -34976
+  w Debris#5.spinX -640
+  w Debris#5.spinY 385
+  w Debris#5.spinZ 750
   w Debris#5.angle_x -29440
   w Debris#5.angle_y 17710
   w Debris#5.angle_z -31036
@@ -19931,7 +19963,12 @@ call 902 UpdateExplosions
   w Debris#6.posX 42251312
   w Debris#6.posY 4621859
   w Debris#6.posZ 17238116
+  w Debris#6.velX -4696
   w Debris#6.velY -92592
+  w Debris#6.velZ -1378
+  w Debris#6.spinX -293
+  w Debris#6.spinY 736
+  w Debris#6.spinZ 449
   w Debris#6.angle_x -13478
   w Debris#6.angle_y -31680
   w Debris#6.angle_z 20654
@@ -19939,7 +19976,12 @@ call 902 UpdateExplosions
   w Debris#7.posX 40598670
   w Debris#7.posY 1136163
   w Debris#7.posZ 18089530
+  w Debris#7.velX -40623
   w Debris#7.velY -168368
+  w Debris#7.velZ 17131
+  w Debris#7.spinX -266
+  w Debris#7.spinY -543
+  w Debris#7.spinZ 365
   w Debris#7.angle_x -12236
   w Debris#7.angle_y -24978
   w Debris#7.angle_z 16790
@@ -19947,7 +19989,12 @@ call 902 UpdateExplosions
   w Debris#8.posX 40703458
   w Debris#8.posY 2431523
   w Debris#8.posZ 17141332
+  w Debris#8.velX -38345
   w Debris#8.velY -140208
+  w Debris#8.velZ -3482
+  w Debris#8.spinX -274
+  w Debris#8.spinY -40
+  w Debris#8.spinZ 566
   w Debris#8.angle_x -12604
   w Debris#8.angle_y -1840
   w Debris#8.angle_z 26036
@@ -19955,7 +20002,12 @@ call 902 UpdateExplosions
   w Debris#9.posX 43277572
   w Debris#9.posY 1371683
   w Debris#9.posZ 17145104
+  w Debris#9.velX 17614
   w Debris#9.velY -163248
+  w Debris#9.velZ -3400
+  w Debris#9.spinX -533
+  w Debris#9.spinY -113
+  w Debris#9.spinZ 132
   w Debris#9.angle_x -24518
   w Debris#9.angle_y -5198
   w Debris#9.angle_z 6072
@@ -19963,7 +20015,12 @@ call 902 UpdateExplosions
   w Debris#10.posX 44024520
   w Debris#10.posY 1866275
   w Debris#10.posZ 18902994
+  w Debris#10.velX 33852
   w Debris#10.velY -152496
+  w Debris#10.velZ 34815
+  w Debris#10.spinX 52
+  w Debris#10.spinY -705
+  w Debris#10.spinZ 667
   w Debris#10.angle_x 2392
   w Debris#10.angle_y -32430
   w Debris#10.angle_z 30682
@@ -19971,7 +20028,12 @@ call 902 UpdateExplosions
   w Debris#11.posX 43309220
   w Debris#11.posY 3161635
   w Debris#11.posZ 15440068
+  w Debris#11.velX 18302
   w Debris#11.velY -124336
+  w Debris#11.velZ -40466
+  w Debris#11.spinX 267
+  w Debris#11.spinY 273
+  w Debris#11.spinZ 185
   w Debris#11.angle_x 12282
   w Debris#11.angle_y 12558
   w Debris#11.angle_z 8510
@@ -19979,7 +20041,12 @@ call 902 UpdateExplosions
   w Debris#12.posX 42873186
   w Debris#12.posY 2808355
   w Debris#12.posZ 16535328
+  w Debris#12.velX 8823
   w Debris#12.velY -132016
+  w Debris#12.velZ -16656
+  w Debris#12.spinX 126
+  w Debris#12.spinY -358
+  w Debris#12.spinZ 504
   w Debris#12.angle_x 5796
   w Debris#12.angle_y -16468
   w Debris#12.angle_z 23184
@@ -19987,7 +20054,12 @@ call 902 UpdateExplosions
   w Debris#13.posX 43550720
   w Debris#13.posY 1489443
   w Debris#13.posZ 17018880
+  w Debris#13.velX 23552
   w Debris#13.velY -160688
+  w Debris#13.velZ -6144
+  w Debris#13.spinX 40
+  w Debris#13.spinY -343
+  w Debris#13.spinZ -443
   w Debris#13.angle_x 1840
   w Debris#13.angle_y -15778
   w Debris#13.angle_z -20378
@@ -19995,18 +20067,30 @@ call 902 UpdateExplosions
   w Debris#14.posX 39268483
   w Debris#14.posY 101486
   w Debris#14.posZ 14096725
+  w Debris#14.velX 0
   w Debris#14.velY 0
+  w Debris#14.velZ 0
+  w Debris#14.spinX 0
+  w Debris#14.spinY 0
+  w Debris#14.spinZ 0
   w Debris#14.angle_x 0
   w Debris#14.angle_y 0
   w Debris#14.angle_z 0
+  w Debris#14.flags 0
   w Debris#15.obj null
   w Debris#15.posX 47186552
   w Debris#15.posY 71174
   w Debris#15.posZ 9644527
+  w Debris#15.velX 0
   w Debris#15.velY 0
+  w Debris#15.velZ 0
+  w Debris#15.spinX 0
+  w Debris#15.spinY 0
+  w Debris#15.spinZ 0
   w Debris#15.angle_x 0
   w Debris#15.angle_y 0
   w Debris#15.angle_z 0
+  w Debris#15.flags 0
   w Debris#0.ref1.src null
   w Debris#1.ref1.src null
   w Debris#14.ref1.src FrameTable#3
@@ -20061,90 +20145,6 @@ call 903 UpdateUnitWeapons
 call 903 UpdateUnitWeapons
   a unit Unit#252
 call 903 UpdateExplosions
-  r Debris#0.velX -120882
-  r Debris#0.velZ 6011
-  r Debris#0.spinX 717
-  r Debris#0.spinY 23
-  r Debris#0.spinZ -689
-  r Debris#0.flags 1
-  r Debris#1.velX -31579
-  r Debris#1.velZ 50016
-  r Debris#1.spinX -717
-  r Debris#1.spinY 46
-  r Debris#1.spinZ 300
-  r Debris#1.flags 1
-  r Debris#2.velX 8264
-  r Debris#2.velZ -41112
-  r Debris#2.spinX 479
-  r Debris#2.spinY 341
-  r Debris#2.spinZ -103
-  r Debris#3.velX 9458
-  r Debris#3.velZ -48049
-  r Debris#3.spinX 471
-  r Debris#3.spinY 466
-  r Debris#3.spinZ -84
-  r Debris#4.velX 33792
-  r Debris#4.velZ -15360
-  r Debris#4.spinX -310
-  r Debris#4.spinY 114
-  r Debris#4.spinZ -494
-  r Debris#5.velX -3120
-  r Debris#5.velZ -34976
-  r Debris#5.spinX -640
-  r Debris#5.spinY 385
-  r Debris#5.spinZ 750
-  r Debris#6.velX -4696
-  r Debris#6.velZ -1378
-  r Debris#6.spinX -293
-  r Debris#6.spinY 736
-  r Debris#6.spinZ 449
-  r Debris#7.velX -40623
-  r Debris#7.velZ 17131
-  r Debris#7.spinX -266
-  r Debris#7.spinY -543
-  r Debris#7.spinZ 365
-  r Debris#8.velX -38345
-  r Debris#8.velZ -3482
-  r Debris#8.spinX -274
-  r Debris#8.spinY -40
-  r Debris#8.spinZ 566
-  r Debris#9.velX 17614
-  r Debris#9.velZ -3400
-  r Debris#9.spinX -533
-  r Debris#9.spinY -113
-  r Debris#9.spinZ 132
-  r Debris#10.velX 33852
-  r Debris#10.velZ 34815
-  r Debris#10.spinX 52
-  r Debris#10.spinY -705
-  r Debris#10.spinZ 667
-  r Debris#11.velX 18302
-  r Debris#11.velZ -40466
-  r Debris#11.spinX 267
-  r Debris#11.spinY 273
-  r Debris#11.spinZ 185
-  r Debris#12.velX 8823
-  r Debris#12.velZ -16656
-  r Debris#12.spinX 126
-  r Debris#12.spinY -358
-  r Debris#12.spinZ 504
-  r Debris#13.velX 23552
-  r Debris#13.velZ -6144
-  r Debris#13.spinX 40
-  r Debris#13.spinY -343
-  r Debris#13.spinZ -443
-  r Debris#14.velX 0
-  r Debris#14.velZ 0
-  r Debris#14.spinX 0
-  r Debris#14.spinY 0
-  r Debris#14.spinZ 0
-  r Debris#14.flags 0
-  r Debris#15.velX 0
-  r Debris#15.velZ 0
-  r Debris#15.spinX 0
-  r Debris#15.spinY 0
-  r Debris#15.spinZ 0
-  r Debris#15.flags 0
   i map.GetCellMeanHeight pos=(40081691,21283195) = 1
   i map.GetCellMeanHeight pos=(34340764,16210680) = 1
   i map.GetCellMeanHeight pos=(36785874,17584021) = 1
@@ -26118,7 +26118,12 @@ call 937 UpdateExplosions
   w Debris#2.posX 43223968
   w Debris#2.posY 1463906
   w Debris#2.posZ 13457584
+  w Debris#2.velX 9458
   w Debris#2.velY 65147
+  w Debris#2.velZ -48049
+  w Debris#2.spinX 471
+  w Debris#2.spinY 466
+  w Debris#2.spinZ -84
   w Debris#2.angle_x -27385
   w Debris#2.angle_y -27790
   w Debris#2.angle_z -6804
@@ -26126,7 +26131,12 @@ call 937 UpdateExplosions
   w Debris#3.posX 45170688
   w Debris#3.posY 1154636
   w Debris#3.posZ 16072704
+  w Debris#3.velX 33792
   w Debris#3.velY -46370
+  w Debris#3.velZ -15360
+  w Debris#3.spinX -310
+  w Debris#3.spinY 114
+  w Debris#3.spinZ -494
   w Debris#3.angle_x -25110
   w Debris#3.angle_y 9234
   w Debris#3.angle_z 25522
@@ -26134,7 +26144,12 @@ call 937 UpdateExplosions
   w Debris#4.posX 42217728
   w Debris#4.posY 1351921
   w Debris#4.posZ 14503424
+  w Debris#4.velX -3120
   w Debris#4.velY 15761
+  w Debris#4.velZ -34976
+  w Debris#4.spinX -640
+  w Debris#4.spinY 385
+  w Debris#4.spinZ 750
   w Debris#4.angle_x 13696
   w Debris#4.angle_y 31185
   w Debris#4.angle_z -4786
@@ -26142,7 +26157,12 @@ call 937 UpdateExplosions
   w Debris#5.posX 42091648
   w Debris#5.posY 1264226
   w Debris#5.posZ 17191264
+  w Debris#5.velX -4696
   w Debris#5.velY 66683
+  w Debris#5.velZ -1378
+  w Debris#5.spinX -293
+  w Debris#5.spinY 736
+  w Debris#5.spinZ 449
   w Debris#5.angle_x -23733
   w Debris#5.angle_y -5920
   w Debris#5.angle_z -29167
@@ -26150,7 +26170,12 @@ call 937 UpdateExplosions
   w Debris#6.posX 39399728
   w Debris#6.posY 1035434
   w Debris#6.posZ 17022944
+  w Debris#6.velX -38345
   w Debris#6.velY -56299
+  w Debris#6.velZ -3482
+  w Debris#6.spinX -274
+  w Debris#6.spinY -40
+  w Debris#6.spinZ 566
   w Debris#6.angle_x -22194
   w Debris#6.angle_y -3240
   w Debris#6.angle_z -19690
@@ -26158,7 +26183,12 @@ call 937 UpdateExplosions
   w Debris#7.posX 43876448
   w Debris#7.posY 271928
   w Debris#7.posZ 17029504
+  w Debris#7.velX 17614
   w Debris#7.velY -118174
+  w Debris#7.velZ -3400
+  w Debris#7.spinX -533
+  w Debris#7.spinY -113
+  w Debris#7.spinZ 132
   w Debris#7.angle_x 22363
   w Debris#7.angle_y -9153
   w Debris#7.angle_z 10692
@@ -26166,7 +26196,12 @@ call 937 UpdateExplosions
   w Debris#8.posX 45175488
   w Debris#8.posY 679306
   w Debris#8.posZ 20086704
+  w Debris#8.velX 33852
   w Debris#8.velY -86852
+  w Debris#8.velZ 34815
+  w Debris#8.spinX 52
+  w Debris#8.spinY -705
+  w Debris#8.spinZ 667
   w Debris#8.angle_x 4212
   w Debris#8.angle_y 8431
   w Debris#8.angle_z -11509
@@ -26174,7 +26209,12 @@ call 937 UpdateExplosions
   w Debris#9.posX 43931488
   w Debris#9.posY 1312674
   w Debris#9.posZ 14064224
+  w Debris#9.velX 18302
   w Debris#9.velY -15305
+  w Debris#9.velZ -40466
+  w Debris#9.spinX 267
+  w Debris#9.spinY 273
+  w Debris#9.spinZ 185
   w Debris#9.angle_x 21627
   w Debris#9.angle_y 22113
   w Debris#9.angle_z 14985
@@ -26182,7 +26222,12 @@ call 937 UpdateExplosions
   w Debris#10.posX 43173168
   w Debris#10.posY 1211976
   w Debris#10.posZ 15969024
+  w Debris#10.velX 8823
   w Debris#10.velY -35930
+  w Debris#10.velZ -16656
+  w Debris#10.spinX 126
+  w Debris#10.spinY -358
+  w Debris#10.spinZ 504
   w Debris#10.angle_x 10206
   w Debris#10.angle_y -28998
   w Debris#10.angle_z -24712
@@ -26190,7 +26235,12 @@ call 937 UpdateExplosions
   w Debris#11.posX 44351488
   w Debris#11.posY 380995
   w Debris#11.posZ 16809984
+  w Debris#11.velX 23552
   w Debris#11.velY -107221
+  w Debris#11.velZ -6144
+  w Debris#11.spinX 40
+  w Debris#11.spinY -343
+  w Debris#11.spinZ -443
   w Debris#11.angle_x 3240
   w Debris#11.angle_y -27783
   w Debris#11.angle_z 29653
@@ -26198,18 +26248,30 @@ call 937 UpdateExplosions
   w Debris#12.posX 39885083
   w Debris#12.posY 177416
   w Debris#12.posZ 21545339
+  w Debris#12.velX 0
   w Debris#12.velY 0
+  w Debris#12.velZ 0
+  w Debris#12.spinX 0
+  w Debris#12.spinY 0
+  w Debris#12.spinZ 0
   w Debris#12.angle_x 0
   w Debris#12.angle_y 0
   w Debris#12.angle_z 0
+  w Debris#12.flags 0
   w Debris#13.obj null
   w Debris#13.posX 43120184
   w Debris#13.posY 229187
   w Debris#13.posZ 14053656
+  w Debris#13.velX 0
   w Debris#13.velY 0
+  w Debris#13.velZ 0
+  w Debris#13.spinX 0
+  w Debris#13.spinY 0
+  w Debris#13.spinZ 0
   w Debris#13.angle_x 0
   w Debris#13.angle_y 0
   w Debris#13.angle_z 0
+  w Debris#13.flags 0
   w Debris#14.posX 39258111
   w Debris#14.posY 172355
   w Debris#14.posZ 18654853
@@ -26255,68 +26317,6 @@ call 938 UpdateUnitWeapons
 call 938 UpdateUnitWeapons
   a unit Unit#252
 call 938 UpdateExplosions
-  r Debris#2.velX 9458
-  r Debris#2.velZ -48049
-  r Debris#2.spinX 471
-  r Debris#2.spinY 466
-  r Debris#2.spinZ -84
-  r Debris#3.velX 33792
-  r Debris#3.velZ -15360
-  r Debris#3.spinX -310
-  r Debris#3.spinY 114
-  r Debris#3.spinZ -494
-  r Debris#4.velX -3120
-  r Debris#4.velZ -34976
-  r Debris#4.spinX -640
-  r Debris#4.spinY 385
-  r Debris#4.spinZ 750
-  r Debris#5.velX -4696
-  r Debris#5.velZ -1378
-  r Debris#5.spinX -293
-  r Debris#5.spinY 736
-  r Debris#5.spinZ 449
-  r Debris#6.velX -38345
-  r Debris#6.velZ -3482
-  r Debris#6.spinX -274
-  r Debris#6.spinY -40
-  r Debris#6.spinZ 566
-  r Debris#7.velX 17614
-  r Debris#7.velZ -3400
-  r Debris#7.spinX -533
-  r Debris#7.spinY -113
-  r Debris#7.spinZ 132
-  r Debris#8.velX 33852
-  r Debris#8.velZ 34815
-  r Debris#8.spinX 52
-  r Debris#8.spinY -705
-  r Debris#8.spinZ 667
-  r Debris#9.velX 18302
-  r Debris#9.velZ -40466
-  r Debris#9.spinX 267
-  r Debris#9.spinY 273
-  r Debris#9.spinZ 185
-  r Debris#10.velX 8823
-  r Debris#10.velZ -16656
-  r Debris#10.spinX 126
-  r Debris#10.spinY -358
-  r Debris#10.spinZ 504
-  r Debris#11.velX 23552
-  r Debris#11.velZ -6144
-  r Debris#11.spinX 40
-  r Debris#11.spinY -343
-  r Debris#11.spinZ -443
-  r Debris#12.velX 0
-  r Debris#12.velZ 0
-  r Debris#12.spinX 0
-  r Debris#12.spinY 0
-  r Debris#12.spinZ 0
-  r Debris#12.flags 0
-  r Debris#13.velX 0
-  r Debris#13.velZ 0
-  r Debris#13.spinX 0
-  r Debris#13.spinY 0
-  r Debris#13.spinZ 0
-  r Debris#13.flags 0
   i map.GetCellMeanHeight pos=(28032924,16210680) = 1
   i map.GetCellMeanHeight pos=(32675886,17788395) = 1
   i map.GetCellMeanHeight pos=(39909429,21352800) = 1
@@ -29456,7 +29456,12 @@ call 957 UpdateExplosions
   w Debris#7.posX 45818676
   w Debris#7.posY 371865
   w Debris#7.posZ 20748189
+  w Debris#7.velX 33852
   w Debris#7.velY -46279
+  w Debris#7.velZ 34815
+  w Debris#7.spinX 52
+  w Debris#7.spinY -705
+  w Debris#7.spinZ 667
   w Debris#7.angle_x 5252
   w Debris#7.angle_y -5669
   w Debris#7.angle_z 1831
@@ -29464,7 +29469,12 @@ call 957 UpdateExplosions
   w Debris#8.posX 44279226
   w Debris#8.posY 469462
   w Debris#8.posZ 13295370
+  w Debris#8.velX 18302
   w Debris#8.velY 40272
+  w Debris#8.velZ -40466
+  w Debris#8.spinX 267
+  w Debris#8.spinY 273
+  w Debris#8.spinZ 185
   w Debris#8.angle_x 26967
   w Debris#8.angle_y 27573
   w Debris#8.angle_z 18685
@@ -29472,7 +29482,12 @@ call 957 UpdateExplosions
   w Debris#9.posX 43340805
   w Debris#9.posY 568135
   w Debris#9.posZ 15652560
+  w Debris#9.velX 8823
   w Debris#9.velY 13887
+  w Debris#9.velZ -16656
+  w Debris#9.spinX 126
+  w Debris#9.spinY -358
+  w Debris#9.spinZ 504
   w Debris#9.angle_x 12726
   w Debris#9.angle_y 29378
   w Debris#9.angle_z -14632
@@ -29480,7 +29495,12 @@ call 957 UpdateExplosions
   w Debris#10.posX 44798976
   w Debris#10.posY 168649
   w Debris#10.posZ 16693248
+  w Debris#10.velX 23552
   w Debris#10.velY -72792
+  w Debris#10.velZ -6144
+  w Debris#10.spinX 40
+  w Debris#10.spinY -343
+  w Debris#10.spinZ -443
   w Debris#10.angle_x 4040
   w Debris#10.angle_y 30893
   w Debris#10.angle_z 20793
@@ -29488,10 +29508,16 @@ call 957 UpdateExplosions
   w Debris#11.posX 43120184
   w Debris#11.posY 229187
   w Debris#11.posZ 14053656
+  w Debris#11.velX 0
   w Debris#11.velY 0
+  w Debris#11.velZ 0
+  w Debris#11.spinX 0
+  w Debris#11.spinY 0
+  w Debris#11.spinZ 0
   w Debris#11.angle_x 0
   w Debris#11.angle_y 0
   w Debris#11.angle_z 0
+  w Debris#11.flags 0
   w Debris#12.posX 39258111
   w Debris#12.posY 172355
   w Debris#12.posZ 18654853
@@ -29539,32 +29565,6 @@ call 958 UpdateUnitWeapons
 call 958 UpdateUnitWeapons
   a unit Unit#252
 call 958 UpdateExplosions
-  r Debris#7.velX 33852
-  r Debris#7.velZ 34815
-  r Debris#7.spinX 52
-  r Debris#7.spinY -705
-  r Debris#7.spinZ 667
-  r Debris#8.velX 18302
-  r Debris#8.velZ -40466
-  r Debris#8.spinX 267
-  r Debris#8.spinY 273
-  r Debris#8.spinZ 185
-  r Debris#9.velX 8823
-  r Debris#9.velZ -16656
-  r Debris#9.spinX 126
-  r Debris#9.spinY -358
-  r Debris#9.spinZ 504
-  r Debris#10.velX 23552
-  r Debris#10.velZ -6144
-  r Debris#10.spinX 40
-  r Debris#10.spinY -343
-  r Debris#10.spinZ -443
-  r Debris#11.velX 0
-  r Debris#11.velZ 0
-  r Debris#11.spinX 0
-  r Debris#11.spinY 0
-  r Debris#11.spinZ 0
-  r Debris#11.flags 0
   i map.GetCellMeanHeight pos=(24428444,16210680) = 1
   i map.GetCellMeanHeight pos=(30379128,17902604) = 1
   i map.GetCellMeanHeight pos=(39277849,22353120) = 1
@@ -29703,10 +29703,16 @@ call 958 UpdateExplosions
   w Debris#10.posX 43120184
   w Debris#10.posY 229187
   w Debris#10.posZ 14053656
+  w Debris#10.velX 0
   w Debris#10.velY 0
+  w Debris#10.velZ 0
+  w Debris#10.spinX 0
+  w Debris#10.spinY 0
+  w Debris#10.spinZ 0
   w Debris#10.angle_x 0
   w Debris#10.angle_y 0
   w Debris#10.angle_z 0
+  w Debris#10.flags 0
   w Debris#11.posX 39258111
   w Debris#11.posY 172355
   w Debris#11.posZ 18654853
@@ -29757,12 +29763,6 @@ call 959 UpdateUnitWeapons
 call 959 UpdateUnitWeapons
   a unit Unit#252
 call 959 UpdateExplosions
-  r Debris#10.velX 0
-  r Debris#10.velZ 0
-  r Debris#10.spinX 0
-  r Debris#10.spinY 0
-  r Debris#10.spinZ 0
-  r Debris#10.flags 0
   i map.GetCellMeanHeight pos=(24248220,16210680) = 1
   i map.GetCellMeanHeight pos=(30258246,17908615) = 1
   i map.GetCellMeanHeight pos=(39246270,22403136) = 1
@@ -30354,7 +30354,12 @@ call 962 UpdateExplosions
   w Debris#7.posX 44370736
   w Debris#7.posY 589272
   w Debris#7.posZ 13093040
+  w Debris#7.velX 18302
   w Debris#7.velY -503
+  w Debris#7.velZ -40466
+  w Debris#7.spinX 267
+  w Debris#7.spinY 273
+  w Debris#7.spinZ 185
   w Debris#7.angle_x 28302
   w Debris#7.angle_y 28938
   w Debris#7.angle_z 19610
@@ -30362,7 +30367,12 @@ call 962 UpdateExplosions
   w Debris#8.posX 43384920
   w Debris#8.posY 556020
   w Debris#8.posZ 15569280
+  w Debris#8.velX 8823
   w Debris#8.velY -26888
+  w Debris#8.velZ -16656
+  w Debris#8.spinX 126
+  w Debris#8.spinY -358
+  w Debris#8.spinZ 504
   w Debris#8.angle_x 13356
   w Debris#8.angle_y 27588
   w Debris#8.angle_z -12112
@@ -30370,10 +30380,16 @@ call 962 UpdateExplosions
   w Debris#9.posX 43120184
   w Debris#9.posY 229187
   w Debris#9.posZ 14053656
+  w Debris#9.velX 0
   w Debris#9.velY 0
+  w Debris#9.velZ 0
+  w Debris#9.spinX 0
+  w Debris#9.spinY 0
+  w Debris#9.spinZ 0
   w Debris#9.angle_x 0
   w Debris#9.angle_y 0
   w Debris#9.angle_z 0
+  w Debris#9.flags 0
   w Debris#10.posX 39258111
   w Debris#10.posY 172355
   w Debris#10.posZ 18654853
@@ -30426,22 +30442,6 @@ call 963 UpdateUnitWeapons
 call 963 UpdateUnitWeapons
   a unit Unit#252
 call 963 UpdateExplosions
-  r Debris#7.velX 18302
-  r Debris#7.velZ -40466
-  r Debris#7.spinX 267
-  r Debris#7.spinY 273
-  r Debris#7.spinZ 185
-  r Debris#8.velX 8823
-  r Debris#8.velZ -16656
-  r Debris#8.spinX 126
-  r Debris#8.spinY -358
-  r Debris#8.spinZ 504
-  r Debris#9.velX 0
-  r Debris#9.velZ 0
-  r Debris#9.spinX 0
-  r Debris#9.spinY 0
-  r Debris#9.spinZ 0
-  r Debris#9.flags 0
   i map.GetCellMeanHeight pos=(23527324,16210680) = 1
   i map.GetCellMeanHeight pos=(29774718,17932659) = 1
   i map.GetCellMeanHeight pos=(39151533,22553184) = 1
@@ -32359,7 +32359,12 @@ call 967 UpdateExplosions
   w Debris#6.posX 44462246
   w Debris#6.posY 505207
   w Debris#6.posZ 12890710
+  w Debris#6.velX 18302
   w Debris#6.velY -41278
+  w Debris#6.velZ -40466
+  w Debris#6.spinX 267
+  w Debris#6.spinY 273
+  w Debris#6.spinZ 185
   w Debris#6.angle_x 29637
   w Debris#6.angle_y 30303
   w Debris#6.angle_z 20535
@@ -32367,7 +32372,12 @@ call 967 UpdateExplosions
   w Debris#7.posX 43429035
   w Debris#7.posY 340030
   w Debris#7.posZ 15486000
+  w Debris#7.velX 8823
   w Debris#7.velY -67663
+  w Debris#7.velZ -16656
+  w Debris#7.spinX 126
+  w Debris#7.spinY -358
+  w Debris#7.spinZ 504
   w Debris#7.angle_x 13986
   w Debris#7.angle_y 25798
   w Debris#7.angle_z -9592
@@ -32375,10 +32385,16 @@ call 967 UpdateExplosions
   w Debris#8.posX 43120184
   w Debris#8.posY 229187
   w Debris#8.posZ 14053656
+  w Debris#8.velX 0
   w Debris#8.velY 0
+  w Debris#8.velZ 0
+  w Debris#8.spinX 0
+  w Debris#8.spinY 0
+  w Debris#8.spinZ 0
   w Debris#8.angle_x 0
   w Debris#8.angle_y 0
   w Debris#8.angle_z 0
+  w Debris#8.flags 0
   w Debris#9.posX 39258111
   w Debris#9.posY 172355
   w Debris#9.posZ 18654853
@@ -32404,15 +32420,26 @@ call 967 UpdateExplosions
   w Debris#16.posX 45727264
   w Debris#16.posY 3575686
   w Debris#16.posZ 20035144
+  w Debris#16.velX -102520
   w Debris#16.velY 187454
+  w Debris#16.velZ 28050
+  w Debris#16.spinX 486
+  w Debris#16.spinY -424
+  w Debris#16.spinZ -214
   w Debris#16.angle_x 1944
   w Debris#16.angle_y -1696
   w Debris#16.angle_z -856
+  w Debris#16.flags 1
   w Debris#17.obj DebrisPiece#7
   w Debris#17.posX 46046720
   w Debris#17.posY 3602310
   w Debris#17.posZ 19712224
+  w Debris#17.velX -22656
   w Debris#17.velY 194110
+  w Debris#17.velZ -52680
+  w Debris#17.spinX -737
+  w Debris#17.spinY -631
+  w Debris#17.spinZ -62
   w Debris#17.angle_x -2948
   w Debris#17.angle_y -2524
   w Debris#17.angle_z -248
@@ -32420,7 +32447,12 @@ call 967 UpdateExplosions
   w Debris#18.posX 46343672
   w Debris#18.posY 3540870
   w Debris#18.posZ 19919936
+  w Debris#18.velX 51582
   w Debris#18.velY 178750
+  w Debris#18.velZ -752
+  w Debris#18.spinX -324
+  w Debris#18.spinY -296
+  w Debris#18.spinZ -771
   w Debris#18.angle_x -1296
   w Debris#18.angle_y -1184
   w Debris#18.angle_z -3084
@@ -32428,7 +32460,12 @@ call 967 UpdateExplosions
   w Debris#19.posX 46115984
   w Debris#19.posY 3579782
   w Debris#19.posZ 19849232
+  w Debris#19.velX -5340
   w Debris#19.velY 188478
+  w Debris#19.velZ -18428
+  w Debris#19.spinX 663
+  w Debris#19.spinY -467
+  w Debris#19.spinZ -368
   w Debris#19.angle_x 2652
   w Debris#19.angle_y -1868
   w Debris#19.angle_z -1472
@@ -32436,7 +32473,12 @@ call 967 UpdateExplosions
   w Debris#20.posX 46275656
   w Debris#20.posY 3536774
   w Debris#20.posZ 20113360
+  w Debris#20.velX 34578
   w Debris#20.velY 177726
+  w Debris#20.velZ 47604
+  w Debris#20.spinX -559
+  w Debris#20.spinY 494
+  w Debris#20.spinZ 50
   w Debris#20.angle_x -2236
   w Debris#20.angle_y 1976
   w Debris#20.angle_z 200
@@ -32444,7 +32486,12 @@ call 967 UpdateExplosions
   w Debris#21.posX 46021368
   w Debris#21.posY 3665798
   w Debris#21.posZ 19868748
+  w Debris#21.velX -28994
   w Debris#21.velY 209982
+  w Debris#21.velZ -13549
+  w Debris#21.spinX -725
+  w Debris#21.spinY 216
+  w Debris#21.spinZ 300
   w Debris#21.angle_x -2900
   w Debris#21.angle_y 864
   w Debris#21.angle_z 1200
@@ -32452,7 +32499,12 @@ call 967 UpdateExplosions
   w Debris#22.posX 46233112
   w Debris#22.posY 3745670
   w Debris#22.posZ 19850056
+  w Debris#22.velX 23942
   w Debris#22.velY 229950
+  w Debris#22.velZ -18222
+  w Debris#22.spinX 118
+  w Debris#22.spinY 497
+  w Debris#22.spinZ 19
   w Debris#22.angle_x 472
   w Debris#22.angle_y 1988
   w Debris#22.angle_z 76
@@ -32460,7 +32512,12 @@ call 967 UpdateExplosions
   w Debris#23.posX 46182316
   w Debris#23.posY 3583878
   w Debris#23.posZ 19714784
+  w Debris#23.velX 11243
   w Debris#23.velY 189502
+  w Debris#23.velZ -52040
+  w Debris#23.spinX 318
+  w Debris#23.spinY -525
+  w Debris#23.spinZ -639
   w Debris#23.angle_x 1272
   w Debris#23.angle_y -2100
   w Debris#23.angle_z -2556
@@ -32468,7 +32525,12 @@ call 967 UpdateExplosions
   w Debris#24.posX 46264912
   w Debris#24.posY 3624838
   w Debris#24.posZ 19994160
+  w Debris#24.velX 31892
   w Debris#24.velY 199742
+  w Debris#24.velZ 17804
+  w Debris#24.spinX -749
+  w Debris#24.spinY -610
+  w Debris#24.spinZ 348
   w Debris#24.angle_x -2996
   w Debris#24.angle_y -2440
   w Debris#24.angle_z 1392
@@ -32476,7 +32538,12 @@ call 967 UpdateExplosions
   w Debris#25.posX 46020696
   w Debris#25.posY 3561350
   w Debris#25.posZ 19936432
+  w Debris#25.velX -29162
   w Debris#25.velY 183870
+  w Debris#25.velZ 3372
+  w Debris#25.spinX 333
+  w Debris#25.spinY 463
+  w Debris#25.spinZ 699
   w Debris#25.angle_x 1332
   w Debris#25.angle_y 1852
   w Debris#25.angle_z 2796
@@ -32484,7 +32551,12 @@ call 967 UpdateExplosions
   w Debris#26.posX 46243944
   w Debris#26.posY 3647366
   w Debris#26.posZ 19947056
+  w Debris#26.velX 26650
   w Debris#26.velY 205374
+  w Debris#26.velZ 6028
+  w Debris#26.spinX 775
+  w Debris#26.spinY -225
+  w Debris#26.spinZ -701
   w Debris#26.angle_x 3100
   w Debris#26.angle_y -900
   w Debris#26.angle_z -2804
@@ -32492,7 +32564,12 @@ call 967 UpdateExplosions
   w Debris#27.posX 46020544
   w Debris#27.posY 3792774
   w Debris#27.posZ 19958724
+  w Debris#27.velX -29200
   w Debris#27.velY 241726
+  w Debris#27.velZ 8945
+  w Debris#27.spinX 792
+  w Debris#27.spinY -355
+  w Debris#27.spinZ 295
   w Debris#27.angle_x 3168
   w Debris#27.angle_y -1420
   w Debris#27.angle_z 1180
@@ -32500,7 +32577,12 @@ call 967 UpdateExplosions
   w Debris#28.posX 46133248
   w Debris#28.posY 3692422
   w Debris#28.posZ 19843072
+  w Debris#28.velX -1024
   w Debris#28.velY 216638
+  w Debris#28.velZ -19968
+  w Debris#28.spinX 737
+  w Debris#28.spinY -59
+  w Debris#28.spinZ 397
   w Debris#28.angle_x 2948
   w Debris#28.angle_y -236
   w Debris#28.angle_z 1588
@@ -32508,7 +32590,12 @@ call 967 UpdateExplosions
   w Debris#29.posX 45766292
   w Debris#29.posY 3706758
   w Debris#29.posZ 19943072
+  w Debris#29.velX -92763
   w Debris#29.velY 220222
+  w Debris#29.velZ 5032
+  w Debris#29.spinX 677
+  w Debris#29.spinY 580
+  w Debris#29.spinZ 437
   w Debris#29.angle_x 2708
   w Debris#29.angle_y 2320
   w Debris#29.angle_z 1748
@@ -32516,7 +32603,12 @@ call 967 UpdateExplosions
   w Debris#30.posX 46248120
   w Debris#30.posY 3669894
   w Debris#30.posZ 19827392
+  w Debris#30.velX 27694
   w Debris#30.velY 211006
+  w Debris#30.velZ -23888
+  w Debris#30.spinX -37
+  w Debris#30.spinY 442
+  w Debris#30.spinZ 62
   w Debris#30.angle_x -148
   w Debris#30.angle_y 1768
   w Debris#30.angle_z 248
@@ -32524,7 +32616,12 @@ call 967 UpdateExplosions
   w Debris#31.posX 46188672
   w Debris#31.posY 3837830
   w Debris#31.posZ 19816736
+  w Debris#31.velX 12832
   w Debris#31.velY 252990
+  w Debris#31.velZ -26552
+  w Debris#31.spinX 24
+  w Debris#31.spinY -23
+  w Debris#31.spinZ 393
   w Debris#31.angle_x 96
   w Debris#31.angle_y -92
   w Debris#31.angle_z 1572
@@ -32532,7 +32629,12 @@ call 967 UpdateExplosions
   w Debris#32.posX 46087640
   w Debris#32.posY 3721094
   w Debris#32.posZ 20079264
+  w Debris#32.velX -12426
   w Debris#32.velY 223806
+  w Debris#32.velZ 39080
+  w Debris#32.spinX 248
+  w Debris#32.spinY 472
+  w Debris#32.spinZ 125
   w Debris#32.angle_x 992
   w Debris#32.angle_y 1888
   w Debris#32.angle_z 500
@@ -32540,10 +32642,16 @@ call 967 UpdateExplosions
   w Debris#33.posX 46137344
   w Debris#33.posY 2744320
   w Debris#33.posZ 19922944
+  w Debris#33.velX 0
   w Debris#33.velY 0
+  w Debris#33.velZ 0
+  w Debris#33.spinX 0
+  w Debris#33.spinY 0
+  w Debris#33.spinZ 0
   w Debris#33.angle_x 0
   w Debris#33.angle_y 0
   w Debris#33.angle_z 0
+  w Debris#33.flags 0
   w Debris#34.posY 1712128
   w Debris#35.posY 65536
   w Debris#36.posX 38326068
@@ -32629,114 +32737,6 @@ call 968 UpdateUnitWeapons
 call 968 UpdateUnitWeapons
   a unit Unit#252
 call 968 UpdateExplosions
-  r Debris#6.velX 18302
-  r Debris#6.velZ -40466
-  r Debris#6.spinX 267
-  r Debris#6.spinY 273
-  r Debris#6.spinZ 185
-  r Debris#7.velX 8823
-  r Debris#7.velZ -16656
-  r Debris#7.spinX 126
-  r Debris#7.spinY -358
-  r Debris#7.spinZ 504
-  r Debris#8.velX 0
-  r Debris#8.velZ 0
-  r Debris#8.spinX 0
-  r Debris#8.spinY 0
-  r Debris#8.spinZ 0
-  r Debris#8.flags 0
-  r Debris#16.velX -102520
-  r Debris#16.velZ 28050
-  r Debris#16.spinX 486
-  r Debris#16.spinY -424
-  r Debris#16.spinZ -214
-  r Debris#16.flags 1
-  r Debris#17.velX -22656
-  r Debris#17.velZ -52680
-  r Debris#17.spinX -737
-  r Debris#17.spinY -631
-  r Debris#17.spinZ -62
-  r Debris#18.velX 51582
-  r Debris#18.velZ -752
-  r Debris#18.spinX -324
-  r Debris#18.spinY -296
-  r Debris#18.spinZ -771
-  r Debris#19.velX -5340
-  r Debris#19.velZ -18428
-  r Debris#19.spinX 663
-  r Debris#19.spinY -467
-  r Debris#19.spinZ -368
-  r Debris#20.velX 34578
-  r Debris#20.velZ 47604
-  r Debris#20.spinX -559
-  r Debris#20.spinY 494
-  r Debris#20.spinZ 50
-  r Debris#21.velX -28994
-  r Debris#21.velZ -13549
-  r Debris#21.spinX -725
-  r Debris#21.spinY 216
-  r Debris#21.spinZ 300
-  r Debris#22.velX 23942
-  r Debris#22.velZ -18222
-  r Debris#22.spinX 118
-  r Debris#22.spinY 497
-  r Debris#22.spinZ 19
-  r Debris#23.velX 11243
-  r Debris#23.velZ -52040
-  r Debris#23.spinX 318
-  r Debris#23.spinY -525
-  r Debris#23.spinZ -639
-  r Debris#24.velX 31892
-  r Debris#24.velZ 17804
-  r Debris#24.spinX -749
-  r Debris#24.spinY -610
-  r Debris#24.spinZ 348
-  r Debris#25.velX -29162
-  r Debris#25.velZ 3372
-  r Debris#25.spinX 333
-  r Debris#25.spinY 463
-  r Debris#25.spinZ 699
-  r Debris#26.velX 26650
-  r Debris#26.velZ 6028
-  r Debris#26.spinX 775
-  r Debris#26.spinY -225
-  r Debris#26.spinZ -701
-  r Debris#27.velX -29200
-  r Debris#27.velZ 8945
-  r Debris#27.spinX 792
-  r Debris#27.spinY -355
-  r Debris#27.spinZ 295
-  r Debris#28.velX -1024
-  r Debris#28.velZ -19968
-  r Debris#28.spinX 737
-  r Debris#28.spinY -59
-  r Debris#28.spinZ 397
-  r Debris#29.velX -92763
-  r Debris#29.velZ 5032
-  r Debris#29.spinX 677
-  r Debris#29.spinY 580
-  r Debris#29.spinZ 437
-  r Debris#30.velX 27694
-  r Debris#30.velZ -23888
-  r Debris#30.spinX -37
-  r Debris#30.spinY 442
-  r Debris#30.spinZ 62
-  r Debris#31.velX 12832
-  r Debris#31.velZ -26552
-  r Debris#31.spinX 24
-  r Debris#31.spinY -23
-  r Debris#31.spinZ 393
-  r Debris#32.velX -12426
-  r Debris#32.velZ 39080
-  r Debris#32.spinX 248
-  r Debris#32.spinY 472
-  r Debris#32.spinZ 125
-  r Debris#33.velX 0
-  r Debris#33.velZ 0
-  r Debris#33.spinX 0
-  r Debris#33.spinY 0
-  r Debris#33.spinZ 0
-  r Debris#33.flags 0
   i map.GetCellMeanHeight pos=(47058294,18057199) = 1
   i map.GetCellMeanHeight pos=(22626204,16210680) = 1
   i map.GetCellMeanHeight pos=(46636366,17666687) = 1
@@ -33297,7 +33297,12 @@ call 969 UpdateExplosions
   w Debris#0.posX 38962059
   w Debris#0.posY 643594
   w Debris#0.posZ 22853280
+  w Debris#0.velX -31579
   w Debris#0.velY -4562
+  w Debris#0.velZ 50016
+  w Debris#0.spinX -717
+  w Debris#0.spinY 46
+  w Debris#0.spinZ 300
   w Debris#0.angle_x -15485
   w Debris#0.angle_y 5198
   w Debris#0.angle_z -31636
@@ -33305,7 +33310,12 @@ call 969 UpdateExplosions
   w Debris#1.posX 43517166
   w Debris#1.posY 437989
   w Debris#1.posZ 11968065
+  w Debris#1.velX 9458
   w Debris#1.velY 61209
+  w Debris#1.velZ -48049
+  w Debris#1.spinX 471
+  w Debris#1.spinY 466
+  w Debris#1.spinZ -84
   w Debris#1.angle_x -12313
   w Debris#1.angle_y -12878
   w Debris#1.angle_z -9492
@@ -33313,7 +33323,12 @@ call 969 UpdateExplosions
   w Debris#2.posX 42121008
   w Debris#2.posY 602673
   w Debris#2.posZ 13419168
+  w Debris#2.velX -3120
   w Debris#2.velY -24191
+  w Debris#2.velZ -34976
+  w Debris#2.spinX -640
+  w Debris#2.spinY 385
+  w Debris#2.spinZ 750
   w Debris#2.angle_x -6784
   w Debris#2.angle_y -22031
   w Debris#2.angle_z 19214
@@ -33321,7 +33336,12 @@ call 969 UpdateExplosions
   w Debris#3.posX 41946072
   w Debris#3.posY 476644
   w Debris#3.posZ 17148546
+  w Debris#3.velX -4696
   w Debris#3.velY 48208
+  w Debris#3.velZ -1378
+  w Debris#3.spinX -293
+  w Debris#3.spinY 736
+  w Debris#3.spinZ 449
   w Debris#3.angle_x 32427
   w Debris#3.angle_y 17632
   w Debris#3.angle_z -14799
@@ -33329,7 +33349,12 @@ call 969 UpdateExplosions
   w Debris#4.posX 44498850
   w Debris#4.posY 414496
   w Debris#4.posZ 12809778
+  w Debris#4.velX 18302
   w Debris#4.velY -57588
+  w Debris#4.velZ -40466
+  w Debris#4.spinX 267
+  w Debris#4.spinY 273
+  w Debris#4.spinZ 185
   w Debris#4.angle_x 30171
   w Debris#4.angle_y 30849
   w Debris#4.angle_z 20905
@@ -33337,7 +33362,12 @@ call 969 UpdateExplosions
   w Debris#5.posX 43446681
   w Debris#5.posY 196549
   w Debris#5.posZ 15452688
+  w Debris#5.velX 8823
   w Debris#5.velY -83973
+  w Debris#5.velZ -16656
+  w Debris#5.spinX 126
+  w Debris#5.spinY -358
+  w Debris#5.spinZ 504
   w Debris#5.angle_x 14238
   w Debris#5.angle_y 25082
   w Debris#5.angle_z -8584
@@ -33345,18 +33375,30 @@ call 969 UpdateExplosions
   w Debris#6.posX 43120184
   w Debris#6.posY 229187
   w Debris#6.posZ 14053656
+  w Debris#6.velX 0
   w Debris#6.velY 0
+  w Debris#6.velZ 0
+  w Debris#6.spinX 0
+  w Debris#6.spinY 0
+  w Debris#6.spinZ 0
   w Debris#6.angle_x 0
   w Debris#6.angle_y 0
   w Debris#6.angle_z 0
+  w Debris#6.flags 0
   w Debris#7.obj null
   w Debris#7.posX 39258111
   w Debris#7.posY 172355
   w Debris#7.posZ 18654853
+  w Debris#7.velX 0
   w Debris#7.velY 0
+  w Debris#7.velZ 0
+  w Debris#7.spinX 0
+  w Debris#7.spinY 0
+  w Debris#7.spinZ 0
   w Debris#7.angle_x 0
   w Debris#7.angle_y 0
   w Debris#7.angle_z 0
+  w Debris#7.flags 0
   w Debris#8.posX 44193500
   w Debris#8.posY 187788
   w Debris#8.posZ 16968304
@@ -33379,23 +33421,40 @@ call 969 UpdateExplosions
   w Debris#14.posX 45522224
   w Debris#14.posY 3942439
   w Debris#14.posZ 20091244
+  w Debris#14.velX -102520
   w Debris#14.velY 171144
+  w Debris#14.velZ 28050
+  w Debris#14.spinX 486
+  w Debris#14.spinY -424
+  w Debris#14.spinZ -214
   w Debris#14.angle_x 2916
   w Debris#14.angle_y -2544
   w Debris#14.angle_z -1284
+  w Debris#14.flags 1
   w Debris#15.obj DebrisPiece#7
   w Debris#15.posX 46001408
   w Debris#15.posY 3982375
   w Debris#15.posZ 19606864
+  w Debris#15.velX -22656
   w Debris#15.velY 177800
+  w Debris#15.velZ -52680
+  w Debris#15.spinX -737
+  w Debris#15.spinY -631
+  w Debris#15.spinZ -62
   w Debris#15.angle_x -4422
   w Debris#15.angle_y -3786
   w Debris#15.angle_z -372
+  w Debris#15.flags 1
   w Debris#16.obj DebrisPiece#9
   w Debris#16.posX 46446836
   w Debris#16.posY 3890215
   w Debris#16.posZ 19918432
+  w Debris#16.velX 51582
   w Debris#16.velY 162440
+  w Debris#16.velZ -752
+  w Debris#16.spinX -324
+  w Debris#16.spinY -296
+  w Debris#16.spinZ -771
   w Debris#16.angle_x -1944
   w Debris#16.angle_y -1776
   w Debris#16.angle_z -4626
@@ -33403,7 +33462,12 @@ call 969 UpdateExplosions
   w Debris#17.posX 46105304
   w Debris#17.posY 3948583
   w Debris#17.posZ 19812376
+  w Debris#17.velX -5340
   w Debris#17.velY 172168
+  w Debris#17.velZ -18428
+  w Debris#17.spinX 663
+  w Debris#17.spinY -467
+  w Debris#17.spinZ -368
   w Debris#17.angle_x 3978
   w Debris#17.angle_y -2802
   w Debris#17.angle_z -2208
@@ -33411,7 +33475,12 @@ call 969 UpdateExplosions
   w Debris#18.posX 46344812
   w Debris#18.posY 3884071
   w Debris#18.posZ 20208568
+  w Debris#18.velX 34578
   w Debris#18.velY 161416
+  w Debris#18.velZ 47604
+  w Debris#18.spinX -559
+  w Debris#18.spinY 494
+  w Debris#18.spinZ 50
   w Debris#18.angle_x -3354
   w Debris#18.angle_y 2964
   w Debris#18.angle_z 300
@@ -33419,7 +33488,12 @@ call 969 UpdateExplosions
   w Debris#19.posX 45963380
   w Debris#19.posY 4077607
   w Debris#19.posZ 19841650
+  w Debris#19.velX -28994
   w Debris#19.velY 193672
+  w Debris#19.velZ -13549
+  w Debris#19.spinX -725
+  w Debris#19.spinY 216
+  w Debris#19.spinZ 300
   w Debris#19.angle_x -4350
   w Debris#19.angle_y 1296
   w Debris#19.angle_z 1800
@@ -33427,7 +33501,12 @@ call 969 UpdateExplosions
   w Debris#20.posX 46280996
   w Debris#20.posY 4197415
   w Debris#20.posZ 19813612
+  w Debris#20.velX 23942
   w Debris#20.velY 213640
+  w Debris#20.velZ -18222
+  w Debris#20.spinX 118
+  w Debris#20.spinY 497
+  w Debris#20.spinZ 19
   w Debris#20.angle_x 708
   w Debris#20.angle_y 2982
   w Debris#20.angle_z 114
@@ -33435,7 +33514,12 @@ call 969 UpdateExplosions
   w Debris#21.posX 46204802
   w Debris#21.posY 3954727
   w Debris#21.posZ 19610704
+  w Debris#21.velX 11243
   w Debris#21.velY 173192
+  w Debris#21.velZ -52040
+  w Debris#21.spinX 318
+  w Debris#21.spinY -525
+  w Debris#21.spinZ -639
   w Debris#21.angle_x 1908
   w Debris#21.angle_y -3150
   w Debris#21.angle_z -3834
@@ -33443,7 +33527,12 @@ call 969 UpdateExplosions
   w Debris#22.posX 46328696
   w Debris#22.posY 4016167
   w Debris#22.posZ 20029768
+  w Debris#22.velX 31892
   w Debris#22.velY 183432
+  w Debris#22.velZ 17804
+  w Debris#22.spinX -749
+  w Debris#22.spinY -610
+  w Debris#22.spinZ 348
   w Debris#22.angle_x -4494
   w Debris#22.angle_y -3660
   w Debris#22.angle_z 2088
@@ -33451,7 +33540,12 @@ call 969 UpdateExplosions
   w Debris#23.posX 45962372
   w Debris#23.posY 3920935
   w Debris#23.posZ 19943176
+  w Debris#23.velX -29162
   w Debris#23.velY 167560
+  w Debris#23.velZ 3372
+  w Debris#23.spinX 333
+  w Debris#23.spinY 463
+  w Debris#23.spinZ 699
   w Debris#23.angle_x 1998
   w Debris#23.angle_y 2778
   w Debris#23.angle_z 4194
@@ -33459,7 +33553,12 @@ call 969 UpdateExplosions
   w Debris#24.posX 46297244
   w Debris#24.posY 4049959
   w Debris#24.posZ 19959112
+  w Debris#24.velX 26650
   w Debris#24.velY 189064
+  w Debris#24.velZ 6028
+  w Debris#24.spinX 775
+  w Debris#24.spinY -225
+  w Debris#24.spinZ -701
   w Debris#24.angle_x 4650
   w Debris#24.angle_y -1350
   w Debris#24.angle_z -4206
@@ -33467,7 +33566,12 @@ call 969 UpdateExplosions
   w Debris#25.posX 45962144
   w Debris#25.posY 4268071
   w Debris#25.posZ 19976614
+  w Debris#25.velX -29200
   w Debris#25.velY 225416
+  w Debris#25.velZ 8945
+  w Debris#25.spinX 792
+  w Debris#25.spinY -355
+  w Debris#25.spinZ 295
   w Debris#25.angle_x 4752
   w Debris#25.angle_y -2130
   w Debris#25.angle_z 1770
@@ -33475,7 +33579,12 @@ call 969 UpdateExplosions
   w Debris#26.posX 46131200
   w Debris#26.posY 4117543
   w Debris#26.posZ 19803136
+  w Debris#26.velX -1024
   w Debris#26.velY 200328
+  w Debris#26.velZ -19968
+  w Debris#26.spinX 737
+  w Debris#26.spinY -59
+  w Debris#26.spinZ 397
   w Debris#26.angle_x 4422
   w Debris#26.angle_y -354
   w Debris#26.angle_z 2382
@@ -33483,7 +33592,12 @@ call 969 UpdateExplosions
   w Debris#27.posX 45580766
   w Debris#27.posY 4139047
   w Debris#27.posZ 19953136
+  w Debris#27.velX -92763
   w Debris#27.velY 203912
+  w Debris#27.velZ 5032
+  w Debris#27.spinX 677
+  w Debris#27.spinY 580
+  w Debris#27.spinZ 437
   w Debris#27.angle_x 4062
   w Debris#27.angle_y 3480
   w Debris#27.angle_z 2622
@@ -33491,7 +33605,12 @@ call 969 UpdateExplosions
   w Debris#28.posX 46303508
   w Debris#28.posY 4083751
   w Debris#28.posZ 19779616
+  w Debris#28.velX 27694
   w Debris#28.velY 194696
+  w Debris#28.velZ -23888
+  w Debris#28.spinX -37
+  w Debris#28.spinY 442
+  w Debris#28.spinZ 62
   w Debris#28.angle_x -222
   w Debris#28.angle_y 2652
   w Debris#28.angle_z 372
@@ -33499,7 +33618,12 @@ call 969 UpdateExplosions
   w Debris#29.posX 46214336
   w Debris#29.posY 4335655
   w Debris#29.posZ 19763632
+  w Debris#29.velX 12832
   w Debris#29.velY 236680
+  w Debris#29.velZ -26552
+  w Debris#29.spinX 24
+  w Debris#29.spinY -23
+  w Debris#29.spinZ 393
   w Debris#29.angle_x 144
   w Debris#29.angle_y -138
   w Debris#29.angle_z 2358
@@ -33507,7 +33631,12 @@ call 969 UpdateExplosions
   w Debris#30.posX 46062788
   w Debris#30.posY 4160551
   w Debris#30.posZ 20157424
+  w Debris#30.velX -12426
   w Debris#30.velY 207496
+  w Debris#30.velZ 39080
+  w Debris#30.spinX 248
+  w Debris#30.spinY 472
+  w Debris#30.spinZ 125
   w Debris#30.angle_x 1488
   w Debris#30.angle_y 2832
   w Debris#30.angle_z 750
@@ -33515,18 +33644,30 @@ call 969 UpdateExplosions
   w Debris#31.posX 46137344
   w Debris#31.posY 2744320
   w Debris#31.posZ 19922944
+  w Debris#31.velX 0
   w Debris#31.velY 0
+  w Debris#31.velZ 0
+  w Debris#31.spinX 0
+  w Debris#31.spinY 0
+  w Debris#31.spinZ 0
   w Debris#31.angle_x 0
   w Debris#31.angle_y 0
   w Debris#31.angle_z 0
+  w Debris#31.flags 0
   w Debris#32.obj null
   w Debris#32.posX 46137344
   w Debris#32.posY 1712128
   w Debris#32.posZ 19922944
+  w Debris#32.velX 0
   w Debris#32.velY 0
+  w Debris#32.velZ 0
+  w Debris#32.spinX 0
+  w Debris#32.spinY 0
+  w Debris#32.spinZ 0
   w Debris#32.angle_x 0
   w Debris#32.angle_y 0
   w Debris#32.angle_z 0
+  w Debris#32.flags 0
   w Debris#33.posY 65536
   w Debris#34.posX 38326068
   w Debris#34.posY 150214
@@ -33615,147 +33756,6 @@ call 970 UpdateUnitWeapons
 call 970 UpdateUnitWeapons
   a unit Unit#252
 call 970 UpdateExplosions
-  r Debris#0.velX -31579
-  r Debris#0.velZ 50016
-  r Debris#0.spinX -717
-  r Debris#0.spinY 46
-  r Debris#0.spinZ 300
-  r Debris#1.velX 9458
-  r Debris#1.velZ -48049
-  r Debris#1.spinX 471
-  r Debris#1.spinY 466
-  r Debris#1.spinZ -84
-  r Debris#2.velX -3120
-  r Debris#2.velZ -34976
-  r Debris#2.spinX -640
-  r Debris#2.spinY 385
-  r Debris#2.spinZ 750
-  r Debris#3.velX -4696
-  r Debris#3.velZ -1378
-  r Debris#3.spinX -293
-  r Debris#3.spinY 736
-  r Debris#3.spinZ 449
-  r Debris#4.velX 18302
-  r Debris#4.velZ -40466
-  r Debris#4.spinX 267
-  r Debris#4.spinY 273
-  r Debris#4.spinZ 185
-  r Debris#5.velX 8823
-  r Debris#5.velZ -16656
-  r Debris#5.spinX 126
-  r Debris#5.spinY -358
-  r Debris#5.spinZ 504
-  r Debris#6.velX 0
-  r Debris#6.velZ 0
-  r Debris#6.spinX 0
-  r Debris#6.spinY 0
-  r Debris#6.spinZ 0
-  r Debris#6.flags 0
-  r Debris#7.velX 0
-  r Debris#7.velZ 0
-  r Debris#7.spinX 0
-  r Debris#7.spinY 0
-  r Debris#7.spinZ 0
-  r Debris#7.flags 0
-  r Debris#14.velX -102520
-  r Debris#14.velZ 28050
-  r Debris#14.spinX 486
-  r Debris#14.spinY -424
-  r Debris#14.spinZ -214
-  r Debris#14.flags 1
-  r Debris#15.velX -22656
-  r Debris#15.velZ -52680
-  r Debris#15.spinX -737
-  r Debris#15.spinY -631
-  r Debris#15.spinZ -62
-  r Debris#15.flags 1
-  r Debris#16.velX 51582
-  r Debris#16.velZ -752
-  r Debris#16.spinX -324
-  r Debris#16.spinY -296
-  r Debris#16.spinZ -771
-  r Debris#17.velX -5340
-  r Debris#17.velZ -18428
-  r Debris#17.spinX 663
-  r Debris#17.spinY -467
-  r Debris#17.spinZ -368
-  r Debris#18.velX 34578
-  r Debris#18.velZ 47604
-  r Debris#18.spinX -559
-  r Debris#18.spinY 494
-  r Debris#18.spinZ 50
-  r Debris#19.velX -28994
-  r Debris#19.velZ -13549
-  r Debris#19.spinX -725
-  r Debris#19.spinY 216
-  r Debris#19.spinZ 300
-  r Debris#20.velX 23942
-  r Debris#20.velZ -18222
-  r Debris#20.spinX 118
-  r Debris#20.spinY 497
-  r Debris#20.spinZ 19
-  r Debris#21.velX 11243
-  r Debris#21.velZ -52040
-  r Debris#21.spinX 318
-  r Debris#21.spinY -525
-  r Debris#21.spinZ -639
-  r Debris#22.velX 31892
-  r Debris#22.velZ 17804
-  r Debris#22.spinX -749
-  r Debris#22.spinY -610
-  r Debris#22.spinZ 348
-  r Debris#23.velX -29162
-  r Debris#23.velZ 3372
-  r Debris#23.spinX 333
-  r Debris#23.spinY 463
-  r Debris#23.spinZ 699
-  r Debris#24.velX 26650
-  r Debris#24.velZ 6028
-  r Debris#24.spinX 775
-  r Debris#24.spinY -225
-  r Debris#24.spinZ -701
-  r Debris#25.velX -29200
-  r Debris#25.velZ 8945
-  r Debris#25.spinX 792
-  r Debris#25.spinY -355
-  r Debris#25.spinZ 295
-  r Debris#26.velX -1024
-  r Debris#26.velZ -19968
-  r Debris#26.spinX 737
-  r Debris#26.spinY -59
-  r Debris#26.spinZ 397
-  r Debris#27.velX -92763
-  r Debris#27.velZ 5032
-  r Debris#27.spinX 677
-  r Debris#27.spinY 580
-  r Debris#27.spinZ 437
-  r Debris#28.velX 27694
-  r Debris#28.velZ -23888
-  r Debris#28.spinX -37
-  r Debris#28.spinY 442
-  r Debris#28.spinZ 62
-  r Debris#29.velX 12832
-  r Debris#29.velZ -26552
-  r Debris#29.spinX 24
-  r Debris#29.spinY -23
-  r Debris#29.spinZ 393
-  r Debris#30.velX -12426
-  r Debris#30.velZ 39080
-  r Debris#30.spinX 248
-  r Debris#30.spinY 472
-  r Debris#30.spinZ 125
-  r Debris#31.velX 0
-  r Debris#31.velZ 0
-  r Debris#31.spinX 0
-  r Debris#31.spinY 0
-  r Debris#31.spinZ 0
-  r Debris#31.flags 0
-  r Debris#32.velX 0
-  r Debris#32.velZ 0
-  r Debris#32.spinX 0
-  r Debris#32.spinY 0
-  r Debris#32.spinZ 0
-  r Debris#32.flags 0
   i map.GetCellMeanHeight pos=(47549814,17598447) = 1
   i map.GetCellMeanHeight pos=(22265756,16210680) = 1
   i map.GetCellMeanHeight pos=(46931278,17240703) = 1
@@ -33974,10 +33974,16 @@ call 970 UpdateExplosions
   w Debris#5.posX 43120184
   w Debris#5.posY 229187
   w Debris#5.posZ 14053656
+  w Debris#5.velX 0
   w Debris#5.velY 0
+  w Debris#5.velZ 0
+  w Debris#5.spinX 0
+  w Debris#5.spinY 0
+  w Debris#5.spinZ 0
   w Debris#5.angle_x 0
   w Debris#5.angle_y 0
   w Debris#5.angle_z 0
+  w Debris#5.flags 0
   w Debris#6.posX 39258111
   w Debris#6.posY 172355
   w Debris#6.posZ 18654853
@@ -34003,15 +34009,26 @@ call 970 UpdateExplosions
   w Debris#13.posX 45419704
   w Debris#13.posY 4113583
   w Debris#13.posZ 20119294
+  w Debris#13.velX -102520
   w Debris#13.velY 162989
+  w Debris#13.velZ 28050
+  w Debris#13.spinX 486
+  w Debris#13.spinY -424
+  w Debris#13.spinZ -214
   w Debris#13.angle_x 3402
   w Debris#13.angle_y -2968
   w Debris#13.angle_z -1498
+  w Debris#13.flags 1
   w Debris#14.obj DebrisPiece#7
   w Debris#14.posX 45978752
   w Debris#14.posY 4160175
   w Debris#14.posZ 19554184
+  w Debris#14.velX -22656
   w Debris#14.velY 169645
+  w Debris#14.velZ -52680
+  w Debris#14.spinX -737
+  w Debris#14.spinY -631
+  w Debris#14.spinZ -62
   w Debris#14.angle_x -5159
   w Debris#14.angle_y -4417
   w Debris#14.angle_z -434
@@ -34019,7 +34036,12 @@ call 970 UpdateExplosions
   w Debris#15.posX 46498418
   w Debris#15.posY 4052655
   w Debris#15.posZ 19917680
+  w Debris#15.velX 51582
   w Debris#15.velY 154285
+  w Debris#15.velZ -752
+  w Debris#15.spinX -324
+  w Debris#15.spinY -296
+  w Debris#15.spinZ -771
   w Debris#15.angle_x -2268
   w Debris#15.angle_y -2072
   w Debris#15.angle_z -5397
@@ -34027,7 +34049,12 @@ call 970 UpdateExplosions
   w Debris#16.posX 46099964
   w Debris#16.posY 4120751
   w Debris#16.posZ 19793948
+  w Debris#16.velX -5340
   w Debris#16.velY 164013
+  w Debris#16.velZ -18428
+  w Debris#16.spinX 663
+  w Debris#16.spinY -467
+  w Debris#16.spinZ -368
   w Debris#16.angle_x 4641
   w Debris#16.angle_y -3269
   w Debris#16.angle_z -2576
@@ -34035,7 +34062,12 @@ call 970 UpdateExplosions
   w Debris#17.posX 46379390
   w Debris#17.posY 4045487
   w Debris#17.posZ 20256172
+  w Debris#17.velX 34578
   w Debris#17.velY 153261
+  w Debris#17.velZ 47604
+  w Debris#17.spinX -559
+  w Debris#17.spinY 494
+  w Debris#17.spinZ 50
   w Debris#17.angle_x -3913
   w Debris#17.angle_y 3458
   w Debris#17.angle_z 350
@@ -34043,7 +34075,12 @@ call 970 UpdateExplosions
   w Debris#18.posX 45934386
   w Debris#18.posY 4271279
   w Debris#18.posZ 19828101
+  w Debris#18.velX -28994
   w Debris#18.velY 185517
+  w Debris#18.velZ -13549
+  w Debris#18.spinX -725
+  w Debris#18.spinY 216
+  w Debris#18.spinZ 300
   w Debris#18.angle_x -5075
   w Debris#18.angle_y 1512
   w Debris#18.angle_z 2100
@@ -34051,7 +34088,12 @@ call 970 UpdateExplosions
   w Debris#19.posX 46304938
   w Debris#19.posY 4411055
   w Debris#19.posZ 19795390
+  w Debris#19.velX 23942
   w Debris#19.velY 205485
+  w Debris#19.velZ -18222
+  w Debris#19.spinX 118
+  w Debris#19.spinY 497
+  w Debris#19.spinZ 19
   w Debris#19.angle_x 826
   w Debris#19.angle_y 3479
   w Debris#19.angle_z 133
@@ -34059,7 +34101,12 @@ call 970 UpdateExplosions
   w Debris#20.posX 46216045
   w Debris#20.posY 4127919
   w Debris#20.posZ 19558664
+  w Debris#20.velX 11243
   w Debris#20.velY 165037
+  w Debris#20.velZ -52040
+  w Debris#20.spinX 318
+  w Debris#20.spinY -525
+  w Debris#20.spinZ -639
   w Debris#20.angle_x 2226
   w Debris#20.angle_y -3675
   w Debris#20.angle_z -4473
@@ -34067,7 +34114,12 @@ call 970 UpdateExplosions
   w Debris#21.posX 46360588
   w Debris#21.posY 4199599
   w Debris#21.posZ 20047572
+  w Debris#21.velX 31892
   w Debris#21.velY 175277
+  w Debris#21.velZ 17804
+  w Debris#21.spinX -749
+  w Debris#21.spinY -610
+  w Debris#21.spinZ 348
   w Debris#21.angle_x -5243
   w Debris#21.angle_y -4270
   w Debris#21.angle_z 2436
@@ -34075,7 +34127,12 @@ call 970 UpdateExplosions
   w Debris#22.posX 45933210
   w Debris#22.posY 4088495
   w Debris#22.posZ 19946548
+  w Debris#22.velX -29162
   w Debris#22.velY 159405
+  w Debris#22.velZ 3372
+  w Debris#22.spinX 333
+  w Debris#22.spinY 463
+  w Debris#22.spinZ 699
   w Debris#22.angle_x 2331
   w Debris#22.angle_y 3241
   w Debris#22.angle_z 4893
@@ -34083,7 +34140,12 @@ call 970 UpdateExplosions
   w Debris#23.posX 46323894
   w Debris#23.posY 4239023
   w Debris#23.posZ 19965140
+  w Debris#23.velX 26650
   w Debris#23.velY 180909
+  w Debris#23.velZ 6028
+  w Debris#23.spinX 775
+  w Debris#23.spinY -225
+  w Debris#23.spinZ -701
   w Debris#23.angle_x 5425
   w Debris#23.angle_y -1575
   w Debris#23.angle_z -4907
@@ -34091,7 +34153,12 @@ call 970 UpdateExplosions
   w Debris#24.posX 45932944
   w Debris#24.posY 4493487
   w Debris#24.posZ 19985559
+  w Debris#24.velX -29200
   w Debris#24.velY 217261
+  w Debris#24.velZ 8945
+  w Debris#24.spinX 792
+  w Debris#24.spinY -355
+  w Debris#24.spinZ 295
   w Debris#24.angle_x 5544
   w Debris#24.angle_y -2485
   w Debris#24.angle_z 2065
@@ -34099,7 +34166,12 @@ call 970 UpdateExplosions
   w Debris#25.posX 46130176
   w Debris#25.posY 4317871
   w Debris#25.posZ 19783168
+  w Debris#25.velX -1024
   w Debris#25.velY 192173
+  w Debris#25.velZ -19968
+  w Debris#25.spinX 737
+  w Debris#25.spinY -59
+  w Debris#25.spinZ 397
   w Debris#25.angle_x 5159
   w Debris#25.angle_y -413
   w Debris#25.angle_z 2779
@@ -34107,7 +34179,12 @@ call 970 UpdateExplosions
   w Debris#26.posX 45488003
   w Debris#26.posY 4342959
   w Debris#26.posZ 19958168
+  w Debris#26.velX -92763
   w Debris#26.velY 195757
+  w Debris#26.velZ 5032
+  w Debris#26.spinX 677
+  w Debris#26.spinY 580
+  w Debris#26.spinZ 437
   w Debris#26.angle_x 4739
   w Debris#26.angle_y 4060
   w Debris#26.angle_z 3059
@@ -34115,7 +34192,12 @@ call 970 UpdateExplosions
   w Debris#27.posX 46331202
   w Debris#27.posY 4278447
   w Debris#27.posZ 19755728
+  w Debris#27.velX 27694
   w Debris#27.velY 186541
+  w Debris#27.velZ -23888
+  w Debris#27.spinX -37
+  w Debris#27.spinY 442
+  w Debris#27.spinZ 62
   w Debris#27.angle_x -259
   w Debris#27.angle_y 3094
   w Debris#27.angle_z 434
@@ -34123,7 +34205,12 @@ call 970 UpdateExplosions
   w Debris#28.posX 46227168
   w Debris#28.posY 4572335
   w Debris#28.posZ 19737080
+  w Debris#28.velX 12832
   w Debris#28.velY 228525
+  w Debris#28.velZ -26552
+  w Debris#28.spinX 24
+  w Debris#28.spinY -23
+  w Debris#28.spinZ 393
   w Debris#28.angle_x 168
   w Debris#28.angle_y -161
   w Debris#28.angle_z 2751
@@ -34131,7 +34218,12 @@ call 970 UpdateExplosions
   w Debris#29.posX 46050362
   w Debris#29.posY 4368047
   w Debris#29.posZ 20196504
+  w Debris#29.velX -12426
   w Debris#29.velY 199341
+  w Debris#29.velZ 39080
+  w Debris#29.spinX 248
+  w Debris#29.spinY 472
+  w Debris#29.spinZ 125
   w Debris#29.angle_x 1736
   w Debris#29.angle_y 3304
   w Debris#29.angle_z 875
@@ -34139,10 +34231,16 @@ call 970 UpdateExplosions
   w Debris#30.posX 46137344
   w Debris#30.posY 2744320
   w Debris#30.posZ 19922944
+  w Debris#30.velX 0
   w Debris#30.velY 0
+  w Debris#30.velZ 0
+  w Debris#30.spinX 0
+  w Debris#30.spinY 0
+  w Debris#30.spinZ 0
   w Debris#30.angle_x 0
   w Debris#30.angle_y 0
   w Debris#30.angle_z 0
+  w Debris#30.flags 0
   w Debris#31.posY 1712128
   w Debris#32.posY 65536
   w Debris#33.posX 38326068
@@ -34228,104 +34326,6 @@ call 971 UpdateUnitWeapons
 call 971 UpdateUnitWeapons
   a unit Unit#252
 call 971 UpdateExplosions
-  r Debris#5.velX 0
-  r Debris#5.velZ 0
-  r Debris#5.spinX 0
-  r Debris#5.spinY 0
-  r Debris#5.spinZ 0
-  r Debris#5.flags 0
-  r Debris#13.velX -102520
-  r Debris#13.velZ 28050
-  r Debris#13.spinX 486
-  r Debris#13.spinY -424
-  r Debris#13.spinZ -214
-  r Debris#13.flags 1
-  r Debris#14.velX -22656
-  r Debris#14.velZ -52680
-  r Debris#14.spinX -737
-  r Debris#14.spinY -631
-  r Debris#14.spinZ -62
-  r Debris#15.velX 51582
-  r Debris#15.velZ -752
-  r Debris#15.spinX -324
-  r Debris#15.spinY -296
-  r Debris#15.spinZ -771
-  r Debris#16.velX -5340
-  r Debris#16.velZ -18428
-  r Debris#16.spinX 663
-  r Debris#16.spinY -467
-  r Debris#16.spinZ -368
-  r Debris#17.velX 34578
-  r Debris#17.velZ 47604
-  r Debris#17.spinX -559
-  r Debris#17.spinY 494
-  r Debris#17.spinZ 50
-  r Debris#18.velX -28994
-  r Debris#18.velZ -13549
-  r Debris#18.spinX -725
-  r Debris#18.spinY 216
-  r Debris#18.spinZ 300
-  r Debris#19.velX 23942
-  r Debris#19.velZ -18222
-  r Debris#19.spinX 118
-  r Debris#19.spinY 497
-  r Debris#19.spinZ 19
-  r Debris#20.velX 11243
-  r Debris#20.velZ -52040
-  r Debris#20.spinX 318
-  r Debris#20.spinY -525
-  r Debris#20.spinZ -639
-  r Debris#21.velX 31892
-  r Debris#21.velZ 17804
-  r Debris#21.spinX -749
-  r Debris#21.spinY -610
-  r Debris#21.spinZ 348
-  r Debris#22.velX -29162
-  r Debris#22.velZ 3372
-  r Debris#22.spinX 333
-  r Debris#22.spinY 463
-  r Debris#22.spinZ 699
-  r Debris#23.velX 26650
-  r Debris#23.velZ 6028
-  r Debris#23.spinX 775
-  r Debris#23.spinY -225
-  r Debris#23.spinZ -701
-  r Debris#24.velX -29200
-  r Debris#24.velZ 8945
-  r Debris#24.spinX 792
-  r Debris#24.spinY -355
-  r Debris#24.spinZ 295
-  r Debris#25.velX -1024
-  r Debris#25.velZ -19968
-  r Debris#25.spinX 737
-  r Debris#25.spinY -59
-  r Debris#25.spinZ 397
-  r Debris#26.velX -92763
-  r Debris#26.velZ 5032
-  r Debris#26.spinX 677
-  r Debris#26.spinY 580
-  r Debris#26.spinZ 437
-  r Debris#27.velX 27694
-  r Debris#27.velZ -23888
-  r Debris#27.spinX -37
-  r Debris#27.spinY 442
-  r Debris#27.spinZ 62
-  r Debris#28.velX 12832
-  r Debris#28.velZ -26552
-  r Debris#28.spinX 24
-  r Debris#28.spinY -23
-  r Debris#28.spinZ 393
-  r Debris#29.velX -12426
-  r Debris#29.velZ 39080
-  r Debris#29.spinX 248
-  r Debris#29.spinY 472
-  r Debris#29.spinZ 125
-  r Debris#30.velX 0
-  r Debris#30.velZ 0
-  r Debris#30.spinX 0
-  r Debris#30.spinY 0
-  r Debris#30.spinZ 0
-  r Debris#30.flags 0
   i map.GetCellMeanHeight pos=(47795574,17369071) = 1
   i map.GetCellMeanHeight pos=(22085532,16210680) = 1
   i map.GetCellMeanHeight pos=(47078734,17027711) = 1
@@ -35690,10 +35690,16 @@ call 974 UpdateExplosions
   w Debris#4.posX 43120184
   w Debris#4.posY 229187
   w Debris#4.posZ 14053656
+  w Debris#4.velX 0
   w Debris#4.velY 0
+  w Debris#4.velZ 0
+  w Debris#4.spinX 0
+  w Debris#4.spinY 0
+  w Debris#4.spinZ 0
   w Debris#4.angle_x 0
   w Debris#4.angle_y 0
   w Debris#4.angle_z 0
+  w Debris#4.flags 0
   w Debris#5.posX 39258111
   w Debris#5.posY 172355
   w Debris#5.posZ 18654853
@@ -35719,15 +35725,26 @@ call 974 UpdateExplosions
   w Debris#12.posX 45009624
   w Debris#12.posY 4716609
   w Debris#12.posZ 20231494
+  w Debris#12.velX -102520
   w Debris#12.velY 130369
+  w Debris#12.velZ 28050
+  w Debris#12.spinX 486
+  w Debris#12.spinY -424
+  w Debris#12.spinZ -214
   w Debris#12.angle_x 5346
   w Debris#12.angle_y -4664
   w Debris#12.angle_z -2354
+  w Debris#12.flags 1
   w Debris#13.obj DebrisPiece#7
   w Debris#13.posX 45888128
   w Debris#13.posY 4789825
   w Debris#13.posZ 19343464
+  w Debris#13.velX -22656
   w Debris#13.velY 137025
+  w Debris#13.velZ -52680
+  w Debris#13.spinX -737
+  w Debris#13.spinY -631
+  w Debris#13.spinZ -62
   w Debris#13.angle_x -8107
   w Debris#13.angle_y -6941
   w Debris#13.angle_z -682
@@ -35735,7 +35752,12 @@ call 974 UpdateExplosions
   w Debris#14.posX 46704746
   w Debris#14.posY 4620865
   w Debris#14.posZ 19914672
+  w Debris#14.velX 51582
   w Debris#14.velY 121665
+  w Debris#14.velZ -752
+  w Debris#14.spinX -324
+  w Debris#14.spinY -296
+  w Debris#14.spinZ -771
   w Debris#14.angle_x -3564
   w Debris#14.angle_y -3256
   w Debris#14.angle_z -8481
@@ -35743,7 +35765,12 @@ call 974 UpdateExplosions
   w Debris#15.posX 46078604
   w Debris#15.posY 4727873
   w Debris#15.posZ 19720236
+  w Debris#15.velX -5340
   w Debris#15.velY 131393
+  w Debris#15.velZ -18428
+  w Debris#15.spinX 663
+  w Debris#15.spinY -467
+  w Debris#15.spinZ -368
   w Debris#15.angle_x 7293
   w Debris#15.angle_y -5137
   w Debris#15.angle_z -4048
@@ -35751,7 +35778,12 @@ call 974 UpdateExplosions
   w Debris#16.posX 46517702
   w Debris#16.posY 4609601
   w Debris#16.posZ 20446588
+  w Debris#16.velX 34578
   w Debris#16.velY 120641
+  w Debris#16.velZ 47604
+  w Debris#16.spinX -559
+  w Debris#16.spinY 494
+  w Debris#16.spinZ 50
   w Debris#16.angle_x -6149
   w Debris#16.angle_y 5434
   w Debris#16.angle_z 550
@@ -35759,7 +35791,12 @@ call 974 UpdateExplosions
   w Debris#17.posX 45818410
   w Debris#17.posY 4964417
   w Debris#17.posZ 19773905
+  w Debris#17.velX -28994
   w Debris#17.velY 152897
+  w Debris#17.velZ -13549
+  w Debris#17.spinX -725
+  w Debris#17.spinY 216
+  w Debris#17.spinZ 300
   w Debris#17.angle_x -7975
   w Debris#17.angle_y 2376
   w Debris#17.angle_z 3300
@@ -35767,7 +35804,12 @@ call 974 UpdateExplosions
   w Debris#18.posX 46400706
   w Debris#18.posY 5184065
   w Debris#18.posZ 19722502
+  w Debris#18.velX 23942
   w Debris#18.velY 172865
+  w Debris#18.velZ -18222
+  w Debris#18.spinX 118
+  w Debris#18.spinY 497
+  w Debris#18.spinZ 19
   w Debris#18.angle_x 1298
   w Debris#18.angle_y 5467
   w Debris#18.angle_z 209
@@ -35775,7 +35817,12 @@ call 974 UpdateExplosions
   w Debris#19.posX 46261017
   w Debris#19.posY 4739137
   w Debris#19.posZ 19350504
+  w Debris#19.velX 11243
   w Debris#19.velY 132417
+  w Debris#19.velZ -52040
+  w Debris#19.spinX 318
+  w Debris#19.spinY -525
+  w Debris#19.spinZ -639
   w Debris#19.angle_x 3498
   w Debris#19.angle_y -5775
   w Debris#19.angle_z -7029
@@ -35783,7 +35830,12 @@ call 974 UpdateExplosions
   w Debris#20.posX 46488156
   w Debris#20.posY 4851777
   w Debris#20.posZ 20118788
+  w Debris#20.velX 31892
   w Debris#20.velY 142657
+  w Debris#20.velZ 17804
+  w Debris#20.spinX -749
+  w Debris#20.spinY -610
+  w Debris#20.spinZ 348
   w Debris#20.angle_x -8239
   w Debris#20.angle_y -6710
   w Debris#20.angle_z 3828
@@ -35791,7 +35843,12 @@ call 974 UpdateExplosions
   w Debris#21.posX 45816562
   w Debris#21.posY 4677185
   w Debris#21.posZ 19960036
+  w Debris#21.velX -29162
   w Debris#21.velY 126785
+  w Debris#21.velZ 3372
+  w Debris#21.spinX 333
+  w Debris#21.spinY 463
+  w Debris#21.spinZ 699
   w Debris#21.angle_x 3663
   w Debris#21.angle_y 5093
   w Debris#21.angle_z 7689
@@ -35799,7 +35856,12 @@ call 974 UpdateExplosions
   w Debris#22.posX 46430494
   w Debris#22.posY 4913729
   w Debris#22.posZ 19989252
+  w Debris#22.velX 26650
   w Debris#22.velY 148289
+  w Debris#22.velZ 6028
+  w Debris#22.spinX 775
+  w Debris#22.spinY -225
+  w Debris#22.spinZ -701
   w Debris#22.angle_x 8525
   w Debris#22.angle_y -2475
   w Debris#22.angle_z -7711
@@ -35807,7 +35869,12 @@ call 974 UpdateExplosions
   w Debris#23.posX 45816144
   w Debris#23.posY 5313601
   w Debris#23.posZ 20021339
+  w Debris#23.velX -29200
   w Debris#23.velY 184641
+  w Debris#23.velZ 8945
+  w Debris#23.spinX 792
+  w Debris#23.spinY -355
+  w Debris#23.spinZ 295
   w Debris#23.angle_x 8712
   w Debris#23.angle_y -3905
   w Debris#23.angle_z 3245
@@ -35815,7 +35882,12 @@ call 974 UpdateExplosions
   w Debris#24.posX 46126080
   w Debris#24.posY 5037633
   w Debris#24.posZ 19703296
+  w Debris#24.velX -1024
   w Debris#24.velY 159553
+  w Debris#24.velZ -19968
+  w Debris#24.spinX 737
+  w Debris#24.spinY -59
+  w Debris#24.spinZ 397
   w Debris#24.angle_x 8107
   w Debris#24.angle_y -649
   w Debris#24.angle_z 4367
@@ -35823,7 +35895,12 @@ call 974 UpdateExplosions
   w Debris#25.posX 45116951
   w Debris#25.posY 5077057
   w Debris#25.posZ 19978296
+  w Debris#25.velX -92763
   w Debris#25.velY 163137
+  w Debris#25.velZ 5032
+  w Debris#25.spinX 677
+  w Debris#25.spinY 580
+  w Debris#25.spinZ 437
   w Debris#25.angle_x 7447
   w Debris#25.angle_y 6380
   w Debris#25.angle_z 4807
@@ -35831,7 +35908,12 @@ call 974 UpdateExplosions
   w Debris#26.posX 46441978
   w Debris#26.posY 4975681
   w Debris#26.posZ 19660176
+  w Debris#26.velX 27694
   w Debris#26.velY 153921
+  w Debris#26.velZ -23888
+  w Debris#26.spinX -37
+  w Debris#26.spinY 442
+  w Debris#26.spinZ 62
   w Debris#26.angle_x -407
   w Debris#26.angle_y 4862
   w Debris#26.angle_z 682
@@ -35839,7 +35921,12 @@ call 974 UpdateExplosions
   w Debris#27.posX 46278496
   w Debris#27.posY 5437505
   w Debris#27.posZ 19630872
+  w Debris#27.velX 12832
   w Debris#27.velY 195905
+  w Debris#27.velZ -26552
+  w Debris#27.spinX 24
+  w Debris#27.spinY -23
+  w Debris#27.spinZ 393
   w Debris#27.angle_x 264
   w Debris#27.angle_y -253
   w Debris#27.angle_z 4323
@@ -35847,7 +35934,12 @@ call 974 UpdateExplosions
   w Debris#28.posX 46000658
   w Debris#28.posY 5116481
   w Debris#28.posZ 20352824
+  w Debris#28.velX -12426
   w Debris#28.velY 166721
+  w Debris#28.velZ 39080
+  w Debris#28.spinX 248
+  w Debris#28.spinY 472
+  w Debris#28.spinZ 125
   w Debris#28.angle_x 2728
   w Debris#28.angle_y 5192
   w Debris#28.angle_z 1375
@@ -35855,10 +35947,16 @@ call 974 UpdateExplosions
   w Debris#29.posX 46137344
   w Debris#29.posY 2744320
   w Debris#29.posZ 19922944
+  w Debris#29.velX 0
   w Debris#29.velY 0
+  w Debris#29.velZ 0
+  w Debris#29.spinX 0
+  w Debris#29.spinY 0
+  w Debris#29.spinZ 0
   w Debris#29.angle_x 0
   w Debris#29.angle_y 0
   w Debris#29.angle_z 0
+  w Debris#29.flags 0
   w Debris#30.posY 1712128
   w Debris#31.posY 65536
   w Debris#32.posX 38326068
@@ -35946,104 +36044,6 @@ call 975 UpdateUnitWeapons
 call 975 UpdateUnitWeapons
   a unit Unit#252
 call 975 UpdateExplosions
-  r Debris#4.velX 0
-  r Debris#4.velZ 0
-  r Debris#4.spinX 0
-  r Debris#4.spinY 0
-  r Debris#4.spinZ 0
-  r Debris#4.flags 0
-  r Debris#12.velX -102520
-  r Debris#12.velZ 28050
-  r Debris#12.spinX 486
-  r Debris#12.spinY -424
-  r Debris#12.spinZ -214
-  r Debris#12.flags 1
-  r Debris#13.velX -22656
-  r Debris#13.velZ -52680
-  r Debris#13.spinX -737
-  r Debris#13.spinY -631
-  r Debris#13.spinZ -62
-  r Debris#14.velX 51582
-  r Debris#14.velZ -752
-  r Debris#14.spinX -324
-  r Debris#14.spinY -296
-  r Debris#14.spinZ -771
-  r Debris#15.velX -5340
-  r Debris#15.velZ -18428
-  r Debris#15.spinX 663
-  r Debris#15.spinY -467
-  r Debris#15.spinZ -368
-  r Debris#16.velX 34578
-  r Debris#16.velZ 47604
-  r Debris#16.spinX -559
-  r Debris#16.spinY 494
-  r Debris#16.spinZ 50
-  r Debris#17.velX -28994
-  r Debris#17.velZ -13549
-  r Debris#17.spinX -725
-  r Debris#17.spinY 216
-  r Debris#17.spinZ 300
-  r Debris#18.velX 23942
-  r Debris#18.velZ -18222
-  r Debris#18.spinX 118
-  r Debris#18.spinY 497
-  r Debris#18.spinZ 19
-  r Debris#19.velX 11243
-  r Debris#19.velZ -52040
-  r Debris#19.spinX 318
-  r Debris#19.spinY -525
-  r Debris#19.spinZ -639
-  r Debris#20.velX 31892
-  r Debris#20.velZ 17804
-  r Debris#20.spinX -749
-  r Debris#20.spinY -610
-  r Debris#20.spinZ 348
-  r Debris#21.velX -29162
-  r Debris#21.velZ 3372
-  r Debris#21.spinX 333
-  r Debris#21.spinY 463
-  r Debris#21.spinZ 699
-  r Debris#22.velX 26650
-  r Debris#22.velZ 6028
-  r Debris#22.spinX 775
-  r Debris#22.spinY -225
-  r Debris#22.spinZ -701
-  r Debris#23.velX -29200
-  r Debris#23.velZ 8945
-  r Debris#23.spinX 792
-  r Debris#23.spinY -355
-  r Debris#23.spinZ 295
-  r Debris#24.velX -1024
-  r Debris#24.velZ -19968
-  r Debris#24.spinX 737
-  r Debris#24.spinY -59
-  r Debris#24.spinZ 397
-  r Debris#25.velX -92763
-  r Debris#25.velZ 5032
-  r Debris#25.spinX 677
-  r Debris#25.spinY 580
-  r Debris#25.spinZ 437
-  r Debris#26.velX 27694
-  r Debris#26.velZ -23888
-  r Debris#26.spinX -37
-  r Debris#26.spinY 442
-  r Debris#26.spinZ 62
-  r Debris#27.velX 12832
-  r Debris#27.velZ -26552
-  r Debris#27.spinX 24
-  r Debris#27.spinY -23
-  r Debris#27.spinZ 393
-  r Debris#28.velX -12426
-  r Debris#28.velZ 39080
-  r Debris#28.spinX 248
-  r Debris#28.spinY 472
-  r Debris#28.spinZ 125
-  r Debris#29.velX 0
-  r Debris#29.velZ 0
-  r Debris#29.spinX 0
-  r Debris#29.spinY 0
-  r Debris#29.spinZ 0
-  r Debris#29.flags 0
   i map.GetCellMeanHeight pos=(48778614,16451567) = 1
   i map.GetCellMeanHeight pos=(21725084,16210680) = 1
   i map.GetCellMeanHeight pos=(47668558,16175743) = 1
@@ -37407,7 +37407,12 @@ call 978 UpdateExplosions
   w Debris#2.posX 41903808
   w Debris#2.posY 616936
   w Debris#2.posZ 17136144
+  w Debris#2.velX -4696
   w Debris#2.velY -25187
+  w Debris#2.velZ -1378
+  w Debris#2.spinX -293
+  w Debris#2.spinY 736
+  w Debris#2.spinZ 449
   w Debris#2.angle_x 29790
   w Debris#2.angle_y 24256
   w Debris#2.angle_z -10758
@@ -37415,10 +37420,16 @@ call 978 UpdateExplosions
   w Debris#3.posX 43120184
   w Debris#3.posY 229187
   w Debris#3.posZ 14053656
+  w Debris#3.velX 0
   w Debris#3.velY 0
+  w Debris#3.velZ 0
+  w Debris#3.spinX 0
+  w Debris#3.spinY 0
+  w Debris#3.spinZ 0
   w Debris#3.angle_x 0
   w Debris#3.angle_y 0
   w Debris#3.angle_z 0
+  w Debris#3.flags 0
   w Debris#4.posX 39258111
   w Debris#4.posY 172355
   w Debris#4.posZ 18654853
@@ -37444,15 +37455,26 @@ call 978 UpdateExplosions
   w Debris#11.posX 44599544
   w Debris#11.posY 5189155
   w Debris#11.posZ 20343694
+  w Debris#11.velX -102520
   w Debris#11.velY 97749
+  w Debris#11.velZ 28050
+  w Debris#11.spinX 486
+  w Debris#11.spinY -424
+  w Debris#11.spinZ -214
   w Debris#11.angle_x 7290
   w Debris#11.angle_y -6360
   w Debris#11.angle_z -3210
+  w Debris#11.flags 1
   w Debris#12.obj DebrisPiece#7
   w Debris#12.posX 45797504
   w Debris#12.posY 5288995
   w Debris#12.posZ 19132744
+  w Debris#12.velX -22656
   w Debris#12.velY 104405
+  w Debris#12.velZ -52680
+  w Debris#12.spinX -737
+  w Debris#12.spinY -631
+  w Debris#12.spinZ -62
   w Debris#12.angle_x -11055
   w Debris#12.angle_y -9465
   w Debris#12.angle_z -930
@@ -37460,7 +37482,12 @@ call 978 UpdateExplosions
   w Debris#13.posX 46911074
   w Debris#13.posY 5058595
   w Debris#13.posZ 19911664
+  w Debris#13.velX 51582
   w Debris#13.velY 89045
+  w Debris#13.velZ -752
+  w Debris#13.spinX -324
+  w Debris#13.spinY -296
+  w Debris#13.spinZ -771
   w Debris#13.angle_x -4860
   w Debris#13.angle_y -4440
   w Debris#13.angle_z -11565
@@ -37468,7 +37495,12 @@ call 978 UpdateExplosions
   w Debris#14.posX 46057244
   w Debris#14.posY 5204515
   w Debris#14.posZ 19646524
+  w Debris#14.velX -5340
   w Debris#14.velY 98773
+  w Debris#14.velZ -18428
+  w Debris#14.spinX 663
+  w Debris#14.spinY -467
+  w Debris#14.spinZ -368
   w Debris#14.angle_x 9945
   w Debris#14.angle_y -7005
   w Debris#14.angle_z -5520
@@ -37476,7 +37508,12 @@ call 978 UpdateExplosions
   w Debris#15.posX 46656014
   w Debris#15.posY 5043235
   w Debris#15.posZ 20637004
+  w Debris#15.velX 34578
   w Debris#15.velY 88021
+  w Debris#15.velZ 47604
+  w Debris#15.spinX -559
+  w Debris#15.spinY 494
+  w Debris#15.spinZ 50
   w Debris#15.angle_x -8385
   w Debris#15.angle_y 7410
   w Debris#15.angle_z 750
@@ -37484,7 +37521,12 @@ call 978 UpdateExplosions
   w Debris#16.posX 45702434
   w Debris#16.posY 5527075
   w Debris#16.posZ 19719709
+  w Debris#16.velX -28994
   w Debris#16.velY 120277
+  w Debris#16.velZ -13549
+  w Debris#16.spinX -725
+  w Debris#16.spinY 216
+  w Debris#16.spinZ 300
   w Debris#16.angle_x -10875
   w Debris#16.angle_y 3240
   w Debris#16.angle_z 4500
@@ -37492,7 +37534,12 @@ call 978 UpdateExplosions
   w Debris#17.posX 46496474
   w Debris#17.posY 5826595
   w Debris#17.posZ 19649614
+  w Debris#17.velX 23942
   w Debris#17.velY 140245
+  w Debris#17.velZ -18222
+  w Debris#17.spinX 118
+  w Debris#17.spinY 497
+  w Debris#17.spinZ 19
   w Debris#17.angle_x 1770
   w Debris#17.angle_y 7455
   w Debris#17.angle_z 285
@@ -37500,7 +37547,12 @@ call 978 UpdateExplosions
   w Debris#18.posX 46305989
   w Debris#18.posY 5219875
   w Debris#18.posZ 19142344
+  w Debris#18.velX 11243
   w Debris#18.velY 99797
+  w Debris#18.velZ -52040
+  w Debris#18.spinX 318
+  w Debris#18.spinY -525
+  w Debris#18.spinZ -639
   w Debris#18.angle_x 4770
   w Debris#18.angle_y -7875
   w Debris#18.angle_z -9585
@@ -37508,7 +37560,12 @@ call 978 UpdateExplosions
   w Debris#19.posX 46615724
   w Debris#19.posY 5373475
   w Debris#19.posZ 20190004
+  w Debris#19.velX 31892
   w Debris#19.velY 110037
+  w Debris#19.velZ 17804
+  w Debris#19.spinX -749
+  w Debris#19.spinY -610
+  w Debris#19.spinZ 348
   w Debris#19.angle_x -11235
   w Debris#19.angle_y -9150
   w Debris#19.angle_z 5220
@@ -37516,7 +37573,12 @@ call 978 UpdateExplosions
   w Debris#20.posX 45699914
   w Debris#20.posY 5135395
   w Debris#20.posZ 19973524
+  w Debris#20.velX -29162
   w Debris#20.velY 94165
+  w Debris#20.velZ 3372
+  w Debris#20.spinX 333
+  w Debris#20.spinY 463
+  w Debris#20.spinZ 699
   w Debris#20.angle_x 4995
   w Debris#20.angle_y 6945
   w Debris#20.angle_z 10485
@@ -37524,7 +37586,12 @@ call 978 UpdateExplosions
   w Debris#21.posX 46537094
   w Debris#21.posY 5457955
   w Debris#21.posZ 20013364
+  w Debris#21.velX 26650
   w Debris#21.velY 115669
+  w Debris#21.velZ 6028
+  w Debris#21.spinX 775
+  w Debris#21.spinY -225
+  w Debris#21.spinZ -701
   w Debris#21.angle_x 11625
   w Debris#21.angle_y -3375
   w Debris#21.angle_z -10515
@@ -37532,7 +37599,12 @@ call 978 UpdateExplosions
   w Debris#22.posX 45699344
   w Debris#22.posY 6003235
   w Debris#22.posZ 20057119
+  w Debris#22.velX -29200
   w Debris#22.velY 152021
+  w Debris#22.velZ 8945
+  w Debris#22.spinX 792
+  w Debris#22.spinY -355
+  w Debris#22.spinZ 295
   w Debris#22.angle_x 11880
   w Debris#22.angle_y -5325
   w Debris#22.angle_z 4425
@@ -37540,7 +37612,12 @@ call 978 UpdateExplosions
   w Debris#23.posX 46121984
   w Debris#23.posY 5626915
   w Debris#23.posZ 19623424
+  w Debris#23.velX -1024
   w Debris#23.velY 126933
+  w Debris#23.velZ -19968
+  w Debris#23.spinX 737
+  w Debris#23.spinY -59
+  w Debris#23.spinZ 397
   w Debris#23.angle_x 11055
   w Debris#23.angle_y -885
   w Debris#23.angle_z 5955
@@ -37548,7 +37625,12 @@ call 978 UpdateExplosions
   w Debris#24.posX 44745899
   w Debris#24.posY 5680675
   w Debris#24.posZ 19998424
+  w Debris#24.velX -92763
   w Debris#24.velY 130517
+  w Debris#24.velZ 5032
+  w Debris#24.spinX 677
+  w Debris#24.spinY 580
+  w Debris#24.spinZ 437
   w Debris#24.angle_x 10155
   w Debris#24.angle_y 8700
   w Debris#24.angle_z 6555
@@ -37556,7 +37638,12 @@ call 978 UpdateExplosions
   w Debris#25.posX 46552754
   w Debris#25.posY 5542435
   w Debris#25.posZ 19564624
+  w Debris#25.velX 27694
   w Debris#25.velY 121301
+  w Debris#25.velZ -23888
+  w Debris#25.spinX -37
+  w Debris#25.spinY 442
+  w Debris#25.spinZ 62
   w Debris#25.angle_x -555
   w Debris#25.angle_y 6630
   w Debris#25.angle_z 930
@@ -37564,7 +37651,12 @@ call 978 UpdateExplosions
   w Debris#26.posX 46329824
   w Debris#26.posY 6172195
   w Debris#26.posZ 19524664
+  w Debris#26.velX 12832
   w Debris#26.velY 163285
+  w Debris#26.velZ -26552
+  w Debris#26.spinX 24
+  w Debris#26.spinY -23
+  w Debris#26.spinZ 393
   w Debris#26.angle_x 360
   w Debris#26.angle_y -345
   w Debris#26.angle_z 5895
@@ -37572,7 +37664,12 @@ call 978 UpdateExplosions
   w Debris#27.posX 45950954
   w Debris#27.posY 5734435
   w Debris#27.posZ 20509144
+  w Debris#27.velX -12426
   w Debris#27.velY 134101
+  w Debris#27.velZ 39080
+  w Debris#27.spinX 248
+  w Debris#27.spinY 472
+  w Debris#27.spinZ 125
   w Debris#27.angle_x 3720
   w Debris#27.angle_y 7080
   w Debris#27.angle_z 1875
@@ -37580,10 +37677,16 @@ call 978 UpdateExplosions
   w Debris#28.posX 46137344
   w Debris#28.posY 2744320
   w Debris#28.posZ 19922944
+  w Debris#28.velX 0
   w Debris#28.velY 0
+  w Debris#28.velZ 0
+  w Debris#28.spinX 0
+  w Debris#28.spinY 0
+  w Debris#28.spinZ 0
   w Debris#28.angle_x 0
   w Debris#28.angle_y 0
   w Debris#28.angle_z 0
+  w Debris#28.flags 0
   w Debris#29.posY 1712128
   w Debris#30.posY 65536
   w Debris#31.posX 38326068
@@ -37674,109 +37777,6 @@ call 979 UpdateUnitWeapons
 call 979 UpdateUnitWeapons
   a unit Unit#252
 call 979 UpdateExplosions
-  r Debris#2.velX -4696
-  r Debris#2.velZ -1378
-  r Debris#2.spinX -293
-  r Debris#2.spinY 736
-  r Debris#2.spinZ 449
-  r Debris#3.velX 0
-  r Debris#3.velZ 0
-  r Debris#3.spinX 0
-  r Debris#3.spinY 0
-  r Debris#3.spinZ 0
-  r Debris#3.flags 0
-  r Debris#11.velX -102520
-  r Debris#11.velZ 28050
-  r Debris#11.spinX 486
-  r Debris#11.spinY -424
-  r Debris#11.spinZ -214
-  r Debris#11.flags 1
-  r Debris#12.velX -22656
-  r Debris#12.velZ -52680
-  r Debris#12.spinX -737
-  r Debris#12.spinY -631
-  r Debris#12.spinZ -62
-  r Debris#13.velX 51582
-  r Debris#13.velZ -752
-  r Debris#13.spinX -324
-  r Debris#13.spinY -296
-  r Debris#13.spinZ -771
-  r Debris#14.velX -5340
-  r Debris#14.velZ -18428
-  r Debris#14.spinX 663
-  r Debris#14.spinY -467
-  r Debris#14.spinZ -368
-  r Debris#15.velX 34578
-  r Debris#15.velZ 47604
-  r Debris#15.spinX -559
-  r Debris#15.spinY 494
-  r Debris#15.spinZ 50
-  r Debris#16.velX -28994
-  r Debris#16.velZ -13549
-  r Debris#16.spinX -725
-  r Debris#16.spinY 216
-  r Debris#16.spinZ 300
-  r Debris#17.velX 23942
-  r Debris#17.velZ -18222
-  r Debris#17.spinX 118
-  r Debris#17.spinY 497
-  r Debris#17.spinZ 19
-  r Debris#18.velX 11243
-  r Debris#18.velZ -52040
-  r Debris#18.spinX 318
-  r Debris#18.spinY -525
-  r Debris#18.spinZ -639
-  r Debris#19.velX 31892
-  r Debris#19.velZ 17804
-  r Debris#19.spinX -749
-  r Debris#19.spinY -610
-  r Debris#19.spinZ 348
-  r Debris#20.velX -29162
-  r Debris#20.velZ 3372
-  r Debris#20.spinX 333
-  r Debris#20.spinY 463
-  r Debris#20.spinZ 699
-  r Debris#21.velX 26650
-  r Debris#21.velZ 6028
-  r Debris#21.spinX 775
-  r Debris#21.spinY -225
-  r Debris#21.spinZ -701
-  r Debris#22.velX -29200
-  r Debris#22.velZ 8945
-  r Debris#22.spinX 792
-  r Debris#22.spinY -355
-  r Debris#22.spinZ 295
-  r Debris#23.velX -1024
-  r Debris#23.velZ -19968
-  r Debris#23.spinX 737
-  r Debris#23.spinY -59
-  r Debris#23.spinZ 397
-  r Debris#24.velX -92763
-  r Debris#24.velZ 5032
-  r Debris#24.spinX 677
-  r Debris#24.spinY 580
-  r Debris#24.spinZ 437
-  r Debris#25.velX 27694
-  r Debris#25.velZ -23888
-  r Debris#25.spinX -37
-  r Debris#25.spinY 442
-  r Debris#25.spinZ 62
-  r Debris#26.velX 12832
-  r Debris#26.velZ -26552
-  r Debris#26.spinX 24
-  r Debris#26.spinY -23
-  r Debris#26.spinZ 393
-  r Debris#27.velX -12426
-  r Debris#27.velZ 39080
-  r Debris#27.spinX 248
-  r Debris#27.spinY 472
-  r Debris#27.spinZ 125
-  r Debris#28.velX 0
-  r Debris#28.velZ 0
-  r Debris#28.spinX 0
-  r Debris#28.spinY 0
-  r Debris#28.spinZ 0
-  r Debris#28.flags 0
   i map.GetCellMeanHeight pos=(49761654,15534063) = 1
   i map.GetCellMeanHeight pos=(21364636,16210680) = 1
   i map.GetCellMeanHeight pos=(48258382,15323775) = 1
@@ -38745,7 +38745,12 @@ call 981 UpdateExplosions
   w Debris#0.posX 43630662
   w Debris#0.posY 634267
   w Debris#0.posZ 11391477
+  w Debris#0.velX 9458
   w Debris#0.velY -36651
+  w Debris#0.velZ -48049
+  w Debris#0.spinX 471
+  w Debris#0.spinY 466
+  w Debris#0.spinZ -84
   w Debris#0.angle_x -6661
   w Debris#0.angle_y -7286
   w Debris#0.angle_z -10500
@@ -38753,7 +38758,12 @@ call 981 UpdateExplosions
   w Debris#1.posX 41889720
   w Debris#1.posY 516910
   w Debris#1.posZ 17132010
+  w Debris#1.velX -4696
   w Debris#1.velY -49652
+  w Debris#1.velZ -1378
+  w Debris#1.spinX -293
+  w Debris#1.spinY 736
+  w Debris#1.spinZ 449
   w Debris#1.angle_x 28911
   w Debris#1.angle_y 26464
   w Debris#1.angle_z -9411
@@ -38761,10 +38771,16 @@ call 981 UpdateExplosions
   w Debris#2.posX 43120184
   w Debris#2.posY 229187
   w Debris#2.posZ 14053656
+  w Debris#2.velX 0
   w Debris#2.velY 0
+  w Debris#2.velZ 0
+  w Debris#2.spinX 0
+  w Debris#2.spinY 0
+  w Debris#2.spinZ 0
   w Debris#2.angle_x 0
   w Debris#2.angle_y 0
   w Debris#2.angle_z 0
+  w Debris#2.flags 0
   w Debris#3.posX 39258111
   w Debris#3.posY 172355
   w Debris#3.posZ 18654853
@@ -38790,15 +38806,26 @@ call 981 UpdateExplosions
   w Debris#10.posX 44291984
   w Debris#10.posY 5457937
   w Debris#10.posZ 20427844
+  w Debris#10.velX -102520
   w Debris#10.velY 73284
+  w Debris#10.velZ 28050
+  w Debris#10.spinX 486
+  w Debris#10.spinY -424
+  w Debris#10.spinZ -214
   w Debris#10.angle_x 8748
   w Debris#10.angle_y -7632
   w Debris#10.angle_z -3852
+  w Debris#10.flags 1
   w Debris#11.obj DebrisPiece#7
   w Debris#11.posX 45729536
   w Debris#11.posY 5577745
   w Debris#11.posZ 18974704
+  w Debris#11.velX -22656
   w Debris#11.velY 79940
+  w Debris#11.velZ -52680
+  w Debris#11.spinX -737
+  w Debris#11.spinY -631
+  w Debris#11.spinZ -62
   w Debris#11.angle_x -13266
   w Debris#11.angle_y -11358
   w Debris#11.angle_z -1116
@@ -38806,7 +38833,12 @@ call 981 UpdateExplosions
   w Debris#12.posX 47065820
   w Debris#12.posY 5301265
   w Debris#12.posZ 19909408
+  w Debris#12.velX 51582
   w Debris#12.velY 64580
+  w Debris#12.velZ -752
+  w Debris#12.spinX -324
+  w Debris#12.spinY -296
+  w Debris#12.spinZ -771
   w Debris#12.angle_x -5832
   w Debris#12.angle_y -5328
   w Debris#12.angle_z -13878
@@ -38814,7 +38846,12 @@ call 981 UpdateExplosions
   w Debris#13.posX 46041224
   w Debris#13.posY 5476369
   w Debris#13.posZ 19591240
+  w Debris#13.velX -5340
   w Debris#13.velY 74308
+  w Debris#13.velZ -18428
+  w Debris#13.spinX 663
+  w Debris#13.spinY -467
+  w Debris#13.spinZ -368
   w Debris#13.angle_x 11934
   w Debris#13.angle_y -8406
   w Debris#13.angle_z -6624
@@ -38822,7 +38859,12 @@ call 981 UpdateExplosions
   w Debris#14.posX 46759748
   w Debris#14.posY 5282833
   w Debris#14.posZ 20779816
+  w Debris#14.velX 34578
   w Debris#14.velY 63556
+  w Debris#14.velZ 47604
+  w Debris#14.spinX -559
+  w Debris#14.spinY 494
+  w Debris#14.spinZ 50
   w Debris#14.angle_x -10062
   w Debris#14.angle_y 8892
   w Debris#14.angle_z 900
@@ -38830,7 +38872,12 @@ call 981 UpdateExplosions
   w Debris#15.posX 45615452
   w Debris#15.posY 5863441
   w Debris#15.posZ 19679062
+  w Debris#15.velX -28994
   w Debris#15.velY 95812
+  w Debris#15.velZ -13549
+  w Debris#15.spinX -725
+  w Debris#15.spinY 216
+  w Debris#15.spinZ 300
   w Debris#15.angle_x -13050
   w Debris#15.angle_y 3888
   w Debris#15.angle_z 5400
@@ -38838,7 +38885,12 @@ call 981 UpdateExplosions
   w Debris#16.posX 46568300
   w Debris#16.posY 6222865
   w Debris#16.posZ 19594948
+  w Debris#16.velX 23942
   w Debris#16.velY 115780
+  w Debris#16.velZ -18222
+  w Debris#16.spinX 118
+  w Debris#16.spinY 497
+  w Debris#16.spinZ 19
   w Debris#16.angle_x 2124
   w Debris#16.angle_y 8946
   w Debris#16.angle_z 342
@@ -38846,7 +38898,12 @@ call 981 UpdateExplosions
   w Debris#17.posX 46339718
   w Debris#17.posY 5494801
   w Debris#17.posZ 18986224
+  w Debris#17.velX 11243
   w Debris#17.velY 75332
+  w Debris#17.velZ -52040
+  w Debris#17.spinX 318
+  w Debris#17.spinY -525
+  w Debris#17.spinZ -639
   w Debris#17.angle_x 5724
   w Debris#17.angle_y -9450
   w Debris#17.angle_z -11502
@@ -38854,7 +38911,12 @@ call 981 UpdateExplosions
   w Debris#18.posX 46711400
   w Debris#18.posY 5679121
   w Debris#18.posZ 20243416
+  w Debris#18.velX 31892
   w Debris#18.velY 85572
+  w Debris#18.velZ 17804
+  w Debris#18.spinX -749
+  w Debris#18.spinY -610
+  w Debris#18.spinZ 348
   w Debris#18.angle_x -13482
   w Debris#18.angle_y -10980
   w Debris#18.angle_z 6264
@@ -38862,7 +38924,12 @@ call 981 UpdateExplosions
   w Debris#19.posX 45612428
   w Debris#19.posY 5393425
   w Debris#19.posZ 19983640
+  w Debris#19.velX -29162
   w Debris#19.velY 69700
+  w Debris#19.velZ 3372
+  w Debris#19.spinX 333
+  w Debris#19.spinY 463
+  w Debris#19.spinZ 699
   w Debris#19.angle_x 5994
   w Debris#19.angle_y 8334
   w Debris#19.angle_z 12582
@@ -38870,7 +38937,12 @@ call 981 UpdateExplosions
   w Debris#20.posX 46617044
   w Debris#20.posY 5780497
   w Debris#20.posZ 20031448
+  w Debris#20.velX 26650
   w Debris#20.velY 91204
+  w Debris#20.velZ 6028
+  w Debris#20.spinX 775
+  w Debris#20.spinY -225
+  w Debris#20.spinZ -701
   w Debris#20.angle_x 13950
   w Debris#20.angle_y -4050
   w Debris#20.angle_z -12618
@@ -38878,7 +38950,12 @@ call 981 UpdateExplosions
   w Debris#21.posX 45611744
   w Debris#21.posY 6434833
   w Debris#21.posZ 20083954
+  w Debris#21.velX -29200
   w Debris#21.velY 127556
+  w Debris#21.velZ 8945
+  w Debris#21.spinX 792
+  w Debris#21.spinY -355
+  w Debris#21.spinZ 295
   w Debris#21.angle_x 14256
   w Debris#21.angle_y -6390
   w Debris#21.angle_z 5310
@@ -38886,7 +38963,12 @@ call 981 UpdateExplosions
   w Debris#22.posX 46118912
   w Debris#22.posY 5983249
   w Debris#22.posZ 19563520
+  w Debris#22.velX -1024
   w Debris#22.velY 102468
+  w Debris#22.velZ -19968
+  w Debris#22.spinX 737
+  w Debris#22.spinY -59
+  w Debris#22.spinZ 397
   w Debris#22.angle_x 13266
   w Debris#22.angle_y -1062
   w Debris#22.angle_z 7146
@@ -38894,7 +38976,12 @@ call 981 UpdateExplosions
   w Debris#23.posX 44467610
   w Debris#23.posY 6047761
   w Debris#23.posZ 20013520
+  w Debris#23.velX -92763
   w Debris#23.velY 106052
+  w Debris#23.velZ 5032
+  w Debris#23.spinX 677
+  w Debris#23.spinY 580
+  w Debris#23.spinZ 437
   w Debris#23.angle_x 12186
   w Debris#23.angle_y 10440
   w Debris#23.angle_z 7866
@@ -38902,7 +38989,12 @@ call 981 UpdateExplosions
   w Debris#24.posX 46635836
   w Debris#24.posY 5881873
   w Debris#24.posZ 19492960
+  w Debris#24.velX 27694
   w Debris#24.velY 96836
+  w Debris#24.velZ -23888
+  w Debris#24.spinX -37
+  w Debris#24.spinY 442
+  w Debris#24.spinZ 62
   w Debris#24.angle_x -666
   w Debris#24.angle_y 7956
   w Debris#24.angle_z 1116
@@ -38910,7 +39002,12 @@ call 981 UpdateExplosions
   w Debris#25.posX 46368320
   w Debris#25.posY 6637585
   w Debris#25.posZ 19445008
+  w Debris#25.velX 12832
   w Debris#25.velY 138820
+  w Debris#25.velZ -26552
+  w Debris#25.spinX 24
+  w Debris#25.spinY -23
+  w Debris#25.spinZ 393
   w Debris#25.angle_x 432
   w Debris#25.angle_y -414
   w Debris#25.angle_z 7074
@@ -38918,7 +39015,12 @@ call 981 UpdateExplosions
   w Debris#26.posX 45913676
   w Debris#26.posY 6112273
   w Debris#26.posZ 20626384
+  w Debris#26.velX -12426
   w Debris#26.velY 109636
+  w Debris#26.velZ 39080
+  w Debris#26.spinX 248
+  w Debris#26.spinY 472
+  w Debris#26.spinZ 125
   w Debris#26.angle_x 4464
   w Debris#26.angle_y 8496
   w Debris#26.angle_z 2250
@@ -38926,10 +39028,16 @@ call 981 UpdateExplosions
   w Debris#27.posX 46137344
   w Debris#27.posY 2744320
   w Debris#27.posZ 19922944
+  w Debris#27.velX 0
   w Debris#27.velY 0
+  w Debris#27.velZ 0
+  w Debris#27.spinX 0
+  w Debris#27.spinY 0
+  w Debris#27.spinZ 0
   w Debris#27.angle_x 0
   w Debris#27.angle_y 0
   w Debris#27.angle_z 0
+  w Debris#27.flags 0
   w Debris#28.posY 1712128
   w Debris#29.posY 65536
   w Debris#30.posX 38326068
@@ -39022,114 +39130,6 @@ call 982 UpdateUnitWeapons
 call 982 UpdateUnitWeapons
   a unit Unit#252
 call 982 UpdateExplosions
-  r Debris#0.velX 9458
-  r Debris#0.velZ -48049
-  r Debris#0.spinX 471
-  r Debris#0.spinY 466
-  r Debris#0.spinZ -84
-  r Debris#1.velX -4696
-  r Debris#1.velZ -1378
-  r Debris#1.spinX -293
-  r Debris#1.spinY 736
-  r Debris#1.spinZ 449
-  r Debris#2.velX 0
-  r Debris#2.velZ 0
-  r Debris#2.spinX 0
-  r Debris#2.spinY 0
-  r Debris#2.spinZ 0
-  r Debris#2.flags 0
-  r Debris#10.velX -102520
-  r Debris#10.velZ 28050
-  r Debris#10.spinX 486
-  r Debris#10.spinY -424
-  r Debris#10.spinZ -214
-  r Debris#10.flags 1
-  r Debris#11.velX -22656
-  r Debris#11.velZ -52680
-  r Debris#11.spinX -737
-  r Debris#11.spinY -631
-  r Debris#11.spinZ -62
-  r Debris#12.velX 51582
-  r Debris#12.velZ -752
-  r Debris#12.spinX -324
-  r Debris#12.spinY -296
-  r Debris#12.spinZ -771
-  r Debris#13.velX -5340
-  r Debris#13.velZ -18428
-  r Debris#13.spinX 663
-  r Debris#13.spinY -467
-  r Debris#13.spinZ -368
-  r Debris#14.velX 34578
-  r Debris#14.velZ 47604
-  r Debris#14.spinX -559
-  r Debris#14.spinY 494
-  r Debris#14.spinZ 50
-  r Debris#15.velX -28994
-  r Debris#15.velZ -13549
-  r Debris#15.spinX -725
-  r Debris#15.spinY 216
-  r Debris#15.spinZ 300
-  r Debris#16.velX 23942
-  r Debris#16.velZ -18222
-  r Debris#16.spinX 118
-  r Debris#16.spinY 497
-  r Debris#16.spinZ 19
-  r Debris#17.velX 11243
-  r Debris#17.velZ -52040
-  r Debris#17.spinX 318
-  r Debris#17.spinY -525
-  r Debris#17.spinZ -639
-  r Debris#18.velX 31892
-  r Debris#18.velZ 17804
-  r Debris#18.spinX -749
-  r Debris#18.spinY -610
-  r Debris#18.spinZ 348
-  r Debris#19.velX -29162
-  r Debris#19.velZ 3372
-  r Debris#19.spinX 333
-  r Debris#19.spinY 463
-  r Debris#19.spinZ 699
-  r Debris#20.velX 26650
-  r Debris#20.velZ 6028
-  r Debris#20.spinX 775
-  r Debris#20.spinY -225
-  r Debris#20.spinZ -701
-  r Debris#21.velX -29200
-  r Debris#21.velZ 8945
-  r Debris#21.spinX 792
-  r Debris#21.spinY -355
-  r Debris#21.spinZ 295
-  r Debris#22.velX -1024
-  r Debris#22.velZ -19968
-  r Debris#22.spinX 737
-  r Debris#22.spinY -59
-  r Debris#22.spinZ 397
-  r Debris#23.velX -92763
-  r Debris#23.velZ 5032
-  r Debris#23.spinX 677
-  r Debris#23.spinY 580
-  r Debris#23.spinZ 437
-  r Debris#24.velX 27694
-  r Debris#24.velZ -23888
-  r Debris#24.spinX -37
-  r Debris#24.spinY 442
-  r Debris#24.spinZ 62
-  r Debris#25.velX 12832
-  r Debris#25.velZ -26552
-  r Debris#25.spinX 24
-  r Debris#25.spinY -23
-  r Debris#25.spinZ 393
-  r Debris#26.velX -12426
-  r Debris#26.velZ 39080
-  r Debris#26.spinX 248
-  r Debris#26.spinY 472
-  r Debris#26.spinZ 125
-  r Debris#27.velX 0
-  r Debris#27.velZ 0
-  r Debris#27.spinX 0
-  r Debris#27.spinY 0
-  r Debris#27.spinZ 0
-  r Debris#27.flags 0
   i map.GetCellMeanHeight pos=(50498934,14845935) = 1
   i map.GetCellMeanHeight pos=(21094300,16210680) = 1
   i map.GetCellMeanHeight pos=(48700750,14684799) = 1
@@ -39350,23 +39350,40 @@ call 982 UpdateExplosions
   w Debris#8.posX 44189464
   w Debris#8.posY 5531221
   w Debris#8.posZ 20455894
+  w Debris#8.velX -102520
   w Debris#8.velY 65129
+  w Debris#8.velZ 28050
+  w Debris#8.spinX 486
+  w Debris#8.spinY -424
+  w Debris#8.spinZ -214
   w Debris#8.angle_x 9234
   w Debris#8.angle_y -8056
   w Debris#8.angle_z -4066
+  w Debris#8.flags 1
   w Debris#9.obj DebrisPiece#7
   w Debris#9.posX 45706880
   w Debris#9.posY 5657685
   w Debris#9.posZ 18922024
+  w Debris#9.velX -22656
   w Debris#9.velY 71785
+  w Debris#9.velZ -52680
+  w Debris#9.spinX -737
+  w Debris#9.spinY -631
+  w Debris#9.spinZ -62
   w Debris#9.angle_x -14003
   w Debris#9.angle_y -11989
   w Debris#9.angle_z -1178
+  w Debris#9.flags 1
   w Debris#10.obj DebrisPiece#9
   w Debris#10.posX 47117402
   w Debris#10.posY 5365845
   w Debris#10.posZ 19908656
+  w Debris#10.velX 51582
   w Debris#10.velY 56425
+  w Debris#10.velZ -752
+  w Debris#10.spinX -324
+  w Debris#10.spinY -296
+  w Debris#10.spinZ -771
   w Debris#10.angle_x -6156
   w Debris#10.angle_y -5624
   w Debris#10.angle_z -14649
@@ -39374,7 +39391,12 @@ call 982 UpdateExplosions
   w Debris#11.posX 46035884
   w Debris#11.posY 5550677
   w Debris#11.posZ 19572812
+  w Debris#11.velX -5340
   w Debris#11.velY 66153
+  w Debris#11.velZ -18428
+  w Debris#11.spinX 663
+  w Debris#11.spinY -467
+  w Debris#11.spinZ -368
   w Debris#11.angle_x 12597
   w Debris#11.angle_y -8873
   w Debris#11.angle_z -6992
@@ -39382,7 +39404,12 @@ call 982 UpdateExplosions
   w Debris#12.posX 46794326
   w Debris#12.posY 5346389
   w Debris#12.posZ 20827420
+  w Debris#12.velX 34578
   w Debris#12.velY 55401
+  w Debris#12.velZ 47604
+  w Debris#12.spinX -559
+  w Debris#12.spinY 494
+  w Debris#12.spinZ 50
   w Debris#12.angle_x -10621
   w Debris#12.angle_y 9386
   w Debris#12.angle_z 950
@@ -39390,7 +39417,12 @@ call 982 UpdateExplosions
   w Debris#13.posX 45586458
   w Debris#13.posY 5959253
   w Debris#13.posZ 19665513
+  w Debris#13.velX -28994
   w Debris#13.velY 87657
+  w Debris#13.velZ -13549
+  w Debris#13.spinX -725
+  w Debris#13.spinY 216
+  w Debris#13.spinZ 300
   w Debris#13.angle_x -13775
   w Debris#13.angle_y 4104
   w Debris#13.angle_z 5700
@@ -39398,7 +39430,12 @@ call 982 UpdateExplosions
   w Debris#14.posX 46592242
   w Debris#14.posY 6338645
   w Debris#14.posZ 19576726
+  w Debris#14.velX 23942
   w Debris#14.velY 107625
+  w Debris#14.velZ -18222
+  w Debris#14.spinX 118
+  w Debris#14.spinY 497
+  w Debris#14.spinZ 19
   w Debris#14.angle_x 2242
   w Debris#14.angle_y 9443
   w Debris#14.angle_z 361
@@ -39406,7 +39443,12 @@ call 982 UpdateExplosions
   w Debris#15.posX 46350961
   w Debris#15.posY 5570133
   w Debris#15.posZ 18934184
+  w Debris#15.velX 11243
   w Debris#15.velY 67177
+  w Debris#15.velZ -52040
+  w Debris#15.spinX 318
+  w Debris#15.spinY -525
+  w Debris#15.spinZ -639
   w Debris#15.angle_x 6042
   w Debris#15.angle_y -9975
   w Debris#15.angle_z -12141
@@ -39414,7 +39456,12 @@ call 982 UpdateExplosions
   w Debris#16.posX 46743292
   w Debris#16.posY 5764693
   w Debris#16.posZ 20261220
+  w Debris#16.velX 31892
   w Debris#16.velY 77417
+  w Debris#16.velZ 17804
+  w Debris#16.spinX -749
+  w Debris#16.spinY -610
+  w Debris#16.spinZ 348
   w Debris#16.angle_x -14231
   w Debris#16.angle_y -11590
   w Debris#16.angle_z 6612
@@ -39422,7 +39469,12 @@ call 982 UpdateExplosions
   w Debris#17.posX 45583266
   w Debris#17.posY 5463125
   w Debris#17.posZ 19987012
+  w Debris#17.velX -29162
   w Debris#17.velY 61545
+  w Debris#17.velZ 3372
+  w Debris#17.spinX 333
+  w Debris#17.spinY 463
+  w Debris#17.spinZ 699
   w Debris#17.angle_x 6327
   w Debris#17.angle_y 8797
   w Debris#17.angle_z 13281
@@ -39430,7 +39482,12 @@ call 982 UpdateExplosions
   w Debris#18.posX 46643694
   w Debris#18.posY 5871701
   w Debris#18.posZ 20037476
+  w Debris#18.velX 26650
   w Debris#18.velY 83049
+  w Debris#18.velZ 6028
+  w Debris#18.spinX 775
+  w Debris#18.spinY -225
+  w Debris#18.spinZ -701
   w Debris#18.angle_x 14725
   w Debris#18.angle_y -4275
   w Debris#18.angle_z -13319
@@ -39438,7 +39495,12 @@ call 982 UpdateExplosions
   w Debris#19.posX 45582544
   w Debris#19.posY 6562389
   w Debris#19.posZ 20092899
+  w Debris#19.velX -29200
   w Debris#19.velY 119401
+  w Debris#19.velZ 8945
+  w Debris#19.spinX 792
+  w Debris#19.spinY -355
+  w Debris#19.spinZ 295
   w Debris#19.angle_x 15048
   w Debris#19.angle_y -6745
   w Debris#19.angle_z 5605
@@ -39446,7 +39508,12 @@ call 982 UpdateExplosions
   w Debris#20.posX 46117888
   w Debris#20.posY 6085717
   w Debris#20.posZ 19543552
+  w Debris#20.velX -1024
   w Debris#20.velY 94313
+  w Debris#20.velZ -19968
+  w Debris#20.spinX 737
+  w Debris#20.spinY -59
+  w Debris#20.spinZ 397
   w Debris#20.angle_x 14003
   w Debris#20.angle_y -1121
   w Debris#20.angle_z 7543
@@ -39454,7 +39521,12 @@ call 982 UpdateExplosions
   w Debris#21.posX 44374847
   w Debris#21.posY 6153813
   w Debris#21.posZ 20018552
+  w Debris#21.velX -92763
   w Debris#21.velY 97897
+  w Debris#21.velZ 5032
+  w Debris#21.spinX 677
+  w Debris#21.spinY 580
+  w Debris#21.spinZ 437
   w Debris#21.angle_x 12863
   w Debris#21.angle_y 11020
   w Debris#21.angle_z 8303
@@ -39462,7 +39534,12 @@ call 982 UpdateExplosions
   w Debris#22.posX 46663530
   w Debris#22.posY 5978709
   w Debris#22.posZ 19469072
+  w Debris#22.velX 27694
   w Debris#22.velY 88681
+  w Debris#22.velZ -23888
+  w Debris#22.spinX -37
+  w Debris#22.spinY 442
+  w Debris#22.spinZ 62
   w Debris#22.angle_x -703
   w Debris#22.angle_y 8398
   w Debris#22.angle_z 1178
@@ -39470,7 +39547,12 @@ call 982 UpdateExplosions
   w Debris#23.posX 46381152
   w Debris#23.posY 6776405
   w Debris#23.posZ 19418456
+  w Debris#23.velX 12832
   w Debris#23.velY 130665
+  w Debris#23.velZ -26552
+  w Debris#23.spinX 24
+  w Debris#23.spinY -23
+  w Debris#23.spinZ 393
   w Debris#23.angle_x 456
   w Debris#23.angle_y -437
   w Debris#23.angle_z 7467
@@ -39478,7 +39560,12 @@ call 982 UpdateExplosions
   w Debris#24.posX 45901250
   w Debris#24.posY 6221909
   w Debris#24.posZ 20665464
+  w Debris#24.velX -12426
   w Debris#24.velY 101481
+  w Debris#24.velZ 39080
+  w Debris#24.spinX 248
+  w Debris#24.spinY 472
+  w Debris#24.spinZ 125
   w Debris#24.angle_x 4712
   w Debris#24.angle_y 8968
   w Debris#24.angle_z 2375
@@ -39486,18 +39573,30 @@ call 982 UpdateExplosions
   w Debris#25.posX 46137344
   w Debris#25.posY 2744320
   w Debris#25.posZ 19922944
+  w Debris#25.velX 0
   w Debris#25.velY 0
+  w Debris#25.velZ 0
+  w Debris#25.spinX 0
+  w Debris#25.spinY 0
+  w Debris#25.spinZ 0
   w Debris#25.angle_x 0
   w Debris#25.angle_y 0
   w Debris#25.angle_z 0
+  w Debris#25.flags 0
   w Debris#26.obj null
   w Debris#26.posX 46137344
   w Debris#26.posY 1712128
   w Debris#26.posZ 19922944
+  w Debris#26.velX 0
   w Debris#26.velY 0
+  w Debris#26.velZ 0
+  w Debris#26.spinX 0
+  w Debris#26.spinY 0
+  w Debris#26.spinZ 0
   w Debris#26.angle_x 0
   w Debris#26.angle_y 0
   w Debris#26.angle_z 0
+  w Debris#26.flags 0
   w Debris#27.posY 65536
   w Debris#28.posX 38326068
   w Debris#28.posY 150214
@@ -39595,105 +39694,6 @@ call 983 UpdateUnitWeapons
 call 983 UpdateUnitWeapons
   a unit Unit#252
 call 983 UpdateExplosions
-  r Debris#8.velX -102520
-  r Debris#8.velZ 28050
-  r Debris#8.spinX 486
-  r Debris#8.spinY -424
-  r Debris#8.spinZ -214
-  r Debris#8.flags 1
-  r Debris#9.velX -22656
-  r Debris#9.velZ -52680
-  r Debris#9.spinX -737
-  r Debris#9.spinY -631
-  r Debris#9.spinZ -62
-  r Debris#9.flags 1
-  r Debris#10.velX 51582
-  r Debris#10.velZ -752
-  r Debris#10.spinX -324
-  r Debris#10.spinY -296
-  r Debris#10.spinZ -771
-  r Debris#11.velX -5340
-  r Debris#11.velZ -18428
-  r Debris#11.spinX 663
-  r Debris#11.spinY -467
-  r Debris#11.spinZ -368
-  r Debris#12.velX 34578
-  r Debris#12.velZ 47604
-  r Debris#12.spinX -559
-  r Debris#12.spinY 494
-  r Debris#12.spinZ 50
-  r Debris#13.velX -28994
-  r Debris#13.velZ -13549
-  r Debris#13.spinX -725
-  r Debris#13.spinY 216
-  r Debris#13.spinZ 300
-  r Debris#14.velX 23942
-  r Debris#14.velZ -18222
-  r Debris#14.spinX 118
-  r Debris#14.spinY 497
-  r Debris#14.spinZ 19
-  r Debris#15.velX 11243
-  r Debris#15.velZ -52040
-  r Debris#15.spinX 318
-  r Debris#15.spinY -525
-  r Debris#15.spinZ -639
-  r Debris#16.velX 31892
-  r Debris#16.velZ 17804
-  r Debris#16.spinX -749
-  r Debris#16.spinY -610
-  r Debris#16.spinZ 348
-  r Debris#17.velX -29162
-  r Debris#17.velZ 3372
-  r Debris#17.spinX 333
-  r Debris#17.spinY 463
-  r Debris#17.spinZ 699
-  r Debris#18.velX 26650
-  r Debris#18.velZ 6028
-  r Debris#18.spinX 775
-  r Debris#18.spinY -225
-  r Debris#18.spinZ -701
-  r Debris#19.velX -29200
-  r Debris#19.velZ 8945
-  r Debris#19.spinX 792
-  r Debris#19.spinY -355
-  r Debris#19.spinZ 295
-  r Debris#20.velX -1024
-  r Debris#20.velZ -19968
-  r Debris#20.spinX 737
-  r Debris#20.spinY -59
-  r Debris#20.spinZ 397
-  r Debris#21.velX -92763
-  r Debris#21.velZ 5032
-  r Debris#21.spinX 677
-  r Debris#21.spinY 580
-  r Debris#21.spinZ 437
-  r Debris#22.velX 27694
-  r Debris#22.velZ -23888
-  r Debris#22.spinX -37
-  r Debris#22.spinY 442
-  r Debris#22.spinZ 62
-  r Debris#23.velX 12832
-  r Debris#23.velZ -26552
-  r Debris#23.spinX 24
-  r Debris#23.spinY -23
-  r Debris#23.spinZ 393
-  r Debris#24.velX -12426
-  r Debris#24.velZ 39080
-  r Debris#24.spinX 248
-  r Debris#24.spinY 472
-  r Debris#24.spinZ 125
-  r Debris#25.velX 0
-  r Debris#25.velZ 0
-  r Debris#25.spinX 0
-  r Debris#25.spinY 0
-  r Debris#25.spinZ 0
-  r Debris#25.flags 0
-  r Debris#26.velX 0
-  r Debris#26.velZ 0
-  r Debris#26.spinX 0
-  r Debris#26.spinY 0
-  r Debris#26.spinZ 0
-  r Debris#26.flags 0
   i map.GetCellMeanHeight pos=(50744694,14616559) = 1
   i map.GetCellMeanHeight pos=(21004188,16210680) = 1
   i map.GetCellMeanHeight pos=(48848206,14471807) = 1
@@ -41355,10 +41355,16 @@ call 987 UpdateExplosions
   w Debris#1.posX 44193500
   w Debris#1.posY 187788
   w Debris#1.posZ 16968304
+  w Debris#1.velX 0
   w Debris#1.velY 0
+  w Debris#1.velZ 0
+  w Debris#1.spinX 0
+  w Debris#1.spinY 0
+  w Debris#1.spinZ 0
   w Debris#1.angle_x 0
   w Debris#1.angle_y 0
   w Debris#1.angle_z 0
+  w Debris#1.flags 0
   w Debris#2.posX 44798976
   w Debris#2.posY 168649
   w Debris#2.posZ 16693248
@@ -41378,15 +41384,26 @@ call 987 UpdateExplosions
   w Debris#7.posX 43676864
   w Debris#7.posY 5775316
   w Debris#7.posZ 20596144
+  w Debris#7.velX -102520
   w Debris#7.velY 24354
+  w Debris#7.velZ 28050
+  w Debris#7.spinX 486
+  w Debris#7.spinY -424
+  w Debris#7.spinZ -214
   w Debris#7.angle_x 11664
   w Debris#7.angle_y -10176
   w Debris#7.angle_z -5136
+  w Debris#7.flags 1
   w Debris#8.obj DebrisPiece#7
   w Debris#8.posX 45593600
   w Debris#8.posY 5935060
   w Debris#8.posZ 18658624
+  w Debris#8.velX -22656
   w Debris#8.velY 31010
+  w Debris#8.velZ -52680
+  w Debris#8.spinX -737
+  w Debris#8.spinY -631
+  w Debris#8.spinZ -62
   w Debris#8.angle_x -17688
   w Debris#8.angle_y -15144
   w Debris#8.angle_z -1488
@@ -41394,7 +41411,12 @@ call 987 UpdateExplosions
   w Debris#9.posX 47375312
   w Debris#9.posY 5566420
   w Debris#9.posZ 19904896
+  w Debris#9.velX 51582
   w Debris#9.velY 15650
+  w Debris#9.velZ -752
+  w Debris#9.spinX -324
+  w Debris#9.spinY -296
+  w Debris#9.spinZ -771
   w Debris#9.angle_x -7776
   w Debris#9.angle_y -7104
   w Debris#9.angle_z -18504
@@ -41402,7 +41424,12 @@ call 987 UpdateExplosions
   w Debris#10.posX 46009184
   w Debris#10.posY 5799892
   w Debris#10.posZ 19480672
+  w Debris#10.velX -5340
   w Debris#10.velY 25378
+  w Debris#10.velZ -18428
+  w Debris#10.spinX 663
+  w Debris#10.spinY -467
+  w Debris#10.spinZ -368
   w Debris#10.angle_x 15912
   w Debris#10.angle_y -11208
   w Debris#10.angle_z -8832
@@ -41410,7 +41437,12 @@ call 987 UpdateExplosions
   w Debris#11.posX 46967216
   w Debris#11.posY 5541844
   w Debris#11.posZ 21065440
+  w Debris#11.velX 34578
   w Debris#11.velY 14626
+  w Debris#11.velZ 47604
+  w Debris#11.spinX -559
+  w Debris#11.spinY 494
+  w Debris#11.spinZ 50
   w Debris#11.angle_x -13416
   w Debris#11.angle_y 11856
   w Debris#11.angle_z 1200
@@ -41418,7 +41450,12 @@ call 987 UpdateExplosions
   w Debris#12.posX 45441488
   w Debris#12.posY 6315988
   w Debris#12.posZ 19597768
+  w Debris#12.velX -28994
   w Debris#12.velY 46882
+  w Debris#12.velZ -13549
+  w Debris#12.spinX -725
+  w Debris#12.spinY 216
+  w Debris#12.spinZ 300
   w Debris#12.angle_x -17400
   w Debris#12.angle_y 5184
   w Debris#12.angle_z 7200
@@ -41426,7 +41463,12 @@ call 987 UpdateExplosions
   w Debris#13.posX 46711952
   w Debris#13.posY 6795220
   w Debris#13.posZ 19485616
+  w Debris#13.velX 23942
   w Debris#13.velY 66850
+  w Debris#13.velZ -18222
+  w Debris#13.spinX 118
+  w Debris#13.spinY 497
+  w Debris#13.spinZ 19
   w Debris#13.angle_x 2832
   w Debris#13.angle_y 11928
   w Debris#13.angle_z 456
@@ -41434,7 +41476,12 @@ call 987 UpdateExplosions
   w Debris#14.posX 46407176
   w Debris#14.posY 5824468
   w Debris#14.posZ 18673984
+  w Debris#14.velX 11243
   w Debris#14.velY 26402
+  w Debris#14.velZ -52040
+  w Debris#14.spinX 318
+  w Debris#14.spinY -525
+  w Debris#14.spinZ -639
   w Debris#14.angle_x 7632
   w Debris#14.angle_y -12600
   w Debris#14.angle_z -15336
@@ -41442,7 +41489,12 @@ call 987 UpdateExplosions
   w Debris#15.posX 46902752
   w Debris#15.posY 6070228
   w Debris#15.posZ 20350240
+  w Debris#15.velX 31892
   w Debris#15.velY 36642
+  w Debris#15.velZ 17804
+  w Debris#15.spinX -749
+  w Debris#15.spinY -610
+  w Debris#15.spinZ 348
   w Debris#15.angle_x -17976
   w Debris#15.angle_y -14640
   w Debris#15.angle_z 8352
@@ -41450,7 +41502,12 @@ call 987 UpdateExplosions
   w Debris#16.posX 45437456
   w Debris#16.posY 5689300
   w Debris#16.posZ 20003872
+  w Debris#16.velX -29162
   w Debris#16.velY 20770
+  w Debris#16.velZ 3372
+  w Debris#16.spinX 333
+  w Debris#16.spinY 463
+  w Debris#16.spinZ 699
   w Debris#16.angle_x 7992
   w Debris#16.angle_y 11112
   w Debris#16.angle_z 16776
@@ -41458,7 +41515,12 @@ call 987 UpdateExplosions
   w Debris#17.posX 46776944
   w Debris#17.posY 6205396
   w Debris#17.posZ 20067616
+  w Debris#17.velX 26650
   w Debris#17.velY 42274
+  w Debris#17.velZ 6028
+  w Debris#17.spinX 775
+  w Debris#17.spinY -225
+  w Debris#17.spinZ -701
   w Debris#17.angle_x 18600
   w Debris#17.angle_y -5400
   w Debris#17.angle_z -16824
@@ -41466,7 +41528,12 @@ call 987 UpdateExplosions
   w Debris#18.posX 45436544
   w Debris#18.posY 7077844
   w Debris#18.posZ 20137624
+  w Debris#18.velX -29200
   w Debris#18.velY 78626
+  w Debris#18.velZ 8945
+  w Debris#18.spinX 792
+  w Debris#18.spinY -355
+  w Debris#18.spinZ 295
   w Debris#18.angle_x 19008
   w Debris#18.angle_y -8520
   w Debris#18.angle_z 7080
@@ -41474,7 +41541,12 @@ call 987 UpdateExplosions
   w Debris#19.posX 46112768
   w Debris#19.posY 6475732
   w Debris#19.posZ 19443712
+  w Debris#19.velX -1024
   w Debris#19.velY 53538
+  w Debris#19.velZ -19968
+  w Debris#19.spinX 737
+  w Debris#19.spinY -59
+  w Debris#19.spinZ 397
   w Debris#19.angle_x 17688
   w Debris#19.angle_y -1416
   w Debris#19.angle_z 9528
@@ -41482,7 +41554,12 @@ call 987 UpdateExplosions
   w Debris#20.posX 43911032
   w Debris#20.posY 6561748
   w Debris#20.posZ 20043712
+  w Debris#20.velX -92763
   w Debris#20.velY 57122
+  w Debris#20.velZ 5032
+  w Debris#20.spinX 677
+  w Debris#20.spinY 580
+  w Debris#20.spinZ 437
   w Debris#20.angle_x 16248
   w Debris#20.angle_y 13920
   w Debris#20.angle_z 10488
@@ -41490,7 +41567,12 @@ call 987 UpdateExplosions
   w Debris#21.posX 46802000
   w Debris#21.posY 6340564
   w Debris#21.posZ 19349632
+  w Debris#21.velX 27694
   w Debris#21.velY 47906
+  w Debris#21.velZ -23888
+  w Debris#21.spinX -37
+  w Debris#21.spinY 442
+  w Debris#21.spinZ 62
   w Debris#21.angle_x -888
   w Debris#21.angle_y 10608
   w Debris#21.angle_z 1488
@@ -41498,7 +41580,12 @@ call 987 UpdateExplosions
   w Debris#22.posX 46445312
   w Debris#22.posY 7348180
   w Debris#22.posZ 19285696
+  w Debris#22.velX 12832
   w Debris#22.velY 89890
+  w Debris#22.velZ -26552
+  w Debris#22.spinX 24
+  w Debris#22.spinY -23
+  w Debris#22.spinZ 393
   w Debris#22.angle_x 576
   w Debris#22.angle_y -552
   w Debris#22.angle_z 9432
@@ -41506,7 +41593,12 @@ call 987 UpdateExplosions
   w Debris#23.posX 45839120
   w Debris#23.posY 6647764
   w Debris#23.posZ 20860864
+  w Debris#23.velX -12426
   w Debris#23.velY 60706
+  w Debris#23.velZ 39080
+  w Debris#23.spinX 248
+  w Debris#23.spinY 472
+  w Debris#23.spinZ 125
   w Debris#23.angle_x 5952
   w Debris#23.angle_y 11328
   w Debris#23.angle_z 3000
@@ -41514,10 +41606,16 @@ call 987 UpdateExplosions
   w Debris#24.posX 46137344
   w Debris#24.posY 2744320
   w Debris#24.posZ 19922944
+  w Debris#24.velX 0
   w Debris#24.velY 0
+  w Debris#24.velZ 0
+  w Debris#24.spinX 0
+  w Debris#24.spinY 0
+  w Debris#24.spinZ 0
   w Debris#24.angle_x 0
   w Debris#24.angle_y 0
   w Debris#24.angle_z 0
+  w Debris#24.flags 0
   w Debris#25.posY 1712128
   w Debris#26.posY 65536
   w Debris#27.posX 38326068
@@ -41613,104 +41711,6 @@ call 988 UpdateUnitWeapons
 call 988 UpdateUnitWeapons
   a unit Unit#252
 call 988 UpdateExplosions
-  r Debris#1.velX 0
-  r Debris#1.velZ 0
-  r Debris#1.spinX 0
-  r Debris#1.spinY 0
-  r Debris#1.spinZ 0
-  r Debris#1.flags 0
-  r Debris#7.velX -102520
-  r Debris#7.velZ 28050
-  r Debris#7.spinX 486
-  r Debris#7.spinY -424
-  r Debris#7.spinZ -214
-  r Debris#7.flags 1
-  r Debris#8.velX -22656
-  r Debris#8.velZ -52680
-  r Debris#8.spinX -737
-  r Debris#8.spinY -631
-  r Debris#8.spinZ -62
-  r Debris#9.velX 51582
-  r Debris#9.velZ -752
-  r Debris#9.spinX -324
-  r Debris#9.spinY -296
-  r Debris#9.spinZ -771
-  r Debris#10.velX -5340
-  r Debris#10.velZ -18428
-  r Debris#10.spinX 663
-  r Debris#10.spinY -467
-  r Debris#10.spinZ -368
-  r Debris#11.velX 34578
-  r Debris#11.velZ 47604
-  r Debris#11.spinX -559
-  r Debris#11.spinY 494
-  r Debris#11.spinZ 50
-  r Debris#12.velX -28994
-  r Debris#12.velZ -13549
-  r Debris#12.spinX -725
-  r Debris#12.spinY 216
-  r Debris#12.spinZ 300
-  r Debris#13.velX 23942
-  r Debris#13.velZ -18222
-  r Debris#13.spinX 118
-  r Debris#13.spinY 497
-  r Debris#13.spinZ 19
-  r Debris#14.velX 11243
-  r Debris#14.velZ -52040
-  r Debris#14.spinX 318
-  r Debris#14.spinY -525
-  r Debris#14.spinZ -639
-  r Debris#15.velX 31892
-  r Debris#15.velZ 17804
-  r Debris#15.spinX -749
-  r Debris#15.spinY -610
-  r Debris#15.spinZ 348
-  r Debris#16.velX -29162
-  r Debris#16.velZ 3372
-  r Debris#16.spinX 333
-  r Debris#16.spinY 463
-  r Debris#16.spinZ 699
-  r Debris#17.velX 26650
-  r Debris#17.velZ 6028
-  r Debris#17.spinX 775
-  r Debris#17.spinY -225
-  r Debris#17.spinZ -701
-  r Debris#18.velX -29200
-  r Debris#18.velZ 8945
-  r Debris#18.spinX 792
-  r Debris#18.spinY -355
-  r Debris#18.spinZ 295
-  r Debris#19.velX -1024
-  r Debris#19.velZ -19968
-  r Debris#19.spinX 737
-  r Debris#19.spinY -59
-  r Debris#19.spinZ 397
-  r Debris#20.velX -92763
-  r Debris#20.velZ 5032
-  r Debris#20.spinX 677
-  r Debris#20.spinY 580
-  r Debris#20.spinZ 437
-  r Debris#21.velX 27694
-  r Debris#21.velZ -23888
-  r Debris#21.spinX -37
-  r Debris#21.spinY 442
-  r Debris#21.spinZ 62
-  r Debris#22.velX 12832
-  r Debris#22.velZ -26552
-  r Debris#22.spinX 24
-  r Debris#22.spinY -23
-  r Debris#22.spinZ 393
-  r Debris#23.velX -12426
-  r Debris#23.velZ 39080
-  r Debris#23.spinX 248
-  r Debris#23.spinY 472
-  r Debris#23.spinZ 125
-  r Debris#24.velX 0
-  r Debris#24.velZ 0
-  r Debris#24.spinX 0
-  r Debris#24.spinY 0
-  r Debris#24.spinZ 0
-  r Debris#24.flags 0
   i map.GetCellMeanHeight pos=(51973494,13469679) = 1
   i map.GetCellMeanHeight pos=(20553628,16210680) = 1
   i map.GetCellMeanHeight pos=(49585486,13406847) = 1
@@ -42264,10 +42264,16 @@ call 989 UpdateExplosions
   w Debris#0.posX 44193500
   w Debris#0.posY 187788
   w Debris#0.posZ 16968304
+  w Debris#0.velX 0
   w Debris#0.velY 0
+  w Debris#0.velZ 0
+  w Debris#0.spinX 0
+  w Debris#0.spinY 0
+  w Debris#0.spinZ 0
   w Debris#0.angle_x 0
   w Debris#0.angle_y 0
   w Debris#0.angle_z 0
+  w Debris#0.flags 0
   w Debris#1.posX 44798976
   w Debris#1.posY 168649
   w Debris#1.posZ 16693248
@@ -42287,15 +42293,26 @@ call 989 UpdateExplosions
   w Debris#6.posX 43471824
   w Debris#6.posY 5815869
   w Debris#6.posZ 20652244
+  w Debris#6.velX -102520
   w Debris#6.velY 8044
+  w Debris#6.velZ 28050
+  w Debris#6.spinX 486
+  w Debris#6.spinY -424
+  w Debris#6.spinZ -214
   w Debris#6.angle_x 12636
   w Debris#6.angle_y -11024
   w Debris#6.angle_z -5564
+  w Debris#6.flags 1
   w Debris#7.obj DebrisPiece#7
   w Debris#7.posX 45548288
   w Debris#7.posY 5988925
   w Debris#7.posZ 18553264
+  w Debris#7.velX -22656
   w Debris#7.velY 14700
+  w Debris#7.velZ -52680
+  w Debris#7.spinX -737
+  w Debris#7.spinY -631
+  w Debris#7.spinZ -62
   w Debris#7.angle_x -19162
   w Debris#7.angle_y -16406
   w Debris#7.angle_z -1612
@@ -42303,7 +42320,12 @@ call 989 UpdateExplosions
   w Debris#8.posX 47478476
   w Debris#8.posY 5589565
   w Debris#8.posZ 19903392
+  w Debris#8.velX 51582
   w Debris#8.velY -660
+  w Debris#8.velZ -752
+  w Debris#8.spinX -324
+  w Debris#8.spinY -296
+  w Debris#8.spinZ -771
   w Debris#8.angle_x -8424
   w Debris#8.angle_y -7696
   w Debris#8.angle_z -20046
@@ -42311,7 +42333,12 @@ call 989 UpdateExplosions
   w Debris#9.posX 45998504
   w Debris#9.posY 5842493
   w Debris#9.posZ 19443816
+  w Debris#9.velX -5340
   w Debris#9.velY 9068
+  w Debris#9.velZ -18428
+  w Debris#9.spinX 663
+  w Debris#9.spinY -467
+  w Debris#9.spinZ -368
   w Debris#9.angle_x 17238
   w Debris#9.angle_y -12142
   w Debris#9.angle_z -9568
@@ -42319,7 +42346,12 @@ call 989 UpdateExplosions
   w Debris#10.posX 47036372
   w Debris#10.posY 5562941
   w Debris#10.posZ 21160648
+  w Debris#10.velX 34578
   w Debris#10.velY -1684
+  w Debris#10.velZ 47604
+  w Debris#10.spinX -559
+  w Debris#10.spinY 494
+  w Debris#10.spinZ 50
   w Debris#10.angle_x -14534
   w Debris#10.angle_y 12844
   w Debris#10.angle_z 1300
@@ -42327,7 +42359,12 @@ call 989 UpdateExplosions
   w Debris#11.posX 45383500
   w Debris#11.posY 6401597
   w Debris#11.posZ 19570670
+  w Debris#11.velX -28994
   w Debris#11.velY 30572
+  w Debris#11.velZ -13549
+  w Debris#11.spinX -725
+  w Debris#11.spinY 216
+  w Debris#11.spinZ 300
   w Debris#11.angle_x -18850
   w Debris#11.angle_y 5616
   w Debris#11.angle_z 7800
@@ -42335,7 +42372,12 @@ call 989 UpdateExplosions
   w Debris#12.posX 46759836
   w Debris#12.posY 6920765
   w Debris#12.posZ 19449172
+  w Debris#12.velX 23942
   w Debris#12.velY 50540
+  w Debris#12.velZ -18222
+  w Debris#12.spinX 118
+  w Debris#12.spinY 497
+  w Debris#12.spinZ 19
   w Debris#12.angle_x 3068
   w Debris#12.angle_y 12922
   w Debris#12.angle_z 494
@@ -42343,7 +42385,12 @@ call 989 UpdateExplosions
   w Debris#13.posX 46429662
   w Debris#13.posY 5869117
   w Debris#13.posZ 18569904
+  w Debris#13.velX 11243
   w Debris#13.velY 10092
+  w Debris#13.velZ -52040
+  w Debris#13.spinX 318
+  w Debris#13.spinY -525
+  w Debris#13.spinZ -639
   w Debris#13.angle_x 8268
   w Debris#13.angle_y -13650
   w Debris#13.angle_z -16614
@@ -42351,7 +42398,12 @@ call 989 UpdateExplosions
   w Debris#14.posX 46966536
   w Debris#14.posY 6135357
   w Debris#14.posZ 20385848
+  w Debris#14.velX 31892
   w Debris#14.velY 20332
+  w Debris#14.velZ 17804
+  w Debris#14.spinX -749
+  w Debris#14.spinY -610
+  w Debris#14.spinZ 348
   w Debris#14.angle_x -19474
   w Debris#14.angle_y -15860
   w Debris#14.angle_z 9048
@@ -42359,7 +42411,12 @@ call 989 UpdateExplosions
   w Debris#15.posX 45379132
   w Debris#15.posY 5722685
   w Debris#15.posZ 20010616
+  w Debris#15.velX -29162
   w Debris#15.velY 4460
+  w Debris#15.velZ 3372
+  w Debris#15.spinX 333
+  w Debris#15.spinY 463
+  w Debris#15.spinZ 699
   w Debris#15.angle_x 8658
   w Debris#15.angle_y 12038
   w Debris#15.angle_z 18174
@@ -42367,7 +42424,12 @@ call 989 UpdateExplosions
   w Debris#16.posX 46830244
   w Debris#16.posY 6281789
   w Debris#16.posZ 20079672
+  w Debris#16.velX 26650
   w Debris#16.velY 25964
+  w Debris#16.velZ 6028
+  w Debris#16.spinX 775
+  w Debris#16.spinY -225
+  w Debris#16.spinZ -701
   w Debris#16.angle_x 20150
   w Debris#16.angle_y -5850
   w Debris#16.angle_z -18226
@@ -42375,7 +42437,12 @@ call 989 UpdateExplosions
   w Debris#17.posX 45378144
   w Debris#17.posY 7226941
   w Debris#17.posZ 20155514
+  w Debris#17.velX -29200
   w Debris#17.velY 62316
+  w Debris#17.velZ 8945
+  w Debris#17.spinX 792
+  w Debris#17.spinY -355
+  w Debris#17.spinZ 295
   w Debris#17.angle_x 20592
   w Debris#17.angle_y -9230
   w Debris#17.angle_z 7670
@@ -42383,7 +42450,12 @@ call 989 UpdateExplosions
   w Debris#18.posX 46110720
   w Debris#18.posY 6574653
   w Debris#18.posZ 19403776
+  w Debris#18.velX -1024
   w Debris#18.velY 37228
+  w Debris#18.velZ -19968
+  w Debris#18.spinX 737
+  w Debris#18.spinY -59
+  w Debris#18.spinZ 397
   w Debris#18.angle_x 19162
   w Debris#18.angle_y -1534
   w Debris#18.angle_z 10322
@@ -42391,7 +42463,12 @@ call 989 UpdateExplosions
   w Debris#19.posX 43725506
   w Debris#19.posY 6667837
   w Debris#19.posZ 20053776
+  w Debris#19.velX -92763
   w Debris#19.velY 40812
+  w Debris#19.velZ 5032
+  w Debris#19.spinX 677
+  w Debris#19.spinY 580
+  w Debris#19.spinZ 437
   w Debris#19.angle_x 17602
   w Debris#19.angle_y 15080
   w Debris#19.angle_z 11362
@@ -42399,7 +42476,12 @@ call 989 UpdateExplosions
   w Debris#20.posX 46857388
   w Debris#20.posY 6428221
   w Debris#20.posZ 19301856
+  w Debris#20.velX 27694
   w Debris#20.velY 31596
+  w Debris#20.velZ -23888
+  w Debris#20.spinX -37
+  w Debris#20.spinY 442
+  w Debris#20.spinZ 62
   w Debris#20.angle_x -962
   w Debris#20.angle_y 11492
   w Debris#20.angle_z 1612
@@ -42407,7 +42489,12 @@ call 989 UpdateExplosions
   w Debris#21.posX 46470976
   w Debris#21.posY 7519805
   w Debris#21.posZ 19232592
+  w Debris#21.velX 12832
   w Debris#21.velY 73580
+  w Debris#21.velZ -26552
+  w Debris#21.spinX 24
+  w Debris#21.spinY -23
+  w Debris#21.spinZ 393
   w Debris#21.angle_x 624
   w Debris#21.angle_y -598
   w Debris#21.angle_z 10218
@@ -42415,7 +42502,12 @@ call 989 UpdateExplosions
   w Debris#22.posX 45814268
   w Debris#22.posY 6761021
   w Debris#22.posZ 20939024
+  w Debris#22.velX -12426
   w Debris#22.velY 44396
+  w Debris#22.velZ 39080
+  w Debris#22.spinX 248
+  w Debris#22.spinY 472
+  w Debris#22.spinZ 125
   w Debris#22.angle_x 6448
   w Debris#22.angle_y 12272
   w Debris#22.angle_z 3250
@@ -42423,10 +42515,16 @@ call 989 UpdateExplosions
   w Debris#23.posX 46137344
   w Debris#23.posY 2744320
   w Debris#23.posZ 19922944
+  w Debris#23.velX 0
   w Debris#23.velY 0
+  w Debris#23.velZ 0
+  w Debris#23.spinX 0
+  w Debris#23.spinY 0
+  w Debris#23.spinZ 0
   w Debris#23.angle_x 0
   w Debris#23.angle_y 0
   w Debris#23.angle_z 0
+  w Debris#23.flags 0
   w Debris#24.posY 1712128
   w Debris#25.posY 65536
   w Debris#26.posX 38326068
@@ -42526,104 +42624,6 @@ call 990 UpdateUnitWeapons
 call 990 UpdateUnitWeapons
   a unit Unit#252
 call 990 UpdateExplosions
-  r Debris#0.velX 0
-  r Debris#0.velZ 0
-  r Debris#0.spinX 0
-  r Debris#0.spinY 0
-  r Debris#0.spinZ 0
-  r Debris#0.flags 0
-  r Debris#6.velX -102520
-  r Debris#6.velZ 28050
-  r Debris#6.spinX 486
-  r Debris#6.spinY -424
-  r Debris#6.spinZ -214
-  r Debris#6.flags 1
-  r Debris#7.velX -22656
-  r Debris#7.velZ -52680
-  r Debris#7.spinX -737
-  r Debris#7.spinY -631
-  r Debris#7.spinZ -62
-  r Debris#8.velX 51582
-  r Debris#8.velZ -752
-  r Debris#8.spinX -324
-  r Debris#8.spinY -296
-  r Debris#8.spinZ -771
-  r Debris#9.velX -5340
-  r Debris#9.velZ -18428
-  r Debris#9.spinX 663
-  r Debris#9.spinY -467
-  r Debris#9.spinZ -368
-  r Debris#10.velX 34578
-  r Debris#10.velZ 47604
-  r Debris#10.spinX -559
-  r Debris#10.spinY 494
-  r Debris#10.spinZ 50
-  r Debris#11.velX -28994
-  r Debris#11.velZ -13549
-  r Debris#11.spinX -725
-  r Debris#11.spinY 216
-  r Debris#11.spinZ 300
-  r Debris#12.velX 23942
-  r Debris#12.velZ -18222
-  r Debris#12.spinX 118
-  r Debris#12.spinY 497
-  r Debris#12.spinZ 19
-  r Debris#13.velX 11243
-  r Debris#13.velZ -52040
-  r Debris#13.spinX 318
-  r Debris#13.spinY -525
-  r Debris#13.spinZ -639
-  r Debris#14.velX 31892
-  r Debris#14.velZ 17804
-  r Debris#14.spinX -749
-  r Debris#14.spinY -610
-  r Debris#14.spinZ 348
-  r Debris#15.velX -29162
-  r Debris#15.velZ 3372
-  r Debris#15.spinX 333
-  r Debris#15.spinY 463
-  r Debris#15.spinZ 699
-  r Debris#16.velX 26650
-  r Debris#16.velZ 6028
-  r Debris#16.spinX 775
-  r Debris#16.spinY -225
-  r Debris#16.spinZ -701
-  r Debris#17.velX -29200
-  r Debris#17.velZ 8945
-  r Debris#17.spinX 792
-  r Debris#17.spinY -355
-  r Debris#17.spinZ 295
-  r Debris#18.velX -1024
-  r Debris#18.velZ -19968
-  r Debris#18.spinX 737
-  r Debris#18.spinY -59
-  r Debris#18.spinZ 397
-  r Debris#19.velX -92763
-  r Debris#19.velZ 5032
-  r Debris#19.spinX 677
-  r Debris#19.spinY 580
-  r Debris#19.spinZ 437
-  r Debris#20.velX 27694
-  r Debris#20.velZ -23888
-  r Debris#20.spinX -37
-  r Debris#20.spinY 442
-  r Debris#20.spinZ 62
-  r Debris#21.velX 12832
-  r Debris#21.velZ -26552
-  r Debris#21.spinX 24
-  r Debris#21.spinY -23
-  r Debris#21.spinZ 393
-  r Debris#22.velX -12426
-  r Debris#22.velZ 39080
-  r Debris#22.spinX 248
-  r Debris#22.spinY 472
-  r Debris#22.spinZ 125
-  r Debris#23.velX 0
-  r Debris#23.velZ 0
-  r Debris#23.spinX 0
-  r Debris#23.spinY 0
-  r Debris#23.spinZ 0
-  r Debris#23.flags 0
   i map.GetCellMeanHeight pos=(52465014,13010927) = 1
   i map.GetCellMeanHeight pos=(20373404,16210680) = 1
   i map.GetCellMeanHeight pos=(49880398,12980863) = 1

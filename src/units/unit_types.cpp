@@ -11,6 +11,7 @@
 #pragma pack(push, 1)
 
 #include "../util/vec3.h"
+#include "../util/ftol.h"
 
 #include "unit_def.h"
 
@@ -203,8 +204,8 @@ int __stdcall LoadUnitInfo()
             u->weaponHashXor ^= FindWeapon(parser.GetValue("explodeas"));
             u->weaponHashXor ^= FindWeapon(parser.GetValue("selfdestructas"));
             double version = parser.GetDouble("Version", 0.0);
-            int major = (int)floor(version);
-            int minor = (int)floor((version - major) * 10.0);
+            int major = bx_ftol(floor(version));
+            int minor = bx_ftol(floor((version - major) * 10.0));
             if (major < g_game->version)
                 u->flags1 |= 0x800000;
             else if (major == g_game->version && minor <= g_game->versionMinor)
@@ -513,7 +514,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             value = parser.current->GetFieldInt("stealth", 0);
             unitdef->flags1 = SetFlagField(unitdef->flags1, value, 8, 1);
             unitdef->cloakcost = (float)parser.current->GetFieldInt("cloakcost", 0);
-            unitdef->cloakcostmoving = (float)parser.current->GetFieldInt("cloakcostmoving", (int)unitdef->cloakcost);
+            unitdef->cloakcostmoving = (float)parser.current->GetFieldInt("cloakcostmoving", bx_ftol(unitdef->cloakcost));
             unitdef->mincloakdistance =
                 (short)parser.current->GetFieldInt("mincloakdistance", 0);
             unitdef->buildangle =

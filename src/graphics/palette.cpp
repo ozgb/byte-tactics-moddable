@@ -2,6 +2,7 @@
 #include "../../interfaces/host.h"
 #include "win_types.h"
 #include "display.h"
+#include "../util/ftol.h"
 
 
 struct RGBA {
@@ -60,15 +61,15 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count)
         float v0 = src[i * 4] * brightness;
         if (v0 > 255.0)
             v0 = 255.0f;
-        local[i * 4] = (unsigned char)(int)v0;
+        local[i * 4] = (unsigned char)bx_ftol(v0);
         float v1 = src[i * 4 + 1] * brightness;
         if (v1 > 255.0)
             v1 = 255.0f;
-        local[i * 4 + 1] = (unsigned char)(int)v1;
+        local[i * 4 + 1] = (unsigned char)bx_ftol(v1);
         float v2 = src[i * 4 + 2] * brightness;
         if (v2 > 255.0)
             v2 = 255.0f;
-        local[i * 4 + 2] = (unsigned char)(int)v2;
+        local[i * 4 + 2] = (unsigned char)bx_ftol(v2);
         local[i * 4 + 3] = 0;
     }
 

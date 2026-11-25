@@ -18,6 +18,7 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull((int 
 #include "../state/block.h"
 #include "../../interfaces/ref.h"
 #include "../util/vec3.h"
+#include "../util/ftol.h"
 
 static inline short Whole(const int& v) { return ((short*)&v)[1]; }
 
@@ -370,7 +371,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 2) {
         if (order->target != 0) {
-            float refund = (unsigned int)((1.0f - order->target->buildLeft) * order->target->def->metalCost);
+            float refund = (unsigned int)bx_ftol((1.0f - order->target->buildLeft) * order->target->def->metalCost);
             EconPublish(SCHED_ORDERS, ECONOMY_INCOME, unit->playerIndex, EconHandleOf(unit), ECON_METAL, 0, refund);
             OrdersPublishFinishConstruction(unit, order->target);
             WeaponsPublishDamage(SCHED_ORDERS, unit, order->target, 30000, 9, 0);
@@ -483,8 +484,8 @@ int __stdcall BuildWeaponOrder(Unit* unit, Order* order, int unused)
         fnext = next;
         ftotal = total;
         fprev = prev;
-        int metalCharge = (int)(fnext * t->metalPerShot / ftotal) - (int)(fprev * t->metalPerShot / ftotal);
-        energyCharge = (int)(fnext * t->energyPerShot / ftotal) - (int)(fprev * t->energyPerShot / ftotal);
+        int metalCharge = bx_ftol(fnext * t->metalPerShot / ftotal) - bx_ftol(fprev * t->metalPerShot / ftotal);
+        energyCharge = bx_ftol(fnext * t->energyPerShot / ftotal) - bx_ftol(fprev * t->energyPerShot / ftotal);
         if (EconRequestEnergyAndMetal(SCHED_ORDERS, unit, (float)energyCharge, (float)metalCharge)) {
             order->progress = next;
             if (next >= t->reloadTime)
@@ -790,8 +791,8 @@ int __stdcall AttackChaseOrder(Unit* unit, Order* order, unsigned int flags)
 {
     int weapon = order->weapon;
     if ((flags & 0x800) || !order->target || (flags & 0x10008)) return 5;
-    if (order->range && (int)_hypot(Whole(unit->pos.x) - order->start.x,
-                                    Whole(unit->pos.z) - order->start.y) >= order->range)
+    if (order->range && bx_ftol(_hypot(Whole(unit->pos.x) - order->start.x,
+                                    Whole(unit->pos.z) - order->start.y)) >= order->range)
         return 5;
     unsigned int state = 0;
     state = order->state;
@@ -952,7 +953,7 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
             return 8;
         }
         order->AnnounceStatusIfFlagged(SIM_SPEECH_CAPTURING);
-        order->duration = (int)(target->def->EnergyCost() / 2000 + target->def->MetalCost() / 140 + 150);
+        order->duration = bx_ftol(target->def->EnergyCost() / 2000 + target->def->MetalCost() / 140 + 150);
         order->duration = order->duration < 1800 ? order->duration : 1800;
         order->duration = (target->health + target->def->MaxHealth()) * order->duration / (target->def->maxHealth * 2);
         int experience = 0;
@@ -967,9 +968,9 @@ int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
         if (flags & 0x40) return 8;
         Vec3* position = &unit->pos;
         Fixed distance;
-        distance.value = (int)_hypot(unit->pos.x - target->pos.x, unit->pos.z - target->pos.z);
-        int gap = distance.whole - (int)(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
-        gap += (int)(_hypot(target->footprint.x, target->footprint.y) * -8.0);
+        distance.value = bx_ftol(_hypot(unit->pos.x - target->pos.x, unit->pos.z - target->pos.z));
+        int gap = distance.whole - bx_ftol(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
+        gap += bx_ftol(_hypot(target->footprint.x, target->footprint.y) * -8.0);
         unsigned int range = 0;
         range = unit->def->buildRange;
         if (gap > (int)range) return 0;
@@ -1106,7 +1107,7 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
         RecordUnitSpeech(unit, 7, SIM_SPEECH_REPAIRS_UNSUCCESSFUL);
         return 5;
     }
-    if (order->range && (int)_hypot(Whole(unit->pos.x) - order->start.x, Whole(unit->pos.z) - order->start.y) >= order->range)
+    if (order->range && bx_ftol(_hypot(Whole(unit->pos.x) - order->start.x, Whole(unit->pos.z) - order->start.y)) >= order->range)
         return 5;
     if (order->target->mode != 1) {
         RecordUnitSpeech(unit, 7, SIM_SPEECH_REPAIRS_UNSUCCESSFUL);
@@ -1123,9 +1124,9 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
         if (flags & 0x40)
             return 8;
         Fixed distance;
-        distance.value = (int)_hypot(unit->pos.x - order->target->pos.x, unit->pos.z - order->target->pos.z);
-        int gap = distance.whole - (int)(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
-        gap += (int)(_hypot(order->target->footprint.x, order->target->footprint.y) * -8.0);
+        distance.value = bx_ftol(_hypot(unit->pos.x - order->target->pos.x, unit->pos.z - order->target->pos.z));
+        int gap = distance.whole - bx_ftol(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
+        gap += bx_ftol(_hypot(order->target->footprint.x, order->target->footprint.y) * -8.0);
         unsigned int range = 0;
         range = unit->def->buildRange;
         if (gap > (int)range) {
@@ -1375,7 +1376,7 @@ int __stdcall GroundUnloadOrder(Unit* unit, Order* order, int flags)
         if (order->target->carrier!=unit) { RecordUnitSpeech(unit,13,SIM_SPEECH_KIND_TEXT); return 5; }
         if (order->attempts>=3) return 9;
         if ((unsigned char)(unit->def->flags1>>12)&1)
-            order->AttachApproachRadiusGoal(&order->pos,(int)(unit->def->height180*1.5));
+            order->AttachApproachRadiusGoal(&order->pos,bx_ftol(unit->def->height180*1.5));
         else order->AttachApproachRadiusGoal(&order->pos,0);
         order->flags=0xe8;
         return 1;
@@ -1466,7 +1467,7 @@ int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
         if (!unit->motion || !(unit->def->flags1Byte & 0x40)) break;
         double x = target->def->footprintx;
         double y = target->def->footprintz;
-        int radius = (int)(sqrt(x * x + y + y) * 16.0) / 2;
+        int radius = bx_ftol(sqrt(x * x + y + y) * 16.0) / 2;
         unsigned int range = 0;
         range = unit->def->buildRange;
         order->AttachRingApproachGoal(&target->pos, range + radius, radius);
@@ -1658,9 +1659,9 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
         UnitDef* def = &Definitions()[order->type];
         if (flags & 0x40) {
             Fixed distance;
-            distance.value = (int)_hypot(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
-            int gap = distance.whole - (int)(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
-            gap += (int)(_hypot(def->footprintx, def->footprintz) * -8.0);
+            distance.value = bx_ftol(_hypot(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z));
+            int gap = distance.whole - bx_ftol(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
+            gap += bx_ftol(_hypot(def->footprintx, def->footprintz) * -8.0);
             unsigned int range = 0;
             range = unit->def->buildRange;
             if (gap > (int)range) {
@@ -1753,7 +1754,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
     case 1: {
         if (flags & 0x40)
             return 8;
-        order->time = (int)(15.0f - (f->energy + f->metal) * -0.5f);
+        order->time = bx_ftol(15.0f - (f->energy + f->metal) * -0.5f);
         Vec3 pos;
         pos.x = (size.x + cell.x * 2) << 19;
         pos.z = (size.y + cell.y * 2) << 19;
@@ -2031,7 +2032,7 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
             RecordUnitSpeech(unit, 7, SIM_SPEECH_RESSURECTION_FAILED);
             return 8;
         }
-        order->countdown = (int)(g_game->defs[order->unitType].buildtime * 0.3 / (unit->def->buildRate / 30));
+        order->countdown = bx_ftol(g_game->defs[order->unitType].buildtime * 0.3 / (unit->def->buildRate / 30));
         RecordUnitSpeech(unit, 11, SIM_SPEECH_KIND_TEXT);
         return 1;
     }

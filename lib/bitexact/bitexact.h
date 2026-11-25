@@ -34,7 +34,10 @@ __extension__ typedef unsigned long long bx_u64;
 #endif
 
 /* The correctly rounded square root, equal to x87 fsqrt at 53-bit precision (and to SSE2 sqrtsd and wasm f64.sqrt), done in integer code; finite non-negative x, a negative x giving the x87 indefinite NaN. */
-double bx_sqrt(double x);
+BX_CALL double bx_sqrt(double x);
+
+/* MSVC 5's _ftol: x truncated toward zero to a 64-bit integer, its low 32 bits; 0 for a NaN, an infinity or a magnitude of 2^63 or more. */
+BX_CALL bx_i32 bx_ftol(double x);
 
 /* The state of one linear congruential stream: the 32-bit seed, which each step replaces by seed * 214013 + 2531011 (mod 2^32). */
 typedef struct {

@@ -26,6 +26,7 @@
 #pragma pack(push, 1)
 #include "../game/game.h"
 #include "../game/los_helpers.h"
+#include "../util/ftol.h"
 #pragma pack(pop)
 
 #pragma pack(push, 2)
@@ -55,7 +56,7 @@ struct TeleportEndpoint {
         float fx = x;
         float fy = y;
         float fz = z;
-        return (int)sqrt(fx * fx + fy * fy + fz * fz);
+        return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
     }
     TeleportEndpoint& operator+=(const TeleportEndpoint& o)
     {
@@ -209,7 +210,7 @@ struct WakeVector {
         double fx = x;
         double fy = y;
         double fz = z;
-        return (int)sqrt(fx * fx + fy * fy + fz * fz);
+        return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
     }
     void Scale(int s)
     {
@@ -1641,7 +1642,7 @@ static inline int LengthFloat(const Vec3& v)
     float fx = v.x;
     float fy = v.y;
     float fz = v.z;
-    return (int)sqrt(fx * fx + fy * fy + fz * fz);
+    return bx_ftol(sqrt(fx * fx + fy * fy + fz * fz));
 }
 
 // FUNCTION: 0x473d50

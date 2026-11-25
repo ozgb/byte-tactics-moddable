@@ -181,7 +181,7 @@ def run_clang(kit: Path | None = None) -> int:
                         [*PORT_SOURCES, TEST, MATH_TEST, VECTORS_SOURCE, *extra], out_dir), vectors["bitexact"]),
             (clang_link(tools, flags, "crt_test.exe", [*CRT_PORT_SOURCES, CRT_TESTS[0], VECTORS_SOURCE, *extra],
                         out_dir), vectors["crt"]),
-            (clang_link(tools, flags, "csem_test.exe", [CSEM_TEST, KIT_SOURCE, VECTORS_SOURCE], out_dir),
+            (clang_link(tools, flags, "csem_test.exe", [CSEM_TEST, LIB / "ftol.c", KIT_SOURCE, VECTORS_SOURCE], out_dir),
              vectors["csem"])]
     code = 0
     for exe, vec in exes:

@@ -5,6 +5,7 @@
 #include "rect.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
+#include "../util/ftol.h"
 
 // FUNCTION: 0x4b7e60
 void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
@@ -766,12 +767,12 @@ void* __stdcall BuildLensFrame(int w, int h, int lens)
             int dx = x - hw;
             int dy = y - hh;
             double dist = sqrt((double)(dx * dx + dy * dy));
-            if ((int)dist >= w / 4) {
+            if (bx_ftol(dist) >= w / 4) {
                 p[y * w + x] = 0x7d00;
             } else {
                 int i = y * w + x;
-                int v = (int)(dx / ((w / 2 - dist) / scale))
-                        + (w * ((int)(dy / ((w / 2 - dist) / scale)) + hh) + hw);
+                int v = bx_ftol(dx / ((w / 2 - dist) / scale))
+                        + (w * (bx_ftol(dy / ((w / 2 - dist) / scale)) + hh) + hw);
                 p[i] = v - i;
             }
         }

@@ -231,6 +231,13 @@ static int run_sqrt_float(reader_t *r)
     return bits_of_float((float)bx_sqrt((double)f)) != want;
 }
 
+static int run_ftol(reader_t *r)
+{
+    double x = rd_f64(r);
+    int want = rd_i32(r);
+    return bx_ftol(x) != want;
+}
+
 static int run_hypot(reader_t *r)
 {
     double x = rd_f64(r);
@@ -356,6 +363,7 @@ static const entry_t entries[] = {
     {"mul_div", run_mul_div, "i32,i32,i32", "i32"},
     {"sqrt", run_sqrt, "f64", "f64"},
     {"sqrt_float", run_sqrt_float, "u32", "u32"},
+    {"ftol", run_ftol, "f64", "i32"},
     {"hypot", run_hypot, "f64,f64", "f64"},
     {"acos", run_acos, "f64", "f64"},
     {"float_text", run_float_text, "str", "u32"},

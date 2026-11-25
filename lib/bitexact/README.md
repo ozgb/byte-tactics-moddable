@@ -2,7 +2,7 @@
 
 A portable C port of the maths and the C runtime calls the game logic makes:
 the hand-written fixed-point trigonometry of `src/util/fixed_trig.cpp`, the
-x87 `sqrt`, `_hypot` and `acos`, the text to number conversions of `sscanf` and
+x87 `sqrt`, `_hypot` and `acos`, the double to int conversion of `_ftol`, the text to number conversions of `sscanf` and
 `atof`, and the `rand`, `srand`, `qsort` and `random_shuffle` calls, each giving
 the same result as the original for every input. It lives outside `src/` so
 that the matching link never builds it into the reference exe. It needs no
@@ -10,7 +10,7 @@ libm, no `long double`, and no platform headers.
 
 Plain C89 (MSVC 5 and clang), types from `bitexact.h` (`bx_i32` and so on), names
 prefixed `bx_`. Little-endian only (x86, wasm). There is no umbrella header: a
-caller includes `bitexact.h` (the types, `bx_sqrt`, the rand stream) and the
+caller includes `bitexact.h` (the types, `bx_sqrt`, `bx_ftol`, the rand stream) and the
 header of each provenance it uses (`bx_libcmt.h`, `bx_stl.h`, `bx_game.h`);
 `internal.h` is for the library's own files.
 
@@ -20,11 +20,12 @@ Computed and published files are imported into the clean room (the kit's `runtim
 
 | File | Provenance | Holds |
 | --- | --- | --- |
-| `lib/bitexact/bitexact.h` | published | the integer types, `BX_CALL`, `bx_rand_state`, and the declarations of `bx_sqrt`, `bx_srand`, `bx_rand` |
+| `lib/bitexact/bitexact.h` | published | the integer types, `BX_CALL`, `bx_rand_state`, and the declarations of `bx_sqrt`, `bx_ftol`, `bx_srand`, `bx_rand` |
 | `lib/bitexact/internal.h` | published | the declarations of the helpers shared between files: the 80-bit helpers (`bx_ext`) and the double-double helpers (`bx_dd`) |
 | `lib/bitexact/bx_tables.h` | computed | the declarations of the generated tables |
 | `tools/bitexact_tables.py` | computed | the table generator: the sine table, the angle constants, the sine and cosine of every 16-bit angle, the arctangent and pi constants, the powers of ten |
 | `lib/bitexact/sqrt.c` | published | `bx_sqrt` |
+| `lib/bitexact/ftol.c` | published | `bx_ftol`: IEEE truncation toward zero to 64 bits, then the low 32 bits |
 | `lib/bitexact/ext.c` | published | the bit helpers, the `bx_u128` and `bx_ext` types and every ext and u128 helper, `bx_ext_sqrt`, `bx_ext64_to_double`, `bx_round_to_int`, `bx_bit_length`, `bx_mul_ext` |
 | `lib/bitexact/dd.c` | published | `bx_double_from_words`, `bx_two_sum`, `bx_two_prod`, `bx_dd_const`, the `bx_dd` type and every `bx_dd_*` helper including `bx_dd_atan_ratio`, `bx_dd_atan2_nonneg`, `bx_double_bits64`, `bx_round_shift`, `bx_dd_to_x87_double` |
 | `lib/bitexact/rand.c` | published | `bx_srand`, `bx_rand` |
@@ -58,6 +59,7 @@ The test sources (`lib/bitexact/test/`) and the build files are not in the table
 | `bx_apply_rotation_matrix` | 0x4b72e2, matrix as a parameter |
 | `bx_MulDivTrunc` | `MulDivTrunc` |
 | `bx_sqrt` | x87 `fsqrt` at 53 bits (`sqrt`), in integer code |
+| `bx_ftol` | MSVC 5's `_ftol`: `fistp` of a 64-bit integer with rounding toward zero, the low 32 bits returned; NaN, the infinities and magnitudes of 2^63 or more give the integer indefinite, whose low 32 bits are 0 |
 | `bx_hypot` | LIBCMT `_hypot` 0x4fb440, its 64-bit-mantissa steps in integer code |
 | `bx_acos` | LIBCMT `_CIacos` 0x4e67f0: `fpatan(sqrt((1+x)(1-x)), x)` from a double-double arctangent |
 | `bx_strtof_msvc5` | the text to float of LIBCMT's `sscanf("%f")` (`_atoflt`, `___strgtold12`, `__ld12cvt`), digit for digit |
@@ -141,7 +143,7 @@ The math functions (`test/math_test.c`, see "x87 intermediates") add `name: N ca
 
 The second exe (`test/crt_test.c`, `test/stl_shuffle.cpp` for the STL) links LIBCMT's own `rand`, `srand` and `qsort` and MSVC 5's `std::random_shuffle` beside the ports: 1500 seeds (0, 1, 0xffffffff and random ones) of 10000 draws; shuffles of sizes 0 to 64 and 1000, 32767 to 32769, 40000 and 100000 over many seeds, comparing the order and the next four draws; the load thread sequence (seed, the explosion draws, a shuffle of 3 to 10 positions); and qsort over random, ascending and descending arrays of 0 to 2000 elements of 1 to 0x62 bytes with 1 to 256 distinct keys, comparing the full output (equal keys carry a payload the comparator ignores) and the comparator's call sequence as a hash of the offsets it was given.
 
-The third exe (`test/csem_test.c`) is a recording, not a port test: it calls LIBCMT for the string, number and format functions that game logic uses and writes what they returned to `build/bitexact/vectors/csem.bin`, so a runtime that is not LIBCMT can be held to the same results. Each entry has an edge set (named special inputs and exhaustive small domains) and a random set of at most 20000 generated cases, and prints `name: N cases, M mismatches`. The entries are `atoi` (white space of every kind, signs, leading zeros, trailing text, empty, values around and past `INT_MAX`, `INT_MIN` and 2^32, high bytes), `itoa` (`_itoa` in radix 10, and 16, 8 and 2 for a few values), `strcmpi`, `strnicmp` and `strncmp` (pairs over letters of both cases, digits, the characters between `Z` and `a`, space, `.` and the bytes 0x80 to 0xff, prefixes of each other, every count from 0 to the longer length plus 2, and every pair of one-byte strings with the counts 1 and 2; the raw result), `tolower`, `toupper`, `isspace`, `isdigit` and `isalnum` (every int from -128 to 255, the raw result), `strlwr`, `strncpy` (all 24 bytes of the destination, so the zero fill shows), `strstr`, `strchr`, `strrchr` (also for 0) and `strcspn` (with empty needles and sets), `strtok` (one record per string: each token's offset and length, the null at the end, and the buffer after), `memmove` (overlapping ranges in one buffer), `sprintf` (every distinct conversion of the formats game logic passes, alone over edge and random arguments, and each of those formats over argument sets; the string and the return value) and `sscanf` (every such format without a `%f`: the return value and every stored value) and `ftol` (the double to int conversion that MSVC 5 compiles to a call to `_ftol`). The inputs come from a fixed xorshift seed, so the clang build reproduces them. The clang build of the same file links LIBCMT as the modern build does and compares what that returns with the recorded values. It cannot compare the `ftol` results, because clang converts a double to int inline (it compares the inputs, and counts the results as not compared), nor `isspace`, `isdigit` and `isalnum` below -1, where the result is whatever lies in memory before LIBCMT's table (the exe's `isspace(c)` macro reads that memory for a negative `char`).
+The third exe (`test/csem_test.c`) is a recording, not a port test: it calls LIBCMT for the string, number and format functions that game logic uses and writes what they returned to `build/bitexact/vectors/csem.bin`, so a runtime that is not LIBCMT can be held to the same results. Each entry has an edge set (named special inputs and exhaustive small domains) and a random set of at most 20000 generated cases, and prints `name: N cases, M mismatches`. The entries are `atoi` (white space of every kind, signs, leading zeros, trailing text, empty, values around and past `INT_MAX`, `INT_MIN` and 2^32, high bytes), `itoa` (`_itoa` in radix 10, and 16, 8 and 2 for a few values), `strcmpi`, `strnicmp` and `strncmp` (pairs over letters of both cases, digits, the characters between `Z` and `a`, space, `.` and the bytes 0x80 to 0xff, prefixes of each other, every count from 0 to the longer length plus 2, and every pair of one-byte strings with the counts 1 and 2; the raw result), `tolower`, `toupper`, `isspace`, `isdigit` and `isalnum` (every int from -128 to 255, the raw result), `strlwr`, `strncpy` (all 24 bytes of the destination, so the zero fill shows), `strstr`, `strchr`, `strrchr` (also for 0) and `strcspn` (with empty needles and sets), `strtok` (one record per string: each token's offset and length, the null at the end, and the buffer after), `memmove` (overlapping ranges in one buffer), `sprintf` (every distinct conversion of the formats game logic passes, alone over edge and random arguments, and each of those formats over argument sets; the string and the return value) and `sscanf` (every such format without a `%f`: the return value and every stored value) and `ftol` (the double to int conversion that MSVC 5 compiles to a call to `_ftol`). The inputs come from a fixed xorshift seed, so the clang build reproduces them. The clang build of the same file links LIBCMT as the modern build does and compares what that returns with the recorded values. Since clang converts a double to int inline, the `ftol` results are compared with `bx_ftol` (`ftol.c`, the port the modern build's game logic calls), and the MSVC 5 half compares `bx_ftol` with `_ftol` too. It cannot compare `isspace`, `isdigit` and `isalnum` below -1, where the result is whatever lies in memory before LIBCMT's table (the exe's `isspace(c)` macro reads that memory for a negative `char`).
 
 `uv run tools/bitexact.py --kit DIR` (clang half only, on the vectors of the last MSVC run) builds the three tests with `-DBX_KIT` and writes, for each entry of the csem test and of the library (the other two tests write the recorded result of each case the port reproduces, and count the others in `<entry>.dropped.txt`),  `DIR/<entry>.edge.bin` and `<entry>.random.bin` (little endian, one record per case: the inputs, then the recorded outputs) and `<entry>.layout.txt` (`in <name> <type>` and `out <name> <type>` lines, the types being `i32`, `u32`, `f64`, `str` (a u32 length and the bytes), `bytes<N>`), through `test/kit.c`. A record holds only what its case uses: a `sprintf` record's `args` holds, for each conversion in order, an int as 4 bytes, a double as 8, or a string as a u32 length and its bytes. The one-byte pairs of the comparisons are the entry `compare_bytes`, one record per first byte with each result as a signed byte for every second byte. Any failure to write a kit file makes the run exit non-zero.
 
@@ -162,7 +164,7 @@ The generator inputs are deterministic in both builds, so the n-th oracle call o
 - `src/util/fixed_trig.cpp` is left out of the source list and `cmake/bitexact/trig.c` defines its symbols (`FixedSine`, `FUN_004b70c0` to `MulDivTrunc`) as calls into `bx_FixedSine` and the other trig ports. The matrix routines use the global `g_rotationMatrix`, as the original does. The angle arguments are `int` there, narrowed inside, because callers declare them as `short` or `int`.
 - `route.h` is force-included (`/FI`) into each source that `data/crt_calls.csv` lists with a game-class `fsqrt`, `rand` or `srand` row. It turns `sqrt` into `bx_sqrt`. It also turns `rand` and `srand` into names that are declared nowhere, so a call that does not name a stream fails to link. The game stream lives in the sim block (`src/state/block.cpp`) as two `bx_rand_state`, a main one and a load one, which start at 1 as LIBCMT's per-thread data does; `GameRand`, `GameSrand` and `GameHoldrand` (`src/state/game_rand.h`) take a `RandStream` (`interfaces/rand_stream.h`) to name one. `LoadMatch` runs on the load thread (`StartThread`, `game_load.cpp`), whose `srand`, explosion frames and shuffle draw from the load stream, and every tick runs on the main thread, whose stream `GameMain` seeds (`main.cpp`). `UpdateWind` and `CheckDefeat` run on both threads, so they take the stream as a parameter (`UpdateWindOnStream`, `UpdatePlayersOnStream`). `std::random_shuffle` is called in its three-argument form with a `GameShuffleDraw`, which makes the draws of the STL's two-argument form from the named stream. No object calls the C runtime's `rand` or `srand` any more. `HarnessViewRand` keeps its own state. The harness traces `rng.crtHoldrand` from the main stream (`GameHoldrand`).
 - `atof` becomes `bx_atof_msvc5`; `_hypot` becomes `bx_hypot`, `acos` becomes `bx_acos` and `sscanf` becomes `bx_sscanf` (`cmake/bitexact/sscanf.c`). The wrapper has the C runtime's signature: a format with no plain `%f` is forwarded to the C runtime's `sscanf` as it stands (so the other files that read `data/crt_calls.csv` as routed keep their results), and one with a plain `%f` (no `*`, width or `l`) is walked directive by directive, a `%f` read by `bx_strtof_msvc5` and every other directive handed to the C runtime with a trailing `%n` to learn how much it used. Any other float directive (`%e`, `%g`, `%E`, `%G`, `%F`, or `%f` with `*`, a width or `l`/`L`) has no bit-exact parser, so the wrapper calls `bx_sscanf_refusal`, which by default prints the format to stderr and aborts (a hard failure in the routed build); no game-logic format has one (see "Format strings"). A test replaces the handler to count refusals. Only `RunInitialMission` has a plain `%f` (`tools/x87scan.py --formats`), so a macro for the whole call, which would also catch the formats that need nothing, was avoided in favour of this check. `GameMain`'s `srand` is classed game by `MAINTAINER_SRAND` in `tools/crtcalls.py`, so `main.cpp` is routed from the CSV like any other file.
-- Left on the C runtime, because the library has no port: `_ftol`. `qsort` has no game-logic caller, and the presentation `sqrt` sites (files with no game-class row) keep the inline `fsqrt`.
+- `_ftol`: each double or float to integer conversion of a game-logic function calls `bx_ftol` explicitly (`src/util/ftol.h` includes `bitexact.h` with `BX_CALL` as `__cdecl`), since a cast can't be routed by a macro; a conversion to `short` or `char` narrows `bx_ftol`'s result. `tools/ftollint.py` fails on an inline conversion (`fistp`, `fist`, `fisttp`, `cvttsd2si` and the like) left in a game-logic function of the linked exe. The presentation functions keep the inline conversion. `qsort` has no game-logic caller, and the presentation `sqrt` sites (files with no game-class row) keep the inline `fsqrt`.
 
 ## CRT and float operations in game logic
 
@@ -172,9 +174,12 @@ full list, per function, is `data/crt_calls.csv` (the reference branch's `uv run
 rewrites it). A game-logic function is one reachable from the eight phase calls
 of `RunGameSteps` (HandleNetPackets, UpdateAllUnits, UpdateProjectiles,
 UpdateExplosions, UpdatePlayers, UpdateFeatures, UpdateWind, UpdateMeteors) or
-from `LoadMatch`, or is `AssignStartPositions` (0x4568c0), which is a root by
-explicit listing (`EXTRA_ROOTS` in the tool) because only frame handlers call
-it. Everything else is presentation. Counts are game-logic
+from `LoadMatch`, or is a root by explicit listing (`EXTRA_ROOTS` in the tool):
+`AssignStartPositions` (0x4568c0), which only frame handlers call;
+`RegisterAllOrderTypes` (0x43c050), which fills the order table that `RunOrders`
+calls the order handlers and AI commands through; `LoadUnitInfo` (0x42a8d0), which
+loads the unit definitions from the menu; and the functions only the
+`wind_meteors` and `weapons` seams call. Everything else is presentation. Counts are game-logic
 functions, then call or instruction sites. `sqrt` never appears as a call:
 the compiler emits `fsqrt` inline.
 
@@ -182,9 +187,9 @@ the compiler emits `fsqrt` inline.
 - `fpatan (FixedSine)`: 1 function, 1 site: the merged port in lib/bitexact (`fixed_trig.c`)
 - `fsincos (FixedSine)`: 1 function, 1 site: the merged port in lib/bitexact (`fixed_trig.c`)
 - `_CIacos`: `fpatan(sqrt((1 + x) * (1 - x)), x)` on the x87, whose result is the 64-bit `fpatan` value (the same instruction as `bx_AngleOfVector`'s), stored as a double. A plain-double series port differs in 40 to 46% of 500,000 arguments in [-1, 1] (`x 0.5`: want 1.0471975511965976, got 1.0471975511965974). `bx_acos` (`acos.c`, on the helpers of `dd.c`) takes `s = sqrt((1 + x) * (1 - x))` in doubles, computes `atan2(s, x)` in double-double (the table reduction of `bx_AngleOfVector` with double-double arithmetic and an 11-term series, about 2^-100 accurate), rounds it to a 64-bit mantissa and then to 53 bits. It differs in 7 of 500,000 arguments, all of the same kind: the exact angle lies just above a 53-bit midpoint (the low 11 bits of its 64-bit mantissa are 0x401) and the CPU's `fpatan` returned a value at or below it, that is it is not correctly rounded to 64 bits there. This is a property of the host CPU (the tests ran on the development machine), so `tools/bitexact.py` allows up to 50 such cases in 500,000 and fails above that.
-- `_ftol`: 62 functions, 151 sites: #73
-- `_hypot`: 14 functions, 18 sites: routed to `bx_hypot`
-- `fsqrt`: 14 functions, 20 sites: #73
+- `_ftol`: 84 functions, 192 sites: routed to `bx_ftol` (#1066)
+- `_hypot`: 23 functions, 39 sites: routed to `bx_hypot`
+- `fsqrt`: 18 functions, 24 sites: #73
 - `atof`: 4 functions, 4 sites: #73 (decimal text to double in the TDF and command readers, x87 intermediates)
 - `FUN_004e81b0`: 4 functions, 6 sites: already exact: C++ library, integer and pointer logic
 - `FUN_004e8320`: 4 functions, 6 sites: already exact: C++ library, integer and pointer logic
@@ -218,12 +223,12 @@ the compiler emits `fsqrt` inline.
 - `fseek`: 6 functions, 11 sites: already exact: file system access, no arithmetic (host interface, #24)
 - `ftell`: 5 functions, 8 sites: already exact: file system access, no arithmetic (host interface, #24)
 - `fwrite`: 4 functions, 15 sites: already exact: file system access, no arithmetic (host interface, #24)
-- `_alldiv`: 29 functions, 52 sites: already exact: integer 64-bit helpers
-- `_allmul`: 35 functions, 93 sites: already exact: integer 64-bit helpers
-- `_allshl`: 10 functions, 15 sites: already exact: integer 64-bit helpers
-- `_allshr`: 28 functions, 82 sites: already exact: integer 64-bit helpers
+- `_alldiv`: 32 functions, 61 sites: already exact: integer 64-bit helpers
+- `_allmul`: 39 functions, 101 sites: already exact: integer 64-bit helpers
+- `_allshl`: 12 functions, 17 sites: already exact: integer 64-bit helpers
+- `_allshr`: 32 functions, 90 sites: already exact: integer 64-bit helpers
 - `_itoa`: 3 functions, 3 sites: already exact: integer and byte string logic
-- `_strcmpi`: 65 functions, 94 sites: already exact: integer and byte string logic
+- `_strcmpi`: 73 functions, 109 sites: already exact: integer and byte string logic
 - `_strlwr`: 3 functions, 3 sites: already exact: integer and byte string logic
 - `_strnicmp`: 6 functions, 10 sites: already exact: integer and byte string logic
 - `atoi`: 8 functions, 17 sites: already exact: integer and byte string logic
@@ -233,10 +238,10 @@ the compiler emits `fsqrt` inline.
 - `memmove`: 7 functions, 7 sites: already exact: integer and byte string logic
 - `strchr`: 4 functions, 7 sites: already exact: integer and byte string logic
 - `strcspn`: 1 function, 1 site: already exact: integer and byte string logic
-- `strncmp`: 20 functions, 36 sites: already exact: integer and byte string logic
+- `strncmp`: 21 functions, 37 sites: already exact: integer and byte string logic
 - `strncpy`: 28 functions, 40 sites: already exact: integer and byte string logic
 - `strrchr`: 3 functions, 5 sites: already exact: integer and byte string logic
-- `strstr`: 4 functions, 5 sites: already exact: integer and byte string logic
+- `strstr`: 5 functions, 6 sites: already exact: integer and byte string logic
 - `strtok`: 2 functions, 11 sites: already exact: integer and byte string logic
 - `tolower`: 3 functions, 6 sites: already exact: integer and byte string logic
 - `toupper`: 4 functions, 6 sites: already exact: integer and byte string logic
@@ -246,6 +251,7 @@ the compiler emits `fsqrt` inline.
 - `deflate_slow`: 1 function, 6 sites: already exact: integer compression
 - `deflate_stored`: 1 function, 1 site: already exact: integer compression
 - `_controlfp`: 1 function, 3 sites: already exact: masks exceptions only, see FPU state
+- `floor`: 1 function, 2 sites: already exact: rounding toward minus infinity is exact
 - `_exit`: 1 function, 1 site: already exact: no value flows into the simulation (process exit, crash report text, wall clock for the report only)
 - `asctime`: 1 function, 2 sites: already exact: no value flows into the simulation (process exit, crash report text, wall clock for the report only)
 - `atexit`: 8 functions, 8 sites: already exact: no value flows into the simulation (process exit, crash report text, wall clock for the report only)
@@ -257,9 +263,9 @@ the compiler emits `fsqrt` inline.
 - `_chkstk`: 16 functions, 16 sites: already exact: stack probe
 - `fprintf`: 2 functions, 21 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
 - `printf`: 2 functions, 6 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
-- `sprintf`: 68 functions, 190 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
+- `sprintf`: 71 functions, 193 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
 - `sscanf`: 4 functions, 21 sites: already exact: text formatting, integer and string formats (format strings not inspected, see limits)
-- `_purecall`: 18 functions, 56 sites: already exact: vtable filler, never called
+- `_purecall`: 24 functions, 66 sites: already exact: vtable filler, never called
 - `time`: 2 functions, 2 sites: the #72 port (LoadMatch's seed input: the host supplies the seed; the other site is the crash report text)
 - `rand`: 9 functions, 22 sites: the #72 port (the LoadMatch seeding and std::random_shuffle also draw through rand)
 - `srand`: 1 function, 1 site: the #72 port (the LoadMatch seeding and std::random_shuffle also draw through rand)
@@ -267,6 +273,10 @@ the compiler emits `fsqrt` inline.
 `qsort` is not used by game logic (its one call is in the lobby UI). Float to
 integer conversions in game logic are 62 functions through `_ftol` and one,
 `FixedSine`, with an inline `fistp` (32-bit); no `fist` and no `fldcw` occur.
+`_ftol` truncates to a 64-bit integer and returns its low 32 bits, so a value
+out of the int range wraps (2147483649.0 gives -2147483647, 4294967295.9999995
+gives -1) and NaN, the infinities and magnitudes of 2^63 or more give 0, where
+an inline 32-bit `fistp` or SSE2 `cvttsd2si` gives -2147483648.
 
 ### FPU state
 
@@ -299,17 +309,18 @@ operation, not at each C expression. Values spilled to memory as `float` or
 - Reachability follows direct calls and jumps, every function whose address a
   function takes, and for each data symbol a reachable function references (a
   vtable, an order handler table such as `g_groundOrders`), every function
-  pointer in the exe's data up to the next symbol.
+  pointer in the exe's data up to the next symbol, at any byte offset (the
+  order tables hold 25-byte records).
 - Indirect calls through registers or memory that none of that resolves are
-  not followed: 229 through memory and 109 through registers in game-logic
+  not followed: 273 through memory and 129 through registers in game-logic
   functions, mostly virtual calls and callbacks whose target table is filled at
   run time. A function reached only that way is classed presentation, so its
   rows may be missing from the game-logic list.
 - Tables over-approximate: a function referencing a table reaches every
   entry. `LoadMatch` reaches `InitCommands`, which registers the console and
-  cheat command tables, so 302 of the 1613 game-logic functions are reached
-  only that way (marked `via console commands only` in the notes); 581 of the
-  722 game-logic rows remain without them.
+  cheat command tables, so 290 of the 1792 game-logic functions are reached
+  only that way (marked `via console commands only` in the notes); 660 of the
+  790 game-logic rows remain without them.
   Debug and crash-report code reached through the out-of-memory handler is
   likewise counted as game logic.
 - Format strings of `sprintf`, `sscanf`, `printf` and `fprintf` are not
@@ -386,7 +397,7 @@ Not in the file: 19 single-operation float expressions converted by `_ftol` (`(i
 - `_CIacos`: `fpatan(sqrt((1 + x) * (1 - x)), x)` on the x87, whose result is the 64-bit `fpatan` value (the same instruction as `bx_AngleOfVector`'s). A plain-double series port differs in 45.7% of 500,000 arguments in [-1, 1] (`x 0.889465`: want 0.47462316414879513, got 0.47462316414879507). Left for phase 2 or #5: it needs the double-double arctangent of `dd.c`.
 - `atof`: for decimal text of up to 15 digits with a decimal point (the form of TDF values), the result equals the correctly rounded double, computed as `(double)digits / 10^k` (the integer is exact in a double and 10^k is exact up to 10^15, one division): 0 mismatches in 1,000,000 cases of 1 to 9 digits and 1,000,000 of 10 to 15 digits. Longer text and exponents were not tested. No library function yet, since the port covers only that form.
 - `sscanf("%f")` into a float: 4,089 of 1,000,000 cases (0.41%) differ from the correctly rounded double rounded to float, for example `"-93690462"`: sscanf gives -93690456, the candidate -93690464. The cause is in LIBCMT, not in the digits: `_atoflt` runs `___strgtold12` (up to 25 digits kept, a 96-bit integer of digits made by multiply by 10 and add, scaled by products from the table of powers of ten 10^(+-1..7 * 8^k) with `___ld12mul`'s 5 by 5 limb product), then `__ld12cvt` rounds to 24 bits with `_RoundMan`, whose test for the bits after the round bit (`_ZeroTail(man, 25)`) leaves out bit 25 itself, so when the round bit and the next bit are set and the rest is zero it rounds down. `bx_strtof_msvc5` (`strtof.c`) is a port of that chain, the tables generated by `tools/bitexact_tables.py` and checked against the exe (`bx_pow10_pos`, `bx_pow10_neg`); 0 mismatches against `sscanf` in 2,000,000 texts (integers, decimals with up to 40 digits, leading and trailing zeros, exponents out to e+-50, signs).
-- `atan2` and `floor` are not called by game logic (data/crt_calls.csv), so they are not tested.
+- `atan2` is not called by game logic (data/crt_calls.csv), so it is not tested. `floor` is (`LoadUnitInfo`, on a unit's `Version`): rounding toward minus infinity is exact, and its result is converted by `bx_ftol`.
 
 ### Format strings
 

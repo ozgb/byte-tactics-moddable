@@ -114,6 +114,7 @@ int __stdcall StepGafSequence(GafRef* ref);
 #include "../state/sim_globals.h"
 void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int flag);
 #include "explosions.h"
+#include "../util/ftol.h"
 
 inline Explosion* MakeExplosion(int count, int start, int end)
 {
@@ -275,14 +276,14 @@ GafFrame* __stdcall BuildExplosionFrame(int size)
 {
     double half = size / 2;
     GafFrame* img = AllocFrame("ExplosionFrame", size, size);
-    img->yOffset = img->xOffset = (short)half;
+    img->yOffset = img->xOffset = (short)bx_ftol(half);
     for (int y = 0; y < size; y++) {
         double dy = half - y;
         double dy2 = dy * dy * 1.33;
         for (int x = 0; x < size; x++) {
             double dx = half - x;
             double d = (double)(int)(GameRand(RAND_STREAM_LOAD) * (__int64)10 / 0x8000) + sqrt(dx * dx + dy2);
-            unsigned char c = 32 - (unsigned char)(int)(d / half * 32.0);
+            unsigned char c = 32 - (unsigned char)bx_ftol(d / half * 32.0);
             if (c >= 0x22)
                 img->pixelsOrLayers[y * size + x] = 0xff;
             else if (c >= 0x20)
@@ -705,12 +706,12 @@ void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
             ab = VectorFromTo(b, a);
             n = VectorFromTo(b, c);
             n = NormalizeVector(CrossProduct(n, ab));
-            d->vel.x += RandomInt(200) * (short)(n.x * 512.0f);
-            d->vel.z -= RandomInt(200) * (short)(n.z * 512.0f);
+            d->vel.x += RandomInt(200) * (short)bx_ftol(n.x * 512.0f);
+            d->vel.z -= RandomInt(200) * (short)bx_ftol(n.z * 512.0f);
 #ifdef __clang__
-            int nx = (int)((double)n.x * 65535.0);
-            int ny = (int)((double)n.y * 65535.0);
-            int nz = (int)((double)n.z * 65535.0);
+            int nx = bx_ftol((double)n.x * 65535.0);
+            int ny = bx_ftol((double)n.y * 65535.0);
+            int nz = bx_ftol((double)n.z * 65535.0);
 #else
             int nx = (int)(n.x * 65535.0f);
             int ny = (int)(n.y * 65535.0f);

@@ -182,7 +182,7 @@ struct ReplaySubsystem {
     unsigned firstSlot;
     unsigned slotCount;
     unsigned events;
-    unsigned char importObjects;
+    unsigned char recordsImportChanges;
 };
 
 #endif

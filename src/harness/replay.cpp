@@ -257,7 +257,7 @@ ReplayReach s_importReach;
 
 void ImportObjects(ReplayText& t, const ReplayRoots* extra)
 {
-    if (!s_recording || !kReplaySubsystems[s_sub].importObjects)
+    if (!s_recording || !kReplaySubsystems[s_sub].recordsImportChanges)
         return;
     Recording& r = *s_rec[s_sub];
     const ReplaySlotSets& sets = kReplaySlots[s_slot];

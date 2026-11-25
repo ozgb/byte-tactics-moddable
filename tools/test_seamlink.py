@@ -1466,7 +1466,7 @@ GetOrderType,src/orders/order_dispatch.cpp,orders,x,
 
     def test_the_pilots_table_lists_orders_before_movement(self):
         self.assertEqual(seamlink.PILOTS[-4].owner, "orders")
-        self.assertEqual(seamlink.ORDERS.writing, ("Apply", "RunOrders", "RunSecondaryOrders"))
+        self.assertEqual(seamlink.ORDERS.writing, ("Apply", "RunOrders", "RunSecondaryOrders", "ExpandGroupCommand"))
         self.assertEqual(seamlink.ORDERS.engine_functions, ())
         self.assertIn(seamlink.ORDERS_GLUE_FILE, seamlink.ORDERS.engine_files)
         header = seamlink.ROOT / "interfaces/orders.h"

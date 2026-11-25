@@ -666,7 +666,12 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `movement.Apply`: mixed
+1. `weapons.WeaponCanReachUnit`: query
+1. `units.CanRepair`: query
+1. `los_radar.GetMapCellAtPosition`: query
+1. `units.CanLoad`: query
 1. `units.Apply`: mixed
+1. `targeting.GetWeaponTargetUnit`: query
 1. `scripts.Apply`: mixed
 
 ### `orders.RunOrders`
@@ -677,14 +682,19 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `movement.Apply`: mixed
-1. `units.Apply`: mixed
-1. `scripts.Apply`: mixed
 1. `units.UnitRefInit`: mixed
 1. `units.UnitRefSetValue`: mixed
 1. `units.UnitRefSetUnit`: intent, mixed
-1. `units.LoadUnit`: mixed
 1. `units.FindUnitTypeId`: query
+1. `units.LoadUnit`: mixed
 1. `movement.LoadTarget`: mixed
+1. `weapons.WeaponCanReachUnit`: query
+1. `units.CanRepair`: query
+1. `los_radar.GetMapCellAtPosition`: query
+1. `units.CanLoad`: query
+1. `units.Apply`: mixed
+1. `targeting.GetWeaponTargetUnit`: query
+1. `scripts.Apply`: mixed
 1. a sim event is recorded
 1. `movement.NewPathOrderAt`: mixed
 1. a draw from the Park-Miller generator (`rng`)
@@ -692,15 +702,11 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.NewPathOrderToUnit`: mixed
 1. `units.GetFactoriesInRadius`: query
 1. `movement.NewAirManeuverOrder`: mixed
-1. `weapons.WeaponCanReachUnit`: query
 1. `movement.NewPathOrderToUnitAt`: mixed
 1. `targeting.ChooseWeapon`: query
 1. `weapons.GetWeaponRange`: view read
 1. `movement.NewApproachRadius`: mixed
 1. `movement.NewRingApproach`: mixed
-1. `units.CanRepair`: query
-1. `los_radar.GetMapCellAtPosition`: query
-1. `units.CanLoad`: query
 1. `scripts.QueryScript`: mixed
 1. `scripts.GetPiecePosition`: query
 1. `map.CanPlaceUnitFootprint`: mixed
@@ -710,7 +716,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `units.UnitRefGet`: view read
 1. `movement.NewPointMarker`: mixed
 1. `scripts.FindScript`: query
-1. `targeting.GetWeaponTargetUnit`: query
 1. `los_radar.GetVisibleEnemiesInRadius`: query
 1. `map.SnapWorldPosToFootprint`: query
 1. `targeting.FindBestTargetIfFireAtWill`: mixed
@@ -736,14 +741,19 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `targeting.Apply`: mixed
 1. `weapons.Apply`: mixed
 1. `movement.Apply`: mixed
-1. `units.Apply`: mixed
-1. `scripts.Apply`: mixed
 1. `units.UnitRefInit`: mixed
 1. `units.UnitRefSetValue`: mixed
 1. `units.UnitRefSetUnit`: intent, mixed
-1. `units.LoadUnit`: mixed
 1. `units.FindUnitTypeId`: query
+1. `units.LoadUnit`: mixed
 1. `movement.LoadTarget`: mixed
+1. `weapons.WeaponCanReachUnit`: query
+1. `units.CanRepair`: query
+1. `los_radar.GetMapCellAtPosition`: query
+1. `units.CanLoad`: query
+1. `units.Apply`: mixed
+1. `targeting.GetWeaponTargetUnit`: query
+1. `scripts.Apply`: mixed
 1. a sim event is recorded
 1. `movement.NewPathOrderAt`: mixed
 1. a draw from the Park-Miller generator (`rng`)
@@ -751,15 +761,11 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.NewPathOrderToUnit`: mixed
 1. `units.GetFactoriesInRadius`: query
 1. `movement.NewAirManeuverOrder`: mixed
-1. `weapons.WeaponCanReachUnit`: query
 1. `movement.NewPathOrderToUnitAt`: mixed
 1. `targeting.ChooseWeapon`: query
 1. `weapons.GetWeaponRange`: view read
 1. `movement.NewApproachRadius`: mixed
 1. `movement.NewRingApproach`: mixed
-1. `units.CanRepair`: query
-1. `los_radar.GetMapCellAtPosition`: query
-1. `units.CanLoad`: query
 1. `scripts.QueryScript`: mixed
 1. `scripts.GetPiecePosition`: query
 1. `map.CanPlaceUnitFootprint`: mixed
@@ -769,7 +775,6 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `units.UnitRefGet`: view read
 1. `movement.NewPointMarker`: mixed
 1. `scripts.FindScript`: query
-1. `targeting.GetWeaponTargetUnit`: query
 1. `los_radar.GetVisibleEnemiesInRadius`: query
 1. `map.SnapWorldPosToFootprint`: query
 1. `targeting.FindBestTargetIfFireAtWill`: mixed

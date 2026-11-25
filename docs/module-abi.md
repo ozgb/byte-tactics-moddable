@@ -376,6 +376,12 @@ the fields of that kind, or has no payload struct, in which case the event is th
 header's. A payload is plain data: 4-byte fields and arrays of them, or of bytes, no pointers; a unit or a piece state is a block
 offset. Two kinds share one payload struct only when their fields mean the same.
 
+A payload that names a set of units carries it as a bit set over one player's range of the unit array, not as a counted
+list: the header's `unit` is the first unit of the range (the player's `unitsBegin`), and bit `i` (bit `i % 32` of word
+`i / 32`) stands for the unit `i` records after it. The set has a fixed size, so the payload has one size and fits an
+inbox entry, and the units come in the order of the unit array, the order 3.1c gives them their orders in.
+`OrdersGroupCommand` holds 512 bits, above the 500 units a player may have.
+
 The publisher passes the payload's size with it: `Emit(&payload, sizeof payload)`. An event of fewer
 than 4 bytes has no kind to route by, and is a fatal error. The scheduler copies `size` bytes into a 128-byte inbox entry,
 keeps the size with it, and hands the subscriber the event as a pointer to the header together with the size the publisher

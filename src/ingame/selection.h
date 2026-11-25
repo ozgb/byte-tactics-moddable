@@ -3,6 +3,7 @@
 #include "../../interfaces/ref.h"
 class MissionType;
 struct MouseEvent;
+struct OrdersGroupCommand;
 
 struct Unit;
 
@@ -34,6 +35,7 @@ bool __stdcall SelectSquad(int id, int);
 
 void __stdcall DrawSelectedUnitOrderOverlays(void* obj, Ref<Unit>* sel);
 
+void __stdcall SendGroupCommand(OrdersGroupCommand* command);
 void __stdcall IssueOrderToSelection(MouseEvent* entry, unsigned char mode, MissionType kind, int* pos, int typeId, int amount);
 
 #endif

@@ -9,6 +9,7 @@
 #include "../../interfaces/host.h"
 #include "../util/engine_services.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/orders.h"
 
 #include "../game/game.h"
 #include "../mission/mission.h"
@@ -3734,7 +3735,6 @@ enum {
 #include "../ingame/selection.h"
 void __stdcall IssueMobileBuildOrders(void* mouse);
 Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind);
-void __stdcall DeleteOrder(Unit* owner, Order* node);
 #include "../ingame/control_panel.h"
 #include "../orders/mission_type.h"
 int __stdcall GetGroundHeight(int* pos);
@@ -4230,6 +4230,51 @@ void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit)
 #endif
     UiLineStart("cancel");
     fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
+}
+
+void __stdcall HarnessUiCommand(const OrdersGroupCommand* command)
+{
+    if (!UiLive())
+        return;
+#if BT_ACCESS_LOG
+    AccessLogEmit(1, __builtin_return_address(0));
+#endif
+    int build = command->h.kind == ORDERS_GROUP_BUILD;
+    UiLineStart("command");
+    if (build) {
+        fprintf(s_ui, " build type");
+        UiUnitType((unsigned short)command->params[0]);
+    } else {
+        fprintf(s_ui, " order mode %d kind %s", command->mode, command->mode ? "-" : UiOrderName((unsigned char)command->type));
+    }
+    fprintf(s_ui, " units");
+    Ref<Unit> first;
+    first.offset = command->h.unit;
+    unsigned base = UiUnitIndex(first.get());
+    int any = 0;
+    for (int i = 0; i < ORDERS_GROUP_UNITS; i++) {
+        if (!((command->units[i >> 5] >> (i & 31)) & 1))
+            continue;
+        fprintf(s_ui, "%s%u", any ? "," : " ", base + i);
+        any = 1;
+    }
+    if (!any)
+        fprintf(s_ui, " -");
+    if (!build) {
+        Ref<Unit> target;
+        target.offset = command->target;
+        if (target.get() != nullptr)
+            fprintf(s_ui, " target %u", UiUnitIndex(target.get()));
+        else
+            fprintf(s_ui, " target -");
+    }
+    if (command->hasPos)
+        fprintf(s_ui, " pos %d %d %d", command->pos[0] >> 16, command->pos[1] >> 16, command->pos[2] >> 16);
+    else
+        fprintf(s_ui, " pos -");
+    if (!build)
+        fprintf(s_ui, " param %d amount %d", command->params[0], command->params[1]);
+    fprintf(s_ui, " remove %d\n", command->queue != 0);
 }
 
 static void UiListUnits(int group, int selectedOnly)

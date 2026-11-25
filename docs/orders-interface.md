@@ -36,7 +36,7 @@ Two rulings of the human shape this change:
   3.0 take pointers out of their events and slots: a unit, an order, a target or a reference is its block offset.
 
 Orders' place in it:
-- **Events into orders:** ADD, QUEUE_BUILD, STOP, BE_CARRIED, STATUS_FLAGS, ATTACKED, PARALYZE, COMMAND and, since 6.1, CANCEL, published by
+- **Events into orders:** ADD, QUEUE_BUILD, STOP, BE_CARRIED, STATUS_FLAGS, ATTACKED, PARALYZE, COMMAND and, since 6.1, CANCEL, and since 6.2 GROUP_COMMAND and GROUP_BUILD, published by
   units, ai, weapons, movement and the engine (the UI, the console and the harness). Orders' handler (`OrdersInbox`,
   `src/seams/orders_world.cpp`) passes each to `Apply` and records it with its outcome in the trace's dump (section
   5). Ai's effects ADD_ORDER, QUEUE_BUILD and STOP, weapons' ATTACKED and PARALYZE and movement's ORDER_FLAGS reach it
@@ -100,12 +100,18 @@ are the UI, the console, the harness and the saved game's load.
 | weapons: a damaged unit (#984, #991) | `IssueAttackOrder`, `ai.ReactToAttack`'s return fire | ATTACKED through `OrdersOnWeaponsAttacked` |
 | weapons: a paralyser hits (#984) | the paralysis order | PARALYZE through `OrdersOnWeaponsParalyze` |
 | movement: a target reports the progress of its order (`order_targets.cpp`) | `OrderOrStatusFlags` | STATUS_FLAGS through `OrdersOnMovementOrderFlags` (movement's ORDER_FLAGS) |
-| the UI: a command (`selection.cpp`, `control_panel.cpp`) | `IssueOrCancelOrder` | COMMAND from the engine |
+| the UI: a command (`selection.cpp`, `control_panel.cpp`) | `IssueOrCancelOrder` | GROUP_COMMAND or GROUP_BUILD from the engine (since 6.2, #1048), which the slot `ExpandGroupCommand` turns into a COMMAND for each unit it orders |
 | the UI: the build menu (`control_panel.cpp`) | `QueueBuildOrder` | QUEUE_BUILD from the engine |
 
 **Writers outside the tick** (the player's commands and the saved game):
-- **The UI, the console and the harness** publish COMMAND and QUEUE_BUILD from `SCHED_ENGINE` between ticks, so each
-  event is delivered at once (#970).
+- **The UI, the console and the harness** publish GROUP_COMMAND, GROUP_BUILD, CANCEL and QUEUE_BUILD from
+  `SCHED_ENGINE` between ticks, so each event is delivered at once (#970). A click is one group command: the selected
+  units are a bit set over the local player's range of the unit array (`docs/module-abi.md`, section 6.1), and
+  `OrdersOnGroupCommand` hands it to the slot `ExpandGroupCommand`, whose default (`OrdersExpandGroupCommand`) is the
+  body of 3.1c's `IssueOrderToSelection` and `IssueMobileBuildOrders`: it publishes one COMMAND for each unit it orders,
+  in the order of the unit array, from orders' own outbox, and returns their count as the command's outcome. A mod may
+  replace the slot (a formation). Each COMMAND reaches `OrdersOnCommand`, which logs it in the UI log and hands it to
+  `Apply`; the rules are in `docs/commands.md`, section 6.2.
 - **A unit's initial mission** is units' ADD, published by `RunInitialMission`, which `CreateMissionUnits` calls while a
   game loads (`game_load.cpp`), before the first tick. The net phase publishes no event into orders: `net_game.cpp`
   calls none of the publish helpers.
@@ -136,6 +142,7 @@ header alone. `Apply(event, size)` refuses an event smaller than its kind's payl
 | ATTACKED 293 | `OrdersAttacked` | `attacker` (a block offset, 0 for none) |
 | PARALYZE 294 | `OrdersParalyze` | `ticks` |
 | CANCEL 296 | `OrdersCancel` | `type`: the order type (a byte) whose first order in the unit's list is deleted; outcome 1, or 0 when the unit has none |
+| GROUP_COMMAND 297, GROUP_BUILD 298 | `OrdersGroupCommand` | `mode`, `type`, `queue`, `target`, `hasPos`, `pos[3]`, `params[2]`, `units[16]` (a bit set from the header's `unit`); consumed by `ExpandGroupCommand`, not `Apply`; outcome the count of COMMANDs it published |
 
 ## 3. Effects out of orders
 
@@ -260,7 +267,9 @@ cite the document that decided them; the routes new in this change cite the gate
 | Route | Now | Why |
 |---|---|---|
 | units ADD, to orders | synchronous | Published only by `RunInitialMission`, which `CreateMissionUnits` calls while a game loads (`game_load.cpp`), before the first tick, so it is delivered at once whichever its mode and no read can find it pending. Queued it stayed equal on the tier, as it must. |
-| engine COMMAND, to orders | queued | Published only from the player's UI (`IssueOrderToSelection` in `selection.cpp`, `IssueMobileBuildOrders` in `control_panel.cpp`, called by the panels, the keys and the console's Assign) and by the harness's scripted orders (`HarnessBeforeStep`, before `SchedBeginTick`), all between ticks, where `SchedPublish` delivers at once (#970). No network path reaches them: `HandleNetPackets` calls none of these functions. Queued it stayed equal (section 8). |
+| engine GROUP_COMMAND and GROUP_BUILD, to orders | queued | Published since 6.2 by the callers the next row names, between ticks, where `SchedPublish` delivers at once (#970), as COMMAND was. |
+| orders COMMAND, to orders | queued | Published only by `ExpandGroupCommand` while it consumes a group command, between ticks, so delivered at once. |
+| engine COMMAND, to orders | queued | Before 6.2 published from the player's UI (`IssueOrderToSelection` in `selection.cpp`, `IssueMobileBuildOrders` in `control_panel.cpp`, called by the panels, the keys and the console's Assign) and by the harness's scripted orders (`HarnessBeforeStep`, before `SchedBeginTick`), all between ticks, where `SchedPublish` delivers at once (#970). No network path reaches them: `HandleNetPackets` calls none of these functions. Queued it stayed equal (section 8). |
 | engine QUEUE_BUILD, to orders | queued | The same: published only by `QueueBuildOrderWithSound` (`control_panel.cpp`), from the build menu's click and the harness's scripted orders, between ticks. |
 | units STOP, to orders | synchronous | The gate (section 8): queued, the scenarios crashed (exit code 3). |
 | units BE_CARRIED, to orders | synchronous | The gate (section 8). |

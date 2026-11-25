@@ -1059,6 +1059,7 @@ EVENT_MODULES = [
                  "ORDERS_BE_CARRIED": None, "ORDERS_STATUS_FLAGS": "OrdersStatusFlags",
                  "ORDERS_ATTACKED": "OrdersAttacked", "ORDERS_PARALYZE": "OrdersParalyze",
                  "ORDERS_COMMAND": "OrdersAdd", "ORDERS_CANCEL": "OrdersCancel",
+                 "ORDERS_GROUP_COMMAND": "OrdersGroupCommand", "ORDERS_GROUP_BUILD": "OrdersGroupCommand",
                  "ORDERS_EFFECT_SET_STATE_BITS": "OrdersSetStateBits", "ORDERS_EFFECT_SET_POSITION": "OrdersSetPosition",
                  "ORDERS_EFFECT_ATTACH_TO_PIECE": "OrdersAttachToPiece",
                  "ORDERS_EFFECT_FINISH_CONSTRUCTION": "OrdersFinishConstruction",

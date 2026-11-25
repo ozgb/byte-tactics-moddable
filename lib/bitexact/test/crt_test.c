@@ -3,6 +3,9 @@
 #include <string.h>
 
 #include "../bitexact.h"
+#include "../bx_game.h"
+#include "../bx_libcmt.h"
+#include "../bx_stl.h"
 #include "vectors.h"
 
 #ifdef BX_REPLAY

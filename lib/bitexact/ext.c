@@ -1,91 +1,26 @@
-#include "bitexact.h"
 #include "internal.h"
 
-#define BX_U64(hi, lo) (((bx_u64)(hi) << 32) | (bx_u64)(lo))
-#define BX_ONE ((bx_u64)1)
-#define BX_MANTISSA BX_U64(0xFFFFFu, 0xFFFFFFFFu)
-#define BX_NO_SIGN BX_U64(0x7FFFFFFFu, 0xFFFFFFFFu)
-
-typedef union {
-    double d;
-    bx_u32 w[2];
-} bx_double_bits;
-
-static bx_u64 bx_bits_of(double d)
-{
-    bx_double_bits b;
-    b.d = d;
-    return ((bx_u64)b.w[1] << 32) | b.w[0];
-}
-
-static double bx_from_bits(bx_u64 u)
-{
-    bx_double_bits b;
-    b.w[1] = (bx_u32)(u >> 32);
-    b.w[0] = (bx_u32)u;
-    return b.d;
-}
-
-double bx_sqrt(double x)
-{
-    bx_u64 bits = bx_bits_of(x);
-    bx_u64 m, root = 0, rem = 0, pair;
-    int e, exp2, i;
-
-    if ((bits << 1) == 0)
-        return x;
-    if (bits >> 63)
-        return bx_from_bits(BX_U64(0xFFF80000u, 0u));
-    e = (int)((bits >> 52) & 0x7ff);
-    if (e == 0x7ff)
-        return x;
-    m = bits & BX_MANTISSA;
-    if (e == 0) {
-        exp2 = -1074;
-        while (!(m & (BX_ONE << 52))) {
-            m <<= 1;
-            exp2--;
-        }
-    } else {
-        m |= BX_ONE << 52;
-        exp2 = e - 1075;
-    }
-    if (exp2 & 1) {
-        m <<= 1;
-        exp2--;
-    }
-    for (i = 0; i < 56; i++) {
-        pair = i <= 26 ? (m >> (52 - 2 * i)) & 3 : 0;
-        rem = (rem << 2) | pair;
-        if (rem >= ((root << 2) | 1)) {
-            rem -= (root << 2) | 1;
-            root = (root << 1) | 1;
-        } else {
-            root <<= 1;
-        }
-    }
-    m = root >> 3;
-    pair = root & 7;
-    if (pair > 4 || (pair == 4 && (rem != 0 || (m & 1))))
-        m++;
-    if (m == (BX_ONE << 53)) {
-        m >>= 1;
-        exp2 += 2;
-    }
-    return bx_from_bits(((bx_u64)(exp2 / 2 + 1049) << 52) | (m & BX_MANTISSA));
-}
+#define BX_TOP_BIT (BX_ONE << 63)
 
 typedef struct {
     bx_u64 hi;
     bx_u64 lo;
 } bx_u128;
 
-typedef struct {
-    bx_u64 m;
-    int e;
-} bx_ext;
+bx_u64 bx_bits_of(double d)
+{
+    bx_double_bits b;
+    b.d = d;
+    return ((bx_u64)b.w[1] << 32) | b.w[0];
+}
 
-#define BX_TOP_BIT (BX_ONE << 63)
+double bx_from_bits(bx_u64 u)
+{
+    bx_double_bits b;
+    b.w[1] = (bx_u32)(u >> 32);
+    b.w[0] = (bx_u32)u;
+    return b.d;
+}
 
 static bx_u128 bx_mul_64(bx_u64 a, bx_u64 b)
 {
@@ -166,7 +101,7 @@ static bx_ext bx_ext_from_u128(bx_u128 v, int e, int sticky)
     return r;
 }
 
-static bx_ext bx_ext_of_double(double d)
+bx_ext bx_ext_of_double(double d)
 {
     bx_u64 bits = bx_bits_of(d) & BX_NO_SIGN;
     bx_u64 m = bits & BX_MANTISSA;
@@ -186,7 +121,7 @@ static bx_ext bx_ext_of_double(double d)
     return r;
 }
 
-static double bx_double_of_ext(bx_ext x)
+double bx_double_of_ext(bx_ext x)
 {
     int drop, lead;
     bx_u64 q, guard, below, bits;
@@ -222,14 +157,14 @@ static double bx_double_of_ext(bx_ext x)
     return bx_from_bits(bits);
 }
 
-static bx_ext bx_ext_mul(bx_ext a, bx_ext b)
+bx_ext bx_ext_mul(bx_ext a, bx_ext b)
 {
     if (a.m == 0 || b.m == 0)
         return bx_ext_zero();
     return bx_ext_from_u128(bx_mul_64(a.m, b.m), a.e + b.e, 0);
 }
 
-static bx_ext bx_ext_add(bx_ext a, bx_ext b)
+bx_ext bx_ext_add(bx_ext a, bx_ext b)
 {
     bx_u128 sum;
     bx_ext t;
@@ -273,7 +208,7 @@ static bx_ext bx_ext_add(bx_ext a, bx_ext b)
     return bx_ext_from_u128(sum, e, sticky);
 }
 
-static bx_ext bx_ext_div(bx_ext a, bx_ext b)
+bx_ext bx_ext_div(bx_ext a, bx_ext b)
 {
     bx_u64 ma = a.m >> 11, mb = b.m >> 11, q = 0, rem;
     int xa = a.e + 11, xb = b.e + 11, i, guard, sticky;
@@ -331,7 +266,7 @@ static bx_u128 bx_u128_shl(bx_u128 a, int n)
     return r;
 }
 
-static bx_ext bx_ext_sqrt(bx_ext a)
+bx_ext bx_ext_sqrt(bx_ext a)
 {
     bx_u128 rem, root, cand;
     int odd = a.e & 1, i, pos, guard, sticky;
@@ -382,27 +317,68 @@ double bx_ext64_to_double(bx_u64 m, int e)
     return bx_double_of_ext(x);
 }
 
-double bx_hypot(double x, double y)
+bx_i32 bx_round_to_int(double v)
 {
-    bx_u64 xb = bx_bits_of(x) & BX_NO_SIGN, yb = bx_bits_of(y) & BX_NO_SIGN;
-    double a = bx_from_bits(xb), b = bx_from_bits(yb), big, ra, rb, sum, root;
-    bx_ext eb, ext_sum;
+    bx_i64 t;
+    double f;
 
-    if (xb == BX_U64(0x7FF00000u, 0u) || yb == BX_U64(0x7FF00000u, 0u))
-        return bx_from_bits(BX_U64(0x7FF00000u, 0u));
-    if ((xb >> 52) == 0x7ff)
-        return x;
-    if ((yb >> 52) == 0x7ff)
-        return y;
-    big = xb > yb ? a : b;
-    if (xb == 0 && yb == 0)
+    if (!(v > -4e18 && v < 4e18))
+        return BX_INT_MIN;
+    t = (bx_i64)v;
+    f = v - (double)t;
+    if (v >= 0) {
+        if (f > 0.5 || (f == 0.5 && (t & 1)))
+            t++;
+    } else {
+        if (f < -0.5 || (f == -0.5 && (t & 1)))
+            t--;
+    }
+    if (t > 2147483647 || t < -2147483647 - 1)
+        return BX_INT_MIN;
+    return (bx_i32)t;
+}
+
+static int bx_bit_length(bx_u64 v)
+{
+    int n = 0;
+    while (v) {
+        n++;
+        v >>= 1;
+    }
+    return n;
+}
+
+double bx_mul_ext(bx_i32 x, bx_u32 mant_hi, bx_u32 mant_lo, bx_u32 sign_exp)
+{
+    bx_u32 ax;
+    bx_u64 phi, plo, carry, top, sticky, r, rem;
+    bx_u32 low32;
+    int sh, neg, exp;
+    bx_double_bits b;
+
+    if (x == 0)
         return 0.0;
-    eb = bx_ext_of_double(big);
-    ra = bx_double_of_ext(bx_ext_div(bx_ext_of_double(a), eb));
-    rb = bx_double_of_ext(bx_ext_div(bx_ext_of_double(b), eb));
-    ext_sum = bx_ext_add(bx_ext_mul(bx_ext_of_double(ra), bx_ext_of_double(ra)),
-                         bx_ext_mul(bx_ext_of_double(rb), bx_ext_of_double(rb)));
-    sum = bx_double_of_ext(ext_sum);
-    root = bx_double_of_ext(bx_ext_sqrt(bx_ext_of_double(sum)));
-    return bx_double_of_ext(bx_ext_mul(bx_ext_of_double(root), eb));
+    ax = x < 0 ? (bx_u32)0 - (bx_u32)x : (bx_u32)x;
+    neg = (x < 0) != ((sign_exp & 0x8000) != 0);
+    phi = (bx_u64)ax * (bx_u64)mant_hi;
+    plo = (bx_u64)ax * (bx_u64)mant_lo;
+    carry = phi + (plo >> 32);
+    low32 = (bx_u32)(plo & 0xffffffffu);
+    sh = bx_bit_length(carry) - 32;
+    top = (carry << (32 - sh)) | ((bx_u64)low32 >> sh);
+    sticky = (bx_u64)low32 & (((bx_u64)1 << sh) - 1);
+    r = top >> 11;
+    rem = top & 0x7ff;
+    if (rem > 0x400 || (rem == 0x400 && (sticky || (r & 1))))
+        r++;
+    exp = (int)(sign_exp & 0x7fff) - 16383 + sh;
+    if (r == ((bx_u64)1 << 53)) {
+        r >>= 1;
+        exp++;
+    }
+    b.w[1] = ((bx_u32)(exp + 1023) << 20) | (bx_u32)((r >> 32) & 0xfffff);
+    b.w[0] = (bx_u32)(r & 0xffffffffu);
+    if (neg)
+        b.w[1] |= 0x80000000u;
+    return b.d;
 }

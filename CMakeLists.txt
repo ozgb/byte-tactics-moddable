@@ -45,7 +45,9 @@ add_custom_command(
   DEPENDS "${CMAKE_SOURCE_DIR}/tools/bitexact_tables.py"
   VERBATIM)
 add_library(bitexact STATIC
-  "${BITEXACT_DIR}/trig.c" "${BITEXACT_DIR}/math.c" "${BITEXACT_DIR}/strtof.c" "${BITEXACT_DIR}/rand.c" "${BITEXACT_DIR}/qsort.c"
+  "${BITEXACT_DIR}/sqrt.c" "${BITEXACT_DIR}/ext.c" "${BITEXACT_DIR}/dd.c" "${BITEXACT_DIR}/rand.c"
+  "${BITEXACT_DIR}/hypot.c" "${BITEXACT_DIR}/acos.c" "${BITEXACT_DIR}/strtof.c" "${BITEXACT_DIR}/qsort.c" "${BITEXACT_DIR}/shuffle.c"
+  "${BITEXACT_DIR}/fixed_trig.c" "${BITEXACT_DIR}/explosions.c"
   "${BITEXACT_TABLES}")
 if(BITEXACT_ROUTE)
   target_sources(bitexact PRIVATE "${BITEXACT_SHIM_DIR}/trig.c" "${BITEXACT_SHIM_DIR}/sscanf.c")

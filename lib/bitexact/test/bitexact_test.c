@@ -5,6 +5,9 @@
 #include <string.h>
 
 #include "../bitexact.h"
+#include "../bx_game.h"
+#include "../bx_libcmt.h"
+#include "../bx_stl.h"
 #include "../bx_tables.h"
 #include "vectors.h"
 

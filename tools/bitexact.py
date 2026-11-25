@@ -29,8 +29,13 @@ from sources import ROOT, Original
 LIB = ROOT / "lib/bitexact"
 BUILD = ROOT / "build/bitexact"
 TABLES = BUILD / "bx_tables.c"
+SIN_TABLE = 0x509F00
+RAD_TO_ANGLE16 = 0x509EF0
+ANGLE16_TO_RAD = 0x509EF8
+POW10_POS = 0x5116F0
+POW10_NEG = 0x511850
 ORIG_DATA = BUILD / "orig_data.c"
-PORT_SOURCES = [LIB / "trig.c", LIB / "math.c", LIB / "strtof.c", ROOT / "cmake/bitexact/sscanf.c", TABLES, ORIG_DATA]
+PORT_SOURCES = [LIB / "fixed_trig.c", LIB / "ext.c", LIB / "dd.c", LIB / "sqrt.c", LIB / "hypot.c", LIB / "acos.c", LIB / "strtof.c", ROOT / "cmake/bitexact/sscanf.c", TABLES, ORIG_DATA]
 MATH_TEST = LIB / "test/math_test.c"
 TEST = LIB / "test/bitexact_test.c"
 VECTORS_SOURCE = LIB / "test/vectors.c"
@@ -38,7 +43,7 @@ VECTORS = BUILD / "vectors"
 TDF_NUMBERS = ROOT / "build/tdf_numbers.txt"
 MSVC5 = (ROOT / "toolchain/msvc5-sp3").resolve()
 CLANG_BUILD = BUILD / "clang"
-CRT_PORT_SOURCES = [LIB / "rand.c", LIB / "qsort.c"]
+CRT_PORT_SOURCES = [LIB / "rand.c", LIB / "qsort.c", LIB / "shuffle.c", LIB / "explosions.c"]
 CRT_TESTS = [LIB / "test/crt_test.c", LIB / "test/stl_shuffle.cpp", VECTORS_SOURCE]
 
 
@@ -49,9 +54,9 @@ def generate_and_check() -> bool:
     orig = Original()
     sin = bitexact_tables.sin_table()
     rad_to_angle16, angle16_to_rad = bitexact_tables.angle_doubles()
-    exe_sin = orig.read(bitexact_tables.SIN_TABLE, 2 * len(sin))
-    exe_cos = orig.read(bitexact_tables.SIN_TABLE + 256, 1024)
-    exe_doubles = orig.read(bitexact_tables.RAD_TO_ANGLE16, 16)
+    exe_sin = orig.read(SIN_TABLE, 2 * len(sin))
+    exe_cos = orig.read(SIN_TABLE + 256, 1024)
+    exe_doubles = orig.read(RAD_TO_ANGLE16, 16)
     ok = True
     if struct.pack(f"<{len(sin)}h", *sin) != exe_sin:
         print("tables: generated sine table differs from orig/TotalA.exe", file=sys.stderr)
@@ -62,8 +67,8 @@ def generate_and_check() -> bool:
     if struct.pack("<dd", rad_to_angle16, angle16_to_rad) != exe_doubles:
         print("tables: generated doubles differ from orig/TotalA.exe", file=sys.stderr)
         ok = False
-    for name, negative, base in (("positive", False, bitexact_tables.POW10_POS),
-                                 ("negative", True, bitexact_tables.POW10_NEG)):
+    for name, negative, base in (("positive", False, POW10_POS),
+                                 ("negative", True, POW10_NEG)):
         size = 12 * bitexact_tables.POW10_ENTRIES
         if bitexact_tables.pow10_table(negative) != orig.read(base, size):
             print(f"tables: generated {name} powers of ten differ from orig/TotalA.exe", file=sys.stderr)

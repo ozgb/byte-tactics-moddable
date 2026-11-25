@@ -1,12 +1,48 @@
 # lib/bitexact
 
-A portable C port of the hand-written fixed-point trigonometry in
-`src/util/fixed_trig.cpp`, giving the same result as the original for every
-input. It lives outside `src/` so that the matching link never builds it into the
-reference exe. It needs no libm, no `long double`, and no platform headers.
+A portable C port of the maths and the C runtime calls the game logic makes:
+the hand-written fixed-point trigonometry of `src/util/fixed_trig.cpp`, the
+x87 `sqrt`, `_hypot` and `acos`, the text to number conversions of `sscanf` and
+`atof`, and the `rand`, `srand`, `qsort` and `random_shuffle` calls, each giving
+the same result as the original for every input. It lives outside `src/` so
+that the matching link never builds it into the reference exe. It needs no
+libm, no `long double`, and no platform headers.
 
 Plain C89 (MSVC 5 and clang), types from `bitexact.h` (`bx_i32` and so on), names
-prefixed `bx_`. Little-endian only (x86, wasm).
+prefixed `bx_`. Little-endian only (x86, wasm). There is no umbrella header: a
+caller includes `bitexact.h` (the types, `bx_sqrt`, the rand stream) and the
+header of each provenance it uses (`bx_libcmt.h`, `bx_stl.h`, `bx_game.h`);
+`internal.h` is for the library's own files.
+
+## Provenance
+
+Computed and published files are imported into the clean room (the kit's `runtime/`, MIT); LIBCMT, STL header and game code files are specified instead (the btm runtime spec).
+
+| File | Provenance | Holds |
+| --- | --- | --- |
+| `lib/bitexact/bitexact.h` | published | the integer types, `BX_CALL`, `bx_rand_state`, and the declarations of `bx_sqrt`, `bx_srand`, `bx_rand` |
+| `lib/bitexact/internal.h` | published | the declarations of the helpers shared between files: the 80-bit helpers (`bx_ext`) and the double-double helpers (`bx_dd`) |
+| `lib/bitexact/bx_tables.h` | computed | the declarations of the generated tables |
+| `tools/bitexact_tables.py` | computed | the table generator: the sine table, the angle constants, the sine and cosine of every 16-bit angle, the arctangent and pi constants, the powers of ten |
+| `lib/bitexact/sqrt.c` | published | `bx_sqrt` |
+| `lib/bitexact/ext.c` | published | the bit helpers, the `bx_u128` and `bx_ext` types and every ext and u128 helper, `bx_ext_sqrt`, `bx_ext64_to_double`, `bx_round_to_int`, `bx_bit_length`, `bx_mul_ext` |
+| `lib/bitexact/dd.c` | published | `bx_double_from_words`, `bx_two_sum`, `bx_two_prod`, `bx_dd_const`, the `bx_dd` type and every `bx_dd_*` helper including `bx_dd_atan_ratio`, `bx_dd_atan2_nonneg`, `bx_double_bits64`, `bx_round_shift`, `bx_dd_to_x87_double` |
+| `lib/bitexact/rand.c` | published | `bx_srand`, `bx_rand` |
+| `lib/bitexact/bx_libcmt.h` | LIBCMT | the declarations of `bx_hypot`, `bx_acos`, `bx_strtof_msvc5`, `bx_atof_msvc5`, `bx_qsort` |
+| `lib/bitexact/hypot.c` | LIBCMT | `bx_hypot` |
+| `lib/bitexact/acos.c` | LIBCMT | `bx_acos` |
+| `lib/bitexact/strtof.c` | LIBCMT | `bx_strtof_msvc5`, `bx_atof_msvc5` and the scanner helpers |
+| `lib/bitexact/qsort.c` | LIBCMT | `bx_qsort` |
+| `lib/bitexact/bx_stl.h` | STL header | the declaration of `bx_random_shuffle_int` |
+| `lib/bitexact/shuffle.c` | STL header | `bx_random_shuffle_int` |
+| `lib/bitexact/bx_game.h` | game code | the declarations of the trig ports, the matrix pair, `bx_explosion_frame_draws`, `bx_init_explosions_draws`, `bx_init_explosions_rand` |
+| `lib/bitexact/fixed_trig.c` | game code | `bx_FixedSine`, `bx_fixed_cos`, `bx_mul_hi32`, `bx_ScaledSin`, `bx_ScaledCos`, `bx_AngleOfVector`, `bx_RotatePoint2D`, `bx_build_rotation_matrix`, `bx_apply_rotation_matrix`, `bx_MulDivTrunc` and their small integer helpers |
+| `lib/bitexact/explosions.c` | game code | the explosion draw counts |
+| `cmake/bitexact/route.h` | LIBCMT | the macros that route the game logic's CRT calls to the library |
+| `cmake/bitexact/sscanf.c` | LIBCMT | `bx_sscanf` |
+| `cmake/bitexact/trig.c` | game code | the exe's trig entry points as calls into the trig ports |
+
+The test sources (`lib/bitexact/test/`) and the build files are not in the table.
 
 ## Entry points
 
@@ -33,7 +69,7 @@ prefixed `bx_`. Little-endian only (x86, wasm).
 
 ## rand, random_shuffle, qsort
 
-`rand.c` and `qsort.c`, plain C89 like the trig port.
+`rand.c`, `shuffle.c`, `explosions.c` and `qsort.c`, plain C89 like the trig port (`fixed_trig.c`).
 
 - **Explicit state.** LIBCMT keeps the `rand` seed per thread (`_getptd()+0x14`). The port takes a `bx_rand_state` so a caller names the stream it means. `seed = seed * 214013 + 2531011`, the value is `(seed >> 16) & 0x7fff`, and `bx_srand` stores the seed as it is. The game logic stream is the load thread's. The presentation stream (`HarnessViewRand`, `src/harness/harness.cpp`) uses the same algorithm with its own state, so it is a second `bx_rand_state`, never the logic one.
 - **random_shuffle.** The STL header (`toolchain/msvc5-sp3/INCLUDE/ALGORITHM`, `_Random_shuffle`) draws once per element after the first: `rand() & 0x7fff`, and for a position `d` above 0x7fff widens that by or-ing in 0x7fff words (no extra draws), then swaps the element with `first[rn % d]`. A range of n elements draws n - 1 times; an empty range draws none. The two game calls (`LoadMatch`, 0x4568c0) shuffle int arrays, which is what the port covers.
@@ -138,10 +174,10 @@ it. Everything else is presentation. Counts are game-logic
 functions, then call or instruction sites. `sqrt` never appears as a call:
 the compiler emits `fsqrt` inline.
 
-- `fistp (FixedSine)`: 1 function, 3 sites: the merged port in lib/bitexact (trig.c)
-- `fpatan (FixedSine)`: 1 function, 1 site: the merged port in lib/bitexact (trig.c)
-- `fsincos (FixedSine)`: 1 function, 1 site: the merged port in lib/bitexact (trig.c)
-- `_CIacos`: `fpatan(sqrt((1 + x) * (1 - x)), x)` on the x87, whose result is the 64-bit `fpatan` value (the same instruction as `bx_AngleOfVector`'s), stored as a double. A plain-double series port differs in 40 to 46% of 500,000 arguments in [-1, 1] (`x 0.5`: want 1.0471975511965976, got 1.0471975511965974). `bx_acos` (`trig.c`) takes `s = sqrt((1 + x) * (1 - x))` in doubles, computes `atan2(s, x)` in double-double (the table reduction of `bx_AngleOfVector` with double-double arithmetic and an 11-term series, about 2^-100 accurate), rounds it to a 64-bit mantissa and then to 53 bits. It differs in 7 of 500,000 arguments, all of the same kind: the exact angle lies just above a 53-bit midpoint (the low 11 bits of its 64-bit mantissa are 0x401) and the CPU's `fpatan` returned a value at or below it, that is it is not correctly rounded to 64 bits there. This is a property of the host CPU (the tests ran on the development machine), so `tools/bitexact.py` allows up to 50 such cases in 500,000 and fails above that.
+- `fistp (FixedSine)`: 1 function, 3 sites: the merged port in lib/bitexact (`fixed_trig.c`)
+- `fpatan (FixedSine)`: 1 function, 1 site: the merged port in lib/bitexact (`fixed_trig.c`)
+- `fsincos (FixedSine)`: 1 function, 1 site: the merged port in lib/bitexact (`fixed_trig.c`)
+- `_CIacos`: `fpatan(sqrt((1 + x) * (1 - x)), x)` on the x87, whose result is the 64-bit `fpatan` value (the same instruction as `bx_AngleOfVector`'s), stored as a double. A plain-double series port differs in 40 to 46% of 500,000 arguments in [-1, 1] (`x 0.5`: want 1.0471975511965976, got 1.0471975511965974). `bx_acos` (`acos.c`, on the helpers of `dd.c`) takes `s = sqrt((1 + x) * (1 - x))` in doubles, computes `atan2(s, x)` in double-double (the table reduction of `bx_AngleOfVector` with double-double arithmetic and an 11-term series, about 2^-100 accurate), rounds it to a 64-bit mantissa and then to 53 bits. It differs in 7 of 500,000 arguments, all of the same kind: the exact angle lies just above a 53-bit midpoint (the low 11 bits of its 64-bit mantissa are 0x401) and the CPU's `fpatan` returned a value at or below it, that is it is not correctly rounded to 64 bits there. This is a property of the host CPU (the tests ran on the development machine), so `tools/bitexact.py` allows up to 50 such cases in 500,000 and fails above that.
 - `_ftol`: 62 functions, 151 sites: #73
 - `_hypot`: 14 functions, 18 sites: routed to `bx_hypot`
 - `fsqrt`: 14 functions, 20 sites: #73
@@ -342,8 +378,8 @@ Not in the file: 19 single-operation float expressions converted by `_ftol` (`(i
 `tools/bitexact.py` compares, under the game's FPU mode, the C runtime's functions with portable candidates (`lib/bitexact/test/math_test.c`, 2,000,000 random cases each unless noted). Only a port that matches goes into the library.
 
 - `fsqrt`: `bx_sqrt` (integer digit-by-digit square root, correctly rounded) matches x87 `fsqrt` on doubles (zeros, subnormals, integers and random bit patterns), matches float in and float out (`fld dword; fsqrt; fstp dword`, so the double rounding is harmless), and matches MSVC's `sqrt`: 0 mismatches each. It is in the library (`bx_sqrt`); a target with a correctly rounded `sqrt` instruction needs no port.
-- `_hypot`: MSVC 5's `_hypot` (`__hypothlp`) sets the FPU to 64-bit precision (control word 0x133f) and computes `big = max(|x|, |y|)`, `ra = x / big`, `rb = y / big`, the sum `ra * ra + rb * rb`, its square root and the product with `big`, storing each of ra, rb, the sum, the root and the result as a double. A port in plain double steps differs in 45,901 of 2,000,000 cases (2.3%; 5.7% for integer arguments, 1.3% for random doubles, 2.0% for floats), for example `x -39 y -64972096`: want 64972096.000011712, simple 64972096.000011697. `bx_hypot` (`math.c`) does each step on a 64-bit mantissa in integer code (a 64 by 64 bit product, a long division, a digit-by-digit square root, an add with a sticky bit), rounds to nearest even to 64 bits and then, at each store, to 53 bits (with subnormals and overflow to infinity); 0 mismatches in 2,000,000 cases (integers, doubles over 1e-60 to 1e60, a far smaller argument, floats, integers from -64 to 64, exponents from -900 to 900). Infinite arguments give infinity and a NaN comes back as it is; results out of double range are not tested (the C runtime goes through `matherr` there).
-- `_CIacos`: `fpatan(sqrt((1 + x) * (1 - x)), x)` on the x87, whose result is the 64-bit `fpatan` value (the same instruction as `bx_AngleOfVector`'s). A plain-double series port differs in 45.7% of 500,000 arguments in [-1, 1] (`x 0.889465`: want 0.47462316414879513, got 0.47462316414879507). Left for phase 2 or #5: it needs the double-double arctangent of trig.c.
+- `_hypot`: MSVC 5's `_hypot` (`__hypothlp`) sets the FPU to 64-bit precision (control word 0x133f) and computes `big = max(|x|, |y|)`, `ra = x / big`, `rb = y / big`, the sum `ra * ra + rb * rb`, its square root and the product with `big`, storing each of ra, rb, the sum, the root and the result as a double. A port in plain double steps differs in 45,901 of 2,000,000 cases (2.3%; 5.7% for integer arguments, 1.3% for random doubles, 2.0% for floats), for example `x -39 y -64972096`: want 64972096.000011712, simple 64972096.000011697. `bx_hypot` (`hypot.c`, on the helpers of `ext.c`) does each step on a 64-bit mantissa in integer code (a 64 by 64 bit product, a long division, a digit-by-digit square root, an add with a sticky bit), rounds to nearest even to 64 bits and then, at each store, to 53 bits (with subnormals and overflow to infinity); 0 mismatches in 2,000,000 cases (integers, doubles over 1e-60 to 1e60, a far smaller argument, floats, integers from -64 to 64, exponents from -900 to 900). Infinite arguments give infinity and a NaN comes back as it is; results out of double range are not tested (the C runtime goes through `matherr` there).
+- `_CIacos`: `fpatan(sqrt((1 + x) * (1 - x)), x)` on the x87, whose result is the 64-bit `fpatan` value (the same instruction as `bx_AngleOfVector`'s). A plain-double series port differs in 45.7% of 500,000 arguments in [-1, 1] (`x 0.889465`: want 0.47462316414879513, got 0.47462316414879507). Left for phase 2 or #5: it needs the double-double arctangent of `dd.c`.
 - `atof`: for decimal text of up to 15 digits with a decimal point (the form of TDF values), the result equals the correctly rounded double, computed as `(double)digits / 10^k` (the integer is exact in a double and 10^k is exact up to 10^15, one division): 0 mismatches in 1,000,000 cases of 1 to 9 digits and 1,000,000 of 10 to 15 digits. Longer text and exponents were not tested. No library function yet, since the port covers only that form.
 - `sscanf("%f")` into a float: 4,089 of 1,000,000 cases (0.41%) differ from the correctly rounded double rounded to float, for example `"-93690462"`: sscanf gives -93690456, the candidate -93690464. The cause is in LIBCMT, not in the digits: `_atoflt` runs `___strgtold12` (up to 25 digits kept, a 96-bit integer of digits made by multiply by 10 and add, scaled by products from the table of powers of ten 10^(+-1..7 * 8^k) with `___ld12mul`'s 5 by 5 limb product), then `__ld12cvt` rounds to 24 bits with `_RoundMan`, whose test for the bits after the round bit (`_ZeroTail(man, 25)`) leaves out bit 25 itself, so when the round bit and the next bit are set and the rest is zero it rounds down. `bx_strtof_msvc5` (`strtof.c`) is a port of that chain, the tables generated by `tools/bitexact_tables.py` and checked against the exe (`bx_pow10_pos`, `bx_pow10_neg`); 0 mismatches against `sscanf` in 2,000,000 texts (integers, decimals with up to 40 digits, leading and trailing zeros, exponents out to e+-50, signs).
 - `atan2` and `floor` are not called by game logic (data/crt_calls.csv), so they are not tested.

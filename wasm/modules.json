@@ -84,7 +84,7 @@
       "data_base": 196608,
       "table_base": 48,
       "cxx": ["wasm/wind_meteors/module.cpp", "src/map/meteors.cpp", "src/game/game_state.cpp"],
-      "c": ["wasm/crt/string.c", "lib/bitexact/trig.c"],
+      "c": ["wasm/crt/string.c", "lib/bitexact/fixed_trig.c", "lib/bitexact/dd.c", "lib/bitexact/ext.c"],
       "exports": ["UpdateWind", "UpdateMeteors", "Apply", "InitMeteors", "EmptyShutdownPreCleanup", "LoadMeteorDefaults",
                   "SaveMeteors", "LoadMeteors"],
       "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],

@@ -10,6 +10,14 @@
     "sha256": "f7512a0efd7526dc47bd99023f695b49684376e0b9f90284436a08ca38ea7562",
     "size": 36884
    },
+   "anims/count.gaf": {
+    "sha256": "77d101fc1e3c691f9cb6dc7acdcdc9815c689bbf4eda3c503d351df0d661129a",
+    "size": 89
+   },
+   "anims/fixture.gaf": {
+    "sha256": "5f7a08e2d634be260d8f593553552aea14b0c42c147672c8ee6cacca091f97f5",
+    "size": 346
+   },
    "b.ccx": {
     "sha256": "c304af600ff40b2fd58a44a33b9f4caff4ac76ff9741d146293146ff6467662b",
     "size": 199
@@ -38,6 +46,14 @@
     "sha256": "45118b07ae0f9d82b195c552debbb599737dd4fe3b7ce0e7e363dad2c5258f51",
     "size": 280
    },
+   "objects3d/fixture.3do": {
+    "sha256": "38a8dd3a65b12bcb50c176acdb84b5bb6d5d05b860ec81c3564ced5d22071144",
+    "size": 738
+   },
+   "objects3d/flat.3do": {
+    "sha256": "e349dada2a5d1d399cdb7fadf9c6257293eb876ef84ddabd8c3967209436d2b7",
+    "size": 195
+   },
    "readme.txt": {
     "sha256": "f99903d9031d1a8acde685752f069663d0b79da6efe383049003d836c72e92c4",
     "size": 24
@@ -49,6 +65,14 @@
    "rev32.gp3": {
     "sha256": "42f4e68609ca0eede966d0145449840ff99bc1d6e76213562d74364b24294832",
     "size": 119
+   },
+   "scripts/armfix.cob": {
+    "sha256": "be2d6065e2329aa6a53f9225dfdceb4a89afc4dbeb226902230fc85a121a0a6e",
+    "size": 183
+   },
+   "scripts/none.cob": {
+    "sha256": "120fea7ea6edd948ed0e6ee7e2c9f52bfce06c54d40d5f4433a2f7a80c3410de",
+    "size": 44
    },
    "units/Loose.fbi": {
     "sha256": "5b1390575420476b9aaf6f62ec22410470bf1770060a2d829c6e2cf42d342cca",
@@ -134,6 +158,14 @@
    }
   },
   "malformed": {
+   "anims/over.gaf": {
+    "sha256": "cd3c6d40523f1cf7c94e3ef18c1002ae3e64e0175381ad9c753ff974523d208d",
+    "size": 346
+   },
+   "anims/trunc.gaf": {
+    "sha256": "d08eecc6a09707323a52144f2aa2d065e040ad5fd75be6ef87d6b6608af96f67",
+    "size": 40
+   },
    "badmagic.hpi": {
     "sha256": "53f0daad1fc293d488db87d09423d0d1e142d4811cb0419a446fee88756b7d8b",
     "size": 116
@@ -157,6 +189,22 @@
    "nofooter.hpi": {
     "sha256": "6406e3cb018030dab500fdf47c5693130008abbb06b514a3f51d05f99565cb3a",
     "size": 80
+   },
+   "objects3d/over.3do": {
+    "sha256": "20a7cb618e4c0614ef2c4e71a66797347bb982dbe4c11bee867ed4d26aa627c7",
+    "size": 738
+   },
+   "objects3d/trunc.3do": {
+    "sha256": "dc55b73f858342f5d44a8c699c62abb3aeb1622385d42e10486b33c3d5c06e20",
+    "size": 52
+   },
+   "scripts/over.cob": {
+    "sha256": "90194173bd06fc078c6fd1dfc66e6a00bbaa7abb7b485e57a14c048832054dd4",
+    "size": 183
+   },
+   "scripts/trunc.cob": {
+    "sha256": "0dde69405344c483a82f918ff17fe6054ea897eb83482e8460621755738644cf",
+    "size": 60
    },
    "year.hpi": {
     "sha256": "12426165db6ceef9ca0d5dea2aeaaf9cb4399a4ea29a8774104bc9101899ddc1",

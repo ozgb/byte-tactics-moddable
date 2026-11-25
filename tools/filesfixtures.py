@@ -307,6 +307,190 @@ ARM_FBI = b"""[UNITINFO]
 """
 
 
+class Blob:
+    """A file laid out front to back: `take` reserves bytes and returns their offset."""
+
+    def __init__(self) -> None:
+        self.data = bytearray()
+
+    def take(self, n: int) -> int:
+        at = len(self.data)
+        self.data.extend(b"\0" * n)
+        return at
+
+    def put(self, raw: bytes) -> int:
+        at = len(self.data)
+        self.data.extend(raw)
+        return at
+
+    def string(self, name: str) -> int:
+        return self.put(name.encode("latin-1") + b"\0")
+
+
+def cob(scripts: list[tuple[str, int]], pieces: list[str], statics: int, pairs: list[tuple[int, str]],
+        code: list[int], version: int = 4) -> bytes:
+    """A COB script in the layout of docs/files-gate.md ("COB"): the header, the code, the tables, then the names."""
+    b = Blob()
+    b.take(44)
+    code_at = b.put(struct.pack("<%di" % len(code), *code))
+    starts_at = b.put(struct.pack("<%di" % len(scripts), *[s for _, s in scripts]))
+    names_at = b.take(4 * len(scripts))
+    pieces_at = b.take(4 * len(pieces))
+    pairs_at = b.take(8 * len(pairs))
+    for i, (name, _) in enumerate(scripts):
+        struct.pack_into("<i", b.data, names_at + 4 * i, b.string(name))
+    for i, name in enumerate(pieces):
+        struct.pack_into("<i", b.data, pieces_at + 4 * i, b.string(name))
+    for i, (word, name) in enumerate(pairs):
+        struct.pack_into("<ii", b.data, pairs_at + 8 * i, word, b.string(name))
+    struct.pack_into("<11i", b.data, 0, version, len(scripts), len(pieces), len(code), statics, len(pairs),
+                     starts_at, names_at, pieces_at, code_at, pairs_at)
+    return bytes(b.data)
+
+
+class Frame:
+    """A GAF frame: `rows` of palette indices (None for a pixel a compressed row skips), or `subframes`.
+
+    A compressed frame's row may be given as `bytes`, the row's encoded form as stored.
+    """
+
+    def __init__(self, width: int, height: int, x: int, y: int, transparent: int, *, rows=None,
+                 compressed: int = 0, blend: int = 0, subframes=None) -> None:
+        self.width, self.height, self.x, self.y = width, height, x, y
+        self.transparent, self.rows, self.compressed, self.blend = transparent, rows, compressed, blend
+        self.subframes = subframes
+
+
+def gaf_row(row: list) -> bytes:
+    """One row of a compressed frame: skips of transparent pixels, repeats, and literal runs."""
+    out = bytearray()
+    i = 0
+    while i < len(row):
+        if row[i] is None:
+            n = 1
+            while i + n < len(row) and row[i + n] is None and n < 127:
+                n += 1
+            out.append(n << 1 | 1)
+        else:
+            n = 1
+            while i + n < len(row) and row[i + n] == row[i] and n < 64:
+                n += 1
+            if n >= 2:
+                out += bytes([(n - 1) << 2 | 2, row[i]])
+            else:
+                while i + n < len(row) and row[i + n] is not None and n < 64 and \
+                        (i + n + 1 >= len(row) or row[i + n + 1] != row[i + n]):
+                    n += 1
+                out += bytes([(n - 1) << 2]) + bytes(row[i:i + n])
+        i += n
+    return bytes(out)
+
+
+def gaf(entries: list[tuple[str, int, list[tuple[Frame, int]]]], count: int | None = None) -> bytes:
+    """A GAF file of (name, loop, [(frame, duration)]) entries, in the layout of docs/files-gate.md ("GAF")."""
+    b = Blob()
+    b.take(12 + 4 * len(entries))
+    struct.pack_into("<III", b.data, 0, 0x00010100, len(entries) if count is None else count, 0)
+
+    def frame(f: Frame) -> int:
+        at = b.take(24)
+        if f.subframes:
+            data = b.take(4 * len(f.subframes))
+            for k, sub in enumerate(f.subframes):
+                struct.pack_into("<I", b.data, data + 4 * k, frame(sub))
+        elif f.compressed:
+            data = len(b.data)
+            for row in f.rows:
+                raw = row if isinstance(row, bytes) else gaf_row(row)
+                b.put(struct.pack("<H", len(raw)) + raw)
+        else:
+            data = b.put(bytes(p for row in f.rows for p in row))
+        struct.pack_into("<HHhhBBBBIII", b.data, at, f.width, f.height, f.x, f.y, f.transparent, f.compressed,
+                         len(f.subframes or ()), f.blend, 0, data, 0)
+        return at
+
+    for i, (name, loop, frames) in enumerate(entries):
+        at = b.take(40 + 8 * len(frames))
+        struct.pack_into("<HBBI32s", b.data, at, len(frames), loop, 0, 0, name.encode("latin-1"))
+        struct.pack_into("<I", b.data, 12 + 4 * i, at)
+        for j, (f, duration) in enumerate(frames):
+            struct.pack_into("<II", b.data, at + 40 + 8 * j, frame(f), duration)
+    return bytes(b.data)
+
+
+class Piece:
+    """A 3DO piece: `primitives` are (colour, vertex indices, texture name or None)."""
+
+    def __init__(self, name: str | None, offset: tuple[int, int, int], vertices: list[tuple[int, int, int]],
+                 primitives: list[tuple[int, list[int], str | None]], selection: int = -1, children=()) -> None:
+        self.name, self.offset, self.vertices, self.primitives = name, offset, vertices, primitives
+        self.selection, self.children = selection, list(children)
+
+
+def model(pieces: list[Piece]) -> bytes:
+    """A 3DO model whose top level is `pieces`, in the layout of docs/files-gate.md ("3DO"); the first is at offset 0."""
+    b = Blob()
+
+    def chain(rest: list[Piece]) -> int:
+        if not rest:
+            return 0
+        p = rest[0]
+        at = b.take(52)
+        name = 0 if p.name is None else b.string(p.name)
+        verts = b.put(b"".join(struct.pack("<iii", *v) for v in p.vertices))
+        prims = b.take(32 * len(p.primitives))
+        for i, (colour, indices, texture) in enumerate(p.primitives):
+            idx = b.put(struct.pack("<%dH" % len(indices), *indices))
+            tex = 0 if texture is None else b.string(texture)
+            struct.pack_into("<8i", b.data, prims + 32 * i, colour, len(indices), 0, idx, tex, 0, 0, 0)
+        child = chain(p.children)
+        sibling = chain(rest[1:])
+        struct.pack_into("<13i", b.data, at, 1, len(p.vertices), len(p.primitives), p.selection, *p.offset, name, 0,
+                         verts, prims, sibling, child)
+        return at
+
+    chain(pieces)
+    return bytes(b.data)
+
+
+ARMFIX_COB = cob([("Create", 0), ("Activate", 4), ("Deactivate", 7)], ["base", "turret", "barrel"], 5,
+                 [(9, "pair")], [0x10021001, 0, 1, -65536, 0x10011000, 2, 0x7FFFFFFF, 0x10064000, -1, 3, 0x10012000])
+NONE_COB = cob([], [], 0, [], [])
+
+GAF_IDLE = Frame(6, 4, 3, 2, 9, compressed=1, rows=[
+    [None, None, 5, 5, 5, 7],
+    b"",
+    [11, 23, 3, 47, 5, 60],
+    bytes([1 << 1 | 1, (8 - 1) << 2 | 2, 0x22]),
+])
+GAF_RAW = Frame(4, 3, -1, -2, 0, rows=[[0, 1, 2, 3], [9, 9, 0, 0], [255, 128, 7, 0]])
+GAF_LAYERED = Frame(5, 5, 2, 2, 0, subframes=[
+    Frame(2, 2, 1, 1, 3, rows=[[3, 4], [4, 3]]),
+    Frame(3, 2, 0, 0, 0, compressed=1, blend=1, rows=[[None, 8, None], [6, 6, None]]),
+])
+FIXTURE_GAF = gaf([("Idle", 1, [(GAF_IDLE, 2), (GAF_RAW, 0x00010004)]),
+                   ("Empty", 0, []),
+                   ("Layered", 0, [(GAF_LAYERED, 1)])])
+COUNT_GAF = gaf([("Only", 0, [(Frame(1, 1, 0, 0, 0, rows=[[42]]), 1)])], count=0x00020001)
+
+FIXTURE_3DO = model([
+    Piece("base", (0, 0, 0),
+          [(0, 0, 0), (10, -1, 0), (0, 0, 10), (5, 4, 5), (1, -3, 1), (2, 8, 2)],
+          [(1, [0, 1, 2], "skin"), (2, [3, 4, 5], "skin"), (3, [0, 2], None), (4, [1, 4, 0, 2], None),
+           (5, [5, 3], "glow")],
+          selection=3,
+          children=[
+              Piece("turret", (0, 3 * 65536, 0), [(0, 0, 0), (1, 1, 1), (-1, 2, -1)],
+                    [(6, [0, 1, 2], "armtex"), (7, [2, 1, 0], None)],
+                    children=[Piece("barrel", (0, 0, 2 * 65536), [(0, 0, 4)], [])]),
+              Piece(None, (-65536, 0, 0), [], []),
+          ]),
+    Piece("debris", (7, 8, 9), [(1, 2, 3)], [(8, [0], None)]),
+])
+FLAT_3DO = model([Piece("flat", (0, 0, 0), [(0, 5, 0), (0, 2, 0), (0, 1, 0)],
+                        [(1, [0], None), (2, [1], None), (3, [2], None)])])
+
+
 def base() -> dict[str, bytes]:
     files: dict[str, bytes] = {
         "readme.txt": text("loose", "readme.txt"),
@@ -320,6 +504,12 @@ def base() -> dict[str, bytes]:
         "notes/": b"",
         "data/loose.bin": pattern(70000, 12),
         "x.hpi": b"not an archive\r\n",
+        "scripts/armfix.cob": ARMFIX_COB,
+        "scripts/none.cob": NONE_COB,
+        "anims/fixture.gaf": FIXTURE_GAF,
+        "anims/count.gaf": COUNT_GAF,
+        "objects3d/fixture.3do": FIXTURE_3DO,
+        "objects3d/flat.3do": FLAT_3DO,
     }
     big = pattern(150000, 1)
     files["rev31.gp3"] = archive([
@@ -394,6 +584,13 @@ def malformed() -> dict[str, bytes]:
         "digits.hpi": archive([File("digits.txt", text("digits.hpi", "digits.txt"))],
                               footer=FOOTER.replace(b"1997", b"abcd")),
     }
+    files["scripts/trunc.cob"] = ARMFIX_COB[:60]
+    files["scripts/over.cob"] = struct.pack("<ii", 4, 100000) + ARMFIX_COB[8:]
+    files["anims/trunc.gaf"] = FIXTURE_GAF[:40]
+    files["anims/over.gaf"] = FIXTURE_GAF[:struct.unpack_from("<I", FIXTURE_GAF, 12)[0]] + struct.pack("<H", 30000) \
+        + FIXTURE_GAF[struct.unpack_from("<I", FIXTURE_GAF, 12)[0] + 2:]
+    files["objects3d/trunc.3do"] = FIXTURE_3DO[:52]
+    files["objects3d/over.3do"] = FIXTURE_3DO[:8] + struct.pack("<i", 100000) + FIXTURE_3DO[12:]
     block = pattern(1000, 11)
     files["good.hpi"] = archive(good + [
         File("badsum.bin", block, chunks=[chunk(block, 1, bad_sum=True)]),

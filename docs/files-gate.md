@@ -2,7 +2,7 @@
 
 The files gate judges a data loader by its behaviour alone: how it mounts the archives of a game directory, which file a
 name resolves to, what a listing holds and in what order, the bytes and return values of its reads, what it does with a
-malformed archive, and how it reads a TDF file. The loader is one program; the gate runs it on fixture directories that
+malformed archive, and how it reads a TDF file, a COB script, a GAF image and a 3DO model. The loader is one program; the gate runs it on fixture directories that
 the kit's fixture tool builds, and compares what it writes with the vectors of `reference/files/`.
 
 The vectors were made by the in-repo engine through the files service of `interfaces/files.h`, on the same fixtures.
@@ -23,9 +23,9 @@ digests of every file are in `reference/files/fixtures.json`, and a vector is on
 
 | Fixture | What it holds |
 | --- | --- |
-| `base` | loose files and directories; `rev31.gp3`, two `.ccx`, a `.ufo` and four `.hpi` archives (one named in capitals, and `ex.hpi` and `e_x.hpi`, whose order depends on the case folding below), each with another key; two loose names, `arm_x.fbi` and `armx.fbi`, likewise; `rev32.gp3`, a valid archive the game does not mount; `x.hpi`, a file that is not an archive. The archives hold the same paths as each other and as the disk, names stored twice in one directory, a directory stored twice, a directory and a file of one name, a name with a `/` in it, and files stored plainly and in LZ77 and deflate chunks, with and without chunk encryption, across block boundaries and of exactly two blocks |
+| `base` | loose files and directories; `rev31.gp3`, two `.ccx`, a `.ufo` and four `.hpi` archives (one named in capitals, and `ex.hpi` and `e_x.hpi`, whose order depends on the case folding below), each with another key; two loose names, `arm_x.fbi` and `armx.fbi`, likewise; `rev32.gp3`, a valid archive the game does not mount; `x.hpi`, a file that is not an archive. The archives hold the same paths as each other and as the disk, names stored twice in one directory, a directory stored twice, a directory and a file of one name, a name with a `/` in it, and files stored plainly and in LZ77 and deflate chunks, with and without chunk encryption, across block boundaries and of exactly two blocks; and loose COB, GAF and 3DO files under `scripts`, `anims` and `objects3d` (below) |
 | `budget` | twelve valid `.hpi` archives and one that is not an archive, between the fifth and the sixth |
-| `malformed` | archives with a bad magic, a bad version, no copyright footer, a footer in lower case, a footer with another year and one with letters for the year, and a good archive holding files whose chunks are broken: a bad checksum, a bad chunk magic, an unknown method, a wrong unpacked size, and a chunk table that runs past the end of the archive |
+| `malformed` | archives with a bad magic, a bad version, no copyright footer, a footer in lower case, a footer with another year and one with letters for the year, and a good archive holding files whose chunks are broken: a bad checksum, a bad chunk magic, an unknown method, a wrong unpacked size, and a chunk table that runs past the end of the archive; and, for each of COB, GAF and 3DO, a truncated file and one with a count that runs past its end ("Malformed COB, GAF and 3DO files") |
 
 The archive format is the one the fixture tool writes: a 20-byte header (`HAPI`, the version bytes `00 00 01 00`, the
 size of the header and directory, a key byte and the offset of the root directory), the directory, the file data, and
@@ -67,6 +67,9 @@ an integer is written as one (`1`, not `1.0` or `true`), and `null` is not `0`.
 | `tree` | path, pattern, state, recursive | `FindFilesRecursive`: the list of paths |
 | `match` | string, pattern | `MatchWildcard`: 1 or 0 |
 | `tdf` | name | the TDF reading of the file (below), or `null` when the file is missing or empty |
+| `cob` | name | the COB reading of the file (below), or `null` when the file is missing or empty |
+| `gaf` | name | the GAF reading of the file (below), or `null` when the file is missing or empty |
+| `3do` | name | the 3DO reading of the file (below), or `null` when the file is missing or empty |
 
 The names in this table are the slots of `interfaces/files.h`, which says what each takes and returns. A loader with
 another interface maps each call onto its own; only the values are judged.
@@ -100,6 +103,95 @@ value replaces its value; otherwise the new field is inserted before it. So a na
 ones goes before all of them (`Name`, then `name`, then `Name` again keeps three fields, the last one first), and a
 lookup returns the first of them.
 
+## COB, GAF and 3DO
+
+The game loads each of these files whole through the `Load` call above and reads it in place: every offset below is
+from the start of the file, and the game reads only what the reading names. A word is a little-endian 32-bit
+signed integer, and a name is the bytes from its offset up to a NUL. The fixture tool's `cob`, `gaf` and `model`
+functions write each layout, and are its definition as much as this text.
+
+**COB.** The header is eleven words: `version`, the script count, the piece count, the code length (in words), the
+static variable count, the pair count, and the offsets of the script start table, the script name table, the piece
+name table, the code and the pair table. The script start table holds a word for each script (the index of its first
+code word), the two name tables a name offset for each script and each piece, and the pair table two words for each
+pair. The reading is an object:
+
+| Field | Value |
+| --- | --- |
+| `version` | the first header word |
+| `scripts` | `[name, start]` for each script, in the order of the tables |
+| `pieces` | the piece names, in order |
+| `statics` | the static variable count |
+| `pairs` | `[first word, second word]` for each pair: the second word is an offset, which the game turns into an address but never reads through |
+| `code` | the code length's words from the code offset |
+
+The game doesn't read the code length; the reading uses it to bound the code.
+
+**GAF.** The file starts with three words: a version, the entry count and a zero, then an offset for each entry. The
+entry count is read as its low 16 bits, as a signed number: a count word of 0x00020001 holds one entry, and one of
+0x0000FFFF none. An entry is a 16-bit frame count, a byte `loop` (offset 2), a byte and a word the game doesn't read,
+a 32-byte name (offset 8, NUL-terminated), and then, at offset 40, two words for each frame: the frame's offset and
+its duration. A frame is 24 bytes: width and height (16 bits, unsigned), x and y (16 bits, signed), the transparent
+index, `compressed`, the subframe count and `blend` (a byte each), a word the game doesn't read, the offset of the
+frame's data and a word it doesn't read. The reading is the list of entries, each `{"name", "loop", "frames"}`, and
+a frame is:
+
+| Field | Value |
+| --- | --- |
+| `width`, `height`, `x`, `y`, `transparent`, `compressed`, `blend` | the frame's fields |
+| `duration` | the low 16 bits of the frame's duration word (a top-level frame only) |
+| `frames` | when the subframe count is not 0: the subframes, each a frame without `duration`; the data is a word for each, the subframe's offset |
+| `pixels` | otherwise: the rows, top first, each a list of `width` palette indices, `null` for a pixel the row leaves transparent |
+
+A frame whose `compressed` is 0 holds `width` × `height` bytes, row by row, and every byte is a pixel (the transparent
+index is a pixel value like any other here; drawing is what skips it). A compressed frame holds, for each row, a
+16-bit byte count and then that many bytes of commands, each a byte `b`: when bit 0 is set, `b >> 1` pixels are
+transparent; when bit 1 is set, the next byte is repeated `(b >> 2) + 1` times; otherwise the next `(b >> 2) + 1`
+bytes are copied. A row's pixels start transparent, and it decodes until it has `width` pixels: a run that goes
+past the end of the row is cut there, and a row whose byte count is 0 stays transparent. The byte count is used only
+to find the next row.
+
+**3DO.** A piece is thirteen words: a version, the vertex count, the primitive count, the selection primitive (-1 for
+none), the offset from its parent (x, y, z), the offset of its name (0 for none), a word the game doesn't read, the
+offsets of its vertices and of its primitives, and the offsets of its next sibling and its first child (0 for none).
+The first piece is at offset 0. A vertex is three words (x, y, z), and a primitive is eight words: its colour, its
+vertex count, a word the game doesn't read, the offset of its vertex indices (16 bits each, unsigned), the offset of
+its texture name (0 for none) and three words the game doesn't read. The reading is the list of the first piece and
+its siblings, in order, each:
+
+| Field | Value |
+| --- | --- |
+| `name` | the name, or `null` |
+| `offset` | `[x, y, z]` |
+| `vertices` | `[x, y, z]` for each vertex |
+| `selection` | the selection primitive after the reordering below |
+| `primitives` | `{"colour", "vertices", "texture"}` for each primitive, after the reordering below; `texture` is `null` when there is none |
+| `children` | the list of the first child and its siblings, read the same way |
+
+The game reorders each piece's primitives as it loads them. When the selection primitive is not -1 and the piece has
+primitives, the selection primitive and the first change places and the selection becomes 0. Then the primitives
+from the second on are bubble-sorted by height: passes compare each primitive from the second to the one before
+last with the next, and swap them when the first is higher, until a pass swaps nothing. A primitive's height is the
+sum of its vertices' y, divided by its vertex count as C divides integers (truncating toward zero), so -0.5 is as high
+as 0. The first primitive never moves in the sort.
+
+**Malformed COB, GAF and 3DO files.** The game checks nothing in these files, so the `malformed` fixture's six files
+are not called: in each the game reads outside the file's data, which gives no value to compare.
+
+| File | What the game does |
+| --- | --- |
+| `scripts\trunc.cob` | its tables are past the end, and the game reads and rewrites them there |
+| `scripts\over.cob` | a script count of 100000: the game reads and rewrites the name table past the end |
+| `anims\trunc.gaf` | the entries are past the end, and the game reads them there |
+| `anims\over.gaf` | a frame count of 30000: the game reads frame offsets past the end |
+| `objects3d\trunc.3do` | the vertices, primitives and children are past the end |
+| `objects3d\over.3do` | a primitive count of 100000: the game reads and sorts primitives past the end |
+
+Nor are these called: a compressed GAF row whose commands give fewer than `width` pixels (the game goes on reading
+the next row's bytes), a GAF subframe with subframes of its own (the game doesn't make their offsets addresses), a 3DO
+primitive with no vertices when the sort reaches it (the game divides by zero), a selection primitive past the
+primitive count, and an index past a piece's vertices.
+
 ## The groups
 
 | Group | What it covers |
@@ -110,14 +202,17 @@ lookup returns the first of them.
 | `reading` | `read`, `seek`, `tell`, `length`, `readat` and `load` on a loose file and on each way an archive stores a file, across block boundaries and at the end |
 | `malformed` | the archives that are refused, those read anyway, and broken chunks |
 | `formats` | the TDF reading of TDF and FBI files, a missing and an empty one, and a TDF file that can't be parsed |
+| `cob` | the COB reading of a script with several scripts, pieces and a pair, of one with none, and of a missing and an empty file |
+| `gaf` | the GAF reading of compressed and raw frames (a skipped, an empty, a literal and a cut row), subframes, an empty entry, a count word with high bits, and a missing and an empty file |
+| `3do` | the 3DO reading of a nested tree with siblings, a piece without a name, primitives with and without a texture, the reordering with and without a selection primitive, and a missing and an empty file |
 
 A vector of `reference/files/<group>.json` is `{"name", "fixture", "calls", "results"}`: the calls, each a list of
 strings, and the `[call, value]` the in-repo engine wrote for each.
 
 ## Known limits
 
-- **COB, GAF and 3DO** are not judged yet. A later issue adds a group for each, with a reading in the file format's own
-  terms and fixtures of its own.
+- **What the game does after loading** a COB, GAF or 3DO file is not part of its reading: the COB checksum, the
+  mirroring and textures of a 3DO model, and how a GAF frame is drawn (the transparent index, `blend`).
 - **The TDF section checksum** that the engine keeps with each section is not part of the reading.
 - **The CD-ROM drives**, which 3.1c also mounts from, are not part of the mount sequence the fixtures can exercise.
 - **Reads past the end of an archived file** are not called: 3.1c reads outside its buffers there, so there is no

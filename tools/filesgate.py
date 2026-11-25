@@ -39,7 +39,7 @@ ADAPTER = Path(os.environ.get("BT_FILES_ADAPTER", ROOT / "build" / "modern" / "f
 DEFAULT_LOADER = "wine " + shlex.quote(str(ADAPTER))
 FORMAT = 1
 TIMEOUT = 120
-GROUPS = ("mounting", "lookup", "listing", "reading", "malformed", "formats")
+GROUPS = ("mounting", "lookup", "listing", "reading", "malformed", "formats", "cob", "gaf", "3do")
 
 M = [["mount"]]
 
@@ -167,6 +167,21 @@ CASES: dict[str, list[tuple[str, str, list[list[str]]]]] = {
                              ["tdf", "missing.tdf"], ["tdf", r"data\empty.bin"]]),
         ("fbi", "base", M + [["tdf", r"units\arm.fbi"]]),
         ("tdf_broken", "base", M + [["tdf", r"gamedata\broken.tdf"], ["tdf", r"gamedata\sample.tdf"]]),
+    ],
+    "cob": [
+        ("scripts", "base", M + [["cob", r"scripts\armfix.cob"], ["cob", r"SCRIPTS\ARMFIX.COB"]]),
+        ("none", "base", M + [["cob", r"scripts\none.cob"]]),
+        ("missing", "base", M + [["cob", r"scripts\nothing.cob"], ["cob", r"data\empty.bin"]]),
+    ],
+    "gaf": [
+        ("anims", "base", M + [["gaf", r"anims\fixture.gaf"]]),
+        ("count", "base", M + [["gaf", r"anims\count.gaf"]]),
+        ("missing", "base", M + [["gaf", r"anims\nothing.gaf"], ["gaf", r"data\empty.bin"]]),
+    ],
+    "3do": [
+        ("model", "base", M + [["3do", r"objects3d\fixture.3do"]]),
+        ("flat", "base", M + [["3do", r"objects3d\flat.3do"]]),
+        ("missing", "base", M + [["3do", r"objects3d\nothing.3do"], ["3do", r"data\empty.bin"]]),
     ],
 }
 

@@ -580,6 +580,32 @@ void ImportResultObject(ReplayText& t, unsigned kind, const void* p)
     ReplayAddObjectName(t, Table(), kind, p, true);
 }
 
+void ArgWeaponResult(ReplayText& t, const void* p, unsigned count, ...)
+{
+    t.Add("  o result ");
+    ReplayAddWeapon(t, p);
+    t.AddChar('\n');
+    if (p == nullptr)
+        return;
+    va_list names;
+    va_start(names, count);
+    for (unsigned n = 0; n < count; n++) {
+        const char* name = va_arg(names, const char*);
+        const ReplayObjectField* f = ReplayFindObjectField(ROK_WEAPONDEF, name);
+        if (f == nullptr)
+            continue;
+        t.Add("  o ");
+        ReplayAddWeapon(t, p);
+        t.AddChar('.');
+        t.Add(name);
+        t.AddChar(' ');
+        ReplayFormatObjectField(*f, p, Table(), true, s_field);
+        t.Add(s_field.Data());
+        t.AddChar('\n');
+    }
+    va_end(names);
+}
+
 void ImportResultWeapon(ReplayText& t, const void* p, unsigned count, ...)
 {
     t.Add(" = ");

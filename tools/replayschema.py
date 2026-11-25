@@ -2421,7 +2421,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("        ArgCallbackExit(s_tail, held%d);" % i)
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
-    if res is not None and res["mode"] in ("scalar", "object", "value", "text"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "text", "weapon"):
         L += ["        " + x for x in result_out(res, objects, "o")]
     L.append("    }")
     if ret != "void":
@@ -2564,6 +2564,9 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
             return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, &result);' % upper(res["kind"])]
         if mode == "text":
             return ['ArgValue(s_tail, "result", (const char*)result, "o");']
+        if mode == "weapon":
+            reach = "".join(', "%s"' % f for f in res.get("reach", []))
+            return ["ArgWeaponResult(s_tail, result, %d%s);" % (len(res.get("reach", [])), reach)]
         return []
     lines = []
     if mode == "scalar":
@@ -2628,7 +2631,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "text")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "text", "weapon")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -2912,7 +2915,7 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             L.append("    ArgPending();")
             call.append("0")
     res = s["result"]
-    if res is not None and res["mode"] in ("scalar", "object", "value", "text"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "text", "weapon"):
         closing.append("result")
     L.append("    SetClosing(%s);" % (", ".join('"%s"' % c for c in closing) if closing else "nullptr"))
     expr = "%s(%s)" % (target or "g_seams.%s->%s" % (sub, slot), ", ".join(call))
@@ -2928,6 +2931,8 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             after.append("    CompareResult(%s);" % g)
         elif res["mode"] == "text":
             after.append("    CompareResult((const char*)%s);" % g)
+        elif res["mode"] == "weapon":
+            after.append("    CompareWeaponResult(%s);" % g)
         elif res["mode"] == "value":
             after.append("    CompareValueResult(ROK_%s, &%s);" % (upper(res["kind"]), g))
     L += ["}", ""]
@@ -3601,7 +3606,7 @@ RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "s
 
 def runnable(s: dict) -> bool:
     """The replayer's runner can pass every argument of the slot and compare its result."""
-    return all(a["mode"] in RUNNER_ARG_MODES for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value"))
+    return all(a["mode"] in RUNNER_ARG_MODES for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value", "text", "weapon"))
 
 
 def native_name(slot: str) -> str:

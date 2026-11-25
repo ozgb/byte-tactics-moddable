@@ -117,6 +117,16 @@ int __stdcall Imp_fixture_Locate(FixtureAmount* a0, FixtureAmount* a1)
     return ParseResult<int>(r);
 }
 
+WeaponDef* __stdcall Imp_fixture_Pick()
+{
+    ReplayText t;
+    StartImport(t, "fixture.Pick");
+    const char* r = Enter(t);
+    WeaponDef* w = (WeaponDef*)ReplayParseWeapon(r);
+    ApplyReach(w, ROK_WEAPONDEF, ".flags");
+    return w;
+}
+
 FixtureAmount g_inout_fixture_Query_0;
 bool g_inout_fixture_Query_0_null;
 FixtureAmount g_inout_fixture_Query_1;
@@ -224,4 +234,17 @@ void After_fixture_Locate()
     if (g_result_fixture_Locate != 0 && !g_out_fixture_Locate_0_null) CompareStruct("first", ROK_FIXTUREAMOUNT, &g_out_fixture_Locate_0);
     if (g_result_fixture_Locate != 0 && !g_out_fixture_Locate_1_null) CompareStruct("second", ROK_FIXTUREAMOUNT, &g_out_fixture_Locate_1);
     CompareResult(g_result_fixture_Locate);
+}
+
+WeaponDef* g_result_fixture_Pick;
+
+void Run_fixture_Pick()
+{
+    SetClosing("result");
+    g_result_fixture_Pick = Native_fixture_Pick();
+}
+
+void After_fixture_Pick()
+{
+    CompareWeaponResult(g_result_fixture_Pick);
 }

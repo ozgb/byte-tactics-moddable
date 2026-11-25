@@ -1057,6 +1057,19 @@ template <class T> void CompareResult(T result)
     value.Free();
 }
 
+void CompareWeaponResult(const void* weapon)
+{
+    ReplayText value;
+    ReplayAddWeapon(value, weapon);
+    HashText(value.Data());
+    const char* recorded = OutLine("result");
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff("result", recorded, value.Data());
+    value.Free();
+}
+
 struct ArgvHolder {
     CommandArgs args;
     char text[0x14][128];
@@ -1624,6 +1637,11 @@ int __stdcall Native_fixture_Locate(FixtureAmount* first, FixtureAmount* second)
     if (second != nullptr)
         second->amount = 9;
     return 1;
+}
+
+WeaponDef* __stdcall Native_fixture_Pick()
+{
+    return &g_game->weapons[7];
 }
 
 int __stdcall Native_fixture_Strike(WeaponDef* weapon)
@@ -3580,6 +3598,19 @@ void InOutRunnerSelfTest()
     After_fixture_Measure();
     printf("a scalar that came out differently: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "p4") == 0, "a replayed scalar that differs is reported at the argument");
+
+    printf("a weapon as the result of a slot\n");
+    LoadCall("  o result weapondef#7\n  o weapondef#7.flags 0\n");
+    BeginCompare();
+    Run_fixture_Pick();
+    After_fixture_Pick();
+    Check(g_diffs == 0, "a weapon result is compared by its name");
+    LoadCall("  o result weapondef#8\n");
+    BeginCompare();
+    Run_fixture_Pick();
+    After_fixture_Pick();
+    printf("another weapon: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "another weapon is reported at the result");
 
     printf("a nullable out value of the slot under replay\n");
     LoadCall("  a second null\n  o first.amount 4\n  o result 1\n");

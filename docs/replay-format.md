@@ -550,7 +550,7 @@ the replayer builds a zeroed buffer, restores the lines, and passes the buffer w
 
 `"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: weapons' `Apply` leaves
 `WEAPONS_DETONATE`, `WEAPONS_EXPLODE_PIECE`, `WEAPONS_AREA_DAMAGE`, `WEAPONS_SPAWN` and `WEAPONS_REMOVE_PROJECTILES` to #711,
-whose explosion and debris state is not in the schema yet. The recorder passes an event of such a kind (one at least as long
+whose explosion and debris state is not in the schema yet (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
 as the header) through with no lines, as it does a slot with `"record": false`, so what the call changes reaches the next
 recorded call as `r` lines. `replayschema.py --check` fails for a name that is no kind of the table and for an empty reason.
 `"refs"` maps a struct member (`Struct.member`) to the state kind its block offset leads to, for a ref that is no unit:
@@ -1026,7 +1026,7 @@ from the layout), and the export refuses a copy that names any other source name
 A `bytes-in` import line carries the bytes the call passed in, so a `files.BankWriteBox` line is `i files.BankWriteBox bank#1 x:0102 2 = 2`: the handle, the bytes written, the length, then the result. It has no `o` line. A `bytes-out` import has no bytes in its line: `files.BankReadBox` shows `?` for the destination and the bytes arrive in the `o dst x:...` line after it, as long as the result.
 
 A result is `scalar`, `value` (`o result (-3,40000,7)`), `object` (compared by its name, `o result Unit#12` or `o result null`), `text`, or `weapon` or `object` with `reach` fields recorded as `o weapondef#N.flags` or
-A slot may also return `text` (`const char*`, as an import's result may): it is recorded as `o result "Canal Crossing"`, or `null`, and compared as the text, never the address (`mission.GetMissionName`).
+A slot may also return `text` (`const char*`, as an import's result may): it is recorded as `o result "Canal Crossing"`, or `null`, and compared as the text, never the address (`mission.GetMissionName`). It may also return a `weapon`, recorded as `o result weapondef#17` (or `null`) with an `o weapondef#17.flags 4` line for each field of its `reach`, and compared by that name (`weapons.FindWeaponByName`).
 `o Cell#N.metal` lines (the replayer returns an object it makes, with those fields set).
 
 A `weapon` argument of a slot is recorded as `a weapon weapondef#17`, or `a weapon null`, and the weapon is a root of the slot's walk: the
@@ -1232,6 +1232,7 @@ weapons:
 - `Apply` of DETONATE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES: the slot leaves them `unrecorded` (#711), so the self-destructs of `combat-deaths` reach the recording only through what they change.
 - The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
 - The burst of a weapon: a burst is counted down by `UpdateProjectiles` (#711), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
+- `UpdateProjectiles` and `UpdateExplosions`: `unrecorded`, and `Apply` of DETONATE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES with them (#711). The projectiles' collision, `DetonateProjectile` and `DetonateUnitWeapon` call `AddExplosionEffect`, which appends to `Game.debris` (`Game.count_1491b` and 300 entries of `Debris`, classed `sim` in `data/state_classes.csv`), the raw array that `UpdateExplosions` reads through a local `DebrisView` overlay, and `ExplodeUnitPiece` fills `g_explodedPieces`, 100 pointers to a heap block that holds a model piece (`ExplodedPiece` and its `PieceRec`). The schema has no kind for either: the debris array has no named member after `count_1491b` and an effect holds two animation cursors and a position, and the pieces are reached by pointer from a global array. Naming them is the work of a follow-up.
 
 ## Replaying
 
@@ -1341,9 +1342,10 @@ The recordings of mission 2.0, which the modern build runs as native code in eve
 wine build/modern/replay_inject_test.exe --expect 295 Unit#2.weapon0ReloadTimer tests/replay/weapons/orders-guard-attacked.txt
 ```
 
-The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), all in a window of ticks (a window cannot start at tick 0). They hold weapons' slots and the `Apply` of every kind but the five it leaves to #711 ("Event arguments"): the damage, claims, releases, slot set-ups and aim answers that reach weapons as events. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
+The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), in a window of ticks (a window cannot start at tick 0) but `console-ilose`, a whole run. They hold weapons' slots but `UpdateProjectiles` and `UpdateExplosions`, and the `Apply` of every kind but the five it leaves to #711 ("Event arguments"): the damage, claims, releases, slot set-ups and aim answers that reach weapons as events. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
 
 - `orders-guard-attacked`, ticks 1 to 250 (`Apply`: 23 DAMAGE, 104 RELEASE, 140 CLAIM, 4 INIT_SLOTS and 39 AIM_DONE): two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (weapons' START_SCRIPT effect `AimPrimary` through `services.SchedPublish`, `scripts.GetAimFromPosition`, `network.SendScriptCallByName`), fires (`services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit` (167 calls) and `GetWeaponRange` (32) are called.
+- `console-ilose`, the whole run of 100 ticks (1,869 calls, 359 KB): the load-time `FindWeaponByName` (1,790 calls: the first call names every weapon of the array, `r WeaponName#N.name "..."`, and each returns its weapon, `o result weapondef#N` with `o weapondef#N.flags`, or null), a few `UpdateUnitWeapons` and `GetWeaponRange`.
 - `orders-air-fights`, ticks 100 to 260 (`Apply`: 5 RELEASE, 9 CLAIM, 1 INIT_SLOTS and 22 AIM_DONE): fighters shoot at each other (the line-of-sight handler, `WeaponCanReachUnit`).
 - `orders-weapon-build`, ticks 700 to 780 (`Apply`: 3 RELEASE, 2 CLAIM and 1 INIT_SLOTS): an anti-nuke silo with an interceptor weapon, `FindTargetableProjectile` (3 calls, null) and the walk of the projectile table, and `UpdateUnitWeapons` of the units that have no target.
 - `combat-deaths`, ticks 850 to 1000 (`Apply`: 7 DAMAGE and 7 RELEASE): a solar plant and a laser tower self-destruct; the window holds the `UpdateUnitWeapons` of the units around them.

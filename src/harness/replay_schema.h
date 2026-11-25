@@ -221,6 +221,7 @@ enum ReplayObjectKindId {
     ROK_MISSIONUNIT,
     ROK_MISSIONRULE,
     ROK_MISSIONFEATURE,
+    ROK_WEAPONNAME,
     ROK_WINDMETEORSEVENTHEADER,
     ROK_WINDMETEORSPARAMS,
     ROK_WINDMETEORSLIMITS,
@@ -416,6 +417,7 @@ static const ReplayTableSpec kReplayTables[] = {
     { 0, 1, offsetof(Game, net), { { 1, 0, 0 }, { 1, 0, 0 } }, 1 },
     { 0, 0, offsetof(Game, weapons), { { 256, 0, 0 }, { 1, 0, 0 } }, 0 },
     { 0, 0, offsetof(Game, weapons), { { 256, 0, 0 }, { 1, 0, 0 } }, 0 },
+    { 0, 0, offsetof(Game, weapons), { { 256, 0, 0 }, { 1, 0, 0 } }, 0 },
 };
 
 static_assert(sizeof(((Game*)nullptr)->width) == 1 || sizeof(((Game*)nullptr)->width) == 2 || sizeof(((Game*)nullptr)->width) == 4, "Game::visibilityMask: width is a byte, a short or an int");
@@ -450,6 +452,7 @@ static_assert(sizeof(((Game*)nullptr)->pool) == 1 * sizeof(Pool), "the table of 
 static_assert(sizeof(((Game*)nullptr)->net) == sizeof(unsigned), "the table of Mission is a Ref");
 static_assert(sizeof(((Game*)nullptr)->weapons) == 256 * sizeof(WeaponDef), "the table of WeaponFire holds 256 elements");
 static_assert(sizeof(((Game*)nullptr)->weapons) == 256 * sizeof(WeaponDef), "the table of WeaponHit holds 256 elements");
+static_assert(sizeof(((Game*)nullptr)->weapons) == 256 * sizeof(WeaponDef), "the table of WeaponName holds 256 elements");
 
 #pragma pop_macro("g_meteorNextStrikeTime")
 #pragma pop_macro("g_meteorWeaponName")
@@ -870,7 +873,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "GafFrame", sizeof(GafFrame), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "Object3do", sizeof(Object3do), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "Handle", sizeof(Handle), RS_STATE, RT_ORDER, 0, 4, 0, 0, 0, 0 },
-    { "Feature", sizeof(Feature), RS_STATE, 9, 0, 0, 0, 0, 1, 0 },
+    { "Feature", sizeof(Feature), RS_STATE, 9, 0, 0, 0, 0, 0, 0 },
     { "Spot", sizeof(Spot), RS_STATE, 10, 0, 0, 0, 0, 1, 0 },
     { "Pool", sizeof(Pool), RS_STATE, 11, 0, 0, 0, 0, 0, 0 },
     { "ModelState", sizeof(ModelState), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -884,6 +887,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "MissionUnit", sizeof(MissionUnit), RS_STATE, RT_ORDER, 5, 1, 0, 0, 0, 0 },
     { "MissionRule", sizeof(MissionRule), RS_STATE, RT_ORDER, 6, 1, 0, 0, 0, 0 },
     { "MissionFeature", sizeof(MissionFeature), RS_STATE, RT_ORDER, 7, 1, 0, 0, 0, 0 },
+    { "WeaponName", sizeof(WeaponDef), RS_STATE, 15, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsEventHeader", sizeof(WindMeteorsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsParams", sizeof(WindMeteorsParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsLimits", sizeof(WindMeteorsLimits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -1001,7 +1005,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FeaturesPassMaps", sizeof(FeaturesPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FeaturesAreaDamage", sizeof(FeaturesAreaDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 164;
+static const unsigned kReplayObjectKindCount = 165;
 
 static const unsigned char kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER };
 
@@ -1482,6 +1486,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "name", offsetof(MissionFeature, name), 128, ROK_MISSIONFEATURE, RK_STRING, 0, 0, 0, {}, 0, 0 },
     { "x", offsetof(MissionFeature, x), sizeof(((MissionFeature*)nullptr)->x), ROK_MISSIONFEATURE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "y", offsetof(MissionFeature, y), sizeof(((MissionFeature*)nullptr)->y), ROK_MISSIONFEATURE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "name", offsetof(WeaponDef, name), 32, ROK_WEAPONNAME, RK_STRING, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsEventHeader, kind), sizeof(((WindMeteorsEventHeader*)nullptr)->kind), ROK_WINDMETEORSEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsParams, h.kind), sizeof(((WindMeteorsParams*)nullptr)->h.kind), ROK_WINDMETEORSPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "weapon", offsetof(WindMeteorsParams, params.weapon), 32, ROK_WINDMETEORSPARAMS, RK_STRING, 0, 0, 0, {}, 0, 0 },
@@ -1996,7 +2001,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos1", offsetof(FeaturesAreaDamage, pos[1]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[1]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos2", offsetof(FeaturesAreaDamage, pos[2]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[2]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 964;
+static const unsigned kReplayObjectFieldCount = 965;
 static const unsigned kReplayWalkableFieldCount = 165;
 
 static const unsigned short kReplayReachFields[] = { 45, 50, 168, 169, 170, 37, 36, 0, 24, 50, 171, 37, 35, 38, 45, 51, 53, 108 };
@@ -3031,6 +3036,7 @@ enum ReplaySlotId {
     RSL_PATHFINDING_WRITESTATE,
     RSL_WEAPONS_APPLY,
     RSL_WEAPONS_UPDATEUNITWEAPONS,
+    RSL_WEAPONS_FINDWEAPONBYNAME,
     RSL_WEAPONS_GETWEAPONRANGE,
     RSL_WEAPONS_WEAPONCANREACHUNIT,
     RSL_WEAPONS_FINDTARGETABLEPROJECTILE,
@@ -3299,7 +3305,6 @@ enum ReplaySlotId {
     RSL_NETWORK_SENDSHAREMAPINFO,
     RSL_NETWORK_BROADCASTPLAYERECONOMY,
     RSL_NETWORK_SENDUNITSTATES,
-    RSL_WEAPONS_FINDWEAPONBYNAME,
     RSL_COUNT
 };
 
@@ -3362,6 +3367,8 @@ static const unsigned char kReplayWeaponsUpdateUnitWeaponsReads[] = { 0, 16, 17,
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsWrites[] = { 30, 47, 48, 49 };
 static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjReads[] = { 2, 3, 33, 35, 37, 43, 44, 46, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 64, 65, 66, 67, 75, 76, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 124, 125, 129, 130, 131, 132, 133, 134, 135, 136, 137, 139, 140, 141, 142, 143, 144, 145, 172, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 382, 383 };
 static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjWrites[] = { 57, 62, 67, 81, 82, 83, 84, 86, 87, 88, 89, 91, 92, 93, 94, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 382 };
+static const unsigned char kReplayWeaponsFindWeaponByNameAllOf[] = { ROK_WEAPONNAME };
+static const unsigned short kReplayWeaponsFindWeaponByNameObjReads[] = { 451 };
 static const unsigned short kReplayWeaponsGetWeaponRangeObjReads[] = { 56, 61, 66, 141 };
 static const unsigned char kReplayWeaponsWeaponCanReachUnitReads[] = { 17, 28 };
 static const unsigned short kReplayWeaponsWeaponCanReachUnitObjReads[] = { 35, 37, 51, 52, 53, 56, 61, 66, 108, 125, 129, 130, 137, 141 };
@@ -3634,6 +3641,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "WriteState", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Apply", SUB_WEAPONS, kReplayWeaponsApplyReads, 1, nullptr, 0, kReplayWeaponsApplyObjReads, 51, kReplayWeaponsApplyObjWrites, 16, nullptr, 0 },
     { "UpdateUnitWeapons", SUB_WEAPONS, kReplayWeaponsUpdateUnitWeaponsReads, 8, kReplayWeaponsUpdateUnitWeaponsWrites, 4, kReplayWeaponsUpdateUnitWeaponsObjReads, 92, kReplayWeaponsUpdateUnitWeaponsObjWrites, 43, kReplayWeaponsUpdateUnitWeaponsAllOf, 2 },
+    { "FindWeaponByName", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsFindWeaponByNameObjReads, 1, nullptr, 0, kReplayWeaponsFindWeaponByNameAllOf, 1 },
     { "GetWeaponRange", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsGetWeaponRangeObjReads, 4, nullptr, 0, nullptr, 0 },
     { "WeaponCanReachUnit", SUB_WEAPONS, kReplayWeaponsWeaponCanReachUnitReads, 2, nullptr, 0, kReplayWeaponsWeaponCanReachUnitObjReads, 14, nullptr, 0, nullptr, 0 },
     { "FindTargetableProjectile", SUB_WEAPONS, kReplayWeaponsFindTargetableProjectileReads, 1, nullptr, 0, kReplayWeaponsFindTargetableProjectileObjReads, 16, nullptr, 0, kReplayWeaponsFindTargetableProjectileAllOf, 1 },
@@ -3902,7 +3910,6 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "SendShareMapInfo", SUB_NETWORK, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "BroadcastPlayerEconomy", SUB_NETWORK, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SendUnitStates", SUB_NETWORK, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "FindWeaponByName", SUB_WEAPONS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
 };
 static const unsigned kReplaySlotCount = RSL_COUNT;
 
@@ -3912,18 +3919,18 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "features", 5, 0, 1, 20, 10, RET_FEATURES },
     { "ai", 6, 0, 0, 30, 15, RET_COUNT },
     { "pathfinding", 4, 0, 0, 45, 9, RET_COUNT },
-    { "weapons", 4, 0, 1, 54, 6, RET_WEAPONS },
-    { "targeting", 4, 0, 1, 60, 7, RET_TARGETING },
-    { "los_radar", 5, 0, 0, 67, 27, RET_LOS_RADAR },
-    { "orders", 6, 0, 0, 94, 11, RET_ORDERS },
-    { "units", 7, 0, 0, 105, 44, RET_UNITS },
-    { "players", 5, 0, 0, 149, 28, RET_COUNT },
-    { "map", 9, 0, 1, 177, 11, RET_MAP },
-    { "scripts", 3, 0, 0, 188, 24, RET_SCRIPTS },
-    { "movement", 5, 0, 0, 212, 20, RET_MOVEMENT },
-    { "mission", 2, 0, 1, 232, 12, RET_COUNT },
-    { "files", 3, 0, 0, 244, 58, RET_COUNT },
-    { "network", 2, 0, 0, 302, 22, RET_COUNT },
+    { "weapons", 4, 0, 1, 54, 7, RET_WEAPONS },
+    { "targeting", 4, 0, 1, 61, 7, RET_TARGETING },
+    { "los_radar", 5, 0, 0, 68, 27, RET_LOS_RADAR },
+    { "orders", 6, 0, 0, 95, 11, RET_ORDERS },
+    { "units", 7, 0, 0, 106, 44, RET_UNITS },
+    { "players", 5, 0, 0, 150, 28, RET_COUNT },
+    { "map", 9, 0, 1, 178, 11, RET_MAP },
+    { "scripts", 3, 0, 0, 189, 24, RET_SCRIPTS },
+    { "movement", 5, 0, 0, 213, 20, RET_MOVEMENT },
+    { "mission", 2, 0, 1, 233, 12, RET_COUNT },
+    { "files", 3, 0, 0, 245, 58, RET_COUNT },
+    { "network", 2, 0, 0, 303, 22, RET_COUNT },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

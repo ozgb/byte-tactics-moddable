@@ -191,7 +191,7 @@ class Unrecorded(unittest.TestCase):
 
     def imported(self):
         ann = annotations()
-        self.assertFalse(ann["subsystems"]["weapons"]["slots"]["FindWeaponByName"]["record"])
+        ann["subsystems"]["weapons"]["slots"]["FindWeaponByName"].update({"record": False, "reason": "#711"})
         return ann
 
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
@@ -1761,7 +1761,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_SPOT, offsetof(Spot, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 12;", text)
+        self.assertIn("kReplayInsideSiteCount = 15;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -2145,6 +2145,12 @@ class ArgumentShapes(unittest.TestCase):
         runner = "\n".join(rs.runner("units", "Label", s))
         self.assertIn("CompareResult((const char*)g_result_units_Label);", runner)
 
+    def test_a_weapon_result_is_recorded_by_its_name_and_its_reach_and_compared_by_its_name(self):
+        s, _ = self.slot([], {}, "WeaponDef*", {"mode": "weapon", "reach": ["flags"]})
+        self.assertEqual(rs.result_out(s["result"], {}, "o"), ['ArgWeaponResult(s_tail, result, 1, "flags");'])
+        runner = "\n".join(rs.runner("units", "Pick", s))
+        self.assertIn("CompareWeaponResult(g_result_units_Pick);", runner)
+
     def test_an_all_of_rule_may_name_a_table_behind_a_ref_field_and_not_a_kind_with_no_table(self):
         _, errors, model = rs.generate(rs.read_rows(), annotations())
         self.assertEqual([e for e in errors if "all-of" in e], [])
@@ -2413,7 +2419,7 @@ class ElementForms(unittest.TestCase):
             ann["objects"]["FixtureGroup"]["table"] = table
             self.has(ann, message)
 
-    def test_a_table_behind_a_ref_field_is_no_delta_all_of_or_inside_kind(self):
+    def test_a_table_behind_a_ref_field_is_no_delta_or_inside_kind_and_may_be_all_of(self):
         ann = annotations()
         ann["objects"]["FixtureGroup"]["delta"] = True
         self.has(ann, "FixtureGroup delta: only a kind with a table of Game or SimGlobals can be a delta")
@@ -2423,7 +2429,7 @@ class ElementForms(unittest.TestCase):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureGroup", "note": "test"})
         errors = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::p1cd5"), row("WeaponCanReachUnit", "field_escape", "Game::players")], ann)[1]
-        self.assertTrue(any("the all-of rule names FixtureGroup, which is no table kind of the schema" in e for e in errors), errors)
+        self.assertFalse(any("which is no table kind of the schema" in e for e in errors), errors)
 
     def test_a_vptr_kind_has_its_global_in_the_vtable_functions(self):
         files, _, _ = self.generated()
@@ -2783,10 +2789,10 @@ class CStrings(unittest.TestCase):
         self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->list)::value_type, char*), "FixtureNamed::list holds char*");', text)
         self.assertIn('static_assert(__is_same(decltype(((FixtureNamed*)nullptr)->idents)::value_type, Ref<char>), "FixtureNamed::idents holds Ref<char>");', text)
 
-    def test_the_real_schema_has_none_of_it(self):
-        files, _, _ = rs.generate(rs.read_rows())
-        self.assertNotIn("CSTRING", files[rs.SCHEMA_H].replace("#include", ""))
-        self.assertEqual(files[rs.JSON_OUT].count("cstring"), 0)
+    def test_the_real_schema_has_it_only_for_the_names_of_the_mission(self):
+        real = json.loads(rs.JSON_OUT.read_text())["annotations"]["objects"]
+        users = {k for k, v in real.items() if any(f["kind"] == "cstring" for f in v["fields"])}
+        self.assertEqual(users, {"MissionUnit", "MissionUnitInfo", "MissionFeatureInfo"})
 
     def test_a_walk_never_follows_a_string(self):
         for kind in ("cstring", "cstringref", "cstrings"):

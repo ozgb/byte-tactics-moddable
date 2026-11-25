@@ -774,6 +774,21 @@ void Run_weapons_UpdateUnitWeapons()
     g_seams.weapons->UpdateUnitWeapons(p0);
 }
 
+WeaponDef* g_result_weapons_FindWeaponByName;
+
+void Run_weapons_FindWeaponByName()
+{
+    char p0_text[256];
+    ArgText("name", p0_text, sizeof p0_text);
+    SetClosing("result");
+    g_result_weapons_FindWeaponByName = g_seams.weapons->FindWeaponByName(p0_text);
+}
+
+void After_weapons_FindWeaponByName()
+{
+    CompareWeaponResult(g_result_weapons_FindWeaponByName);
+}
+
 int g_result_weapons_GetWeaponRange;
 
 void Run_weapons_GetWeaponRange()
@@ -1387,6 +1402,10 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_weapons_UpdateUnitWeapons();
         return true;
     }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "FindWeaponByName") == 0) {
+        Run_weapons_FindWeaponByName();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0) {
         Run_weapons_GetWeaponRange();
         return true;
@@ -1548,6 +1567,8 @@ void RunAfter(const char* subsystem, const char* slot)
         After_features_FindFeatureAtPos();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0)
         After_weapons_Apply();
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "FindWeaponByName") == 0)
+        After_weapons_FindWeaponByName();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0)
         After_weapons_GetWeaponRange();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachUnit") == 0)

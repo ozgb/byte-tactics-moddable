@@ -796,6 +796,29 @@ void __stdcall RecWeaponsUpdateUnitWeapons(Unit* a0)
     }
 }
 
+WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "name", (const char*)a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i weapons.FindWeaponByName");
+        ImportValue(line, (const char*)a0);
+    }
+    WeaponDef* result = s_inner_weapons->FindWeaponByName(a0);
+    if (scope.Import()) {
+        ImportResultWeapon(line, result, 1, "flags");
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgWeaponResult(s_tail, result, 1, "flags");
+    }
+    return result;
+}
+
 int __stdcall RecWeaponsGetWeaponRange(Unit* a0, unsigned int a1)
 {
     ReplayRoots roots;
@@ -4861,28 +4884,6 @@ void __stdcall RecNetworkSendUnitStates(Player* a0)
     }
 }
 
-WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_WEAPONS_FINDWEAPONBYNAME, SUB_WEAPONS, roots, false);
-    if (scope.Open()) {
-        ArgValue(s_call, "name", (const char*)a0);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i weapons.FindWeaponByName");
-        ImportValue(line, (const char*)a0);
-    }
-    WeaponDef* result = s_inner_weapons->FindWeaponByName(a0);
-    if (scope.Import()) {
-        ImportResultWeapon(line, result, 1, "flags");
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-    return result;
-}
-
 bool IsImportOf(unsigned owner, unsigned slot)
 {
     switch (owner) {
@@ -5135,6 +5136,8 @@ void HookSeams(const bool* on)
         s_rec_weapons.Apply = RecWeaponsApply;
     if (on[SUB_WEAPONS])
         s_rec_weapons.UpdateUnitWeapons = RecWeaponsUpdateUnitWeapons;
+    if (on[SUB_WEAPONS] || on[SUB_WIND_METEORS])
+        s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])
         s_rec_weapons.GetWeaponRange = RecWeaponsGetWeaponRange;
     if (on[SUB_WEAPONS] || on[SUB_TARGETING])
@@ -5671,8 +5674,6 @@ void HookSeams(const bool* on)
         s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;
     if (on[SUB_NETWORK])
         s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
-    if (on[SUB_WIND_METEORS])
-        s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
     g_seams.wind_meteors = &s_rec_wind_meteors;
     g_seams.economy = &s_rec_economy;
     g_seams.features = &s_rec_features;

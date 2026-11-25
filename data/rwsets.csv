@@ -4454,6 +4454,7 @@ address,function,file,kind,target
 0x419630,MenuEntryNameContains,src/ingame/control_panel.cpp,call,strstr
 0x419630,MenuEntryNameContains,src/ingame/control_panel.cpp,function,
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,call,CellToWorld
+0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,call,HarnessUiCommand
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,call,HarnessUiOrder
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,call,IssueOrCancelOrder
 0x419670,IssueMobileBuildOrders,src/ingame/control_panel.cpp,call,WorldToCell
@@ -26519,6 +26520,7 @@ address,function,file,kind,target
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,function,
 0x48cd80,PickUnitUnderCursor,src/ingame/selection.cpp,global_read,g_game
 0x48cf30,IssueOrderToSelection,src/ingame/selection_48cf30.cpp,call,GetOrderType
+0x48cf30,IssueOrderToSelection,src/ingame/selection_48cf30.cpp,call,HarnessUiCommand
 0x48cf30,IssueOrderToSelection,src/ingame/selection_48cf30.cpp,call,HarnessUiOrder
 0x48cf30,IssueOrderToSelection,src/ingame/selection_48cf30.cpp,call,IssueOrCancelOrder
 0x48cf30,IssueOrderToSelection,src/ingame/selection_48cf30.cpp,call,Order
@@ -44845,6 +44847,20 @@ address,function,file,kind,target
 ,HarnessUiCancel,src/harness/harness.cpp,call,fprintf
 ,HarnessUiCancel,src/harness/harness.cpp,function,
 ,HarnessUiCancel,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
+,HarnessUiCommand,src/harness/harness.cpp,call,UiLineStart
+,HarnessUiCommand,src/harness/harness.cpp,call,UiLive
+,HarnessUiCommand,src/harness/harness.cpp,call,UiOrderName
+,HarnessUiCommand,src/harness/harness.cpp,call,UiUnitIndex
+,HarnessUiCommand,src/harness/harness.cpp,call,UiUnitType
+,HarnessUiCommand,src/harness/harness.cpp,call,fprintf
+,HarnessUiCommand,src/harness/harness.cpp,deref_read,*int
+,HarnessUiCommand,src/harness/harness.cpp,deref_read,*unsigned char
+,HarnessUiCommand,src/harness/harness.cpp,field_read,Game::localPlayer
+,HarnessUiCommand,src/harness/harness.cpp,field_read,Player::unitsBegin
+,HarnessUiCommand,src/harness/harness.cpp,field_read,Player::unitsEnd
+,HarnessUiCommand,src/harness/harness.cpp,function,
+,HarnessUiCommand,src/harness/harness.cpp,global_read,g_game
+,HarnessUiCommand,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,HarnessUiGroup,src/harness/harness.cpp,call,UiLineStart
 ,HarnessUiGroup,src/harness/harness.cpp,call,UiListUnits
 ,HarnessUiGroup,src/harness/harness.cpp,call,UiLive

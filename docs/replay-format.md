@@ -1209,6 +1209,21 @@ weapons:
 - The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
 - The burst of a weapon: a burst is counted down by `UpdateProjectiles` (#711), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
 
+units:
+
+units is complete with part of its seam recorded: the slots below are `record: false` with the reason in the schema, and each has what it needs written here.
+
+- `Apply`, `CreateUnit`, `KillUnit` and `AddBuildProgress`: their closure holds `ApplyUnitDeath`, `InitUnitScript`, `ClearUnitRefs` and `FinishConstruction`, which call `scripts.NewUnitScript`, `scripts.SetCob`, `scripts.CreateObjectState`, `scripts.SetObjectState`, `scripts.DeleteScript` and `scripts.FreeObjectState` (they write `Unit.script` and the model state, and no import form restores a written pointer to an object the import made), and walk the list of `PathOrderAttach` references that starts at `Unit.head` (the references live in `Order.link` and `PathOrder.ref`, kinds of orders and movement, and `PathOrderAttach` has no vtable global to name).
+- `UnitRefUnlink`, `UnitRefInit`, `UnitRefSetUnit`, `UnitRefGet` and `UnitRefSetValue`: the reference is an embedded `PathOrderAttach` of an order, a kind that orders annotates.
+- `UpdateUnitTail`: `AlignUnitToGround` reads the unit's 3D model through `Game.types` (`ModelGroundView`, `CornerHeightSample`), which has no form.
+- `CreateFactoryIndex`, `FreeFactoryIndex`, `RefreshFactoryIndex` and `GetFactoriesInRadius`: the factory index is `s_index` in `src/units/factory_index.cpp`, a static outside the block (only the pointer is tracked by `SimBlockTrack`), so no field names it.
+- `FindMissionUnit`: it is called only by the unit commands of a mission when the mission starts, and no scenario reaches it.
+- `UpdateAllUnits` is the scheduler's loop over every unit. It calls `UpdateUnitHead`, `UpdateUnitBody` and `UpdateUnitTail` through the seam, and other subsystems' slots between them, so its recording would hold a call of another recorded subsystem inside it; the head and body slots are recorded one by one.
+- `WriteState`, `SaveUnits`, `GetMovementLimits`, `CreateFactoryIndex` and `FreeFactoryIndex` are queries or set-up outside the tick, and the load slots are load class.
+- `UpdateUnitBody`'s water damage (`mission.waterDoesDamage` with a damage and a unit at or under the sea level that does not float) and its selection reset (`selected` with `selectable` cleared): no recorded window has a mission that sets water damage, and a unit is selected only by the interface.
+- `UpdateUnitHead`'s wind generator branch (`windgenerator` above 0 with the wind on): the recorded windows have no wind generator.
+- `FindUnitType` with a name that is no type (it returns null): every recorded name is a type.
+
 ## Replaying
 
 The native replay test replays a recording against the native module (`replay_native_test.exe`, built by
@@ -1308,6 +1323,23 @@ The recordings of weapons, which the modern build runs as native code in every m
 The recorder's walker holds as many fields as the schema has walkable object fields (references, embedded objects, unit ids, weapons and vectors of objects), a count the generated schema states, so no slot set can overflow it.
 
 A subsystem that imports a slot of another complete subsystem (`weapons` imports `targeting.GetWeaponTargetPos`, and `targeting` and `wind_meteors` import `weapons` slots) is replayed against the import stubs of that seam, not against the other module: `BindSeams` binds the stubs of the seams a recording's subsystem imports from, after the native tables.
+
+The recordings of units (7.0), which the modern build runs as native code in every mode (it has no WASM module yet). They record the part of the seam that no pending subsystem's state is needed for (see "Not recorded"): `UpdateUnitHead` and `UpdateUnitBody` for each unit of each tick (the timers, the health percentage every 30 ticks, the self-repair through `AddRepairProgress` and `mission.GetMissionParams`, an `i` line whose result is the whole `MissionParams`), `AddRepairProgress`, `Unit::CanLoad`, `CanReclaim` and `CanRepair`, `FindUnitType` and `FindUnitTypeId`:
+
+- `console-units` (the whole run, 170 ticks): 726 head and body calls, `FindUnitTypeId` 3 calls (2 at load, 1 at tick 140).
+- `mission-victory` (the whole run): 1828 head and body calls, and the load-time `FindUnitType` (7 calls) and `FindUnitTypeId` (6 calls) with the names of all 178 unit types (`r UnitDef#N.unitname`), the only run with `FindUnitType` that is short; a window cannot start at tick 0.
+- `orders-air-repair`, ticks 848 to 853 only: `AddRepairProgress` 4 calls (a unit repairing itself, with `services.ScheduleEconomyRequestGranted` and `services.SchedPublish`) and `CanRepair` 2 calls.
+- `orders-guard-reclaim`, ticks 250 to 262 only: `CanReclaim` 6 calls.
+- `units-transport`, ticks 4098 to 4101 only: `CanLoad` 1 call.
+- `orders-guard-attacked`, ticks 28 to 32 only: the health percentage at tick 30.
+
+`replay_inject_test.exe` is also built with the percentage-scale injection of 99 (the 100 of `health * 100 / maxHealth` in `UpdateUnitBody`), and the divergence is reported at call 25 of `orders-guard-attacked` and at `Unit#1.healthPercent` (recorded 100, replayed 99):
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 25 Unit#1.healthPercent tests/replay/units/orders-guard-attacked.txt
+```
+
+`services.ScheduleEconomyRequestGranted` records its resources and not the unit: the unit is a block offset, which differs between the recording and the replay.
 
 ### Against the WASM module
 

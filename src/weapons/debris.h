@@ -22,8 +22,13 @@ struct Debris {
     short angle_x;
     short angle_y;
     short angle_z;
-    unsigned short flag : 1;
-    unsigned short : 15;
+    union {
+        unsigned short flags;
+        struct {
+            unsigned short flag : 1;
+            unsigned short : 15;
+        };
+    };
 };
 
 struct DebrisPiece {

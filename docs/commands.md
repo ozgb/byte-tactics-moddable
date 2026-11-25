@@ -102,7 +102,7 @@ The class is the one of section 3. Command words are compared in any case.
 | `nometal` | converted | always | PLAYERS_SET_STORE |
 | `noenergy` | converted | always | PLAYERS_SET_STORE |
 | `sealevel` | converted | cheat | MAP_SET_SEA_LEVEL |
-| `edge` | direct | cheat | none |
+| `edge` | converted | cheat | MAP_SET_EDGE |
 | `iwin` | converted | cheat | PLAYERS_KILL_UNITS, PLAYERS_END_GAME |
 | `ilose` | converted | cheat | PLAYERS_KILL_UNITS, PLAYERS_END_GAME |
 | `ai` | converted | cheat | PLAYERS_SET_TYPE |
@@ -168,6 +168,8 @@ Each command below says its guards and then its events, in publication order. "T
   word, else argument 1 cut to a byte. Nothing unless it is a player that exists. PLAYERS_SET_STORE with `player`,
   `resource` 1 (`nometal`) or 0 (`noenergy`), `add` 0, `amount` argument 2 (default 0) as a float.
 - **`sealevel [n]`.** MAP_SET_SEA_LEVEL with `level` argument 1 (default 0), always.
+- **`edge [x [z]]`.** MAP_SET_EDGE with `x` argument 1 (default 32) and `z` argument 2 (default 128), always. (With no
+  argument the playable width and height are what the match started with.)
 - **`iwin`.** `s` is the side of the local player (0 Arm, 1 Core). PLAYERS_KILL_UNITS with `player` 0 when `s` is 1, else
   1; then PLAYERS_END_GAME with `victory` 1.
 - **`ilose`.** PLAYERS_KILL_UNITS with `player` the side of the local player (0 or 1, used as a slot number); then
@@ -208,10 +210,6 @@ These are written by the game directly or through a module's own function, not b
 - **`los`, `lostype`, `mapping`, `nowisee`.** They change `mapFlags`: `los` flips bit 1, `lostype` bit 2, `mapping` bit 0,
   and `nowisee` clears bits 0 and 1. Then LOS_RADAR_RECALCULATE with `reset` 0 for `los` and `lostype` and 1 for `mapping` and
   `nowisee`.
-- **`edge [w [h]]`.** Always: the playable width of the map becomes the map's width in cells times 16 minus argument 1
-  (default 32), and the playable height the map's height in cells times 16 minus argument 2 (default 128). (With no
-  argument it is what the match started with.) It is not an event because the map module's state for the replay format
-  does not hold these fields yet.
 - **`reloadaiprofiles`.** The AI players are reset and their profiles loaded again, which runs the AI script's own
   console lines (`plan`, `weight`, `limit` and the others the script holds), each publishing its AI event as section 4.2
   would. It is not an event because an event whose handling runs console lines would put the console inside the
@@ -390,11 +388,12 @@ one of those, and a scenario that uses a console command or an order kind that t
 | conditions-dark-side | judged | - |
 | conditions-shore-to-shore | judged | - |
 | console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
+| console-edge | judged | - |
 | console-features | left out | console commands that are not events: `treedeath` |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
 | console-sight | left out | console commands that are not events: `los`, `lostype`, `mapping`, `radar`, `nowisee`, `view`, `reloadaiprofiles` |
-| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search`, `edge` |
+| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search` |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |
 | duel-pass-dark | judged | - |

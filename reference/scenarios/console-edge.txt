@@ -1,0 +1,14 @@
+# Console edge on The Pass: two computer players, the playable edges cut in at tick 2, so the AI's build range shrinks, and put back with the defaults at tick 1200; 1500 ticks.
+game_seed 457
+crt_seed 1457
+view_seed 2457
+map The Pass
+start_positions fixed
+ticks 1500
+player0.controller ai
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +now Film Chris Include Reload Assert
+console 2 +edge 2000 1100
+console 1200 +edge

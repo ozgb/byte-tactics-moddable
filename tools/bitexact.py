@@ -9,7 +9,9 @@ g_cosTable, g_radToAngle16 and g_angle16ToRad, while the port uses the
 generated tables. The tests are built with clang-cl for i686 (-DBX_REPLAY, the
 library compiled by clang, no original linked in) and run under Wine against
 the vectors the original's code returned (build/bitexact/vectors/*.bin, written
-by the reference branch's tools/bitexact.py). The atof test also feeds
+by the reference branch's tools/bitexact.py). A third exe (test/csem_test.c) is
+replayed against the LIBCMT it links; --kit DIR runs only that exe and the
+others' kit hooks, writing every case to DIR. The atof test also feeds
 bx_atof_msvc5 the numeric TDF value strings of the player's install if
 build/tdf_numbers.txt exists (tools/tdfnumbers.py writes it). The exit status
 is non-zero on any mismatch. Everything is built under build/bitexact/.
@@ -41,10 +43,13 @@ TEST = LIB / "test/bitexact_test.c"
 VECTORS_SOURCE = LIB / "test/vectors.c"
 VECTORS = BUILD / "vectors"
 TDF_NUMBERS = ROOT / "build/tdf_numbers.txt"
+NO_TDF = BUILD / "no_tdf_numbers.txt"
 MSVC5 = (ROOT / "toolchain/msvc5-sp3").resolve()
 CLANG_BUILD = BUILD / "clang"
 CRT_PORT_SOURCES = [LIB / "rand.c", LIB / "qsort.c", LIB / "shuffle.c", LIB / "explosions.c"]
 CRT_TESTS = [LIB / "test/crt_test.c", LIB / "test/stl_shuffle.cpp", VECTORS_SOURCE]
+CSEM_TEST = LIB / "test/csem_test.c"
+KIT_SOURCE = LIB / "test/kit.c"
 
 
 def generate_and_check() -> bool:
@@ -130,10 +135,12 @@ def clang_setup(tools: dict[str, str]) -> list[str] | None:
             "-DBX_REPLAY", f"-I{LIB}"]
 
 
-def clang_link(tools: dict[str, str], flags: list[str], name: str, sources: list[Path]) -> Path | None:
+def clang_link(tools: dict[str, str], flags: list[str], name: str, sources: list[Path],
+               out_dir: Path = CLANG_BUILD) -> Path | None:
+    out_dir.mkdir(parents=True, exist_ok=True)
     objects = []
     for src in sources:
-        obj = CLANG_BUILD / (src.stem + ".obj")
+        obj = out_dir / (src.stem + ".obj")
         fpu = ["-msse2", "-mfpmath=sse"] if src.parent != LIB / "test" else ["-mno-sse"]
         proc = subprocess.run([tools["clang-cl"], *flags, *fpu, "/c", f"/Fo{obj}", str(src)], capture_output=True,
                               text=True)
@@ -141,7 +148,7 @@ def clang_link(tools: dict[str, str], flags: list[str], name: str, sources: list
             print(proc.stdout + proc.stderr, file=sys.stderr)
             return None
         objects.append(obj)
-    exe = CLANG_BUILD / name
+    exe = out_dir / name
     cmd = [tools["lld-link"], "/nologo", "/machine:x86", "/subsystem:console", "/entry:mainCRTStartup", "/fixed:no",
            "/safeseh:no", "/incremental:no", "/nodefaultlib", "/force:multiple", f"/out:{exe}", *map(str, objects),
            str(MSVC5 / "LIB/LIBCMT.LIB"), str(MSVC5 / "LIB/OLDNAMES.LIB"), str(CLANG_BUILD / "KERNEL32.lib")]
@@ -152,9 +159,10 @@ def clang_link(tools: dict[str, str], flags: list[str], name: str, sources: list
     return exe
 
 
-def run_clang() -> int:
-    """The tests built with clang-cl for i686 against the vectors the MSVC 5 exes wrote; 2 if they cannot be built."""
-    vectors = {name: VECTORS / f"{name}.bin" for name in ("bitexact", "crt")}
+def run_clang(kit: Path | None = None) -> int:
+    """The tests built with clang-cl for i686 against the vectors the MSVC 5 exes wrote; 2 if they cannot be built.
+    With a kit directory the three tests are built with -DBX_KIT and write their cases there."""
+    vectors = {name: VECTORS / f"{name}.bin" for name in ("bitexact", "crt", "csem")}
     for path in vectors.values():
         if not path.exists():
             print(f"bitexact: {path} is missing; the vectors come from the reference branch's tools/bitexact.py", file=sys.stderr)
@@ -163,26 +171,40 @@ def run_clang() -> int:
     flags = clang_setup(tools) if tools else None
     if tools is None or flags is None:
         return 2
+    out_dir = CLANG_BUILD
+    if kit is not None:
+        kit.mkdir(parents=True, exist_ok=True)
+        flags = flags + ["-DBX_KIT"]
+        out_dir = CLANG_BUILD / "kit"
+    extra = [KIT_SOURCE]
     exes = [(clang_link(tools, flags, "bitexact_test.exe",
-                        [*PORT_SOURCES, TEST, MATH_TEST, VECTORS_SOURCE]), vectors["bitexact"]),
-            (clang_link(tools, flags, "crt_test.exe", [*CRT_PORT_SOURCES, CRT_TESTS[0], VECTORS_SOURCE]),
-             vectors["crt"])]
+                        [*PORT_SOURCES, TEST, MATH_TEST, VECTORS_SOURCE, *extra], out_dir), vectors["bitexact"]),
+            (clang_link(tools, flags, "crt_test.exe", [*CRT_PORT_SOURCES, CRT_TESTS[0], VECTORS_SOURCE, *extra],
+                        out_dir), vectors["crt"]),
+            (clang_link(tools, flags, "csem_test.exe", [CSEM_TEST, KIT_SOURCE, VECTORS_SOURCE], out_dir),
+             vectors["csem"])]
     code = 0
     for exe, vec in exes:
         if exe is None:
             return 2
         print(f"clang: {exe.name}")
         sys.stdout.flush()
-        code = run(exe, vec, *(tdf_args() if exe.name == "bitexact_test.exe" else [])) or code
+        if kit is None:
+            code = run(exe, vec, *(tdf_args() if exe.name == "bitexact_test.exe" else [])) or code
+        else:
+            code = run(exe, vec, *([NO_TDF] if exe.name == "bitexact_test.exe" else []), kit) or code
     return code
 
 
 def main() -> int:
-    argparse.ArgumentParser(description=__doc__.split("\n")[0]).parse_args()
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--kit", type=Path, metavar="DIR",
+                        help="write each case of the library's entries and the C semantics to DIR (-DBX_KIT)")
+    args = parser.parse_args()
     if not generate_and_check():
         return 2
     BUILD.mkdir(parents=True, exist_ok=True)
-    clang = run_clang()
+    clang = run_clang(args.kit.resolve() if args.kit else None)
     print("bitexact (clang): " + ("OK" if clang == 0 else f"FAILED (exit {clang})"))
     return clang
 

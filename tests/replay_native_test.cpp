@@ -773,12 +773,17 @@ template <class T> void ApplyValues(std::vector<T, std::allocator<T> >* out, con
     }
 }
 
-void ApplyReach(void* object, unsigned kind, const char* suffix)
+bool ApplyReachField(void* object, unsigned kind, const char* suffix)
 {
     const char* value = OutValue(suffix);
     const ReplayObjectField* f = ReplayFindObjectField(kind, suffix + 1);
-    if (object != nullptr && value != nullptr && f != nullptr)
-        ReplayRestoreObjectField(*f, object, value, g_objects, AllocObject);
+    return object == nullptr || value == nullptr || f == nullptr || ReplayRestoreObjectField(*f, object, value, g_objects, AllocObject);
+}
+
+void ApplyReach(void* object, unsigned kind, const char* suffix)
+{
+    if (!ApplyReachField(object, kind, suffix))
+        Fatal(g_file, g_callIndex, "a value that cannot be restored", suffix);
 }
 
 const char* ArgLine(const char* name)
@@ -891,7 +896,9 @@ void* ArgWeapon(const char* name)
     return p;
 }
 
-void ParseStruct(const char* name, unsigned kind, void* object)
+char g_refusedKey[96];
+
+bool ParseStructFields(const char* name, unsigned kind, void* object)
 {
     for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
         const ReplayObjectField& f = kReplayObjectFields[i];
@@ -900,8 +907,12 @@ void ParseStruct(const char* name, unsigned kind, void* object)
         char key[96];
         sprintf(key, "%s.%s", name, f.name);
         const char* value = ArgLine(key);
-        if (value == nullptr || !ReplayRestoreObjectField(f, object, value, g_objects, AllocObject))
+        if (value == nullptr)
             continue;
+        if (!ReplayRestoreObjectField(f, object, value, g_objects, AllocObject)) {
+            strcpy(g_refusedKey, key);
+            return false;
+        }
         void* target = nullptr;
         if (f.kind == RK_REF) {
             unsigned offset = *(unsigned*)((unsigned char*)object + f.offset);
@@ -914,19 +925,34 @@ void ParseStruct(const char* name, unsigned kind, void* object)
             g_rootObjects[g_rootCount++] = target;
         }
     }
+    return true;
 }
 
-void ParseEvent(const char* name, unsigned table, void* buffer)
+void ParseStruct(const char* name, unsigned kind, void* object)
+{
+    if (!ParseStructFields(name, kind, object))
+        Fatal(g_file, g_callIndex, "a value that cannot be restored", g_refusedKey);
+}
+
+bool ParseEventFields(const char* name, unsigned table, void* buffer)
 {
     char key[96];
     sprintf(key, "%s.kind", name);
     const char* value = ArgLine(key);
     for (unsigned i = 0; value != nullptr && i < kReplayObjectFieldCount; i++) {
         const ReplayObjectField& f = kReplayObjectFields[i];
-        if (f.object == kReplayEventTables[table].header && strcmp(f.name, "kind") == 0)
-            ReplayRestoreObjectField(f, buffer, value, g_objects, AllocObject);
+        if (f.object == kReplayEventTables[table].header && strcmp(f.name, "kind") == 0 && !ReplayRestoreObjectField(f, buffer, value, g_objects, AllocObject)) {
+            strcpy(g_refusedKey, key);
+            return false;
+        }
     }
-    ParseStruct(name, ReplayEventObject(table, *(int*)buffer), buffer);
+    return ParseStructFields(name, ReplayEventObject(table, *(int*)buffer), buffer);
+}
+
+void ParseEvent(const char* name, unsigned table, void* buffer)
+{
+    if (!ParseEventFields(name, table, buffer))
+        Fatal(g_file, g_callIndex, "a value that cannot be restored", g_refusedKey);
 }
 
 void* ParseStructOpt(const char* name, unsigned kind, void* storage)
@@ -3502,6 +3528,25 @@ void FormSelfTest()
     t.Clear();
     ReplayAddEvent(t, "event", RET_TARGETING, &aim, sizeof(TargetingEventHeader), g_objects);
     Check(strstr(t.Data(), "  a event.pos0 0\n") != nullptr, "an event copies exactly its size: the payload beyond it reads as zero");
+
+    printf("refused values\n");
+    LoadCall("  a event.kind 1\n  a event.unit FrameTable#?\n");
+    memset(buffer, 0, sizeof buffer);
+    Check(!ParseEventFields("event", RET_TARGETING, buffer) && strcmp(g_refusedKey, "event.unit") == 0, "an event field the restore refuses stops the replay at its name");
+    LoadCall("  a pos.x 1\n");
+    Vec3 refusedPos = Vec3();
+    Check(ParseStructFields("pos", ROK_VEC3, &refusedPos) && refusedPos.x == 1, "and a struct of fields it takes is restored");
+    TargetingSetUnit refusedUnit;
+    memset(&refusedUnit, 0, sizeof refusedUnit);
+    LoadCall("  a aim.target FrameTable#?\n");
+    Check(!ParseStructFields("aim", ROK_TARGETINGSETUNIT, &refusedUnit) && strcmp(g_refusedKey, "aim.target") == 0, "a struct field the restore refuses stops the replay");
+    g_outNames[0] = "out.target";
+    g_outValues[0] = "FrameTable#?";
+    g_outCount = 1;
+    Check(!ApplyReachField(&refusedUnit, ROK_TARGETINGSETUNIT, ".target"), "and so does a reached field it refuses");
+    g_outValues[0] = "null";
+    Check(ApplyReachField(&refusedUnit, ROK_TARGETINGSETUNIT, ".target"), "while null is restored");
+    g_outCount = 0;
 
     printf("arrays of structs\n");
     Point16 points[3] = { { 1, 2 }, { 3, 4 }, { -5, 6 } };

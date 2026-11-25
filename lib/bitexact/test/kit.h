@@ -19,7 +19,7 @@ void kit_str(const char *s);
 void kit_bytes(const void *data, size_t size);
 void kit_dropped(const char *entry);
 void kit_end(void);
-void kit_close(void);
+int kit_close(void);
 
 #ifdef __cplusplus
 }
@@ -37,7 +37,7 @@ void kit_close(void);
 #define kit_bytes(data, size) ((void)0)
 #define kit_dropped(entry) ((void)0)
 #define kit_end() ((void)0)
-#define kit_close() ((void)0)
+#define kit_close() 0
 
 #endif
 

@@ -295,7 +295,7 @@ int main(int argc, char **argv)
     test_shuffle();
     test_load();
     test_qsort();
-    kit_close();
+    bad |= kit_close();
     if (argc > 1)
         bad |= vec_close();
     printf("info: InitExplosions draws %lu times\n", (unsigned long)bx_init_explosions_draws());

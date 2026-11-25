@@ -24,6 +24,7 @@ static const char *const sprintf_formats[] = {
     " M:%d",
     " to %i",
     "%+d",
+    "+%d",
     "%.1f",
     "%02d:%02d:%02d",
     "%02x%c",
@@ -143,7 +144,8 @@ static const char *const sprintf_formats[] = {
     "u%04xm%04x",
     "u%04xmob",
     "weapon %d - area of effect",
-    "weapon %d - coverage"
+    "weapon %d - coverage",
+    "will be rejected in %d seconds"
 };
 
 static const char *const sscanf_formats[] = {
@@ -218,6 +220,8 @@ static int rndn(int n)
 
 static stat_t *cur;
 static int cur_bad;
+static int kit_quiet;
+static int pack_bad;
 static const char *cur_note;
 static unsigned char rtmp[8192];
 
@@ -229,7 +233,8 @@ static void begin(stat_t *s, int edge)
     s->cases++;
     if (edge)
         s->edge++;
-    kit_begin(s->name, edge);
+    if (!kit_quiet)
+        kit_begin(s->name, edge);
 }
 
 static void finish(void)
@@ -432,7 +437,7 @@ static void test_itoa(void)
     }
 }
 
-static void test_cmp_case(int kind, const char *a, const char *b, int n, int edge)
+static int test_cmp_case(int kind, const char *a, const char *b, int n, int edge)
 {
     stat_t *s = kind == 0 ? &st_strcmpi : kind == 1 ? &st_strnicmp : &st_strncmp;
     int raw;
@@ -447,9 +452,9 @@ static void test_cmp_case(int kind, const char *a, const char *b, int n, int edg
         raw = _strnicmp(a, b, (size_t)n);
     else
         raw = call_strncmp(a, b, (size_t)n);
-    out_i(raw < 0 ? -1 : raw > 0 ? 1 : 0);
-    out_i(raw);
+    raw = out_i(raw);
     finish();
+    return raw;
 }
 
 static void test_cmp_all(const char *a, const char *b, int edge, int counts)
@@ -464,6 +469,42 @@ static void test_cmp_all(const char *a, const char *b, int edge, int counts)
     }
 }
 
+static int packed_result(int v)
+{
+    if (v < -128 || v > 127) {
+        printf("  compare_bytes: result %d does not fit a byte\n", v);
+        pack_bad = 1;
+    }
+    return v;
+}
+
+static void test_cmp_bytes(void)
+{
+    static signed char r[5][256];
+    char a[2], b[2];
+    int i, j, n;
+    kit_layout("compare_bytes", "in a i32\nout strcmpi bytes256\nout strnicmp1 bytes256\nout strnicmp2 bytes256\n"
+               "out strncmp1 bytes256\nout strncmp2 bytes256\n");
+    a[1] = b[1] = 0;
+    for (i = 0; i < 256; i++) {
+        a[0] = (char)i;
+        kit_quiet = 1;
+        for (j = 0; j < 256; j++) {
+            b[0] = (char)j;
+            r[0][j] = (signed char)packed_result(test_cmp_case(0, a, b, 0, 1));
+            for (n = 1; n <= 2; n++) {
+                r[n][j] = (signed char)packed_result(test_cmp_case(1, a, b, n, 1));
+                r[2 + n][j] = (signed char)packed_result(test_cmp_case(2, a, b, n, 1));
+            }
+        }
+        kit_quiet = 0;
+        kit_begin("compare_bytes", 1);
+        kit_i32(i);
+        kit_bytes(r, sizeof(r));
+        kit_end();
+    }
+}
+
 static void test_cmp(void)
 {
     static const char *const pool[] = {
@@ -471,29 +512,16 @@ static void test_cmp(void)
         "ABC", "abd", "abcd", "ABCD", "a_", "A_", "a`", "A`", "a[", "aZ", "az", "a\240", "A\300", "\340", "\377",
         "\200", "\337", "[a", "_B", "`b", "^", "Z[", "z{", "abc.", "abc ", "a b", "\351", "\311", "\351a", "\311A",
         "_a", "_A", "\\\\", "[\\]^_`", "{|}~"};
-    char a[2], b[2];
     char sa[16], sb[16];
     int n = (int)(sizeof(pool) / sizeof(pool[0]));
     int i, j, k, len;
-    kit_layout("strcmpi", "in a str\nin b str\nout sign i32\nout raw i32\n");
-    kit_layout("strnicmp", "in a str\nin b str\nin n i32\nout sign i32\nout raw i32\n");
-    kit_layout("strncmp", "in a str\nin b str\nin n i32\nout sign i32\nout raw i32\n");
+    kit_layout("strcmpi", "in a str\nin b str\nout v i32\n");
+    kit_layout("strnicmp", "in a str\nin b str\nin n i32\nout v i32\n");
+    kit_layout("strncmp", "in a str\nin b str\nin n i32\nout v i32\n");
     for (i = 0; i < n; i++)
         for (j = 0; j < n; j++)
             test_cmp_all(pool[i], pool[j], 1, 1);
-    a[1] = b[1] = 0;
-    for (i = 0; i < 256; i++)
-        for (j = 0; j < 256; j++) {
-            a[0] = (char)i;
-            b[0] = (char)j;
-            if (i == 0 && j != 0) {
-                test_cmp_all("", b, 1, 0);
-            } else if (i != 0 && j == 0) {
-                test_cmp_all(a, "", 1, 0);
-            } else if (i != 0) {
-                test_cmp_all(a, b, 1, 0);
-            }
-        }
+    test_cmp_bytes();
     for (k = 0; k < 20000; k++) {
         int la = rndn(13);
         int mode = rndn(5);
@@ -1132,10 +1160,11 @@ static void fill_args(const plan_t *pl, args_t *a, int edge, int k)
                 a->iv[j] = edge ? (k == 0 ? 65 : ((k * 29 + j * 7) % 384) - 128) : rndn(384) - 128;
             else if (edge)
                 a->iv[j] = ipool[k == 0 ? 0 : (k * 37 + j * 11) % nipool];
-            else
+            else {
                 a->iv[j] = (int)rnd32();
                 if (rndn(2))
                     a->iv[j] >>= rndn(32);
+            }
         } else if (pl->kind[j] == 's') {
             if (edge) {
                 strcpy(a->sv[j], spool[k == 0 ? 0 : (k * 3 + j * 5) % NSPOOL]);
@@ -1171,6 +1200,39 @@ static int call_sprintf(char *buf, const char *fmt, const plan_t *pl, const args
                    w[14], w[15]);
 }
 
+static void kit_args(const plan_t *pl, const args_t *a)
+{
+#ifdef BX_KIT
+    static unsigned char buf[MAXCONV * (4 + STR_BYTES)];
+    int j, n, p = 0;
+    for (j = 0; j < pl->n; j++) {
+        if (pl->kind[j] == 'i') {
+            bx_u32 v = (bx_u32)a->iv[j];
+            buf[p++] = (unsigned char)v;
+            buf[p++] = (unsigned char)(v >> 8);
+            buf[p++] = (unsigned char)(v >> 16);
+            buf[p++] = (unsigned char)(v >> 24);
+        } else if (pl->kind[j] == 's') {
+            n = (int)strlen(a->sv[j]);
+            buf[p++] = (unsigned char)n;
+            buf[p++] = (unsigned char)(n >> 8);
+            buf[p++] = 0;
+            buf[p++] = 0;
+            memcpy(buf + p, a->sv[j], n);
+            p += n;
+        } else {
+            memcpy(buf + p, &a->dv[j], 8);
+            p += 8;
+        }
+    }
+    kit_u32((bx_u32)p);
+    kit_bytes(buf, p);
+#else
+    (void)pl;
+    (void)a;
+#endif
+}
+
 static void test_sprintf_case(const char *fmt, const plan_t *pl, const args_t *a, int edge)
 {
     static char buf[8192];
@@ -1180,9 +1242,7 @@ static void test_sprintf_case(const char *fmt, const plan_t *pl, const args_t *a
     cur_note = fmt;
     kit_str(fmt);
     kit_str(pl->kind);
-    kit_bytes(a->iv, (int)sizeof(a->iv));
-    kit_bytes(a->dv, (int)sizeof(a->dv));
-    kit_bytes(a->sv, (int)sizeof(a->sv));
+    kit_args(pl, a);
     ret = call_sprintf(buf, fmt, pl, a);
     out_str_n(buf, ret < 0 ? 0 : ret);
     out_i(ret);
@@ -1195,7 +1255,7 @@ static void test_sprintf(void)
     int i, j, k, count;
     plan_t pl;
     args_t a;
-    kit_layout("sprintf", "in fmt str\nin kinds str\nin ints bytes32\nin dbls bytes64\nin strs bytes512\nout s str\nout ret i32\n");
+    kit_layout("sprintf", "in fmt str\nin kinds str\nin args str\nout s str\nout ret i32\n");
     init_pools();
     for (i = 0; i < nf; i++) {
         parse_plan(sprintf_formats[i], &pl);
@@ -1432,7 +1492,8 @@ int main(int argc, char **argv)
     test_sprintf();
     test_sscanf();
     test_ftol();
-    kit_close();
+    bad |= kit_close();
+    bad |= pack_bad;
     if (argc > 1)
         bad |= vec_close();
     for (i = 0; i < (int)(sizeof(all_stats) / sizeof(all_stats[0])); i++) {

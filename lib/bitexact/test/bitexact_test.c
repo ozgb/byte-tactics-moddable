@@ -649,7 +649,7 @@ int main(int argc, char **argv)
             bad = 1;
     }
     bad |= run_math_tests(argc > 2 ? argv[2] : 0);
-    kit_close();
+    bad |= kit_close();
     if (argc > 1)
         bad |= vec_close();
     printf("info: the table's 80-bit fsincos values are exact roundings; this CPU's fsincos differs from them in %lu of %lu values"

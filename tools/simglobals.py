@@ -37,7 +37,7 @@ LINK_DATA = ROOT / "link" / "data.cpp"
 LINK_GLOBALS = ROOT / "link" / "globals.h"
 
 EXCLUDED = {"s_cobScriptCache@src/util/int_map.cpp", "g_game"}
-SKIP_FILES = {"src/state/sim_globals.h", "src/state/sim_globals.cpp", "src/harness/trace_schema.h"}
+SKIP_FILES = {"src/state/sim_globals.h", "src/state/sim_globals.cpp", "src/harness/trace_schema.h", "src/harness/replay_schema.h"}
 SOURCE_SUFFIXES = (".cpp", ".h", ".inl")
 
 TYPE_OVERRIDES = {

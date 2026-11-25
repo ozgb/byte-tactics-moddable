@@ -874,28 +874,6 @@
      "kind": "u16"
     }
    ]
-  },
-  "FixtureOrderEntry": {
-   "type": "OrderTableEntry",
-   "scope": "value",
-   "fields": [
-    {
-     "name": "value",
-     "kind": "cstring"
-    },
-    {
-     "name": "name",
-     "kind": "cstring"
-    },
-    {
-     "name": "drawMask",
-     "kind": "i32"
-    },
-    {
-     "name": "flags",
-     "kind": "u32"
-    }
-   ]
   }
  },
  "fixtures": {
@@ -1107,13 +1085,6 @@
    "elem": {
     "mode": "value",
     "kind": "FixtureLosTable"
-   }
-  },
-  "g_missionOrderTableVec": {
-   "kind": "vector",
-   "elem": {
-    "mode": "value",
-    "kind": "FixtureOrderEntry"
    }
   }
  }

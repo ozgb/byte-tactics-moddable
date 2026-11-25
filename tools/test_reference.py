@@ -79,9 +79,11 @@ class EventsLogTest(unittest.TestCase):
 
     def test_the_digest_has_a_line_for_each_tick_and_phase(self):
         lines = self.DIGEST.splitlines()
-        self.assertEqual(lines[:2], ["bt-event-digest 1", "log bt-events 1"])
-        self.assertEqual([line.rsplit(" ", 1)[0] for line in lines[2:]], ["0 load 1", "5 units 2", "5 players 1"])
-        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{16}", line.rsplit(" ", 1)[1]) for line in lines[2:]))
+        self.assertEqual(lines[:2], ["bt-event-digest 2", "log bt-events 1"])
+        runs = [line for line in lines[2:] if " tick " not in line]
+        self.assertEqual([line.rsplit(" ", 1)[0] for line in runs], ["0 load 1", "5 units 2", "5 players 1"])
+        self.assertTrue(all(re.fullmatch(r"[0-9a-f]{16}", line.rsplit(" ", 1)[1]) for line in runs))
+        self.assertEqual([line.split(" ")[:3] for line in eventdigest.tick_lines(self.DIGEST)], [["0", "tick", "1"], ["5", "tick", "3"]])
 
     def test_the_hash_is_the_trace_hash_of_the_records_bytes(self):
         hasher = tracerehash.Hasher()
@@ -94,7 +96,7 @@ class EventsLogTest(unittest.TestCase):
     def test_a_changed_record_changes_the_hash_of_its_tick_and_phase(self):
         got = eventdigest.digest_text(self.LOG.replace("sound 0x0 1 0", "sound 0x0 2 0"))
         diff = eventdigest.digest_difference(self.DIGEST, got)
-        self.assertTrue(diff.startswith("events digest line 4 (tick 5, phase units): stored `5 units 2 "), diff)
+        self.assertTrue(diff.startswith("events digest line 5 (tick 5, phase units): stored `5 units 2 "), diff)
 
     def test_a_missing_or_extra_record_changes_the_count(self):
         got = eventdigest.digest_text(self.LOG.replace("5 units sound 0x0 1 0\n", ""))
@@ -108,7 +110,7 @@ class EventsLogTest(unittest.TestCase):
 
     def test_a_longer_digest_differs_at_the_extra_line(self):
         got = eventdigest.digest_text(self.LOG + "6 meteors message 0x0 0 1\n")
-        self.assertIn("line 6 (tick 6, phase meteors): only the got digest has it (`6 meteors 1 ", eventdigest.digest_difference(self.DIGEST, got))
+        self.assertIn("line 8 (tick 6, phase meteors): only the got digest has it (`6 meteors 1 ", eventdigest.digest_difference(self.DIGEST, got))
 
     def test_a_dropped_line_is_a_record_of_its_phase(self):
         got = eventdigest.digest_text(self.LOG + "5 players dropped 3\n")
@@ -144,6 +146,31 @@ class EventsLogTest(unittest.TestCase):
                 differing, lines = reference.events_report(scenarios, logs, directory)
         self.assertEqual(differing, ["other"])
         self.assertIn("1 of 3 equal, 1 differ, 1 with no stored digest", lines[-1])
+
+    def test_end_of_tick_compares_the_tick_lines_only(self):
+        moved = eventdigest.digest_text(self.LOG.replace("5 players radar_units", "5 units radar_units"))
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "a.txt").write_text(self.DIGEST)
+            (directory / "b.txt").write_text(self.DIGEST)
+            scenarios = {"a": Path("a"), "b": Path("b")}
+            logs = {"a": moved, "b": eventdigest.digest_text(self.LOG + "6 meteors message 0x0 0 1\n")}
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                strict, _ = reference.events_report(scenarios, logs, directory)
+                loose, lines = reference.events_report(scenarios, logs, directory, end_of_tick=True)
+        self.assertEqual(strict, ["a", "b"])
+        self.assertEqual(loose, ["b"])
+        self.assertIn("1 of 2 equal, 1 differ", lines[-1])
+        self.assertIn("(tick 6)", lines[0])
+
+    def test_the_event_records_report_passes_the_end_of_tick_switch_to_tracediff(self):
+        for end_of_tick in (False, True):
+            with mock.patch.object(reference, "resolve_quiet", return_value="abc"), mock.patch.object(reference, "build_cached", return_value=Path("ref")), \
+                    mock.patch.object(reference.subprocess, "run") as run, contextlib.redirect_stdout(io.StringIO()):
+                reference.report_event_records("a", "wasm", {"a": ({"commit": "abc"},)}, Path("x.exe"), {"a": Path("s.txt")}, False, None, end_of_tick)
+            cmd = run.call_args[0][0]
+            self.assertEqual(cmd[-1], "--events")
+            self.assertEqual("--end-of-tick" in cmd, end_of_tick)
 
     def test_a_run_with_no_event_log_differs_from_a_stored_one(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -458,11 +485,11 @@ class CheckQuirksTest(unittest.TestCase):
                 d = tmp / name
                 d.mkdir()
                 rows = [f"{t} {ph} {h}" for t, ph, h in phase_hashes]
-                (d / "trace.txt").write_text("bt-trace 8\n" + "\n".join(rows) + "\n")
+                (d / "trace.txt").write_text("bt-trace 9\n" + "\n".join(rows) + "\n")
                 return d
 
-            quirk_rows = [(1, "units", "1" * 16), (2, "units", "2" * 16), (2, "players", "9" * 16)]
-            off_rows = [(1, "units", "1" * 16), (2, "units", "2" * 16), (2, "players", "3" * 16)]
+            quirk_rows = [(1, "units", "1" * 16), (1, "tick", "4" * 16), (2, "units", "2" * 16), (2, "players", "9" * 16), (2, "tick", "5" * 16)]
+            off_rows = [(1, "units", "1" * 16), (1, "tick", "4" * 16), (2, "units", "2" * 16), (2, "players", "3" * 16), (2, "tick", "5" * 16)]
 
             def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1, watch=None):
                 if keep_always:
@@ -597,15 +624,15 @@ class ScanRunTest(unittest.TestCase):
 
 
 class EarlyExitTest(unittest.TestCase):
-    HEADER = "bt-trace 8\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
+    HEADER = "bt-trace 9\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
 
     @staticmethod
     def rows(first, last):
-        return "".join(f"{tick} units {tick:016x}\n" for tick in range(first, last + 1))
+        return "".join(f"{tick} tick {tick:016x}\n" for tick in range(first, last + 1))
 
     def stored(self, ticks):
         header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
-        rows = [(tick, "units", f"{tick:016x}") for tick in range(1, ticks + 1)]
+        rows = [(tick, "tick", f"{tick:016x}") for tick in range(1, ticks + 1)]
         return header, reference.tracedigest.digests(rows)
 
     def play(self, trace_text, ticks=5, result=None, wine_log=None, want=True):
@@ -631,7 +658,7 @@ class EarlyExitTest(unittest.TestCase):
                 return out, []
 
     def test_a_cut_trace_is_an_early_exit_with_its_exit_code_and_host_message(self):
-        trace = self.HEADER + self.rows(1, 3) + "4 units 00000"
+        trace = self.HEADER + self.rows(1, 3) + "4 tick 00000"
         early, kept = self.play(trace, result={"exit_codes": [2], "reason": ""}, wine_log="noise\nmodule trapped at tick 4: out of fuel\n")
         self.assertIsInstance(early, reference.EarlyExit)
         text = str(early)
@@ -651,7 +678,7 @@ class EarlyExitTest(unittest.TestCase):
 
     def test_a_cut_line_in_the_next_tick_leaves_the_last_tick_whole(self):
         self.assertEqual(reference.trace_end(self.write(self.HEADER + self.rows(1, 3) + "4 un")), (3, True))
-        self.assertEqual(reference.trace_end(self.write(self.HEADER + self.rows(1, 3) + "3 units 00")), (2, True))
+        self.assertEqual(reference.trace_end(self.write(self.HEADER + self.rows(1, 3) + "3 tick 00")), (2, True))
         self.assertEqual(reference.trace_end(self.write(self.HEADER + self.rows(1, 3))), (3, False))
 
     def write(self, text):
@@ -662,7 +689,7 @@ class EarlyExitTest(unittest.TestCase):
         return Path(handle.name)
 
     def test_a_full_length_trace_with_a_different_digest_is_a_difference_not_an_early_exit(self):
-        trace = self.HEADER + self.rows(1, 4) + "5 units " + "f" * 16 + "\n"
+        trace = self.HEADER + self.rows(1, 4) + "5 tick " + "f" * 16 + "\n"
         (header, digests, _, kept), _ = self.play(trace)
         self.assertEqual(len(digests), 5)
         self.assertIn("tick 5", reference.difference(self.stored(5), header, digests))
@@ -1025,13 +1052,13 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
 
     def test_the_other_runs_are_stopped_and_the_report_names_the_tick(self):
         header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
-        good = [(1, "units", "1" * 16), (2, "units", "2" * 16), (3, "units", "3" * 16), (4, "units", "4" * 16)]
-        bad = good[:1] + [(2, "units", "9" * 16)] + good[2:]
+        good = [(1, "tick", "1" * 16), (2, "tick", "2" * 16), (3, "tick", "3" * 16), (4, "tick", "4" * 16)]
+        bad = good[:1] + [(2, "tick", "9" * 16)] + good[2:]
         stored = (header, reference.tracedigest.digests(good))
         procs, paths, calls, reported = {}, {}, [], []
 
         def rows(items):
-            return "bt-trace 8\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in items)
+            return "bt-trace 9\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in items)
 
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
@@ -1047,7 +1074,7 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
                 paths[proc.pid] = trace
                 started(proc)
                 if name == "a":
-                    trace.write_text(rows(bad) + "3 units 33")
+                    trace.write_text(rows(bad) + "3 tick 33")
                 try:
                     proc.wait(30)
                 finally:
@@ -1090,9 +1117,9 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
 
     def test_a_partial_last_line_is_not_compared(self):
         tail = reference.tracedigest.TraceTail()
-        text = b"bt-trace 8\nseed 1\n1 units " + b"1" * 16 + b"\n2 units " + b"2" * 16 + b"\n3 un"
+        text = b"bt-trace 9\nseed 1\n1 tick " + b"1" * 16 + b"\n2 tick " + b"2" * 16 + b"\n3 ti"
         self.assertEqual(len(tail.feed(text)), 1)
-        self.assertEqual(tail.feed(b"its " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "units", "2" * 16)])[0]])
+        self.assertEqual(tail.feed(b"ck " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "tick", "2" * 16)])[0]])
 
 
 class KeyLockTest(unittest.TestCase):
@@ -1271,11 +1298,11 @@ class BothModesTest(unittest.TestCase):
 
     def test_the_watch_judges_a_native_run_against_the_scenarios_digests_and_names_the_mode(self):
         header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
-        good = [(1, "units", "1" * 16), (2, "units", "2" * 16)]
+        good = [(1, "tick", "1" * 16), (2, "tick", "2" * 16)]
         expected = {"a": (header, reference.tracedigest.digests(good))}
         with tempfile.TemporaryDirectory() as tmp:
             trace = Path(tmp) / "trace.txt"
-            trace.write_text("bt-trace 8\n1 units " + "1" * 16 + "\n2 units " + "9" * 16 + "\n3 units " + "3" * 16 + "\n")
+            trace.write_text("bt-trace 9\n1 tick " + "1" * 16 + "\n2 tick " + "9" * 16 + "\n3 tick " + "3" * 16 + "\n")
             proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
             watch = reference.Watch(expected, lambda pid, started: trace)
             try:
@@ -1292,7 +1319,7 @@ class BothModesTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             run = Path(tmp) / "run"
             run.mkdir()
-            (run / "trace.txt").write_text("bt-trace 8\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 units " + "1" * 16 + "\n")
+            (run / "trace.txt").write_text("bt-trace 9\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 tick " + "1" * 16 + "\n")
             (run / "blockptrs.txt").write_text("scan")
             (run / "sound.txt").write_text("header\n")
             (run / reference.UI_FILE).write_text("ui\n")
@@ -1348,14 +1375,14 @@ class BothModesTest(unittest.TestCase):
 
 
 class RecheckTest(unittest.TestCase):
-    HEADER = "bt-trace 8\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
+    HEADER = "bt-trace 9\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
 
     def rows(self, tick_values):
-        return "".join(f"{t} units {v * 16}\n" for t, v in tick_values)
+        return "".join(f"{t} tick {v * 16}\n" for t, v in tick_values)
 
     def found(self, tmp, kept_text, watch_text):
         """Run a Watch over `watch_text` (the live trace), keeping a trace.txt of `kept_text` in place of the real copy."""
-        good = reference.tracedigest.digests([(t, "units", v * 16) for t, v in ((1, "1"), (2, "2"), (3, "3"))])
+        good = reference.tracedigest.digests([(t, "tick", v * 16) for t, v in ((1, "1"), (2, "2"), (3, "3"))])
         live = Path(tmp) / "work/i1/game/trace.txt"
         live.parent.mkdir(parents=True)
         live.write_text(self.HEADER + watch_text)
@@ -1393,13 +1420,198 @@ class RecheckTest(unittest.TestCase):
 
     def test_a_file_that_stops_short_of_the_tick_says_so(self):
         with tempfile.TemporaryDirectory() as tmp:
-            found, _ = self.found(tmp, self.rows([(1, "1")]) + "2 units " + "2" * 5, self.rows([(1, "1"), (2, "9"), (3, "3")]))
+            found, _ = self.found(tmp, self.rows([(1, "1")]) + "2 tick " + "2" * 5, self.rows([(1, "1"), (2, "9"), (3, "3")]))
             self.assertIn("does not reach tick 2", reference.recheck(found))
 
     def test_the_diff_line_names_the_trace_the_watch_read(self):
         with tempfile.TemporaryDirectory() as tmp:
             found, live = self.found(tmp, self.rows([(1, "1")]), self.rows([(1, "1"), (2, "9"), (3, "3")]))
             self.assertEqual(reference.shown(found.trace), live)
+
+
+class EndOfTickTest(unittest.TestCase):
+    STORED = [(1, "d1", "s1"), (2, "d2", "s2"), (3, "d3", "s3")]
+    NAMES = ("eq", "diff", "bad")
+
+    def report(self, end_of_tick, got_by_name):
+        """check_traces on three scenarios whose played digests are `got_by_name`; (exit status, output, the columns play_all was given)."""
+        header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+        stored = (header, self.STORED)
+        columns = []
+        divergences = []
+
+        def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None,
+                          scan_every=1, watch=None, column=reference.DIGEST):
+            columns.append(column)
+            return {name: (header, got_by_name[name], 1.0, None) for name in scenarios}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            (tmp / "accesslog.attr").write_text("")
+            files = {}
+            for n in self.NAMES:
+                files[n] = tmp / f"{n}.txt"
+                files[n].write_text("ticks 2\n")
+            (tmp / "traces").mkdir()
+            for n in self.NAMES:
+                (tmp / "traces" / f"{n}.txt").write_text("")
+            out = io.StringIO()
+            status = None
+            with mock.patch.object(reference, "scenario_files", lambda: files), \
+                    mock.patch.object(reference, "TRACES", tmp / "traces"), \
+                    mock.patch.object(reference.tracedigest, "parse_digest", lambda p: stored), \
+                    mock.patch.object(reference, "play_all", fake_play_all), \
+                    mock.patch.object(reference, "report_fuel", lambda *a, **k: 0), \
+                    mock.patch.multiple(reference, **{n: (lambda *a, **k: ([], [])) for n in
+                                                      ("sound_report", "ui_report", "events_report", "frame_report", "save_report")}), \
+                    mock.patch.object(reference, "report_divergence", lambda *a: divergences.append(a) or (_ for _ in ()).throw(SystemExit(1))), \
+                    contextlib.redirect_stdout(out):
+                try:
+                    reference.check_traces(tmp / "x.exe", None, 1, end_of_tick=end_of_tick)
+                except SystemExit as e:
+                    status = e.code
+        self.divergences = divergences
+        return status, out.getvalue(), columns
+
+    def test_end_of_tick_marks_a_digest_only_difference_without_failing(self):
+        digest_only = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        status, out, columns = self.report(True, {"eq": self.STORED, "diff": digest_only, "bad": self.STORED})
+        self.assertEqual(columns, [reference.STATE])
+        self.assertIsNone(status)
+        self.assertRegex(out, r"ok   diff \(3 ticks, [^)]*\) \[digest differs from tick 2\]\n")
+        self.assertRegex(out, r"ok   eq \(3 ticks, [^)]*\)\n")
+        self.assertRegex(out, r"3 of 3 scenarios equal, total [^\n]*\n2 of 3 scenarios equal on every row\n")
+
+    def test_end_of_tick_fails_a_state_difference_and_runs_tracediff_on_it(self):
+        state = [(1, "d1", "s1"), (2, "x2", "y2"), (3, "d3", "s3")]
+        status, out, _ = self.report(True, {"eq": self.STORED, "diff": state, "bad": self.STORED})
+        self.assertEqual(status, 1)
+        self.assertRegex(out, r"DIFF diff \(3 ticks, [^)]*\) tick 2: stored s2, got y2 \[digest differs from tick 2\]\n")
+        self.assertIn("2 of 3 scenarios equal, total", out)
+        self.assertIn("2 of 3 scenarios equal on every row", out)
+        self.assertEqual([(d[0], d[-1]) for d in self.divergences], [("diff", True)])
+
+    def test_without_the_switch_the_digest_decides_and_nothing_is_added(self):
+        digest_only = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        status, out, columns = self.report(False, {"eq": self.STORED, "diff": digest_only, "bad": self.STORED})
+        self.assertEqual(columns, [reference.DIGEST])
+        self.assertEqual(status, 1)
+        self.assertRegex(out, r"DIFF diff \(3 ticks, [^)]*\) tick 2: stored d2, got x2\n")
+        self.assertNotIn("digest differs", out)
+        self.assertNotIn("on every row", out)
+
+    def test_the_digest_column_is_compared_by_default(self):
+        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        self.assertEqual(reference.first_difference(self.STORED, got), "tick 2: stored d2, got x2")
+        self.assertEqual(reference.first_difference(self.STORED, got, reference.DIGEST), "tick 2: stored d2, got x2")
+
+    def test_the_state_column_ignores_the_digest(self):
+        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        self.assertIsNone(reference.first_difference(self.STORED, got, reference.STATE))
+
+    def test_the_state_column_reports_the_state(self):
+        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "x3", "y3")]
+        self.assertEqual(reference.first_difference(self.STORED, got, reference.STATE), "tick 3: stored s3, got y3")
+
+    def test_a_short_trace_differs_in_either_column(self):
+        for column in (reference.DIGEST, reference.STATE):
+            self.assertEqual(reference.first_difference(self.STORED, self.STORED[:2], column), "tick 3: only the stored trace has it")
+
+    def test_difference_takes_the_column_and_still_checks_the_seeds(self):
+        header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        self.assertIsNone(reference.difference((header, self.STORED), header, got, reference.STATE))
+        self.assertIsNotNone(reference.difference((header, self.STORED), header, got))
+        seeds = {**header, "game_seed": "2"}
+        self.assertIn("seeds differ", reference.difference((header, self.STORED), seeds, self.STORED, reference.STATE))
+
+    def test_the_note_names_the_first_tick_whose_digest_differs(self):
+        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "x3", "s3")]
+        self.assertEqual(reference.digest_note(self.STORED, got), " [digest differs from tick 2]")
+        self.assertEqual(reference.digest_note(self.STORED, self.STORED), "")
+        self.assertEqual(reference.digest_note(self.STORED, self.STORED[:1]), " [digest differs from tick 2]")
+
+    def test_the_every_row_line(self):
+        self.assertEqual(reference.every_row_line(2, 3), "2 of 3 scenarios equal on every row")
+
+    def test_the_tracediff_command_gets_the_switch(self):
+        cmd = reference.tracediff_command(Path("a"), Path("b"), Path("s"), False, None, True)
+        self.assertIn("--end-of-tick", cmd)
+        self.assertNotIn("--end-of-tick", reference.tracediff_command(Path("a"), Path("b"), Path("s"), False, None))
+
+    def test_the_options_are_refused_with_traces_and_quirks(self):
+        for argv in (["--traces", "--end-of-tick"], ["--check", "--end-of-tick", "--quirks", "recommended"], ["--end-of-tick"]):
+            with mock.patch.object(sys, "argv", ["reference.py", *argv]), contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as raised:
+                    reference.main()
+            self.assertEqual(raised.exception.code, 2, argv)
+
+    def watch_over(self, tmp, column):
+        """A Watch over a live trace whose second tick differs in its `units` row only, the `tick` rows being equal."""
+        def text(units2):
+            rows = [(1, "units", "1" * 16), (1, "tick", "a" * 16), (2, "units", units2 * 16), (2, "tick", "b" * 16),
+                    (3, "units", "3" * 16), (3, "tick", "c" * 16)]
+            return "bt-trace 9\ngame_seed 1\ncrt_seed 1\nview_seed 1\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in rows)
+
+        live = Path(tmp) / "live/trace.txt"
+        live.parent.mkdir(parents=True)
+        live.write_text(text("9"))
+        expected_rows = [line.split() for line in text("2").splitlines()[4:]]
+        good = reference.tracedigest.digests([(int(t), ph, h) for t, ph, h in expected_rows])
+        kept = Path(tmp) / "kept"
+        kept.mkdir()
+        (kept / "trace.txt").write_text(text("9"))
+        proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+        watch = reference.Watch({"a": ({}, good)}, lambda pid, started: live, column)
+        try:
+            with mock.patch.object(reference, "keep_run", lambda *a, **k: kept):
+                watch.started("a")(proc)
+                watch.poll()
+        finally:
+            proc.kill()
+            proc.wait()
+        return watch.found
+
+    def test_the_watch_halts_on_a_digest_difference_by_default(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            found = self.watch_over(tmp, reference.DIGEST)
+            self.assertIsNotNone(found)
+            self.assertEqual(found.tick, 2)
+            self.assertRegex(found.diff, r"tick 2: stored \w{16}, got \w{16}")
+
+    def test_the_watch_in_end_of_tick_mode_ignores_a_digest_only_difference(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertIsNone(self.watch_over(tmp, reference.STATE))
+
+    def test_the_watch_in_end_of_tick_mode_halts_on_a_state_difference(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            live = tmp / "trace.txt"
+            live.write_text("bt-trace 9\n1 tick " + "a" * 16 + "\n2 tick " + "9" * 16 + "\n3 tick " + "c" * 16 + "\n")
+            good = reference.tracedigest.digests([(1, "tick", "a" * 16), (2, "tick", "b" * 16), (3, "tick", "c" * 16)])
+            kept = tmp / "kept"
+            kept.mkdir()
+            (kept / "trace.txt").write_text(live.read_text())
+            proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+            watch = reference.Watch({"a": ({}, good)}, lambda pid, started: live, reference.STATE)
+            try:
+                with mock.patch.object(reference, "keep_run", lambda *a, **k: kept):
+                    watch.started("a")(proc)
+                    watch.poll()
+            finally:
+                proc.kill()
+                proc.wait()
+            found = watch.found
+            self.assertEqual((found.tick, found.stored, found.got), (2, "b" * 16, "9" * 16))
+            self.assertIsNone(reference.recheck(found, reference.STATE))
+
+    def test_recheck_reads_the_column_the_watch_judged(self):
+        found = reference.Found("a", "d", 2, 1.0, None, tick=2, stored="b" * 16, got="9" * 16)
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "trace.txt").write_text("bt-trace 9\n1 tick " + "a" * 16 + "\n2 tick " + "b" * 16 + "\n3 tick " + "c" * 16 + "\n")
+            found.kept = Path(tmp)
+            self.assertIn("a different value", reference.recheck(found, reference.STATE))
+            self.assertIsNone(reference.recheck(found, reference.DIGEST))
 
 
 class TracediffCommandTest(unittest.TestCase):
@@ -1417,7 +1629,7 @@ class TracediffCommandTest(unittest.TestCase):
 
 
 class GateCacheTest(unittest.TestCase):
-    OPTIONS = {"tier": False, "mode": "wasm", "steps_per_frame": None, "quirks": None, "roundtrip": None, "poison": False}
+    OPTIONS = {"tier": False, "mode": "wasm", "steps_per_frame": None, "quirks": None, "roundtrip": None, "poison": False, "end_of_tick": False}
 
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()
@@ -1435,6 +1647,8 @@ class GateCacheTest(unittest.TestCase):
         (self.root / "reference/commit.txt").write_text("c1")
         (self.root / "data").mkdir()
         (self.root / "data/block_pointers.csv").write_text("site,class\n")
+        (self.root / "docs").mkdir()
+        (self.root / "docs/sim-events.md").write_text("### SIM_EVENT_SOUND\n")
         (self.root / "tools/reference.py").write_text("import helper\nfrom helper import x\n")
         (self.root / "tools/helper.py").write_text("def f():\n    import deeper\n")
         (self.root / "tools/deeper.py").write_text("x = 1\n")
@@ -1452,6 +1666,9 @@ class GateCacheTest(unittest.TestCase):
     def test_the_key_is_stable(self):
         self.assertEqual(self.key(), self.key())
 
+    def test_end_of_tick_changes_the_key(self):
+        self.assertNotEqual(self.key(end_of_tick=True), self.key(end_of_tick=False))
+
     def test_each_input_changes_the_key(self):
         base = self.key()
         edits = [self.build / n for n in ("TotalA.exe", "wasmtime_host.dll", "modules.json", "m.wasm")]
@@ -1468,7 +1685,7 @@ class GateCacheTest(unittest.TestCase):
 
     def test_savefile_block_pointers_and_imports_change_the_key(self):
         base = self.key()
-        for relative in ("tools/savefile.py", "data/block_pointers.csv", "tools/deeper.py"):
+        for relative in ("tools/savefile.py", "data/block_pointers.csv", "docs/sim-events.md", "tools/deeper.py"):
             self.assertIn(relative, (*reference.KEY_TOOLS, *reference.KEY_DATA, "tools/deeper.py"))
             path = self.root / relative
             old = path.read_text()

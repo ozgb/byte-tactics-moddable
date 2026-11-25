@@ -5,11 +5,16 @@
 Refuses the module, before anything plays, when `tools/wasm_modules.py check-module` finds a problem in the file: the window,
 table, imports, exports, kinds or size budget of docs/module-abi.md, section 5.2. Then copies the runtime files of the modern build (and objs/objects.rsp, which the block pointer check reads beside the map) into a fresh directory with MODULE.wasm in place of the subsystem's module,
 starts the game on a short scenario to see whether the loader accepts the module, then plays
-`tools/reference.py --check --tier` (`--full`: the full `--check`) and `tools/replay.py --check --subsystem NAME` on that
+`tools/reference.py --check --end-of-tick --tier` (`--full`: without `--tier`) and `tools/replay.py --check --subsystem NAME` on that
 runtime. It writes DIR/result.json, built from the parsed fields of those tools' reports and nothing else: for each scenario
 and recording, `equal` or the first divergence (tick, phase, field name, the module's value), the kit version and the
 module's sha256. A failure of another check of the run is `other_checks: failed`, with `reason: block-pointer` when it is
 the block pointer check, which judges the harness's scan and not the module's behaviour. The reference's values never reach it. The raw reports stay in DIR/logs/, which is for the host only.
+
+The verdict of a scenario is its end-of-tick `state` (the hash of the `tick` row, the whole judged state at the end of the tick),
+and so is the exit status. Each scenario also has a `digest` verdict, and the result a top-level `digest`: `equal` or `differs`
+(from a tick) for the digest of all the rows of the tick. A module equal on `state` but different on `digest` kept the end-of-tick
+contract with another order inside the tick; the digest is not a failure.
 
 Exit status: 0 when every scenario and recording is equal, 1 when one differs or failed to run, 2 when the loader refused
 the module or the arguments were wrong.
@@ -29,7 +34,7 @@ import reference
 import replay
 
 ROOT = Path(__file__).resolve().parent.parent
-FORMAT = 1
+FORMAT = 2
 RUNTIME_FILES = ("TotalA.exe", "TotalA.map", "CMakeCache.txt", "wasmtime_host.dll", "modules.json")
 OBJECT_LIST = "objs/objects.rsp"
 PROBE = "game_seed 1\ncrt_seed 2\nview_seed 3\nmap The Pass\nstart_positions fixed\nticks 10\nplayer0.controller human\nplayer0.side Arm\nplayer1.controller ai\nplayer1.side Core\n"
@@ -38,6 +43,7 @@ VALUE_LIMIT = 200
 NAME = re.compile(r"[A-Za-z0-9_.#\[\]-]{1,200}$")
 SCENARIO_LINE = re.compile(r"(ok|DIFF)\s+(\S+) \(\d+ ticks, [^)]*\)(?: (.*))?$")
 TICK = re.compile(r"tick (\d+): ")
+DIGEST_DIFFERS = re.compile(r"\[digest differs from tick (\d+)\]$")
 DIVERGENCE_FOR = re.compile(r"tracediff for (\S+): a = ")
 DIVERGENCE_AT = re.compile(r"first divergence: tick (\d+), phase (\S+)$")
 DIVERGENCE_FIELD = re.compile(r"first differing field: (\S+): a=(.*?) b=(.*)$")
@@ -143,17 +149,25 @@ def clean_value(text: str | None) -> str | None:
 
 
 def parse_suite(output: str, exit_code: int, expected: list[str]) -> dict[str, dict]:
-    """The verdict of each scenario from the lines of tools/reference.py's --check report.
+    """The verdict of each scenario from the lines of tools/reference.py's --check --end-of-tick report.
 
-    `ok` and `DIFF` lines give equal or differs with the tick; the tracediff block gives the phase, the field and the value of
+    `ok` and `DIFF` lines give equal or differs with the tick (of the end-of-tick state), and a ` [digest differs from tick T]` suffix
+    gives the scenario's `digest` verdict (`equal` for an `ok` line without it, not_judged for a `DIFF` line without it, as the watch prints it, and for a scenario that is not_judged or failed); the tracediff block gives the phase, the field and the value of
     b (the module's side) for the scenario it names; `<name>: failed to run` lines give failed. A scenario with no line is
     not_judged (the run stopped at the first divergence). Nothing is read from a stored or reference side."""
     verdicts: dict[str, dict] = {name: {"status": "not_judged"} for name in expected}
     blocks: dict[str, dict] = {}
+    digests: dict[str, dict] = {}
     current = None
     for line in output.splitlines():
         if m := SCENARIO_LINE.match(line):
             name = m[2]
+            if name in verdicts:
+                late = DIGEST_DIFFERS.search(line)
+                if late:
+                    digests[name] = {"status": "differs", "tick": int(late[1])}
+                elif m[1] == "ok":
+                    digests[name] = {"status": "equal"}
             if name in verdicts and m[1] == "ok":
                 verdicts[name] = {"status": "equal"}
             elif name in verdicts:
@@ -176,7 +190,9 @@ def parse_suite(output: str, exit_code: int, expected: list[str]) -> dict[str, d
         for name in verdicts:
             if verdicts[name]["status"] == "not_judged":
                 verdicts[name] = {"status": "failed"}
-    elif all(v["status"] == "equal" for v in verdicts.values()):
+    for name, v in verdicts.items():
+        v["digest"] = digests[name] if name in digests and v["status"] in ("equal", "differs") else {"status": "not_judged"}
+    if exit_code != 0 and all(v["status"] == "equal" for v in verdicts.values()):
         verdicts["other_checks"] = {"status": "failed"}
         if any(BLOCK_POINTER_SUMMARY.match(line) for line in output.splitlines()):
             verdicts["other_checks"]["reason"] = "block-pointer"
@@ -202,6 +218,14 @@ def verdict_of(suite: dict[str, dict], recordings: dict[str, dict]) -> str:
     return "equal" if statuses and set(statuses) == {"equal"} else "failed"
 
 
+def digest_of(suite: dict[str, dict]) -> str:
+    """The digest verdict of the suite: differs when a judged scenario's digest differs, equal when all the judged ones are equal, else not_judged."""
+    statuses = [v["digest"]["status"] for v in suite.values() if "digest" in v]
+    if "differs" in statuses:
+        return "differs"
+    return "equal" if "equal" in statuses else "not_judged"
+
+
 def build_result(subsystem: str, module: Path, full: bool, kit: dict, suite: dict | None, recordings: dict | None,
                  message: str | None, seconds: float) -> dict:
     """The contents of result.json. Every value comes from a parsed field, none from a report's text."""
@@ -210,7 +234,8 @@ def build_result(subsystem: str, module: Path, full: bool, kit: dict, suite: dic
     if message is not None:
         result.update(verdict="refused", message=message)
         return result
-    result.update(scenarios=suite or {}, recordings=recordings or {}, verdict=verdict_of(suite or {}, recordings or {}))
+    result.update(scenarios=suite or {}, recordings=recordings or {}, verdict=verdict_of(suite or {}, recordings or {}),
+                  digest=digest_of(suite or {}))
     return result
 
 
@@ -233,7 +258,7 @@ def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game
     message = probe(exe, game_dir, out)
     if message is not None:
         return build_result(subsystem, module, full, kit, None, None, message, time.time() - started)
-    check = [sys.executable, str(ROOT / "tools/reference.py"), "--check", "--no-cache", "--exe", str(exe)]
+    check = [sys.executable, str(ROOT / "tools/reference.py"), "--check", "--end-of-tick", "--no-cache", "--exe", str(exe)]
     if not full:
         check.append("--tier")
     if game_dir:

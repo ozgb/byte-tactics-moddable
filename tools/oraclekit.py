@@ -63,6 +63,19 @@ number of arguments and their meanings, records, flags, phases); the export is r
 `docs/sim-events.md` is copied with a generated `## Terms` section from tools/oraclekit/sim_event_terms.csv (term, definition,
 kit_reference): `page_terms` scans the page for hex numbers and for flag, state, kill type and damage kind numbers, and the export
 is refused when one has no row, or a row names something the page does not use.
+`runtime/` is the plain-maths part of the bit-exact library, imported into the clean-room engine under the MIT licence. The files
+of RUNTIME_IMPORTS (repository path to kit path: the library's headers, its square root, extension, double-double and random
+number sources, and the table generator tools/bitexact_tables.py) are read from HEAD like every other file, the only way a file
+under lib/ reaches the kit, and each is written with an MIT header (a block comment, or `#` lines after a shebang in a Python
+file) that gives `SPDX-License-Identifier: MIT`, the copyright line of the repository's LICENSE and the pointer to
+`runtime/LICENSE`, which is that licence text without its scope paragraph. The manifest digests cover the files as written.
+The export reads the Provenance table of lib/bitexact/README.md (header `| File | Provenance | Holds |`, each File a backticked
+path, each Provenance one of PROVENANCE_KINDS) and refuses, naming the path and the reason, a row of another provenance, a file
+of RUNTIME_IMPORTS with no row, one whose row is not computed or published (the other kinds are specified, not imported), and a
+README without the section or the table, all before it writes anything. The leak check judges the imported files by provenance:
+only the address rule and the source file rule apply to them (the runtime headers count as kit headers), where every other file
+keeps every rule. Every tracked file under tests/runtime/vectors/ is copied to `runtime/vectors/` as data, with the full leak
+check; the export is refused when there is none. When the contents are injected (tests), the imports are empty unless given.
 """
 
 from __future__ import annotations
@@ -115,6 +128,26 @@ FIELD_SOURCE_FIELDS = ("aliases", "reachFirst", "reachCount")
 FORBIDDEN = ("src/", "include/", "orig/", "lib/", "build/", "cmake/")
 TAG_PATTERNS = {"interfaces": re.compile(r"^interfaces-v(\d+)$"),
                 "reference_traces": re.compile(r"^reference-traces-v(\d+)$")}
+
+RUNTIME_DIR = "runtime"
+RUNTIME_LICENSE = RUNTIME_DIR + "/LICENSE"
+RUNTIME_IMPORTS = {
+    "lib/bitexact/bitexact.h": "runtime/bitexact.h",
+    "lib/bitexact/internal.h": "runtime/internal.h",
+    "lib/bitexact/bx_tables.h": "runtime/bx_tables.h",
+    "lib/bitexact/sqrt.c": "runtime/sqrt.c",
+    "lib/bitexact/ext.c": "runtime/ext.c",
+    "lib/bitexact/dd.c": "runtime/dd.c",
+    "lib/bitexact/rand.c": "runtime/rand.c",
+    "tools/bitexact_tables.py": "runtime/bitexact_tables.py",
+}
+VECTORS_SOURCE = "tests/runtime/vectors"
+VECTORS_DIR = RUNTIME_DIR + "/vectors"
+PROVENANCE_README = "lib/bitexact/README.md"
+PROVENANCE_KINDS = ("computed", "published", "LIBCMT", "STL header", "game code")
+IMPORT_KINDS = ("computed", "published")
+PROVENANCE_HEADER = "| File | Provenance | Holds |"
+LICENSE_SOURCE = "LICENSE"
 
 CONTENTS = [
     ("file", "docs/trace-format.md", "the trace spec"),
@@ -220,6 +253,96 @@ def select(root: Path, contents=None, lister=tracked) -> list[str]:
                 raise Refusal("refused: %s has mode %s, only regular files (100644, 100755) are exported" % (path, mode))
             out.append(path)
     return sorted(set(out))
+
+
+def read_tracked(root: Path, path: str) -> bytes:
+    """A tracked file of HEAD; Refusal when there is none."""
+    try:
+        return blob(root, path)
+    except subprocess.CalledProcessError:
+        raise Refusal("refused: %s has no tracked file" % path)
+
+
+def provenance_rows(readme: str) -> dict[str, str]:
+    """The provenance of each file of the `## Provenance` table of lib/bitexact/README.md; Refusal when the section or the table is missing or a row is malformed."""
+    section = re.search(r"^## Provenance[ \t]*$(.*?)(?=^## |\Z)", readme, re.M | re.S)
+    if not section:
+        raise Refusal("refused: %s has no `## Provenance` section" % PROVENANCE_README)
+    lines = [l.strip() for l in section.group(1).splitlines()]
+    if PROVENANCE_HEADER not in lines:
+        raise Refusal("refused: the Provenance section of %s has no table with the header %s" % (PROVENANCE_README, PROVENANCE_HEADER))
+    rows: dict[str, str] = {}
+    for line in lines[lines.index(PROVENANCE_HEADER) + 1:]:
+        if not line.startswith("|"):
+            break
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if all(re.fullmatch(r":?-+:?", c) for c in cells):
+            continue
+        named = re.fullmatch(r"`([^`]+)`", cells[0]) if len(cells) >= 2 else None
+        if not named:
+            raise Refusal("refused: a row of the Provenance table of %s does not start with a backticked path: %s" % (PROVENANCE_README, line))
+        rows[named.group(1)] = cells[1]
+    return rows
+
+
+def check_provenance(readme: str, imports: dict[str, str]) -> None:
+    """Refusal naming the path when a row has an unknown provenance, or a file to import has no row or a row that is not computed or published."""
+    rows = provenance_rows(readme)
+    for path, kind in sorted(rows.items()):
+        if kind not in PROVENANCE_KINDS:
+            raise Refusal("refused: %s has the provenance %r in %s, not one of %s" % (path, kind, PROVENANCE_README, ", ".join(PROVENANCE_KINDS)))
+    for path in sorted(imports):
+        if path not in rows:
+            raise Refusal("refused: %s is imported into the kit and has no row in the Provenance table of %s" % (path, PROVENANCE_README))
+        if rows[path] not in IMPORT_KINDS:
+            raise Refusal("refused: %s is %s in %s, and only %s files are imported into the kit" % (
+                path, rows[path], PROVENANCE_README, " or ".join(IMPORT_KINDS)))
+
+
+def copyright_line(licence: str) -> str:
+    """The line of the repository's LICENSE that starts with Copyright."""
+    for line in licence.splitlines():
+        if line.startswith("Copyright"):
+            return line.strip()
+    raise Refusal("refused: %s has no line starting with Copyright" % LICENSE_SOURCE)
+
+
+def runtime_license(licence: str) -> bytes:
+    """The licence text of the kit's runtime/: LICENSE without the paragraph that says which files it covers."""
+    paragraphs = [p for p in licence.strip("\n").split("\n\n") if not p.startswith("This licence covers")]
+    return ("\n\n".join(paragraphs) + "\n").encode()
+
+
+def mit_header(path: str, data: bytes, copyright: str) -> bytes:
+    """An imported file with its MIT header: a block comment for C, `#` lines (after a shebang) for Python."""
+    notes = ["SPDX-License-Identifier: MIT", copyright, "The full licence text is in %s." % RUNTIME_LICENSE]
+    if path.endswith(".py"):
+        head = b""
+        if data.startswith(b"#!"):
+            head, _, data = data.partition(b"\n")
+            head += b"\n"
+        return head + ("".join("# %s\n" % n for n in notes) + "\n").encode() + data
+    return ("/*\n" + "".join(" * %s\n" % n for n in notes) + " */\n\n").encode() + data
+
+
+def runtime_files(root: Path, imports: dict[str, str], lister=tracked) -> dict[str, bytes]:
+    """The kit's runtime/: the imported files with their headers, runtime/LICENSE and the vectors; Refusal when a file or the vectors are not tracked."""
+    if not imports:
+        return {}
+    check_provenance(read_tracked(root, PROVENANCE_README).decode(), imports)
+    licence = read_tracked(root, LICENSE_SOURCE).decode()
+    copyright = copyright_line(licence)
+    files = {RUNTIME_LICENSE: runtime_license(licence)}
+    for path, kit_path in sorted(imports.items()):
+        files[kit_path] = mit_header(kit_path, read_tracked(root, path), copyright)
+    found = lister(root, VECTORS_SOURCE)
+    if not found:
+        raise Refusal("refused: %s has no tracked file" % VECTORS_SOURCE)
+    for path, mode in found:
+        if mode not in KIT_MODES:
+            raise Refusal("refused: %s has mode %s, only regular files (100644, 100755) are exported" % (path, mode))
+        files[VECTORS_DIR + "/" + path.removeprefix(VECTORS_SOURCE + "/")] = blob(root, path)
+    return files
 
 
 def highest(names: list[str], pattern: re.Pattern) -> str | None:
@@ -939,21 +1062,28 @@ def function_hits(path: str, text: str, undeclared: set[str], literals: set[str]
     return hits
 
 
-def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_RUN, index=None) -> list[str]:
+def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_RUN, index=None, imported=None) -> list[str]:
     """One line per hit of speclint's address, identifier and token-run rules over every text file of the export, and of the
-    source file and function rules."""
+    source file and function rules. The imported files (`imported`, by default IMPORTED) are judged by provenance: only the address
+    rule and the source file rule apply to them, and their headers are kit headers."""
+    imported = IMPORTED if imported is None else imported
     source_ids, source_runs, literals = index if index is not None else speclint.source_index(root, run)
     kit = structured_text(files)
     allowed = speclint.identifiers(kit)
     declared = declared_names(files)
     undeclared = source_functions(root) - declared
     headers = {Path(p).name for p in files if p.startswith(DECLARED_DIRS) and p.endswith(".h")}
+    headers |= {Path(p).name for p in imported if p.endswith(".h")}
     hits: list[str] = schema_hits(files[SCHEMA], source_ids - declared) if SCHEMA in files else []
     for path in sorted(files):
         text = text_of(files[path])
         if text is None:
             continue
         hits += source_file_hits(path, text, headers)
+        if path in imported:
+            hits += ["%s:%d: %s" % (path, number, message) for number, message in
+                     speclint.lint(text, source_ids, allowed, source_runs, run, literals, kit) if message.startswith("address or marker")]
+            continue
         if not path.startswith(DECLARED_DIRS + FROZEN_DIRS):
             hits += function_hits(path, text, undeclared, literals)
         for number, message in speclint.lint(text, source_ids, allowed, source_runs, run, literals, kit):
@@ -963,6 +1093,9 @@ def leak_check(files: dict[str, bytes], root: Path, run: int = speclint.DEFAULT_
                 continue
             hits.append("%s:%d: %s" % (path, number, message))
     return hits
+
+
+IMPORTED = frozenset(RUNTIME_IMPORTS.values()) | {RUNTIME_LICENSE}
 
 
 MARKER_LINE = re.compile(rb"^[ \t]*//[ \t]*(?:FUNCTION|GLOBAL):[ \t]*0x[0-9a-fA-F]+.*(?:\r?\n|$)", re.M)
@@ -981,13 +1114,16 @@ def check_target(out: Path) -> None:
         raise Refusal("refused: %s is not empty" % out)
 
 
-def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, lister=tracked, leaks=None, counts=None) -> dict:
-    """Write the kit to `out` and return its manifest. Nothing is written when the export is refused or leaks (`leaks` replaces leak_check in tests)."""
+def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, lister=tracked, leaks=None, counts=None, imports=None) -> dict:
+    """Write the kit to `out` and return its manifest. Nothing is written when the export is refused or leaks (`leaks` replaces leak_check in tests). `imports` is RUNTIME_IMPORTS unless the contents are injected, then none."""
+    imports = imports if imports is not None else (RUNTIME_IMPORTS if contents is None else {})
     paths = select(root, contents, lister)
+    extra = runtime_files(root, imports, lister)
     tags = version_tags(root)
     version = check_tags(tags, untagged)
     check_traces(root, tags, untagged)
     files = {p: strip_markers(p, blob(root, p)) for p in paths}
+    files.update(extra)
     files[LAYOUT] = (json.dumps(layout, indent=1, sort_keys=False) + "\n").encode()
     try:
         files[MODULES] = kit_modules(blob(root, MODULES))
@@ -1018,7 +1154,7 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     if counts is not None:
         counts.update(names.counts)
     files[README] = blob(root, README_SOURCE)
-    hits = leaks(files, root) if leaks else leak_check(files, root, index=index)
+    hits = leaks(files, root) if leaks else leak_check(files, root, index=index, imported=frozenset(extra) - {p for p in extra if p.startswith(VECTORS_DIR + "/")})
     if hits:
         raise Refusal("refused: the kit leaks the decompilation:\n" + "\n".join(hits))
     manifest = manifest_of(files, git(root, "rev-parse", "HEAD").strip(), tags, version, tag_commits(root, tags))

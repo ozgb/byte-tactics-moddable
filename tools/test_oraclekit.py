@@ -1177,5 +1177,119 @@ class CouplingTest(unittest.TestCase):
             self.assertTrue(any("ReactToAttack" in h for h in hits), hits)
 
 
+RT_IMPORTS = {"lib/bitexact/m.h": "runtime/m.h", "lib/bitexact/m.c": "runtime/m.c", "tools/gen.py": "runtime/gen.py"}
+RT_LICENSE = ("MIT License\n\nThis licence covers the files in the tools/ directory only.\n\nCopyright (c) 2026 Someone\n\n"
+              "Permission is hereby granted.\n")
+
+
+def provenance(rows: dict[str, str], header: str = "| File | Provenance | Holds |") -> str:
+    lines = ["# lib", "", "## Provenance", "", header, "| --- | --- | --- |"]
+    return "\n".join(lines + ["| `%s` | %s | things |" % r for r in rows.items()] + ["", "## Data", ""]) + "\n"
+
+
+def runtime_repo(tmp: str, kinds: dict[str, str] | None = None, readme: str | None = None) -> Path:
+    kinds = kinds if kinds is not None else {p: "computed" for p in RT_IMPORTS}
+    files = {"lib/bitexact/m.h": "int bx_m(int);\n", "lib/bitexact/m.c": "int bx_m(int a) { return a; }\n",
+             "tools/gen.py": "#!/usr/bin/env python3\nprint(1)\n", "LICENSE": RT_LICENSE,
+             "lib/bitexact/README.md": readme if readme is not None else provenance(kinds),
+             "tests/runtime/vectors/v.csv": "a,b\n1,2\n", "tests/runtime/vectors/sub/w.csv": "c\n3\n"}
+    return repo(tmp, files)
+
+
+def runtime_export(root: Path, out: Path) -> dict:
+    return oraclekit.export(root, out, True, {"records": {}}, CONTENTS, imports=RT_IMPORTS)
+
+
+class RuntimeKitTest(unittest.TestCase):
+    def refused(self, root: Path, out: Path, *words: str) -> None:
+        with self.assertRaises(oraclekit.Refusal) as caught:
+            runtime_export(root, out)
+        for word in words:
+            self.assertIn(word, str(caught.exception))
+        self.assertFalse(out.exists())
+
+    def test_the_real_import_list_is_what_the_issue_names(self):
+        self.assertEqual(sorted(oraclekit.RUNTIME_IMPORTS.values()), sorted(
+            ["runtime/" + n for n in ("bitexact.h", "internal.h", "bx_tables.h", "sqrt.c", "ext.c", "dd.c", "rand.c", "bitexact_tables.py")]))
+        self.assertTrue(all(oraclekit.forbidden(p) for p in oraclekit.RUNTIME_IMPORTS if p.startswith("lib/")))
+
+    def test_a_file_marked_libcmt_stl_header_or_game_code_is_refused(self):
+        for kind in ("LIBCMT", "STL header", "game code"):
+            with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+                kinds = {p: "computed" for p in RT_IMPORTS}
+                kinds["lib/bitexact/m.c"] = kind
+                self.refused(runtime_repo(tmp, kinds), Path(out) / "k", "lib/bitexact/m.c", kind)
+
+    def test_an_unknown_provenance_word_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            kinds = {p: "computed" for p in RT_IMPORTS}
+            kinds["lib/bitexact/other.c"] = "guessed"
+            self.refused(runtime_repo(tmp, kinds), Path(out) / "k", "lib/bitexact/other.c", "guessed")
+
+    def test_an_import_file_without_a_row_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            kinds = {p: "published" for p in RT_IMPORTS if p != "tools/gen.py"}
+            self.refused(runtime_repo(tmp, kinds), Path(out) / "k", "tools/gen.py", "no row")
+
+    def test_a_readme_without_the_section_or_the_table_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            self.refused(runtime_repo(tmp, readme="# lib\n\n## Data\n"), Path(out) / "k", "Provenance")
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            self.refused(runtime_repo(tmp, readme=provenance({}, "| File | Kind | Holds |")), Path(out) / "k", "header")
+
+    def test_the_imported_files_start_with_the_mit_header_and_the_licence_is_written(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            kit = Path(out) / "k"
+            manifest = runtime_export(runtime_repo(tmp), kit)
+            header = (kit / "runtime/m.h").read_text()
+            self.assertTrue(header.startswith("/*\n * SPDX-License-Identifier: MIT\n * Copyright (c) 2026 Someone\n"), header)
+            self.assertIn("runtime/LICENSE", header.split("*/")[0])
+            self.assertTrue(header.endswith("int bx_m(int);\n"))
+            script = (kit / "runtime/gen.py").read_text()
+            self.assertTrue(script.startswith("#!/usr/bin/env python3\n# SPDX-License-Identifier: MIT\n# Copyright (c) 2026 Someone\n"), script)
+            licence = (kit / "runtime/LICENSE").read_text()
+            self.assertIn("Copyright (c) 2026 Someone", licence)
+            self.assertNotIn("covers", licence)
+            self.assertIn("Permission is hereby granted", licence)
+            by_path = {f["path"]: f for f in manifest["files"]}
+            self.assertEqual(by_path["runtime/m.h"]["sha256"], hashlib.sha256(header.encode()).hexdigest())
+            self.assertEqual(oraclekit.verify(kit), [])
+
+    def test_the_vectors_are_copied_with_their_relative_paths(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            kit = Path(out) / "k"
+            runtime_export(runtime_repo(tmp), kit)
+            self.assertEqual((kit / "runtime/vectors/v.csv").read_text(), "a,b\n1,2\n")
+            self.assertEqual((kit / "runtime/vectors/sub/w.csv").read_text(), "c\n3\n")
+
+    def test_a_missing_vectors_directory_is_refused_by_name(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = runtime_repo(tmp)
+            git(root, "rm", "-q", "-r", "tests/runtime/vectors")
+            git(root, "commit", "-q", "-m", "z")
+            self.refused(root, Path(out) / "k", "tests/runtime/vectors")
+
+    def test_the_leak_check_asks_an_imported_file_for_addresses_and_source_files_only(self):
+        imported = frozenset({"runtime/m.c", "runtime/m.h"})
+        code = "int g_meteorNextStrike;\nint MeteorStrike(int a) { return a; }\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "src"
+            src.mkdir()
+            (src / "meteors.cpp").write_text(LEAK_SOURCE)
+            files = {"layout.json": LEAK_LAYOUT.encode(), "runtime/m.c": code.encode(), "runtime/m.h": b"int x;\n", "docs/a.md": code.encode()}
+            hits = oraclekit.leak_check(files, Path(tmp), imported=imported)
+            self.assertFalse([h for h in hits if h.startswith("runtime/")], hits)
+            self.assertTrue([h for h in hits if h.startswith("docs/a.md")], hits)
+            files["runtime/m.c"] = b"int a; /* 0x437de0 */\n"
+            files["docs/a.md"] = b"alpha\n"
+            hits = oraclekit.leak_check(files, Path(tmp), imported=imported)
+            self.assertEqual(len(hits), 1, hits)
+            self.assertTrue(hits[0].startswith("runtime/m.c:1:") and "0x437de0" in hits[0], hits)
+            files["runtime/m.c"] = b'#include "m.h"\n#include "other.c"\n'
+            hits = oraclekit.leak_check(files, Path(tmp), imported=imported)
+            self.assertEqual(len(hits), 1, hits)
+            self.assertIn("other.c", hits[0])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -447,6 +447,14 @@ void ReplayAddWeapon(ReplayText& t, const void* p)
     }
 }
 
+void ReplayEnsureAllOfTables(const unsigned short* kinds, unsigned count, ReplayAllocFn alloc)
+{
+    for (unsigned i = 0; i < count; i++) {
+        if (kReplayObjectKinds[kinds[i]].table != 0 && kReplayTables[kReplayObjectKinds[kinds[i]].table - 1].capped)
+            EnsureTable(kinds[i], alloc);
+    }
+}
+
 void* ReplayParseWeapon(const char* value)
 {
     if (strncmp(value, "weapondef#", 10) != 0)
@@ -1412,7 +1420,7 @@ void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned s
     reach.count++;
 }
 
-void VisitRange(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned char kind, void* begin, void* end, const unsigned short* limit, unsigned limitCount)
+void VisitRange(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned short kind, void* begin, void* end, const unsigned short* limit, unsigned limitCount)
 {
     unsigned stride = kReplayObjectKinds[kind].size;
     unsigned char* b = (unsigned char*)begin;
@@ -1583,6 +1591,8 @@ void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const
                 if (base != nullptr)
                     Visit(reach, table, assign, f.target, BlockAt(*(const unsigned*)(base + f.offset)), nullptr, 0);
             }
+            if (f.kind == RK_PTR && f.base == RB_GAME)
+                Visit(reach, table, assign, f.target, *(void* const*)((const unsigned char*)g_game + f.offset), nullptr, 0);
             if (f.kind == RK_VECTOR && f.base != RB_RNG && kReplayVectors[f.array - 1].mode == RV_OBJECT) {
                 const unsigned char* root = f.base == RB_GAME ? (const unsigned char*)g_game : (const unsigned char*)g_simGlobals;
                 VectorView view = root == nullptr ? VectorView() : ViewOf(ReplayFieldView(f), root);

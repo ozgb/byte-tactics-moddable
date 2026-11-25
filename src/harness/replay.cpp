@@ -827,7 +827,7 @@ void AddSpace(ReplayText& t)
     t.AddChar(' ');
 }
 
-void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes)
+void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes, unsigned offset)
 {
     t.Add(" = ");
     if (buffer == nullptr) {
@@ -836,6 +836,10 @@ void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes)
     }
     t.Add("snapshot#");
     t.AddUnsigned(s_snapshots.Add(buffer, bytes));
+    if (offset != 0) {
+        t.AddChar('+');
+        t.AddUnsigned(offset);
+    }
 }
 
 void AddAllocName(ReplayText& t, const void* p)

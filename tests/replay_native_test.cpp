@@ -41,6 +41,12 @@
 #include "../src/ai/ai_player.h"
 #include "../src/units/squads.h"
 #include "../src/orders/orders_seam.h"
+#include "../src/map/line_of_sight.h"
+#include "../src/map/line_of_sight_index.h"
+#include "../src/map/radar_capture.h"
+#include "../src/ingame/radar_picture.h"
+#include "../src/ingame/radar.h"
+#include "../src/ingame/info_panel.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -1240,6 +1246,9 @@ void* SnapshotAnswer(const char* result, unsigned bytes, unsigned* offset)
     if (strncmp(result, "snapshot#", 9) != 0)
         return nullptr;
     unsigned ordinal = (unsigned)atoi(result + 9);
+    const char* plus = strchr(result, '+');
+    if (plus != nullptr)
+        g_captureUsed = (unsigned)atoi(plus + 1);
     unsigned size = (bytes + 7u) & ~7u;
     if (ordinal == 0 || ordinal > MAX_SNAPSHOTS || g_captureUsed + size > CAPTURE_ARENA_BYTES)
         Fatal(g_file, g_callIndex, "a snapshot that the replayer cannot allocate", result);
@@ -2698,6 +2707,9 @@ void ReplayCall(const char* file, Outcome& out)
     g_hash = 2166136261u;
     g_sets = sets;
     ReplayAnswerHook() = ReplayAnswerImport;
+    ReplayEnsureAllOfTables(sets->allOf, sets->allOfCount, AllocObject);
+    if (g_game->unitsEnd.get() == nullptr && g_game->units.get() != nullptr && g_game->poolCount != 0)
+        g_game->unitsEnd = (Unit*)((unsigned char*)g_game->units.get() + g_game->poolCount * sizeof(Unit) - sizeof(Unit));
     bool ran = RunSlot(g_subsystem, slotText);
     ReplayAnswerHook() = nullptr;
     if (!ran)
@@ -4454,6 +4466,12 @@ void SnapshotSelfTest()
     CompareSnapshots();
     Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2.length") == 0, "and a buffer of another size");
     g_snapshotBytes[1] = 700;
+    unsigned later = 0;
+    unsigned char* placed = (unsigned char*)SnapshotAnswer("snapshot#1+5784", 56, &later);
+    Check(placed == g_captureArena + 5784 && later == 5784, "an offset after the ordinal is where the buffer is placed and the offset it answers");
+    g_captureUsed = 0;
+    placed = (unsigned char*)SnapshotAnswer("snapshot#2", 56, &later);
+    Check(placed == g_captureArena && later == 0, "a line with no offset follows the buffers of the call, from the start of the arena");
     free(body);
     t.Free();
     recorded.Free();
@@ -5358,6 +5376,59 @@ void GameRefSelfTest()
     Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureView#1.flags") == 0, "a changed field of the target is reported");
     Check(RestoreField(kReplayFields[RF_GAME_SLOWEST], "null") && g_game->slowest.get() == nullptr, "null restores as null");
     FormatField(kReplayFields[RF_GAME_SLOWEST], now);
+    Check(strcmp(now.Data(), "null") == 0, "and is written null");
+    now.Free();
+    free(text);
+}
+
+void GamePtrSelfTest()
+{
+    printf("a raw pointer field of Game\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureView* view = (FixtureView*)SimAlloc(sizeof(FixtureView));
+    memset((void*)view, 0, sizeof(FixtureView));
+    view->flags = 4;
+    g_game->gaf_1480f = (void*)view;
+    unsigned char reads[1] = { RF_GAME_GAF_1480F };
+    unsigned short objects[1] = { FieldIndex(ROK_FIXTUREVIEW, "flags") };
+    ReplaySlotSets sets = { "ptr", 0, reads, 1, reads, 1, objects, 1, objects, 1 };
+    Recorder recorder;
+    RecordGameFields(recorder, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(strcmp(text, "  r Game.gaf_1480f FixtureView#1\n  r FixtureView#1.flags 4\n") == 0, "the target is named at first sight, and the walk reaches it");
+
+    view->flags = 6;
+    g_game->gaf_1480f = nullptr;
+    RecordGameFields(recorder, sets);
+    Check(strcmp(recorder.text.Data(), "  r Game.gaf_1480f null\n") == 0, "a null pointer is written null, and no object follows");
+
+    ResetBlock();
+    char* line = strchr(text, '\n');
+    *line = '\0';
+    Check(RestoreField(kReplayFields[RF_GAME_GAF_1480F], strchr(text + 4, ' ') + 1), "the pointer line restores");
+    *line = '\n';
+    RestoreText(line + 1, sets);
+    FixtureView* rebuilt = (FixtureView*)g_game->gaf_1480f;
+    Check(rebuilt != nullptr && rebuilt->flags == 4, "the replayer allocates the target and restores its fields");
+    if (rebuilt == nullptr) {
+        free(text);
+        return;
+    }
+    ReplayText now;
+    FormatField(kReplayFields[RF_GAME_GAF_1480F], now);
+    Check(strcmp(now.Data(), "FixtureView#1") == 0, "the restored pointer is written as it was");
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the target compares equal through the Game field");
+    rebuilt->flags = 5;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureView#1.flags") == 0, "a changed field of the target is reported");
+    Check(RestoreField(kReplayFields[RF_GAME_GAF_1480F], "null") && g_game->gaf_1480f == nullptr, "null restores as null");
+    FormatField(kReplayFields[RF_GAME_GAF_1480F], now);
     Check(strcmp(now.Data(), "null") == 0, "and is written null");
     now.Free();
     free(text);
@@ -6953,6 +7024,7 @@ int SelfTest(const char* file)
     DeltaLimitSelfTest();
     UnconditionedUnitIdSelfTest();
     GameRefSelfTest();
+    GamePtrSelfTest();
     ExecuteCommandSelfTest();
     CapacityTableSelfTest();
     TrackedCountSelfTest();

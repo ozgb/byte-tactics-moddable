@@ -78,7 +78,7 @@ FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F
                "cstrings": "CSTRINGS", "blob": "BLOB"}
 STRING_ELEMS = {"cstring": (1, "char*"), "cstring_ref": (2, "Ref<char>")}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
-FACTOR = re.compile(r"^\(?\s*(\w+)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
+FACTOR = re.compile(r"^\(?\s*(\w+(?:\.\w+)*)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream", "EconUnit", "EconType"}
 VALUE_POINTER_TYPES = {"Point16", "Vec3", "Angles16", "EconMapInfo", "PlayersMapInfo", "LosRadarMapInfo", "PathMapInfo", "EconomySpend"}
@@ -1269,6 +1269,8 @@ def check_length(where: str, a: dict, label: str, args: list[dict], errors: list
         errors.append("%s: the length %s of %s is no integer" % (where, length, a["name"]))
     if "elem" in a and a["elem"] not in SIZES:
         errors.append("%s: the `elem` of %s is one of %s" % (where, label, ", ".join(sorted(SIZES))))
+    if "resultElem" in a and (a["mode"] != "bytes-out" or a["resultElem"] not in SIZES):
+        errors.append("%s: `resultElem` of %s is on a bytes-out argument and is one of %s" % (where, label, ", ".join(sorted(SIZES))))
 
 
 def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict) -> list[str]:
@@ -1782,7 +1784,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                         elif rule["rule"] in ("fields", "all-of"):
                             for tag, into, block in (("reads", obj_reads, reads), ("writes", obj_writes, writes)):
                                 for name in rule.get(tag, []):
-                                    k, fname = name.split(".", 1)
+                                    k, _, fname = name.partition(".")
                                     if name in field_index:
                                         block.add(name)
                                     elif (k, fname) not in object_index:
@@ -1890,19 +1892,22 @@ def check_sim_names(sim: dict) -> list[str]:
 
 
 def check_game_ref(name: str, spec: dict, leaf: dict | None, kinds: dict, errors: list[str]) -> dict:
-    """The field entry of a Game member that is a ref: its target is a state kind with no table, named at first sight."""
+    """The field entry of a Game member that is a ref or a raw pointer: its target is a state kind named at first sight, or for a ref a table kind of Game."""
     where = "Game.%s" % name
     target = spec.get("target")
+    held = spec.get("kind")
     if set(spec) - {"kind", "target"}:
-        errors.append("%s: a ref field of Game is {\"kind\": \"ref\", \"target\": KIND}" % where)
+        errors.append("%s: a %s field of Game is {\"kind\": \"%s\", \"target\": KIND}" % (where, held, held))
     found = kinds.get(target)
     if found is None or found["scope"] != "state":
         errors.append("%s: the target %s is no state kind of the schema" % (where, target))
+    elif held == "ptr" and (found.get("table") or found.get("inside") or found.get("kinds")):
+        errors.append("%s: the target %s has a table, sites or kinds, and is named by them, not at first sight" % (where, target))
     elif (found.get("table") and not is_global_table(found)) or found.get("inside") or found.get("kinds"):
         errors.append("%s: the target %s has a table behind a ref, sites or kinds, and is named by them, not at first sight" % (where, target))
     if leaf is None or leaf["size"] != 4:
-        raise Error("Game has no field %s of 4 bytes for a ref" % name)
-    return {"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": 4, "kind": "ref", "target": target}
+        raise Error("Game has no field %s of 4 bytes for a %s" % (name, held))
+    return {"name": "Game." + name, "base": "game", "offset": leaf["offset"], "size": 4, "kind": held, "target": target}
 
 
 def block_vector(name: str, spec: dict, owner: str, vectors: list[dict], ann: dict | None, errors: list[str]) -> dict:
@@ -1927,7 +1932,7 @@ def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], ki
         if spec is not None and spec.get("kind") == "vector":
             errors.append("Game.%s: a vector is a member of SimGlobals, not of Game" % name)
             continue
-        if spec is not None and spec.get("kind") == "ref":
+        if spec is not None and spec.get("kind") in ("ref", "ptr"):
             fields.append(check_game_ref(name, spec, leaf, kinds or {}, errors))
             continue
         if spec is not None:
@@ -2045,7 +2050,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     for f in fields:
         base = {"game": "RB_GAME", "sim": "RB_SIM", "rng": "RB_RNG", "region": "RB_REGION"}[f["base"]]
         offset = "offsetof(SimGlobals, %s)" % f["offset"] if f["base"] == "sim" else "%d" % f["offset"]
-        extra = ", %d" % f["array"] if f.get("array") else ", 0, ROK_%s" % upper(f["target"]) if f["kind"] == "ref" else ""
+        extra = ", %d" % f["array"] if f.get("array") else ", 0, ROK_%s" % upper(f["target"]) if f["kind"] in ("ref", "ptr") else ""
         if f["kind"] == "vector":
             extra = ", %d%s" % (f["vector"], ", ROK_%s" % upper(f["target"]) if f.get("target") else "")
         L.append('    { "%s", %s, %d, %s, RK_%s%s },' % (f["name"], offset, f["size"], base, FIELD_KINDS[f["kind"]], extra))
@@ -2538,7 +2543,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L.append("        line.AddText(cb%d.Lines());" % i)
         for i, a in enumerate(s["args"]):
             if a["mode"] == "bytes-out":
-                L.append('        ImportOutBytes(line, "%s", a%d, (int)result, %s);' % (a["line"], i, length_parts(a, i)[1]))
+                L.append('        ImportOutBytes(line, "%s", a%d, (int)result%s, %s);' % (a["line"], i, " * %d" % SIZES[a["resultElem"]] if a.get("resultElem") else "", length_parts(a, i)[1]))
             elif a["mode"] == "vec3" and a.get("dir") == "out":
                 L.append('        ImportOutVec3(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif is_vec3_out(a):
@@ -3458,7 +3463,8 @@ def render_service_end(services: list[dict]) -> str:
         pointer = "(c.result.kind == 1 ? c.result.v.p : nullptr)"
         outs_after = [(i, a) for i, a in enumerate(s["args"]) if a.get("reach")]
         if res == "snapshot":
-            L.append("        AddSnapshot(t, %s, (unsigned)a[%d].v.i);" % (pointer, index[s["bytes"]]))
+            offset_index = [i for i, p in enumerate(s["args"]) if p["param"] == s["offset"]][0]
+            L.append("        AddSnapshot(t, %s, (unsigned)a[%d].v.i, a[%d].v.p != nullptr && %s != nullptr ? *(const unsigned*)a[%d].v.p : 0);" % (pointer, index[s["bytes"]], offset_index, pointer, offset_index))
         elif res == "int":
             L.append("        AddResult(t, c.result);")
         elif res == "double":

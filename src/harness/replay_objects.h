@@ -182,6 +182,7 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
 const ReplayObjectField* ReplayFindObjectField(unsigned kind, const char* name);
 int ReplayFindObjectKind(const char* name, unsigned length);
 void* ReplayResolveObject(const char* text, unsigned* kind, ReplayObjectTable& table, ReplayAllocFn alloc);
+void ReplayEnsureAllOfTables(const unsigned short* kinds, unsigned count, ReplayAllocFn alloc);
 void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned short* rootKinds, void* const* roots, unsigned rootCount,
                 const unsigned short* rootLimit = nullptr, unsigned rootLimitCount = 0);
 bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex);

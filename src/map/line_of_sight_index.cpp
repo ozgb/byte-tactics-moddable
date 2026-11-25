@@ -23,6 +23,10 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 #include "../../interfaces/state_writer.h"
 #include <stdio.h>
 
+#ifndef BT_REPLAY_INJECT_REFRESH_TICKS
+#define BT_REPLAY_INJECT_REFRESH_TICKS 0x1e
+#endif
+
 static LosUnitIndex* s_index;
 
 static LosUnitIndex* EnsureUnitIndex()
@@ -104,7 +108,7 @@ void __stdcall RefreshUnitIndex(int player)
     if (s_index == nullptr)
         return;
     LosUnitIndexEntry& entry = s_index->players[player];
-    if (!entry.live || (unsigned int)g_game->ticks < entry.lastTick + 0x1e)
+    if (!entry.live || (unsigned int)g_game->ticks < entry.lastTick + BT_REPLAY_INJECT_REFRESH_TICKS)
         return;
     entry.visible.Clear();
     entry.known.Clear();

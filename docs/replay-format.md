@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units and ai have recordings so far; pathfinding and los_radar have none yet (their region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units, ai and los_radar have recordings so far; pathfinding has none yet (its region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -372,6 +372,8 @@ owner's capacity field must come before the ref field in the owner's list, so th
   r FixtureEye#3.pos (5,6)
 ```
 
+A slot that is all-of over a kind with a capacity gets the whole table allocated before it runs, whether or not a line named an element, since the module may write past the live count (`AddEyeball` writes element `count_14277`).
+
 The replayer's table is outside the block, so a ref to it is the difference of two addresses, as any ref the module stores. A replay of a module that
 frees such a table frees the replayer's memory, which is why the module's allocator makes it. The replayer calls the exe's `operator new`, so such a table is for native replays; a WASM
 module has an allocator of its own that the host does not call.
@@ -467,7 +469,7 @@ themselves. The annotation, for `Player.explored` and `Game.visibilityMask`:
 `elem` is the element type (its size is what counts: the elements are written as the bytes of memory), and `length` is an
 integer, or one or two factors joined by `*`, each a member of the object, `member>>k`, `member+a` or `member+a>>k`, or an integer. The
 addend comes before the shift, as in C: `(count+0xff)>>8` is the `(count + 0xff) >> 8` words that `grid.dirty` holds, where `count>>8` is a word short
-whenever the count is not a multiple of 256. A member is one, two or
+whenever the count is not a multiple of 256. A member of an embedded struct is named by its path, `grid1.count*2` for `Game.grid1.count`. A member is one, two or
 four bytes. The length is read from the object each time the array is written, so the members it names have to be recorded
 (`exploredSize` is a field of `Player`) for the replayer to know the length at the call.
 
@@ -904,12 +906,13 @@ and a handle, numbered in the outermost call by first use, and the bytes follow 
   o snapshot#1 x:0100000002000000...
 ```
 
-No line is written for the offset, because it is the replayer's own. After the `w` lines and the closing `o` lines, the call has one
+The offset the engine's arena handed out follows the handle as `+offset` when it is not 0 (`= snapshot#2+5728`): the engine clears the arena between two calls that the recording does not
+show, so a buffer's offset, which the module passes on in an event (`RecordSimEvent`), is an input of the call. The replayer places the buffer at the offset and answers it; a line with no offset follows the buffers before it in the call, the first at the start of the arena. After the `w` lines and the closing `o` lines, the call has one
 `o snapshot#<n> x:<bytes>` line per snapshot it allocated, the buffer's bytes as the slot left them, with a long buffer in several
 lines of the same name, in order, of at most 512 bytes (the lines are joined). A null result (the arena was full) is `= null` and has no
 line.
 
-The replayer's answer allocates `bytes` from an arena of its own, zeroed, and returns that pointer and its own offset in `offset`. At
+The replayer's answer allocates `bytes` from an arena of its own, zeroed, at the recorded offset, and returns that pointer and the offset in `offset`. At
 slot exit it compares each buffer with the recorded bytes and reports a difference at `snapshot#<n>[<byte>]` (recorded and replayed
 byte), at `snapshot#<n>.length` when the sizes differ, and at `snapshot#<n>` when a snapshot was recorded and not allocated, or the
 other way round. The `o snapshot` lines are never the outputs of the import before them. The tool writes the recorder's and the
@@ -945,6 +948,14 @@ The target is a state kind with no `table` behind a ref, `inside`, `kinds` or `v
 The target may instead be a kind of a table of `Game` or `SimGlobals` (`"unitsEnd": {"kind": "ref", "target": "Unit"}`): the field is then written as the element,
 `Game.unitsEnd Unit#2500`, as `Player.unitsEnd` is, and the replayer stores the address of that element of the table. A rule that makes the table kind all-of for the
 rows that read the field (`field_read Game::unitsEnd`) makes the walk reach every unit up to it.
+
+A member of `Game` that is a raw pointer (not a `Ref`) to one object is `{"kind": "ptr", "target": KIND}` and is written, restored and walked
+the same way (`Game.losTable`, a `FrameTable*` into loaded GAF memory: `r Game.losTable FrameTable#1`, `r FrameTable#1.count 40`). The replayer allocates the empty
+object and stores its address, so a service that is given the table (`GetGafFrame`) names it `FrameTable#1` again.
+
+### A field the replayer derives
+
+`Game.unitsEnd` (the last slot of the unit pool, `units + poolCount * sizeof(Unit) - sizeof(Unit)`, set once by the unit module at match load) is a ref field to the unit table, recorded by the slots that read it. A recording without a line for it (los_radar's, whose slots read only `Game.poolCount`) leaves it null, and the replayer then sets it from `Game.units` and `Game.poolCount` before each call.
 
 ### An array of refs in the sim globals
 
@@ -1050,7 +1061,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
 | `argv` | a pointer to the argument list of a command (a count and its strings) | `a args.count 2`, `a args[0] "x"` |
-| `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
+| `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length; with `"resultElem": "u16"` the result counts elements of that size, as `UnitsInRange`'s count of ids does, and the bytes are `result * 2`). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for a slot that reads only those (`GetGroundHeight`), which also makes its own argument `a pos (x,z)` and the replayer pass y as 0; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `callback` | an object an import calls back on, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
@@ -1339,6 +1350,16 @@ ai:
 - The imports `weapons.WeaponCanReachPos`, `weapons.FindTargetableProjectile` and `los_radar.GetSeenUnitsInRadius`, and `los_radar.IsPointVisible`, which the retargeting and the scouting call when an enemy is near: no recorded call reaches them.
 - The `ScoutTimer` and `SquadScoutTimer` branches that need an enemy in sight, and the orders an assault timer gives (`orders.GetOrderType` is called once in `console-sight` and once in `skirmish2`).
 
+los_radar:
+
+- `Apply` of SHARE_MAPPING and SHARE_RADAR, and `network.BroadcastPlayerInfo` (`CmdShareMapping`, `CmdShareRadar`): they act only in a network game (outcome 0 otherwise), and no scenario is one.
+- `Apply` of SHARE_MAP (`ShareMapInfo`), CELL_HEIGHTS and SIGHT_LOAD: no recorded scenario publishes them (the first comes from `UpdateResourceSharing` of a network game and the third from a loaded game, which the run-from-tick-0 recordings do not include).
+- The sight circle drawn from a frame of the `vismask` table, `GafFrame::pixelsOrLayers` (`mapFlags` bit 2 clear, `+lostype` off): `console-sight` reaches it and is not recorded, because the pixels of a GAF frame are loaded engine memory that the replayer would have to rebuild as a blob. The recorded scenarios all draw sight from the height-line tables (`Game.grid1`, `SimGlobals.g_losTables`).
+- `GetVisibleEnemiesInRadius` as a slot: its out buffer of units has no form in a slot (`units-buffer` is the form of an import), so the slot is `record: false` and targeting's recordings replay it as an import line.
+- The slots no recording calls at top level: `GetOriginCellAtPosition`, `IsUnitVisibleToPlayer`, `IsPointVisible`, `HasReadyUnitInRange`, `FreeUnitIndex` and `Shutdown`. The first four run only inside `RefreshUnitIndex`, `UpdateSensorRadarAndCloak` and the engine's own callers, and `HasReadyUnitInRange` needs a cloaking unit; the last two run when a match is unloaded.
+- `GetSeenUnitsInRadius`, `LoadMappingData`, `SaveMappingData`, `InitRadar`, `FreeRadar`, `LoadTntMap`, `FreeMapResources`: load class, or called by `ai` only.
+- The unit index (`LosUnitIndex`, `s_index` in `line_of_sight_index.cpp`) is module state outside the block, built by `CreateUnitIndex` at match load and rebuilt by `RefreshUnitIndex`, so a window cannot restore it: los_radar is recorded as whole runs from tick 0, and the index is checked through the results of `HasReadyUnitInRange` and of targeting's `GetVisibleEnemiesInRadius` imports.
+
 ## Replaying
 
 The native replay test replays a recording against the native module (`replay_native_test.exe`, built by
@@ -1405,6 +1426,12 @@ out `Vec3`:
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 356 pos.x tests/replay/targeting/skirmish4-long.txt
+```
+
+The recordings of los_radar are whole runs from tick 0 (no window): the unit index (`s_index` of `line_of_sight_index.cpp`) is module state outside the block, built by `CreateUnitIndex` at match load and rebuilt by `RefreshUnitIndex`, so a window could not restore it. `console-units` (300 ticks: `UpdateUnitLineOfSight` 725, `RecordRadarUnits` 301, `RefreshUnitIndex` 602, `Apply` 26 of UPDATE_UNIT once, REMOVE_UNIT 7, REVEAL_UNIT 7, ADD_EYEBALL 3, RECALCULATE once and SIGHT_RESET 7, `UpdateSensorRadarAndCloak` 11, `RecordRadarMapped` 11, `SoundHeardMask` 21, `GetMapCellAtPosition` 78) holds the eyeballs and the removals of units, and `sensors-sonar-jam` (150 ticks: `Apply` of REVEAL_UNIT 3, RECALCULATE once and SIGHT_RESET 3, `UpdateSensorRadarAndCloak` 6, the jamming and sonar paths of its visitors) the sensors. A radar capture is a snapshot (`services.SimCaptureAlloc`), with the arena offset of the engine after the handle. The injected change is the refresh period of the unit index, 0x3c ticks in place of 0x1e (`BT_REPLAY_INJECT_REFRESH_TICKS`), reported at call 530 of `console-units`, where the index is not rebuilt and its first `services.SimAlloc` is missing:
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 530 "import 0 services.SimAlloc" tests/replay/los_radar/console-units.txt
 ```
 
 The recordings of targeting, which the modern build runs as native code in every mode (it has no WASM module yet): `orders-guard-attacked` (units that guard and are attacked: every

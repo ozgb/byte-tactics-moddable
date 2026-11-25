@@ -626,6 +626,8 @@ GafFrame* __stdcall GetGafFrame(FrameTable* table, int index)
     ApplyReach(o, ROK_GAFFRAME, ".xOffset");
     ApplyReach(o, ROK_GAFFRAME, ".yOffset");
     ApplyReach(o, ROK_GAFFRAME, ".transparency");
+    ApplyReach(o, ROK_GAFFRAME, ".pixelsOrLayers");
+    ApplyReach(o, ROK_GAFFRAME, ".pixelsOrLayers[]");
     return o;
 }
 

@@ -49,8 +49,8 @@ class legacy_los_radar:
         self.patch.start()
         ann = annotations()
         slots = ann["subsystems"]["los_radar"]["slots"]
-        slots["GetVisibleEnemiesInRadius"].pop("record")
-        slots["GetVisibleEnemiesInRadius"].pop("reason")
+        slots["GetVisibleEnemiesInRadius"].pop("record", None)
+        slots["GetVisibleEnemiesInRadius"].pop("reason", None)
         slots["GetVisibleEnemiesInRadius"]["functions"] = ["GetVisibleEnemiesInRadius", "EntryOf", "Unit::Ready"]
         reach = slots["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"]
         slots["GetVisibleEnemiesInRadius"]["args"]["out"] = {"mode": "units", "dir": "out", "kind": "Unit", "reach": reach, "depth": 2}
@@ -422,7 +422,7 @@ class TargetingForms(unittest.TestCase):
     def test_a_unit_buffer_slot_without_playsas_records_itself_and_replays_itself(self):
         files, errors, model = self.generated()
         self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadius" in e], [])
-        slot = model["subsystems"]["los_radar"]["unrecorded"]["GetVisibleEnemiesInRadius"]
+        slot = model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]
         self.assertNotIn("playsAs", slot)
         self.assertEqual([a["mode"] for a in slot["args"]], ["scalar", "vec3", "scalar", "scalar", "units-buffer", "scalar"])
         out = slot["args"][4]
@@ -441,6 +441,19 @@ class TargetingForms(unittest.TestCase):
         self.assertIn("return EnterList(t, a4, a5);", body)
         self.assertNotIn("a5);\n    Space", body)
         self.assertIn("g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;", stub)
+
+    def test_a_recorded_unit_buffer_slot_writes_its_units_and_the_runner_compares_them(self):
+        files, _, _ = self.generated()
+        hooks = files[rs.HOOKS_H]
+        body = hooks[hooks.index("RecLosRadarGetVisibleEnemiesInRadius"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn('ArgOutUnitBuffer(s_tail, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5);', body)
+        runner = files[rs.SLOTS_H]
+        body = runner[runner.index("void Run_los_radar_GetVisibleEnemiesInRadius()"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("calloc(g_units_los_radar_GetVisibleEnemiesInRadius_4_capacity > 0", body)
+        self.assertIn('SetClosing("out ", "result");', body)
+        self.assertIn('CompareUnitBuffer("out", g_units_los_radar_GetVisibleEnemiesInRadius_4', runner)
 
     def test_a_self_recording_unit_buffer_needs_a_reach_and_a_capacity(self):
         ann = annotations()
@@ -3032,9 +3045,11 @@ class Blobs(unittest.TestCase):
         s = model["subsystems"]["weapons"]["slots"]["UpdateUnitWeapons"]
         self.assertEqual([names[i] for i in s["objectReads"]], ["FixtureProgram.entries", "FixtureProgram.entries[]"])
 
-    def test_the_real_schema_has_none_of_it(self):
+    def test_the_real_schema_has_only_the_pixels_of_a_gaf_frame(self):
         files, _, _ = rs.generate(rs.read_rows())
-        self.assertNotIn("RK_BLOB", files[rs.SCHEMA_H])
+        blobs = [line for line in files[rs.SCHEMA_H].split("\n") if "RK_BLOB," in line]
+        self.assertEqual(len(blobs), 1)
+        self.assertIn('"pixelsOrLayers[]", offsetof(GafFrame, pixelsOrLayers)', blobs[0])
 
     def test_a_blob_is_checked(self):
         ann = annotations()
@@ -3272,6 +3287,25 @@ class EventForms(unittest.TestCase):
             ann["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["unrecorded"] = unrecorded
             _, errors, _ = rs.generate(rs.read_rows(), ann)
             self.assertTrue(any(want in e for e in errors), (unrecorded, errors))
+
+    def test_kind_writes_name_a_recorded_kind_and_object_fields(self):
+        for kind_writes, want in (({"PLAYERS_NOTHING": ["Player.metal"]}, "which is no kind of the events of players"),
+                                  ({"PLAYERS_SET_STORE": []}, "no list of object fields"),
+                                  ({"PLAYERS_SET_STORE": ["Player.nothing"]}, "which is no object field"),
+                                  (["PLAYERS_SET_STORE"], "maps the name of a kind")):
+            ann = annotations()
+            ann["subsystems"]["players"]["slots"]["Apply"]["args"]["event"]["kindWrites"] = kind_writes
+            _, errors, _ = rs.generate(rs.read_rows(), ann)
+            self.assertTrue(any(want in e for e in errors), (kind_writes, errors))
+
+    def test_kind_writes_add_to_the_writes_of_that_kind_alone(self):
+        files, errors, model = rs.generate(rs.read_rows(), annotations())
+        self.assertEqual(errors, [])
+        slot = model["subsystems"]["players"]["slots"]["Apply"]
+        self.assertEqual([k["kind"] for k in slot["kindWrites"]], ["PLAYERS_SET_STORE"])
+        self.assertIn("kReplayPlayersApplyObjWrites197", files[rs.SCHEMA_H])
+        self.assertIn("{ RSL_PLAYERS_APPLY, 197, &kReplayKindSlots[0] }", files[rs.SCHEMA_H])
+        self.assertIn("SlotScope scope(RSL_PLAYERS_APPLY, SUB_PLAYERS, roots, true, a0 != nullptr && a1 >= sizeof(*a0) ? (int)a0->kind : -1);", files[rs.HOOKS_H])
 
     def test_refs_names_a_payload_member_and_a_state_kind(self):
         for refs, want in (({"WeaponsAimDone.callback": "Nothing"}, "which is no state kind"),

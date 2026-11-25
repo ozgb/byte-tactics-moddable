@@ -252,10 +252,11 @@ void AddLiveRoots(ReplayRoots& to, const ReplayRoots& from)
     }
 }
 
+unsigned short s_importChanged[kReplayObjectFieldCount];
+ReplayReach s_importReach;
+
 void ImportObjects(ReplayText& t, const ReplayRoots* extra)
 {
-    static unsigned short s_changed[kReplayObjectFieldCount];
-    static ReplayReach s_importReach;
     if (!s_recording || !kReplaySubsystems[s_sub].importObjects)
         return;
     Recording& r = *s_rec[s_sub];
@@ -266,7 +267,7 @@ void ImportObjects(ReplayText& t, const ReplayRoots* extra)
         for (unsigned j = 0; j < sets.objWriteCount && !written; j++)
             written = sets.objWrites[j] == sets.objReads[i];
         if (!written)
-            s_changed[n++] = sets.objReads[i];
+            s_importChanged[n++] = sets.objReads[i];
     }
     if (n == 0)
         return;
@@ -275,7 +276,7 @@ void ImportObjects(ReplayText& t, const ReplayRoots* extra)
     if (extra != nullptr)
         AddLiveRoots(roots, *extra);
     ReplayWalk(s_importReach, r.table, true, sets, roots.kind, roots.object, roots.count);
-    ReplayCaptureObjects(t, r.known, r.table, s_importReach, s_changed, n, 'o');
+    ReplayCaptureObjects(t, r.known, r.table, s_importReach, s_importChanged, n, 'o');
 }
 
 void ImportServiceObjects(ReplayText& t, const ReplayImport& c)

@@ -1908,8 +1908,7 @@
      {
       "name": "bytes",
       "kind": "bytes",
-      "size": 6,
-      "member": "unknown_0"
+      "size": 6
      }
     ]
    },
@@ -17846,7 +17845,7 @@
   {"name": "DamageTableEntry", "type": "DamageTableEntry", "scope": "value", "table": null, "inside": null, "fields": [{"name": "name", "kind": "cstring", "member": "name.ptr"}, {"name": "value", "kind": "i32"}]},
   {"name": "MeteorShowerParams", "type": "MeteorShowerParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "weapon", "kind": "string", "size": 32}, {"name": "radius", "kind": "i32"}, {"name": "density", "kind": "f32"}, {"name": "duration", "kind": "f32"}, {"name": "interval", "kind": "f32"}]},
   {"name": "PlayerInfo", "type": "PlayerInfo", "scope": "state", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "u8"}, {"name": "flags_97_wide", "kind": "u16", "aliases": ["PlayerInfo::shareMetal", "PlayerInfo::shareEnergy", "PlayerInfo::shareMapping", "PlayerInfo::flags_97", "PlayerInfo::shareRadar"]}, {"name": "side", "kind": "u8"}, {"name": "flags", "kind": "u16", "aliases": ["PlayerInfo::flags_9b", "PlayerInfo::bit6"]}, {"name": "flags_9d_wide", "kind": "u16", "aliases": ["PlayerInfo::flags_9d"]}, {"name": "energy", "kind": "u16"}, {"name": "metal", "kind": "u16"}, {"name": "color", "kind": "u8"}]},
-  {"name": "SpatialBucket", "type": "SpatialBucket", "scope": "state", "table": {"base": "game", "member": "cells_1429f", "ref": true, "count": "width_142a3*height_142a7"}, "inside": null, "delta": true, "fields": [{"name": "head", "kind": "ref", "target": "Unit", "aliases": ["UnitBucket::first"]}, {"name": "bytes", "kind": "bytes", "size": 6, "member": "unknown_0"}]},
+  {"name": "SpatialBucket", "type": "SpatialBucket", "scope": "state", "table": {"base": "game", "member": "cells_1429f", "ref": true, "count": "width_142a3*height_142a7"}, "inside": null, "delta": true, "fields": [{"name": "head", "kind": "ref", "target": "Unit", "aliases": ["UnitBucket::first"]}, {"name": "bytes", "kind": "bytes", "size": 6}]},
   {"name": "OverflowBucket", "type": "SpatialBucket", "scope": "state", "table": null, "inside": null, "fields": [{"name": "head", "kind": "ref", "target": "Unit", "aliases": ["UnitBucket::first"]}]},
   {"name": "Cell", "type": "Cell", "scope": "state", "table": {"base": "game", "member": "cells", "ref": true, "count": "width*height"}, "inside": null, "delta": true, "fields": [{"name": "metal", "kind": "u8"}, {"name": "unit", "kind": "u16"}, {"name": "unit2", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "high", "kind": "u8"}, {"name": "low", "kind": "u8"}, {"name": "feature", "kind": "u16"}, {"name": "offsetY", "kind": "u8"}, {"name": "offsetX", "kind": "u8"}, {"name": "flags", "kind": "u8", "aliases": ["Cell::flag0", "Cell::bits1", "Cell::owner", "Cell::bit7"]}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.flags", "Unit.player", "Player.active", "Player.type", "Unit.motion", "UnitMotion.pathLockStamp"], "depth": 2, "reachFirst": 5, "reachCount": 6}, {"name": "occupant2", "kind": "unitid", "target": "Unit", "member": "unit2", "reach": ["Unit.flags", "Unit.player", "Player.active", "Player.type", "Unit.motion", "UnitMotion.pathLockStamp"], "depth": 2, "reachFirst": 5, "reachCount": 6}, {"name": "spot", "kind": "u16"}]},
   {"name": "CobScript", "type": "CobScript", "scope": "state", "table": null, "inside": null, "fields": []},

@@ -1748,7 +1748,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "metal", offsetof(PlayerInfo, metal), sizeof(((PlayerInfo*)nullptr)->metal), ROK_PLAYERINFO, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "color", offsetof(PlayerInfo, color), sizeof(((PlayerInfo*)nullptr)->color), ROK_PLAYERINFO, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "head", offsetof(SpatialBucket, head), sizeof(((SpatialBucket*)nullptr)->head), ROK_SPATIALBUCKET, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
-    { "bytes", offsetof(SpatialBucket, unknown_0), 6, ROK_SPATIALBUCKET, RK_BYTES, 0, 0, 0, {}, 0, 0 },
+    { "bytes", offsetof(SpatialBucket, bytes), 6, ROK_SPATIALBUCKET, RK_BYTES, 0, 0, 0, {}, 0, 0 },
     { "head", offsetof(SpatialBucket, head), sizeof(((SpatialBucket*)nullptr)->head), ROK_OVERFLOWBUCKET, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "metal", offsetof(Cell, metal), sizeof(((Cell*)nullptr)->metal), ROK_CELL, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(Cell, unit), sizeof(((Cell*)nullptr)->unit), ROK_CELL, RK_U16, 0, 0, 0, {}, 0, 0 },
@@ -3414,7 +3414,7 @@ static_assert(sizeof(((PlayerInfo*)nullptr)->energy) == 2, "PlayerInfo::energy h
 static_assert(sizeof(((PlayerInfo*)nullptr)->metal) == 2, "PlayerInfo::metal has the size the schema says");
 static_assert(sizeof(((PlayerInfo*)nullptr)->color) == 1, "PlayerInfo::color has the size the schema says");
 static_assert(sizeof(((SpatialBucket*)nullptr)->head) == 4, "SpatialBucket::head has the size the schema says");
-static_assert(sizeof(((SpatialBucket*)nullptr)->unknown_0) == 6, "SpatialBucket::bytes has the size the schema says");
+static_assert(sizeof(((SpatialBucket*)nullptr)->bytes) == 6, "SpatialBucket::bytes has the size the schema says");
 static_assert(sizeof(((SpatialBucket*)nullptr)->head) == 4, "SpatialBucket::head has the size the schema says");
 static_assert(sizeof(((Cell*)nullptr)->metal) == 1, "Cell::metal has the size the schema says");
 static_assert(sizeof(((Cell*)nullptr)->unit) == 2, "Cell::unit has the size the schema says");

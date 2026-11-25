@@ -41,7 +41,7 @@
    ["readat", "data\\loose.bin", "65500", "100"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 0],
    ["length", 70000],
@@ -119,7 +119,7 @@
    ["readat", "data\\stored.bin", "65500", "100"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 1],
    ["length", 70000],
@@ -185,7 +185,7 @@
    ["readat", "data\\keyed_stored.bin", "2500", "300"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 1],
    ["length", 5000],
@@ -253,7 +253,7 @@
    ["readat", "data\\big.bin", "65500", "100"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 1],
    ["length", 150000],
@@ -330,7 +330,7 @@
    ["readat", "data\\keyed.bin", "65500", "100"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 1],
    ["length", 90000],
@@ -407,7 +407,7 @@
    ["readat", "data\\big2.bin", "65500", "100"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 1],
    ["length", 140000],
@@ -484,7 +484,7 @@
    ["readat", "data\\enc.bin", "65500", "100"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 1],
    ["length", 70000],
@@ -561,7 +561,7 @@
    ["readat", "data\\mixed.bin", "65500", "100"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 1],
    ["length", 200000],
@@ -637,7 +637,7 @@
    ["readat", "data\\exact.bin", "65500", "100"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["inarchive", 1],
    ["length", 131072],
@@ -685,7 +685,7 @@
    ["load", "data\\small.lz"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["read", [1, "0bfe935e70c321c7ca3afc75ce0d0ca2f98b5422e008bb31c00c6d7f1f1c0ad6"]],
    ["read", [99, "e7e58ac93fc016de5e3d065903eaf58671039e8088f43ed0f87ecc9f7eb27ffd"]],
@@ -707,7 +707,7 @@
    ["readat", "data\\empty.bin", "0", "4"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["length", 0],
    ["read", [0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"]],
@@ -734,7 +734,7 @@
    ["close", "3"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["open", 1],
    ["open", 2],
    ["open", 3],
@@ -759,7 +759,7 @@
    ["load", "D.HPI"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["load", [25, "680da15d90517eaf4e4ecc4e7b784aec5cf94b38c4a65d8f1d622aec39d3adae"]],
    ["load", [3000, "6bcb2669c875db52e288e0722ae22fd024ba10f93aa56e7c388afd32cfc2fdd2"]],
    ["load", [27, "43c6cfd8ec3755356a72e2b9d63732aff2b917f9fa43f4e032f7a531999b6501"]],

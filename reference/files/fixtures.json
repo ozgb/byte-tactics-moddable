@@ -22,13 +22,21 @@
     "sha256": "599b38dbdc60be500123854c1fdf773659f18376ce605234979acffcc831cec0",
     "size": 70000
    },
+   "e_x.hpi": {
+    "sha256": "56c581c7fa7b8448afb4da51ffd2242a0db40f67b80873823f295afc9f80c457",
+    "size": 144
+   },
+   "ex.hpi": {
+    "sha256": "767b6a9f6e9fb5b4e2077de36fbcf1c3197e0e309a0db3e9e5f57df5552f9c22",
+    "size": 143
+   },
    "gamedata/broken.tdf": {
     "sha256": "2ad3c853516653d1a9f08877da23fb6e0b72acc0ad657fff18812fab3198bccf",
     "size": 22
    },
    "gamedata/sample.tdf": {
-    "sha256": "bb94db3ead108c6a8da17c7a31132a5766722c5455ec432a57abeab14cd34326",
-    "size": 276
+    "sha256": "45118b07ae0f9d82b195c552debbb599737dd4fe3b7ce0e7e363dad2c5258f51",
+    "size": 280
    },
    "readme.txt": {
     "sha256": "f99903d9031d1a8acde685752f069663d0b79da6efe383049003d836c72e92c4",
@@ -53,6 +61,14 @@
    "units/arm.fbi": {
     "sha256": "59ce716dab13d2d6d566e42c42516d08297fa2fe67a66bdcc7260a9c31dff28c",
     "size": 112
+   },
+   "units/arm_x.fbi": {
+    "sha256": "f400e054b51cbcaa2df6b1643afb2021ceb7eb84e0834d13a5b423e2b2f68022",
+    "size": 29
+   },
+   "units/armx.fbi": {
+    "sha256": "109e9e66632a62c4c5ecba2f0f3014cde6b917f4566f0ee6776d80e7271150a2",
+    "size": 28
    },
    "x.hpi": {
     "sha256": "23b1a71435244a443adf02ae07f7d243a341965d8750fa47c5923175bac172ed",

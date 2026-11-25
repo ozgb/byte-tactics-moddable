@@ -93,7 +93,8 @@ CASES: dict[str, list[tuple[str, str, list[list[str]]]]] = {
     "lookup": [
         ("shadowing", "base", M + load(r"units\arm.fbi", r"units\core.fbi", r"units\only_ccx.fbi", "readme.txt",
                                        r"units\ufo.fbi", r"units\c.fbi", r"units\d.fbi", r"units\b.fbi",
-                                       r"gamedata\sample.tdf", r"gamedata\sidedata.tdf", r"units\Shadow.TXT")),
+                                       r"gamedata\sample.tdf", r"gamedata\sidedata.tdf", r"units\Shadow.TXT",
+                                       r"units\fold.fbi")),
         ("case", "base", M + load(r"UNITS\CORE.FBI", r"Units\Core.Fbi", r"mixed\case.txt", r"MIXED\CASE.TXT",
                                   "README.TXT", r"units\shadow.txt", r"UNITS\ARM.FBI", r"units\D.fbi")),
         ("separators", "base", M + load("units/core.fbi", "units/arm.fbi", "a/b.txt", r"a\b.txt", r"\units\core.fbi",
@@ -216,12 +217,27 @@ def run_vector(loader: list[str], game: Path, calls: list[list[str]], env=None) 
             return {"failed": "malformed output: %s" % e}
 
 
+def same(a, b) -> bool:
+    """JSON equality that also holds the types apart: true is not 1, and 1.0 is not 1."""
+    if type(a) is not type(b):
+        return False
+    if isinstance(a, list):
+        return len(a) == len(b) and all(same(x, y) for x, y in zip(a, b))
+    if isinstance(a, dict):
+        return a.keys() == b.keys() and all(same(a[k], b[k]) for k in a)
+    return a == b
+
+
+class CouldNotRun(Exception):
+    """The gate itself could not run (exit 2, no result)."""
+
+
 def compare(calls: list[list[str]], want: list, got: list) -> dict:
     """The verdict of one vector: equal, or differs at the first line that differs (the loader's value)."""
     for i, expected in enumerate(want):
         if i >= len(got):
             return {"status": "differs", "line": i + 1, "call": "\t".join(calls[i]), "value": "missing"}
-        if got[i] != expected:
+        if not same(got[i], expected):
             return {"status": "differs", "line": i + 1, "call": "\t".join(calls[i]), "value": got[i]}
     if len(got) > len(want):
         return {"status": "differs", "line": len(want) + 1, "call": "", "value": got[len(want)]}
@@ -229,7 +245,10 @@ def compare(calls: list[list[str]], want: list, got: list) -> dict:
 
 
 def stored_groups(groups=GROUPS) -> dict[str, dict]:
-    return {g: json.loads((VECTORS / (g + ".json")).read_text()) for g in groups}
+    try:
+        return {g: json.loads((VECTORS / (g + ".json")).read_text()) for g in groups}
+    except (OSError, ValueError) as e:
+        raise CouldNotRun("filesgate: could not read the stored vectors: %s" % e)
 
 
 def build_fixtures(where: Path) -> list[str]:
@@ -246,7 +265,7 @@ def judge(loader: list[str], groups=GROUPS, env=None, jobs: int = 8) -> dict:
         fx = Path(tmp)
         problems = build_fixtures(fx)
         if problems:
-            raise SystemExit("filesgate: the rebuilt fixtures differ from reference/files/fixtures.json:\n"
+            raise CouldNotRun("filesgate: the rebuilt fixtures differ from reference/files/fixtures.json:\n"
                              + "\n".join(problems))
         jobs_list = [(g, v) for g in groups for v in data[g]["vectors"]]
         with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
@@ -266,16 +285,17 @@ def judge(loader: list[str], groups=GROUPS, env=None, jobs: int = 8) -> dict:
         "format": FORMAT,
         "verdict": "equal" if all(s == "equal" for s in overall) else "failed" if "failed" in overall else "differs",
         "suite": "files",
-        "kit": {"interfaces": kit_tag()},
+        "kit": {"interfaces": kit_tag("interfaces"), "reference_traces": kit_tag("reference-traces")},
         "seconds": round(time.time() - start, 1),
         "groups": group_status,
         "vectors": vectors,
     }
 
 
-def kit_tag() -> str | None:
+def kit_tag(prefix: str) -> str | None:
+    """The newest `<prefix>-v*` tag reachable from HEAD."""
     try:
-        tags = subprocess.run(["git", "-C", str(ROOT), "tag", "--merged", "HEAD", "interfaces-v*"], check=True,
+        tags = subprocess.run(["git", "-C", str(ROOT), "tag", "--merged", "HEAD", prefix + "-v*"], check=True,
                               capture_output=True, text=True).stdout.split()
     except (OSError, subprocess.CalledProcessError):
         return None
@@ -297,7 +317,7 @@ def record(loader: list[str]) -> None:
             for run in pair:
                 if "failed" in run:
                     raise SystemExit("filesgate: %s/%s failed: %s" % (g, name, run["failed"]))
-            if pair[0]["lines"] != pair[1]["lines"]:
+            if not same(pair[0]["lines"], pair[1]["lines"]):
                 raise SystemExit("filesgate: %s/%s differs between two runs" % (g, name))
             vectors[g].append({"name": name, "fixture": fixture, "calls": calls, "results": pair[0]["lines"]})
         for g in GROUPS:
@@ -349,7 +369,7 @@ def retail(game: Path, loader: list[str], reference: list[str]) -> int:
     for i, call in enumerate(calls):
         a = want["lines"][i] if i < len(want["lines"]) else None
         b = got["lines"][i] if i < len(got["lines"]) else None
-        if a != b:
+        if not same(a, b):
             parted += 1
             if parted <= 20:
                 print("differs: line %d: %s" % (i + 1, "\t".join(call)))
@@ -378,7 +398,11 @@ def main() -> None:
         sys.exit(retail(args.game_dir.expanduser().resolve(), loader_command(args.loader),
                         loader_command(args.reference)))
     else:
-        result = judge(loader_command(args.loader), tuple(args.group or GROUPS))
+        try:
+            result = judge(loader_command(args.loader), tuple(args.group or GROUPS))
+        except CouldNotRun as e:
+            print(e, file=sys.stderr)
+            sys.exit(2)
         args.out.mkdir(parents=True, exist_ok=True)
         (args.out / "result.json").write_text(json.dumps(result, indent=1) + "\n")
         for g, s in result["groups"].items():

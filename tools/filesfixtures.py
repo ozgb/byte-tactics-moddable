@@ -273,10 +273,10 @@ TDF_SAMPLE = b"""// sample: the parser's cases
 \t{
 \tName = First unit ;
 \tname=second wins;
+\tName = third ;
 \tZeta=  42abc  ;
 \tFloat=0.15;
 \tNeg=-7.5;
-\tBig=40000;
 \tHex=0x10;
 \tEmpty=;
 \tSpaced key = a = b ;
@@ -313,6 +313,8 @@ def base() -> dict[str, bytes]:
         "units/arm.fbi": ARM_FBI,
         "units/Loose.fbi": text("loose", "units\\Loose.fbi"),
         "units/Shadow.TXT": text("loose", "units\\Shadow.TXT"),
+        "units/arm_x.fbi": text("loose", "units\\arm_x.fbi"),
+        "units/armx.fbi": text("loose", "units\\armx.fbi"),
         "gamedata/sample.tdf": TDF_SAMPLE,
         "gamedata/broken.tdf": TDF_BROKEN,
         "notes/": b"",
@@ -365,6 +367,8 @@ def base() -> dict[str, bytes]:
         Dir("notes", [File("n.txt", text("c.hpi", "notes\\n.txt"))]),
     ], key=0x80)
     files["D.HPI"] = archive([Dir("UNITS", [File("D.FBI", text("D.HPI", "UNITS\\D.FBI"))])])
+    files["e_x.hpi"] = archive([Dir("units", [File("fold.fbi", text("e_x.hpi", "units\\fold.fbi"))])], key=0x21)
+    files["ex.hpi"] = archive([Dir("units", [File("fold.fbi", text("ex.hpi", "units\\fold.fbi"))])], key=0x22)
     files["rev32.gp3"] = archive([File("rev32.txt", text("rev32.gp3", "rev32.txt"))])
     return files
 
@@ -409,6 +413,8 @@ def build(out: Path) -> dict[str, dict[str, dict]]:
     digests: dict[str, dict[str, dict]] = {}
     for name, make in FIXTURES.items():
         top = out / name
+        if top.exists() and any(top.iterdir()):
+            raise SystemExit("filesfixtures: %s is not empty; build into an empty directory" % top)
         top.mkdir(parents=True, exist_ok=True)
         digests[name] = {}
         for path, data in sorted(make().items()):
@@ -431,9 +437,15 @@ def digests_of() -> dict[str, dict[str, dict]]:
 
 
 def check(out: Path, stored: dict) -> list[str]:
-    """The fixture files under `out` that are missing or differ from `stored`."""
+    """The fixture files under `out` that are missing, differ from `stored` or are not in it."""
     problems = []
     for name, files in stored.items():
+        top = out / name
+        if top.is_dir():
+            for target in sorted(top.rglob("*")):
+                rel = target.relative_to(top).as_posix()
+                if target.is_file() and rel not in files:
+                    problems.append("extra: %s/%s" % (name, rel))
         for path, want in files.items():
             target = out / name / path
             if not target.is_file():

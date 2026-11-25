@@ -55,6 +55,8 @@ struct OPENHAPIFILE {
 
 #include "hpi.h"
 
+typedef char OpenHapiFileNameOffset[offsetof(OPENHAPIFILE, name) == OPENHAPIFILE_NAME_OFFSET ? 1 : -1];
+
 // FUNCTION: 0x4bb2c0
 FileHandle* __stdcall HAPI_OpenFileAppend(const char* param1)
 {

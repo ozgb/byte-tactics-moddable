@@ -4,7 +4,7 @@
    ["mount"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]]
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]]
   ]},
  {"name": "base_twice", "fixture": "base",
   "calls": [
@@ -12,8 +12,8 @@
    ["mount"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]]
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]]
   ]},
  {"name": "base_unmounted", "fixture": "base",
   "calls": [
@@ -27,7 +27,7 @@
    ["load", [-1, null]],
    ["load", [112, "59ce716dab13d2d6d566e42c42516d08297fa2fe67a66bdcc7260a9c31dff28c"]],
    ["load", [24, "f99903d9031d1a8acde685752f069663d0b79da6efe383049003d836c72e92c4"]],
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["load", [32, "69d15473441d15724a6a737bf31ce4e3b3cc155d77f08a1c7524707433ae6f44"]]
   ]},
  {"name": "not_mounted", "fixture": "base",
@@ -37,7 +37,7 @@
    ["load", "x.hpi"]
   ],
   "results": [
-   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
    ["load", [-1, null]],
    ["load", [16, "23b1a71435244a443adf02ae07f7d243a341965d8750fa47c5923175bac172ed"]]
   ]},

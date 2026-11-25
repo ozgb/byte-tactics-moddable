@@ -89,6 +89,12 @@ class Fixtures(unittest.TestCase):
             self.assertEqual(filesfixtures.check(Path(tmp), stored), [])
             (Path(tmp) / "base" / "readme.txt").write_bytes(b"changed")
             self.assertEqual(filesfixtures.check(Path(tmp), stored), ["differs: base/readme.txt"])
+            (Path(tmp) / "base" / "readme.txt").unlink()
+            (Path(tmp) / "base" / "stray.txt").write_bytes(b"x")
+            self.assertEqual(filesfixtures.check(Path(tmp), stored),
+                             ["extra: base/stray.txt", "missing: base/readme.txt"])
+            with self.assertRaises(SystemExit):
+                filesfixtures.build(Path(tmp))
 
     def test_the_key_byte_255_derives_no_key(self):
         self.assertEqual(filesfixtures.derived_key(0xFF), 0)
@@ -123,6 +129,29 @@ class Vectors(unittest.TestCase):
                          {"status": "differs", "line": 2, "call": "b", "value": ["b", 5]})
         self.assertEqual(filesgate.compare(calls, want, want[:1])["value"], "missing")
 
+    def test_types_are_compared_strictly(self):
+        self.assertFalse(filesgate.same(True, 1))
+        self.assertFalse(filesgate.same(1.0, 1))
+        self.assertFalse(filesgate.same([1, [True]], [1, [1]]))
+        self.assertFalse(filesgate.same({"a": 1}, {"a": 1.0}))
+        self.assertTrue(filesgate.same([1, {"a": [None, "x"]}], [1, {"a": [None, "x"]}]))
+        calls = [["match", "a", "*"]]
+        self.assertEqual(filesgate.compare(calls, [["match", 1]], [["match", True]])["status"], "differs")
+
+    def test_fixtures_that_do_not_match_stop_the_gate_with_exit_2(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stored = Path(tmp) / "vectors"
+            shutil.copytree(filesgate.VECTORS, stored)
+            body = json.loads((stored / "fixtures.json").read_text())
+            body["fixtures"]["base"]["readme.txt"]["sha256"] = "0" * 64
+            (stored / "fixtures.json").write_text(json.dumps(body))
+            old, filesgate.VECTORS = filesgate.VECTORS, stored
+            try:
+                with self.assertRaises(filesgate.CouldNotRun):
+                    filesgate.judge(replayer(Path(tmp)), ("formats",))
+            finally:
+                filesgate.VECTORS = old
+
     def test_a_line_without_json_is_malformed(self):
         with self.assertRaises(ValueError):
             filesgate.parse_out("mount\n")
@@ -154,12 +183,13 @@ class Judge(unittest.TestCase):
 
 
 FAULTS = {
-    "mounting": ("winner", "mounting/base"),
-    "lookup": ("case", "lookup/case"),
-    "listing": ("swap", "listing/root"),
-    "reading": ("read", "reading/loose"),
-    "malformed": ("mountall", "malformed/mount"),
-    "formats": ("tdforder", "formats/tdf"),
+    "budget": ("mounting", "mounting/base", "mount"),
+    "winner": ("lookup", "lookup/shadowing", "load\tunits\\core.fbi"),
+    "case": ("lookup", "lookup/shadowing", "load\tunits\\Shadow.TXT"),
+    "swap": ("listing", "listing/root", "find\t*\t-1\t1"),
+    "read": ("reading", "reading/loose", "read\t1\t100"),
+    "mountall": ("malformed", "malformed/mount", "mount"),
+    "tdforder": ("formats", "formats/tdf", "tdf\tgamedata\\sample.tdf"),
 }
 
 
@@ -174,13 +204,19 @@ class Adapter(unittest.TestCase):
                          {g: "equal" for g in filesgate.GROUPS},
                          [k for k, v in result["vectors"].items() if v["status"] != "equal"])
 
-    def test_each_injected_fault_is_caught(self):
-        for group, (fault, vector) in FAULTS.items():
+    def test_each_injected_fault_is_caught_at_its_call(self):
+        for fault, (group, vector, call) in FAULTS.items():
             with self.subTest(fault=fault):
                 env = dict(os.environ, BT_FILES_FAULT=fault)
                 result = filesgate.judge(filesgate.loader_command(filesgate.DEFAULT_LOADER), (group,), env=env)
                 self.assertEqual(result["groups"][group]["status"], "differs")
-                self.assertEqual(result["vectors"][vector]["status"], "differs")
+                first = next(k for k, v in result["vectors"].items() if v["status"] != "equal")
+                self.assertEqual(first, vector)
+                self.assertEqual(result["vectors"][vector]["call"], call)
+
+    def test_the_kit_tags_are_reported(self):
+        result = filesgate.judge(filesgate.loader_command(filesgate.DEFAULT_LOADER), ("formats",))
+        self.assertEqual(set(result["kit"]), {"interfaces", "reference_traces"})
 
 
 if __name__ == "__main__":

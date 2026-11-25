@@ -12,6 +12,7 @@
 #include "../src/util/engine_services.h"
 #include "../src/files/files_impl.h"
 #include "../src/files/file_handle.h"
+#include "../src/files/hpi.h"
 #include "../src/graphics/display.h"
 #include "../src/harness/replay.h"
 #include "../src/state/sim_globals.h"
@@ -344,7 +345,6 @@ static void SwapFirst(std::vector<std::vector<char> >& items)
 
 static void Array(Text& t, std::vector<std::vector<char> >& items)
 {
-    SwapFirst(items);
     t.Char('[');
     for (unsigned int i = 0; i < items.size(); i++) {
         if (i)
@@ -369,20 +369,15 @@ static const char* BaseName(const char* path)
 
 static const char* ArchiveName(OPENHAPIFILE* archive)
 {
-    return BaseName((const char*)archive + 0x14);
+    return BaseName((const char*)archive + OPENHAPIFILE_NAME_OFFSET);
 }
 
 static void OpMount(Text& t)
 {
     RegisterDataArchives();
     Display* d = GetDisplay();
-    if (Fault("winner")) {
-        for (int i = 0, j = d->count - 1; i < j; i++, j--) {
-            OPENHAPIFILE* x = d->files[i];
-            d->files[i] = d->files[j];
-            d->files[j] = x;
-        }
-    }
+    if (Fault("budget") && d->count > 0)
+        d->count--;
     std::vector<std::vector<char> > items;
     for (int i = 0; i < d->count; i++)
         items.push_back(StrItem(ArchiveName(d->files[i])));
@@ -401,6 +396,13 @@ static void OpMount(Text& t)
         }
     }
     Array(t, items);
+    if (Fault("winner")) {
+        for (int i = 0, j = d->count - 1; i < j; i++, j--) {
+            OPENHAPIFILE* x = d->files[i];
+            d->files[i] = d->files[j];
+            d->files[j] = x;
+        }
+    }
 }
 
 static void OpFind(Text& t, const char* path, int state, int recursive)
@@ -422,6 +424,7 @@ static void OpFind(Text& t, const char* path, int state, int recursive)
         } while (g_seams.files->FindNext(h, &fd) == 0);
         g_seams.files->FindClose(h);
     }
+    SwapFirst(items);
     Array(t, items);
 }
 
@@ -430,6 +433,7 @@ static void Names(Text& t, std::vector<StringRef>& names)
     std::vector<std::vector<char> > items;
     for (unsigned int i = 0; i < names.size(); i++)
         items.push_back(StrItem(names[i].ptr));
+    SwapFirst(items);
     Array(t, items);
 }
 

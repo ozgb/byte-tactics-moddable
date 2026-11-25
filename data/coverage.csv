@@ -136,7 +136,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPBDPBXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPBDPBXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,403,316,6221,3891,2320,980,,23,
+game,*,,403,316,6220,3891,2320,980,,23,
 game,AppendToDebugFile,src/game/main.cpp,0,0,0,0,0,0,?AppendToDebugFile@@YGXPAD@Z,1,
 game,AtexitNoOp,src/game/main.cpp,1,0,0,0,0,0,?AtexitNoOp@@YGXXZ,0,shutdown
 game,CampaignFileExists,src/game/campaign.cpp,0,0,0,0,0,0,?CampaignFileExists@@YGHPAD@Z,1,
@@ -813,7 +813,7 @@ pathfinding,WriteCells,src/ai/pathfind.cpp,1,0,0,0,0,0,?WriteCells@?A0x@@YGXPBUS
 pathfinding,WriteNodes,src/ai/pathfind.cpp,1,0,0,0,0,0,?WriteNodes@?A0x@@YGXPBUStateWriter@@PAVPathfinder@@@Z,0,test-only
 pathfinding,WriteRequest,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?WriteRequest@?A0x@@YGXPBUStateWriter@@HHPBUPathRequest@@I@Z,0,demo: hpa
 pathfinding,WriteSearch,src/ai/pathfind_hpa.cpp,1,0,0,0,0,0,?WriteSearch@?A0x@@YGXPBUStateWriter@@PAUHpaView@?A0x@@@Z,0,demo: hpa
-platform,*,,751,403,8434,3474,3492,984,,86,
+platform,*,,753,405,8442,3483,3498,988,,86,
 platform,AbortProgram,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AbortProgram@@YGXXZ,0,
 platform,AddAnimplayPointer,src/game/data_files.cpp,0,0,0,0,0,0,?AddAnimplayPointer@@YGXPAX@Z,1,
 platform,AllocDebugBlock,src/debug/debug_lib.cpp,1,0,0,0,0,0,?AllocDebugBlock@@YAIII@Z,0,

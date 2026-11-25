@@ -370,8 +370,7 @@ void __stdcall CmdRCache(int unused)
 // FUNCTION: 0x416730
 void __stdcall CmdEdge(CommandArgs* args)
 {
-    g_game->mapWidth = g_game->baseX - args->GetIntArg(1, 0x20);
-    g_game->mapHeight = g_game->baseY - args->GetIntArg(2, 0x80);
+    MapPublishSetEdge(SCHED_ENGINE, args->GetIntArg(1, 0x20), args->GetIntArg(2, 0x80));
 }
 
 // FUNCTION: 0x416780

@@ -544,8 +544,6 @@ game,ai,shared_write,AiWeight::fix,1
 game,ai,shared_write,AiWeight::scale,1
 game,ai,shared_write,Game::difficulty,2
 game,ai,shared_write,Game::mapFlags,1
-game,ai,shared_write,Game::mapHeight,1
-game,ai,shared_write,Game::mapWidth,1
 game,ai,shared_write,Game::maxUnitsSetting,1
 game,ai,shared_write,Game::ticks,12
 game,ai,shared_write,Player::allied,3
@@ -695,8 +693,6 @@ game,los_radar,indirect,UpdateSensorRadarAndCloak,1
 game,los_radar,indirect,UpdateUnitLineOfSight,1
 game,los_radar,shared_write,Game::localPlayer,1
 game,los_radar,shared_write,Game::mapFlags,5
-game,los_radar,shared_write,Game::mapHeight,1
-game,los_radar,shared_write,Game::mapWidth,1
 game,los_radar,shared_write,Game::numPlayers,1
 game,los_radar,shared_write,Game::playerIndex,14
 game,los_radar,shared_write,Game::ticks,6
@@ -738,6 +734,8 @@ game,map,shared_write,Grid::cells,1
 game,map,shared_write,Grid::height,1
 game,map,shared_write,Grid::width,1
 game,map,shared_write,MapEventHeader::kind,2
+game,map,shared_write,MapSetEdge::x,1
+game,map,shared_write,MapSetEdge::z,1
 game,map,shared_write,MapSetSeaLevel::level,1
 game,map,shared_write,Point16::x,17
 game,map,shared_write,Point16::y,17
@@ -834,8 +832,6 @@ game,orders,shared_write,Angles16::heading,5
 game,orders,shared_write,Fixed::whole,4
 game,orders,shared_write,Game::interfaceType,2
 game,orders,shared_write,Game::localPlayer,2
-game,orders,shared_write,Game::mapHeight,6
-game,orders,shared_write,Game::mapWidth,6
 game,orders,shared_write,Game::playerIndex,1
 game,orders,shared_write,Game::ticks,18
 game,orders,shared_write,OrdersEventHeader::kind,2
@@ -1276,8 +1272,6 @@ game,presentation,shared_write,Game::gameSpeed,11
 game,presentation,shared_write,Game::interfaceType,8
 game,presentation,shared_write,Game::localPlayer,70
 game,presentation,shared_write,Game::mapFlags,19
-game,presentation,shared_write,Game::mapHeight,9
-game,presentation,shared_write,Game::mapWidth,9
 game,presentation,shared_write,Game::maxUnitsSetting,2
 game,presentation,shared_write,Game::mode_391f1,5
 game,presentation,shared_write,Game::numPlayers,4
@@ -2321,8 +2315,8 @@ los_radar,game,call,SimAlloc,1
 los_radar,game,call,SimAllocTagged,1
 los_radar,game,call,SimBlockTrack,1
 los_radar,game,call,SimCaptureAlloc,2
-los_radar,game,shared_write,Game::mapHeight,4
-los_radar,game,shared_write,Game::mapWidth,5
+los_radar,game,shared_write,Game::mapHeight,3
+los_radar,game,shared_write,Game::mapWidth,4
 los_radar,game,shared_write,Point16::x,1
 los_radar,game,shared_write,Point16::y,1
 los_radar,game,shared_write,Ref<Unit>::offset,7
@@ -2344,6 +2338,8 @@ los_radar,map,shared_write,Cell::feature,7
 los_radar,map,shared_write,Cell::high,7
 los_radar,map,shared_write,Cell::low,7
 los_radar,map,shared_write,Game::cells,17
+los_radar,map,shared_write,Game::mapHeight,1
+los_radar,map,shared_write,Game::mapWidth,1
 los_radar,map,shared_write,Game::visibilityMask,3
 los_radar,map,shared_write,Point16::x,17
 los_radar,map,shared_write,Point16::y,17
@@ -2503,6 +2499,8 @@ los_radar,wind_meteors,shared_write,Vec3::x,1
 los_radar,wind_meteors,shared_write,Vec3::y,1
 los_radar,wind_meteors,shared_write,Vec3::z,1
 map,ai,shared_write,Fixed::value,1
+map,ai,shared_write,Game::mapHeight,1
+map,ai,shared_write,Game::mapWidth,1
 map,ai,shared_write,Point16::x,8
 map,ai,shared_write,Point16::y,8
 map,ai,shared_write,Ref<Unit>::offset,3
@@ -2531,10 +2529,12 @@ map,files,call,HapiBank::WriteBox,2
 map,game,call,MapEventSize,1
 map,game,call,SchedPublish,1
 map,game,call,SimAlloc,3
+map,game,shared_write,Game::mapHeight,3
+map,game,shared_write,Game::mapWidth,4
 map,game,shared_write,Grid::cells,1
 map,game,shared_write,Grid::height,1
 map,game,shared_write,Grid::width,1
-map,game,shared_write,MapEventHeader::kind,1
+map,game,shared_write,MapEventHeader::kind,2
 map,game,shared_write,Point16::x,1
 map,game,shared_write,Point16::y,1
 map,game,shared_write,Ref<Unit>::offset,7
@@ -2557,6 +2557,8 @@ map,harness,shared_write,g_lastPlaceMetalSum,1
 map,harness,shared_write,g_passMaps,2
 map,los_radar,indirect,GetMapCell,1
 map,los_radar,indirect,GetMapCellAtPosition,1
+map,los_radar,shared_write,Game::mapHeight,1
+map,los_radar,shared_write,Game::mapWidth,1
 map,los_radar,shared_write,Game::seaLevel,10
 map,los_radar,shared_write,Grid::cells,2
 map,los_radar,shared_write,Grid::height,3
@@ -2585,6 +2587,8 @@ map,movement,shared_write,Vec3::y,29
 map,movement,shared_write,Vec3::z,33
 map,network,shared_write,Unit::flags,3
 map,orders,shared_write,Fixed::value,8
+map,orders,shared_write,Game::mapHeight,6
+map,orders,shared_write,Game::mapWidth,6
 map,orders,shared_write,Game::overflowBucket,7
 map,orders,shared_write,Game::seaLevel,3
 map,orders,shared_write,Point16::x,26
@@ -2620,6 +2624,8 @@ map,players,shared_write,Vec3::y,3
 map,players,shared_write,Vec3::z,3
 map,presentation,shared_write,Cell::flags,2
 map,presentation,shared_write,Fixed::value,7
+map,presentation,shared_write,Game::mapHeight,9
+map,presentation,shared_write,Game::mapWidth,9
 map,presentation,shared_write,Game::seaLevel,4
 map,presentation,shared_write,Point16::x,5
 map,presentation,shared_write,Point16::y,5

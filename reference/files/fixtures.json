@@ -1,0 +1,151 @@
+{
+ "format": 1,
+ "fixtures": {
+  "base": {
+   "D.HPI": {
+    "sha256": "7f3232492ce83049d7dfcaa04f9177406709c66744a8f8b1da52e6afe34c9c35",
+    "size": 136
+   },
+   "a.ccx": {
+    "sha256": "f7512a0efd7526dc47bd99023f695b49684376e0b9f90284436a08ca38ea7562",
+    "size": 36884
+   },
+   "b.ccx": {
+    "sha256": "c304af600ff40b2fd58a44a33b9f4caff4ac76ff9741d146293146ff6467662b",
+    "size": 199
+   },
+   "c.hpi": {
+    "sha256": "abcf67fd4ec47a0a3a471e812380a58d7e75bf75e22e098d4960ea798628e994",
+    "size": 316
+   },
+   "data/loose.bin": {
+    "sha256": "599b38dbdc60be500123854c1fdf773659f18376ce605234979acffcc831cec0",
+    "size": 70000
+   },
+   "gamedata/broken.tdf": {
+    "sha256": "2ad3c853516653d1a9f08877da23fb6e0b72acc0ad657fff18812fab3198bccf",
+    "size": 22
+   },
+   "gamedata/sample.tdf": {
+    "sha256": "bb94db3ead108c6a8da17c7a31132a5766722c5455ec432a57abeab14cd34326",
+    "size": 276
+   },
+   "readme.txt": {
+    "sha256": "f99903d9031d1a8acde685752f069663d0b79da6efe383049003d836c72e92c4",
+    "size": 24
+   },
+   "rev31.gp3": {
+    "sha256": "e0576d0bb6de2ea27fb38e18b3abc599084a069148723570a0ee577353870bdf",
+    "size": 310435
+   },
+   "rev32.gp3": {
+    "sha256": "42f4e68609ca0eede966d0145449840ff99bc1d6e76213562d74364b24294832",
+    "size": 119
+   },
+   "units/Loose.fbi": {
+    "sha256": "5b1390575420476b9aaf6f62ec22410470bf1770060a2d829c6e2cf42d342cca",
+    "size": 29
+   },
+   "units/Shadow.TXT": {
+    "sha256": "736c14761f6988e8c7fbb32ff32350ca4bcbd77c892d2006cd62c201fedc6163",
+    "size": 30
+   },
+   "units/arm.fbi": {
+    "sha256": "59ce716dab13d2d6d566e42c42516d08297fa2fe67a66bdcc7260a9c31dff28c",
+    "size": 112
+   },
+   "x.hpi": {
+    "sha256": "23b1a71435244a443adf02ae07f7d243a341965d8750fa47c5923175bac172ed",
+    "size": 16
+   },
+   "z.ufo": {
+    "sha256": "756c652ad3b6919ace8fc87014b2f71691e383f5615c5a4b2a28ba663abeec2d",
+    "size": 193
+   }
+  },
+  "budget": {
+   "h01.hpi": {
+    "sha256": "48a368d35ef25be05b8fd5ef909adbf9758daac78fd71855a5b83a82a964765c",
+    "size": 156
+   },
+   "h02.hpi": {
+    "sha256": "32f8328bbe29df5fee6a3521c292bd6ac11d9e718885f0bdc0e6224dfcfb369e",
+    "size": 156
+   },
+   "h03.hpi": {
+    "sha256": "4785ea5cb82af405c4d4aaac6a026b54fa607c2890936a6ba17ad8bcad46209d",
+    "size": 156
+   },
+   "h04.hpi": {
+    "sha256": "2f51cd100fe47ae6a04e0ceead2c1d2de8cb3fa967d9bbc7ab624ee9e28dd4bf",
+    "size": 156
+   },
+   "h05.hpi": {
+    "sha256": "c1982ca7ae631489f00fd1858bfed47c6001b14e07fad64f02d9aa12ffba6232",
+    "size": 156
+   },
+   "h05bad.hpi": {
+    "sha256": "193a0b56ab2b7334de22d7804951b84ef9fb859e672d2404705a64d1e8e69e16",
+    "size": 21
+   },
+   "h06.hpi": {
+    "sha256": "d55de0732891f1e6958df70c68f8ec1f5145f8d53196a354923585b1f7cb7bda",
+    "size": 156
+   },
+   "h07.hpi": {
+    "sha256": "28b82fdc1bc66ce95c67e4b6e3c1bcb3fc251ce58c5e377278afea7f676f87f8",
+    "size": 156
+   },
+   "h08.hpi": {
+    "sha256": "ea83c48ad53b82304b0ff6e1a2e7ea19568dbdaa54ab5f70863c1b4c399ee781",
+    "size": 156
+   },
+   "h09.hpi": {
+    "sha256": "4979ed6ad5a24a7606f3b813b7e2cc5dcafcff239ebb9812d77a9bdee1e27487",
+    "size": 156
+   },
+   "h10.hpi": {
+    "sha256": "e2cfb983876413856f99c5fe0f9ed6ce4830cbb0e43170f6034ea2035a6c0a9b",
+    "size": 156
+   },
+   "h11.hpi": {
+    "sha256": "ea0f8a84c2dab9504a68321596f381989f32b7267cc2c20c9de403b0f950967d",
+    "size": 156
+   },
+   "h12.hpi": {
+    "sha256": "97842127a3abfadd6a49162761a8e2743516aeafb70b7d93eae0090197794060",
+    "size": 156
+   }
+  },
+  "malformed": {
+   "badmagic.hpi": {
+    "sha256": "53f0daad1fc293d488db87d09423d0d1e142d4811cb0419a446fee88756b7d8b",
+    "size": 116
+   },
+   "badver.hpi": {
+    "sha256": "fae41ddd747e0ce90234470ad2fcd5de6a3497be6d94be84665e63a1e9b94212",
+    "size": 116
+   },
+   "digits.hpi": {
+    "sha256": "bff82d63ef62ac70d3969d7c652b26e2d8aa331db8736dca5ff39e7a6ad6060f",
+    "size": 122
+   },
+   "good.hpi": {
+    "sha256": "4538d474a6913140406cc5825bb30c319a8d44334ae9e063dcfbfbbcd0535260",
+    "size": 3004
+   },
+   "lower.hpi": {
+    "sha256": "199994d822e8d794065517dd2b107dddf7a2a63d21a150f2dbea598c8592d725",
+    "size": 116
+   },
+   "nofooter.hpi": {
+    "sha256": "6406e3cb018030dab500fdf47c5693130008abbb06b514a3f51d05f99565cb3a",
+    "size": 80
+   },
+   "year.hpi": {
+    "sha256": "12426165db6ceef9ca0d5dea2aeaaf9cb4399a4ea29a8774104bc9101899ddc1",
+    "size": 116
+   }
+  }
+ }
+}

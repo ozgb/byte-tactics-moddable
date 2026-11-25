@@ -1,0 +1,86 @@
+{"format": 1, "group": "malformed", "vectors": [
+ {"name": "mount", "fixture": "malformed",
+  "calls": [
+   ["mount"],
+   ["load", "good.txt"],
+   ["load", "year.txt"],
+   ["load", "digits.txt"],
+   ["load", "good.txt"]
+  ],
+  "results": [
+   ["mount", ["digits.hpi", "good.hpi", "year.hpi"]],
+   ["load", [25, "82f8cb27bcf5b2db1c3f9b0a3ca01585573b845e08ff2d3a4c60474c159e1463"]],
+   ["load", [25, "9e0053d5999157fdd3eeb796857517284b1b1dbc14e8ac8c9f16ad4147355d2a"]],
+   ["load", [29, "17143fdb141416b3689a068aaa8597acd197990c232944234eac4e09f98b27c9"]],
+   ["load", [25, "82f8cb27bcf5b2db1c3f9b0a3ca01585573b845e08ff2d3a4c60474c159e1463"]]
+  ]},
+ {"name": "bad_checksum", "fixture": "malformed",
+  "calls": [
+   ["mount"],
+   ["open", "badsum.bin"],
+   ["length", "1"],
+   ["read", "1", "10"]
+  ],
+  "results": [
+   ["mount", ["digits.hpi", "good.hpi", "year.hpi"]],
+   ["open", 1],
+   ["length", 1000],
+   ["fatal", null]
+  ]},
+ {"name": "bad_chunk_magic", "fixture": "malformed",
+  "calls": [
+   ["mount"],
+   ["open", "badsqsh.bin"],
+   ["read", "1", "10"]
+  ],
+  "results": [
+   ["mount", ["digits.hpi", "good.hpi", "year.hpi"]],
+   ["open", 1],
+   ["fatal", null]
+  ]},
+ {"name": "bad_method", "fixture": "malformed",
+  "calls": [
+   ["mount"],
+   ["open", "badmethod.bin"],
+   ["read", "1", "10"]
+  ],
+  "results": [
+   ["mount", ["digits.hpi", "good.hpi", "year.hpi"]],
+   ["open", 1],
+   ["fatal", null]
+  ]},
+ {"name": "bad_size", "fixture": "malformed",
+  "calls": [
+   ["mount"],
+   ["open", "badsize.bin"],
+   ["read", "1", "10"]
+  ],
+  "results": [
+   ["mount", ["digits.hpi", "good.hpi", "year.hpi"]],
+   ["open", 1],
+   ["fatal", null]
+  ]},
+ {"name": "truncated", "fixture": "malformed",
+  "calls": [
+   ["mount"],
+   ["open", "trunc.bin"],
+   ["length", "1"],
+   ["read", "1", "10"],
+   ["tell", "1"],
+   ["close", "1"],
+   ["load", "trunc.bin"],
+   ["readat", "trunc.bin", "0", "10"],
+   ["lengthbyname", "trunc.bin"]
+  ],
+  "results": [
+   ["mount", ["digits.hpi", "good.hpi", "year.hpi"]],
+   ["open", 1],
+   ["length", 1000],
+   ["read", [-1, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"]],
+   ["tell", 0],
+   ["close", 0],
+   ["load", [-1, null]],
+   ["readat", null],
+   ["lengthbyname", 1000]
+  ]}
+]}

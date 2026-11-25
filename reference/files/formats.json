@@ -1,0 +1,36 @@
+{"format": 1, "group": "formats", "vectors": [
+ {"name": "tdf", "fixture": "base",
+  "calls": [
+   ["mount"],
+   ["tdf", "gamedata\\sample.tdf"],
+   ["tdf", "gamedata\\sidedata.tdf"],
+   ["tdf", "missing.tdf"],
+   ["tdf", "data\\empty.bin"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["tdf", {"name": "root", "fields": [], "records": [{"name": "Alpha", "fields": [["Big", "40000", "40000", 40000, -2147483648, "40e3880000000000"], ["Empty", "", "", 0, 0, "0000000000000000"], ["Float", "0.15", "0.15", 0, 9830, "3fc3333333333333"], ["Hex", "0x10", "0x10", 0, 0, "0000000000000000"], ["Inner", "1", "1", 1, 65536, "3ff0000000000000"], ["name", "second wins", "second wins", 0, 0, "0000000000000000"], ["Name", "First unit", "second wins", 0, 0, "0000000000000000"], ["Neg", "-7.5", "-7.5", -7, -491520, "c01e000000000000"], ["Spaced key", "a = b", "a = b", 0, 0, "0000000000000000"], ["Zeta", "42abc", "42abc", 42, 2752512, "4045000000000000"]], "records": [{"name": "Child", "fields": [["x", "1", "1", 1, 65536, "3ff0000000000000"]], "records": []}, {"name": "child", "fields": [["y", "2", "2", 2, 131072, "4000000000000000"]], "records": []}]}, {"name": "Beta", "fields": [["a", "1", "1", 1, 65536, "3ff0000000000000"]], "records": []}]}],
+   ["tdf", {"name": "root", "fields": [], "records": [{"name": "SIDE0", "fields": [["name", "ARM", "ARM", 0, 0, "0000000000000000"]], "records": []}]}],
+   ["tdf", null],
+   ["tdf", null]
+  ]},
+ {"name": "fbi", "fixture": "base",
+  "calls": [
+   ["mount"],
+   ["tdf", "units\\arm.fbi"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["tdf", {"name": "root", "fields": [], "records": [{"name": "UNITINFO", "fields": [["Acceleration", "0.12", "0.12", 0, 7864, "3fbeb851eb851eb8"], ["BuildCostMetal", "120", "120", 120, 7864320, "405e000000000000"], ["MaxDamage", "650", "650", 650, 42598400, "4084500000000000"], ["Name", "Fixture Kbot", "Fixture Kbot", 0, 0, "0000000000000000"], ["UnitName", "ARMFIX", "ARMFIX", 0, 0, "0000000000000000"]], "records": []}]}]
+  ]},
+ {"name": "tdf_broken", "fixture": "base",
+  "calls": [
+   ["mount"],
+   ["tdf", "gamedata\\broken.tdf"],
+   ["tdf", "gamedata\\sample.tdf"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI"]],
+   ["fatal", null]
+  ]}
+]}

@@ -321,6 +321,9 @@ enum ReplayObjectKindId {
     ROK_MODELPIECE,
     ROK_COBSCRIPTBASE,
     ROK_GAFSOURCES,
+    ROK_PATHMAPINFO,
+    ROK_PATHUNITSTATE,
+    ROK_PATHREQUEST,
     ROK_WINDMETEORSEVENTHEADER,
     ROK_WINDMETEORSPARAMS,
     ROK_WINDMETEORSLIMITS,
@@ -342,6 +345,7 @@ enum ReplayObjectKindId {
     ROK_MAPPASSMAPS,
     ROK_MAPPATHLOCKSTAMP,
     ROK_MAPSETSEALEVEL,
+    ROK_MAPSETEDGE,
     ROK_MAPCELLSCHANGED,
     ROK_WEAPONSEVENTHEADER,
     ROK_WEAPONSDAMAGE,
@@ -882,6 +886,7 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 168, ROK_MAPPASSMAPS },
     { 169, ROK_MAPPATHLOCKSTAMP },
     { 170, ROK_MAPSETSEALEVEL },
+    { 171, ROK_MAPSETEDGE },
     { 176, ROK_MAPCELLSCHANGED },
     { 256, ROK_WEAPONSDAMAGE },
     { 257, ROK_WEAPONSDAMAGE },
@@ -1034,16 +1039,16 @@ static const ReplayEventTable kReplayEventTables[] = {
     { ROK_WINDMETEORSEVENTHEADER, 0, 7 },
     { ROK_TARGETINGEVENTHEADER, 7, 6 },
     { ROK_LOSRADAREVENTHEADER, 13, 11 },
-    { ROK_MAPEVENTHEADER, 24, 11 },
-    { ROK_WEAPONSEVENTHEADER, 35, 25 },
-    { ROK_ORDERSEVENTHEADER, 60, 25 },
-    { ROK_AIEVENTHEADER, 85, 10 },
-    { ROK_MOVEMENTEVENTHEADER, 95, 23 },
-    { ROK_UNITSEVENTHEADER, 118, 30 },
-    { ROK_SCRIPTSEVENTHEADER, 148, 4 },
-    { ROK_ECONOMYEVENTHEADER, 152, 8 },
-    { ROK_PLAYERSEVENTHEADER, 160, 12 },
-    { ROK_FEATURESEVENTHEADER, 172, 9 },
+    { ROK_MAPEVENTHEADER, 24, 12 },
+    { ROK_WEAPONSEVENTHEADER, 36, 25 },
+    { ROK_ORDERSEVENTHEADER, 61, 25 },
+    { ROK_AIEVENTHEADER, 86, 10 },
+    { ROK_MOVEMENTEVENTHEADER, 96, 23 },
+    { ROK_UNITSEVENTHEADER, 119, 30 },
+    { ROK_SCRIPTSEVENTHEADER, 149, 4 },
+    { ROK_ECONOMYEVENTHEADER, 153, 8 },
+    { ROK_PLAYERSEVENTHEADER, 161, 12 },
+    { ROK_FEATURESEVENTHEADER, 173, 9 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
@@ -1065,6 +1070,7 @@ static_assert(sizeof(MapSetYard) <= REPLAY_EVENT_MAX, "MapSetYard fits the event
 static_assert(sizeof(MapPassMaps) <= REPLAY_EVENT_MAX, "MapPassMaps fits the event buffer");
 static_assert(sizeof(MapPathLockStamp) <= REPLAY_EVENT_MAX, "MapPathLockStamp fits the event buffer");
 static_assert(sizeof(MapSetSeaLevel) <= REPLAY_EVENT_MAX, "MapSetSeaLevel fits the event buffer");
+static_assert(sizeof(MapSetEdge) <= REPLAY_EVENT_MAX, "MapSetEdge fits the event buffer");
 static_assert(sizeof(MapCellsChanged) <= REPLAY_EVENT_MAX, "MapCellsChanged fits the event buffer");
 static_assert(sizeof(WeaponsDamage) <= REPLAY_EVENT_MAX, "WeaponsDamage fits the event buffer");
 static_assert(sizeof(WeaponsDetonate) <= REPLAY_EVENT_MAX, "WeaponsDetonate fits the event buffer");
@@ -1326,6 +1332,9 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "ModelPiece", sizeof(ModelPiece), RS_STATE, RT_ORDER, 14, 1, 0, 0, 0, 0 },
     { "CobScriptBase", sizeof(CobScript), RS_STATE, RT_ORDER, 0, 0, 27, 1, 0, 0 },
     { "GafSources", sizeof(StringRef), RS_STATE, 25, 0, 0, 0, 0, 0, 0 },
+    { "PathMapInfo", sizeof(PathMapInfo), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "PathUnitState", sizeof(PathUnitState), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "PathRequest", sizeof(PathRequest), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsEventHeader", sizeof(WindMeteorsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsParams", sizeof(WindMeteorsParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsLimits", sizeof(WindMeteorsLimits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -1347,6 +1356,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "MapPassMaps", sizeof(MapPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapPathLockStamp", sizeof(MapPathLockStamp), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapSetSeaLevel", sizeof(MapSetSeaLevel), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "MapSetEdge", sizeof(MapSetEdge), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "MapCellsChanged", sizeof(MapCellsChanged), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WeaponsEventHeader", sizeof(WeaponsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WeaponsDamage", sizeof(WeaponsDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -1477,7 +1487,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FeaturesPassMaps", sizeof(FeaturesPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FeaturesAreaDamage", sizeof(FeaturesAreaDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 263;
+static const unsigned kReplayObjectKindCount = 267;
 
 static const unsigned short kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_VICTORYKILLENEMYCOMMANDER, ROK_VICTORYDESTROYALLUNITS, ROK_VICTORYKILLALLMOBILEUNITS, ROK_VICTORYBUILDUNITTYPE, ROK_VICTORYCAPTUREUNITTYPE, ROK_VICTORYKILLALLOFTYPE, ROK_VICTORYKILLUNITTYPE, ROK_VICTORYUNITTYPEPASSESX, ROK_VICTORYUNITTYPEPASSESZ, ROK_VICTORYTIMERRUNSOUT, ROK_DEFEATCOMMANDERKILLED, ROK_DEFEATALLUNITSKILLED, ROK_DEFEATALLUNITSKILLEDOFTYPE, ROK_DEFEATUNITTYPEKILLED, ROK_DEFEATDEATHTIMERRUNSOUT, ROK_DEFEATANYUNITPASSESX, ROK_DEFEATANYUNITPASSESZ, ROK_PLAINTIMER, ROK_ASSAULTTIMER, ROK_ESCORTTIMER, ROK_SQUADSCOUTTIMER, ROK_SCOUTTIMER, ROK_BUILDTIMER, ROK_SPATIALTIMER, ROK_COBSCRIPT };
 
@@ -2379,6 +2389,30 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "child", offsetof(ModelPiece, child), sizeof(((ModelPiece*)nullptr)->child), ROK_MODELPIECE, RK_REF, ROK_MODELPIECE, 0, 0, {}, 0, 0 },
     { "parent", offsetof(ModelPiece, parent), sizeof(((ModelPiece*)nullptr)->parent), ROK_MODELPIECE, RK_REF, ROK_MODELPIECE, 0, 0, {}, 0, 0 },
     { "ptr", offsetof(StringRef, ptr), sizeof(void*), ROK_GAFSOURCES, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
+    { "width", offsetof(PathMapInfo, width), sizeof(((PathMapInfo*)nullptr)->width), ROK_PATHMAPINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "height", offsetof(PathMapInfo, height), sizeof(((PathMapInfo*)nullptr)->height), ROK_PATHMAPINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unitSlots", offsetof(PathMapInfo, unitSlots), sizeof(((PathMapInfo*)nullptr)->unitSlots), ROK_PATHMAPINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "moveClassCount", offsetof(PathMapInfo, moveClassCount), sizeof(((PathMapInfo*)nullptr)->moveClassCount), ROK_PATHMAPINFO, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "player", offsetof(PathUnitState, player), sizeof(((PathUnitState*)nullptr)->player), ROK_PATHUNITSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "cell", offsetof(PathUnitState, cell), sizeof(((PathUnitState*)nullptr)->cell), ROK_PATHUNITSTATE, RK_POINT16, 0, 0, 0, {}, 0, 0 },
+    { "heading", offsetof(PathUnitState, heading), sizeof(((PathUnitState*)nullptr)->heading), ROK_PATHUNITSTATE, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "moveClass", offsetof(PathUnitState, moveClass), sizeof(((PathUnitState*)nullptr)->moveClass), ROK_PATHUNITSTATE, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "footprintX", offsetof(PathUnitState, footprintX), sizeof(((PathUnitState*)nullptr)->footprintX), ROK_PATHUNITSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "footprintY", offsetof(PathUnitState, footprintY), sizeof(((PathUnitState*)nullptr)->footprintY), ROK_PATHUNITSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(PathRequest, unit), sizeof(((PathRequest*)nullptr)->unit), ROK_PATHREQUEST, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "notBefore", offsetof(PathRequest, notBefore), sizeof(((PathRequest*)nullptr)->notBefore), ROK_PATHREQUEST, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "goalKind", offsetof(PathRequest, goal.kind), sizeof(((PathRequest*)nullptr)->goal.kind), ROK_PATHREQUEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "goalCentre", offsetof(PathRequest, goal.centre), sizeof(((PathRequest*)nullptr)->goal.centre), ROK_PATHREQUEST, RK_POINT16, 0, 0, 0, {}, 0, 0 },
+    { "goalRadius0", offsetof(PathRequest, goal.radius[0]), sizeof(((PathRequest*)nullptr)->goal.radius[0]), ROK_PATHREQUEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "goalRadius1", offsetof(PathRequest, goal.radius[1]), sizeof(((PathRequest*)nullptr)->goal.radius[1]), ROK_PATHREQUEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "goalLeft", offsetof(PathRequest, goal.left), sizeof(((PathRequest*)nullptr)->goal.left), ROK_PATHREQUEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "goalRight", offsetof(PathRequest, goal.right), sizeof(((PathRequest*)nullptr)->goal.right), ROK_PATHREQUEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "goalTop", offsetof(PathRequest, goal.top), sizeof(((PathRequest*)nullptr)->goal.top), ROK_PATHREQUEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "goalBottom", offsetof(PathRequest, goal.bottom), sizeof(((PathRequest*)nullptr)->goal.bottom), ROK_PATHREQUEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "requester", offsetof(PathRequest, requester), sizeof(((PathRequest*)nullptr)->requester), ROK_PATHREQUEST, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "target", offsetof(PathRequest, target), sizeof(((PathRequest*)nullptr)->target), ROK_PATHREQUEST, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "useStart", offsetof(PathRequest, useStart), sizeof(((PathRequest*)nullptr)->useStart), ROK_PATHREQUEST, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "start", offsetof(PathRequest, start), sizeof(((PathRequest*)nullptr)->start), ROK_PATHREQUEST, RK_POINT16, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsEventHeader, kind), sizeof(((WindMeteorsEventHeader*)nullptr)->kind), ROK_WINDMETEORSEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsParams, h.kind), sizeof(((WindMeteorsParams*)nullptr)->h.kind), ROK_WINDMETEORSPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "weapon", offsetof(WindMeteorsParams, params.weapon), 32, ROK_WINDMETEORSPARAMS, RK_STRING, 0, 0, 0, {}, 0, 0 },
@@ -2459,6 +2493,10 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "kind", offsetof(MapSetSeaLevel, h.kind), sizeof(((MapSetSeaLevel*)nullptr)->h.kind), ROK_MAPSETSEALEVEL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MapSetSeaLevel, h.unit), sizeof(((MapSetSeaLevel*)nullptr)->h.unit), ROK_MAPSETSEALEVEL, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "level", offsetof(MapSetSeaLevel, level), sizeof(((MapSetSeaLevel*)nullptr)->level), ROK_MAPSETSEALEVEL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(MapSetEdge, h.kind), sizeof(((MapSetEdge*)nullptr)->h.kind), ROK_MAPSETEDGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(MapSetEdge, h.unit), sizeof(((MapSetEdge*)nullptr)->h.unit), ROK_MAPSETEDGE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "x", offsetof(MapSetEdge, x), sizeof(((MapSetEdge*)nullptr)->x), ROK_MAPSETEDGE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "z", offsetof(MapSetEdge, z), sizeof(((MapSetEdge*)nullptr)->z), ROK_MAPSETEDGE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MapCellsChanged, h.kind), sizeof(((MapCellsChanged*)nullptr)->h.kind), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MapCellsChanged, h.unit), sizeof(((MapCellsChanged*)nullptr)->h.unit), ROK_MAPCELLSCHANGED, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "rect0", offsetof(MapCellsChanged, rect[0]), sizeof(((MapCellsChanged*)nullptr)->rect[0]), ROK_MAPCELLSCHANGED, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -3121,8 +3159,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos1", offsetof(FeaturesAreaDamage, pos[1]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[1]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos2", offsetof(FeaturesAreaDamage, pos[2]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[2]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 1600;
-static const unsigned kReplayWalkableFieldCount = 258;
+static const unsigned kReplayObjectFieldCount = 1628;
+static const unsigned kReplayWalkableFieldCount = 259;
 
 static const unsigned short kReplayReachFields[] = { 47, 102, 257, 258, 259, 91, 100, 0, 22, 102, 260, 39, 42, 43, 44, 46, 48, 68, 91, 97, 99, 100, 101, 103, 104, 105, 106, 107, 60, 133, 138, 148, 152, 162, 176, 163, 164, 147, 165, 0, 22, 91, 99, 39, 47, 103, 105, 138 };
 
@@ -3991,6 +4029,30 @@ static_assert(sizeof(((ModelPiece*)nullptr)->sibling) == 4, "ModelPiece::sibling
 static_assert(sizeof(((ModelPiece*)nullptr)->child) == 4, "ModelPiece::child has the size the schema says");
 static_assert(sizeof(((ModelPiece*)nullptr)->parent) == 4, "ModelPiece::parent has the size the schema says");
 static_assert(__is_pointer(decltype(((StringRef*)nullptr)->ptr)), "StringRef::ptr is a raw pointer");
+static_assert(sizeof(((PathMapInfo*)nullptr)->width) == 4, "PathMapInfo::width has the size the schema says");
+static_assert(sizeof(((PathMapInfo*)nullptr)->height) == 4, "PathMapInfo::height has the size the schema says");
+static_assert(sizeof(((PathMapInfo*)nullptr)->unitSlots) == 4, "PathMapInfo::unitSlots has the size the schema says");
+static_assert(sizeof(((PathMapInfo*)nullptr)->moveClassCount) == 4, "PathMapInfo::moveClassCount has the size the schema says");
+static_assert(sizeof(((PathUnitState*)nullptr)->player) == 4, "PathUnitState::player has the size the schema says");
+static_assert(sizeof(((PathUnitState*)nullptr)->cell) == 4, "PathUnitState::cell has the size the schema says");
+static_assert(sizeof(((PathUnitState*)nullptr)->heading) == 2, "PathUnitState::heading has the size the schema says");
+static_assert(sizeof(((PathUnitState*)nullptr)->moveClass) == 4, "PathUnitState::moveClass has the size the schema says");
+static_assert(sizeof(((PathUnitState*)nullptr)->footprintX) == 4, "PathUnitState::footprintX has the size the schema says");
+static_assert(sizeof(((PathUnitState*)nullptr)->footprintY) == 4, "PathUnitState::footprintY has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->unit) == 4, "PathRequest::unit has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->notBefore) == 4, "PathRequest::notBefore has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->goal.kind) == 4, "PathRequest::goalKind has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->goal.centre) == 4, "PathRequest::goalCentre has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->goal.radius[0]) == 4, "PathRequest::goalRadius0 has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->goal.radius[1]) == 4, "PathRequest::goalRadius1 has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->goal.left) == 4, "PathRequest::goalLeft has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->goal.right) == 4, "PathRequest::goalRight has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->goal.top) == 4, "PathRequest::goalTop has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->goal.bottom) == 4, "PathRequest::goalBottom has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->requester) == 4, "PathRequest::requester has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->target) == 4, "PathRequest::target has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->useStart) == 4, "PathRequest::useStart has the size the schema says");
+static_assert(sizeof(((PathRequest*)nullptr)->start) == 4, "PathRequest::start has the size the schema says");
 static_assert(sizeof(((WindMeteorsEventHeader*)nullptr)->kind) == 4, "WindMeteorsEventHeader::kind has the size the schema says");
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->h.kind) == 4, "WindMeteorsParams::kind has the size the schema says");
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->params.radius) == 4, "WindMeteorsParams::radius has the size the schema says");
@@ -4070,6 +4132,10 @@ static_assert(sizeof(((MapPathLockStamp*)nullptr)->stamp) == 4, "MapPathLockStam
 static_assert(sizeof(((MapSetSeaLevel*)nullptr)->h.kind) == 4, "MapSetSeaLevel::kind has the size the schema says");
 static_assert(sizeof(((MapSetSeaLevel*)nullptr)->h.unit) == 4, "MapSetSeaLevel::unit has the size the schema says");
 static_assert(sizeof(((MapSetSeaLevel*)nullptr)->level) == 4, "MapSetSeaLevel::level has the size the schema says");
+static_assert(sizeof(((MapSetEdge*)nullptr)->h.kind) == 4, "MapSetEdge::kind has the size the schema says");
+static_assert(sizeof(((MapSetEdge*)nullptr)->h.unit) == 4, "MapSetEdge::unit has the size the schema says");
+static_assert(sizeof(((MapSetEdge*)nullptr)->x) == 4, "MapSetEdge::x has the size the schema says");
+static_assert(sizeof(((MapSetEdge*)nullptr)->z) == 4, "MapSetEdge::z has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->h.kind) == 4, "MapCellsChanged::kind has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->h.unit) == 4, "MapCellsChanged::unit has the size the schema says");
 static_assert(sizeof(((MapCellsChanged*)nullptr)->rect[0]) == 4, "MapCellsChanged::rect0 has the size the schema says");
@@ -4816,6 +4882,7 @@ enum ReplaySubsystemId {
     SUB_FILES,
     SUB_NETWORK,
     SUB_ECONWORLD,
+    SUB_PATHWORLD,
     SUB_COUNT
 };
 
@@ -4871,7 +4938,6 @@ enum ReplaySlotId {
     RSL_PATHFINDING_CELLSCHANGED,
     RSL_PATHFINDING_STEP,
     RSL_PATHFINDING_POLL,
-    RSL_PATHFINDING_WRITESTATE,
     RSL_WEAPONS_APPLY,
     RSL_WEAPONS_UPDATEPROJECTILES,
     RSL_WEAPONS_UPDATEEXPLOSIONS,
@@ -5099,6 +5165,24 @@ enum ReplaySlotId {
     RSL_ECONWORLD_TYPEINFO,
     RSL_ECONWORLD_CELLMETAL,
     RSL_ECONWORLD_EMIT,
+    RSL_PATHWORLD_TICK,
+    RSL_PATHWORLD_SEARCHSTEPLIMIT,
+    RSL_PATHWORLD_PLAYERCOUNT,
+    RSL_PATHWORLD_ISPLAYING,
+    RSL_PATHWORLD_UNITSPERPLAYER,
+    RSL_PATHWORLD_FIRSTUNIT,
+    RSL_PATHWORLD_LASTUNIT,
+    RSL_PATHWORLD_NEXTUNIT,
+    RSL_PATHWORLD_UNITSTATE,
+    RSL_PATHWORLD_MOVECLASS,
+    RSL_PATHWORLD_INBOUNDS,
+    RSL_PATHWORLD_PASS,
+    RSL_PATHWORLD_SEENSIZE,
+    RSL_PATHWORLD_SEEN,
+    RSL_PATHWORLD_LINEOFSIGHT,
+    RSL_PATHWORLD_TERRAINPASS,
+    RSL_PATHWORLD_BEGINSEARCH,
+    RSL_PATHWORLD_ENDSEARCH,
     RSL_COUNT
 };
 
@@ -5151,7 +5235,7 @@ static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 42, 
 static const unsigned short kReplayFeaturesApplyAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL, ROK_WEAPONHIT };
 static const unsigned char kReplayFeaturesApplyReads[] = { 1, 2, 18, 19, 22, 85, 86, 87 };
 static const unsigned char kReplayFeaturesApplyWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayFeaturesApplyObjReads[] = { 20, 42, 43, 199, 226, 238, 241, 242, 243, 244, 247, 412, 413, 418, 419, 420, 421, 422, 423, 427, 428, 431, 433, 438, 439, 440, 441, 442, 443, 444, 445, 446, 450, 451, 452, 455, 456, 458, 459, 460, 660, 661 };
+static const unsigned short kReplayFeaturesApplyObjReads[] = { 20, 42, 43, 101, 199, 226, 238, 241, 242, 243, 244, 247, 412, 413, 418, 419, 420, 421, 422, 423, 427, 428, 429, 430, 431, 433, 438, 439, 440, 441, 442, 443, 444, 445, 446, 450, 451, 452, 455, 456, 458, 459, 460, 660, 661 };
 static const unsigned short kReplayFeaturesApplyObjWrites[] = { 241, 242, 243, 244, 247, 439, 440, 441, 442, 443, 444, 445, 446, 450, 451, 452, 453, 454, 455, 458, 459, 460 };
 static const unsigned short kReplayFeaturesPlaceAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL };
 static const unsigned char kReplayFeaturesPlaceReads[] = { 1, 2 };
@@ -5173,7 +5257,7 @@ static const unsigned char kReplayFeaturesUpdateFeatureSpotReads[] = { 0, 1, 2, 
 static const unsigned char kReplayFeaturesUpdateFeatureSpotWrites[] = { 85, 86, 87 };
 static const unsigned short kReplayFeaturesUpdateFeatureSpotObjReads[] = { 42, 43, 238, 241, 242, 243, 244, 247, 397, 398, 399, 400, 409, 412, 413, 418, 419, 426, 427, 431, 432, 433, 435, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 452, 453, 454, 455, 456, 458, 459, 460 };
 static const unsigned short kReplayFeaturesUpdateFeatureSpotObjWrites[] = { 241, 242, 243, 244, 247, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454, 455, 458, 459, 460 };
-static const unsigned short kReplayFeaturesFindFeatureAtPosAllOf[] = { ROK_FEATURE };
+static const unsigned short kReplayFeaturesFindFeatureAtPosAllOf[] = { ROK_CELL, ROK_FEATURE };
 static const unsigned char kReplayFeaturesFindFeatureAtPosReads[] = { 1, 2 };
 static const unsigned short kReplayFeaturesFindFeatureAtPosObjReads[] = { 42, 43, 241, 242, 243, 412 };
 static const unsigned char kReplayAiApplyReads[] = { 0, 15, 39, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 85, 86, 87 };
@@ -5225,6 +5309,28 @@ static const unsigned short kReplayAiCreateSquadManagerObjReads[] = { 35, 37, 70
 static const unsigned short kReplayAiCreateSquadManagerObjWrites[] = { 36, 707, 708, 709, 710, 711, 712, 713 };
 static const unsigned short kReplayAiFreeSquadManagerObjReads[] = { 36, 712 };
 static const unsigned short kReplayAiFreeSquadManagerObjWrites[] = { 36 };
+static const unsigned char kReplayPathfindingRegionSizeReads[] = { 1, 2 };
+static const unsigned short kReplayPathfindingRegionSizeObjReads[] = { 42, 43 };
+static const unsigned char kReplayPathfindingInitReads[] = { 1, 2 };
+static const unsigned char kReplayPathfindingInitWrites[] = { 88 };
+static const unsigned short kReplayPathfindingInitObjReads[] = { 42, 43 };
+static const unsigned char kReplayPathfindingShutdownReads[] = { 1, 2, 88 };
+static const unsigned short kReplayPathfindingShutdownObjReads[] = { 42, 43 };
+static const unsigned char kReplayPathfindingSubmitReads[] = { 1, 2, 88 };
+static const unsigned char kReplayPathfindingSubmitWrites[] = { 88 };
+static const unsigned short kReplayPathfindingSubmitObjReads[] = { 42, 43 };
+static const unsigned char kReplayPathfindingCancelReads[] = { 1, 2, 88 };
+static const unsigned char kReplayPathfindingCancelWrites[] = { 88 };
+static const unsigned short kReplayPathfindingCancelObjReads[] = { 42, 43 };
+static const unsigned char kReplayPathfindingCellsChangedReads[] = { 1, 2, 88 };
+static const unsigned char kReplayPathfindingCellsChangedWrites[] = { 88 };
+static const unsigned short kReplayPathfindingCellsChangedObjReads[] = { 42, 43 };
+static const unsigned char kReplayPathfindingStepReads[] = { 1, 2, 88 };
+static const unsigned char kReplayPathfindingStepWrites[] = { 88 };
+static const unsigned short kReplayPathfindingStepObjReads[] = { 42, 43 };
+static const unsigned char kReplayPathfindingPollReads[] = { 1, 2, 88 };
+static const unsigned char kReplayPathfindingPollWrites[] = { 88 };
+static const unsigned short kReplayPathfindingPollObjReads[] = { 42, 43 };
 static const unsigned short kReplayWeaponsApplyAllOf[] = { ROK_PLAYER, ROK_CELL, ROK_PROJECTILE, ROK_FEATURE, ROK_SPOT, ROK_DEBRISPIECE, ROK_DEBRIS, ROK_EXPLODEDSLOT, ROK_GAFLISTS, ROK_GAFSOURCES };
 static const ReplayIdReach kReplayWeaponsApplyIdReach[] = { { 245, kReplayReachFields + 11, 30 }, { 246, kReplayReachFields + 11, 30 } };
 static const unsigned char kReplayWeaponsApplyReads[] = { 0, 1, 2, 16, 17, 18, 28, 29, 30, 54, 85, 86, 87 };
@@ -5407,8 +5513,8 @@ static const unsigned short kReplayPlayersUpdatePlayersFinishObjReads[] = { 0, 2
 static const unsigned char kReplayPlayersInitWrites[] = { 88 };
 static const unsigned char kReplayPlayersShutdownReads[] = { 88 };
 static const unsigned short kReplayMapApplyAllOf[] = { ROK_UNIT, ROK_SPATIALBUCKET, ROK_CELL, ROK_PASSMAP, ROK_FEATURE };
-static const unsigned char kReplayMapApplyReads[] = { 0, 1, 2, 17, 19, 23, 24, 26, 27 };
-static const unsigned char kReplayMapApplyWrites[] = { 17 };
+static const unsigned char kReplayMapApplyReads[] = { 0, 1, 2, 17, 19, 23, 24, 26, 27, 31, 32, 41, 42 };
+static const unsigned char kReplayMapApplyWrites[] = { 17, 41, 42 };
 static const unsigned short kReplayMapApplyObjReads[] = { 0, 22, 42, 43, 46, 63, 64, 65, 91, 92, 93, 99, 100, 102, 103, 104, 105, 126, 233, 234, 236, 237, 239, 240, 241, 242, 243, 244, 245, 246, 260, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 438 };
 static const unsigned short kReplayMapApplyObjWrites[] = { 63, 65, 91, 92, 233, 234, 236, 237, 244, 260, 319 };
 static const unsigned short kReplayMapGetCellMeanHeightAllOf[] = { ROK_CELL };
@@ -5528,14 +5634,14 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UnitAccount", SUB_ECONOMY, kReplayEconomyUnitAccountReads, 1, kReplayEconomyUnitAccountWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetCellFeature", SUB_FEATURES, kReplayFeaturesGetCellFeatureReads, 2, nullptr, 0, kReplayFeaturesGetCellFeatureObjReads, 3, nullptr, 0, nullptr, 0 },
     { "GetFootprintCentre", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesGetFootprintCentreObjReads, 3, nullptr, 0, nullptr, 0 },
-    { "Apply", SUB_FEATURES, kReplayFeaturesApplyReads, 8, kReplayFeaturesApplyWrites, 3, kReplayFeaturesApplyObjReads, 42, kReplayFeaturesApplyObjWrites, 22, kReplayFeaturesApplyAllOf, 5 },
+    { "Apply", SUB_FEATURES, kReplayFeaturesApplyReads, 8, kReplayFeaturesApplyWrites, 3, kReplayFeaturesApplyObjReads, 45, kReplayFeaturesApplyObjWrites, 22, kReplayFeaturesApplyAllOf, 5 },
     { "Place", SUB_FEATURES, kReplayFeaturesPlaceReads, 2, nullptr, 0, kReplayFeaturesPlaceObjReads, 18, kReplayFeaturesPlaceObjWrites, 19, kReplayFeaturesPlaceAllOf, 4 },
     { "FeatureTypeCount", SUB_FEATURES, kReplayFeaturesFeatureTypeCountReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "AnimateFeatureType", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesAnimateFeatureTypeObjReads, 3, kReplayFeaturesAnimateFeatureTypeObjWrites, 2, kReplayFeaturesAnimateFeatureTypeAllOf, 1 },
     { "ScanFeatureCell", SUB_FEATURES, kReplayFeaturesScanFeatureCellReads, 6, kReplayFeaturesScanFeatureCellWrites, 4, kReplayFeaturesScanFeatureCellObjReads, 21, kReplayFeaturesScanFeatureCellObjWrites, 19, kReplayFeaturesScanFeatureCellAllOf, 4 },
     { "FirstFeatureSpot", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesFirstFeatureSpotObjReads, 1, nullptr, 0, kReplayFeaturesFirstFeatureSpotAllOf, 1 },
     { "UpdateFeatureSpot", SUB_FEATURES, kReplayFeaturesUpdateFeatureSpotReads, 10, kReplayFeaturesUpdateFeatureSpotWrites, 3, kReplayFeaturesUpdateFeatureSpotObjReads, 44, kReplayFeaturesUpdateFeatureSpotObjWrites, 25, kReplayFeaturesUpdateFeatureSpotAllOf, 4 },
-    { "FindFeatureAtPos", SUB_FEATURES, kReplayFeaturesFindFeatureAtPosReads, 2, nullptr, 0, kReplayFeaturesFindFeatureAtPosObjReads, 6, nullptr, 0, kReplayFeaturesFindFeatureAtPosAllOf, 1 },
+    { "FindFeatureAtPos", SUB_FEATURES, kReplayFeaturesFindFeatureAtPosReads, 2, nullptr, 0, kReplayFeaturesFindFeatureAtPosObjReads, 6, nullptr, 0, kReplayFeaturesFindFeatureAtPosAllOf, 2 },
     { "Apply", SUB_AI, kReplayAiApplyReads, 17, kReplayAiApplyWrites, 4, kReplayAiApplyObjReads, 13, kReplayAiApplyObjWrites, 4, nullptr, 0 },
     { "DumpPlayerAI", SUB_AI, kReplayAiDumpPlayerAIReads, 13, nullptr, 0, kReplayAiDumpPlayerAIObjReads, 7, kReplayAiDumpPlayerAIObjWrites, 3, kReplayAiDumpPlayerAIAllOf, 1 },
     { "ResetAIPlayers", SUB_AI, kReplayAiResetAIPlayersReads, 11, nullptr, 0, kReplayAiResetAIPlayersObjReads, 10, nullptr, 0, kReplayAiResetAIPlayersAllOf, 1 },
@@ -5550,15 +5656,14 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UpdateSquads", SUB_AI, kReplayAiUpdateSquadsReads, 22, kReplayAiUpdateSquadsWrites, 3, kReplayAiUpdateSquadsObjReads, 142, kReplayAiUpdateSquadsObjWrites, 37, kReplayAiUpdateSquadsAllOf, 2 },
     { "CreateSquadManager", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiCreateSquadManagerObjReads, 3, kReplayAiCreateSquadManagerObjWrites, 8, nullptr, 0 },
     { "FreeSquadManager", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiFreeSquadManagerObjReads, 2, kReplayAiFreeSquadManagerObjWrites, 1, nullptr, 0 },
-    { "RegionSize", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Init", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Shutdown", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Submit", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Cancel", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "CellsChanged", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Step", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Poll", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "WriteState", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "RegionSize", SUB_PATHFINDING, kReplayPathfindingRegionSizeReads, 2, nullptr, 0, kReplayPathfindingRegionSizeObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "Init", SUB_PATHFINDING, kReplayPathfindingInitReads, 2, kReplayPathfindingInitWrites, 1, kReplayPathfindingInitObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "Shutdown", SUB_PATHFINDING, kReplayPathfindingShutdownReads, 3, nullptr, 0, kReplayPathfindingShutdownObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "Submit", SUB_PATHFINDING, kReplayPathfindingSubmitReads, 3, kReplayPathfindingSubmitWrites, 1, kReplayPathfindingSubmitObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "Cancel", SUB_PATHFINDING, kReplayPathfindingCancelReads, 3, kReplayPathfindingCancelWrites, 1, kReplayPathfindingCancelObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "CellsChanged", SUB_PATHFINDING, kReplayPathfindingCellsChangedReads, 3, kReplayPathfindingCellsChangedWrites, 1, kReplayPathfindingCellsChangedObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "Step", SUB_PATHFINDING, kReplayPathfindingStepReads, 3, kReplayPathfindingStepWrites, 1, kReplayPathfindingStepObjReads, 2, nullptr, 0, nullptr, 0 },
+    { "Poll", SUB_PATHFINDING, kReplayPathfindingPollReads, 3, kReplayPathfindingPollWrites, 1, kReplayPathfindingPollObjReads, 2, nullptr, 0, nullptr, 0 },
     { "Apply", SUB_WEAPONS, kReplayWeaponsApplyReads, 13, kReplayWeaponsApplyWrites, 5, kReplayWeaponsApplyObjReads, 181, kReplayWeaponsApplyObjWrites, 90, kReplayWeaponsApplyAllOf, 10, kReplayWeaponsApplyIdReach, 2 },
     { "UpdateProjectiles", SUB_WEAPONS, kReplayWeaponsUpdateProjectilesReads, 16, kReplayWeaponsUpdateProjectilesWrites, 5, kReplayWeaponsUpdateProjectilesObjReads, 114, kReplayWeaponsUpdateProjectilesObjWrites, 41, kReplayWeaponsUpdateProjectilesAllOf, 7, kReplayWeaponsUpdateProjectilesIdReach, 2 },
     { "UpdateExplosions", SUB_WEAPONS, kReplayWeaponsUpdateExplosionsReads, 3, kReplayWeaponsUpdateExplosionsWrites, 1, kReplayWeaponsUpdateExplosionsObjReads, 41, kReplayWeaponsUpdateExplosionsObjWrites, 32, kReplayWeaponsUpdateExplosionsAllOf, 7 },
@@ -5619,7 +5724,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "RegionSize", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Init", SUB_PLAYERS, nullptr, 0, kReplayPlayersInitWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Shutdown", SUB_PLAYERS, kReplayPlayersShutdownReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "Apply", SUB_MAP, kReplayMapApplyReads, 9, kReplayMapApplyWrites, 1, kReplayMapApplyObjReads, 45, kReplayMapApplyObjWrites, 11, kReplayMapApplyAllOf, 5 },
+    { "Apply", SUB_MAP, kReplayMapApplyReads, 13, kReplayMapApplyWrites, 3, kReplayMapApplyObjReads, 45, kReplayMapApplyObjWrites, 11, kReplayMapApplyAllOf, 5 },
     { "GetCellMeanHeight", SUB_MAP, kReplayMapGetCellMeanHeightReads, 2, nullptr, 0, kReplayMapGetCellMeanHeightObjReads, 2, nullptr, 0, kReplayMapGetCellMeanHeightAllOf, 1 },
     { "CanBuildAt", SUB_MAP, kReplayMapCanBuildAtReads, 9, kReplayMapCanBuildAtWrites, 2, kReplayMapCanBuildAtObjReads, 22, nullptr, 0, kReplayMapCanBuildAtAllOf, 2 },
     { "CanPlaceUnitFootprint", SUB_MAP, kReplayMapCanPlaceUnitFootprintReads, 9, kReplayMapCanPlaceUnitFootprintWrites, 2, kReplayMapCanPlaceUnitFootprintObjReads, 24, nullptr, 0, kReplayMapCanPlaceUnitFootprintAllOf, 2 },
@@ -5786,6 +5891,24 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "TypeInfo", SUB_ECONWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "CellMetal", SUB_ECONWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Emit", SUB_ECONWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Tick", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "SearchStepLimit", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "PlayerCount", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "IsPlaying", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UnitsPerPlayer", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "FirstUnit", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "LastUnit", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "NextUnit", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UnitState", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "MoveClass", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "InBounds", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Pass", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "SeenSize", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "Seen", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "LineOfSight", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "TerrainPass", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "BeginSearch", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "EndSearch", SUB_PATHWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
 };
 static const unsigned kReplaySlotCount = RSL_COUNT;
 
@@ -5794,20 +5917,21 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "economy", 5, 0, 1, 8, 11, RET_ECONOMY },
     { "features", 5, 1, 1, 19, 10, RET_FEATURES },
     { "ai", 6, 0, 1, 29, 14, RET_AI },
-    { "pathfinding", 4, 0, 0, 43, 9, RET_COUNT },
-    { "weapons", 4, 0, 1, 52, 9, RET_WEAPONS },
-    { "targeting", 4, 0, 1, 61, 7, RET_TARGETING },
-    { "los_radar", 5, 0, 1, 68, 20, RET_LOS_RADAR },
-    { "orders", 6, 2, 0, 88, 7, RET_ORDERS },
-    { "units", 7, 1, 1, 95, 8, RET_UNITS },
-    { "players", 5, 1, 1, 103, 9, RET_PLAYERS },
-    { "map", 9, 1, 1, 112, 11, RET_MAP },
-    { "scripts", 3, 0, 1, 123, 13, RET_SCRIPTS },
-    { "movement", 5, 0, 0, 136, 20, RET_MOVEMENT },
-    { "mission", 2, 0, 1, 156, 12, RET_COUNT },
-    { "files", 3, 0, 0, 168, 58, RET_COUNT },
-    { "network", 2, 0, 0, 226, 22, RET_COUNT },
-    { "econworld", 5, 0, 1, 248, 0, RET_COUNT },
+    { "pathfinding", 4, 0, 1, 43, 8, RET_COUNT },
+    { "weapons", 4, 0, 1, 51, 9, RET_WEAPONS },
+    { "targeting", 4, 0, 1, 60, 7, RET_TARGETING },
+    { "los_radar", 5, 0, 1, 67, 20, RET_LOS_RADAR },
+    { "orders", 6, 2, 0, 87, 7, RET_ORDERS },
+    { "units", 7, 1, 1, 94, 8, RET_UNITS },
+    { "players", 5, 1, 1, 102, 9, RET_PLAYERS },
+    { "map", 9, 2, 1, 111, 11, RET_MAP },
+    { "scripts", 3, 0, 1, 122, 13, RET_SCRIPTS },
+    { "movement", 5, 0, 0, 135, 20, RET_MOVEMENT },
+    { "mission", 2, 0, 1, 155, 12, RET_COUNT },
+    { "files", 3, 0, 0, 167, 58, RET_COUNT },
+    { "network", 2, 0, 0, 225, 22, RET_COUNT },
+    { "econworld", 5, 0, 1, 247, 0, RET_COUNT },
+    { "pathworld", 4, 0, 1, 247, 0, RET_COUNT },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

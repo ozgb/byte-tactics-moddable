@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v34` is the fixed target for anyone writing a new
+The git tag `reference-traces-v41` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v34`**.
+code as a base. This page names the current tag: **`reference-traces-v41`**.
 
 ## What the tag holds
 
@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v34`**.
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 91 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 93 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest and one 64-bit end-of-tick state per tick
   for each scenario.
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v34`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v34
+git checkout reference-traces-v41
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -136,7 +136,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v34
+git checkout reference-traces-v41
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -208,9 +208,9 @@ What the code shows about the players fields (the player loader and saver):
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v35`
+the digests that should become a target gets a new tag (`reference-traces-v42`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v34`. The oracle kit pairs it with the interfaces of #1028, `interfaces-v32`
+`reference-traces-v41`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v40`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
@@ -375,11 +375,31 @@ and so on), and this page is updated to name it. The current tag is
   `bt-event-digest 2` (#1039): the lines of v33 and a `tick` line for each tick that has events. The sound logs, UI
   logs and frames are those of v33, and the saves decode equal to v33's.
 
+- `reference-traces-v35`: the 91 scenarios and digests of v34, with the files gate's stored readings in
+  `reference/files/` (#1046): what a clean-room data loader must read from the game's files.
+- `reference-traces-v36`: the same as v35, with COB, GAF and 3DO readings added to `reference/files/` (#1071).
+- `reference-traces-v37`: the same 91 scenarios and digests as v36, with the engine core gate's vectors in
+  `reference/core/` (#1041, #1076: commands, console, fuel, hash, host, loader and runtime), the commands of a tick
+  stated as events (#1040), and the files gate's readings with floats converted as 3.1c's `_ftol` (#1066). The
+  traces, events, sound and UI logs are those of v36.
+- `reference-traces-v38`: the same 91 scenarios and digests as v37 (#1048). A click is sent as one group command,
+  so the UI logs of six scenarios gain `command` lines; the traces and event digests are those of v37.
+- `reference-traces-v39`: the same 91 scenarios and digests as v38, with more `reference/core/` vectors closing the
+  engine core kit's gaps (#1090).
+- `reference-traces-v40`: the 91 scenarios of v39 and a new one, `console-edge` (#1087), 92 in all, in which the
+  console cuts in the map's playable edges and later puts them back. The trace format is still `bt-trace 9`; the digests of the 91 are those of
+  v39 (only each trace's commit line changed), and the new scenario adds its own trace, events, sound and UI logs.
+  The saves decode equal to v39's.
+- `reference-traces-v41`: the 92 scenarios of v40 and a new one, `orders-reclaim-feature` (#897), 93 in all, in
+  which the human Arm commander reclaims a tree that the console places. The trace format is still `bt-trace 9`; the
+  92 traces are those of v40, and the new scenario adds its own trace, events, sound and UI logs. The saves are those
+  of v40.
+
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 is `bt-trace 9`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v41 are `bt-trace 9`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

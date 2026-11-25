@@ -4445,12 +4445,8 @@ address,function,file,kind,target
 0x416710,CmdRCache,src/game/console_commands.cpp,function,
 0x416710,CmdRCache,src/game/console_commands.cpp,global_read,g_game
 0x416730,CmdEdge,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
-0x416730,CmdEdge,src/game/console_commands.cpp,field_read,Game::baseX
-0x416730,CmdEdge,src/game/console_commands.cpp,field_read,Game::baseY
-0x416730,CmdEdge,src/game/console_commands.cpp,field_write,Game::mapHeight
-0x416730,CmdEdge,src/game/console_commands.cpp,field_write,Game::mapWidth
+0x416730,CmdEdge,src/game/console_commands.cpp,call,MapPublishSetEdge
 0x416730,CmdEdge,src/game/console_commands.cpp,function,
-0x416730,CmdEdge,src/game/console_commands.cpp,global_read,g_game
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetArg
 0x416780,CmdSearch,src/game/console_commands.cpp,call,CommandArgs::GetIntArg
 0x416780,CmdSearch,src/game/console_commands.cpp,call,SimSetSearchSteps
@@ -42655,6 +42651,23 @@ address,function,file,kind,target
 ,AiWriteTimer,src/ai/ai_player.cpp,global_read,classes@AiWriteTimer
 ,AiWriteTimer,src/ai/ai_player.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,Align8,src/ai/pathfind_hpa.cpp,function,
+,AllocAtLocked,src/state/block.cpp,call,At
+,AllocAtLocked,src/state/block.cpp,call,ChunkSizeFor
+,AllocAtLocked,src/state/block.cpp,call,CountUse
+,AllocAtLocked,src/state/block.cpp,call,Head
+,AllocAtLocked,src/state/block.cpp,call,Size
+,AllocAtLocked,src/state/block.cpp,call,memset
+,AllocAtLocked,src/state/block.cpp,field_read,BlockChunk::aux
+,AllocAtLocked,src/state/block.cpp,field_read,BlockChunk::size
+,AllocAtLocked,src/state/block.cpp,field_read,BlockHeader::freeHead
+,AllocAtLocked,src/state/block.cpp,field_write,BlockChunk::aux
+,AllocAtLocked,src/state/block.cpp,field_write,BlockChunk::size
+,AllocAtLocked,src/state/block.cpp,field_write,BlockHeader::freeHead
+,AllocAtLocked,src/state/block.cpp,function,
+,AllocAtLocked,src/state/block.cpp,global_read,kChunkHeader
+,AllocAtLocked,src/state/block.cpp,global_read,kFirstChunk
+,AllocAtLocked,src/state/block.cpp,global_read,kFreeBit
+,AllocAtLocked,src/state/block.cpp,global_read,kMinChunk
 ,AllocDepthFrame,src/graphics/gaf.cpp,call,GameAllocIgnoreTag
 ,AllocDepthFrame,src/graphics/gaf.cpp,field_write,GafFrame::blend
 ,AllocDepthFrame,src/graphics/gaf.cpp,field_write,GafFrame::compressed
@@ -42843,15 +42856,21 @@ address,function,file,kind,target
 ,ApplyMapEvent,src/map/terrain.cpp,call,SpatialBucket::UnlinkUnit
 ,ApplyMapEvent,src/map/terrain.cpp,call,get
 ,ApplyMapEvent,src/map/terrain.cpp,call,operator bool
+,ApplyMapEvent,src/map/terrain.cpp,field_read,Game::baseX
+,ApplyMapEvent,src/map/terrain.cpp,field_read,Game::baseY
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEventHeader::kind
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapEventHeader::unit
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapPassMaps::cell
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapPassMaps::size
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapPathLockStamp::stamp
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MapSetEdge::x
+,ApplyMapEvent,src/map/terrain.cpp,field_read,MapSetEdge::z
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapSetSeaLevel::level
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,MapSetYard::open
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,Unit::motion
 ,ApplyMapEvent,src/map/terrain.cpp,field_read,Unit::spatialBucket
+,ApplyMapEvent,src/map/terrain.cpp,field_write,Game::mapHeight
+,ApplyMapEvent,src/map/terrain.cpp,field_write,Game::mapWidth
 ,ApplyMapEvent,src/map/terrain.cpp,field_write,Game::seaLevel
 ,ApplyMapEvent,src/map/terrain.cpp,function,
 ,ApplyMapEvent,src/map/terrain.cpp,global_read,g_game
@@ -42985,8 +43004,15 @@ address,function,file,kind,target
 ,ArgObject,src/harness/replay.cpp,call,ReplayText::AddChar
 ,ArgObject,src/harness/replay.cpp,call,Table
 ,ArgObject,src/harness/replay.cpp,function,
+,ArgOutBytes,src/harness/replay.cpp,call,ReplayBytes
+,ArgOutBytes,src/harness/replay.cpp,call,ReplayText::Add
+,ArgOutBytes,src/harness/replay.cpp,call,ReplayText::AddChar
+,ArgOutBytes,src/harness/replay.cpp,function,
 ,ArgPending,src/harness/replay.cpp,call,ReplayText::Add
 ,ArgPending,src/harness/replay.cpp,function,
+,ArgRegionOffset,src/harness/replay.cpp,call,ArgValue
+,ArgRegionOffset,src/harness/replay.cpp,call,SimBlockBase
+,ArgRegionOffset,src/harness/replay.cpp,function,
 ,ArgRegionResult,src/harness/replay.cpp,call,ReplayText::Add
 ,ArgRegionResult,src/harness/replay.cpp,field_read,RegionState::ptr
 ,ArgRegionResult,src/harness/replay.cpp,function,
@@ -48070,6 +48096,7 @@ address,function,file,kind,target
 ,HeuristicOf,src/ai/pathfind_hpa.cpp,field_read,PathRequest::goal
 ,HeuristicOf,src/ai/pathfind_hpa.cpp,function,
 ,HexDigit,src/harness/replay_objects.cpp,function,
+,HookSeams,src/harness/replay_hooks.inc,call,WrapWorldPathworld
 ,HookSeams,src/harness/replay_hooks.inc,call,operator=
 ,HookSeams,src/harness/replay_hooks.inc,deref_read,*AiSeam
 ,HookSeams,src/harness/replay_hooks.inc,deref_read,*EconomySeam
@@ -48100,6 +48127,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::network
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::orders
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::pathfinding
+,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::pathworld
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::players
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::scripts
 ,HookSeams,src/harness/replay_hooks.inc,field_read,Seams::targeting
@@ -48302,7 +48330,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Shutdown
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Step
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Submit
-,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::WriteState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::DeactivateConditions
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::Init
@@ -48341,6 +48368,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::network
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::orders
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::pathfinding
+,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::pathworld
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::players
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::scripts
 ,HookSeams,src/harness/replay_hooks.inc,field_write,Seams::targeting
@@ -48583,7 +48611,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingShutdown
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingStep
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingSubmit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingWriteState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersDeactivateConditions
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersInit
@@ -51268,6 +51295,12 @@ address,function,file,kind,target
 ,MapPublishCellsChanged,src/game/map_events.h,field_write,MapCellsChanged::rect
 ,MapPublishCellsChanged,src/game/map_events.h,field_write,MapEventHeader::kind
 ,MapPublishCellsChanged,src/game/map_events.h,function,
+,MapPublishSetEdge,src/game/map_events.h,call,SchedPublish
+,MapPublishSetEdge,src/game/map_events.h,call,memset
+,MapPublishSetEdge,src/game/map_events.h,field_write,MapEventHeader::kind
+,MapPublishSetEdge,src/game/map_events.h,field_write,MapSetEdge::x
+,MapPublishSetEdge,src/game/map_events.h,field_write,MapSetEdge::z
+,MapPublishSetEdge,src/game/map_events.h,function,
 ,MapPublishSetSeaLevel,src/game/map_events.h,call,SchedPublish
 ,MapPublishSetSeaLevel,src/game/map_events.h,call,memset
 ,MapPublishSetSeaLevel,src/game/map_events.h,field_write,MapEventHeader::kind
@@ -54718,6 +54751,7 @@ address,function,file,kind,target
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,global_read,s_inner_economy
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,indirect_call,indirect via double (*const)(EconType) __attribute__((stdcall)) [EconomySeam::GetEnergyUse]
+,RecEconomyInit,src/harness/replay_hooks.inc,call,ArgRegionOffset
 ,RecEconomyInit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecEconomyInit,src/harness/replay_hooks.inc,call,ArgValueStruct
 ,RecEconomyInit,src/harness/replay_hooks.inc,call,RegionBind
@@ -55034,7 +55068,6 @@ address,function,file,kind,target
 ,RecFeaturesApply,src/harness/replay_hooks.inc,call,EventRoots
 ,RecFeaturesApply,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFeaturesApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecFeaturesApply,src/harness/replay_hooks.inc,field_read,FeaturesEventHeader::kind
 ,RecFeaturesApply,src/harness/replay_hooks.inc,field_read,FeaturesSeam::Apply
 ,RecFeaturesApply,src/harness/replay_hooks.inc,function,
 ,RecFeaturesApply,src/harness/replay_hooks.inc,global_read,s_call
@@ -55269,7 +55302,7 @@ address,function,file,kind,target
 ,RecFilesBankOpenNumberedBox,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecFilesBankOpenNumberedBox,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(HapiBank *, int) __attribute__((stdcall)) [FilesSeam::BankOpenNumberedBox]"
 ,RecFilesBankReadBox,src/harness/replay_hooks.inc,call,ArgHandle
-,RecFilesBankReadBox,src/harness/replay_hooks.inc,call,ArgPending
+,RecFilesBankReadBox,src/harness/replay_hooks.inc,call,ArgOutBytes
 ,RecFilesBankReadBox,src/harness/replay_hooks.inc,call,ArgValue
 ,RecFilesBankReadBox,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFilesBankReadBox,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -55811,6 +55844,7 @@ address,function,file,kind,target
 ,RecLosRadarHasReadyUnitInRange,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarHasReadyUnitInRange,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarHasReadyUnitInRange,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, const Vec3 *, int) __attribute__((stdcall)) [LosRadarSeam::HasReadyUnitInRange]"
+,RecLosRadarInit,src/harness/replay_hooks.inc,call,ArgRegionOffset
 ,RecLosRadarInit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarInit,src/harness/replay_hooks.inc,call,ArgValueStruct
 ,RecLosRadarInit,src/harness/replay_hooks.inc,call,RegionBind
@@ -56068,7 +56102,7 @@ address,function,file,kind,target
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
-,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ArgPending
+,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ArgOutBytes
 ,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,ArgValueStruct
 ,RecMapUnitsInRange,src/harness/replay_hooks.inc,call,FinishImport
@@ -56815,7 +56849,7 @@ address,function,file,kind,target
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [OrdersSeam::RunSecondaryOrders]
-,RecPathfindingCancel,src/harness/replay_hooks.inc,call,ArgPending
+,RecPathfindingCancel,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,field_read,PathfindingSeam::Cancel
@@ -56835,8 +56869,10 @@ address,function,file,kind,target
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
-,RecPathfindingInit,src/harness/replay_hooks.inc,call,ArgPending
+,RecPathfindingInit,src/harness/replay_hooks.inc,call,ArgRegionOffset
 ,RecPathfindingInit,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathfindingInit,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecPathfindingInit,src/harness/replay_hooks.inc,call,RegionBind
 ,RecPathfindingInit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingInit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingInit,src/harness/replay_hooks.inc,field_read,PathfindingSeam::Init
@@ -56844,7 +56880,7 @@ address,function,file,kind,target
 ,RecPathfindingInit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPathfindingInit,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingInit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(const PathMapInfo *, void *, unsigned int) __attribute__((stdcall)) [PathfindingSeam::Init]"
-,RecPathfindingPoll,src/harness/replay_hooks.inc,call,ArgPending
+,RecPathfindingPoll,src/harness/replay_hooks.inc,call,ArgOutBytes
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -56854,8 +56890,8 @@ address,function,file,kind,target
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecPathfindingPoll,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(PathfindingEventHeader *, unsigned int, PathPoint *, int) __attribute__((stdcall)) [PathfindingSeam::Poll]"
-,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,ArgPending
 ,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,ArgValueStruct
 ,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingRegionSize,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingRegionSize,src/harness/replay_hooks.inc,field_read,PathfindingSeam::RegionSize
@@ -56864,11 +56900,13 @@ address,function,file,kind,target
 ,RecPathfindingRegionSize,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingRegionSize,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecPathfindingRegionSize,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned int (*const)(const PathMapInfo *) __attribute__((stdcall)) [PathfindingSeam::RegionSize]
+,RecPathfindingShutdown,src/harness/replay_hooks.inc,call,ArgRegionResult
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,field_read,PathfindingSeam::Shutdown
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,function,
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
+,RecPathfindingShutdown,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecPathfindingShutdown,src/harness/replay_hooks.inc,indirect_call,indirect via void *(*const)() __attribute__((stdcall)) [PathfindingSeam::Shutdown]
 ,RecPathfindingStep,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingStep,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -56876,7 +56914,7 @@ address,function,file,kind,target
 ,RecPathfindingStep,src/harness/replay_hooks.inc,function,
 ,RecPathfindingStep,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingStep,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [PathfindingSeam::Step]
-,RecPathfindingSubmit,src/harness/replay_hooks.inc,call,ArgPending
+,RecPathfindingSubmit,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,field_read,PathfindingSeam::Submit
@@ -56884,14 +56922,244 @@ address,function,file,kind,target
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingSubmit,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const PathRequest *) __attribute__((stdcall)) [PathfindingSeam::Submit]
-,RecPathfindingWriteState,src/harness/replay_hooks.inc,call,ArgPending
-,RecPathfindingWriteState,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecPathfindingWriteState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecPathfindingWriteState,src/harness/replay_hooks.inc,field_read,PathfindingSeam::WriteState
-,RecPathfindingWriteState,src/harness/replay_hooks.inc,function,
-,RecPathfindingWriteState,src/harness/replay_hooks.inc,global_read,s_call
-,RecPathfindingWriteState,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
-,RecPathfindingWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [PathfindingSeam::WriteState]
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,field_read,PathWorldView::BeginSearch
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,function,
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldBeginSearch,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(PathUnit) __attribute__((stdcall)) [PathWorldView::BeginSearch]
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,field_read,PathWorldView::EndSearch
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,function,
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldEndSearch,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(PathUnit) __attribute__((stdcall)) [PathWorldView::EndSearch]
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,field_read,PathWorldView::FirstUnit
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,function,
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldFirstUnit,src/harness/replay_hooks.inc,indirect_call,indirect via PathUnit (*const)(int) __attribute__((stdcall)) [PathWorldView::FirstUnit]
+,RecPathworldInBounds,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldInBounds,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldInBounds,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldInBounds,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldInBounds,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldInBounds,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldInBounds,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldInBounds,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldInBounds,src/harness/replay_hooks.inc,field_read,PathWorldView::InBounds
+,RecPathworldInBounds,src/harness/replay_hooks.inc,function,
+,RecPathworldInBounds,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldInBounds,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldInBounds,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldInBounds,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(PathClass, int, int) __attribute__((stdcall)) [PathWorldView::InBounds]"
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,field_read,PathWorldView::IsPlaying
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,function,
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldIsPlaying,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(int) __attribute__((stdcall)) [PathWorldView::IsPlaying]
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,field_read,PathWorldView::LastUnit
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,function,
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldLastUnit,src/harness/replay_hooks.inc,indirect_call,indirect via PathUnit (*const)(int) __attribute__((stdcall)) [PathWorldView::LastUnit]
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,field_read,PathWorldView::LineOfSight
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,function,
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldLineOfSight,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(PathClass, int, int, int, int) __attribute__((stdcall)) [PathWorldView::LineOfSight]"
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,field_read,PathWorldView::MoveClass
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,function,
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldMoveClass,src/harness/replay_hooks.inc,indirect_call,indirect via PathClass (*const)(int) __attribute__((stdcall)) [PathWorldView::MoveClass]
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,field_read,PathWorldView::NextUnit
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,function,
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldNextUnit,src/harness/replay_hooks.inc,indirect_call,indirect via PathUnit (*const)(PathUnit) __attribute__((stdcall)) [PathWorldView::NextUnit]
+,RecPathworldPass,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldPass,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldPass,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldPass,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldPass,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldPass,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldPass,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldPass,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldPass,src/harness/replay_hooks.inc,field_read,PathWorldView::Pass
+,RecPathworldPass,src/harness/replay_hooks.inc,function,
+,RecPathworldPass,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldPass,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldPass,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldPass,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(PathClass, int, int) __attribute__((stdcall)) [PathWorldView::Pass]"
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,field_read,PathWorldView::PlayerCount
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,function,
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldPlayerCount,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)() __attribute__((stdcall)) [PathWorldView::PlayerCount]
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,field_read,PathWorldView::SearchStepLimit
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,function,
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldSearchStepLimit,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned int (*const)() __attribute__((stdcall)) [PathWorldView::SearchStepLimit]
+,RecPathworldSeen,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldSeen,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldSeen,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldSeen,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldSeen,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldSeen,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldSeen,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldSeen,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldSeen,src/harness/replay_hooks.inc,field_read,PathWorldView::Seen
+,RecPathworldSeen,src/harness/replay_hooks.inc,function,
+,RecPathworldSeen,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldSeen,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldSeen,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldSeen,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, int, int) __attribute__((stdcall)) [PathWorldView::Seen]"
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,call,ImportOutScalar
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,field_read,PathWorldView::SeenSize
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,function,
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldSeenSize,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int *, int *) __attribute__((stdcall)) [PathWorldView::SeenSize]"
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,field_read,PathWorldView::TerrainPass
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,function,
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldTerrainPass,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(PathClass, int, int) __attribute__((stdcall)) [PathWorldView::TerrainPass]"
+,RecPathworldTick,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldTick,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldTick,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldTick,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldTick,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldTick,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldTick,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldTick,src/harness/replay_hooks.inc,field_read,PathWorldView::Tick
+,RecPathworldTick,src/harness/replay_hooks.inc,function,
+,RecPathworldTick,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldTick,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldTick,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned int (*const)() __attribute__((stdcall)) [PathWorldView::Tick]
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,ArgStruct
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,ImportOutInOut
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,ImportValue
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldUnitState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldUnitState,src/harness/replay_hooks.inc,field_read,PathWorldView::UnitState
+,RecPathworldUnitState,src/harness/replay_hooks.inc,function,
+,RecPathworldUnitState,src/harness/replay_hooks.inc,global_read,s_call
+,RecPathworldUnitState,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldUnitState,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldUnitState,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(PathUnit, PathUnitState *) __attribute__((stdcall)) [PathWorldView::UnitState]"
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,call,ArgValue
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,call,FinishImport
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,call,ImportResult
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,field_read,PathWorldView::UnitsPerPlayer
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,function,
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,global_read,s_inner_pathworld
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,global_read,s_tail
+,RecPathworldUnitsPerPlayer,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)() __attribute__((stdcall)) [PathWorldView::UnitsPerPlayer]
 ,RecPlayersApply,src/harness/replay_hooks.inc,call,ArgEvent
 ,RecPlayersApply,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPlayersApply,src/harness/replay_hooks.inc,call,EventRoots
@@ -56913,6 +57181,7 @@ address,function,file,kind,target
 ,RecPlayersDeactivateConditions,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPlayersDeactivateConditions,src/harness/replay_hooks.inc,global_read,s_inner_players
 ,RecPlayersDeactivateConditions,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(MissionConditions *) __attribute__((stdcall)) [PlayersSeam::DeactivateConditions]
+,RecPlayersInit,src/harness/replay_hooks.inc,call,ArgRegionOffset
 ,RecPlayersInit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPlayersInit,src/harness/replay_hooks.inc,call,ArgValueStruct
 ,RecPlayersInit,src/harness/replay_hooks.inc,call,RegionBind
@@ -61067,6 +61336,12 @@ address,function,file,kind,target
 ,SimAlloc,src/state/block.cpp,function,
 ,SimAlloc,src/state/block.cpp,global_read,g_allocHooks
 ,SimAlloc,src/state/block.cpp,indirect_call,"indirect via void (*const)(void *, unsigned int) __attribute__((cdecl)) [AllocHooks::added]"
+,SimAllocAt,src/state/block.cpp,call,AllocAtLocked
+,SimAllocAt,src/state/block.cpp,call,Guard::~Guard
+,SimAllocAt,src/state/block.cpp,field_read,AllocHooks::added
+,SimAllocAt,src/state/block.cpp,function,
+,SimAllocAt,src/state/block.cpp,global_read,g_allocHooks
+,SimAllocAt,src/state/block.cpp,indirect_call,"indirect via void (*const)(void *, unsigned int) __attribute__((cdecl)) [AllocHooks::added]"
 ,SimAllocRegion,src/state/block.cpp,call,SimAllocTagged
 ,SimAllocRegion,src/state/block.cpp,function,
 ,SimAllocTagged,src/state/block.h,call,AllocSite::~AllocSite
@@ -64990,6 +65265,49 @@ address,function,file,kind,target
 ,WrapWorldEconworld,src/harness/replay_hooks.inc,global_read,s_hooked
 ,WrapWorldEconworld,src/harness/replay_hooks.inc,global_write,s_inner_econworld
 ,WrapWorldEconworld,src/harness/replay_hooks.inc,global_write,s_rec_econworld
+,WrapWorldPathworld,src/harness/replay_hooks.inc,call,operator=
+,WrapWorldPathworld,src/harness/replay_hooks.inc,deref_read,*PathWorldView
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::BeginSearch
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::EndSearch
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::FirstUnit
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::InBounds
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::IsPlaying
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::LastUnit
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::LineOfSight
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::MoveClass
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::NextUnit
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::Pass
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::PlayerCount
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::SearchStepLimit
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::Seen
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::SeenSize
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::TerrainPass
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::Tick
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::UnitState
+,WrapWorldPathworld,src/harness/replay_hooks.inc,field_write,PathWorldView::UnitsPerPlayer
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldBeginSearch
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldEndSearch
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldFirstUnit
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldInBounds
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldIsPlaying
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldLastUnit
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldLineOfSight
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldMoveClass
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldNextUnit
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldPass
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldPlayerCount
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldSearchStepLimit
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldSeen
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldSeenSize
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldTerrainPass
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldTick
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldUnitState
+,WrapWorldPathworld,src/harness/replay_hooks.inc,fn_ref,RecPathworldUnitsPerPlayer
+,WrapWorldPathworld,src/harness/replay_hooks.inc,function,
+,WrapWorldPathworld,src/harness/replay_hooks.inc,global_escape,s_rec_pathworld
+,WrapWorldPathworld,src/harness/replay_hooks.inc,global_read,s_hooked
+,WrapWorldPathworld,src/harness/replay_hooks.inc,global_write,s_inner_pathworld
+,WrapWorldPathworld,src/harness/replay_hooks.inc,global_write,s_rec_pathworld
 ,WriteAiRecords,src/ai/ai_player.cpp,call,AiPlayerSlotOf
 ,WriteAiRecords,src/ai/ai_player.cpp,call,AiWritePlayerAI
 ,WriteAiRecords,src/ai/ai_player.cpp,call,AiWriteTimer

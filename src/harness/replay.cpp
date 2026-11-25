@@ -640,6 +640,11 @@ void ImportEffect(ReplayText& t, unsigned table, const void* p, unsigned size)
     ReplayAddEffect(t, table, p, size, Table());
 }
 
+void ArgRegionOffset(ReplayText& t, const char* name, const void* region)
+{
+    ArgValue(t, name, (unsigned)((const unsigned char*)region - (const unsigned char*)SimBlockBase()));
+}
+
 void ArgRegionResult(ReplayText& t, const void* result)
 {
     t.Add(result != nullptr && result == s_regions[s_sub].ptr ? "  o result region\n" : "  o result null\n");
@@ -766,6 +771,27 @@ void ImportOutBytes(ReplayText& t, const char* name, const void* p, int count, i
     t.Add(name);
     t.AddChar(' ');
     ReplayBytes(t, p, count < length ? count : length);
+}
+
+void ArgOutBytes(ReplayText& t, const char* name, const void* p, int count, int length)
+{
+    if (count <= 0 || p == nullptr)
+        return;
+    t.Add("  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayBytes(t, p, count < length ? count : length);
+    t.AddChar('\n');
+}
+
+template <class T> void ImportOutScalar(ReplayText& t, const char* name, const T* p)
+{
+    if (p == nullptr)
+        return;
+    t.Add("\n  o ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayValue(t, *p);
 }
 
 void ImportOutVec3(ReplayText& t, const char* name, const Vec3* v)

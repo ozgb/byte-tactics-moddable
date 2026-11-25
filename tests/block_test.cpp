@@ -273,11 +273,44 @@ static void RunSpanTests()
     Check(LocateSpan(spans, 0, 0x1000, &off) == 0, "no spans, no match");
 }
 
+static unsigned int OffsetOf(void* p)
+{
+    return (unsigned int)((char*)p - (char*)SimBlockBase());
+}
+
+static void RunAllocAtTests()
+{
+    SimBlockReset();
+    SimBlockInit();
+    void* first = SimAlloc(100);
+    unsigned int firstOff = OffsetOf(first);
+    void* region = SimAllocAt(0x10000, 5000);
+    Check(region != 0 && OffsetOf(region) == 0x10000, "SimAllocAt places the payload at the offset asked for");
+    Check(AllZero(region, 5000), "SimAllocAt zeroes the bytes");
+    void* next = SimAllocAt(0x10000 + 5008, 64);
+    Check(next != 0 && OffsetOf(next) == 0x10000 + 5008, "a placed chunk may follow another at once");
+    Check(SimAllocAt(0x10000 + 64, 16) == 0, "an offset inside an allocated chunk is refused");
+    Check(SimAllocAt(firstOff, 16) == 0, "the offset of another allocation is refused");
+    Check(SimAllocAt(0x8004, 16) == 0, "an offset that is not 8-byte aligned is refused");
+    Check(SimAllocAt(0x10000 - 8, 16) == 0, "bytes that reach the chunk header of an allocation are refused");
+    Check(SimAllocAt(SimBlockSize() - 8, 16) == 0, "an allocation past the block's end is refused");
+    Check(SimAllocAt(SimBlockSize() + 0x1000, 16) == 0, "an offset past the block's end is refused");
+    void* gap = SimAlloc(200);
+    Check(OffsetOf(gap) < 0x10000, "a later SimAlloc fills the free bytes before the offset");
+    void* after = SimAlloc(0x20000);
+    Check(OffsetOf(after) > 0x10000 + 5000, "an allocation too large for the gap goes after the placed one");
+    SimFree(region);
+    void* again = SimAllocAt(0x10000, 5000);
+    Check(again != 0 && OffsetOf(again) == 0x10000, "the offset is free again after SimFree, and the freed chunk fits exactly");
+    SimBlockReset();
+}
+
 int main()
 {
     RunSpanTests();
     RunStreamTests();
     RunTrackTests();
+    RunAllocAtTests();
     Run a, b;
     Fresh(&a, 400);
     Fresh(&b, 400);

@@ -15,6 +15,8 @@ inline unsigned int MapEventSize(int kind)
         return sizeof(MapPathLockStamp);
     case MAP_SET_SEA_LEVEL:
         return sizeof(MapSetSeaLevel);
+    case MAP_SET_EDGE:
+        return sizeof(MapSetEdge);
     case MAP_EFFECT_CELLS_CHANGED:
         return sizeof(MapCellsChanged);
     default:

@@ -12,7 +12,7 @@ uv run tools/coupling.py --summary [NAME ...] # print entry points, imports and 
 
 To browse the same data with the source beside it (the subsystem map, a flow chart and call graph for each function, and who reads and writes each global and field), run `uv run tools/codemap.py`: it serves an interactive view on 127.0.0.1 and opens it in a browser.
 
-The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5864 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
+The inputs are `data/rwsets.csv`, `data/hazard_edges.csv` and `data/state_classes.csv` (see `docs/state.md`); the tool's docstring has the rules that assign a function to a subsystem. The 5887 functions of `data/rwsets.csv` are in 22 subsystems, and the sim items are the rows of `data/state_classes.csv` of class `sim` or `mixed`, plus the struct fields classified the same way. A call or a shared item counts functions of the calling subsystem, not call sites.
 
 The subsystems and the issue each maps to:
 
@@ -34,8 +34,8 @@ The subsystems and the issue each maps to:
 | [scripts](#the-remaining-subsystems) | 93 | none yet |
 | [movement](#the-remaining-subsystems) | 173 | none yet |
 | [network](#the-remaining-subsystems) | 342 | none yet |
-| [game](#the-remaining-subsystems) | 392 | none yet |
-| [harness](#the-remaining-subsystems) | 878 | none yet |
+| [game](#the-remaining-subsystems) | 395 | none yet |
+| [harness](#the-remaining-subsystems) | 898 | none yet |
 | [presentation](#the-remaining-subsystems) | 1430 | none yet |
 | [platform](#the-remaining-subsystems) | 827 | none yet |
 | [seams](#the-remaining-subsystems) | 227 | none yet |
@@ -488,7 +488,7 @@ Coverage: 91.8% of functions (89 of 97), 88.0% of lines, 74.5% of branches; 8 li
 
 Issue #18. 251 functions. The order state machines, VTOL orders and order lists (`src/orders/*.cpp`). The unit motion (`UnitMotion`) and the goal objects are movement's since #993: orders makes, steers and frees them through `g_seams.movement`.
 
-Coverage: 94.8% of functions (239 of 252), 85.5% of lines, 65.5% of branches; 13 live functions no scenario enters, and 18 more are dead (data/coverage.csv).
+Coverage: 94.8% of functions (239 of 252), 85.6% of lines, 65.7% of branches; 13 live functions no scenario enters, and 18 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (13 of 252 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 239 are entered, 94.8%), by reason:
 
@@ -619,7 +619,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Command-line switch only (2): `Onl_LoadConfigFile`, `SetPacketRate`. Switches a scenario cannot pass (`-blockscan` and the network options).
 - Entered by the console scenarios (#445): `SendShareEnergy`, `SendShareMetal`, `SendPacketToPlayer`, `FindSlotByDpidInSendPacketToPlayer`, `PlayerReady` and `Player::SetType`, which the console commands `Give` and `AI` reach.
 
-**game** (392 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 249 functions are called from outside, by platform (85 distinct functions) and presentation (36); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 627 functions, the most of any subsystem, 218 of them from presentation, then platform 105, network 30, files 23 and units 25.
+**game** (395 functions). Phase root `StepAllGafSequences`. Start-up, load, save and shutdown code, and the main loop: `MainLoopTick`, `RunGameSteps` (which calls every phase root), `UpdateFramePacing`, `BattleFrame`, `EndGameFrame`, `MainFrameTick`, `RunEndGameState` and `UpdateBattleRoom` (the last two pump `HandleNetPackets`) are set to game by `override`, because what drives the step is not presentation. 249 functions are called from outside, by platform (85 distinct functions) and presentation (36); the busiest are `SetCursorMode` (19), `SimAllocTagged` (19), `AllocSite::~AllocSite` (12). It imports 627 functions, the most of any subsystem, 218 of them from presentation, then platform 105, network 30, files 23 and units 25.
 
 **game, functions no scenario enters** (91 of 407 after `save-midgame` (#422) and `allied-victory` (#432), and `load-midgame` (#442), and `mission-defeat`, `mission-victory` and `mission-radius` (#444), and the six `console-` scenarios (#445); 316 are entered, 77.6%), by reason:
 
@@ -658,7 +658,7 @@ Each has no module issue yet. Entry points and couplings come from the same tool
 - Template instances no entered function uses (63): `??8@YG_NABU?$Ref@D@@PAD@Z`, `??8@YG_NABU?$Ref@G@@PAG@Z`, `??8@YG_NABU?$Ref@UFrameRing@@@@PAUFrameRing@@@Z`, `??8@YG_NABU?$Ref@VOrderFx@@@@PAVOrderFx@@@Z`, `??8@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z`, `??9@YG_NABU?$Ref@D@@PAD@Z`, `??9@YG_NABU?$Ref@UHotRadarSlot@@@@PAUHotRadarSlot@@@Z`, `??9@YG_NABU?$Ref@UWeaponDef@@@@PAUWeaponDef@@@Z`, `??9@YG_NABU?$Ref@VPlayerFrameInfo@@@@PAVPlayerFrameInfo@@@Z`, `??9@YG_NABU?$Ref@VUnitDef@@@@PAVUnitDef@@@Z`, `BlockVector::Capacity`, `BlockVector::Capacity`, `BlockVector::Clear`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::CopyAssign`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::Erase`, `BlockVector::operator?4`, `BlockVector::operator?4`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `BlockVector::~BlockVector`, `Ref::Ref`, `Ref::Ref`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::get`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?B`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?C`, `Ref::operator?D`. These are the `Ref` accessors and comparisons of `interfaces/ref.h` and the `BlockVector` members of `src/state/block_vector.h`, one instance for each type and member. No function a scenario enters calls them.
 - Error paths only (1): `RefOutsideBlock`. The fatal error of a `Ref` whose pointer lies outside the state block, which a passing run never reaches.
 
-**harness** (878 functions). The test harness of #3 (`src/harness`). No phase root. 52 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 86 functions (game 27, platform 31).
+**harness** (898 functions). The test harness of #3 (`src/harness`). No phase root. 52 functions are called from outside; the busiest are `HarnessViewRand` (21), `HarnessCrtSeed` (2). It imports 86 functions (game 27, platform 31).
 
 **presentation** (1430 functions). Rendering, UI and sound (`src/graphics`, `src/gui`, `src/frontend`, `src/ingame`, `src/sound`), except what a phase walk reaches, the main loop and frame handlers (game), and the timer, window and environment code of `src/graphics/display.cpp` (platform). No phase root, and none of its functions calls one (a test checks this). 274 functions are called from outside, mostly by game (218 distinct functions); the busiest are `PlaySoundByName` (7), `GetDisplay` (16), `GetGafFrame` (11). It imports 355 functions: platform 159, network 54, files 32, game 36, map 4. The reverse direction is the one to remove: the nine module subsystems import from presentation, weapons, los_radar and features most of all. Its coverage varies between runs in two functions. `UpdateCdCategoryByActivity` samples the sim's CD-activity counts on a wall-clock timer (`GetTicks`, which reads `host_time_ms`), so which of its branches run depends on how fast the run went. `Lock` (a static copy in each of `src/graphics/palette.cpp`, `pcx.cpp` and `surface.cpp`) waits on the blit-lock event only when another thread holds the lock, so its wait line and branch run in some runs and not others. `data/coverage.csv` marks both, each copy of `Lock` included, with an `unstable:` row and `tools/coverage.py` leaves their lines and branches out of the presentation totals; `FindGafEntry` also read as varying because a lost counter update makes llvm-cov report a saturated count, which the tool now ignores.
 
@@ -772,7 +772,7 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **weapons** | 97 of 115 | 84.3% | 86.2% | 71.6% | 18 | 19 |
 | **targeting** | 21 of 21 | 100.0% | 96.2% | 79.1% | 0 | 1 |
 | **los_radar** | 89 of 97 | 91.8% | 88.0% | 74.5% | 8 | 22 |
-| **orders** | 239 of 252 | 94.8% | 85.5% | 65.5% | 13 | 18 |
+| **orders** | 239 of 252 | 94.8% | 85.6% | 65.7% | 13 | 18 |
 | **units** | 107 of 122 | 87.7% | 86.2% | 71.2% | 15 | 28 |
 | **players** | 110 of 160 | 68.8% | 71.3% | 65.6% | 50 | 10 |
 | **map** | 71 of 76 | 93.4% | 93.3% | 82.5% | 5 | 9 |

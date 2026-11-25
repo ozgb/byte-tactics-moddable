@@ -77,6 +77,8 @@ def functions(query_writes=False, units_reads=False):
         fn("Query", "src/economy.cpp", 5, 7, returns="int",
            items=[("field_read", "Player::energy")] + ([("global_write", "g_count")] if query_writes else [])),
         fn("Run", "src/orders.cpp", 1, 4, [(2, "call", "RandomInt", True)], [("field_read", "Player::energy")]),
+        fn("LoadAll", "src/load.cpp", 1, 4, [(2, "indirect_call", seam("EconomySeam", "Spend"), False),
+                                             (3, "indirect_call", seam("UnitsSeam", "Apply"), False)]),
     ]
 
 
@@ -84,10 +86,13 @@ SUBSYSTEMS = [{"function": "RunTick", "file": "src/tick.cpp", "subsystem": "game
               {"function": "UpdateAll", "file": "src/units.cpp", "subsystem": "units"},
               {"function": "Spend", "file": "src/economy.cpp", "subsystem": "economy"},
               {"function": "Query", "file": "src/economy.cpp", "subsystem": "economy"},
-              {"function": "Run", "file": "src/orders.cpp", "subsystem": "orders"}]
-SOURCES = {"src/tick.cpp": TICK, "src/units.cpp": UNITS, "src/economy.cpp": "\n" * 8, "src/orders.cpp": "\n" * 4}
+              {"function": "Run", "file": "src/orders.cpp", "subsystem": "orders"},
+              {"function": "LoadAll", "file": "src/load.cpp", "subsystem": "game"}]
+SOURCES = {"src/tick.cpp": TICK, "src/units.cpp": UNITS, "src/economy.cpp": "\n" * 8, "src/orders.cpp": "\n" * 4,
+           "src/load.cpp": "\n" * 4}
 LOOPS = {("units", 1): "each unit."}
-FIXED = {"LOOPS": LOOPS, "TICK_STEPS": {}, "SILENT_INTENTS": {}}
+LOAD_STEPS = {"economy.Spend": "nothing."}
+FIXED = {"LOOPS": LOOPS, "TICK_STEPS": {}, "SILENT_INTENTS": {}, "LOAD_FUNCTION": "LoadAll", "LOAD_STEPS": LOAD_STEPS}
 
 
 def fixed(**names):
@@ -343,6 +348,12 @@ class Problems(unittest.TestCase):
         with fixed(TICK_STEPS={"Gone": "x"}):
             self.assertEqual(page().problems(), ["TICK_STEPS describes Gone, which the tick does not call"])
 
+    def test_load_steps_must_match_the_load(self):
+        with fixed(LOAD_STEPS={"economy.Spend": "x", "units.Gone": "y"}):
+            self.assertEqual(page().problems(), ["LOAD_STEPS describes units.Gone, which the load does not call"])
+        with fixed(LOAD_STEPS={}):
+            self.assertEqual(page().problems(), ["the load calls economy.Spend, which LOAD_STEPS does not describe"])
+
     def test_intent_with_no_write_is_reported(self):
         p = program()
         p.fns["Spend"][0].items = set()
@@ -374,10 +385,12 @@ class Render(unittest.TestCase):
                       "| by item | 1 | 0 |", text)
         self.assertIn("### `orders.Run`\n\n1. a draw from the Park-Miller generator (`rng`)\n", text)
         self.assertIn("| economy | 0 / 1 | 0 / 0 | 0 / 1 | 0 / 0 | 1 | 0 | 1 |", text)
+        self.assertIn("## The load\n", text)
+        self.assertIn("|---|---|---|\n| 1 | `economy.Spend` | nothing. |\n\n### Draws from the load stream", text)
 
     def test_names_no_function_outside_an_interface(self):
         text = self.render()
-        for name in ("RunTick", "UpdateAll()", "Player::energy", "src/"):
+        for name in ("RunTick", "UpdateAll()", "Player::energy", "src/", "LoadAll"):
             self.assertNotIn(name, text)
 
 

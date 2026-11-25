@@ -116,5 +116,13 @@
       "expect": 22,
       "field": "ModelState#5.pieces[1].short_12"
     }
+  },
+  "pathfinding": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_STEP_BUDGET=0x500",
+      "recording": "skirmish2.txt",
+      "expect": 1,
+      "field": "region"
+    }
   }
 }

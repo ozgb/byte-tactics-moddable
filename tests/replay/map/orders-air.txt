@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem map 9.1
+subsystem map 9.2
 call 1020 GetGroundHeight
   r Game.width 224
   r Game.height 102
@@ -307,6 +307,10 @@ call 1024 Apply
   r Game.height_142a7 13
   r Game.poolCount 2501
   r Game.overflowBucket OverflowBucket#1
+  r Game.baseX 3584
+  r Game.baseY 1632
+  r Game.mapWidth 3552
+  r Game.mapHeight 1504
   r Unit#2.cell (40,16)
   r Unit#2.footprint (7,6)
   r Unit#2.id 2

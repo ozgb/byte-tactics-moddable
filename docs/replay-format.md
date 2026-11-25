@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units, ai, los_radar and scripts have recordings so far; pathfinding has none yet (its region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units, ai, los_radar, pathfinding and scripts have recordings so far. The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -1291,6 +1291,9 @@ from the layout), and the export refuses a copy that names any other source name
 | `argv` | a pointer to the argument list of a command (a count and its strings) | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length; with `"resultElem": "u16"` the result counts elements of that size, as `UnitsInRange`'s count of ids does, and the bytes are `result * 2`). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
 | `load` (`load`) | a pointer to load-time data, `{"mode": "load", "load": "cob"}`, as an argument or a result of a slot or an import | `a data UnitDef#12`, `a data UnitDef#12+448` or `a data null`, in an import line ` UnitDef#12`, and `o result UnitDef#12` or ` = UnitDef#12` for a result (see Load inputs, "A pointer to load-time data") |
+| `bytes-out` (slot) | `void*` with a `length` argument that a recorded slot fills, and a result that is its length in bytes (`pathfinding.Poll`'s `out`, the payload of an event, whose length is the result and at most the size argument) | no `a` line; `o out x:0102` after the call, as long as the result and at most the length, and no line for a result of 0; the replayer passes a zeroed buffer of the length argument and compares the bytes (a difference is reported at the argument, `out`) |
+| `scratch` (`capacity`) | a pointer to elements that a recorded slot fills, with an integer `capacity` argument after it (`pathfinding.Poll`'s `points`) | nothing: no `a` line and no `o` line. The replayer passes a zeroed buffer of `capacity` elements, and what the call writes to it is not compared. Only a recorded slot takes it (`--check` fails for an imported one), and `--check` fails for a `capacity` that does not name an integer argument after it |
+| `scalar` (`dir: out`) | an `int*` or another scalar pointer that an import fills, `{"mode": "scalar", "dir": "out"}` (`pathworld.SeenSize`'s `width` and `height`) | nothing goes in the import line; `o width 12` follows it for a pointer that is not null, and the stub writes the value through the pointer. Only an import takes it (`--check` fails for a recorded slot), and the pointer is one of `int*`, `unsigned int*`, `short*`, `unsigned short*` and `unsigned char*` |
 | `weapon` | `WeaponDef*` | `weapondef#17`, or `null`; as a slot argument `a weapon weapondef#17` and, before it, an `r weapondef#17.speed 40` line for each `WeaponDef` field in the read set of the slot (the weapon is a root of the walk) |
 | `vec3` | `Vec3*` with a `label` | `pos=(x,y,z)` in an import line, or `pos=(x,z)` with `"axes": "xz"` for a slot that reads only those (`GetGroundHeight`), which also makes its own argument `a pos (x,z)` and the replayer pass y as 0; with `dir: out`, nothing in the import line and `o out (x,y,z)` after it, which the replayer's stub writes |
 | `callback` | an object an import calls back on, an import's argument | ` visitor#1` in the import line, and a `c` line for each call the import made on the object (see Callbacks) |
@@ -1468,18 +1471,18 @@ inside a nested command fails the recording.
 
 ## A module's region and world view
 
-Economy, pathfinding, los_radar and players take a region at match load (`RegionSize(info)`, `Init(info[, world], region, size)`, `Shutdown()`), and economy a world view. The engine calls them before the first tick, so a window that starts later would never see them. The `region` annotation of a subsystem names its slots:
+Economy, pathfinding, los_radar and players take a region at match load (`RegionSize(info)`, `Init(info[, world], region, size)`, `Shutdown()`), and economy a world view (pathfinding reads its own from `g_seams`). The engine calls them before the first tick, so a window that starts later would never see them. The `region` annotation of a subsystem names its slots:
 
 ```json
 "region": {"size": "RegionSize", "init": "Init", "shutdown": "Shutdown", "world": "econworld"}
 ```
 
-`world` is optional. `replayschema.py --check` fails for a slot that is not in the interface, a missing key and a world that is no entry of `WORLD_VIEWS`.
+`world` is optional (a world view that `Init` is given; one the module reads from `g_seams` has no `world` key, see The world view). `replayschema.py --check` fails for a slot that is not in the interface, a missing key and a world that is no entry of `WORLD_VIEWS`.
 
 | Slot | Lines |
 |---|---|
 | `RegionSize` | `a map (2501,2)` (the map-info struct, a value kind: `EconMapInfo`, `PlayersMapInfo`, `LosRadarMapInfo`, `PathMapInfo`), `o result 120048` |
-| `Init` | `a map (2501,2)`, `a size 120048`, then `w region [120048]` and the runs of the region as the module left it; the region and the world are no `a` lines |
+| `Init` | `a map (2501,2)`, `a region 4185712` (the block offset of the region), `a size 120048`, then `w region [120048]` and the runs of the region as the module left it; the world is no `a` line |
 | `Shutdown` | `o result region` when it returns the region the module was given, else `o result null` |
 
 `RegionSize` and `Init` are recorded whatever the window: the recorder writes them as the first calls of the file even when the window starts later, and the replayer runs the module's own `Init` on a region of the recorded size, so the module's statics are bound before the first windowed call. The region is zero when `Init` starts, in the game and in the replayer.
@@ -1490,9 +1493,11 @@ A field a slot writes only some of the time must be in its read set, for a windo
 
 **The world view.** A world view is a table of calls a module is given at `Init`. `WORLD_VIEWS` of `replayschema.py` lists it (`econworld`: `EconomyWorldView`, in `interfaces/economy.h`), and it is a subsystem of the schema with `"world": true` that is never recorded (the `record` switch refuses it) and whose slots are all `"record": false` and are imports of the subsystem that lists them. Its calls are `i econworld.PlayerInfo 3 = (...)` lines with the forms of imports. An out struct of a void slot is the result (` = (1,2,3)`), and one of a slot that returns a value is `{"mode": "value", "dir": "out", "named": true, "line": "uinfo"}`: nothing in the import line and `o uinfo (...)` after it, which the stub writes back. A block offset of a unit (`EconUnit`) is `{"mode": "object", "kind": "Unit", "ref": true}`: `Unit#251`, in arguments and results. `Emit` is `{"mode": "effect", "events": "economy", "size": "size"}`: `i econworld.Emit (16,0,Unit#1,0) 16`, the effect as the value of its payload struct (see Services). The recorder wraps the world given to `Init` with a recording copy; the replayer passes stubs that answer from the lines.
 
+`pathworld` (`PathWorldView`, in `interfaces/pathfinding.h`) is the world view of pathfinding. The module is not given it at `Init` but reads it from `g_seams.pathworld`, so it has no `world` key in pathfinding's `region` annotation and is listed in `SEAM_WORLD_VIEWS` of `replayschema.py`: the recorder replaces `g_seams.pathworld` with its recording copy when pathfinding is recorded, and the replayer binds `g_seams.pathworld` to the stubs. Its slots are all imports of pathfinding (`i pathworld.Tick = 1171`, `i pathworld.UnitState 3316696 = 1`, `i pathworld.Pass 780 15 11 = 1`). A unit, a movement class and a requester's handle (`PathUnit`, `PathClass`, `PathHandle`) are block offsets or numbers that pathfinding keeps in its region and only hands back to the world view, so they are scalars (the raw numbers), not `Unit#N`: the stubs return the recorded numbers and the region replays byte for byte. `SeenSize` writes two ints through its pointers, the scalar out form (`o width 224`; see Struct arguments).
+
 ### A region that holds block offsets
 
-pathfinding's region holds the `Pathfinder`, whose `PathGrid.cells`, `dirty`, `OpenHeap.pool` and `items` are `Ref`s, offsets from the block base, into the region itself. The region form restores the bytes, so a replayer whose region is at another offset of its block would read other memory: pathfinding is not recorded until its region is position independent, typed as objects, or placed at the recorded offset (#1044).
+pathfinding's region holds the `Pathfinder`, whose `PathGrid.cells`, `dirty`, `OpenHeap.pool` and `items` are `Ref`s, offsets from the block base, into the region itself. The region form restores the bytes, so they replay as recorded only if the region is at the block offset it had. The `Init` line of every region form therefore records it (`a region 4185712`, the offset of the region from the block base, after `a map`), and the replayer allocates the region at exactly that offset, with no allocation of its own at another one. A recording whose offset the replayer cannot take is refused with the offset named, as `block offset 2098176 (64 bytes) is not free` (the range clashes with another region, or with the replayer's own `Game`) or `block offset ... is past the block's end`; it is never replayed at another offset. The self-test `a region at its recorded offset` places a region, refuses a second one that clashes with it, one at the offset of the replayer's `Game` and one past the block's end, each by its offset.
 
 ## Not recorded
 
@@ -1515,11 +1520,9 @@ targeting:
 
 features:
 
-- `Apply` of RECLAIM: the slot leaves it `unrecorded` (#897); a feature reclaim needs a scenario that makes a unit reclaim one, which changes `reference/` and makes the full gate this issue's. The reclaim itself, which reads and writes economy's account and units, is reached only through it.
 - `Apply` of REMOVE and `Place`: no recorded window removes a feature by event or places one through the synchronous slot. Placing a feature is reached through `Apply` of PLACE (`orders-air-fights`, a model with a spot), and removing one through the replacement of a dead feature.
 - The start of a fire and the burning half of `UpdateFeatureSpot` (the smoke, the spread, the burn-out), and `ScanFeatureCell` seeding a feature: no recorded window holds a flamable feature hit by a fire-starting weapon, and no feature of these maps has a seed chance above 0.
-- `FindFeatureAtPos`: called by the reclaim and resurrect orders (the reclaim, resurrect and VTOL reclaim orders) and by the players' mining check, none of which a recorded window reaches; its `cell` and `size` are the nullable out form.
-- The network branches of the feature damage (`Game.netGameFlags`-dependent game type 3): the recordings are of games of type 2.
+- The network branches of the feature damage and the reclaim (`Game.netGameFlags`-dependent game type 3, `network.SendFeatureReclaimed`): the recordings are of games of type 2.
 - `FreeFeaturePool` and the other load slots (`LoadFeatureFileList`, `FreeFeatureFileList`, `NopAfterFeatureEnum`, `ResolveFeatureLinks`, `InitFeatureAnimPool`, `PlaceMissionFeatures`, `StampFeatureMetal`, `FindOrLoadFeatureType`, `LoadFeatures`) are `load class`; `SaveFeatures` is a query of a saved game, outside the tick; `UpdateFeatures` is the scheduler's phase driver, which calls the slots below it, each recorded on its own.
 
 mission:
@@ -1576,6 +1579,14 @@ ai:
 - `Apply` of REACT_TO_ATTACK: no recorded window has a unit of a computer player under attack (the AI of `skirmish2` and `console-sight` does not meet an enemy within the windows).
 - The imports `weapons.WeaponCanReachPos`, `weapons.FindTargetableProjectile` and `los_radar.GetSeenUnitsInRadius`, and `los_radar.IsPointVisible`, which the retargeting and the scouting call when an enemy is near: no recorded call reaches them.
 - The `ScoutTimer` and `SquadScoutTimer` branches that need an enemy in sight, and the orders an assault timer gives (`orders.GetOrderType` is called once in `console-sight` and once in `skirmish2`).
+
+pathfinding:
+
+- `Poll`'s `points` is a `scratch` buffer, never recorded or compared: the waypoints are copied from the events the region holds, whose writes `Step` records, and movement records the waypoints it receives.
+- `WriteState` is unrecorded ("a dump query, called from the harness only"), and so are `SetSearchScale` and `DebugCell`, which are optional and called by a console command and by the debug overlay.
+- `CellsChanged` with the cause `PATH_CHANGE_TERRAIN` (1): the recorded windows reach only cause 2, the refresh of the stamps of units; no scenario changes terrain or features in a recorded window, and the default implementation ignores both.
+- An event of kind PROGRESS, a search that is cut short (PARTIAL, FAILED or NEAREST) and an `Init` for another map size: every recorded search is a direct one that is found, ending in the tick it starts.
+- The alternative implementation of the seam (a hierarchical search): the default module is the one the game runs, and the recordings are of it.
 
 los_radar:
 
@@ -1640,7 +1651,13 @@ load pointers replays equal, a changed offset, a changed holder and a pointer in
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 
-Pathfinding is not recorded yet: its region holds `Ref`s into itself, which the replayer's block would break (see A module's region and world view, "A region that holds block offsets"). The self-test also replays a module's region (`a module's region`): a whole write that leaves out the zero chunks, a changed run, and a changed byte reported at `region` with its byte.
+The self-test also replays a module's region (`a module's region`): a whole write that leaves out the zero chunks, a changed run, and a changed byte reported at `region` with its byte, and a region at its recorded offset (see A module's region and world view, "A region that holds block offsets"). It runs the forms of out buffers too (`a byte buffer a slot fills`, `a scratch buffer`, `a scalar the import writes`).
+
+The recordings of pathfinding, which the modern build runs as native code in every mode (it has no WASM module yet), hold five windows of 600 KB to 2 MB, each with the region form's `RegionSize` and `Init` first (the region at its recorded offset, `a region 4341424`, of 959,664 bytes). Every tick's `Step` is mostly imports, a walk of the unit slots through `pathworld.NextUnit` (about 2,700 lines), so a window is a few ticks: `orders-move-attack` (ticks 179 to 195: `Submit` once, `Cancel` once, `Step` 17, `Poll` 19, `CellsChanged` once; the search of tick 181 is a STARTED event of 24 bytes and a FINISHED one of 28, both found directly, with 101 `pathworld.Pass` imports, `UnitState`, `SeenSize`, `BeginSearch` and `EndSearch`), `skirmish2` (ticks 1169 to 1172: `Cancel` 2, `CellsChanged` 15 at tick 1170, `Submit` once, `Step` 4, `Poll` 6, the events of tick 1171), `orders-tier2-core` (ticks 1029 to 1031: `Cancel` 2, `Submit` once, the events of tick 1030, 299 `pathworld.Pass`), `orders-air` (ticks 3599 to 3601: `Cancel` and `Submit` once, the events of tick 3600) and `orders-factory` (ticks 17 to 20: `Cancel` once and `CellsChanged` 15 at tick 19, each with the cause 2 and its movement class bits). A unit's `PathUnit`, a movement class and a requester's `PathHandle` are numbers in the recording (`i pathworld.UnitState 3316696 = 1`, `a requester 5406984`), and `o out (0,(32,13),63113,780,2,2)` is the `PathUnitState` the stub writes. The event payload of `Poll` is `o out x:...` as long as the result (`x:0200000090983200...` for a FINISHED), and its `points` are a scratch buffer. The injected change is the default step budget of a search, 0x500 in place of 0x535 (the step-budget injection of the test build, which the game takes when the match sets no limit): `Step` adds a smaller share to the budget kept in the region, and the divergence is reported at call 1 of `skirmish2`, at `region`, byte 72:
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 1 region tests/replay/pathfinding/skirmish2.txt
+```
 
 The recordings of economy: `console-economy` (ticks 30 to 200: `Apply` of RESET, REQUEST, SPEND and INCOME 36 times, `RequestGranted` 32, `Spend` 3, `UpdatePlayerEconomy` 12, `UpdateMetalExtraction` once, the `+give`, `+nometal` and `+noenergy` commands), `edges-economy-targeting` (ticks 10 to 60: `Apply` 58, `Spend` 35, `UpdateMetalExtraction` 55 with the `econworld.Emit` of the extractors' effects), `duel-shore-to-shore` (ticks 600 to 660, a computer player at difficulty 0: `UpdatePlayerEconomy` 6 with the half handicap), `save-midgame` (ticks 899 to 902: `UnitAccount` 4) and `console-iwin` (the whole run: `GetEnergyUse` 2232, the unit types). Each file starts with `RegionSize` and `Init` at tick 0, and the windowed ones then restore the region as the runs of `r region` lines. `replay_inject_test.exe` for economy is built with a handicap of 0.4 where the half handicap is 0.5, and the divergence is reported at call 2 of `duel-shore-to-shore`, at `region` (the account of a unit that the computer player gets half of):
 
@@ -1722,10 +1739,11 @@ of a chain are recorded whole before a cell's `occupant` reaches them with a lim
 wine build/modern/replay_inject_test.exe --expect 404 "import 1 los_radar.GetMapCell" tests/replay/features/commander-death.txt
 ```
 
-The recordings of features 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), both in a window of ticks. The first call that names a field of `Cell` writes it for every cell of the table (about 43 KB of each file, as runs), and the first that names a `Feature` or a `Spot` every element of those tables:
+The recordings of features 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), each in a window of ticks. The first call that names a field of `Cell` writes it for every cell of the table (about 43 KB of each file, as runs), and the first that names a `Feature` or a `Spot` every element of those tables:
 
 - `commander-death`, ticks 181 to 186 (2,637 calls): the death of the commander at tick 182 is 30 DAMAGE events (`Apply`: 29 kill their feature, outcome 1, and one does not), each kill places a spot with the death animation (`services.InitGafSequence`, `los_radar.GetMapCell`, the pool's lists and the cell's flags written), then `UpdateFeatureSpot` (145 calls, `services.StepGafSequence`) walks the used list, and the phase's `FeatureTypeCount`, `AnimateFeatureType` (399 types a tick), `ScanFeatureCell`, `FirstFeatureSpot` and `GetCellFeature` are called every tick.
 - `orders-air-fights`, ticks 708 to 713 (2,435 calls; `Apply`: 2 DAMAGE and 1 PLACE, all outcome 1): DAMAGE at tick 709 that kill features, and a PLACE of a feature with a model (`FEATURES_HAS_POS | FEATURES_HAS_ROT`, a spot with its piece state: `scripts.ObjectStateSize`, `services.SimAllocTagged "Object State"`, and the INIT_STATE and PASS_MAPS effects through `services.SchedPublish`), and 11 `UpdateFeatureSpot` calls.
+- `orders-reclaim-feature`, ticks 243 to 248 (2,425 calls; `Apply`: 1 RECLAIM, outcome 1): the commander reclaims the tree the console placed. `FindFeatureAtPos` (the reclaim order's check, every other tick: `cell` and `size` written, and, as it reads the cell `los_radar.GetMapCell` gives and the cell its offsets lead to, all-of over `Cell`), then at tick 245 RECLAIM names the unit (`a event.unit Unit#1`) and the position: two INCOME effects through `services.SchedPublish`, the kill of the feature with its reclaim spot (`services.InitGafSequence`), and `mission.GetGameType`; then `UpdateFeatureSpot` steps the spot.
 
 `replay_inject_test.exe` is also built with the start-shift injection of 15 (the 16 of `rules[i].x << 16` in `Mission::GetStartPosition`), and the divergence is reported at call 237 of `console-ilose` and at `out.x` (recorded 36700160, replayed 18350080):
 

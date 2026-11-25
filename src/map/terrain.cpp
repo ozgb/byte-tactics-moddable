@@ -1478,6 +1478,12 @@ int __stdcall ApplyMapEvent(const MapEventHeader* event, unsigned int size)
     case MAP_SET_SEA_LEVEL:
         g_game->seaLevel = reinterpret_cast<const MapSetSeaLevel*>(event)->level;
         return 1;
+    case MAP_SET_EDGE: {
+        const MapSetEdge* e = reinterpret_cast<const MapSetEdge*>(event);
+        g_game->mapWidth = g_game->baseX - e->x;
+        g_game->mapHeight = g_game->baseY - e->z;
+        return 1;
+    }
     }
     Unit* unit = MapUnitOfHandle(event->unit);
     if (!unit)

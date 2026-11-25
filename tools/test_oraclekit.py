@@ -1178,8 +1178,8 @@ class CouplingTest(unittest.TestCase):
 
 
 RT_IMPORTS = {"lib/bitexact/m.h": "runtime/m.h", "lib/bitexact/m.c": "runtime/m.c", "tools/gen.py": "runtime/gen.py"}
-RT_LICENSE = ("MIT License\n\nThis licence covers the files in the tools/ directory only.\n\nCopyright (c) 2026 Someone\n\n"
-              "Permission is hereby granted.\n")
+RT_LICENSE = ("MIT License\n\nThis licence covers the files in the tools/ directory only.\n\nCopyright (c) 2026 Someone\n"
+              "Copyright (c) 2026 Other (lib/bitexact/ and tools/gen.py)\n\nPermission is hereby granted.\n")
 
 
 def provenance(rows: dict[str, str], header: str = "| File | Provenance | Holds |") -> str:
@@ -1242,18 +1242,27 @@ class RuntimeKitTest(unittest.TestCase):
             kit = Path(out) / "k"
             manifest = runtime_export(runtime_repo(tmp), kit)
             header = (kit / "runtime/m.h").read_text()
-            self.assertTrue(header.startswith("/*\n * SPDX-License-Identifier: MIT\n * Copyright (c) 2026 Someone\n"), header)
+            self.assertTrue(header.startswith("/*\n * SPDX-License-Identifier: MIT\n * Copyright (c) 2026 Other\n"), header)
             self.assertIn("runtime/LICENSE", header.split("*/")[0])
             self.assertTrue(header.endswith("int bx_m(int);\n"))
             script = (kit / "runtime/gen.py").read_text()
-            self.assertTrue(script.startswith("#!/usr/bin/env python3\n# SPDX-License-Identifier: MIT\n# Copyright (c) 2026 Someone\n"), script)
+            self.assertTrue(script.startswith("#!/usr/bin/env python3\n# SPDX-License-Identifier: MIT\n# Copyright (c) 2026 Other\n"), script)
             licence = (kit / "runtime/LICENSE").read_text()
-            self.assertIn("Copyright (c) 2026 Someone", licence)
+            self.assertIn("Copyright (c) 2026 Other\n", licence)
+            self.assertNotIn("Someone", licence)
+            self.assertNotIn("(lib/bitexact/", licence)
             self.assertNotIn("covers", licence)
             self.assertIn("Permission is hereby granted", licence)
             by_path = {f["path"]: f for f in manifest["files"]}
             self.assertEqual(by_path["runtime/m.h"]["sha256"], hashlib.sha256(header.encode()).hexdigest())
             self.assertEqual(oraclekit.verify(kit), [])
+
+    def test_a_licence_without_the_runtime_copyright_line_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:
+            root = runtime_repo(tmp)
+            (root / "LICENSE").write_text(RT_LICENSE.replace(" (lib/bitexact/ and tools/gen.py)", ""))
+            git(root, "commit", "-qam", "licence")
+            self.refused(root, Path(out) / "k", "LICENSE", "lib/bitexact/")
 
     def test_the_vectors_are_copied_with_their_relative_paths(self):
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as out:

@@ -8,6 +8,7 @@ rand.c. The reconstructed game code in src/ is derived from Total Annihilation
 licence.
 
 Copyright (c) 2026 Hector Bailey
+Copyright (c) 2026 Oscar Bailey (lib/bitexact/ and tools/bitexact_tables.py)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

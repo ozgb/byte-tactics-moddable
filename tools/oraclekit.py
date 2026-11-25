@@ -67,8 +67,9 @@ is refused when one has no row, or a row names something the page does not use.
 of RUNTIME_IMPORTS (repository path to kit path: the library's headers, its square root, extension, double-double and random
 number sources, and the table generator tools/bitexact_tables.py) are read from HEAD like every other file, the only way a file
 under lib/ reaches the kit, and each is written with an MIT header (a block comment, or `#` lines after a shebang in a Python
-file) that gives `SPDX-License-Identifier: MIT`, the copyright line of the repository's LICENSE and the pointer to
-`runtime/LICENSE`, which is that licence text without its scope paragraph. The manifest digests cover the files as written.
+file) that gives `SPDX-License-Identifier: MIT`, the Copyright line of the repository's LICENSE whose parenthesis names lib/bitexact/
+(RUNTIME_COPYRIGHT_SCOPE, without the parenthesis) and the pointer to `runtime/LICENSE`, which is that licence text without
+its scope paragraph and with that copyright line alone. The manifest digests cover the files as written.
 The export reads the Provenance table of lib/bitexact/README.md (header `| File | Provenance | Holds |`, each File a backticked
 path, each Provenance one of PROVENANCE_KINDS) and refuses, naming the path and the reason, a row of another provenance, a file
 of RUNTIME_IMPORTS with no row, one whose row is not computed or published (the other kinds are specified, not imported), and a
@@ -142,6 +143,7 @@ RUNTIME_IMPORTS = {
     "tools/bitexact_tables.py": "runtime/bitexact_tables.py",
 }
 VECTORS_SOURCE = "tests/runtime/vectors"
+RUNTIME_COPYRIGHT_SCOPE = "lib/bitexact/"
 VECTORS_DIR = RUNTIME_DIR + "/vectors"
 PROVENANCE_README = "lib/bitexact/README.md"
 PROVENANCE_KINDS = ("computed", "published", "LIBCMT", "STL header", "game code")
@@ -300,16 +302,23 @@ def check_provenance(readme: str, imports: dict[str, str]) -> None:
 
 
 def copyright_line(licence: str) -> str:
-    """The line of the repository's LICENSE that starts with Copyright."""
+    """The Copyright line of the repository's LICENSE whose parenthesis names lib/bitexact/, without the parenthesis."""
     for line in licence.splitlines():
-        if line.startswith("Copyright"):
-            return line.strip()
-    raise Refusal("refused: %s has no line starting with Copyright" % LICENSE_SOURCE)
+        holder, paren, scope = line.strip().rpartition(" (")
+        if holder.startswith("Copyright") and paren and RUNTIME_COPYRIGHT_SCOPE in scope:
+            return holder
+    raise Refusal("refused: %s has no Copyright line naming %s in parentheses" % (LICENSE_SOURCE, RUNTIME_COPYRIGHT_SCOPE))
 
 
 def runtime_license(licence: str) -> bytes:
-    """The licence text of the kit's runtime/: LICENSE without the paragraph that says which files it covers."""
-    paragraphs = [p for p in licence.strip("\n").split("\n\n") if not p.startswith("This licence covers")]
+    """The licence text of the kit's runtime/: LICENSE without the paragraph that says which files it covers, and with
+    only the copyright line of the runtime's files."""
+    copyright = copyright_line(licence)
+    paragraphs = []
+    for p in licence.strip("\n").split("\n\n"):
+        if p.startswith("This licence covers"):
+            continue
+        paragraphs.append(copyright if p.startswith("Copyright") else p)
     return ("\n\n".join(paragraphs) + "\n").encode()
 
 

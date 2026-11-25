@@ -41,6 +41,7 @@
 #include "../src/ai/ai_player.h"
 #include "../src/units/squads.h"
 #include "../src/orders/orders_seam.h"
+#include "../src/movement/movement_seam.h"
 #include "../src/map/line_of_sight.h"
 #include "../src/map/line_of_sight_index.h"
 #include "../src/map/radar_capture.h"

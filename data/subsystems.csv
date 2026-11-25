@@ -3156,7 +3156,10 @@ CollectRows,src/harness/block_scan.cpp,harness,folder:src/harness/,
 CommandAllowed,src/network/net_game.cpp,network,file:src/network/,
 CommandArgs::Count,src/util/commands.cpp,platform,folder:src/util/,
 CommandArgs::GetArgPtr,src/util/engine_services.h,platform,folder:src/util/,
+CommandBegin,src/harness/harness.cpp,harness,folder:src/harness/,
+CommandEnd,src/harness/harness.cpp,harness,folder:src/harness/,
 CommandEntry::operator=,src/util/commands.cpp,platform,folder:src/util/,
+CommandEventModule,src/harness/harness.cpp,harness,folder:src/harness/,
 CommandHandlerInit::CommandHandlerInit,src/util/commands.cpp,platform,folder:src/util/,
 CommandLineNumber::~CommandLineNumber,src/debug/debug_lib.cpp,platform,folder:src/debug/,
 CommandLineSwitch::~CommandLineSwitch,src/debug/command_line.h,platform,folder:src/debug/,
@@ -3354,7 +3357,10 @@ FeaturesInbox,src/seams/features_world.cpp,seams,folder:src/seams/,
 FeaturesPlaceOf,src/game/features_events.h,game,name:Feature,game
 FeaturesPublishDamage,src/game/features_events.h,game,name:Damage,game
 FeaturesPublishPlace,src/game/features_events.h,game,name:Feature,game
+FeaturesPublishPlaceAt,src/game/features_events.h,game,name:Feature,game
 FeaturesPublishRemove,src/game/features_events.h,game,name:Feature,game
+FeaturesPublishRemoveAll,src/game/features_events.h,game,name:Feature,game
+FeaturesPublishRemoveAt,src/game/features_events.h,game,name:Feature,game
 FileHasLoadLine,src/harness/harness.cpp,harness,folder:src/harness/,
 FileNameEntry::operator char *,src/units/unit_types.cpp,units,default:src/units/,
 FileNameEntry::~FileNameEntry,src/units/unit_types.cpp,units,default:src/units/,
@@ -3664,6 +3670,7 @@ HarnessAfterStep,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessAiEvent,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessAwaitLoadAndEndFrame,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessBeforeStep,src/harness/harness.cpp,harness,folder:src/harness/,
+HarnessCommandEvent,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessConditionClass,src/game/victory.cpp,players,file:src/game/victory,
 HarnessCrtSeed,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessEconomyEvent,src/harness/harness.cpp,harness,folder:src/harness/,
@@ -4023,6 +4030,7 @@ MapInsertResult::MapInsertResult,src/debug/free_block_map.h,platform,folder:src/
 MapOnFeaturesPassMaps,src/seams/map_world.cpp,seams,folder:src/seams/,
 MapPoint,src/map/terrain.cpp,map,file:src/map/terrain,
 MapPublishCellsChanged,src/game/map_events.h,map,name:Cell,
+MapPublishSetSeaLevel,src/game/map_events.h,game,default:src/game/,game
 MapRange,src/ai/ai_player.cpp,ai,file:src/ai/,
 MapSlot,src/harness/harness.cpp,harness,folder:src/harness/,
 MapUnitOfHandle,src/map/terrain.cpp,map,file:src/map/terrain,
@@ -4345,7 +4353,11 @@ PlayersEventSize,src/game/players_event_size.h,game,file:src/game/players,game
 PlayersInbox,src/seams/players_world.cpp,seams,folder:src/seams/,
 PlayersInit,src/game/players.cpp,players,file:src/game/players,
 PlayersOnEconomyShare,src/seams/players_world.cpp,seams,folder:src/seams/,
+PlayersPublishDeactivateConditions,src/game/players_events.h,game,file:src/game/players,game
+PlayersPublishEndGame,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishKillUnits,src/game/players_events.h,game,file:src/game/players,game
+PlayersPublishSetStore,src/game/players_events.h,game,file:src/game/players,game
+PlayersPublishSetType,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishTransfer,src/game/players_events.h,game,file:src/game/players,game
 PlayersRegionSize,src/game/players.cpp,players,file:src/game/players,
 PlayersShutdown,src/game/players.cpp,players,file:src/game/players,
@@ -4387,6 +4399,8 @@ ProbeWord,src/harness/block_scan.cpp,harness,folder:src/harness/,
 PruneLoose,src/orders/order_list.cpp,orders,file:src/orders/,
 PruneUsed,src/orders/order_list.cpp,orders,file:src/orders/,
 PublishCleared,src/units/unit_targets.cpp,targeting,default:src/units/,targeting
+PublishDepth::PublishDepth,src/game/scheduler.cpp,game,default:src/game/,
+PublishDepth::~PublishDepth,src/game/scheduler.cpp,game,default:src/game/,
 PublishEffect,src/map/features.cpp,features,file:src/map/features,
 PublishWindMeteors,src/game/wind_meteors_events.h,game,name:Wind,game
 PublishWindMeteorsLimits,src/game/wind_meteors_events.h,game,name:Wind,game
@@ -5402,6 +5416,9 @@ UnitsOnWeaponsHealth,src/seams/units_world.cpp,seams,folder:src/seams/,
 UnitsOnWeaponsHit,src/seams/units_world.cpp,seams,folder:src/seams/,
 UnitsOnWeaponsMarkDamaged,src/seams/units_world.cpp,seams,folder:src/seams/,
 UnitsOnWeaponsNotice,src/seams/units_world.cpp,seams,folder:src/seams/,
+UnitsPublishCreate,src/game/units_events.h,game,default:src/game/,game
+UnitsPublishKillAll,src/game/units_events.h,game,default:src/game/,game
+UnitsPublishReloadType,src/game/units_events.h,game,default:src/game/,game
 UnitsWriteState,src/units/factory_index.cpp,units,default:src/units/,
 UnlinkBucketUnit,src/map/terrain.cpp,map,file:src/map/terrain,
 UnlinkNode,src/orders/order_list.cpp,orders,file:src/orders/,

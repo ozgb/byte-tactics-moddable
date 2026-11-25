@@ -263,17 +263,24 @@ Before the loop:
 Each entity:
 
 1. `economy.Apply`: mixed
+1. `players.Apply`: mixed
+1. `wind_meteors.Apply`: intent
 1. `weapons.Apply`: mixed
+1. `los_radar.Apply`: mixed
 1. `map.Apply`: mixed
-1. `map.GetCellMeanHeight`: query
-1. `map.GetGroundHeight`: query
-1. a draw from the C runtime generator (`rng.crtHoldrand`)
-1. a sim event is recorded
-1. `los_radar.GetMapCell`: query
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
+1. `units.Apply`: mixed
 1. `scripts.Apply`: mixed
+1. `map.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
+1. a sim event is recorded
+1. `mission.GetGameType`: view read
+1. `los_radar.GetMapCell`: query
 1. a draw from the Park-Miller generator (`rng`)
 1. `los_radar.SoundHeardMask`: query
+1. `map.GetCellMeanHeight`: query
+1. a draw from the C runtime generator (`rng.crtHoldrand`)
 
 After the loop:
 
@@ -286,8 +293,22 @@ Nested in the pass `features`, where its lists name it. Loop 1 visits each featu
 Before the loops:
 
 1. `economy.Apply`: mixed
+1. `players.Apply`: mixed
+1. `wind_meteors.Apply`: intent
 1. `weapons.Apply`: mixed
+1. `los_radar.Apply`: mixed
 1. `map.Apply`: mixed
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
+1. `units.Apply`: mixed
+1. `scripts.Apply`: mixed
+1. `map.GetGroundHeight`: query
+1. `scripts.ObjectStateSize`: query
+1. a sim event is recorded
+1. `mission.GetGameType`: view read
+1. `los_radar.GetMapCell`: query
+1. a draw from the Park-Miller generator (`rng`)
+1. `los_radar.SoundHeardMask`: query
 
 Each entity of loop 1:
 
@@ -300,14 +321,22 @@ None.
 Each entity of loop 2:
 
 1. `economy.Apply`: mixed
+1. `players.Apply`: mixed
+1. `wind_meteors.Apply`: intent
 1. `weapons.Apply`: mixed
+1. `los_radar.Apply`: mixed
 1. `map.Apply`: mixed
-1. a draw from the Park-Miller generator (`rng`)
-1. `los_radar.GetMapCell`: query
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
+1. `units.Apply`: mixed
 1. `scripts.Apply`: mixed
 1. `map.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
+1. `mission.GetGameType`: view read
+1. `los_radar.GetMapCell`: query
+1. a draw from the Park-Miller generator (`rng`)
+1. `los_radar.SoundHeardMask`: query
 
 ### wind
 
@@ -385,29 +414,53 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. `los_radar.GetMapCell`: query
 1. `players.Apply`: mixed
+1. `features.Apply`: mixed
+1. `wind_meteors.Apply`: intent
+1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
 1. `units.Apply`: mixed
 1. `scripts.Apply`: mixed
 
 ### `economy.UpdatePlayerEconomy`
 
 1. `players.Apply`: mixed
+1. `features.Apply`: mixed
+1. `wind_meteors.Apply`: intent
+1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
 1. `units.Apply`: mixed
 1. `scripts.Apply`: mixed
 
 ### `economy.UpdateResourceSharing`
 
 1. `players.Apply`: mixed
+1. `features.Apply`: mixed
+1. `wind_meteors.Apply`: intent
+1. `weapons.Apply`: mixed
 1. `los_radar.Apply`: mixed
+1. `map.Apply`: mixed
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
 1. `units.Apply`: mixed
 1. `scripts.Apply`: mixed
 
 ### `features.Apply`
 
 1. `economy.Apply`: mixed
+1. `players.Apply`: mixed
+1. `wind_meteors.Apply`: intent
 1. `weapons.Apply`: mixed
+1. `los_radar.Apply`: mixed
 1. `map.Apply`: mixed
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
+1. `units.Apply`: mixed
 1. `scripts.Apply`: mixed
 1. `map.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
@@ -421,6 +474,10 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. `los_radar.GetMapCell`: query
 
+### `features.FindOrLoadFeatureType`
+
+1. `weapons.FindWeaponByName`: query
+
 ### `features.GetFootprintCentre`
 
 1. `map.GetGroundHeight`: query
@@ -428,27 +485,44 @@ listed under them). Entry points that run no other subsystem's step are left out
 ### `features.Place`
 
 1. `economy.Apply`: mixed
+1. `players.Apply`: mixed
+1. `wind_meteors.Apply`: intent
 1. `weapons.Apply`: mixed
+1. `los_radar.Apply`: mixed
 1. `map.Apply`: mixed
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
+1. `units.Apply`: mixed
 1. `scripts.Apply`: mixed
 1. `map.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
+1. `mission.GetGameType`: view read
+1. `los_radar.GetMapCell`: query
+1. a draw from the Park-Miller generator (`rng`)
+1. `los_radar.SoundHeardMask`: query
 
 ### `features.UpdateFeatures`
 
 1. `economy.Apply`: mixed
+1. `players.Apply`: mixed
+1. `wind_meteors.Apply`: intent
 1. `weapons.Apply`: mixed
+1. `los_radar.Apply`: mixed
 1. `map.Apply`: mixed
-1. a draw from the Park-Miller generator (`rng`)
-1. `los_radar.GetMapCell`: query
+1. `ai.Apply`: mixed
+1. `orders.Apply`: mixed
+1. `units.Apply`: mixed
 1. `scripts.Apply`: mixed
 1. `map.GetGroundHeight`: query
 1. `scripts.ObjectStateSize`: query
 1. a sim event is recorded
+1. `mission.GetGameType`: view read
+1. `los_radar.GetMapCell`: query
+1. a draw from the Park-Miller generator (`rng`)
+1. `los_radar.SoundHeardMask`: query
 1. `map.GetCellMeanHeight`: query
 1. a draw from the C runtime generator (`rng.crtHoldrand`)
-1. `los_radar.SoundHeardMask`: query
 
 ### `los_radar.Apply`
 
@@ -845,7 +919,7 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 ### `units.Apply`
 
-1. a sim event is recorded
+1. a draw from the Park-Miller generator (`rng`)
 1. `economy.Apply`: mixed
 1. `players.Apply`: mixed
 1. `features.Apply`: mixed
@@ -857,21 +931,25 @@ listed under them). Entry points that run no other subsystem's step are left out
 1. `movement.Apply`: mixed
 1. `orders.Apply`: mixed
 1. `scripts.Apply`: mixed
-1. `orders.GetOrderFlags`: query
-1. `scripts.QueryScript`: mixed
-1. `mission.GetGameType`: view read
-1. `los_radar.GetMapCell`: query
-1. `map.GetGroundHeight`: query
-1. `features.Place`: mixed
-1. `scripts.DeleteScript`: intent
-1. `scripts.FreeObjectState`: intent
-1. a draw from the Park-Miller generator (`rng`)
 1. `scripts.NewUnitScript`: intent
 1. `scripts.SetCob`: intent
 1. `scripts.CreatePlayerObjectState`: mixed
 1. `scripts.SetObjectState`: intent
 1. `scripts.CreateObjectState`: mixed
 1. `economy.UpdateMetalExtraction`: intent
+1. `map.GetGroundHeight`: query
+1. a sim event is recorded
+1. `scripts.QueryScript`: mixed
+1. `mission.GetGameType`: view read
+1. `los_radar.GetMapCell`: query
+1. `features.Place`: mixed
+1. `scripts.DeleteScript`: intent
+1. `scripts.FreeObjectState`: intent
+1. a call into orders outside its interface
+1. `orders.MissionTypeFromName`: query
+1. `features.FindOrLoadFeatureType`: mixed
+1. `weapons.FindWeaponByName`: query
+1. `orders.GetOrderFlags`: query
 
 ### `units.CreateUnit`
 
@@ -1052,21 +1130,34 @@ is not listed.
 | ai | `targeting.GetWeaponTargetUnit` | query |
 | ai | `units.Apply` | mixed |
 | ai | `weapons.FindTargetableProjectile` | query |
+| economy | `ai.Apply` | mixed |
+| economy | `features.Apply` | mixed |
 | economy | `los_radar.Apply` | mixed |
 | economy | `los_radar.GetMapCell` | query |
+| economy | `map.Apply` | mixed |
+| economy | `orders.Apply` | mixed |
 | economy | `players.Apply` | mixed |
 | economy | `scripts.Apply` | mixed |
 | economy | `units.Apply` | mixed |
+| economy | `weapons.Apply` | mixed |
+| economy | `wind_meteors.Apply` | intent |
+| features | `ai.Apply` | mixed |
 | features | `economy.Apply` | mixed |
+| features | `los_radar.Apply` | mixed |
 | features | `los_radar.GetMapCell` | query |
 | features | `los_radar.SoundHeardMask` | query |
 | features | `map.Apply` | mixed |
 | features | `map.GetCellMeanHeight` | query |
 | features | `map.GetGroundHeight` | query |
 | features | `mission.GetGameType` | view read |
+| features | `orders.Apply` | mixed |
+| features | `players.Apply` | mixed |
 | features | `scripts.Apply` | mixed |
 | features | `scripts.ObjectStateSize` | query |
+| features | `units.Apply` | mixed |
 | features | `weapons.Apply` | mixed |
+| features | `weapons.FindWeaponByName` | query |
+| features | `wind_meteors.Apply` | intent |
 | los_radar | `map.UnitsInRange` | query |
 | map | `features.GetCellFeature` | query |
 | map | `los_radar.Apply` | mixed |
@@ -1180,6 +1271,7 @@ is not listed.
 | units | `economy.UnitAccount` | query |
 | units | `economy.UpdateMetalExtraction` | intent |
 | units | `features.Apply` | mixed |
+| units | `features.FindOrLoadFeatureType` | mixed |
 | units | `features.Place` | mixed |
 | units | `los_radar.Apply` | mixed |
 | units | `los_radar.GetMapCell` | query |
@@ -1194,6 +1286,7 @@ is not listed.
 | units | `orders.Apply` | mixed |
 | units | `orders.GetOrderFlags` | query |
 | units | `orders.LoadOrders` | intent |
+| units | `orders.MissionTypeFromName` | query |
 | units | `orders.RunOrders` | intent |
 | units | `orders.RunSecondaryOrders` | intent |
 | units | `players.Apply` | mixed |
@@ -1210,6 +1303,7 @@ is not listed.
 | units | `scripts.SetObjectState` | intent |
 | units | `targeting.Apply` | mixed |
 | units | `weapons.Apply` | mixed |
+| units | `weapons.FindWeaponByName` | query |
 | units | `weapons.LoadState` | intent |
 | units | `weapons.UpdateUnitWeapons` | intent |
 | weapons | `ai.Apply` | mixed |
@@ -1373,10 +1467,10 @@ the split lies in.
 
 | writer | reader | place | split | write in | read in | may split inside | matched | rows | across |
 |---|---|---|---|---|---|---|---|---|---|
-| features | map | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `weapons.Apply` (step 2) |  | by subsystem | 3 | 1 |
-| features | weapons | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `weapons.Apply` (step 2) |  | by subsystem | 1 | 1 |
-| units | orders | features.anim, each entity of loop 2 | split | `weapons.Apply` (step 2) | `weapons.Apply` again, after step 2 | `weapons.Apply` | by subsystem | 1 | 0 |
-| units | weapons | features.anim, each entity of loop 2 | split | `weapons.Apply` (step 2) | `weapons.Apply` again, after step 2 | `weapons.Apply` | by item | 1 | 0 |
+| features | map | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `players.Apply` (step 2) |  | by subsystem | 3 | 1 |
+| features | weapons | features.anim, each entity of loop 2 | write before calling | the caller, before the first step | `players.Apply` (step 2) |  | by subsystem | 1 | 1 |
+| units | orders | features.anim, each entity of loop 2 | split | `players.Apply` (step 2) | `players.Apply` again, after step 2 | `players.Apply` | by subsystem | 1 | 0 |
+| units | weapons | features.anim, each entity of loop 2 | split | `players.Apply` (step 2) | `players.Apply` again, after step 2 | `players.Apply` | by item | 1 | 0 |
 
 ### Phase tail
 
@@ -1393,18 +1487,18 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 
 | subsystem | view read | query | intent | mixed | edges written | edges read | inside an entity |
 |---|---|---|---|---|---|---|---|
-| wind_meteors | 0 / 0 | 0 / 0 | 0 / 0 | 1 / 0 | 0 | 0 | 0 |
-| economy | 0 / 0 | 1 / 1 | 0 / 2 | 4 / 7 | 39 | 3 | 41 |
-| features | 1 / 0 | 5 / 5 | 0 / 0 | 4 / 4 | 13 | 3 | 16 |
-| ai | 0 / 0 | 2 / 0 | 0 / 2 | 5 / 2 | 0 | 18 | 18 |
+| wind_meteors | 0 / 0 | 0 / 0 | 0 / 2 | 1 / 0 | 0 | 0 | 0 |
+| economy | 0 / 0 | 1 / 1 | 1 / 2 | 9 / 7 | 39 | 3 | 41 |
+| features | 1 / 0 | 6 / 5 | 1 / 0 | 9 / 6 | 13 | 3 | 16 |
+| ai | 0 / 0 | 2 / 0 | 0 / 2 | 5 / 4 | 0 | 18 | 18 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 3 | 0 / 1 | 0 | 0 | 0 |
-| weapons | 0 / 2 | 10 / 3 | 0 / 2 | 11 / 4 | 19 | 47 | 66 |
+| weapons | 0 / 2 | 10 / 5 | 0 / 2 | 11 / 5 | 19 | 47 | 66 |
 | targeting | 1 / 0 | 3 / 4 | 0 / 0 | 2 / 7 | 3 | 28 | 31 |
-| los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 5 | 11 | 22 | 32 |
-| orders | 3 / 0 | 21 / 1 | 1 / 3 | 30 / 4 | 8 | 47 | 55 |
-| units | 1 / 1 | 5 / 6 | 14 / 3 | 17 / 17 | 130 | 22 | 152 |
-| players | 1 / 0 | 3 / 0 | 11 / 0 | 8 / 3 | 1 | 12 | 11 |
-| map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 7 | 16 | 25 | 41 |
+| los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 6 | 11 | 22 | 32 |
+| orders | 3 / 0 | 21 / 2 | 1 / 3 | 30 / 6 | 8 | 47 | 55 |
+| units | 1 / 1 | 7 / 6 | 14 / 3 | 18 / 18 | 130 | 22 | 152 |
+| players | 1 / 0 | 3 / 0 | 11 / 0 | 8 / 4 | 1 | 12 | 11 |
+| map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 8 | 16 | 25 | 41 |
 | scripts | 0 / 0 | 1 / 9 | 0 / 7 | 0 / 15 | 14 | 15 | 29 |
 | movement | 0 / 0 | 3 / 1 | 3 / 2 | 9 / 12 | 14 | 26 | 40 |
 | mission | 0 / 4 | 0 / 0 | 0 / 0 | 0 / 4 | 0 | 0 | 0 |

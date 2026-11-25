@@ -55,8 +55,6 @@ struct OPENHAPIFILE {
 
 #include "hpi.h"
 
-typedef char OpenHapiFileNameOffset[offsetof(OPENHAPIFILE, name) == OPENHAPIFILE_NAME_OFFSET ? 1 : -1];
-
 // FUNCTION: 0x4bb2c0
 FileHandle* __stdcall HAPI_OpenFileAppend(const char* param1)
 {
@@ -1719,3 +1717,5 @@ typedef void (FileList::*FileListInsertFillFn)(FileList::iterator, FileList::siz
 
 // FUNCTION: 0x4be6c0 ?insert@?$vector@VStringRef@@V?$allocator@VStringRef@@@std@@@std@@QAEXPAVStringRef@@IABV3@@Z
 FileListInsertFillFn g_fileListInsertFill = &FileList::insert;
+
+typedef char OpenHapiFileNameOffset[offsetof(OPENHAPIFILE, name) == OPENHAPIFILE_NAME_OFFSET ? 1 : -1];

@@ -170,7 +170,8 @@ def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | 
             if member not in handles and traceschema.is_unit_ref(ctype, member):
                 field.update({"kind": "ref", "target": "Unit"})
             elif "%s.%s" % (name, member) in refs and ctype == "unsigned int" and length is None:
-                field.update({"kind": "ref", "target": refs["%s.%s" % (name, member)]})
+                note = refs["%s.%s" % (name, member)]
+                field.update({"kind": "ref", "target": note} if isinstance(note, str) else {"kind": "ref", "target": note["kind"], "poly": note["poly"]})
             elif ctype in EVENT_SCALARS:
                 field["kind"] = EVENT_SCALARS[ctype]
             else:
@@ -1302,14 +1303,17 @@ def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict
         errors.append("%s: `refs` of %s maps a payload member to the kind it leads to" % (where, label))
         refs = {}
     structs = interface_structs(a["events"])
-    for key, kind in refs.items():
+    for key, note in refs.items():
+        kind = note if isinstance(note, str) else note.get("kind") if isinstance(note, dict) else None
+        if isinstance(note, dict) and (set(note) != {"kind", "poly"} or note["poly"] != kind):
+            errors.append("%s: `refs` of %s leads %s to {\"kind\": KIND, \"poly\": KIND}, with the same kind in both" % (where, label, key))
         struct, _, member = key.partition(".")
         ctype = next((c for c, m, n in structs.get(struct, []) if m == member and n is None), None)
         if kinds.get(kind, {}).get("scope") != "state":
             errors.append("%s: `refs` of %s leads %s to %s, which is no state kind" % (where, label, key, kind))
         elif ctype != "unsigned int":
             errors.append("%s: `refs` of %s names %s, which is no unsigned int member of a struct of interfaces/%s.h" % (where, label, key, a["events"]))
-        elif traceschema.is_unit_ref(ctype, member):
+        elif traceschema.is_unit_ref(ctype, member) and member not in traceschema.module_of_header(a["events"] + ".h").handles:
             errors.append("%s: `refs` of %s names %s, which is a unit ref already" % (where, label, key))
     return errors
 

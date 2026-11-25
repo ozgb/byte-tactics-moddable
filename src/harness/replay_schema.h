@@ -2724,10 +2724,10 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "speed", offsetof(MovementSetSpeed, speed), sizeof(((MovementSetSpeed*)nullptr)->speed), ROK_MOVEMENTSETSPEED, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MovementTarget, h.kind), sizeof(((MovementTarget*)nullptr)->h.kind), ROK_MOVEMENTTARGET, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MovementTarget, h.unit), sizeof(((MovementTarget*)nullptr)->h.unit), ROK_MOVEMENTTARGET, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
-    { "target", offsetof(MovementTarget, target), sizeof(((MovementTarget*)nullptr)->target), ROK_MOVEMENTTARGET, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "target", offsetof(MovementTarget, target), sizeof(((MovementTarget*)nullptr)->target), ROK_MOVEMENTTARGET, RK_REF, ROK_ORDERFX, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MovementTargetValue, h.kind), sizeof(((MovementTargetValue*)nullptr)->h.kind), ROK_MOVEMENTTARGETVALUE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MovementTargetValue, h.unit), sizeof(((MovementTargetValue*)nullptr)->h.unit), ROK_MOVEMENTTARGETVALUE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
-    { "target", offsetof(MovementTargetValue, target), sizeof(((MovementTargetValue*)nullptr)->target), ROK_MOVEMENTTARGETVALUE, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "target", offsetof(MovementTargetValue, target), sizeof(((MovementTargetValue*)nullptr)->target), ROK_MOVEMENTTARGETVALUE, RK_REF, ROK_ORDERFX, 0, 0, {}, 0, 0 },
     { "value", offsetof(MovementTargetValue, value), sizeof(((MovementTargetValue*)nullptr)->value), ROK_MOVEMENTTARGETVALUE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(MovementOrderFlags, h.kind), sizeof(((MovementOrderFlags*)nullptr)->h.kind), ROK_MOVEMENTORDERFLAGS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(MovementOrderFlags, h.unit), sizeof(((MovementOrderFlags*)nullptr)->h.unit), ROK_MOVEMENTORDERFLAGS, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
@@ -3067,7 +3067,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos2", offsetof(FeaturesAreaDamage, pos[2]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[2]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
 static const unsigned kReplayObjectFieldCount = 1579;
-static const unsigned kReplayWalkableFieldCount = 258;
+static const unsigned kReplayWalkableFieldCount = 260;
 
 static const unsigned short kReplayReachFields[] = { 46, 100, 233, 234, 235, 89, 98, 0, 22, 100, 236, 89, 97, 39, 46, 101, 103, 136 };
 

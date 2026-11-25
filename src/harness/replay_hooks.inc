@@ -2494,8 +2494,6 @@ void __stdcall RecScriptsWriteState(const StateWriter* a0)
 
 int __stdcall RecMovementApply(const MovementEventHeader* a0, unsigned int a1)
 {
-    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == MOVEMENT_SET_TARGET || a0->kind == MOVEMENT_DESTROY_TARGET || a0->kind == MOVEMENT_SET_ALTITUDE || a0->kind == MOVEMENT_SET_APPROACH_RADIUS || a0->kind == MOVEMENT_SET_HEADING))
-        return s_inner_movement->Apply(a0, a1);
     ReplayRoots roots;
     EventRoots(roots, RET_MOVEMENT, a0, a1);
     SlotScope scope(RSL_MOVEMENT_APPLY, SUB_MOVEMENT, roots);

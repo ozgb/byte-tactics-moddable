@@ -133,7 +133,7 @@ def build_crt() -> Path | None:
 
 def build_csem() -> Path | None:
     BUILD.mkdir(parents=True, exist_ok=True)
-    return link("csem_test.exe", [], [CSEM_TEST, VECTORS_SOURCE])
+    return link("csem_test.exe", [], [CSEM_TEST, LIB / "ftol.c", VECTORS_SOURCE])
 
 
 def link(name: str, objects: list[Path], sources: list[Path]) -> Path | None:
@@ -236,7 +236,7 @@ def run_clang(kit: Path | None = None) -> int:
         return 2
     if kit is not None:
         kit.mkdir(parents=True, exist_ok=True)
-        exe = clang_link(tools, flags + ["-DBX_KIT"], "csem_test.exe", [CSEM_TEST, KIT_SOURCE, VECTORS_SOURCE],
+        exe = clang_link(tools, flags + ["-DBX_KIT"], "csem_test.exe", [CSEM_TEST, LIB / "ftol.c", KIT_SOURCE, VECTORS_SOURCE],
                          CLANG_BUILD / "kit")
         if exe is None:
             return 2
@@ -247,7 +247,7 @@ def run_clang(kit: Path | None = None) -> int:
                         [*PORT_SOURCES, TEST, MATH_TEST, VECTORS_SOURCE]), vectors["bitexact"]),
             (clang_link(tools, flags, "crt_test.exe", [*CRT_PORT_SOURCES, CRT_TESTS[0], VECTORS_SOURCE]),
              vectors["crt"]),
-            (clang_link(tools, flags, "csem_test.exe", [CSEM_TEST, KIT_SOURCE, VECTORS_SOURCE]), vectors["csem"])]
+            (clang_link(tools, flags, "csem_test.exe", [CSEM_TEST, LIB / "ftol.c", KIT_SOURCE, VECTORS_SOURCE]), vectors["csem"])]
     code = 0
     for exe, vec in exes:
         if exe is None:

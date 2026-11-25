@@ -64,6 +64,9 @@ bx_i32 bx_FUN_004b7381(bx_i32 a, bx_i32 b, bx_i32 c);
 /* The correctly rounded square root, equal to x87 fsqrt at 53-bit precision (and to SSE2 sqrtsd and wasm f64.sqrt), done in integer code; finite non-negative x, a negative x giving the x87 indefinite NaN. */
 double bx_sqrt(double x);
 
+/* MSVC 5's _ftol: x truncated toward zero to a 64-bit integer, its low 32 bits; 0 for a NaN, an infinity or a magnitude of 2^63 or more. */
+bx_i32 bx_ftol(double x);
+
 /* MSVC 5's _hypot: big = max(|x|, |y|), then sqrt((x / big)^2 + (y / big)^2) * big with each step rounded to a 64-bit mantissa as the x87 does at control word 0x133f and then stored as a double; finite arguments, results within double range. */
 double bx_hypot(double x, double y);
 

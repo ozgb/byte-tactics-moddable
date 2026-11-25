@@ -398,6 +398,23 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(purecall_test DEPENDS "${CMAKE_BINARY_DIR}/purecall_test.exe")
 
+if(ZLIB_SOURCES)
+  add_library(files_adapter_objects OBJECT src/files/hpi.cpp src/files/sqsh.cpp src/game/cd_check.cpp src/util/tdf.cpp
+    src/host/win32/files.cpp src/host/win32/threads.cpp src/host/win32/memory.cpp src/host/win32/time.cpp link/data.cpp
+    tests/files_adapter.cpp)
+  target_include_directories(files_adapter_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
+  target_include_directories(files_adapter_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+  target_compile_options(files_adapter_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+  add_custom_command(
+    OUTPUT "${CMAKE_BINARY_DIR}/files_adapter.exe"
+    COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/files_adapter.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
+            $<TARGET_OBJECTS:files_adapter_objects> ${ZLIB_OBJECTS} $<TARGET_FILE:bitexact> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${CMAKE_BINARY_DIR}/USER32.lib"
+            "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/LIBCPMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+    DEPENDS files_adapter_objects ${ZLIB_TARGETS} bitexact $<TARGET_OBJECTS:files_adapter_objects> ${ZLIB_OBJECTS} "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${CMAKE_BINARY_DIR}/USER32.lib"
+    COMMAND_EXPAND_LISTS)
+  add_custom_target(files_adapter DEPENDS "${CMAKE_BINARY_DIR}/files_adapter.exe")
+endif()
+
 add_library(ref_test_objects OBJECT src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/ref_test.cpp)
 target_include_directories(ref_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(ref_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})

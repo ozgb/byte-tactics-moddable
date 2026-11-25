@@ -1,0 +1,79 @@
+{"format": 1, "group": "mounting", "vectors": [
+ {"name": "base", "fixture": "base",
+  "calls": [
+   ["mount"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]]
+  ]},
+ {"name": "base_twice", "fixture": "base",
+  "calls": [
+   ["mount"],
+   ["mount"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]]
+  ]},
+ {"name": "base_unmounted", "fixture": "base",
+  "calls": [
+   ["load", "units\\core.fbi"],
+   ["load", "units\\arm.fbi"],
+   ["load", "readme.txt"],
+   ["mount"],
+   ["load", "units\\core.fbi"]
+  ],
+  "results": [
+   ["load", [-1, null]],
+   ["load", [112, "59ce716dab13d2d6d566e42c42516d08297fa2fe67a66bdcc7260a9c31dff28c"]],
+   ["load", [24, "f99903d9031d1a8acde685752f069663d0b79da6efe383049003d836c72e92c4"]],
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
+   ["load", [32, "69d15473441d15724a6a737bf31ce4e3b3cc155d77f08a1c7524707433ae6f44"]]
+  ]},
+ {"name": "not_mounted", "fixture": "base",
+  "calls": [
+   ["mount"],
+   ["load", "rev32.txt"],
+   ["load", "x.hpi"]
+  ],
+  "results": [
+   ["mount", ["rev31.gp3", "a.ccx", "b.ccx", "z.ufo", "c.hpi", "D.HPI", "ex.hpi", "e_x.hpi"]],
+   ["load", [-1, null]],
+   ["load", [16, "23b1a71435244a443adf02ae07f7d243a341965d8750fa47c5923175bac172ed"]]
+  ]},
+ {"name": "budget", "fixture": "budget",
+  "calls": [
+   ["mount"],
+   ["load", "id.txt"],
+   ["load", "h11.txt"],
+   ["load", "h10.txt"]
+  ],
+  "results": [
+   ["mount", ["h01.hpi", "h02.hpi", "h03.hpi", "h04.hpi", "h05.hpi", "h06.hpi", "h07.hpi", "h08.hpi", "h09.hpi", "h10.hpi"]],
+   ["load", [22, "848a53d18c92c6c6b4c5cabf189ae509646bb6889fa8fb6e3bfa3605b518e982"]],
+   ["load", [-1, null]],
+   ["load", [19, "f3b3155d75f16951e612baeca1937e0fc1c2f59dafb0b31dcabf2ab7a3d9d6c8"]]
+  ]},
+ {"name": "budget_twice", "fixture": "budget",
+  "calls": [
+   ["mount"],
+   ["mount"],
+   ["load", "id.txt"],
+   ["load", "h11.txt"],
+   ["load", "h12.txt"]
+  ],
+  "results": [
+   ["mount", ["h01.hpi", "h02.hpi", "h03.hpi", "h04.hpi", "h05.hpi", "h06.hpi", "h07.hpi", "h08.hpi", "h09.hpi", "h10.hpi"]],
+   ["mount", ["h01.hpi", "h02.hpi", "h03.hpi", "h04.hpi", "h05.hpi", "h06.hpi", "h07.hpi", "h08.hpi", "h09.hpi", "h10.hpi", "h11.hpi", "h12.hpi"]],
+   ["load", [22, "848a53d18c92c6c6b4c5cabf189ae509646bb6889fa8fb6e3bfa3605b518e982"]],
+   ["load", [19, "6e0f27c8b3fcf06135cc65a23130570d6a36e40d41fab1cc2ccb12d6f24db43d"]],
+   ["load", [19, "d9977f2ab3548d07a44b2c69cb3039216a804fdb38ecb95c0687327a8e7e23bf"]]
+  ]},
+ {"name": "malformed", "fixture": "malformed",
+  "calls": [
+   ["mount"]
+  ],
+  "results": [
+   ["mount", ["digits.hpi", "good.hpi", "year.hpi"]]
+  ]}
+]}

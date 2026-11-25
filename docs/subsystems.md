@@ -488,7 +488,7 @@ Coverage: 91.8% of functions (89 of 97), 88.0% of lines, 74.5% of branches; 8 li
 
 Issue #18. 251 functions. The order state machines, VTOL orders and order lists (`src/orders/*.cpp`). The unit motion (`UnitMotion`) and the goal objects are movement's since #993: orders makes, steers and frees them through `g_seams.movement`.
 
-Coverage: 94.8% of functions (239 of 252), 85.5% of lines, 65.5% of branches; 13 live functions no scenario enters, and 18 more are dead (data/coverage.csv).
+Coverage: 94.8% of functions (239 of 252), 85.6% of lines, 65.7% of branches; 13 live functions no scenario enters, and 18 more are dead (data/coverage.csv).
 
 **Live functions no scenario enters** (13 of 252 after `orders-immediate`, `orders-factory` and `orders-air` (#418), the three scenarios of #419, the three of #421, the ten of #426 and `save-midgame` (#422), `load-midgame` (#442), and `units-transport` and `units-transport-ship` (#428), and `mission-defeat`, `mission-victory` and `mission-radius` (#444); 239 are entered, 94.8%), by reason:
 
@@ -772,7 +772,7 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | **weapons** | 97 of 115 | 84.3% | 86.2% | 71.6% | 18 | 19 |
 | **targeting** | 21 of 21 | 100.0% | 96.2% | 79.1% | 0 | 1 |
 | **los_radar** | 89 of 97 | 91.8% | 88.0% | 74.5% | 8 | 22 |
-| **orders** | 239 of 252 | 94.8% | 85.5% | 65.5% | 13 | 18 |
+| **orders** | 239 of 252 | 94.8% | 85.6% | 65.7% | 13 | 18 |
 | **units** | 107 of 122 | 87.7% | 86.2% | 71.2% | 15 | 28 |
 | **players** | 110 of 160 | 68.8% | 71.3% | 65.6% | 50 | 10 |
 | **map** | 71 of 76 | 93.4% | 93.3% | 82.5% | 5 | 9 |

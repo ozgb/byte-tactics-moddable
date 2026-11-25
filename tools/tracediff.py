@@ -33,7 +33,7 @@ compares only the `tick` rows and reports the first tick whose `tick` row differ
 
 With `--events` or `--event-logs`, `--end-of-tick` compares the two sim event logs tick by tick under the rule of docs/events-log.md ("What the check compares"): it names the first tick whose `tick` line of the event digest differs and, in it, the first record that the logs hold a different number of times, or else the first pair of kinds whose projection differs and the first record of that projection that differs, with both records and their line numbers.
 
-With `--display`, both exes play the scenario and their display digests (display.txt, docs/display-log.md) are compared; at the first frame that differs both play again with `-testdisplay <tick>` (`--display-tick TICK` names the tick and skips the first pair of runs) and the first item of that frame's display lists that differs is printed, with both lines and their line numbers. `--display-lists` compares two displaylist.txt files without running. `--end-of-tick` compares frame numbers, ticks, counts and `set` of the digests, and the items of a frame as sorted `<layer> <item>` lines.
+With `--display`, both exes play the scenario and their display digests (display.txt, docs/display-log.md) are compared; at the first frame that differs both play again with `-testdisplay <tick>` (`-testdisplay all` for a frame of tick 0, such as a loading frame; `--display-tick TICK` names the tick and skips the first pair of runs) and the first item of that frame's display lists that differs is printed, with both lines and their line numbers. `--display-lists` compares two displaylist.txt files without running. `--end-of-tick` compares frame numbers, ticks, counts and `set` of the digests, and the items of a frame as sorted `<layer> <item>` lines.
 
 `--traces` compares existing trace files without running, and reports the first
 divergence only. `--dumps` diffs the phase of two existing dump files.
@@ -624,6 +624,11 @@ def print_display_difference(a: str, b: str, end_of_tick: bool = False) -> int:
     return 1 if diff else 0
 
 
+def testdisplay_for(tick: int) -> str:
+    """The -testdisplay argument that lists the frames of `tick`: `all` for tick 0, which the harness takes as no tick."""
+    return "all" if tick == 0 else str(tick)
+
+
 def compare_display(args: argparse.Namespace) -> int:
     """Play both exes on the scenario, find the first frame whose display digest differs, play both again with `-testdisplay` at its tick and print the first item that differs."""
     exes = [Path(e).resolve() for e in args.exe]
@@ -649,7 +654,7 @@ def compare_display(args: argparse.Namespace) -> int:
         if frame is None:
             return 1
         tick = frame[1]
-    runs = [play_loading(e, s, args.game_dir, None, None, p, x, testdisplay=str(tick))
+    runs = [play_loading(e, s, args.game_dir, None, None, p, x, testdisplay=testdisplay_for(tick))
             for e, s, p, x in zip(exes, scenarios, poison, xserver)]
     lists = [(run / "displaylist.txt").read_text() if (run / "displaylist.txt").is_file() else None for run in runs]
     for side, text in zip("ab", lists):

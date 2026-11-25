@@ -552,5 +552,18 @@ class DisplayTest(unittest.TestCase):
         self.assertEqual((code, calls), (0, ["9", "9"]))
 
 
+    def test_a_frame_of_tick_0_is_replayed_with_every_frame(self):
+        one = self.listing("fill screen 0 0 10 10 1", tick=0)
+        two = self.listing("fill screen 0 0 10 10 2", tick=0)
+        code, calls, out = self.run_display((td.displaylog.digest_text(one), td.displaylog.digest_text(two)), (one, two))
+        self.assertEqual(code, 1)
+        self.assertEqual(calls, [None, None, "all", "all"])
+        self.assertIn("item at line 3 of A", out)
+
+    def test_a_given_tick_0_lists_every_frame(self):
+        one = self.listing("fill screen 0 0 10 10 1", tick=0)
+        code, calls, _ = self.run_display(("", ""), (one, one), display_tick=0)
+        self.assertEqual((code, calls), (0, ["all", "all"]))
+
 if __name__ == "__main__":
     unittest.main()

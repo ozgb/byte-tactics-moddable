@@ -1,13 +1,24 @@
 #ifndef HARNESS_REPLAY_OBJECTS_H
 #define HARNESS_REPLAY_OBJECTS_H
 
+#include "../state/block.h"
 #include "replay_text.h"
 #include "replay_types.h"
 
+inline void* ReplayRefPtr(unsigned offset)
+{
+    return offset == 0 ? nullptr : (char*)SimBlockBase() + offset;
+}
+
+inline unsigned ReplayRefOffset(const void* p)
+{
+    return p == nullptr ? 0u : (unsigned)((const char*)p - (const char*)SimBlockBase());
+}
+
 #ifdef BT_REPLAY_FIXTURES
-enum { REPLAY_OBJECT_KINDS = 192 };
+enum { REPLAY_OBJECT_KINDS = 256 };
 #else
-enum { REPLAY_OBJECT_KINDS = 160 };
+enum { REPLAY_OBJECT_KINDS = 224 };
 #endif
 
 enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 16384, REPLAY_HANDLE_CALLBACK = 3, REPLAY_KEY_BYTES = 512 };

@@ -67,6 +67,10 @@ static EconAccount* s_region;
 
 enum { HANDICAP_NONE = 0, HANDICAP_HALF = 1, HANDICAP_SEVEN = 2 };
 
+#ifndef BT_REPLAY_INJECT_HANDICAP_HALF
+#define BT_REPLAY_INJECT_HANDICAP_HALF 0.5
+#endif
+
 static Unit* UnitOfHandle(EconUnit handle)
 {
     Ref<Unit> ref;
@@ -109,7 +113,7 @@ static inline void AddIncome(float* dst, int handicap, V v)
 {
     switch (handicap) {
     case HANDICAP_HALF:
-        *dst += v * 0.5;
+        *dst += v * BT_REPLAY_INJECT_HANDICAP_HALF;
         return;
     case HANDICAP_SEVEN:
         *dst += v * 0.7;
@@ -129,7 +133,7 @@ static inline void AddIncomeW(float* dst, int handicap, double v)
 {
     switch (handicap) {
     case HANDICAP_HALF:
-        *dst += v * 0.5;
+        *dst += v * BT_REPLAY_INJECT_HANDICAP_HALF;
         return;
     case HANDICAP_SEVEN:
         *dst += v * 0.7;

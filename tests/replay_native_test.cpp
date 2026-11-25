@@ -30,6 +30,7 @@
 #include "../src/weapons/weapons_apply.h"
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
+#include "../src/game/economy.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -441,8 +442,33 @@ PassMap* PassMapEntries()
 
 #pragma pop_macro("g_passMaps")
 
+struct RegionBinding {
+    void* ptr;
+    unsigned size;
+};
+
+RegionBinding g_region;
+ReplayRegionView g_regionView;
+
+void* AllocRegion(unsigned size)
+{
+    return AllocObject(size);
+}
+
+void RegionBind(void* ptr, unsigned size)
+{
+    g_region.ptr = ptr;
+    g_region.size = size;
+    SimBlockTrack(&g_region.ptr);
+}
+
 unsigned char* BlockBase(const ReplayField& f)
 {
+    if (f.base == RB_REGION) {
+        g_regionView.size = g_region.size;
+        g_regionView.data = g_region.ptr == nullptr ? 0u : (unsigned)((unsigned char*)g_region.ptr - (unsigned char*)SimBlockBase());
+        return (unsigned char*)&g_regionView;
+    }
     return f.base == RB_GAME ? (unsigned char*)g_game : (unsigned char*)g_simGlobals;
 }
 
@@ -1030,6 +1056,17 @@ void CompareObjectResult(unsigned kind, const void* object)
     if (strcmp(recorded, value.Data()) != 0)
         Diff("result", recorded, value.Data());
     value.Free();
+}
+
+void CompareRegionResult(const void* result)
+{
+    const char* value = result != nullptr && result == g_region.ptr ? "region" : "null";
+    HashText(value);
+    const char* recorded = OutLine("result");
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value) != 0)
+        Diff("result", recorded, value);
 }
 
 template <class T> void CompareResult(T result)
@@ -1837,6 +1874,8 @@ void ResetBlock()
     g_known.Reset();
     g_objects.Reset();
     g_captureUsed = 0;
+    g_region.ptr = nullptr;
+    g_region.size = 0;
 }
 
 const ReplaySlotSets* FindSlot(const char* subsystem, const char* name)
@@ -6280,6 +6319,59 @@ void GameWriteSelfTest()
     delete table;
 }
 
+void RegionSelfTest()
+{
+    printf("a module's region\n");
+    ResetBlock();
+    ReplayClearFailure();
+    const ReplayField& f = kReplayFields[RF_REGION];
+    Check(f.base == RB_REGION && f.kind == RK_ARRAY, "the region is a block field of its own base");
+    unsigned char* region = (unsigned char*)AllocObject(2048);
+    RegionBind(region, 2048);
+    region[600] = 0x11;
+    region[601] = 0x22;
+    ReplayKnown known;
+    ReplayText first;
+    ReplayText second;
+    ReplayText scratch;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayEmitField(first, known, *table, 'w', f.name, ReplayFieldView(f), BlockBase(f), scratch);
+    Check(strncmp(first.Data(), "  w region [2048]\n  w region 512:0000", 36) == 0, "a whole write names the length, and leaves out the zero chunks");
+    Check(CountLines(first.Data(), "  w region ") == 2 && strstr(first.Data(), " 1024:") == nullptr && strstr(first.Data(), " 1536:") == nullptr, "only the chunk with a non-zero byte follows");
+    region[2000] = 0x7f;
+    ReplayEmitField(second, known, *table, 'w', f.name, ReplayFieldView(f), BlockBase(f), scratch);
+    Check(strcmp(second.Data(), "  w region 2000:7f\n") == 0, "a later write is the changed run");
+
+    ReplayKnown replayed;
+    ReplayText lines;
+    lines.AddText(first);
+    lines.AddText(second);
+    for (const char* p = lines.Data(); *p != '\0';) {
+        const char* end = strchr(p, '\n');
+        char value[1300];
+        size_t n = (size_t)(end - (p + 11));
+        memcpy(value, p + 11, n);
+        value[n] = '\0';
+        Check(ReplayApplyArray(ReplayFieldView(f), nullptr, "region", value, replayed, false, nullptr), "a line of the region applies");
+        p = end + 1;
+    }
+    ReplayText now;
+    FormatField(f, now);
+    Check(strcmp(replayed.Get("region"), now.Data()) == 0, "the lines make the bytes the module left");
+    region[600] = 0x12;
+    FormatField(f, now);
+    BeginCompare();
+    if (strcmp(replayed.Get("region"), now.Data()) != 0)
+        Diff("region", replayed.Get("region"), now.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "region") == 0 && strstr(g_detail.Data(), "byte 600 of 2048: recorded 11, replayed 12") != nullptr, "a changed byte is reported at the region, with its byte");
+    first.Free();
+    second.Free();
+    lines.Free();
+    now.Free();
+    scratch.Free();
+    delete table;
+}
+
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
@@ -6329,6 +6421,7 @@ int SelfTest(const char* file)
     NestedVectorSelfTest();
     SimVectorSelfTest();
     GameWriteSelfTest();
+    RegionSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

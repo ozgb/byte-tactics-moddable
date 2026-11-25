@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map and weapons have recordings so far; economy and pathfinding have none yet (their interfaces take a region and a world view at Init, which the recorder cannot record: #698). The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons and economy have recordings so far; pathfinding, los_radar and players have none yet (their region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -1180,6 +1180,34 @@ calls through the seam table of the module with the cursor set back over those l
 `<import>.c[<k>]`. A command that is not a seam slot is not recorded, a slot import of the nested call is not recorded, and a command run
 inside a nested command fails the recording.
 
+## A module's region and world view
+
+Economy, pathfinding, los_radar and players take a region at match load (`RegionSize(info)`, `Init(info[, world], region, size)`, `Shutdown()`), and economy a world view. The engine calls them before the first tick, so a window that starts later would never see them. The `region` annotation of a subsystem names its slots:
+
+```json
+"region": {"size": "RegionSize", "init": "Init", "shutdown": "Shutdown", "world": "econworld"}
+```
+
+`world` is optional. `replayschema.py --check` fails for a slot that is not in the interface, a missing key and a world that is no entry of `WORLD_VIEWS`.
+
+| Slot | Lines |
+|---|---|
+| `RegionSize` | `a map (2501,2)` (the map-info struct, a value kind: `EconMapInfo`, `PlayersMapInfo`, `LosRadarMapInfo`, `PathMapInfo`), `o result 120048` |
+| `Init` | `a map (2501,2)`, `a size 120048`, then `w region [120048]` and the runs of the region as the module left it; the region and the world are no `a` lines |
+| `Shutdown` | `o result region` when it returns the region the module was given, else `o result null` |
+
+`RegionSize` and `Init` are recorded whatever the window: the recorder writes them as the first calls of the file even when the window starts later, and the replayer runs the module's own `Init` on a region of the recorded size, so the module's statics are bound before the first windowed call. The region is zero when `Init` starts, in the game and in the replayer.
+
+**The region is the module's own state.** It is the pseudo-field `region` of the schema (base `region`, a byte array: `elem` u8, length the size given at `Init`), and it is in the read and write set of every recorded slot of the subsystem but `RegionSize`, `Init` (write only) and `Shutdown` (read only). It is written with the array forms of Arrays: a whole write `[N]` the first time, then the runs that changed since the last line that named it (`r region 66:4841 12070:803f`). A whole write of the region leaves out each 512-byte chunk that is all zero, since a region is large and mostly zero, and the replayer zeroes the array on `[N]`: the first chunk then is the line `w region [120048]` alone. No other array leaves a chunk out. A difference is reported at `region`, as `byte 12033 of 120048: recorded 00, replayed 89`.
+
+A field a slot writes only some of the time must be in its read set, for a window to replay it (a field written for the player of the call only, while every player is walked): the schema's rules for economy give `Player.energyIncome` and the ledger fields of `UnitResources` reads for that reason.
+
+**The world view.** A world view is a table of calls a module is given at `Init`. `WORLD_VIEWS` of `replayschema.py` lists it (`econworld`: `EconomyWorldView`, in `interfaces/economy.h`), and it is a subsystem of the schema with `"world": true` that is never recorded (the `record` switch refuses it) and whose slots are all `"record": false` and are imports of the subsystem that lists them. Its calls are `i econworld.PlayerInfo 3 = (...)` lines with the forms of imports. An out struct of a void slot is the result (` = (1,2,3)`), and one of a slot that returns a value is `{"mode": "value", "dir": "out", "named": true, "line": "uinfo"}`: nothing in the import line and `o uinfo (...)` after it, which the stub writes back. A block offset of a unit (`EconUnit`) is `{"mode": "object", "kind": "Unit", "ref": true}`: `Unit#251`, in arguments and results. `Emit` is `{"mode": "effect", "events": "economy", "size": "size"}`: `i econworld.Emit (16,0,Unit#1,0) 16`, the effect as the value of its payload struct (see Services). The recorder wraps the world given to `Init` with a recording copy; the replayer passes stubs that answer from the lines.
+
+### A region that holds block offsets
+
+pathfinding's region holds the `Pathfinder`, whose `PathGrid.cells`, `dirty`, `OpenHeap.pool` and `items` are `Ref`s, offsets from the block base, into the region itself. The region form restores the bytes, so a replayer whose region is at another offset of its block would read other memory: pathfinding is not recorded until its region is position independent, typed as objects, or placed at the recorded offset (#1044).
+
 ## Not recorded
 
 No scenario reaches these paths of targeting, and no recording holds them. Each has its reason.
@@ -1208,6 +1236,13 @@ weapons:
 - `Apply` of DETONATE, EXPLODE_PIECE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES: the slot leaves them `unrecorded` (#711), so the self-destructs of `combat-deaths` reach the recording only through what they change.
 - The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
 - The burst of a weapon: a burst is counted down by `UpdateProjectiles` (#711), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
+
+economy:
+
+- `UpdateResourceSharing` and its `network.SendShareMapInfo` import: it returns unless `Game.netGameFlags` bit 0 is set, and a share needs a remote partner. No scenario is a network game, and no play-test recording is stored.
+- `Shutdown`: the game calls it when a match is unloaded, which no scenario run does before it ends. The form is replayed by the self-test.
+- `Apply` of LOAD: only a loaded game publishes it (`load-midgame` is not recorded).
+- `GetEnergyUse` is recorded at tick 0 only (`console-iwin`, the whole run, 100 ticks): the unit type loader calls it, and a window cannot start before tick 1.
 
 ## Replaying
 
@@ -1243,7 +1278,13 @@ own `pool`, which the module grows), and a write to a `Game` field through a poi
 recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 
-Economy and pathfinding are not recorded yet: both take a region and a world view at `Init` and economy takes an event struct (#698 is the recorder's follow-up for that shape).
+Pathfinding is not recorded yet: its region holds `Ref`s into itself, which the replayer's block would break (see A module's region and world view, "A region that holds block offsets"). The self-test also replays a module's region (`a module's region`): a whole write that leaves out the zero chunks, a changed run, and a changed byte reported at `region` with its byte.
+
+The recordings of economy: `console-economy` (ticks 30 to 200: `Apply` of RESET, REQUEST, SPEND and INCOME 36 times, `RequestGranted` 32, `Spend` 3, `UpdatePlayerEconomy` 12, `UpdateMetalExtraction` once, the `+give`, `+nometal` and `+noenergy` commands), `edges-economy-targeting` (ticks 10 to 60: `Apply` 58, `Spend` 35, `UpdateMetalExtraction` 55 with the `econworld.Emit` of the extractors' effects), `duel-shore-to-shore` (ticks 600 to 660, a computer player at difficulty 0: `UpdatePlayerEconomy` 6 with the half handicap), `save-midgame` (ticks 899 to 902: `UnitAccount` 4) and `console-iwin` (the whole run: `GetEnergyUse` 2232, the unit types). Each file starts with `RegionSize` and `Init` at tick 0, and the windowed ones then restore the region as the runs of `r region` lines. `replay_inject_test.exe` for economy is built with a handicap of 0.4 where the half handicap is 0.5, and the divergence is reported at call 2 of `duel-shore-to-shore`, at `region` (the account of a unit that the computer player gets half of):
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 2 region tests/replay/economy/duel-shore-to-shore.txt
+```
 
 `replay_inject_test.exe` is built with the target-scale injection of 0x6666 (the 0xcccc of the weapon target position, the part of the
 distance a target's body offset moves the aim point), and the divergence is reported at call 356 of `skirmish4-long` and at `pos.x`, the

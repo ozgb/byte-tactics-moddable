@@ -2797,7 +2797,7 @@ class Blobs(unittest.TestCase):
         text = files[rs.FIXTURE_SCHEMA_H]
         row = [l for l in text.split("\n") if l.startswith('    { "entries[]", offsetof(FixtureProgram, entries)')][0]
         self.assertIn("RK_BLOB, ROK_ALLOC,", row)
-        self.assertTrue(row.endswith(", 8 },"), row)
+        self.assertTrue(row.endswith(", 9 },"), row)
 
     def test_the_bytes_are_a_raw_array_with_the_length_expression(self):
         text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
@@ -3098,8 +3098,8 @@ class Committed(unittest.TestCase):
     def test_every_simulation_subsystem_is_covered(self):
         files, _, model = rs.generate(rs.read_rows())
         written = json.loads(files[rs.JSON_OUT])
-        self.assertEqual(sorted(written["subsystems"]), sorted(m[0] for m in rs.seam_members()))
-        self.assertEqual(set(written["subsystems"]), set(coupling.SIM_SUBSYSTEMS) | {"files", "network"})
+        self.assertEqual(sorted(written["subsystems"]), sorted(m[0] for m in rs.seam_members() + rs.world_members()))
+        self.assertEqual(set(written["subsystems"]), set(coupling.SIM_SUBSYSTEMS) | {"files", "network", "econworld"})
 
     def test_every_manifest_slot_has_sets(self):
         manifest = json.loads((rs.ROOT / "wasm/modules.json").read_text())
@@ -3155,6 +3155,76 @@ class CompleteImports(unittest.TestCase):
         stub = stub[:stub.index("\n}\n")]
         self.assertIn('ApplyVec3(a1, "out");', stub)
         self.assertNotIn('t.Add("?")', stub)
+
+
+class Regions(unittest.TestCase):
+    def model(self, ann=None):
+        return rs.build(ann or annotations(), rs.read_rows(), rs.read_assignment())
+
+    def test_the_region_is_a_block_field_of_its_own_base(self):
+        model, errors = self.model()
+        self.assertEqual(errors, [])
+        field = [f for f in model["fields"] if f["name"] == "region"][0]
+        self.assertEqual((field["base"], field["kind"], field["size"]), ("region", "array", 4))
+        array = model["arrays"][field["array"] - 1]
+        self.assertEqual((array["elem"], array["ref"], array["owner"], array["member"]), (1, True, "ReplayRegionView", "data"))
+        self.assertEqual(array["length"][0], {"member": "size", "shift": 0})
+
+    def test_the_region_is_in_the_sets_of_every_slot_but_its_own_two(self):
+        model, _ = self.model()
+        slots = model["subsystems"]["economy"]["slots"]
+        self.assertEqual((slots["RegionSize"]["reads"], slots["RegionSize"]["writes"]), ([], []))
+        self.assertNotIn("region", slots["Init"]["reads"])
+        self.assertIn("region", slots["Init"]["writes"])
+        self.assertIn("region", slots["Shutdown"]["reads"])
+        self.assertNotIn("region", slots["Shutdown"]["writes"])
+        for name in ("Apply", "Spend", "UpdatePlayerEconomy", "UnitAccount", "RequestGranted"):
+            self.assertIn("region", slots[name]["reads"], name)
+            self.assertIn("region", slots[name]["writes"], name)
+
+    def test_init_takes_the_region_and_the_world_and_shutdown_returns_it(self):
+        model, _ = self.model()
+        economy = model["subsystems"]["economy"]
+        init = {a["name"]: a for a in economy["slots"]["Init"]["args"]}
+        self.assertEqual(init["map"]["mode"], "value")
+        self.assertEqual((init["world"]["mode"], init["world"]["seam"]), ("world", "econworld"))
+        self.assertEqual(init["region"]["mode"], "region")
+        self.assertEqual(init["size"]["mode"], "scalar")
+        self.assertEqual(economy["slots"]["Shutdown"]["result"]["mode"], "region")
+        self.assertEqual(economy["region"], {"size": "RegionSize", "init": "Init", "shutdown": "Shutdown", "world": "econworld"})
+
+    def test_a_world_view_is_a_subsystem_that_is_never_recorded(self):
+        model, _ = self.model()
+        world = model["subsystems"]["econworld"]
+        self.assertTrue(world["world"])
+        self.assertEqual(world["slots"], {})
+        self.assertIn("UnitInfo", world["unrecorded"])
+        unit_info = {a["name"]: a for a in world["unrecorded"]["UnitInfo"]["args"]}
+        self.assertEqual((unit_info["out"]["mode"], unit_info["out"]["dir"], unit_info["out"]["named"]), ("value", "out", True))
+        emit = {a["name"]: a for a in world["unrecorded"]["Emit"]["args"]}
+        self.assertEqual((emit["effect"]["mode"], emit["effect"]["events"], emit["effect"]["size"]), ("effect", "economy", "size"))
+
+    def test_the_hooks_wrap_the_world_and_record_init_whatever_the_window(self):
+        files, errors, _ = rs.generate(rs.read_rows())
+        self.assertEqual(errors, [])
+        hooks = files[rs.HOOKS_H]
+        self.assertIn("a1 = WrapWorld_econworld(a1);", hooks)
+        self.assertIn("RegionBind(SUB_ECONOMY, a2, a3);", hooks)
+        self.assertIn("if (slot == RSL_ECONOMY_REGIONSIZE || slot == RSL_ECONOMY_INIT)", hooks)
+
+    def test_a_region_names_its_slots(self):
+        ann = annotations()
+        ann["subsystems"]["economy"]["region"]["init"] = "Create"
+        _, errors = self.model(ann)
+        self.assertTrue(any("the region's init is Create" in e for e in errors), errors)
+        ann = annotations()
+        ann["subsystems"]["economy"]["region"]["world"] = "nowhere"
+        _, errors = self.model(ann)
+        self.assertTrue(any("no world view" in e for e in errors), errors)
+        ann = annotations()
+        del ann["subsystems"]["economy"]["region"]["shutdown"]
+        _, errors = self.model(ann)
+        self.assertTrue(any("size, init and shutdown" in e for e in errors), errors)
 
 
 if __name__ == "__main__":

@@ -44,5 +44,13 @@
       "expect": 295,
       "field": "Unit#2.weapon0ReloadTimer"
     }
+  },
+  "economy": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_HANDICAP_HALF=0.4",
+      "recording": "duel-shore-to-shore.txt",
+      "expect": 2,
+      "field": "region"
+    }
   }
 }

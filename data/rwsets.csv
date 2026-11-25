@@ -42218,11 +42218,6 @@ address,function,file,kind,target
 ,BurnOut,src/map/features.cpp,field_read,Spot::feature
 ,BurnOut,src/map/features.cpp,function,
 ,BurnOut,src/map/features.cpp,global_read,g_game
-,ByteAt,src/harness/display_log.cpp,field_read,Item::end
-,ByteAt,src/harness/display_log.cpp,field_read,Item::start
-,ByteAt,src/harness/display_log.cpp,function,
-,ByteAt,src/harness/display_log.cpp,global_escape,s_items@src/harness/display_log.cpp
-,ByteAt,src/harness/display_log.cpp,global_read,s_text@src/harness/display_log.cpp
 ,ByteMap_00408090::Get,src/ai/ai_player_407e70.cpp,deref_read,*unsigned char
 ,ByteMap_00408090::Get,src/ai/ai_player_407e70.cpp,field_read,ByteMap_00408090::data
 ,ByteMap_00408090::Get,src/ai/ai_player_407e70.cpp,field_read,MapSize_00408090::width
@@ -49644,12 +49639,15 @@ address,function,file,kind,target
 ,Snap,src/orders/vtol_orders.cpp,call,WorldToCellMul
 ,Snap,src/orders/vtol_orders.cpp,deref_read,*Vec3
 ,Snap,src/orders/vtol_orders.cpp,function,
-,SortLines,src/harness/display_log.cpp,call,ByteAt
 ,SortLines,src/harness/display_log.cpp,call,CompareFrom
 ,SortLines,src/harness/display_log.cpp,call,SortLines
+,SortLines,src/harness/display_log.cpp,call,WordAt
 ,SortLines,src/harness/display_log.cpp,deref_read,*int
 ,SortLines,src/harness/display_log.cpp,deref_write,*int
+,SortLines,src/harness/display_log.cpp,field_read,Item::end
+,SortLines,src/harness/display_log.cpp,field_read,Item::start
 ,SortLines,src/harness/display_log.cpp,function,
+,SortLines,src/harness/display_log.cpp,global_read,s_items@src/harness/display_log.cpp
 ,SpeechQueue::Remove,src/sound/sound.cpp,call,GameFreeThunk
 ,SpeechQueue::Remove,src/sound/sound.cpp,call,operator=
 ,SpeechQueue::Remove,src/sound/sound.cpp,field_read,SpeechEntry::data
@@ -51574,6 +51572,12 @@ address,function,file,kind,target
 ,WidthTextGlyphs,src/graphics/font.cpp,field_read,Font::glyphs
 ,WidthTextGlyphs,src/graphics/font.cpp,field_read,Font::offsets
 ,WidthTextGlyphs,src/graphics/font.cpp,function,
+,WordAt,src/harness/display_log.cpp,deref_read,*unsigned char
+,WordAt,src/harness/display_log.cpp,field_read,Item::end
+,WordAt,src/harness/display_log.cpp,field_read,Item::start
+,WordAt,src/harness/display_log.cpp,function,
+,WordAt,src/harness/display_log.cpp,global_escape,s_items@src/harness/display_log.cpp
+,WordAt,src/harness/display_log.cpp,global_escape,s_text@src/harness/display_log.cpp
 ,WorldPosition,src/harness/harness.cpp,call,GameAt
 ,WorldPosition,src/harness/harness.cpp,call,GetGroundHeight
 ,WorldPosition,src/harness/harness.cpp,deref_read,*int

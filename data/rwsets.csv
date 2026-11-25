@@ -56498,6 +56498,7 @@ address,function,file,kind,target
 ,RecPlayersApply,src/harness/replay_hooks.inc,call,EventRoots
 ,RecPlayersApply,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPlayersApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecPlayersApply,src/harness/replay_hooks.inc,field_read,PlayersEventHeader::kind
 ,RecPlayersApply,src/harness/replay_hooks.inc,field_read,PlayersSeam::Apply
 ,RecPlayersApply,src/harness/replay_hooks.inc,function,
 ,RecPlayersApply,src/harness/replay_hooks.inc,global_read,s_call

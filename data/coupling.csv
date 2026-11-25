@@ -667,6 +667,7 @@ game,harness,shared_write,Game::ticks,3
 game,harness,shared_write,Game::uiOptionFlags,1
 game,harness,shared_write,LoadingFlags::value,1
 game,harness,shared_write,Player::allied,1
+game,harness,shared_write,PlayersEventHeader::kind,1
 game,harness,shared_write,Point16::x,1
 game,harness,shared_write,Point16::y,1
 game,harness,shared_write,Vec3::x,3
@@ -5507,6 +5508,7 @@ seams,harness,shared_write,PathfindingSeam::CellsChanged,2
 seams,harness,shared_write,PathfindingSeam::Poll,2
 seams,harness,shared_write,PathfindingSeam::Step,2
 seams,harness,shared_write,PathfindingSeam::Submit,2
+seams,harness,shared_write,PlayersEventHeader::kind,1
 seams,harness,shared_write,PlayersSeam::Apply,2
 seams,harness,shared_write,PlayersSeam::UpdatePlayerBody,2
 seams,harness,shared_write,PlayersSeam::UpdatePlayerHead,2

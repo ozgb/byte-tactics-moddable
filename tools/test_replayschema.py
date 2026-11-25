@@ -999,6 +999,7 @@ class Polymorphic(unittest.TestCase):
 
     def test_an_argument_of_the_base_type_is_recorded_as_the_base(self):
         ann = annotations()
+        ann["subsystems"]["units"]["status"] = "pending"
         ann["subsystems"]["units"]["slots"] = {"UnitRefSetValue": {"args": {"value": {"mode": "object", "kind": "OrderFx", "poly": "OrderFx"}}}}
         files, errors, model = self.generated(ann)
         self.assertEqual(errors, [])

@@ -1691,274 +1691,6 @@ void __stdcall RecOrdersWriteState(const StateWriter* a0)
     }
 }
 
-int __stdcall RecUnitsApply(const UnitsEventHeader* a0, unsigned int a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_APPLY, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "event");
-        ArgValue(s_call, "size", a1);
-    }
-    int result = s_inner_units->Apply(a0, a1);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsUpdateAllUnits()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_UPDATEALLUNITS, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->UpdateAllUnits();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsUnitTypeSetAddTypeOrCategory(UnitTypeSet* a0, const char* a1, int* a2)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_UNITTYPESETADDTYPEORCATEGORY, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "self");
-        ArgValue(s_call, "text", (const char*)a1);
-        ArgPending(s_call, "out");
-    }
-    s_inner_units->UnitTypeSetAddTypeOrCategory(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsAllocateUnitMemory()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_ALLOCATEUNITMEMORY, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->AllocateUnitMemory();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsFreeUnitMemory()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_FREEUNITMEMORY, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->FreeUnitMemory();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsFreeUnitInfo()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_FREEUNITINFO, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->FreeUnitInfo();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsRefreshUnitInfo()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_REFRESHUNITINFO, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->RefreshUnitInfo();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsLoadUnitTypes()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_LOADUNITTYPES, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->LoadUnitTypes();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsFreeUnitTypes()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_FREEUNITTYPES, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->FreeUnitTypes();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsLoadDownloadMenus()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_LOADDOWNLOADMENUS, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->LoadDownloadMenus();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsFreeDownloadMenus()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_FREEDOWNLOADMENUS, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->FreeDownloadMenus();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsFreeMovementClasses()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_FREEMOVEMENTCLASSES, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->FreeMovementClasses();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsInitUnitCategories()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_INITUNITCATEGORIES, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->InitUnitCategories();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsFreeUnitCategories()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_FREEUNITCATEGORIES, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->FreeUnitCategories();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsKillAllUnits()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_KILLALLUNITS, SUB_UNITS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_units->KillAllUnits();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsKillUnitsOfType(short a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_KILLUNITSOFTYPE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "id", a0);
-    }
-    s_inner_units->KillUnitsOfType(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsReloadUnitType(unsigned short a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_RELOADUNITTYPE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "id", a0);
-    }
-    s_inner_units->ReloadUnitType(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsKillUnit(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_KILLUNIT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "cause", a1);
-    }
-    s_inner_units->KillUnit(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsLoadUnits(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_LOADUNITS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_units->LoadUnits(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsSaveUnits(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_SAVEUNITS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_units->SaveUnits(a0);
-    if (scope.Open()) {
-    }
-}
-
-Unit* __stdcall RecUnitsLoadUnit(unsigned short a0, HapiBank* a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_LOADUNIT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "id", a0);
-        ArgHandle(s_call, "file", OBJ_BANK, a1);
-    }
-    Unit* result = s_inner_units->LoadUnit(a0, a1);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_UNIT, result, "o");
-    }
-    return result;
-}
-
-Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, const Vec3* a2, int a3, int a4, int a5)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_CREATEUNIT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgValue(s_call, "typeId", a1);
-        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a2);
-        ArgValue(s_call, "finished", a3);
-        ArgValue(s_call, "mode", a4);
-        ArgValue(s_call, "id", a5);
-    }
-    Unit* result = s_inner_units->CreateUnit(a0, a1, a2, a3, a4, a5);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_UNIT, result, "o");
-    }
-    return result;
-}
-
 UnitDef* __stdcall RecUnitsFindUnitType(const char* a0)
 {
     ReplayRoots roots;
@@ -1981,42 +1713,6 @@ unsigned short __stdcall RecUnitsFindUnitTypeId(const char* a0)
         ArgValue(s_call, "name", (const char*)a0);
     }
     unsigned short result = s_inner_units->FindUnitTypeId(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-Unit* __stdcall RecUnitsFindMissionUnit(const char* a0, const Ref<Unit>* a1, int a2, Unit* a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a3);
-    SlotScope scope(RSL_UNITS_FINDMISSIONUNIT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "name", (const char*)a0);
-        ArgPending(s_call, "units");
-        ArgValue(s_call, "count", a2);
-        ArgObject(s_call, "after", ROK_UNIT, a3);
-    }
-    Unit* result = s_inner_units->FindMissionUnit(a0, a1, a2, a3);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_UNIT, result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecUnitsAddBuildProgress(Unit* a0, Unit* a1, float a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_UNITS_ADDBUILDPROGRESS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "builder", ROK_UNIT, a0);
-        ArgObject(s_call, "unit", ROK_UNIT, a1);
-        ArgValue(s_call, "amount", a2);
-    }
-    int result = s_inner_units->AddBuildProgress(a0, a1, a2);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -2092,18 +1788,6 @@ int __stdcall RecUnitsCanRepair(Unit* a0, Unit* a1)
     return result;
 }
 
-void __stdcall RecUnitsUnitRefUnlink(UnitRef* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_UNITREFUNLINK, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "ref");
-    }
-    s_inner_units->UnitRefUnlink(a0);
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecUnitsUpdateUnitHead(Unit* a0)
 {
     ReplayRoots roots;
@@ -2126,157 +1810,6 @@ int __stdcall RecUnitsUpdateUnitBody(Unit* a0)
         ArgObject(s_call, "unit", ROK_UNIT, a0);
     }
     int result = s_inner_units->UpdateUnitBody(a0);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsUpdateUnitTail(Unit* a0, int a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a0);
-    SlotScope scope(RSL_UNITS_UPDATEUNITTAIL, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgObject(s_call, "unit", ROK_UNIT, a0);
-        ArgValue(s_call, "moved", a1);
-    }
-    s_inner_units->UpdateUnitTail(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, Ref<Unit>* a3, int a4)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_GETFACTORIESINRADIUS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a1);
-        ArgValue(s_call, "radius", a2);
-        ArgPending(s_call, "out");
-        ArgValue(s_call, "capacity", a4);
-    }
-    int result = s_inner_units->GetFactoriesInRadius(a0, a1, a2, a3, a4);
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsCreateFactoryIndex(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_CREATEFACTORYINDEX, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-    }
-    s_inner_units->CreateFactoryIndex(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsFreeFactoryIndex(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_FREEFACTORYINDEX, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-    }
-    s_inner_units->FreeFactoryIndex(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsRefreshFactoryIndex(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_REFRESHFACTORYINDEX, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-    }
-    s_inner_units->RefreshFactoryIndex(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsUnitRefInit(UnitRef* a0, Unit* a1, OrderBase* a2)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_UNITS_UNITREFINIT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "ref");
-        ArgObject(s_call, "unit", ROK_UNIT, a1);
-        ArgPending(s_call, "value");
-    }
-    s_inner_units->UnitRefInit(a0, a1, a2);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsUnitRefSetUnit(UnitRef* a0, Unit* a1)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_UNIT, a1);
-    SlotScope scope(RSL_UNITS_UNITREFSETUNIT, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "ref");
-        ArgObject(s_call, "unit", ROK_UNIT, a1);
-    }
-    s_inner_units->UnitRefSetUnit(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-Unit* __stdcall RecUnitsUnitRefGet(UnitRef* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_UNITREFGET, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "ref");
-    }
-    Unit* result = s_inner_units->UnitRefGet(a0);
-    if (scope.Open()) {
-        ArgObject(s_tail, "result", ROK_UNIT, result, "o");
-    }
-    return result;
-}
-
-void __stdcall RecUnitsUnitRefSetValue(UnitRef* a0, OrderBase* a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_UNITREFSETVALUE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "ref");
-        ArgPending(s_call, "value");
-    }
-    s_inner_units->UnitRefSetValue(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecUnitsWriteState(const StateWriter* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_WRITESTATE, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "writer");
-    }
-    s_inner_units->WriteState(a0);
-    if (scope.Open()) {
-    }
-}
-
-int __stdcall RecUnitsGetMovementLimits(MapMoveLimits* a0, int a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_UNITS_GETMOVEMENTLIMITS, SUB_UNITS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "out");
-        ArgValue(s_call, "capacity", a1);
-    }
-    int result = s_inner_units->GetMovementLimits(a0, a1);
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -4809,6 +4342,26 @@ WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
     return result;
 }
 
+void __stdcall RecMissionGetMissionParams(MissionParams* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONPARAMS, SUB_MISSION, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i mission.GetMissionParams");
+    }
+    s_inner_mission->GetMissionParams(a0);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_MISSIONPARAMS, a0);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValueStruct(s_tail, "o", "result", ROK_MISSIONPARAMS, a0);
+    }
+}
+
 bool IsImportOf(unsigned owner, unsigned slot)
 {
     switch (owner) {
@@ -4872,6 +4425,14 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_MAP_GETGROUNDHEIGHT)
             return true;
         if (slot == RSL_SCRIPTS_GETSWEETSPOT)
+            return true;
+        return false;
+    case SUB_UNITS:
+        if (slot == RSL_LOS_RADAR_GETMAPCELL)
+            return true;
+        if (slot == RSL_MAP_GETGROUNDHEIGHT)
+            return true;
+        if (slot == RSL_MISSION_GETMISSIONPARAMS)
             return true;
         return false;
     case SUB_MAP:
@@ -5093,7 +4654,7 @@ void HookSeams(const bool* on)
         s_rec_targeting.SavedTargetPair = RecTargetingSavedTargetPair;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.Apply = RecLosRadarApply;
-    if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS] || on[SUB_MAP])
+    if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS] || on[SUB_UNITS] || on[SUB_MAP])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
     if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS])
         s_rec_los_radar.GetMapCellAtPosition = RecLosRadarGetMapCellAtPosition;
@@ -5168,57 +4729,9 @@ void HookSeams(const bool* on)
     if (on[SUB_ORDERS])
         s_rec_orders.WriteState = RecOrdersWriteState;
     if (on[SUB_UNITS])
-        s_rec_units.Apply = RecUnitsApply;
-    if (on[SUB_UNITS])
-        s_rec_units.UpdateAllUnits = RecUnitsUpdateAllUnits;
-    if (on[SUB_UNITS])
-        s_rec_units.UnitTypeSetAddTypeOrCategory = RecUnitsUnitTypeSetAddTypeOrCategory;
-    if (on[SUB_UNITS])
-        s_rec_units.AllocateUnitMemory = RecUnitsAllocateUnitMemory;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeUnitMemory = RecUnitsFreeUnitMemory;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeUnitInfo = RecUnitsFreeUnitInfo;
-    if (on[SUB_UNITS])
-        s_rec_units.RefreshUnitInfo = RecUnitsRefreshUnitInfo;
-    if (on[SUB_UNITS])
-        s_rec_units.LoadUnitTypes = RecUnitsLoadUnitTypes;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeUnitTypes = RecUnitsFreeUnitTypes;
-    if (on[SUB_UNITS])
-        s_rec_units.LoadDownloadMenus = RecUnitsLoadDownloadMenus;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeDownloadMenus = RecUnitsFreeDownloadMenus;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeMovementClasses = RecUnitsFreeMovementClasses;
-    if (on[SUB_UNITS])
-        s_rec_units.InitUnitCategories = RecUnitsInitUnitCategories;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeUnitCategories = RecUnitsFreeUnitCategories;
-    if (on[SUB_UNITS])
-        s_rec_units.KillAllUnits = RecUnitsKillAllUnits;
-    if (on[SUB_UNITS])
-        s_rec_units.KillUnitsOfType = RecUnitsKillUnitsOfType;
-    if (on[SUB_UNITS])
-        s_rec_units.ReloadUnitType = RecUnitsReloadUnitType;
-    if (on[SUB_UNITS])
-        s_rec_units.KillUnit = RecUnitsKillUnit;
-    if (on[SUB_UNITS])
-        s_rec_units.LoadUnits = RecUnitsLoadUnits;
-    if (on[SUB_UNITS])
-        s_rec_units.SaveUnits = RecUnitsSaveUnits;
-    if (on[SUB_UNITS])
-        s_rec_units.LoadUnit = RecUnitsLoadUnit;
-    if (on[SUB_UNITS])
-        s_rec_units.CreateUnit = RecUnitsCreateUnit;
-    if (on[SUB_UNITS])
         s_rec_units.FindUnitType = RecUnitsFindUnitType;
     if (on[SUB_UNITS])
         s_rec_units.FindUnitTypeId = RecUnitsFindUnitTypeId;
-    if (on[SUB_UNITS])
-        s_rec_units.FindMissionUnit = RecUnitsFindMissionUnit;
-    if (on[SUB_UNITS])
-        s_rec_units.AddBuildProgress = RecUnitsAddBuildProgress;
     if (on[SUB_UNITS])
         s_rec_units.AddRepairProgress = RecUnitsAddRepairProgress;
     if (on[SUB_UNITS])
@@ -5228,33 +4741,9 @@ void HookSeams(const bool* on)
     if (on[SUB_UNITS])
         s_rec_units.CanRepair = RecUnitsCanRepair;
     if (on[SUB_UNITS])
-        s_rec_units.UnitRefUnlink = RecUnitsUnitRefUnlink;
-    if (on[SUB_UNITS])
         s_rec_units.UpdateUnitHead = RecUnitsUpdateUnitHead;
     if (on[SUB_UNITS])
         s_rec_units.UpdateUnitBody = RecUnitsUpdateUnitBody;
-    if (on[SUB_UNITS])
-        s_rec_units.UpdateUnitTail = RecUnitsUpdateUnitTail;
-    if (on[SUB_UNITS])
-        s_rec_units.GetFactoriesInRadius = RecUnitsGetFactoriesInRadius;
-    if (on[SUB_UNITS])
-        s_rec_units.CreateFactoryIndex = RecUnitsCreateFactoryIndex;
-    if (on[SUB_UNITS])
-        s_rec_units.FreeFactoryIndex = RecUnitsFreeFactoryIndex;
-    if (on[SUB_UNITS])
-        s_rec_units.RefreshFactoryIndex = RecUnitsRefreshFactoryIndex;
-    if (on[SUB_UNITS])
-        s_rec_units.UnitRefInit = RecUnitsUnitRefInit;
-    if (on[SUB_UNITS])
-        s_rec_units.UnitRefSetUnit = RecUnitsUnitRefSetUnit;
-    if (on[SUB_UNITS])
-        s_rec_units.UnitRefGet = RecUnitsUnitRefGet;
-    if (on[SUB_UNITS])
-        s_rec_units.UnitRefSetValue = RecUnitsUnitRefSetValue;
-    if (on[SUB_UNITS])
-        s_rec_units.WriteState = RecUnitsWriteState;
-    if (on[SUB_UNITS])
-        s_rec_units.GetMovementLimits = RecUnitsGetMovementLimits;
     if (on[SUB_PLAYERS])
         s_rec_players.Apply = RecPlayersApply;
     if (on[SUB_PLAYERS])
@@ -5327,7 +4816,7 @@ void HookSeams(const bool* on)
         s_rec_map.CanPlaceFootprintAt = RecMapCanPlaceFootprintAt;
     if (on[SUB_MAP])
         s_rec_map.IsPadSlotFree = RecMapIsPadSlotFree;
-    if (on[SUB_MAP] || on[SUB_WEAPONS] || on[SUB_TARGETING])
+    if (on[SUB_MAP] || on[SUB_WEAPONS] || on[SUB_TARGETING] || on[SUB_UNITS])
         s_rec_map.GetGroundHeight = RecMapGetGroundHeight;
     if (on[SUB_MAP])
         s_rec_map.PassMapGet = RecMapPassMapGet;
@@ -5583,6 +5072,8 @@ void HookSeams(const bool* on)
         s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
     if (on[SUB_WIND_METEORS])
         s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
+    if (on[SUB_UNITS])
+        s_rec_mission.GetMissionParams = RecMissionGetMissionParams;
     g_seams.wind_meteors = &s_rec_wind_meteors;
     g_seams.economy = &s_rec_economy;
     g_seams.features = &s_rec_features;

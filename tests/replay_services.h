@@ -439,8 +439,6 @@ int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int reso
     ReplayText t;
     StartImport(t, RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
     Space(t);
-    t.AddInt((int)(unsigned int)unit);
-    Space(t);
     t.AddInt((int)(unsigned int)resources);
     const char* result = Enter(t);
     return atoi(result);

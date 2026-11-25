@@ -336,6 +336,15 @@ void __stdcall Imp_scripts_GetSweetSpot(Unit* a0, Vec3* a1)
     (void)r;
 }
 
+void __stdcall Imp_mission_GetMissionParams(MissionParams* a0)
+{
+    ReplayText t;
+    StartImport(t, "mission.GetMissionParams");
+    const char* r = Enter(t);
+    *a0 = ParseValueText<MissionParams>(ROK_MISSIONPARAMS, r);
+    (void)r;
+}
+
 void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
 {
     ReplayText t;
@@ -396,6 +405,53 @@ TargetingSeam g_native_targeting = {
     FindBestTargetIfFireAtWill,
     ChooseWeaponSlot,
     SavedTargetPair,
+};
+
+UnitsSeam g_native_units = {
+    UnitsNative_Apply,
+    UnitsNative_UpdateAllUnits,
+    UnitsNative_UnitTypeSetAddTypeOrCategory,
+    UnitsNative_AllocateUnitMemory,
+    UnitsNative_FreeUnitMemory,
+    UnitsNative_FreeUnitInfo,
+    UnitsNative_RefreshUnitInfo,
+    UnitsNative_LoadUnitTypes,
+    UnitsNative_FreeUnitTypes,
+    UnitsNative_LoadDownloadMenus,
+    UnitsNative_FreeDownloadMenus,
+    UnitsNative_FreeMovementClasses,
+    UnitsNative_InitUnitCategories,
+    UnitsNative_FreeUnitCategories,
+    UnitsNative_KillAllUnits,
+    UnitsNative_KillUnitsOfType,
+    UnitsNative_ReloadUnitType,
+    UnitsNative_KillUnit,
+    UnitsNative_LoadUnits,
+    UnitsNative_SaveUnits,
+    UnitsNative_LoadUnit,
+    UnitsNative_CreateUnit,
+    UnitsNative_FindUnitType,
+    UnitsNative_FindUnitTypeId,
+    UnitsNative_FindMissionUnit,
+    UnitsNative_AddBuildProgress,
+    UnitsNative_AddRepairProgress,
+    UnitsNative_CanLoad,
+    UnitsNative_CanReclaim,
+    UnitsNative_CanRepair,
+    UnitsNative_UnitRefUnlink,
+    UnitsNative_UpdateUnitHead,
+    UnitsNative_UpdateUnitBody,
+    UnitsNative_UpdateUnitTail,
+    UnitsNative_GetFactoriesInRadius,
+    UnitsNative_CreateFactoryIndex,
+    UnitsNative_FreeFactoryIndex,
+    UnitsNative_RefreshFactoryIndex,
+    UnitsNative_UnitRefInit,
+    UnitsNative_UnitRefSetUnit,
+    UnitsNative_UnitRefGet,
+    UnitsNative_UnitRefSetValue,
+    UnitsNative_WriteState,
+    UnitsNative_GetMovementLimits,
 };
 
 MapSeam g_native_map = {
@@ -688,6 +744,118 @@ void After_targeting_SavedTargetPair()
     CompareResult(g_result_targeting_SavedTargetPair);
 }
 
+UnitDef* g_result_units_FindUnitType;
+
+void Run_units_FindUnitType()
+{
+    char p0_text[256];
+    ArgText("name", p0_text, sizeof p0_text);
+    SetClosing("result");
+    g_result_units_FindUnitType = g_seams.units->FindUnitType(p0_text);
+}
+
+void After_units_FindUnitType()
+{
+    CompareObjectResult(ROK_UNITDEF, g_result_units_FindUnitType);
+}
+
+unsigned short g_result_units_FindUnitTypeId;
+
+void Run_units_FindUnitTypeId()
+{
+    char p0_text[256];
+    ArgText("name", p0_text, sizeof p0_text);
+    SetClosing("result");
+    g_result_units_FindUnitTypeId = g_seams.units->FindUnitTypeId(p0_text);
+}
+
+void After_units_FindUnitTypeId()
+{
+    CompareResult(g_result_units_FindUnitTypeId);
+}
+
+int g_result_units_AddRepairProgress;
+
+void Run_units_AddRepairProgress()
+{
+    Unit* p0 = (Unit*)ArgObject("builder", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("unit", ROK_UNIT);
+    float p2 = ArgScalar<float>("amount");
+    SetClosing("result");
+    g_result_units_AddRepairProgress = g_seams.units->AddRepairProgress(p0, p1, p2);
+}
+
+void After_units_AddRepairProgress()
+{
+    CompareResult(g_result_units_AddRepairProgress);
+}
+
+int g_result_units_CanLoad;
+
+void Run_units_CanLoad()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
+    SetClosing("result");
+    g_result_units_CanLoad = g_seams.units->CanLoad(p0, p1);
+}
+
+void After_units_CanLoad()
+{
+    CompareResult(g_result_units_CanLoad);
+}
+
+int g_result_units_CanReclaim;
+
+void Run_units_CanReclaim()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
+    SetClosing("result");
+    g_result_units_CanReclaim = g_seams.units->CanReclaim(p0, p1);
+}
+
+void After_units_CanReclaim()
+{
+    CompareResult(g_result_units_CanReclaim);
+}
+
+int g_result_units_CanRepair;
+
+void Run_units_CanRepair()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
+    SetClosing("result");
+    g_result_units_CanRepair = g_seams.units->CanRepair(p0, p1);
+}
+
+void After_units_CanRepair()
+{
+    CompareResult(g_result_units_CanRepair);
+}
+
+void Run_units_UpdateUnitHead()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.units->UpdateUnitHead(p0);
+}
+
+int g_result_units_UpdateUnitBody;
+
+void Run_units_UpdateUnitBody()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing("result");
+    g_result_units_UpdateUnitBody = g_seams.units->UpdateUnitBody(p0);
+}
+
+void After_units_UpdateUnitBody()
+{
+    CompareResult(g_result_units_UpdateUnitBody);
+}
+
 int g_result_map_Apply;
 
 void Run_map_Apply()
@@ -959,6 +1127,38 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_targeting_SavedTargetPair();
         return true;
     }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "FindUnitType") == 0) {
+        Run_units_FindUnitType();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "FindUnitTypeId") == 0) {
+        Run_units_FindUnitTypeId();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "AddRepairProgress") == 0) {
+        Run_units_AddRepairProgress();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanLoad") == 0) {
+        Run_units_CanLoad();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanReclaim") == 0) {
+        Run_units_CanReclaim();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanRepair") == 0) {
+        Run_units_CanRepair();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "UpdateUnitHead") == 0) {
+        Run_units_UpdateUnitHead();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "UpdateUnitBody") == 0) {
+        Run_units_UpdateUnitBody();
+        return true;
+    }
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "Apply") == 0) {
         Run_map_Apply();
         return true;
@@ -1034,6 +1234,20 @@ void RunAfter(const char* subsystem, const char* slot)
         After_targeting_ChooseWeapon();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SavedTargetPair") == 0)
         After_targeting_SavedTargetPair();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "FindUnitType") == 0)
+        After_units_FindUnitType();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "FindUnitTypeId") == 0)
+        After_units_FindUnitTypeId();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "AddRepairProgress") == 0)
+        After_units_AddRepairProgress();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanLoad") == 0)
+        After_units_CanLoad();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanReclaim") == 0)
+        After_units_CanReclaim();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanRepair") == 0)
+        After_units_CanRepair();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "UpdateUnitBody") == 0)
+        After_units_UpdateUnitBody();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "Apply") == 0)
         After_map_Apply();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetCellMeanHeight") == 0)
@@ -1063,6 +1277,7 @@ LosRadarSeam g_import_los_radar;
 MapSeam g_import_map;
 NetworkSeam g_import_network;
 ScriptsSeam g_import_scripts;
+MissionSeam g_import_mission;
 PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
@@ -1070,6 +1285,7 @@ void BindSeams()
     g_seams.wind_meteors = &g_native_wind_meteors;
     g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
+    g_seams.units = &g_native_units;
     g_seams.map = &g_native_map;
     g_seams.files = &g_import_files;
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
@@ -1095,6 +1311,8 @@ void BindSeams()
     g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
     g_import_scripts.QueryScript = Imp_scripts_QueryScript;
     g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
+    g_seams.mission = &g_import_mission;
+    g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
     g_seams.pathfinding = &g_import_pathfinding;
     g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
@@ -1113,6 +1331,11 @@ void BindSeams()
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+    }
+    if (strcmp(g_subsystem, "units") == 0) {
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;

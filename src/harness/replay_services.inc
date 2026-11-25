@@ -347,8 +347,6 @@ void ReplayImportEnd(ReplayImport& c)
     case RI_SCHEDULE_ECONOMY_REQUEST_GRANTED:
     {
         AddSpace(t);
-        t.AddInt(a[0].v.i);
-        AddSpace(t);
         t.AddInt(a[1].v.i);
         AddResult(t, c.result);
         break;

@@ -36,10 +36,11 @@ Map's place in it:
   Map's handler (`MapInbox`, `src/seams/map_world.cpp`) passes each to `Apply`; features' PASS_MAPS reaches it through
   `MapOnFeaturesPassMaps`, the route #971 added, which now builds a PASS_MAPS event and hands it to the same handler;
   it moved from map's files into the same glue, as it is the engine's adapter.
-- **Routes:** ten of the eleven routes into map are synchronous: six because the gate diverged with them queued, units'
+- **Routes:** ten of the thirteen routes into map are synchronous: six because the gate diverged with them queued, units'
   ADD_UNIT and BUCKET_PREPEND by #952's rule, features' PASS_MAPS as #971 left it, and RECLAIM_FOOTPRINT because no
   scenario reaches it (sections 4 and 8). Of map's two effects, CELLS_CHANGED is synchronous by #952's rule and
-  CELL_HEIGHTS stays queued, and so does the route of LOAD_PATH_LOCK_STAMP, the eleventh (section 4).
+  CELL_HEIGHTS stays queued, and so do the routes of LOAD_PATH_LOCK_STAMP and of the console's SET_SEA_LEVEL and
+  SET_EDGE, the other three (section 4).
 - **Runs:** none. Map has no pass of its own: every write it makes inside the tick is on behalf of a caller, and the
   scheduler gains no pass for it. Map's inbox is delivered at each phase boundary and before each synchronous slot.
 - **Synchronous slots:** `CanBuildAt`, `CanPlaceUnitFootprint` and `PickRandomReclaimableResourcesInRadius`, called
@@ -284,6 +285,8 @@ one only when an event that can be pending writes what it reads. No route into m
 | units REFRESH_PASS_MAP | removed in 5.0 | Map's own synchronous slots `RefreshMovedUnits` and `RefreshUnitIfStale` instead, called at the search's statement after map's inbox is delivered (section 8). Queued in 4.0, the event diverged. |
 | units LOAD_PATH_LOCK_STAMP | queued | #952's rule finds no read that a pending event would change. It is published only by `LoadUnitMotion` (`unit_save.cpp`) while a saved game loads, outside the tick, where #970's rule delivers it at once anyway. Only map reads the stamp, and map applies its inbox in order before any of its synchronous slots and at each phase boundary, so every read of the stamp (the pass map refresh, and the trace's hash after a phase boundary) sees it. The same as movement's LOAD. |
 | units RECLAIM_FOOTPRINT | synchronous | No scenario reaches it (section 8): `LoadUnit` publishes it only for a saved unit whose yard is open, and the one saved game of the suite has none. It is published only as a saved game is read, outside the tick, where #970's rule delivers it at once anyway, so the policy changes no order. |
+| engine SET_SEA_LEVEL | queued | The tick's rule: queued inside the tick, delivered at once outside it, where the console publishes it. |
+| engine SET_EDGE | queued | The same as SET_SEA_LEVEL. |
 | features PASS_MAPS | synchronous | #971 made it synchronous by #952's rule (`docs/features-interface.md`, section 4); unchanged. |
 | map CELLS_CHANGED, to pathfinding | synchronous | #952's rule. Queued it stayed equal on the tier, which says little: the default pathfinding marks the stale clusters of its hierarchy from it, and the scenarios' paths came out the same. It can be pending while a later read in the same phase needs it: a path submitted later in the units phase (orders' `Submit`) reads the stale marks, and in 4.x units' own `CellsChanged` reports, direct calls into pathfinding, interleaved with map's in that phase (queued, map's would land after all of units', in another order than 3.1c's). Since 5.0 those reports are map's CELLS_CHANGED too, so the route carries them all at their statements. |
 | map CELL_HEIGHTS, to los_radar | queued | Unchanged from #965 (above). |

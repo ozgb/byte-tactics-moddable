@@ -177,6 +177,8 @@ call 382 Apply
   r Game.overflowBucket OverflowBucket#1
   r Game.baseX 3584
   r Game.baseY 1632
+  r Game.mapWidth 3552
+  r Game.mapHeight 1504
   r Unit#3.cell (38,24)
   r Unit#3.footprint (2,2)
   r Unit#3.id 3
@@ -39177,8 +39179,6 @@ call 382 Apply
   i services.SchedPublish 7 32
   i services.SchedPublish 7 32
   i services.SchedPublish 7 32
-  w Game.mapWidth 3552
-  w Game.mapHeight 1504
   w Unit#3.spatialBucket null
   w Unit#252.cargoNext null
   w PassMap#0.cells 260:ffffffffffffffffffffffffffffffffffffffff

@@ -309,6 +309,8 @@ call 1024 Apply
   r Game.overflowBucket OverflowBucket#1
   r Game.baseX 3584
   r Game.baseY 1632
+  r Game.mapWidth 3552
+  r Game.mapHeight 1504
   r Unit#2.cell (40,16)
   r Unit#2.footprint (7,6)
   r Unit#2.id 2
@@ -39309,8 +39311,6 @@ call 1024 Apply
   i services.SchedPublish 7 32
   i services.SchedPublish 7 32
   i services.SchedPublish 7 32
-  w Game.mapWidth 3552
-  w Game.mapHeight 1504
   w Unit#2.cobStateFlags 4
   w Unit#2.flags 0x3ce42321
   w PassMap#0.cells 265:50d5ffffd0ffffffd0ffffff50d5ffff

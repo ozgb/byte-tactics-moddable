@@ -11,6 +11,8 @@ call 0 Apply
   r Game.overflowBucket null
   r Game.baseX 3584
   r Game.baseY 1632
+  r Game.mapWidth 0
+  r Game.mapHeight 0
   r PassMap#0.footprintX 0
   r PassMap#0.footprintZ 0
   r PassMap#0.maxWaterDepth 0
@@ -449,8 +451,6 @@ call 0 Apply
   a event.size0 1
   a event.size1 1
   a size 24
-  w Game.mapWidth 0
-  w Game.mapHeight 0
   o result 1
 call 0 Apply
   r Cell#440.feature 1
@@ -9794,6 +9794,8 @@ call 0 Apply
   r Game.width_142a3 28
   r Game.height_142a7 13
   r Game.overflowBucket OverflowBucket#1
+  r Game.mapWidth 3552
+  r Game.mapHeight 1504
   r Unit#1.cell (34,14)
   r Unit#1.footprint (2,2)
   r Unit#1.id 1
@@ -45200,8 +45202,6 @@ call 0 Apply
   a event.kind 160
   a event.unit Unit#1
   a size 8
-  w Game.mapWidth 3552
-  w Game.mapHeight 1504
   w Unit#1.spatialBucket SpatialBucket#32
   w SpatialBucket#32.head Unit#1
   w Cell#3170.unit 1

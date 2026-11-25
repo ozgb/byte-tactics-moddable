@@ -58410,6 +58410,7 @@ address,function,file,kind,target
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddEffect
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddObjectName
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddTextN
+,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddValueOrNull
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayAddWords
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayBytes
 ,ReplayImportEnd,src/harness/replay_services.inc,call,ReplayCalls

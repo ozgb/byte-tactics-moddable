@@ -2272,7 +2272,7 @@ los_radar,game,call,RecordMessage,3
 los_radar,game,call,RecordSimEvent,2
 los_radar,game,call,SimAlloc,1
 los_radar,game,call,SimAllocTagged,1
-los_radar,game,call,SimBlockTrack,2
+los_radar,game,call,SimBlockTrack,1
 los_radar,game,call,SimCaptureAlloc,2
 los_radar,game,shared_write,Game::mapHeight,4
 los_radar,game,shared_write,Game::mapWidth,5

@@ -1586,6 +1586,8 @@ harness,ai,shared_write,AiSeam::UpdateSquads,1
 harness,ai,shared_write,EconomySeam::GetEnergyUse,1
 harness,ai,shared_write,Game::difficulty,2
 harness,ai,shared_write,LosRadarSeam::GetMapCell,1
+harness,ai,shared_write,MissionSeam::GetGameType,1
+harness,ai,shared_write,MissionSeam::GetMissionParams,2
 harness,ai,shared_write,Player::energyCapacity,1
 harness,ai,shared_write,Player::metalCapacity,1
 harness,ai,shared_write,Player::type,7
@@ -1612,6 +1614,7 @@ harness,features,shared_write,Game::playerIndex,1
 harness,features,shared_write,LosRadarSeam::GetMapCell,14
 harness,features,shared_write,MapSeam::GetCellMeanHeight,1
 harness,features,shared_write,MapSeam::GetGroundHeight,2
+harness,features,shared_write,MissionSeam::GetGameType,2
 harness,features,shared_write,NetworkSeam::SendFeatureBurning,1
 harness,features,shared_write,NetworkSeam::SendFeatureHit,1
 harness,features,shared_write,NetworkSeam::SendFeatureKilled,1
@@ -1694,6 +1697,7 @@ harness,game,shared_write,LosRadarSeam::UpdateSensorRadarAndCloak,1
 harness,game,shared_write,LosRadarSeam::UpdateUnitLineOfSight,1
 harness,game,shared_write,MapSeam::GetGroundHeight,1
 harness,game,shared_write,MapSeam::SnapWorldPosToFootprint,2
+harness,game,shared_write,MissionSeam::GetGameType,12
 harness,game,shared_write,MovementSeam::ApplyPathEvent,1
 harness,game,shared_write,MovementSeam::UpdateMotion,1
 harness,game,shared_write,NetworkSeam::SendUnitStates,1
@@ -1741,6 +1745,7 @@ harness,los_radar,shared_write,Game::playerIndex,14
 harness,los_radar,shared_write,LosRadarSeam::RecordRadarMapped,1
 harness,los_radar,shared_write,LosRadarSeam::RecordRadarUnits,1
 harness,los_radar,shared_write,MapSeam::GetGroundHeight,1
+harness,los_radar,shared_write,MissionSeam::GetMissionParams,2
 harness,los_radar,shared_write,NetworkSeam::BroadcastPlayerInfo,3
 harness,los_radar,shared_write,Player::type,2
 harness,los_radar,shared_write,Seams::features,2
@@ -1779,6 +1784,7 @@ harness,network,shared_write,Game::localPlayer,19
 harness,network,shared_write,Game::mode_391f1,2
 harness,network,shared_write,Game::numPlayers,6
 harness,network,shared_write,LoadingFlags::value,1
+harness,network,shared_write,MissionSeam::GetGameType,4
 harness,network,shared_write,MovementSeam::HasNetState,1
 harness,network,shared_write,MovementSeam::WriteNetState,1
 harness,network,shared_write,Player::alliedBy,2
@@ -1789,7 +1795,7 @@ harness,network,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,network,shared_write,Seams::mission,7
 harness,network,shared_write,Seams::movement,1
 harness,network,shared_write,Seams::scripts,3
-harness,orders,call,Add,90
+harness,orders,call,Add,88
 harness,orders,call,DeleteOrder,1
 harness,orders,call,FindOrderByType,1
 harness,orders,indirect,OrdersWriteState,1
@@ -1804,6 +1810,8 @@ harness,orders,shared_write,MapSeam::CanPlaceFootprintAt,1
 harness,orders,shared_write,MapSeam::GetGroundHeight,4
 harness,orders,shared_write,MapSeam::IsPadSlotFree,2
 harness,orders,shared_write,MapSeam::SnapWorldPosToFootprint,2
+harness,orders,shared_write,MissionSeam::GetGameType,1
+harness,orders,shared_write,MissionSeam::GetMissionParams,1
 harness,orders,shared_write,MovementSeam::NewAirManeuverOrder,1
 harness,orders,shared_write,MovementSeam::NewApproachRadius,1
 harness,orders,shared_write,MovementSeam::NewPathOrderAt,24
@@ -1889,6 +1897,8 @@ harness,players,shared_write,Game::localPlayer,11
 harness,players,shared_write,Game::playerIndex,3
 harness,players,shared_write,LosRadarSeam::ClampWorldPosToTerrain,1
 harness,players,shared_write,MapSeam::GetCellMeanHeight,1
+harness,players,shared_write,MissionSeam::GetGameType,10
+harness,players,shared_write,MissionSeam::GetMissionParams,3
 harness,players,shared_write,NetworkSeam::BroadcastPlayerEconomy,1
 harness,players,shared_write,NetworkSeam::BroadcastPlayerInfo,1
 harness,players,shared_write,NetworkSeam::SendShareEnergy,1
@@ -1921,6 +1931,8 @@ harness,presentation,shared_write,Game::localPlayer,71
 harness,presentation,shared_write,Game::mode_391f1,5
 harness,presentation,shared_write,Game::numPlayers,4
 harness,presentation,shared_write,Game::playerIndex,23
+harness,presentation,shared_write,MissionSeam::GetGameType,17
+harness,presentation,shared_write,MissionSeam::GetMissionParams,3
 harness,presentation,shared_write,NetworkSeam::BroadcastPlayerInfo,1
 harness,presentation,shared_write,Player::alliedBy,4
 harness,presentation,shared_write,Player::energyCapacity,3
@@ -2008,6 +2020,8 @@ harness,seams,shared_write,MapSeam::IsPadSlotFree,1
 harness,seams,shared_write,MapSeam::PassMapGet,2
 harness,seams,shared_write,MapSeam::PassMapInBounds,2
 harness,seams,shared_write,MapSeam::SnapWorldPosToFootprint,1
+harness,seams,shared_write,MissionSeam::GetGameType,1
+harness,seams,shared_write,MissionSeam::GetMissionParams,1
 harness,seams,shared_write,MovementSeam::Apply,2
 harness,seams,shared_write,MovementSeam::ApplyPathEvent,1
 harness,seams,shared_write,MovementSeam::HasNetState,1
@@ -2145,6 +2159,8 @@ harness,units,shared_write,Game::localPlayer,1
 harness,units,shared_write,Game::playerIndex,2
 harness,units,shared_write,LosRadarSeam::GetMapCell,1
 harness,units,shared_write,MapSeam::GetGroundHeight,3
+harness,units,shared_write,MissionSeam::GetGameType,1
+harness,units,shared_write,MissionSeam::GetMissionParams,1
 harness,units,shared_write,MovementSeam::ReadNetState,1
 harness,units,shared_write,MovementSeam::UpdateMotion,1
 harness,units,shared_write,NetworkSeam::SendActivateFlags,1
@@ -2182,6 +2198,7 @@ harness,weapons,shared_write,LosRadarSeam::GetMapCell,1
 harness,weapons,shared_write,LosRadarSeam::GetMapCellAtPosition,3
 harness,weapons,shared_write,MapSeam::GetCellMeanHeight,2
 harness,weapons,shared_write,MapSeam::GetGroundHeight,1
+harness,weapons,shared_write,MissionSeam::GetMissionParams,4
 harness,weapons,shared_write,NetworkSeam::SendProjectileDetonated,1
 harness,weapons,shared_write,NetworkSeam::SendScriptCallByName,1
 harness,weapons,shared_write,NetworkSeam::SendUnitDamage,1
@@ -2473,6 +2490,7 @@ map,harness,shared_write,Point16::y,1
 map,harness,shared_write,Vec3::x,3
 map,harness,shared_write,Vec3::y,1
 map,harness,shared_write,Vec3::z,3
+map,harness,shared_write,g_lastPlaceMetalSum,1
 map,harness,shared_write,g_passMaps,2
 map,los_radar,indirect,GetMapCell,1
 map,los_radar,indirect,GetMapCellAtPosition,1
@@ -5369,6 +5387,8 @@ seams,harness,shared_write,MapSeam::IsPadSlotFree,2
 seams,harness,shared_write,MapSeam::PassMapGet,2
 seams,harness,shared_write,MapSeam::PassMapInBounds,2
 seams,harness,shared_write,MapSeam::SnapWorldPosToFootprint,3
+seams,harness,shared_write,MissionSeam::GetGameType,2
+seams,harness,shared_write,MissionSeam::GetMissionParams,2
 seams,harness,shared_write,MovementSeam::Apply,2
 seams,harness,shared_write,MovementSeam::ApplyPathEvent,2
 seams,harness,shared_write,MovementSeam::HasNetState,2

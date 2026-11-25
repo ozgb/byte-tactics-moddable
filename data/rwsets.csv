@@ -47811,7 +47811,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::ResetAIPlayers
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::UpdatePlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::UpdateSquads
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::WriteState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::GetEnergyUse
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::Init
@@ -47914,6 +47913,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::GetMapCell
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::GetMapCellAtPosition
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::GetOriginCellAtPosition
+,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::GetSeenUnitsInRadius
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::GetVisibleEnemiesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::HasReadyUnitInRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,LosRadarSeam::Init
@@ -47942,6 +47942,9 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapGet
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapInBounds
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SnapWorldPosToFootprint
+,HookSeams,src/harness/replay_hooks.inc,field_write,MissionSeam::GetGameType
+,HookSeams,src/harness/replay_hooks.inc,field_write,MissionSeam::GetMissionParams
+,HookSeams,src/harness/replay_hooks.inc,field_write,MissionSeam::GetNameSlot
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::ApplyPathEvent
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::GetMotionState
@@ -47985,16 +47988,11 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,NetworkSeam::SendWeaponFire
 ,HookSeams,src/harness/replay_hooks.inc,field_write,NetworkSeam::SendWeaponFireAt
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::Apply
-,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::ClearOrderTypeTable
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::GetOrderFlags
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::GetOrderType
-,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::LoadOrders
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::MissionTypeFromName
-,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RegisterAllOrderTypes
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RunOrders
 ,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::RunSecondaryOrders
-,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::SaveOrders
-,HookSeams,src/harness/replay_hooks.inc,field_write,OrdersSeam::WriteState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Cancel
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::CellsChanged
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PathfindingSeam::Init
@@ -48153,7 +48151,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiResetAIPlayers
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiUpdatePlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiUpdateSquads
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiWriteState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyGetEnergyUse
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyInit
@@ -48256,6 +48253,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarGetMapCell
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarGetMapCellAtPosition
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarGetOriginCellAtPosition
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarGetSeenUnitsInRadius
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarGetVisibleEnemiesInRadius
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarHasReadyUnitInRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecLosRadarInit
@@ -48284,6 +48282,9 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapGet
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapInBounds
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSnapWorldPosToFootprint
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMissionGetGameType
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMissionGetMissionParams
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMissionGetNameSlot
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementApplyPathEvent
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementGetMotionState
@@ -48327,16 +48328,11 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecNetworkSendWeaponFire
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecNetworkSendWeaponFireAt
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersApply
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersClearOrderTypeTable
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersGetOrderFlags
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersGetOrderType
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersLoadOrders
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersMissionTypeFromName
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRegisterAllOrderTypes
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRunOrders
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersRunSecondaryOrders
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersSaveOrders
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecOrdersWriteState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingCancel
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingCellsChanged
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPathfindingInit
@@ -48874,6 +48870,9 @@ address,function,file,kind,target
 ,ImportResultWeapon,src/harness/replay.cpp,deref_read,*ReplayObjectField
 ,ImportResultWeapon,src/harness/replay.cpp,function,
 ,ImportResultWeapon,src/harness/replay.cpp,global_read,s_field
+,ImportStructIn,src/harness/replay.cpp,call,ImportValueStruct
+,ImportStructIn,src/harness/replay.cpp,call,ReplayText::Add
+,ImportStructIn,src/harness/replay.cpp,function,
 ,ImportValueStruct,src/harness/replay.cpp,call,ReplayAddValue
 ,ImportValueStruct,src/harness/replay.cpp,call,ReplayText::AddChar
 ,ImportValueStruct,src/harness/replay.cpp,call,Table
@@ -54171,8 +54170,9 @@ address,function,file,kind,target
 ,Rec::Rec,src/map/line_of_sight.h,field_write,Rec::field_6
 ,Rec::Rec,src/map/line_of_sight.h,field_write,Rec::flags
 ,Rec::Rec,src/map/line_of_sight.h,function,
-,RecAiApply,src/harness/replay_hooks.inc,call,ArgPending
+,RecAiApply,src/harness/replay_hooks.inc,call,ArgEvent
 ,RecAiApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecAiApply,src/harness/replay_hooks.inc,call,EventRoots
 ,RecAiApply,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecAiApply,src/harness/replay_hooks.inc,field_read,AiSeam::Apply
@@ -54215,7 +54215,7 @@ address,function,file,kind,target
 ,RecAiDestroyPlayerAI,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiDestroyPlayerAI,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiDestroyPlayerAI,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [AiSeam::DestroyPlayerAI]
-,RecAiDumpPlayerAI,src/harness/replay_hooks.inc,call,ArgPending
+,RecAiDumpPlayerAI,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecAiDumpPlayerAI,src/harness/replay_hooks.inc,call,ArgValue
 ,RecAiDumpPlayerAI,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiDumpPlayerAI,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -54288,14 +54288,6 @@ address,function,file,kind,target
 ,RecAiUpdateSquads,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiUpdateSquads,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiUpdateSquads,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [AiSeam::UpdateSquads]
-,RecAiWriteState,src/harness/replay_hooks.inc,call,ArgPending
-,RecAiWriteState,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiWriteState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiWriteState,src/harness/replay_hooks.inc,field_read,AiSeam::WriteState
-,RecAiWriteState,src/harness/replay_hooks.inc,function,
-,RecAiWriteState,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiWriteState,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [AiSeam::WriteState]
 ,RecEconomyApply,src/harness/replay_hooks.inc,call,ArgPending
 ,RecEconomyApply,src/harness/replay_hooks.inc,call,ArgValue
 ,RecEconomyApply,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -54306,8 +54298,12 @@ address,function,file,kind,target
 ,RecEconomyApply,src/harness/replay_hooks.inc,global_read,s_inner_economy
 ,RecEconomyApply,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecEconomyApply,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const EconomyEventHeader *, unsigned int) __attribute__((stdcall)) [EconomySeam::Apply]"
-,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,ArgPending
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,ArgValue
+,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,FinishImport
+,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,ImportResult
+,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,ImportValue
+,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecEconomyGetEnergyUse,src/harness/replay_hooks.inc,field_read,EconomySeam::GetEnergyUse
@@ -54429,6 +54425,11 @@ address,function,file,kind,target
 ,RecFeaturesFeatureTypeCount,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)() __attribute__((stdcall)) [FeaturesSeam::FeatureTypeCount]
 ,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,ArgPending
 ,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,ArgValue
+,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,FinishImport
+,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,ImportPending
+,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,ImportResult
+,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecFeaturesFindFeatureAtPos,src/harness/replay_hooks.inc,field_read,FeaturesSeam::FindFeatureAtPos
@@ -54469,6 +54470,11 @@ address,function,file,kind,target
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,Add
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,ArgObject
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,ArgValue
+,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,FinishImport
+,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,ImportObject
+,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,ImportResult
+,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecFeaturesGetCellFeature,src/harness/replay_hooks.inc,field_read,FeaturesSeam::GetCellFeature
@@ -54484,6 +54490,7 @@ address,function,file,kind,target
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,FinishImport
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,ImportObject
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,ImportResultValue
+,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,ImportStructIn
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecFeaturesGetFootprintCentre,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55211,6 +55218,11 @@ address,function,file,kind,target
 ,RecLosRadarGetMapCellAtPosition,src/harness/replay_hooks.inc,indirect_call,indirect via Cell *(*const)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetMapCellAtPosition]
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ArgObject
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ArgPending
+,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,FinishImport
+,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ImportPending
+,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,field_read,LosRadarSeam::GetOriginCellAtPosition
@@ -55219,6 +55231,24 @@ address,function,file,kind,target
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecLosRadarGetOriginCellAtPosition,src/harness/replay_hooks.inc,indirect_call,indirect via Cell *(*const)(Vec3 *) __attribute__((stdcall)) [LosRadarSeam::GetOriginCellAtPosition]
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgPending
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgValue
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,FinishImport
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportPending
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportResult
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportValue
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,field_read,LosRadarSeam::GetSeenUnitsInRadius
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,function,
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_read,s_call
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_read,s_inner_los_radar
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,global_read,s_tail
+,RecLosRadarGetSeenUnitsInRadius,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, const Vec3 *, int, Ref<Unit> *, int) __attribute__((stdcall)) [LosRadarSeam::GetSeenUnitsInRadius]"
 ,RecLosRadarGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,call,ArgValue
 ,RecLosRadarGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,call,ArgVec3
 ,RecLosRadarGetVisibleEnemiesInRadius,src/harness/replay_hooks.inc,call,FinishImport
@@ -55416,6 +55446,12 @@ address,function,file,kind,target
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,FinishImport
+,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ImportObject
+,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ImportResult
+,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ImportStructIn
+,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMapCanPlaceFootprintAt,src/harness/replay_hooks.inc,field_read,MapSeam::CanPlaceFootprintAt
@@ -55440,6 +55476,7 @@ address,function,file,kind,target
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,FinishImport
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ImportResult
+,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ImportStructIn
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,ReplayText::Add
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMapGetCellMeanHeight,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55468,6 +55505,12 @@ address,function,file,kind,target
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,Add
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,FinishImport
+,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,ImportObject
+,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,ImportResult
+,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,ImportValue
+,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMapIsPadSlotFree,src/harness/replay_hooks.inc,field_read,MapSeam::IsPadSlotFree
@@ -55498,6 +55541,12 @@ address,function,file,kind,target
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOut
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOutExit
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgObject
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,FinishImport
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ImportInOut
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ImportObject
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ImportOutInOut
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,field_read,MapSeam::SnapWorldPosToFootprint
@@ -55506,6 +55555,45 @@ address,function,file,kind,target
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
+,RecMissionGetGameType,src/harness/replay_hooks.inc,call,ArgValue
+,RecMissionGetGameType,src/harness/replay_hooks.inc,call,FinishImport
+,RecMissionGetGameType,src/harness/replay_hooks.inc,call,ImportResult
+,RecMissionGetGameType,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMissionGetGameType,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecMissionGetGameType,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMissionGetGameType,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMissionGetGameType,src/harness/replay_hooks.inc,field_read,MissionSeam::GetGameType
+,RecMissionGetGameType,src/harness/replay_hooks.inc,function,
+,RecMissionGetGameType,src/harness/replay_hooks.inc,global_read,s_inner_mission
+,RecMissionGetGameType,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMissionGetGameType,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)() __attribute__((stdcall)) [MissionSeam::GetGameType]
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,FinishImport
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,ImportResultValue
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,field_read,MissionSeam::GetMissionParams
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,function,
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,global_read,s_inner_mission
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,ArgObject
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,ArgValue
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,FinishImport
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,ImportValue
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,field_read,MissionSeam::GetNameSlot
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,function,
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,global_read,s_call
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,global_read,s_inner_mission
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMissionGetNameSlot,src/harness/replay_hooks.inc,indirect_call,indirect via const char *(*const)(int) __attribute__((stdcall)) [MissionSeam::GetNameSlot]
 ,RecMovementApply,src/harness/replay_hooks.inc,call,ArgPending
 ,RecMovementApply,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMovementApply,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -55548,6 +55636,12 @@ address,function,file,kind,target
 ,RecMovementHasNetState,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Unit *) __attribute__((stdcall)) [MovementSeam::HasNetState]
 ,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,ArgValue
+,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,ImportHandle
+,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementLoadTarget,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementLoadTarget,src/harness/replay_hooks.inc,field_read,MovementSeam::LoadTarget
@@ -55558,6 +55652,12 @@ address,function,file,kind,target
 ,RecMovementLoadTarget,src/harness/replay_hooks.inc,indirect_call,"indirect via unsigned int (*const)(int, unsigned int, HapiBank *, const char *) __attribute__((stdcall)) [MovementSeam::LoadTarget]"
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,field_read,MovementSeam::NewAirManeuverOrder
@@ -55567,6 +55667,11 @@ address,function,file,kind,target
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMovementNewAirManeuverOrder,src/harness/replay_hooks.inc,indirect_call,"indirect via unsigned int (*const)(unsigned int, const Vec3 *, const Vec3 *) __attribute__((stdcall)) [MovementSeam::NewAirManeuverOrder]"
 ,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,call,ArgValue
+,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,field_read,MovementSeam::NewApproachRadius
@@ -55577,6 +55682,12 @@ address,function,file,kind,target
 ,RecMovementNewApproachRadius,src/harness/replay_hooks.inc,indirect_call,"indirect via unsigned int (*const)(unsigned int, int, int, int) __attribute__((stdcall)) [MovementSeam::NewApproachRadius]"
 ,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementNewPathOrderAt,src/harness/replay_hooks.inc,field_read,MovementSeam::NewPathOrderAt
@@ -55588,6 +55699,12 @@ address,function,file,kind,target
 ,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,Add
 ,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,ArgValue
+,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,ImportObject
+,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementNewPathOrderToUnit,src/harness/replay_hooks.inc,field_read,MovementSeam::NewPathOrderToUnit
@@ -55600,6 +55717,13 @@ address,function,file,kind,target
 ,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,ImportObject
+,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementNewPathOrderToUnitAt,src/harness/replay_hooks.inc,field_read,MovementSeam::NewPathOrderToUnitAt
@@ -55611,6 +55735,12 @@ address,function,file,kind,target
 ,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,Add
 ,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,ArgValue
+,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,ImportObject
+,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,field_read,MovementSeam::NewPathOrderToUnitAtAngle
@@ -55621,6 +55751,12 @@ address,function,file,kind,target
 ,RecMovementNewPathOrderToUnitAtAngle,src/harness/replay_hooks.inc,indirect_call,"indirect via unsigned int (*const)(unsigned int, Unit *, short) __attribute__((stdcall)) [MovementSeam::NewPathOrderToUnitAtAngle]"
 ,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementNewPointMarker,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementNewPointMarker,src/harness/replay_hooks.inc,field_read,MovementSeam::NewPointMarker
@@ -55630,6 +55766,11 @@ address,function,file,kind,target
 ,RecMovementNewPointMarker,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMovementNewPointMarker,src/harness/replay_hooks.inc,indirect_call,"indirect via unsigned int (*const)(unsigned int, const Point16 *, const Point16 *) __attribute__((stdcall)) [MovementSeam::NewPointMarker]"
 ,RecMovementNewRingApproach,src/harness/replay_hooks.inc,call,ArgValue
+,RecMovementNewRingApproach,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementNewRingApproach,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementNewRingApproach,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementNewRingApproach,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementNewRingApproach,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementNewRingApproach,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementNewRingApproach,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementNewRingApproach,src/harness/replay_hooks.inc,field_read,MovementSeam::NewRingApproach
@@ -55650,6 +55791,11 @@ address,function,file,kind,target
 ,RecMovementReadNetState,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, BitReader *) __attribute__((stdcall)) [MovementSeam::ReadNetState]"
 ,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ArgValue
+,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ImportHandle
+,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementSaveTarget,src/harness/replay_hooks.inc,field_read,MovementSeam::SaveTarget
@@ -55658,6 +55804,11 @@ address,function,file,kind,target
 ,RecMovementSaveTarget,src/harness/replay_hooks.inc,global_read,s_inner_movement
 ,RecMovementSaveTarget,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(unsigned int, unsigned int, HapiBank *, const char *) __attribute__((stdcall)) [MovementSeam::SaveTarget]"
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,ArgValue
+,RecMovementTargetType,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementTargetType,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementTargetType,src/harness/replay_hooks.inc,call,ImportValue
+,RecMovementTargetType,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementTargetType,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementTargetType,src/harness/replay_hooks.inc,field_read,MovementSeam::TargetType
@@ -55669,6 +55820,11 @@ address,function,file,kind,target
 ,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,Add
 ,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,ArgValue
+,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,FinishImport
+,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,ImportObject
+,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,ImportResult
+,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementUnitTarget,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementUnitTarget,src/harness/replay_hooks.inc,field_read,MovementSeam::UnitTarget
@@ -55776,6 +55932,11 @@ address,function,file,kind,target
 ,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,Add
 ,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,ArgObject
 ,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,ArgValue
+,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,FinishImport
+,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,ImportObject
+,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,ImportValue
+,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecNetworkSendFeatureReclaimed,src/harness/replay_hooks.inc,field_read,NetworkSeam::SendFeatureReclaimed
@@ -55817,6 +55978,12 @@ address,function,file,kind,target
 ,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,Add
 ,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,ArgObject
 ,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,ArgValue
+,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,FinishImport
+,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,ImportObject
+,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,ImportResult
+,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,ImportValue
+,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecNetworkSendScriptCall,src/harness/replay_hooks.inc,field_read,NetworkSeam::SendScriptCall
@@ -55929,8 +56096,9 @@ address,function,file,kind,target
 ,RecNetworkSendWeaponFireAt,src/harness/replay_hooks.inc,global_read,s_call
 ,RecNetworkSendWeaponFireAt,src/harness/replay_hooks.inc,global_read,s_inner_network
 ,RecNetworkSendWeaponFireAt,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(unsigned char, Vec3 *, Vec3 *) __attribute__((stdcall)) [NetworkSeam::SendWeaponFireAt]"
-,RecOrdersApply,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersApply,src/harness/replay_hooks.inc,call,ArgEvent
 ,RecOrdersApply,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersApply,src/harness/replay_hooks.inc,call,EventRoots
 ,RecOrdersApply,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersApply,src/harness/replay_hooks.inc,field_read,OrdersSeam::Apply
@@ -55939,12 +56107,6 @@ address,function,file,kind,target
 ,RecOrdersApply,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersApply,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersApply,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const OrdersEventHeader *, unsigned int) __attribute__((stdcall)) [OrdersSeam::Apply]"
-,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,field_read,OrdersSeam::ClearOrderTypeTable
-,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,function,
-,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,global_read,s_inner_orders
-,RecOrdersClearOrderTypeTable,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [OrdersSeam::ClearOrderTypeTable]
 ,RecOrdersGetOrderFlags,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersGetOrderFlags,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersGetOrderFlags,src/harness/replay_hooks.inc,call,ArgValue
@@ -55958,8 +56120,15 @@ address,function,file,kind,target
 ,RecOrdersGetOrderFlags,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(Unit *) __attribute__((stdcall)) [OrdersSeam::GetOrderFlags]
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ArgObject
-,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ArgPending
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ArgValue
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,FinishImport
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ImportObject
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ImportResult
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ImportStructIn
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ImportValue
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,field_read,OrdersSeam::GetOrderType
@@ -55968,17 +56137,6 @@ address,function,file,kind,target
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersGetOrderType,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(unsigned char, Unit *, Unit *, Vec3 *) __attribute__((stdcall)) [OrdersSeam::GetOrderType]"
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,Add
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,ArgHandle
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,ArgObject
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,ArgValue
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,field_read,OrdersSeam::LoadOrders
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,function,
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,global_read,s_call
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,global_read,s_inner_orders
-,RecOrdersLoadOrders,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, HapiBank *, int) __attribute__((stdcall)) [OrdersSeam::LoadOrders]"
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,ArgValue
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -55988,12 +56146,6 @@ address,function,file,kind,target
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecOrdersMissionTypeFromName,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(const char *) __attribute__((stdcall)) [OrdersSeam::MissionTypeFromName]
-,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,field_read,OrdersSeam::RegisterAllOrderTypes
-,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,function,
-,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,global_read,s_inner_orders
-,RecOrdersRegisterAllOrderTypes,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [OrdersSeam::RegisterAllOrderTypes]
 ,RecOrdersRunOrders,src/harness/replay_hooks.inc,call,Add
 ,RecOrdersRunOrders,src/harness/replay_hooks.inc,call,ArgObject
 ,RecOrdersRunOrders,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -56012,26 +56164,6 @@ address,function,file,kind,target
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [OrdersSeam::RunSecondaryOrders]
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,call,Add
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,call,ArgHandle
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,call,ArgObject
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,call,ArgValue
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,field_read,OrdersSeam::SaveOrders
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,function,
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,global_read,s_call
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,global_read,s_inner_orders
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,global_read,s_tail
-,RecOrdersSaveOrders,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, HapiBank *) __attribute__((stdcall)) [OrdersSeam::SaveOrders]"
-,RecOrdersWriteState,src/harness/replay_hooks.inc,call,ArgPending
-,RecOrdersWriteState,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecOrdersWriteState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecOrdersWriteState,src/harness/replay_hooks.inc,field_read,OrdersSeam::WriteState
-,RecOrdersWriteState,src/harness/replay_hooks.inc,function,
-,RecOrdersWriteState,src/harness/replay_hooks.inc,global_read,s_call
-,RecOrdersWriteState,src/harness/replay_hooks.inc,global_read,s_inner_orders
-,RecOrdersWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [OrdersSeam::WriteState]
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,call,ArgPending
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -56179,6 +56311,9 @@ address,function,file,kind,target
 ,RecPlayersLoadConditions,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPlayersLoadConditions,src/harness/replay_hooks.inc,global_read,s_inner_players
 ,RecPlayersLoadConditions,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(MissionConditions *, HapiBank *) __attribute__((stdcall)) [PlayersSeam::LoadConditions]"
+,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,FinishImport
+,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,field_read,PlayersSeam::LoadDefaultAIScript
@@ -56365,6 +56500,12 @@ address,function,file,kind,target
 ,RecScriptsFindScript,src/harness/replay_hooks.inc,call,Add
 ,RecScriptsFindScript,src/harness/replay_hooks.inc,call,ArgObject
 ,RecScriptsFindScript,src/harness/replay_hooks.inc,call,ArgValue
+,RecScriptsFindScript,src/harness/replay_hooks.inc,call,FinishImport
+,RecScriptsFindScript,src/harness/replay_hooks.inc,call,ImportObject
+,RecScriptsFindScript,src/harness/replay_hooks.inc,call,ImportResult
+,RecScriptsFindScript,src/harness/replay_hooks.inc,call,ImportValue
+,RecScriptsFindScript,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecScriptsFindScript,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecScriptsFindScript,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecScriptsFindScript,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecScriptsFindScript,src/harness/replay_hooks.inc,field_read,ScriptsSeam::FindScript
@@ -56401,6 +56542,11 @@ address,function,file,kind,target
 ,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,Add
 ,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,ArgObject
 ,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,ArgPending
+,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,FinishImport
+,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,ImportObject
+,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,ImportPending
+,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecScriptsGetNanoPiecePosition,src/harness/replay_hooks.inc,field_read,ScriptsSeam::GetNanoPiecePosition
@@ -56614,6 +56760,11 @@ address,function,file,kind,target
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,Add
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,ArgObject
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,ArgValue
+,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,FinishImport
+,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,ImportObject
+,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,ImportResult
+,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecTargetingChooseWeapon,src/harness/replay_hooks.inc,field_read,TargetingSeam::ChooseWeapon
@@ -56680,6 +56831,12 @@ address,function,file,kind,target
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,field_read,UnitsSeam::AddBuildProgress
@@ -56691,6 +56848,12 @@ address,function,file,kind,target
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,field_read,UnitsSeam::AddRepairProgress
@@ -56718,6 +56881,11 @@ address,function,file,kind,target
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,field_read,UnitsSeam::CanLoad
@@ -56729,6 +56897,11 @@ address,function,file,kind,target
 ,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsCanReclaim,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsCanReclaim,src/harness/replay_hooks.inc,field_read,UnitsSeam::CanReclaim
@@ -56740,6 +56913,11 @@ address,function,file,kind,target
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,field_read,UnitsSeam::CanRepair
@@ -56759,6 +56937,12 @@ address,function,file,kind,target
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgValue
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsCreateUnit,src/harness/replay_hooks.inc,field_read,UnitsSeam::CreateUnit
@@ -56790,6 +56974,11 @@ address,function,file,kind,target
 ,RecUnitsFindUnitType,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecUnitsFindUnitType,src/harness/replay_hooks.inc,indirect_call,indirect via UnitDef *(*const)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitType]
 ,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,field_read,UnitsSeam::FindUnitTypeId
@@ -56845,6 +57034,13 @@ address,function,file,kind,target
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ArgPending
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ArgValue
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ImportPending
+,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ImportResult
+,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ImportValueStruct
+,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,field_read,UnitsSeam::GetFactoriesInRadius
@@ -56902,6 +57098,12 @@ address,function,file,kind,target
 ,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ArgHandle
 ,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ArgValue
+,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ImportHandle
+,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ImportValue
+,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsLoadUnit,src/harness/replay_hooks.inc,field_read,UnitsSeam::LoadUnit
@@ -56956,6 +57158,11 @@ address,function,file,kind,target
 ,RecUnitsSaveUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [UnitsSeam::SaveUnits]
 ,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,ImportPending
+,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefGet
@@ -56967,6 +57174,11 @@ address,function,file,kind,target
 ,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,ImportPending
+,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefInit
@@ -56977,6 +57189,11 @@ address,function,file,kind,target
 ,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,ImportObject
+,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,ImportPending
+,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefSetUnit
@@ -56985,6 +57202,10 @@ address,function,file,kind,target
 ,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitRef *, Unit *) __attribute__((stdcall)) [UnitsSeam::UnitRefSetUnit]"
 ,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,ArgPending
+,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,FinishImport
+,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,ImportPending
+,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefSetValue
@@ -57068,6 +57289,12 @@ address,function,file,kind,target
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,Add
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ArgValue
+,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,FinishImport
+,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ImportObject
+,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ImportResultObject
+,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ImportValue
+,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecWeaponsFindTargetableProjectile,src/harness/replay_hooks.inc,field_read,WeaponsSeam::FindTargetableProjectile
@@ -57119,6 +57346,13 @@ address,function,file,kind,target
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgObject
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgStruct
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ArgValue
+,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,FinishImport
+,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ImportObject
+,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ImportResult
+,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ImportStructIn
+,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ImportValue
+,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecWeaponsWeaponCanReachPos,src/harness/replay_hooks.inc,field_read,WeaponsSeam::WeaponCanReachPos
@@ -58327,6 +58561,7 @@ address,function,file,kind,target
 ,ReplayImportEnd,src/harness/replay_services.inc,field_read,TdfFile::root
 ,ReplayImportEnd,src/harness/replay_services.inc,function,
 ,ReplayImportEnd,src/harness/replay_services.inc,global_maybe_written,s_nested
+,ReplayImportEnd,src/harness/replay_services.inc,global_read,g_lastPlaceMetalSum
 ,ReplayImportEnd,src/harness/replay_services.inc,global_read,kReplayImportNames@src/harness/replay_services.h
 ,ReplayImportEnd,src/harness/replay_services.inc,global_read,kReplaySubsystems@src/harness/replay_schema.h
 ,ReplayImportEnd,src/harness/replay_services.inc,global_read,s_call
@@ -58747,8 +58982,17 @@ address,function,file,kind,target
 ,ReplayVptrOf,src/harness/replay_objects.cpp,function,
 ,ReplayVtable,src/harness/replay_vtables.cpp,function,
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_approachRadiusVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_assaultTimerVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_buildTimerVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_escortTimerVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_orderVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_pathOrderAttachVtable
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_pathOrderVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_plainTimerVtable
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_ringApproachVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_scoutTimerVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_spatialTimerVtable
+,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_squadScoutTimerVtable
 ,ReplayVtable,src/harness/replay_vtables.cpp,global_escape,g_weaponAimCobVtable
 ,ReplayVtableName,src/harness/replay_vtables.cpp,function,
 ,ReplayWalk,src/harness/replay_objects.cpp,call,BlockAt

@@ -554,6 +554,9 @@ int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Pla
     Space(t);
     t.AddInt((int)type);
     const char* result = Enter(t);
+    const char* g_lastPlaceMetalSumText = OutValue("SimGlobals.g_lastPlaceMetalSum");
+    if (g_lastPlaceMetalSumText != nullptr)
+        g_lastPlaceMetalSum = atoi(g_lastPlaceMetalSumText);
     return atoi(result);
 }
 
@@ -566,6 +569,9 @@ int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short oth
     Space(t);
     t.AddInt((int)flags);
     const char* result = Enter(t);
+    const char* g_lastPlaceMetalSumText = OutValue("SimGlobals.g_lastPlaceMetalSum");
+    if (g_lastPlaceMetalSumText != nullptr)
+        g_lastPlaceMetalSum = atoi(g_lastPlaceMetalSumText);
     return atoi(result);
 }
 

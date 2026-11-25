@@ -255,5 +255,9 @@ the log leaves out:
   the game saves and restores under the cursor, are not items.
 - **Screenshots.** A screenshot draws into a picture of its own, through the same items with
   that picture as their target, and writes it to a file. No scenario takes one.
+- **Draws on the game's other threads.** While a game loads, the game makes pictures on a
+  thread of its own (the minimap's small picture among them), and the cursor's thread draws
+  the cursor. Only what the game draws on its main thread, the one that draws the frames, is
+  an item.
 - **The options screen's backdrop.** When the options screen opens, the game copies the
   frame under it into a surface of its own with no drawing item.

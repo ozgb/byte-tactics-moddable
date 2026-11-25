@@ -24,6 +24,8 @@ struct DlPicture {
 int DlWants();
 int DlIsOn();
 void DlEnter();
+void DlLockRegistries();
+void DlUnlockRegistries();
 void DlLeave();
 int DlOffsetX();
 int DlOffsetY();

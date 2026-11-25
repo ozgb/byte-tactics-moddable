@@ -31,7 +31,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import filesfixtures  # noqa: E402
+import filesfixtures
 
 ROOT = Path(__file__).resolve().parent.parent
 VECTORS = ROOT / "reference" / "files"

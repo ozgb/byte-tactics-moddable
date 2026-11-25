@@ -1427,13 +1427,16 @@ static void test_ftol_case(double d, int edge)
     {
         int w = (int)vec_get();
         kit_i32(w);
-        st_ftol.skipped++;
+        if (bx_ftol(d) != w)
+            cur_bad = 1;
         (void)v;
     }
 #else
     vec_put(hi);
     vec_put(lo);
     out_i(v);
+    if (bx_ftol(d) != v)
+        cur_bad = 1;
 #endif
     finish();
 }

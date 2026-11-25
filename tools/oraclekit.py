@@ -64,8 +64,8 @@ number of arguments and their meanings, records, flags, phases); the export is r
 kit_reference): `page_terms` scans the page for hex numbers and for flag, state, kill type and damage kind numbers, and the export
 is refused when one has no row, or a row names something the page does not use.
 `runtime/` is the plain-maths part of the bit-exact library, imported into the clean-room engine under the MIT licence. The files
-of RUNTIME_IMPORTS (repository path to kit path: the library's headers, its square root, extension, double-double and random
-number sources, and the table generator tools/bitexact_tables.py) are read from HEAD like every other file, the only way a file
+of RUNTIME_IMPORTS (repository path to kit path: the library's headers, its square root, double to int conversion, extension,
+double-double and random number sources, and the table generator tools/bitexact_tables.py) are read from HEAD like every other file, the only way a file
 under lib/ reaches the kit, and each is written with an MIT header (a block comment, or `#` lines after a shebang in a Python
 file) that gives `SPDX-License-Identifier: MIT`, the Copyright line of the repository's LICENSE whose parenthesis names lib/bitexact/
 (RUNTIME_COPYRIGHT_SCOPE, without the parenthesis) and the pointer to `runtime/LICENSE`, which is that licence text without
@@ -137,6 +137,7 @@ RUNTIME_IMPORTS = {
     "lib/bitexact/internal.h": "runtime/internal.h",
     "lib/bitexact/bx_tables.h": "runtime/bx_tables.h",
     "lib/bitexact/sqrt.c": "runtime/sqrt.c",
+    "lib/bitexact/ftol.c": "runtime/ftol.c",
     "lib/bitexact/ext.c": "runtime/ext.c",
     "lib/bitexact/dd.c": "runtime/dd.c",
     "lib/bitexact/rand.c": "runtime/rand.c",

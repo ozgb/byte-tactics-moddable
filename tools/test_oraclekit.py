@@ -1210,7 +1210,7 @@ class RuntimeKitTest(unittest.TestCase):
 
     def test_the_real_import_list_is_what_the_issue_names(self):
         self.assertEqual(sorted(oraclekit.RUNTIME_IMPORTS.values()), sorted(
-            ["runtime/" + n for n in ("bitexact.h", "internal.h", "bx_tables.h", "sqrt.c", "ext.c", "dd.c", "rand.c", "bitexact_tables.py")]))
+            ["runtime/" + n for n in ("bitexact.h", "internal.h", "bx_tables.h", "sqrt.c", "ftol.c", "ext.c", "dd.c", "rand.c", "bitexact_tables.py")]))
         self.assertTrue(all(oraclekit.forbidden(p) for p in oraclekit.RUNTIME_IMPORTS if p.startswith("lib/")))
 
     def test_a_file_marked_libcmt_stl_header_or_game_code_is_refused(self):

@@ -593,6 +593,33 @@ static void run_qsort(void)
     sha256_print(&s, "bx_qsort");
 }
 
+static void run_ftol(void)
+{
+    sha256_t s;
+    static const bx_u64 edges[] = {
+        0x0000000000000000ull, 0x8000000000000000ull, 0x0000000000000001ull, 0x3fefffffffffffffull, 0x3ff0000000000000ull,
+        0xbff8000000000000ull, 0x41dfffffffc00000ull, 0x41dfffffffe00000ull, 0x41e0000000000000ull, 0x41e0000000200000ull,
+        0xc1e0000000000000ull, 0xc1e0000000200000ull, 0x41efffffffffffffull, 0x41f0000000000000ull, 0xc1f0000000000000ull,
+        0x4340000000000001ull, 0x43dfffffffffffffull, 0x43e0000000000000ull, 0xc3e0000000000000ull, 0x7fefffffffffffffull,
+        0x7ff0000000000000ull, 0xfff0000000000000ull, 0x7ff8000000000000ull, 0xfff8000000000000ull, 0x7ff0000000000001ull,
+        0x41e3880000000000ull, 0x4183880000000000ull};
+    bx_u64 state = 0x9e3779b97f4a7c15ull;
+    int i;
+
+    sha256_init(&s);
+    for (i = 0; i < (int)(sizeof(edges) / sizeof(edges[0])); i++)
+        put_i32(&s, bx_ftol(from_bits(edges[i])));
+    for (i = 0; i < 200000; i++) {
+        bx_u64 bits;
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        bits = (state & 0x800fffffffffffffull) | ((bx_u64)(1013 + (int)((state >> 40) % 80u)) << 52);
+        put_i32(&s, bx_ftol(from_bits(i & 7 ? bits : state)));
+    }
+    sha256_print(&s, "bx_ftol");
+}
+
 int main(void)
 {
     run_sine();
@@ -613,5 +640,6 @@ int main(void)
     run_shuffle();
     run_explosions();
     run_qsort();
+    run_ftol();
     return 0;
 }

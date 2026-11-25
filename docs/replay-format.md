@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units, ai and los_radar have recordings so far; pathfinding has none yet (its region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units, ai, los_radar and scripts have recordings so far; pathfinding has none yet (its region is not recorded: see A module's region and world view). The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -359,6 +359,15 @@ A field of kind `embeds` is `count` structs of a kind laid out in place (`CobScr
 `"inside": [{"kind": "CobScript", "member": "channels[]"}]`. An element is named by its site and index, and its fields are written one by one, so a changed element
 is its changed fields: `r CobScript#3.channels[2].pc 7`. The index is read off the address, and the replayer resolves `CobScript#3.channels[2]` to the bytes inside the container.
 
+An array whose live length is a member of the owner (`ModelState.pieces`, `count` pieces after a header of 34 bytes, allocated at `34 + 54 * count`) has a `count` that is a length
+expression over the owner's members, as an array's `length` is (see Arrays), and a `capacity`, a positive integer:
+`{"name": "pieces", "kind": "embeds", "count": "count", "capacity": 128, "target": "ModelPiece", "member": "pieces[]"}`. The walk, the lines and the comparison go over the first `count`
+elements, read from the object each time, and the elements are named by their site and index as before (`ModelState#3.pieces[14]`, `ModelState#3.pieces[14].short_12`). The member in the C struct
+holds one element (`ModelPiece pieces[1]`), the rest of the elements being the memory that follows the struct. The capacity is what the replayer allocates: it makes the owner (a kind
+named at first sight, or the object a service answers for) with room for `capacity` elements after the member's offset, the size of its type if that is larger, and a name past `capacity` resolves to nothing. A run whose
+object has a `count` above the capacity ends with `ModelState.pieces has 130 elements, past the capacity of 128 that the schema gives`, so the capacity is chosen from the largest object the shipped data builds:
+the 773 models of `objects3d` in the archives of `~/.ta` (counted from the first node by its sibling and child offsets) have at most 36 pieces (`armscorp`), and 128 leaves room for the mods that add more. The count member has to be in the slot's read set (a rule's `reads` adds it), so that the replayer restores it before it reads the elements.
+
 A member of each element is a site too, when the array is of a struct that is no kind: `{"name": "callbacks", "kind": "embeds", "count": 3, "target": "AimCallback",
 "member": "weapons[].callbacks"}` in `Unit`, and `"inside": [{"kind": "Unit", "member": "weapons[].callbacks"}]` in the kind, give `Unit#3.weapons[1].callbacks` in walk lines, service lines and argument values.
 
@@ -529,6 +538,14 @@ lines have the same forms, against the value known after the last `r` or `w` lin
 and applies the runs to it; at the end of the call it is compared with the value the lines made known, and a difference is
 reported at the field, as `byte 25 of 32: recorded 15, replayed 14, 1 bytes differ`.
 
+### An array whose length is in load-time data
+
+A factor of the `length` of an array field may follow a field of kind `load` to a member of the loaded type: `{"name": "pieces", "kind": "array", "elem": "u8", "ref": true, "length": "table->pieceCount*76"}`
+in `CobScript`, where `table` is the `load` field that holds the unit's `ScriptTable`, and `pieceCount` a member of that type; `{"name": "points", "kind": "array", "elem": "u8", "ref": true, "length": "object->vertexCount*12"}`
+in `ModelPiece`, where `object` leads to the `Object3do` node of the piece. The recorder reads the pointer from the object and the member from the file in memory, and the replayer does the same from the
+copy of the file it loaded (see Load inputs): a null pointer is a length of 0. `member->member` is one factor, with the shifts and addends of any factor, and only the length of an array field of a state
+kind may have one. `replayschema.py --check` fails for a field that is no field of kind `load` of the kind, and for a member that is no byte, short or int of the loaded type.
+
 ## Struct arguments
 
 A struct argument is recorded by the lines of its fields (`a pos.x 1`), whatever the kind. Three more forms are for structs of
@@ -618,12 +635,12 @@ For example, the lines `a event.kind 66`, `a event.weapon "Meteor"`, `a event.ra
 `42000000` `4d6574656f72` followed by 26 `00` bytes, `2c010000` `00000040` `0000a040` `00007042`.
 
 `"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: weapons' `Apply` leaves
-`WEAPONS_EXPLODE_PIECE` (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
+`WEAPONS_EXPLODE_PIECE` and scripts' `Apply` `SCRIPTS_FREE_STATE` and `SCRIPTS_INIT_STATE` (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
 as the header) through with no lines, as it does a slot with `"record": false`, so what the call changes reaches the next
 recorded call as `r` lines. `replayschema.py --check` fails for a name that is no kind of the table and for an empty reason.
 `"refs"` maps a struct member (`Struct.member`) to the state kind its block offset leads to, for a ref that is no unit:
 `{"WeaponsAimDone.callback": "WeaponAimCobCb", "WeaponsStartScript.callback": "WeaponAimCobCb"}` makes `callback` of those
-two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). The check fails
+two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). Scripts' `ScriptsStart.callback` is a ref of the same kind, and `ScriptsState.state` one to a `ModelState`. The check fails
 for a kind that is no state kind, for a member that is no `unsigned int` of a struct of the module's interface header, and for
 a member that is a unit ref already.
 
@@ -1198,7 +1215,7 @@ from the layout), and the export refuses a copy that names any other source name
   that is no `embed` field of its container, for one that two kinds claim, and for the old single-site object form.
 - Array forms and hand-made vtables (see An array of refs, An array of embedded structs, A table behind a ref field, A vtable pointer the code sets by hand):
   field kinds `refs` and `embeds` with a `count`, a `table` whose `base` is `{"object", "field"}`, `inside` members with `[]`, and `vptr` (with an optional `vptr_unset` reason) on a kind.
-  `replayschema.py --check` fails for a count that is no positive integer, a base that is no ref field leading to the kind, a site no `embeds` field leads to, a `vptr` that is no global name, is also a vtable, or is on a kind with a table, kinds or a vtable, and a `vptr_unset` with no reason or on a kind with no `vptr`.
+  `replayschema.py --check` fails for a count that is no positive integer (or a length expression with a `capacity`, for `embeds`; see An array of embedded structs), a base that is no ref field leading to the kind, a site no `embeds` field leads to, a `vptr` that is no global name, is also a vtable, or is on a kind with a table, kinds or a vtable, and a `vptr_unset` with no reason or on a kind with no `vptr`.
 - `when` (an object, see A condition on a field): `{"field", "equals"}` with an optional `mask`, `via` and `kind`, on a field of
   a state kind. `replayschema.py --check` fails for a field it reads that is not an integer or flags field, that has a `when` of its own, or
   a mask and a value that can never meet.
@@ -1554,6 +1571,21 @@ los_radar:
 - The slots no recording calls at top level: `GetOriginCellAtPosition`, `IsUnitVisibleToPlayer`, `IsPointVisible`, `HasReadyUnitInRange`, `FreeUnitIndex` and `Shutdown`. The first four run only inside `RefreshUnitIndex`, `UpdateSensorRadarAndCloak` and the engine's own callers; `UpdateSensorRadarAndCloak` calls `HasReadyUnitInRange` for each unit that can cloak, so both recordings replay it as part of that slot (it reads the `visible` lists of the index and decides `Unit.flags` bit 0x1000 and `Unit.workTime`); the last two run when a match is unloaded.
 - `GetSeenUnitsInRadius`, `LoadMappingData`, `SaveMappingData`, `InitRadar`, `FreeRadar`, `LoadTntMap`, `FreeMapResources`: load class, or called by `ai` only.
 
+scripts:
+
+- `StartScriptWithArgsByIndex`: only a remote machine starts a script by its index (`network`), and no scenario is a network game. The slot is `record: false`; a START event of the form by index, which `Apply` handles, is recorded in its place when a scenario publishes one (the recorded windows hold the forms by name).
+- `DeleteScript`: `record: false`, since the slot destroys its argument: the walk that follows the call finds the object with the vtable of its base class and its memory freed. The death of a unit reaches it (`console-iwin`, tick 30), and `FreeObjectState`, which the death calls too, is recorded.
+- `SaveScriptState` and `LoadScriptState`: `record: false` (save class): they write and read a bank of a saved game, and `SavedScript` and `SavedPiece` are the types of its records.
+- `WriteState`: `record: false`, a query for the trace's dump, outside the tick.
+- `PoseUnitModel`: `record: false`, no caller outside scripts (it runs inside `GetSweetSpot` and the DETACH_PIECE event).
+- `UpdateObjectState`: `record: false`, called by the renderer and by a script's sound-and-smoke effect (`EmitSfx`); no scenario draws a unit.
+- `ObjectStateSize`: `record: false`, only features calls it, and features' recordings hold it as an import with the model as an `Object3do` object (`Feature.object`, which no holder of the load kinds names), so its argument is not the `model` load form.
+- `GetAimFromPosition`, `GetNanoPiecePosition` and `GetSweetSpot`: `record: false`. Their out `Vec3` is written in the import form (`o out (x,y,z)`) by the recordings of weapons, targeting and orders, which a slot form would change; weapons' and targeting's recordings hold the first and the third as imports, and their results are checked there.
+- `Apply` of FREE_STATE and INIT_STATE: unrecorded (`unrecorded` of the slot). They free and build the model state of a feature spot from `Feature.object`, the model of a feature type, which no holder of the load kinds names, so the pointer could not be written. DETACH_PIECE: nothing publishes it (`WeaponsPublishDetachPiece` has no caller), so no scenario reaches it.
+- `CreateObjectState` is a recorded slot that no committed recording calls: it builds the model state of a unit type that has no script, and every unit type that the scenarios checked (`orders-factory`, `orders-air`, `mission-victory`, `console-units`) create has one.
+- A script that sets a unit value and reads it back in the same call (the factory's `SetUnitValue 18` and `GetUnitValue 18`, the yard): `SchedPublish` runs the handler of the event before it returns, and the handler writes `Unit.cobStateFlags`, which the script then reads, so the replay would take the other branch. No form records a block field that a handler of an import wrote, so no recorded window holds such a call: the recordings avoid the tick at which `orders-factory` finishes a unit (793). An import line that names a block field its handler wrote is the form that would record it.
+- The paths of a script that no recorded window reaches: `EmitSfx` (smoke and thrust, with the `los_radar.IsUnitVisibleToPlayer` import), `AttachUnit` and `DropUnit` of a transport, `GetUnitValue` of the angle and distance cases and of the ground height (`map.GetGroundHeight`), `ExplodePiece` (weapons' EXPLODE_PIECE, left out there), and a start with a callback by its index.
+
 ## Replaying
 
 The native replay test replays a recording against the native module (`replay_native_test.exe`, built by
@@ -1736,6 +1768,26 @@ The recordings of ai 6.0, which the modern build runs as native code in every mo
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 76 SquadManager#1.countdown tests/replay/ai/skirmish2.txt
+```
+
+The recordings of scripts, which the modern build runs as native code in every mode, each of a window of a few ticks, since `RunScripts` runs for every unit with a script at every tick and each call holds the whole script, model state and
+pieces of its unit at its first record. A recording carries the files of the unit types that its lines name (`load cob` and `load model`), about half of its size:
+
+| Recording | Window | Calls | Reaches |
+|---|---|---|---|
+| `orders-air` | 1025 to 1027 | `RunScripts` 18, `QueryScript` 4, `GetPiecePosition` 4, `Apply` 4 (START), `GetPieceOffset` 3, `GetPieceAngles` 3, and the creation of a unit: `NewUnitScript`, `SetCob`, `CreatePlayerObjectState` (16 `services.SimAllocTagged`), `SetObjectState` | a unit is built: the piece queries of movement, the scripts that answer them, the model state built from the model and the script table of its unit type |
+| `orders-factory` | 19 to 20 | `RunScripts` 6, `QueryScript` 3, `GetPieceOffset` 3, `Apply` 3, `FindScript` 1, and the creation of a unit | `FindScript` of an order, the start of `Create` and `SetMaxReloadTime` of a new unit |
+| `console-iwin` | 28 to 34 | `RunScripts` 6, `QueryScript` 1, `FreeObjectState` 1 (17 `services.SimFree`) | the death of a unit: its model state and the point lists of its pieces are freed |
+| `orders-move-attack` | 5 to 8 | `RunScripts` 8, `Apply` 2 (START of `StartMoving` and `MoveRate1`) | two commanders that start to move: a thread of the script starts and the pieces turn |
+
+A `RunScripts` call reaches the script of its unit (`CobScript#N`: the 8 channels, the statics and the pieces, whose lengths are read from the `ScriptTable` of `table`), the model state (`ModelState#N`, with the `count` pieces after it, each `ModelPiece` with the `Object3do` node it leads to, the offsets and rotations
+that the script writes, and the points of the piece) and the fields of the unit that the script reads. The scripts' kind `CobScript` is the class `UnitScript`, the only concrete class (`vtable_symbol`
+`??_7UnitScript@@6B@`), under the name the recordings of weapons and features already use for `Unit.script`; its base `CobScriptBase` is the class `CobScript`, which the virtual calls of the module name.
+
+The injected change of scripts is the turn step of `AnimatePieces` scaled by 2 (`BT_REPLAY_INJECT_TURN_SCALE`, 1 in the game): the divergence is reported at call 22 of `orders-air` and at `ModelState#5.pieces[1].short_12`, the angle of a piece that turns (recorded 5423, replayed 6074):
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 22 "ModelState#5.pieces[1].short_12" tests/replay/scripts/orders-air.txt
 ```
 
 ### Against the WASM module

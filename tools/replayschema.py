@@ -78,7 +78,7 @@ FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F
                "cstrings": "CSTRINGS", "blob": "BLOB", "load": "LOAD"}
 STRING_ELEMS = {"cstring": (1, "char*"), "cstring_ref": (2, "Ref<char>")}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
-FACTOR = re.compile(r"^\(?\s*(\w+(?:\.\w+)*)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
+FACTOR = re.compile(r"^\(?\s*(\w+(?:\.\w+)*(?:->\w+)?)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream", "EconUnit", "EconType"}
 VALUE_POINTER_TYPES = {"Point16", "Vec3", "Angles16", "EconMapInfo", "PlayersMapInfo", "LosRadarMapInfo", "PathMapInfo", "EconomySpend"}
@@ -349,7 +349,7 @@ def parse_addend(text: str | None) -> int:
     return int(text, 16) if text.lower().startswith("0x") else int(text)
 
 
-def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
+def parse_length(expr, where: str, errors: list[str], via_ok: bool = False) -> list[dict]:
     """The two factors of a length expression: an integer, or `member`, `member>>k`, `member+a` or `member+a>>k` (the addend before the shift), once or twice, joined by `*`."""
     parts = [str(expr)] if isinstance(expr, int) else [p.strip() for p in str(expr).split("*")]
     if not 1 <= len(parts) <= 2:
@@ -361,7 +361,11 @@ def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
         if p.isdigit():
             out.append({"const": int(p)})
         elif m:
-            out.append({"member": m.group(1), "shift": int(m.group(3) or 0), **({"add": parse_addend(m.group(2))} if m.group(2) else {})})
+            member, _, via = m.group(1).partition("->")
+            if via and not via_ok:
+                errors.append("%s: the factor `%s` follows a pointer, which only the length of an array of an object may do" % (where, p))
+                via = ""
+            out.append({"member": member, "shift": int(m.group(3) or 0), **({"via": via} if via else {}), **({"add": parse_addend(m.group(2))} if m.group(2) else {})})
         else:
             errors.append("%s: the factor `%s` of the length is no integer, member, member>>k, member+a or member+a>>k" % (where, p))
             out.append({"const": 1})
@@ -370,9 +374,26 @@ def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
     return out
 
 
+def resolve_vias(length: list[dict], spec: dict, ann: dict, where: str, errors: list[str]) -> None:
+    """Gives each factor that follows a load field (`table->pieceCount`) the type of the data the field points to."""
+    for f in length:
+        if "via" not in f:
+            continue
+        field = next((x for x in spec["fields"] if x["name"] == f["member"] and x["kind"] == "load"), None)
+        load = ann.get("loads", {}).get(field["load"]) if field else None
+        if load is None:
+            errors.append("%s: the length follows `%s`, which is no field of kind load of the kind" % (where, f["member"]))
+            f["via_type"] = "int"
+        else:
+            f["via_type"] = load["type"]
+
+
 def render_factor(f: dict, owner: str) -> str:
     if "const" in f:
         return "{ %d, 0, 0 }" % f["const"]
+    if "via" in f:
+        return "{ offsetof(%s, %s), (unsigned char)sizeof(((%s*)nullptr)->%s), %d, %du, 1, offsetof(%s, %s) }" % (
+            f["via_type"], f["via"], f["via_type"], f["via"], f["shift"], f.get("add", 0), owner, f["member"])
     add = ", %du" % f["add"] if f.get("add") else ""
     return "{ offsetof(%s, %s), (unsigned char)sizeof(((%s*)nullptr)->%s), %d%s }" % (owner, f["member"], owner, f["member"], f["shift"], add)
 
@@ -382,8 +403,16 @@ def render_length(length: list[dict], owner: str) -> str:
 
 
 def factor_asserts(length: list[dict], owner: str, where: str) -> list[str]:
-    return ['static_assert(sizeof(((%s*)nullptr)->%s) == 1 || sizeof(((%s*)nullptr)->%s) == 2 || sizeof(((%s*)nullptr)->%s) == 4, "%s: %s is a byte, a short or an int");'
-            % (owner, f["member"], owner, f["member"], owner, f["member"], where, f["member"]) for f in length if "member" in f]
+    out = []
+    for f in length:
+        if "member" not in f:
+            continue
+        o, m = (f["via_type"], f["via"]) if "via" in f else (owner, f["member"])
+        out.append('static_assert(sizeof(((%s*)nullptr)->%s) == 1 || sizeof(((%s*)nullptr)->%s) == 2 || sizeof(((%s*)nullptr)->%s) == 4, "%s: %s is a byte, a short or an int");'
+                   % (o, m, o, m, o, m, where, m))
+        if "via" in f:
+            out.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s: %s is a pointer");' % (owner, f["member"], where, f["member"]))
+    return out
 
 
 def check_array(where: str, spec: dict, owner: str, errors: list[str], object_field: bool = False) -> dict:
@@ -402,7 +431,7 @@ def check_array(where: str, spec: dict, owner: str, errors: list[str], object_fi
     if "raw" in spec and (not strings or spec["raw"] is not True or spec.get("ref")):
         errors.append("%s: `raw` is true on an array of strings that has no `ref`, and says the field is a plain pointer to the elements" % where)
     return {"elem": 4 if strings else SIZES[elem], "ref": bool(spec.get("ref", False)), "raw": raw, "strings": strings,
-            "length": parse_length(spec.get("length", 0), where, errors), "owner": owner}
+            "length": parse_length(spec.get("length", 0), where, errors, object_field), "owner": owner}
 
 
 VECTOR_SCALARS = {"char": 1, "unsigned char": 1, "short": 2, "unsigned short": 2, "int": 4, "unsigned": 4, "unsigned int": 4, "long": 4,
@@ -658,7 +687,14 @@ def check_elements(ann: dict) -> list[str]:
             target = kinds.get(f.get("target"))
             if spec["scope"] != "state":
                 errors.append("%s: only the fields of a state kind are arrays of refs or embeds" % where)
-            if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+            if f["kind"] == "embeds" and isinstance(count, str):
+                capacity = f.get("capacity")
+                if isinstance(capacity, bool) or not isinstance(capacity, int) or capacity < 1:
+                    errors.append("%s: an array of embeds with a counted length has a `capacity`, a positive integer: the room the replayer allocates" % where)
+                parse_length(count, where, errors)
+            elif "capacity" in f:
+                errors.append("%s: only an array of embeds whose `count` is a length expression has a `capacity`" % where)
+            elif isinstance(count, bool) or not isinstance(count, int) or count < 1:
                 errors.append("%s: `count` is a positive integer" % where)
             if target is None or target["scope"] != "state":
                 errors.append("%s: the target %s is no state kind of the schema" % (where, f.get("target")))
@@ -895,7 +931,7 @@ def check_inside(ann: dict) -> tuple[dict, list[str]]:
                 errors.append("%s: the site %s.%s is no %s field of %s that leads to %s" % (where, key[0], key[1], "embeds" if array else "embed", key[0], name))
                 continue
             sites.setdefault(name, []).append({"kind": name, "container": site["kind"], "member": member, "offset": member.replace("[]", "[0]"),
-                                               "array": member[:member.index("[]")] if array else None, "count": leads[0]["count"] if array else 1, "ref": False})
+                                               "array": member[:member.index("[]")] if array else None, "count": leads[0].get("capacity", 1) if array and isinstance(leads[0]["count"], str) else leads[0]["count"] if array else 1, "ref": False})
     return sites, errors
 
 
@@ -1768,11 +1804,14 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     errors.append("%s: only the fields of a state kind can be arrays" % where)
                 array = check_array(where, f, spec["type"], errors, True)
                 array["member"] = f.get("member", f["name"])
+                resolve_vias(array["length"], spec, ann, where, errors)
                 arrays.append(array)
                 entry["array"] = len(arrays)
             if f["kind"] in ("refs", "embeds"):
-                elems.append({"kind": f["kind"], "count": f["count"] if isinstance(f.get("count"), int) and f["count"] > 0 else 1, "owner": spec["type"],
-                              "member": embeds_member(f) if f["kind"] == "embeds" else f.get("member", f["name"])})
+                counted = f["kind"] == "embeds" and isinstance(f.get("count"), str)
+                elems.append({"kind": f["kind"], "count": f["capacity"] if counted and isinstance(f.get("capacity"), int) else f["count"] if isinstance(f.get("count"), int) and f["count"] > 0 else 1,
+                              "owner": spec["type"], "member": embeds_member(f) if f["kind"] == "embeds" else f.get("member", f["name"]),
+                              "live": parse_length(f["count"], "%s.%s" % (kind, f["name"]), []) if counted else None})
                 entry["elems"] = len(elems)
             if f["kind"] == "self":
                 selfs.append(check_self(kind, spec, f, ann["objects"], errors))
@@ -2346,12 +2385,16 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     if not vectors:
         L.append("    { RV_OBJECT, 0, 1 },")
     L += ["};", "", "static const ReplayElemSpec kReplayElems[] = {"]
+    elem_asserts: list[str] = []
     for e in model["elems"]:
         stride = "sizeof(unsigned)" if e["kind"] == "refs" else "sizeof(((%s*)nullptr)->%s[0])" % (e["owner"], e["member"].split("[]")[0])
-        L.append("    { %d, %s }," % (e["count"], stride))
+        used = ", 1, %s" % render_length(e["live"], e["owner"]) if e["live"] else ""
+        L.append("    { %d, %s%s }," % (e["count"], stride, used))
+        if e["live"]:
+            elem_asserts += factor_asserts(e["live"], e["owner"], "%s::%s" % (e["owner"], e["member"]))
     if not model["elems"]:
         L.append("    { 1, 1 },")
-    L += ["};", "", "static const ReplaySelfSpec kReplaySelfs[] = {"]
+    L += ["};"] + elem_asserts + ["", "static const ReplaySelfSpec kReplaySelfs[] = {"]
     for x in model["selfs"]:
         stride = "sizeof(%s)" % kind_type[x["target"]] if x["index"] and x["target"] in kind_type else "0"
         L.append("    { offsetof(%s, %s), %s }," % (x["owner"], x["member"], stride))
@@ -2402,7 +2445,11 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     for o in objects:
         first, count = poly_at.get(o["name"], (0, 0))
         inside_first, inside_count = site_at[o["name"]]
-        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True), int(bool(o.get("vptr_unset")))))
+        room = [f for f in model["object_fields"] if f["object"] == o["name"] and f["kind"] == "embeds" and isinstance(f.get("count"), str)]
+        size = "sizeof(%s)" % o["type"]
+        for f in room:
+            size = "REPLAY_MAX_SIZE(%s, offsetof(%s, %s) + %d * sizeof(((%s*)nullptr)->%s[0]))" % (size, o["type"], embeds_member(f).replace("[]", "[0]"), f.get("capacity", 1), o["type"], embeds_member(f).split("[]")[0])
+        L.append('    { "%s", %s, %s, %s, %d, %d, %d, %d, %d, %d },' % (o["name"], size, scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True), int(bool(o.get("vptr_unset")))))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned short kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
           "enum ReplayCallbackId {"]
@@ -2475,7 +2522,10 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         if f["kind"] == "embeds":
             mem = embeds_member(f)
             array = mem.split("[]")[0]
-            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %s * sizeof(((%s*)nullptr)->%s[0]), "%s::%s holds %s elements");' % (t, array, f["count"], t, array, t, f["name"], f["count"]))
+            if isinstance(f["count"], int):
+                L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %s * sizeof(((%s*)nullptr)->%s[0]), "%s::%s holds %s elements");' % (t, array, f["count"], t, array, t, f["name"], f["count"]))
+            else:
+                L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s holds one element of its kind and room for the rest after it");' % (t, array, types[f["target"]], t, f["name"]))
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, mem.replace("[]", "[0]"), types[f["target"]], t, f["name"]))
             continue
         if f["kind"] == "embed":

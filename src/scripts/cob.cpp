@@ -30,6 +30,10 @@ struct SavedScript {
 int __stdcall GetCobChecksum(void* param);
 #include "../util/math.h"
 
+#ifndef BT_REPLAY_INJECT_TURN_SCALE
+#define BT_REPLAY_INJECT_TURN_SCALE 1
+#endif
+
 // FUNCTION: 0x4b0610
 CobScript::CobScript()
 {
@@ -830,7 +834,7 @@ void CobScript::AnimatePieces(int elapsed)
                 if (pieces[i].e[3][j] != 0) {
                     int r = GetPieceRotation(i, j);
                     int cur = r;
-                    int step = elapsed * pieces[i].e[3][j];
+                    int step = elapsed * pieces[i].e[3][j] * BT_REPLAY_INJECT_TURN_SCALE;
                     r += step;
                     int want = pieces[i].e[2][j];
                     if (want != -1) {

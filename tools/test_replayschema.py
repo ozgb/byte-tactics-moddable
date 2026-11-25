@@ -130,7 +130,7 @@ class Accounting(unittest.TestCase):
 
     def test_a_pending_subsystem_lists_what_is_left(self):
         assignment = rs.read_assignment()
-        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons", "features", "ai", "orders", "economy", "units", "players", "mission", "los_radar")
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons", "features", "ai", "orders", "economy", "units", "players", "mission", "los_radar", "scripts")
                              for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         model, errors = build([row(slot, "field_read", "Game::scrollSpeed"), row(slot, "field_escape", "Unit::unmatched")])
         pending = model["subsystems"][sub]["pending"]
@@ -1825,7 +1825,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_LOSUNITINDEXENTRY, ROK_LOSUNITINDEX, offsetof(LosUnitIndex, players[0]), "players[]", sizeof(((LosUnitIndex*)nullptr)->players[0]), 10, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 20;", text)
+        self.assertIn("kReplayInsideSiteCount = 23;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -1886,7 +1886,7 @@ class FeatureKinds(unittest.TestCase):
         self.assertEqual(kinds["Feature"]["table"], {"base": "game", "member": "features", "ref": True, "count": "featureCount", "alloc": 2048})
         self.assertEqual(kinds["Spot"]["table"], {"base": "game", "member": "spots", "ref": True, "count": 2048, "alloc": 2048})
         self.assertEqual(kinds["Pool"]["table"], {"base": "game", "member": "pool", "count": 1})
-        self.assertEqual(kinds["ModelState"]["fields"], [])
+        self.assertEqual(kinds["ModelState"]["type"], "ModelState")
         self.assertEqual(self.field("Spot", "state")["target"], "ModelState")
 
     def test_the_two_sides_of_a_union_are_never_live_together(self):
@@ -2882,7 +2882,7 @@ class CStrings(unittest.TestCase):
         self.assertIn("{ 1, 0, 0 } }, 1, 1 },", text)
         self.assertIn("{ 1, 0, 0 } }, 0, 2 },", text)
         self.assertIn("{ 1, 0, 0 } }, 0, 1 },", text)
-        self.assertEqual([(a["raw"], a["strings"], a["ref"]) for a in model["arrays"][-5:-2]], [(True, 1, False), (False, 2, True), (False, 1, False)])
+        self.assertEqual([(a["raw"], a["strings"], a["ref"]) for a in model["arrays"] if a["owner"] == "FixtureNamed" and a["strings"]], [(True, 1, False), (False, 2, True), (False, 1, False)])
 
     def test_the_header_checks_the_storage_and_the_element_type_of_an_array(self):
         text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
@@ -3103,6 +3103,71 @@ class LoadForms(unittest.TestCase):
         has(lambda f: f["Attach"]["params"][0].update(type="int"), "is int, and a load is a pointer")
         has(lambda f: f["Lookup"]["result"].update(load="nowhere"), "the result names the load nowhere")
         has(lambda f: f["Lookup"]["args"].update(lane={"mode": "scalar", "load": "cob"}), "has the mode scalar and a `load` key, which only the mode load takes")
+
+
+class CountedForms(unittest.TestCase):
+    """An array of embedded structs counted by a member of its owner, and an array whose length follows a load field to the loaded file."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, kind, name):
+        return next(f for f in ann["objects"][kind]["fields"] if f["name"] == name)
+
+    def test_the_real_schema_counts_the_pieces_of_a_model_state(self):
+        files, errors, model = rs.generate(rs.read_rows())
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("REPLAY_MAX_SIZE(sizeof(ModelState), offsetof(ModelState, pieces[0]) + 128 * sizeof(((ModelState*)nullptr)->pieces[0]))", text)
+        self.assertIn("{ 128, sizeof(((ModelState*)nullptr)->pieces[0]), 1, { { offsetof(ModelState, count),", text)
+        self.assertIn('"pieces[]", sizeof(((ModelState*)nullptr)->pieces[0]), 128, 0 },', text)
+        self.assertIn("offsetof(ScriptTable, pieceCount), (unsigned char)sizeof(((ScriptTable*)nullptr)->pieceCount), 0, 0u, 1, offsetof(UnitScript, table) }, { 76, 0, 0 }", text)
+        self.assertIn("offsetof(Object3do, vertexCount), (unsigned char)sizeof(((Object3do*)nullptr)->vertexCount), 0, 0u, 1, offsetof(ModelPiece, object) }, { 12, 0, 0 }", text)
+
+    def test_a_counted_array_is_sized_for_its_capacity(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('{ "FixtureTrack", REPLAY_MAX_SIZE(sizeof(FixtureTrack), offsetof(FixtureTrack, laps[0]) + 5 * sizeof(((FixtureTrack*)nullptr)->laps[0])),', text)
+        self.assertIn('    { ROK_FIXTURELAP, ROK_FIXTURETRACK, offsetof(FixtureTrack, laps[0]), "laps[]", sizeof(((FixtureTrack*)nullptr)->laps[0]), 5, 0 },', text)
+        self.assertIn("FixtureTrack::laps[]: count is a byte, a short or an int", text)
+        self.assertIn("FixtureTrack::laps holds one element of its kind and room for the rest after it", text)
+
+    def test_a_counted_array_is_checked(self):
+        ann = annotations()
+        del self.field(ann, "FixtureTrack", "laps")["capacity"]
+        self.has(ann, "FixtureTrack.laps: an array of embeds with a counted length has a `capacity`")
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "laps")["capacity"] = 0
+        self.has(ann, "FixtureTrack.laps: an array of embeds with a counted length has a `capacity`")
+        ann = annotations()
+        self.field(ann, "FixtureScript", "channels")["capacity"] = 8
+        self.has(ann, "FixtureScript.channels: only an array of embeds whose `count` is a length expression has a `capacity`")
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "laps")["count"] = "count*count*count"
+        self.has(ann, "FixtureTrack.laps: the length `count*count*count` is not one or two factors joined by *")
+
+    def test_a_length_that_follows_a_pointer_names_a_load_field(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("offsetof(FixtureFile, lapCount), (unsigned char)sizeof(((FixtureFile*)nullptr)->lapCount), 0, 0u, 1, offsetof(FixtureTrack, table) }, { 2, 0, 0 }", text)
+        self.assertIn("FixtureTrack::marks: table is a pointer", text)
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "marks")["length"] = "count->lapCount*2"
+        self.has(ann, "FixtureTrack.marks: the length follows `count`, which is no field of kind load of the kind")
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "marks")["length"] = "nowhere->lapCount*2"
+        self.has(ann, "FixtureTrack.marks: the length follows `nowhere`, which is no field of kind load of the kind")
+
+    def test_only_the_length_of_an_array_of_an_object_follows_a_pointer(self):
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "laps")["count"] = "table->lapCount"
+        self.has(ann, "the factor `table->lapCount` follows a pointer, which only the length of an array of an object may do")
 
 
 class NestedVectors(unittest.TestCase):

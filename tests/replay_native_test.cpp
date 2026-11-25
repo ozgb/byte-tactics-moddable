@@ -31,6 +31,11 @@
 #include "../src/map/pass_map.h"
 #include "../src/weapons/weapon_aim_cob_cb.h"
 #include "../src/scripts/cob_script.h"
+#include "../src/scripts/cob_types.h"
+#include "../src/scripts/unit_script.h"
+#include "../src/scripts/object_state.h"
+#include "../src/scripts/piece_queries.h"
+#include "../src/scripts/scripts_seam.h"
 #include "../src/weapons/weapons.h"
 #include "../src/weapons/weapons_apply.h"
 #include "../src/weapons/weapon_types.h"
@@ -239,6 +244,11 @@ extern void (* const g_fixtureTimerVtable[2])() = { nullptr, nullptr };
 extern void (* const g_fixtureAssaultVtable[2])() = { nullptr, nullptr };
 extern void (* const g_fixtureCbVtable[2])() = { nullptr, nullptr };
 extern void (* const g_fixtureAttachVtable[2])() = { nullptr, nullptr };
+
+struct PieceOffsetObjectView;
+struct PieceAnglesObjectView;
+Vec3 __stdcall GetPieceOffset(PieceOffsetObjectView* obj, int index);
+Angles16 __stdcall GetPieceAngles(PieceAnglesObjectView* obj, int index);
 
 namespace {
 
@@ -2222,6 +2232,119 @@ void __stdcall UpdatePlayersSlot()
 
 void __stdcall UpdatePlayersOnStreamSlot(RandStream)
 {
+}
+
+
+int __stdcall ScriptsNative_Apply(const ScriptsEventHeader* event, unsigned int size)
+{
+    return ScriptsApply(event, size);
+}
+
+int __stdcall ScriptsNative_StartScriptWithArgsByIndex(CobScript* script, int index, Callback* callback, int update, int count, int a, int b, int c, int d)
+{
+    return 0;
+}
+
+int __stdcall ScriptsNative_QueryScript(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3)
+{
+    return script->QueryScript(name, arg0, arg1, arg2, arg3);
+}
+
+int __stdcall ScriptsNative_FindScript(CobScript* script, const char* name)
+{
+    return script->FindScript(name);
+}
+
+void __stdcall ScriptsNative_GetPieceOffset(Unit* unit, int piece, Vec3* out)
+{
+    *out = GetPieceOffset((PieceOffsetObjectView*)unit, piece);
+}
+
+void __stdcall ScriptsNative_GetPiecePosition(Unit* unit, int piece, Vec3* out)
+{
+    *out = GetPiecePosition((Object*)unit, piece);
+}
+
+void __stdcall ScriptsNative_GetPieceAngles(Unit* unit, int piece, Angles16* out)
+{
+    *out = GetPieceAngles((PieceAnglesObjectView*)unit, piece);
+}
+
+void __stdcall ScriptsNative_GetNanoPiecePosition(Unit* unit, Vec3* out)
+{
+    GetNanoPiecePosition((Object*)unit, out);
+}
+
+void __stdcall ScriptsNative_GetAimFromPosition(Unit* unit, Vec3* out, unsigned char weapon)
+{
+    GetAimFromPosition((Object*)unit, out, weapon);
+}
+
+void __stdcall ScriptsNative_GetSweetSpot(Unit* unit, Vec3* out)
+{
+    GetSweetSpot((SweetSpotObjectView*)unit, (int)out);
+}
+
+void __stdcall ScriptsNative_PoseUnitModel(Unit* unit)
+{
+}
+
+ModelState* __stdcall ScriptsNative_CreateObjectState(Object3do* model)
+{
+    return CreateObjectState(model);
+}
+
+void __stdcall ScriptsNative_FreeObjectState(ModelState* state)
+{
+    FreeObjectState(state);
+}
+
+void __stdcall ScriptsNative_UpdateObjectState(UnitDrawView* unit)
+{
+}
+
+unsigned int __stdcall ScriptsNative_ObjectStateSize(Object3do* model)
+{
+    return 0;
+}
+
+void __stdcall ScriptsNative_NewUnitScript(Unit* unit)
+{
+    NewUnitScript(unit);
+}
+
+void __stdcall ScriptsNative_SetCob(CobScript* script, ScriptTable* data)
+{
+    script->SetCob(data);
+}
+
+ModelState* __stdcall ScriptsNative_CreatePlayerObjectState(Object3do* model, ScriptTable* data, Unit* owner)
+{
+    return CreatePlayerObjectState(model, (ModelBuildList*)data, owner);
+}
+
+void __stdcall ScriptsNative_SetObjectState(UnitScript* script, ModelState* state)
+{
+    script->SetObjectState((ObjectState*)state);
+}
+
+void __stdcall ScriptsNative_RunScripts(CobScript* script, int elapsed)
+{
+    script->RunScripts(elapsed);
+}
+
+void __stdcall ScriptsNative_SaveScriptState(CobScript* script, HapiBank* file)
+{
+}
+
+int __stdcall ScriptsNative_LoadScriptState(CobScript* script, HapiBank* file)
+{
+    return 0;
+}
+
+void __stdcall ScriptsNative_DeleteScript(CobScript* script)
+{
+    delete script;
 }
 
 
@@ -6492,6 +6615,87 @@ void EmbedsSelfTest()
     free(second);
 }
 
+void CountedEmbedsSelfTest()
+{
+    printf("an array of embedded structs counted by a member, and an array measured by a load\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned short fields[5] = { FieldIndex(ROK_FIXTURETRACK, "count"), FieldIndex(ROK_FIXTURETRACK, "marks"), FieldIndex(ROK_FIXTURETRACK, "laps"),
+                                 FieldIndex(ROK_FIXTURELAP, "time"), FieldIndex(ROK_FIXTURELAP, "mark") };
+    ReplaySlotSets sets = { "track", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5 };
+    FixtureFile* file = (FixtureFile*)Fresh(sizeof(FixtureFile));
+    file->lapCount = 3;
+    FixtureTrack* track = (FixtureTrack*)Fresh(sizeof(FixtureTrack) + 4 * sizeof(FixtureLap));
+    track->count = 3;
+    track->table = file;
+    unsigned char* marks = (unsigned char*)Fresh(6);
+    for (int i = 0; i < 6; i++)
+        marks[i] = (unsigned char)(10 + i);
+    track->marks = marks;
+    track->laps[0].time = 5;
+    track->laps[1].time = 6;
+    track->laps[2].time = 7;
+    track->laps[2].mark = -4;
+    track->laps[3].time = 99;
+    unsigned short kinds[1] = { ROK_FIXTURETRACK };
+    void* roots[1] = { track };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(ReplayFailure() == nullptr, "a count within the capacity is recorded");
+    Check(strstr(text, "  r FixtureTrack#1.laps[2].time 7\n") != nullptr && strstr(text, "  r FixtureTrack#1.laps[2].mark -4\n") != nullptr, "the elements up to the count are written under their index");
+    Check(strstr(text, "laps[3]") == nullptr && strstr(text, "FixtureLap#") == nullptr, "an element past the count is not, and none is named by order");
+    Check(strstr(text, "  r FixtureTrack#1.marks [6] 0:0a0b0c0d0e0f\n") != nullptr, "an array whose length is a member of the file its load field leads to has that many bytes");
+
+    ResetBlock();
+    RestoreText(text, sets);
+    FixtureTrack* rebuilt = (FixtureTrack*)ReplayResolveObject("FixtureTrack#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuilt->count == 3 && rebuilt->laps[2].time == 7 && rebuilt->laps[2].mark == -4 && rebuilt->laps[0].time == 5, "the elements are restored in place");
+    Check(rebuilt != nullptr && ReplayResolveObject("FixtureTrack#1.laps[4]", nullptr, g_objects, AllocObject) == &rebuilt->laps[4], "the owner has room for the capacity, so the last element has an address");
+    Check(ReplayResolveObject("FixtureTrack#1.laps[5]", nullptr, g_objects, AllocObject) == nullptr, "and a name past the capacity names nothing");
+    if (rebuilt == nullptr) {
+        free(text);
+        return;
+    }
+    FixtureFile* again = (FixtureFile*)Fresh(sizeof(FixtureFile));
+    again->lapCount = 3;
+    rebuilt->table = again;
+    g_rootKinds[0] = ROK_FIXTURETRACK;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("%s", g_detail.Data());
+    Check(g_diffs == 0, "the restored track compares equal");
+    rebuilt->laps[1].time = 8;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureTrack#1.laps[1].time") == 0, "a changed field is reported at its element");
+    rebuilt->laps[1].time = 6;
+    rebuilt->count = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureTrack#1.count") == 0, "a count that changed is reported, and the elements past it are not compared");
+    rebuilt->count = 3;
+    again->lapCount = 2;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs > 0 && strncmp(g_firstKey, "FixtureTrack#1.marks", 20) == 0, "an array is as long as the file the replayer loaded says");
+    free(text);
+
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureTrack* full = (FixtureTrack*)Fresh(sizeof(FixtureTrack) + 4 * sizeof(FixtureLap));
+    full->count = 6;
+    roots[0] = full;
+    Recorder over;
+    over.Record(kinds, roots, 1, sets);
+    printf("%s\n", ReplayFailure() == nullptr ? "no failure" : ReplayFailure());
+    Check(ReplayFailure() != nullptr && strstr(ReplayFailure(), "FixtureTrack.laps has 6 elements, past the capacity of 5 that the schema gives") != nullptr, "a count above the capacity fails the recording");
+    ReplayClearFailure();
+}
+
 void EmbeddedPolymorphicSelfTest()
 {
     printf("an embedded polymorphic object\n");
@@ -7815,6 +8019,7 @@ int SelfTest(const char* file)
     BasedTableSelfTest();
     ElementSiteSelfTest();
     EmbedsSelfTest();
+    CountedEmbedsSelfTest();
     EmbeddedPolymorphicSelfTest();
     CallbackSelfTest();
     HeldCallbackSelfTest();
@@ -7966,4 +8171,43 @@ void __cdecl operator delete(void* p)
         return;
     }
     free(p);
+}
+
+void __cdecl GameFreeThunk(void* p)
+{
+    SimFree(p);
+}
+
+void __stdcall ReleaseUnitPictures(ModelState* state)
+{
+}
+
+int __stdcall GetCobChecksum(int key);
+
+int __stdcall GetCobChecksum(void* param)
+{
+    return GetCobChecksum((int)param);
+}
+
+extern "C" void __cdecl bx_RotatePoint2D(short angle, int* xz);
+void __cdecl RotatePoint2D(short angle, int* xy)
+{
+    bx_RotatePoint2D(angle, xy);
+}
+
+void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles)
+{
+    int a[2];
+    int b[2];
+    a[0] = in->x;
+    a[1] = in->y;
+    RotatePoint2D(angles[0], a);
+    b[0] = a[1];
+    b[1] = in->z;
+    RotatePoint2D(angles[2], b);
+    out->y = b[0];
+    a[1] = b[1];
+    RotatePoint2D(angles[1], a);
+    out->x = a[0];
+    out->z = a[1];
 }

@@ -48,6 +48,12 @@ unsigned FactorValue(const ReplayFactor& f, const void* object)
     if (f.size == 0)
         return f.offset;
     const unsigned char* at = (const unsigned char*)object + f.offset;
+    if (f.through) {
+        const unsigned char* data = *(const unsigned char* const*)((const unsigned char*)object + f.hop);
+        if (data == nullptr)
+            return 0;
+        at = data + f.offset;
+    }
     unsigned v = f.size == 1 ? *at : f.size == 2 ? *(const unsigned short*)at : *(const unsigned*)at;
     return (v + f.add) >> f.shift;
 }
@@ -1470,6 +1476,20 @@ struct Deferred {
     unsigned short field[MAX_DEFERRED];
 };
 
+unsigned ElementCount(const ReplayObjectField& field, const ReplayElemSpec& elems, const unsigned char* base)
+{
+    if (!elems.live)
+        return elems.count;
+    unsigned n = ReplayLengthOf(elems.used, base);
+    if (n > elems.count) {
+        char message[200];
+        sprintf(message, "%s.%s has %u elements, past the capacity of %u that the schema gives", kReplayObjectKinds[field.object].name, field.name, n, elems.count);
+        ReplayFail(message);
+        return elems.count;
+    }
+    return n;
+}
+
 void ExpandObject(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned kind, unsigned char* base, const unsigned short* limit, unsigned limitCount,
                   const unsigned short* fields, unsigned fieldCount, Deferred& deferred)
 {
@@ -1485,7 +1505,7 @@ void ExpandObject(ReplayReach& reach, ReplayObjectTable& table, bool assign, uns
         }
         if (field.kind == RK_EMBEDS) {
             const ReplayElemSpec& elems = kReplayElems[field.array - 1];
-            for (unsigned e = 0; e < elems.count; e++)
+            for (unsigned e = 0, n = ElementCount(field, elems, base); e < n; e++)
                 Visit(reach, table, assign, field.target, base + field.offset + e * elems.stride, limit, limitCount);
             continue;
         }

@@ -518,6 +518,18 @@ int __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, in
     return EnterList(t, a4, a5);
 }
 
+int __stdcall Imp_los_radar_IsUnitVisibleToPlayer(Player* a0, Unit* a1)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.IsUnitVisibleToPlayer");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
 int __stdcall Imp_map_GetCellMeanHeight(Vec3* a0)
 {
     ReplayText t;
@@ -1031,6 +1043,33 @@ MapSeam g_native_map = {
     RefreshUnitIfStaleSlot,
     WriteStateSlot,
     PathLockStamp,
+};
+
+ScriptsSeam g_native_scripts = {
+    ScriptsNative_Apply,
+    ScriptsNative_StartScriptWithArgsByIndex,
+    ScriptsNative_QueryScript,
+    ScriptsNative_FindScript,
+    ScriptsNative_GetPieceOffset,
+    ScriptsNative_GetPiecePosition,
+    ScriptsNative_GetPieceAngles,
+    ScriptsNative_GetNanoPiecePosition,
+    ScriptsNative_GetAimFromPosition,
+    ScriptsNative_GetSweetSpot,
+    ScriptsNative_PoseUnitModel,
+    ScriptsNative_CreateObjectState,
+    ScriptsNative_FreeObjectState,
+    ScriptsNative_UpdateObjectState,
+    ScriptsNative_ObjectStateSize,
+    ScriptsNative_NewUnitScript,
+    ScriptsNative_SetCob,
+    ScriptsNative_CreatePlayerObjectState,
+    ScriptsNative_SetObjectState,
+    ScriptsNative_RunScripts,
+    ScriptsNative_SaveScriptState,
+    ScriptsNative_LoadScriptState,
+    ScriptsNative_DeleteScript,
+    ScriptsWriteState,
 };
 
 MissionSeam g_native_mission = {
@@ -2367,6 +2406,195 @@ void After_map_PassMapInBounds()
     CompareResult(g_result_map_PassMapInBounds);
 }
 
+int g_result_scripts_Apply;
+
+void Run_scripts_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_SCRIPTS, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_scripts_Apply = g_seams.scripts->Apply((ScriptsEventHeader*)p0, p1);
+}
+
+void After_scripts_Apply()
+{
+    CompareResult(g_result_scripts_Apply);
+}
+
+int g_inout_scripts_QueryScript_2;
+bool g_inout_scripts_QueryScript_2_null;
+int g_inout_scripts_QueryScript_3;
+bool g_inout_scripts_QueryScript_3_null;
+int g_inout_scripts_QueryScript_4;
+bool g_inout_scripts_QueryScript_4_null;
+int g_inout_scripts_QueryScript_5;
+bool g_inout_scripts_QueryScript_5_null;
+int g_result_scripts_QueryScript;
+
+void Run_scripts_QueryScript()
+{
+    CobScript* p0 = (CobScript*)ArgObject("script", ROK_COBSCRIPT);
+    char p1_text[256];
+    ArgText("name", p1_text, sizeof p1_text);
+    g_inout_scripts_QueryScript_2 = 0;
+    int* p2 = ParseInOutScalar("arg0", &g_inout_scripts_QueryScript_2);
+    g_inout_scripts_QueryScript_2_null = p2 == nullptr;
+    g_inout_scripts_QueryScript_3 = 0;
+    int* p3 = ParseInOutScalar("arg1", &g_inout_scripts_QueryScript_3);
+    g_inout_scripts_QueryScript_3_null = p3 == nullptr;
+    g_inout_scripts_QueryScript_4 = 0;
+    int* p4 = ParseInOutScalar("arg2", &g_inout_scripts_QueryScript_4);
+    g_inout_scripts_QueryScript_4_null = p4 == nullptr;
+    g_inout_scripts_QueryScript_5 = 0;
+    int* p5 = ParseInOutScalar("arg3", &g_inout_scripts_QueryScript_5);
+    g_inout_scripts_QueryScript_5_null = p5 == nullptr;
+    SetClosing("arg0 ", "arg1 ", "arg2 ", "arg3 ", "result");
+    g_result_scripts_QueryScript = g_seams.scripts->QueryScript(p0, p1_text, p2, p3, p4, p5);
+}
+
+void After_scripts_QueryScript()
+{
+    CompareInOutScalar("arg0", g_inout_scripts_QueryScript_2_null ? nullptr : &g_inout_scripts_QueryScript_2);
+    CompareInOutScalar("arg1", g_inout_scripts_QueryScript_3_null ? nullptr : &g_inout_scripts_QueryScript_3);
+    CompareInOutScalar("arg2", g_inout_scripts_QueryScript_4_null ? nullptr : &g_inout_scripts_QueryScript_4);
+    CompareInOutScalar("arg3", g_inout_scripts_QueryScript_5_null ? nullptr : &g_inout_scripts_QueryScript_5);
+    CompareResult(g_result_scripts_QueryScript);
+}
+
+int g_result_scripts_FindScript;
+
+void Run_scripts_FindScript()
+{
+    CobScript* p0 = (CobScript*)ArgObject("script", ROK_COBSCRIPT);
+    char p1_text[256];
+    ArgText("name", p1_text, sizeof p1_text);
+    SetClosing("result");
+    g_result_scripts_FindScript = g_seams.scripts->FindScript(p0, p1_text);
+}
+
+void After_scripts_FindScript()
+{
+    CompareResult(g_result_scripts_FindScript);
+}
+
+Vec3 g_out_scripts_GetPieceOffset_2;
+
+void Run_scripts_GetPieceOffset()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    int p1 = ArgScalar<int>("piece");
+    memset(&g_out_scripts_GetPieceOffset_2, 0, sizeof g_out_scripts_GetPieceOffset_2);
+    SetClosing("result");
+    g_seams.scripts->GetPieceOffset(p0, p1, &g_out_scripts_GetPieceOffset_2);
+}
+
+void After_scripts_GetPieceOffset()
+{
+    CompareValueResult(ROK_VEC3, &g_out_scripts_GetPieceOffset_2);
+}
+
+Vec3 g_out_scripts_GetPiecePosition_2;
+
+void Run_scripts_GetPiecePosition()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    int p1 = ArgScalar<int>("piece");
+    memset(&g_out_scripts_GetPiecePosition_2, 0, sizeof g_out_scripts_GetPiecePosition_2);
+    SetClosing("result");
+    g_seams.scripts->GetPiecePosition(p0, p1, &g_out_scripts_GetPiecePosition_2);
+}
+
+void After_scripts_GetPiecePosition()
+{
+    CompareValueResult(ROK_VEC3, &g_out_scripts_GetPiecePosition_2);
+}
+
+Angles16 g_out_scripts_GetPieceAngles_2;
+
+void Run_scripts_GetPieceAngles()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    int p1 = ArgScalar<int>("piece");
+    memset(&g_out_scripts_GetPieceAngles_2, 0, sizeof g_out_scripts_GetPieceAngles_2);
+    SetClosing("result");
+    g_seams.scripts->GetPieceAngles(p0, p1, &g_out_scripts_GetPieceAngles_2);
+}
+
+void After_scripts_GetPieceAngles()
+{
+    CompareValueResult(ROK_ANGLES16, &g_out_scripts_GetPieceAngles_2);
+}
+
+ModelState* g_result_scripts_CreateObjectState;
+
+void Run_scripts_CreateObjectState()
+{
+    Object3do* p0 = (Object3do*)ArgLoad("model", RL_MODEL);
+    SetClosing("result");
+    g_result_scripts_CreateObjectState = g_seams.scripts->CreateObjectState(p0);
+}
+
+void After_scripts_CreateObjectState()
+{
+    CompareObjectResult(ROK_MODELSTATE, g_result_scripts_CreateObjectState);
+}
+
+void Run_scripts_FreeObjectState()
+{
+    ModelState* p0 = (ModelState*)ArgObject("state", ROK_MODELSTATE);
+    SetClosing(nullptr);
+    g_seams.scripts->FreeObjectState(p0);
+}
+
+void Run_scripts_NewUnitScript()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.scripts->NewUnitScript(p0);
+}
+
+void Run_scripts_SetCob()
+{
+    CobScript* p0 = (CobScript*)ArgObject("script", ROK_COBSCRIPTBASE);
+    ScriptTable* p1 = (ScriptTable*)ArgLoad("data", RL_COB);
+    SetClosing(nullptr);
+    g_seams.scripts->SetCob(p0, p1);
+}
+
+ModelState* g_result_scripts_CreatePlayerObjectState;
+
+void Run_scripts_CreatePlayerObjectState()
+{
+    Object3do* p0 = (Object3do*)ArgLoad("model", RL_MODEL);
+    ScriptTable* p1 = (ScriptTable*)ArgLoad("data", RL_COB);
+    Unit* p2 = (Unit*)ArgObject("owner", ROK_UNIT);
+    SetClosing("result");
+    g_result_scripts_CreatePlayerObjectState = g_seams.scripts->CreatePlayerObjectState(p0, p1, p2);
+}
+
+void After_scripts_CreatePlayerObjectState()
+{
+    CompareObjectResult(ROK_MODELSTATE, g_result_scripts_CreatePlayerObjectState);
+}
+
+void Run_scripts_SetObjectState()
+{
+    UnitScript* p0 = (UnitScript*)ArgObject("script", ROK_COBSCRIPT);
+    ModelState* p1 = (ModelState*)ArgObject("state", ROK_MODELSTATE);
+    SetClosing(nullptr);
+    g_seams.scripts->SetObjectState(p0, p1);
+}
+
+void Run_scripts_RunScripts()
+{
+    CobScript* p0 = (CobScript*)ArgObject("script", ROK_COBSCRIPT);
+    int p1 = ArgScalar<int>("elapsed");
+    SetClosing(nullptr);
+    g_seams.scripts->RunScripts(p0, p1);
+}
+
 int g_result_mission_GetGameType;
 
 void Run_mission_GetGameType()
@@ -2978,6 +3206,58 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_map_PassMapInBounds();
         return true;
     }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_scripts_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "QueryScript") == 0) {
+        Run_scripts_QueryScript();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "FindScript") == 0) {
+        Run_scripts_FindScript();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "GetPieceOffset") == 0) {
+        Run_scripts_GetPieceOffset();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "GetPiecePosition") == 0) {
+        Run_scripts_GetPiecePosition();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "GetPieceAngles") == 0) {
+        Run_scripts_GetPieceAngles();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "CreateObjectState") == 0) {
+        Run_scripts_CreateObjectState();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "FreeObjectState") == 0) {
+        Run_scripts_FreeObjectState();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "NewUnitScript") == 0) {
+        Run_scripts_NewUnitScript();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "SetCob") == 0) {
+        Run_scripts_SetCob();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "CreatePlayerObjectState") == 0) {
+        Run_scripts_CreatePlayerObjectState();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "SetObjectState") == 0) {
+        Run_scripts_SetObjectState();
+        return true;
+    }
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "RunScripts") == 0) {
+        Run_scripts_RunScripts();
+        return true;
+    }
     if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetGameType") == 0) {
         Run_mission_GetGameType();
         return true;
@@ -3157,6 +3437,22 @@ void RunAfter(const char* subsystem, const char* slot)
         After_map_PassMapGet();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "PassMapInBounds") == 0)
         After_map_PassMapInBounds();
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "Apply") == 0)
+        After_scripts_Apply();
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "QueryScript") == 0)
+        After_scripts_QueryScript();
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "FindScript") == 0)
+        After_scripts_FindScript();
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "GetPieceOffset") == 0)
+        After_scripts_GetPieceOffset();
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "GetPiecePosition") == 0)
+        After_scripts_GetPiecePosition();
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "GetPieceAngles") == 0)
+        After_scripts_GetPieceAngles();
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "CreateObjectState") == 0)
+        After_scripts_CreateObjectState();
+    if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "CreatePlayerObjectState") == 0)
+        After_scripts_CreatePlayerObjectState();
     if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetGameType") == 0)
         After_mission_GetGameType();
     if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetNameSlot") == 0)
@@ -3196,6 +3492,7 @@ void BindSeams()
     g_seams.units = &g_native_units;
     g_seams.players = &g_native_players;
     g_seams.map = &g_native_map;
+    g_seams.scripts = &g_native_scripts;
     g_seams.mission = &g_native_mission;
     g_seams.files = &g_import_files;
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
@@ -3232,13 +3529,6 @@ void BindSeams()
     g_import_network.SendShareMetal = Imp_network_SendShareMetal;
     g_seams.pathfinding = &g_import_pathfinding;
     g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
-    g_seams.scripts = &g_import_scripts;
-    g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
-    g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
-    g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;
-    g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
-    g_import_scripts.QueryScript = Imp_scripts_QueryScript;
-    g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
     g_seams.orders = &g_import_orders;
     g_import_orders.GetOrderType = Imp_orders_GetOrderType;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
@@ -3257,6 +3547,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
@@ -3265,6 +3556,13 @@ void BindSeams()
         g_import_mission.GetGameType = Imp_mission_GetGameType;
         g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
         g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+        g_seams.scripts = &g_import_scripts;
+        g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
+        g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
+        g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;
+        g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
+        g_import_scripts.QueryScript = Imp_scripts_QueryScript;
+        g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
     }
     if (strcmp(g_subsystem, "ai") == 0) {
         g_seams.mission = &g_import_mission;
@@ -3278,6 +3576,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
@@ -3300,6 +3599,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
@@ -3308,6 +3608,13 @@ void BindSeams()
         g_import_mission.GetGameType = Imp_mission_GetGameType;
         g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
         g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+        g_seams.scripts = &g_import_scripts;
+        g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
+        g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
+        g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;
+        g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
+        g_import_scripts.QueryScript = Imp_scripts_QueryScript;
+        g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
     }
     if (strcmp(g_subsystem, "targeting") == 0) {
         g_seams.los_radar = &g_import_los_radar;
@@ -3317,6 +3624,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
@@ -3327,6 +3635,13 @@ void BindSeams()
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
         g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+        g_seams.scripts = &g_import_scripts;
+        g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
+        g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
+        g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;
+        g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
+        g_import_scripts.QueryScript = Imp_scripts_QueryScript;
+        g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
     }
     if (strcmp(g_subsystem, "los_radar") == 0) {
         g_seams.map = &g_import_map;
@@ -3342,6 +3657,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
@@ -3375,5 +3691,20 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
+    }
+    if (strcmp(g_subsystem, "scripts") == 0) {
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+        g_seams.los_radar = &g_import_los_radar;
+        g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+        g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+        g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
+        g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+        g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+        g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
     }
 }

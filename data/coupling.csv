@@ -675,6 +675,7 @@ game,harness,shared_write,Player::allied,1
 game,harness,shared_write,PlayersEventHeader::kind,1
 game,harness,shared_write,Point16::x,1
 game,harness,shared_write,Point16::y,1
+game,harness,shared_write,ScriptsEventHeader::kind,1
 game,harness,shared_write,Vec3::x,3
 game,harness,shared_write,Vec3::y,1
 game,harness,shared_write,Vec3::z,3
@@ -1824,11 +1825,10 @@ harness,network,shared_write,Player::alliedBy,2
 harness,network,shared_write,Player::progress,2
 harness,network,shared_write,Player::type,69
 harness,network,shared_write,ScriptsSeam::FindScript,2
-harness,network,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,network,shared_write,Seams::mission,7
 harness,network,shared_write,Seams::movement,1
 harness,network,shared_write,Seams::scripts,3
-harness,orders,call,Add,91
+harness,orders,call,Add,85
 harness,orders,call,FindOrderByType,1
 harness,orders,indirect,OrdersWriteState,1
 harness,orders,shared_write,FeaturesSeam::FindFeatureAtPos,3
@@ -2123,7 +2123,6 @@ harness,seams,shared_write,Ref<Unit>::offset,10
 harness,seams,shared_write,ScriptsSeam::Apply,2
 harness,seams,shared_write,ScriptsSeam::CreateObjectState,1
 harness,seams,shared_write,ScriptsSeam::CreatePlayerObjectState,1
-harness,seams,shared_write,ScriptsSeam::DeleteScript,1
 harness,seams,shared_write,ScriptsSeam::FindScript,1
 harness,seams,shared_write,ScriptsSeam::FreeObjectState,1
 harness,seams,shared_write,ScriptsSeam::GetAimFromPosition,1
@@ -2138,7 +2137,6 @@ harness,seams,shared_write,ScriptsSeam::QueryScript,1
 harness,seams,shared_write,ScriptsSeam::RunScripts,1
 harness,seams,shared_write,ScriptsSeam::SetCob,1
 harness,seams,shared_write,ScriptsSeam::SetObjectState,1
-harness,seams,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,seams,shared_write,Seams::ai,2
 harness,seams,shared_write,Seams::economy,5
 harness,seams,shared_write,Seams::features,3
@@ -2212,7 +2210,6 @@ harness,units,shared_write,Player::type,6
 harness,units,shared_write,Ref<Unit>::offset,2
 harness,units,shared_write,ScriptsSeam::CreateObjectState,1
 harness,units,shared_write,ScriptsSeam::CreatePlayerObjectState,1
-harness,units,shared_write,ScriptsSeam::DeleteScript,1
 harness,units,shared_write,ScriptsSeam::FreeObjectState,1
 harness,units,shared_write,ScriptsSeam::NewUnitScript,1
 harness,units,shared_write,ScriptsSeam::QueryScript,1
@@ -5561,7 +5558,6 @@ seams,harness,shared_write,Ref<Unit>::offset,1
 seams,harness,shared_write,ScriptsSeam::Apply,2
 seams,harness,shared_write,ScriptsSeam::CreateObjectState,2
 seams,harness,shared_write,ScriptsSeam::CreatePlayerObjectState,2
-seams,harness,shared_write,ScriptsSeam::DeleteScript,2
 seams,harness,shared_write,ScriptsSeam::FindScript,2
 seams,harness,shared_write,ScriptsSeam::FreeObjectState,2
 seams,harness,shared_write,ScriptsSeam::GetAimFromPosition,2
@@ -5576,7 +5572,6 @@ seams,harness,shared_write,ScriptsSeam::QueryScript,2
 seams,harness,shared_write,ScriptsSeam::RunScripts,2
 seams,harness,shared_write,ScriptsSeam::SetCob,2
 seams,harness,shared_write,ScriptsSeam::SetObjectState,2
-seams,harness,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,2
 seams,harness,shared_write,Seams::ai,3
 seams,harness,shared_write,Seams::economy,2
 seams,harness,shared_write,Seams::features,2

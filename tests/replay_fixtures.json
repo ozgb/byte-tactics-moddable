@@ -918,6 +918,56 @@
      "poly": "FixtureGoalBase"
     }
    ]
+  },
+  "FixtureTrack": {
+   "type": "FixtureTrack",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "count",
+     "kind": "i32"
+    },
+    {
+     "name": "table",
+     "kind": "load",
+     "load": "fixture_script"
+    },
+    {
+     "name": "marks",
+     "kind": "array",
+     "elem": "u8",
+     "ref": true,
+     "length": "table->lapCount*2"
+    },
+    {
+     "name": "laps",
+     "kind": "embeds",
+     "count": "count",
+     "capacity": 5,
+     "target": "FixtureLap",
+     "member": "laps[]"
+    }
+   ]
+  },
+  "FixtureLap": {
+   "type": "FixtureLap",
+   "scope": "state",
+   "inside": [
+    {
+     "kind": "FixtureTrack",
+     "member": "laps[]"
+    }
+   ],
+   "fields": [
+    {
+     "name": "time",
+     "kind": "u16"
+    },
+    {
+     "name": "mark",
+     "kind": "i16"
+    }
+   ]
   }
  },
  "fixtures": {

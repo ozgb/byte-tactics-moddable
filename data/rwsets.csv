@@ -48997,7 +48997,7 @@ address,function,file,kind,target
 ,ImportObjects,src/harness/replay.cpp,field_read,ReplaySlotSets::objReads
 ,ImportObjects,src/harness/replay.cpp,field_read,ReplaySlotSets::objWriteCount
 ,ImportObjects,src/harness/replay.cpp,field_read,ReplaySlotSets::objWrites
-,ImportObjects,src/harness/replay.cpp,field_read,ReplaySubsystem::importObjects
+,ImportObjects,src/harness/replay.cpp,field_read,ReplaySubsystem::recordsImportChanges
 ,ImportObjects,src/harness/replay.cpp,function,
 ,ImportObjects,src/harness/replay.cpp,global_escape,s_importChanged
 ,ImportObjects,src/harness/replay.cpp,global_read,kReplaySlots@src/harness/replay_schema.h

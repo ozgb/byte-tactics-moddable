@@ -649,6 +649,36 @@ class TailWriteTest(unittest.TestCase):
         self.assert_only_the_tick_row_changes(got)
 
 
+class SelectionTest(unittest.TestCase):
+    """The selection, bit 0x10 of a unit's flags, is view state: setting it between two ticks changes no row (#1050)."""
+
+    FIXTURE = Path(__file__).resolve().parent / "testdata/tracerehash/orders-build-patrol-24"
+
+    @classmethod
+    def setUpClass(cls):
+        schema_path = Path(__file__).resolve().parent.parent / "data/trace_schema.json"
+        cls.schema = tr.Schema(json.loads(schema_path.read_text()))
+        cls.blocks = tr.parse_dump(tr.read_text(f"{cls.FIXTURE}.dump.txt.xz"), cls.schema.data["trace_format"])
+        cls.trace = tr.parse_trace_rows(tr.read_text(f"{cls.FIXTURE}.trace.txt"))
+
+    def rows_with_flags(self, bit):
+        def change(path, value):
+            return (path, "0x%08x" % (int(value, 16) ^ bit)) if path == "units[1].flags" else (path, value)
+        blocks = {key: [change(path, value) for path, value in lines] for key, lines in self.blocks.items()}
+        return {phase: f"{value:016x}" for _, phase, value in tr.rehash(self.schema, blocks)}
+
+    def test_the_selection_bit_changes_no_row(self):
+        self.assertEqual(int(dict(self.blocks[(24, "tick")])["units[1].flags"], 16) & 0x10, 0)
+        got = self.rows_with_flags(0x10)
+        for phase, value in got.items():
+            self.assertEqual(value, self.trace[(24, phase)], phase)
+
+    def test_the_selectable_bit_changes_the_rows(self):
+        got = self.rows_with_flags(0x20)
+        for phase in ("units", "tick"):
+            self.assertNotEqual(got[phase], self.trace[(24, phase)], phase)
+
+
 class ReadTextTest(unittest.TestCase):
     def test_xz_path_is_decompressed(self):
         with tempfile.TemporaryDirectory() as d:

@@ -85,7 +85,7 @@ interface did with the input.
 | `input` | `key down <vk>`, `key up <vk>`, `char <code>`, `mouse move <x> <y>`, `mouse left down <x> <y>` and the like | An event of the scenario's `input` lines, in decimal, at the tick of its line. |
 | `scroll` | `<x> <z>` | The camera scroll, at tick 1 and at the end of any tick where it differs from the last `scroll` line. Every scenario logs it (see below). |
 | `view` | `<draws>` | The number of draws made so far from the view random stream, counted from the start of the run, at the end of any tick where it differs from the last `view` line. A draw made between two steps counts into the next tick. See below. |
-| `select` | `<units>` | The local player's selected units, at tick 1 and at the end of any tick where the selection differs from the last `select` line. |
+| `select` | `<units>` | The local player's selected units, at tick 1 and at the end of any tick where the selection differs from the last `select` line. The selection is view state, which no trace row hashes: this record is what a presentation is judged on. |
 | `command` | `order mode <M> kind <KIND or -> units <units> target <T or -> pos <x> <y> <z> or - param <N> amount <A> remove <0 or 1>`, or `build type <TYPE> units <units> pos <x> <y> <z> remove <0 or 1>` | One click that orders the selection, as the one group command it sends. See below. |
 | `order` | `<KIND> unit <U> target <T or -> pos <x> <y> <z> or - type <NAME or -> param <N or -> amount <A> remove <0 or 1>` | One order given to one unit. See below. |
 | `qbuild` | `<U> <TYPE> <count>` | A click in a factory's build menu changed the build queue of unit `U` by `count` (1 or 5, negative for a right click) of the unit type, or missile, named `TYPE` by the button. |

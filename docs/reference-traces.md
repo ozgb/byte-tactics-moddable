@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v41` is the fixed target for anyone writing a new
+The git tag `reference-traces-v42` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v41`**.
+code as a base. This page names the current tag: **`reference-traces-v42`**.
 
 ## What the tag holds
 
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v41`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v41
+git checkout reference-traces-v42
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -136,7 +136,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v41
+git checkout reference-traces-v42
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -210,7 +210,7 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v42`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v41`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v40`
+`reference-traces-v42`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v41`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
@@ -394,12 +394,16 @@ and so on), and this page is updated to name it. The current tag is
   which the human Arm commander reclaims a tree that the console places. The trace format is still `bt-trace 9`; the
   92 traces are those of v40, and the new scenario adds its own trace, events, sound and UI logs. The saves are those
   of v40.
+- `reference-traces-v42`: the 93 scenarios of v41, with the selection (bit 0x10 of a unit's `flags`) masked out of the
+  `Unit` table (#1050): it is view state, judged by the UI log's `select` record. The trace format is still
+  `bt-trace 9`. The digests of the eight `ui-` scenarios that select units change; the other 85 are those of v41 (only
+  each trace's commit line changed). The event digests, sound logs, UI logs, frames and saves are those of v41.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v41 are `bt-trace 9`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v42 are `bt-trace 9`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

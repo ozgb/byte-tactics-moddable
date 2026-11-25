@@ -187,7 +187,7 @@ class Walker:
         if field["kind"] in ("pointer", "ref"):
             self.hash.pointer(*self.pointer_id(value))
         elif "mask" in field:
-            self.hash.h32(int(value, 16))
+            self.hash.h32(int(value, 16) & field["mask"])
         else:
             self.hash.run(value_bytes(field, value))
 

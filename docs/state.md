@@ -157,6 +157,27 @@ LOAD, map's LOAD_PATH_LOCK_STAMP, wind_meteors' LIMITS and RESET); section 5 of 
 restores. `tools/seamlink.py --private-state` reads `data/rwsets.csv`, which has every function and no windows, so it
 covers the save and load code as it covers the tick's.
 
+## The selection
+
+The selection is view state (#1047, decided by the human on 2026-11-24), though it is a bit of the simulation's unit
+record: `selected`, bit 0x10 of `Unit.flags` (+0x110). It stays there in this repository, as 3.1c lays it out; moving
+it is work for the re-implementation. The trace masks it out of the `Unit` table (`tools/traceschema.py`, mask
+0xffffffef), so no row hashes it (the phase rows, `world` and the end-of-tick `tick` row), and two runs that differ
+only in what is selected have equal traces. The save keeps the bit as 3.1c writes it. What a presentation is judged on
+is the UI log's `select` record (`docs/ui-log.md`), and the group command a click sends carries its units
+(`OrdersGroupCommand`), so the simulation never needs the selection to carry out an order.
+
+Who touches the bit:
+- Presentation sets and clears it (the functions of selection.cpp) and reads it: the panels (control_panel.cpp,
+  info_panel.cpp), and `SendGroupCommand` (selection.cpp), which turns the selection into the units of a group command.
+  `ExpandGroupCommand`'s default reads the units from the command alone.
+- Game logic reads it once: `UpdateUnitBody` (unit_position.cpp) clears it when the unit can no longer be selected (not
+  selectable, still being built, in its hold-off after a transfer, or carried by a unit whose cargo is not selectable).
+  The read changes nothing but the bit. It is 3.1c's deselection rule, a rule of the view that runs in the tick.
+- Game logic writes it twice more, and reads it nowhere else: `InitUnitFromType` (units.cpp) clears it for a new unit, and
+  `LoadUnit` (unit_save.cpp) restores it from the save.
+- The harness reads it for the UI log's `select` record.
+
 ## Determinism findings
 
 - **`g_timeoutTimerStart`** is set from wall-clock `GetTicks()` in `CheckPlayerTimeouts` (net_game.cpp), and `IsTimedOut` reads it. This is network only and already a #40 task.

@@ -1498,6 +1498,21 @@ int __stdcall RecOrdersMissionTypeFromName(const char* a0)
     return result;
 }
 
+int __stdcall RecOrdersExpandGroupCommand(const OrdersGroupCommand* a0, unsigned int a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_ORDERS_EXPANDGROUPCOMMAND, SUB_ORDERS, roots);
+    if (scope.Open()) {
+        ArgPending(s_call, "command");
+        ArgValue(s_call, "size", a1);
+    }
+    int result = s_inner_orders->ExpandGroupCommand(a0, a1);
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 UnitDef* __stdcall RecUnitsFindUnitType(const char* a0)
 {
     ReplayRoots roots;
@@ -5612,6 +5627,8 @@ void HookSeams(const bool* on)
         s_rec_orders.GetOrderType = RecOrdersGetOrderType;
     if (on[SUB_ORDERS])
         s_rec_orders.MissionTypeFromName = RecOrdersMissionTypeFromName;
+    if (on[SUB_ORDERS])
+        s_rec_orders.ExpandGroupCommand = RecOrdersExpandGroupCommand;
     if (on[SUB_UNITS])
         s_rec_units.FindUnitType = RecUnitsFindUnitType;
     if (on[SUB_UNITS] || on[SUB_ORDERS] || on[SUB_PLAYERS])

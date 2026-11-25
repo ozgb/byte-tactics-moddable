@@ -359,6 +359,7 @@ enum ReplayObjectKindId {
     ROK_ORDERSATTACKED,
     ROK_ORDERSPARALYZE,
     ROK_ORDERSCANCEL,
+    ROK_ORDERSGROUPCOMMAND,
     ROK_ORDERSSETSTATEBITS,
     ROK_ORDERSSETPOSITION,
     ROK_ORDERSATTACHTOPIECE,
@@ -886,6 +887,8 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 294, ROK_ORDERSPARALYZE },
     { 295, ROK_ORDERSADD },
     { 296, ROK_ORDERSCANCEL },
+    { 297, ROK_ORDERSGROUPCOMMAND },
+    { 298, ROK_ORDERSGROUPCOMMAND },
     { 304, ROK_ORDERSSETSTATEBITS },
     { 305, ROK_ORDERSSETPOSITION },
     { 306, ROK_ORDERSATTACHTOPIECE },
@@ -1003,14 +1006,14 @@ static const ReplayEventTable kReplayEventTables[] = {
     { ROK_LOSRADAREVENTHEADER, 13, 11 },
     { ROK_MAPEVENTHEADER, 24, 11 },
     { ROK_WEAPONSEVENTHEADER, 35, 25 },
-    { ROK_ORDERSEVENTHEADER, 60, 23 },
-    { ROK_AIEVENTHEADER, 83, 10 },
-    { ROK_MOVEMENTEVENTHEADER, 93, 23 },
-    { ROK_UNITSEVENTHEADER, 116, 30 },
-    { ROK_SCRIPTSEVENTHEADER, 146, 4 },
-    { ROK_ECONOMYEVENTHEADER, 150, 8 },
-    { ROK_PLAYERSEVENTHEADER, 158, 12 },
-    { ROK_FEATURESEVENTHEADER, 170, 9 },
+    { ROK_ORDERSEVENTHEADER, 60, 25 },
+    { ROK_AIEVENTHEADER, 85, 10 },
+    { ROK_MOVEMENTEVENTHEADER, 95, 23 },
+    { ROK_UNITSEVENTHEADER, 118, 30 },
+    { ROK_SCRIPTSEVENTHEADER, 148, 4 },
+    { ROK_ECONOMYEVENTHEADER, 152, 8 },
+    { ROK_PLAYERSEVENTHEADER, 160, 12 },
+    { ROK_FEATURESEVENTHEADER, 172, 9 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
@@ -1060,6 +1063,7 @@ static_assert(sizeof(OrdersStatusFlags) <= REPLAY_EVENT_MAX, "OrdersStatusFlags 
 static_assert(sizeof(OrdersAttacked) <= REPLAY_EVENT_MAX, "OrdersAttacked fits the event buffer");
 static_assert(sizeof(OrdersParalyze) <= REPLAY_EVENT_MAX, "OrdersParalyze fits the event buffer");
 static_assert(sizeof(OrdersCancel) <= REPLAY_EVENT_MAX, "OrdersCancel fits the event buffer");
+static_assert(sizeof(OrdersGroupCommand) <= REPLAY_EVENT_MAX, "OrdersGroupCommand fits the event buffer");
 static_assert(sizeof(OrdersSetStateBits) <= REPLAY_EVENT_MAX, "OrdersSetStateBits fits the event buffer");
 static_assert(sizeof(OrdersSetPosition) <= REPLAY_EVENT_MAX, "OrdersSetPosition fits the event buffer");
 static_assert(sizeof(OrdersAttachToPiece) <= REPLAY_EVENT_MAX, "OrdersAttachToPiece fits the event buffer");
@@ -1333,6 +1337,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "OrdersAttacked", sizeof(OrdersAttacked), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersParalyze", sizeof(OrdersParalyze), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersCancel", sizeof(OrdersCancel), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "OrdersGroupCommand", sizeof(OrdersGroupCommand), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersSetStateBits", sizeof(OrdersSetStateBits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersSetPosition", sizeof(OrdersSetPosition), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "OrdersAttachToPiece", sizeof(OrdersAttachToPiece), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -1434,7 +1439,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FeaturesPassMaps", sizeof(FeaturesPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FeaturesAreaDamage", sizeof(FeaturesAreaDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 256;
+static const unsigned kReplayObjectKindCount = 257;
 
 static const unsigned short kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_VICTORYKILLENEMYCOMMANDER, ROK_VICTORYDESTROYALLUNITS, ROK_VICTORYKILLALLMOBILEUNITS, ROK_VICTORYBUILDUNITTYPE, ROK_VICTORYCAPTUREUNITTYPE, ROK_VICTORYKILLALLOFTYPE, ROK_VICTORYKILLUNITTYPE, ROK_VICTORYUNITTYPEPASSESX, ROK_VICTORYUNITTYPEPASSESZ, ROK_VICTORYTIMERRUNSOUT, ROK_DEFEATCOMMANDERKILLED, ROK_DEFEATALLUNITSKILLED, ROK_DEFEATALLUNITSKILLEDOFTYPE, ROK_DEFEATUNITTYPEKILLED, ROK_DEFEATDEATHTIMERRUNSOUT, ROK_DEFEATANYUNITPASSESX, ROK_DEFEATANYUNITPASSESZ, ROK_PLAINTIMER, ROK_ASSAULTTIMER, ROK_ESCORTTIMER, ROK_SQUADSCOUTTIMER, ROK_SCOUTTIMER, ROK_BUILDTIMER, ROK_SPATIALTIMER };
 
@@ -2454,6 +2459,34 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "kind", offsetof(OrdersCancel, h.kind), sizeof(((OrdersCancel*)nullptr)->h.kind), ROK_ORDERSCANCEL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(OrdersCancel, h.unit), sizeof(((OrdersCancel*)nullptr)->h.unit), ROK_ORDERSCANCEL, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "type", offsetof(OrdersCancel, type), sizeof(((OrdersCancel*)nullptr)->type), ROK_ORDERSCANCEL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "kind", offsetof(OrdersGroupCommand, h.kind), sizeof(((OrdersGroupCommand*)nullptr)->h.kind), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "unit", offsetof(OrdersGroupCommand, h.unit), sizeof(((OrdersGroupCommand*)nullptr)->h.unit), ROK_ORDERSGROUPCOMMAND, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "mode", offsetof(OrdersGroupCommand, mode), sizeof(((OrdersGroupCommand*)nullptr)->mode), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "type", offsetof(OrdersGroupCommand, type), sizeof(((OrdersGroupCommand*)nullptr)->type), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "queue", offsetof(OrdersGroupCommand, queue), sizeof(((OrdersGroupCommand*)nullptr)->queue), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "target", offsetof(OrdersGroupCommand, target), sizeof(((OrdersGroupCommand*)nullptr)->target), ROK_ORDERSGROUPCOMMAND, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
+    { "hasPos", offsetof(OrdersGroupCommand, hasPos), sizeof(((OrdersGroupCommand*)nullptr)->hasPos), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos0", offsetof(OrdersGroupCommand, pos[0]), sizeof(((OrdersGroupCommand*)nullptr)->pos[0]), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos1", offsetof(OrdersGroupCommand, pos[1]), sizeof(((OrdersGroupCommand*)nullptr)->pos[1]), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "pos2", offsetof(OrdersGroupCommand, pos[2]), sizeof(((OrdersGroupCommand*)nullptr)->pos[2]), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "params0", offsetof(OrdersGroupCommand, params[0]), sizeof(((OrdersGroupCommand*)nullptr)->params[0]), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "params1", offsetof(OrdersGroupCommand, params[1]), sizeof(((OrdersGroupCommand*)nullptr)->params[1]), ROK_ORDERSGROUPCOMMAND, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "units0", offsetof(OrdersGroupCommand, units[0]), sizeof(((OrdersGroupCommand*)nullptr)->units[0]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units1", offsetof(OrdersGroupCommand, units[1]), sizeof(((OrdersGroupCommand*)nullptr)->units[1]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units2", offsetof(OrdersGroupCommand, units[2]), sizeof(((OrdersGroupCommand*)nullptr)->units[2]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units3", offsetof(OrdersGroupCommand, units[3]), sizeof(((OrdersGroupCommand*)nullptr)->units[3]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units4", offsetof(OrdersGroupCommand, units[4]), sizeof(((OrdersGroupCommand*)nullptr)->units[4]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units5", offsetof(OrdersGroupCommand, units[5]), sizeof(((OrdersGroupCommand*)nullptr)->units[5]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units6", offsetof(OrdersGroupCommand, units[6]), sizeof(((OrdersGroupCommand*)nullptr)->units[6]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units7", offsetof(OrdersGroupCommand, units[7]), sizeof(((OrdersGroupCommand*)nullptr)->units[7]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units8", offsetof(OrdersGroupCommand, units[8]), sizeof(((OrdersGroupCommand*)nullptr)->units[8]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units9", offsetof(OrdersGroupCommand, units[9]), sizeof(((OrdersGroupCommand*)nullptr)->units[9]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units10", offsetof(OrdersGroupCommand, units[10]), sizeof(((OrdersGroupCommand*)nullptr)->units[10]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units11", offsetof(OrdersGroupCommand, units[11]), sizeof(((OrdersGroupCommand*)nullptr)->units[11]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units12", offsetof(OrdersGroupCommand, units[12]), sizeof(((OrdersGroupCommand*)nullptr)->units[12]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units13", offsetof(OrdersGroupCommand, units[13]), sizeof(((OrdersGroupCommand*)nullptr)->units[13]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units14", offsetof(OrdersGroupCommand, units[14]), sizeof(((OrdersGroupCommand*)nullptr)->units[14]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "units15", offsetof(OrdersGroupCommand, units[15]), sizeof(((OrdersGroupCommand*)nullptr)->units[15]), ROK_ORDERSGROUPCOMMAND, RK_U32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(OrdersSetStateBits, h.kind), sizeof(((OrdersSetStateBits*)nullptr)->h.kind), ROK_ORDERSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(OrdersSetStateBits, h.unit), sizeof(((OrdersSetStateBits*)nullptr)->h.unit), ROK_ORDERSSETSTATEBITS, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "mask", offsetof(OrdersSetStateBits, mask), sizeof(((OrdersSetStateBits*)nullptr)->mask), ROK_ORDERSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -2961,8 +2994,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos1", offsetof(FeaturesAreaDamage, pos[1]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[1]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos2", offsetof(FeaturesAreaDamage, pos[2]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[2]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 1496;
-static const unsigned kReplayWalkableFieldCount = 241;
+static const unsigned kReplayObjectFieldCount = 1524;
+static const unsigned kReplayWalkableFieldCount = 243;
 
 static const unsigned short kReplayReachFields[] = { 46, 100, 224, 225, 226, 89, 98, 0, 22, 100, 227, 89, 97, 39, 46, 101, 103, 136 };
 
@@ -3959,6 +3992,34 @@ static_assert(sizeof(((OrdersParalyze*)nullptr)->ticks) == 4, "OrdersParalyze::t
 static_assert(sizeof(((OrdersCancel*)nullptr)->h.kind) == 4, "OrdersCancel::kind has the size the schema says");
 static_assert(sizeof(((OrdersCancel*)nullptr)->h.unit) == 4, "OrdersCancel::unit has the size the schema says");
 static_assert(sizeof(((OrdersCancel*)nullptr)->type) == 4, "OrdersCancel::type has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->h.kind) == 4, "OrdersGroupCommand::kind has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->h.unit) == 4, "OrdersGroupCommand::unit has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->mode) == 4, "OrdersGroupCommand::mode has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->type) == 4, "OrdersGroupCommand::type has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->queue) == 4, "OrdersGroupCommand::queue has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->target) == 4, "OrdersGroupCommand::target has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->hasPos) == 4, "OrdersGroupCommand::hasPos has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->pos[0]) == 4, "OrdersGroupCommand::pos0 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->pos[1]) == 4, "OrdersGroupCommand::pos1 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->pos[2]) == 4, "OrdersGroupCommand::pos2 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->params[0]) == 4, "OrdersGroupCommand::params0 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->params[1]) == 4, "OrdersGroupCommand::params1 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[0]) == 4, "OrdersGroupCommand::units0 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[1]) == 4, "OrdersGroupCommand::units1 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[2]) == 4, "OrdersGroupCommand::units2 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[3]) == 4, "OrdersGroupCommand::units3 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[4]) == 4, "OrdersGroupCommand::units4 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[5]) == 4, "OrdersGroupCommand::units5 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[6]) == 4, "OrdersGroupCommand::units6 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[7]) == 4, "OrdersGroupCommand::units7 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[8]) == 4, "OrdersGroupCommand::units8 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[9]) == 4, "OrdersGroupCommand::units9 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[10]) == 4, "OrdersGroupCommand::units10 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[11]) == 4, "OrdersGroupCommand::units11 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[12]) == 4, "OrdersGroupCommand::units12 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[13]) == 4, "OrdersGroupCommand::units13 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[14]) == 4, "OrdersGroupCommand::units14 has the size the schema says");
+static_assert(sizeof(((OrdersGroupCommand*)nullptr)->units[15]) == 4, "OrdersGroupCommand::units15 has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->h.kind) == 4, "OrdersSetStateBits::kind has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->h.unit) == 4, "OrdersSetStateBits::unit has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->mask) == 4, "OrdersSetStateBits::mask has the size the schema says");
@@ -4646,6 +4707,7 @@ enum ReplaySlotId {
     RSL_ORDERS_GETORDERFLAGS,
     RSL_ORDERS_GETORDERTYPE,
     RSL_ORDERS_MISSIONTYPEFROMNAME,
+    RSL_ORDERS_EXPANDGROUPCOMMAND,
     RSL_UNITS_FINDUNITTYPE,
     RSL_UNITS_FINDUNITTYPEID,
     RSL_UNITS_ADDREPAIRPROGRESS,
@@ -5305,6 +5367,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "GetOrderFlags", SUB_ORDERS, nullptr, 0, nullptr, 0, kReplayOrdersGetOrderFlagsObjReads, 2, nullptr, 0, nullptr, 0 },
     { "GetOrderType", SUB_ORDERS, kReplayOrdersGetOrderTypeReads, 10, nullptr, 0, kReplayOrdersGetOrderTypeObjReads, 29, kReplayOrdersGetOrderTypeObjWrites, 1, nullptr, 0 },
     { "MissionTypeFromName", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "ExpandGroupCommand", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "FindUnitType", SUB_UNITS, kReplayUnitsFindUnitTypeReads, 1, nullptr, 0, kReplayUnitsFindUnitTypeObjReads, 1, nullptr, 0, kReplayUnitsFindUnitTypeAllOf, 1 },
     { "FindUnitTypeId", SUB_UNITS, kReplayUnitsFindUnitTypeIdReads, 1, nullptr, 0, kReplayUnitsFindUnitTypeIdObjReads, 2, nullptr, 0, kReplayUnitsFindUnitTypeIdAllOf, 1 },
     { "AddRepairProgress", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsAddRepairProgressObjReads, 5, nullptr, 0, nullptr, 0 },
@@ -5508,16 +5571,16 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "weapons", 4, 0, 1, 52, 8, RET_WEAPONS },
     { "targeting", 4, 0, 1, 60, 7, RET_TARGETING },
     { "los_radar", 5, 0, 1, 67, 20, RET_LOS_RADAR },
-    { "orders", 6, 1, 0, 87, 6, RET_ORDERS },
-    { "units", 7, 1, 1, 93, 8, RET_UNITS },
-    { "players", 5, 1, 1, 101, 9, RET_PLAYERS },
-    { "map", 9, 1, 1, 110, 11, RET_MAP },
-    { "scripts", 3, 0, 0, 121, 24, RET_SCRIPTS },
-    { "movement", 5, 0, 0, 145, 20, RET_MOVEMENT },
-    { "mission", 2, 0, 1, 165, 12, RET_COUNT },
-    { "files", 3, 0, 0, 177, 58, RET_COUNT },
-    { "network", 2, 0, 0, 235, 22, RET_COUNT },
-    { "econworld", 5, 0, 1, 257, 0, RET_COUNT },
+    { "orders", 6, 2, 0, 87, 7, RET_ORDERS },
+    { "units", 7, 1, 1, 94, 8, RET_UNITS },
+    { "players", 5, 1, 1, 102, 9, RET_PLAYERS },
+    { "map", 9, 1, 1, 111, 11, RET_MAP },
+    { "scripts", 3, 0, 0, 122, 24, RET_SCRIPTS },
+    { "movement", 5, 0, 0, 146, 20, RET_MOVEMENT },
+    { "mission", 2, 0, 1, 166, 12, RET_COUNT },
+    { "files", 3, 0, 0, 178, 58, RET_COUNT },
+    { "network", 2, 0, 0, 236, 22, RET_COUNT },
+    { "econworld", 5, 0, 1, 258, 0, RET_COUNT },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

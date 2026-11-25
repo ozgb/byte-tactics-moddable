@@ -956,6 +956,15 @@ def object_targets(target: str, ann: dict) -> list[tuple[str, str]]:
     return hits
 
 
+def whole_struct_kinds(kind: str, target: str, ann: dict) -> list[str]:
+    """The state and index kinds a `deref_write *T` assigns whole: those of type T, or with a field that aliases a member of T (a view)."""
+    if kind != "deref_write" or not target.startswith("*") or BARE_POINTER.match(target):
+        return []
+    type_name = target[1:]
+    return [k for k, spec in ann["objects"].items() if spec["scope"] != "value"
+            and (spec["type"] == type_name or any(a.startswith(type_name + "::") for f in spec["fields"] for a in f.get("aliases", [])))]
+
+
 WALKABLE = ("ref", "embed", "unitid", "weapon", "refs", "embeds")
 MAX_REACH_DEPTH = 2
 
@@ -1744,6 +1753,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                             pass
                         elif target.startswith("Game::") or target.startswith("g_"):
                             pending["untracked"].add(target)
+                    for whole in whole_struct_kinds(kind, target, ann):
+                        obj_writes.update(i for i, f in enumerate(object_fields) if f["object"] == whole)
                     if kind in OBJECT_KINDS:
                         hits = object_targets(target, ann)
                         for hit in hits:

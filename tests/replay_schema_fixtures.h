@@ -5249,7 +5249,7 @@ static const unsigned short kReplayWeaponsUpdateExplosionsAllOf[] = { ROK_DEBRIS
 static const unsigned char kReplayWeaponsUpdateExplosionsReads[] = { 17, 28, 56 };
 static const unsigned char kReplayWeaponsUpdateExplosionsWrites[] = { 56 };
 static const unsigned short kReplayWeaponsUpdateExplosionsObjReads[] = { 371, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 762, 763, 764, 765, 766, 767, 768, 770, 771, 772, 773, 774, 775 };
-static const unsigned short kReplayWeaponsUpdateExplosionsObjWrites[] = { 371, 735, 736, 737, 738, 739, 740, 741, 746, 751, 752, 753, 755, 756, 757, 758, 759, 760, 761, 765, 766, 767, 768 };
+static const unsigned short kReplayWeaponsUpdateExplosionsObjWrites[] = { 371, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 765, 766, 767, 768 };
 static const unsigned short kReplayWeaponsUpdateUnitWeaponsAllOf[] = { ROK_PROJECTILE, ROK_WEAPONFIRE };
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsReads[] = { 0, 16, 17, 28, 30, 91, 92, 93 };
 static const unsigned char kReplayWeaponsUpdateUnitWeaponsWrites[] = { 30, 91, 92, 93 };
@@ -5543,7 +5543,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "Poll", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "WriteState", SUB_PATHFINDING, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Apply", SUB_WEAPONS, kReplayWeaponsApplyReads, 1, nullptr, 0, kReplayWeaponsApplyObjReads, 51, kReplayWeaponsApplyObjWrites, 16, nullptr, 0 },
-    { "UpdateExplosions", SUB_WEAPONS, kReplayWeaponsUpdateExplosionsReads, 3, kReplayWeaponsUpdateExplosionsWrites, 1, kReplayWeaponsUpdateExplosionsObjReads, 41, kReplayWeaponsUpdateExplosionsObjWrites, 23, kReplayWeaponsUpdateExplosionsAllOf, 7 },
+    { "UpdateExplosions", SUB_WEAPONS, kReplayWeaponsUpdateExplosionsReads, 3, kReplayWeaponsUpdateExplosionsWrites, 1, kReplayWeaponsUpdateExplosionsObjReads, 41, kReplayWeaponsUpdateExplosionsObjWrites, 32, kReplayWeaponsUpdateExplosionsAllOf, 7 },
     { "UpdateUnitWeapons", SUB_WEAPONS, kReplayWeaponsUpdateUnitWeaponsReads, 8, kReplayWeaponsUpdateUnitWeaponsWrites, 4, kReplayWeaponsUpdateUnitWeaponsObjReads, 92, kReplayWeaponsUpdateUnitWeaponsObjWrites, 43, kReplayWeaponsUpdateUnitWeaponsAllOf, 2 },
     { "FindWeaponByName", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsFindWeaponByNameObjReads, 1, nullptr, 0, kReplayWeaponsFindWeaponByNameAllOf, 1 },
     { "GetWeaponRange", SUB_WEAPONS, nullptr, 0, nullptr, 0, kReplayWeaponsGetWeaponRangeObjReads, 4, nullptr, 0, nullptr, 0 },

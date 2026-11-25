@@ -1017,7 +1017,9 @@ from the layout), and the export refuses a copy that names any other source name
   `Player.energy`), so that a write through a pointer is recorded as a `w` line of the field it lands on;
   `all-of` makes every slot of a table kind a root of the call (`Game.players` is walked by index), and a slot may have the rule for
   several kinds. A rule's `reads` and `writes` may also name block fields, `Game.visibilityMask` or `SimGlobals.g_x`, which join the slot's read and write sets: a write
-  through a `*short` or a `memset` into `Game` is a `w` line of the field it lands on. `replayschema.py
+  through a `*short` or a `memset` into `Game` is a `w` line of the field it lands on. A `deref_write` of a struct pointer `*T`, where `T` is the type of a
+  state or index kind or a view of one (a type whose members the kind's fields have as `aliases`, `DebrisView` of `Debris`), is a whole-struct assignment and
+  needs no rule: every field of the kind joins the slot's writes, so the compaction of `UpdateExplosions` (`*e = e[1]`) records every field of each `Debris` it moves. `replayschema.py
   --check` fails for a row of a subsystem function with no rule and for a rule that matches no row.
 - `objects`' extras: `table` (an object, see Objects) names a kind by its index in a table, `inside` (a list of `{"kind": "Feature",
   "member": "anim"}`) names every member of another kind that the kind lives in (`Feature#5.anim`), a field of kind
@@ -1328,7 +1330,6 @@ weapons:
 - The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
 - The burst of a weapon: a burst is counted down by `UpdateProjectiles` (unrecorded), not by the fire control; `Projectile.active` is only set to the burst count when the shot is made.
 - `UpdateProjectiles`: `unrecorded`, for the reason of DETONATE and AREA_DAMAGE above (its collision, `DetonateProjectile` and `ApplyAreaDamage` read units and cells by id). `UpdateExplosions` is recorded, and so is `AddExplosionEffect`, which `UpdateProjectiles` and `Apply` also call: what they add to `Game.debris` reaches the recording as `r Debris#N` lines.
-- A `Debris` that `UpdateExplosions` frees by compaction (`*e = e[1]`) rewrites the fields of the elements it moves, which only the fields of the slot's sets record.
 
 economy:
 

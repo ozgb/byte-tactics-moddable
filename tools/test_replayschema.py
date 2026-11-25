@@ -3420,6 +3420,26 @@ class CompilerVtablesAndRefArrays(unittest.TestCase):
         ann["sim_fields"]["g_playerAI"]["target"] = "Player"
         self.has(ann, "SimGlobals.g_playerAI: the target Player is no state kind")
 
+    def test_a_whole_struct_write_writes_every_field_of_the_kind(self):
+        _, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        of = model["object_fields"]
+        writes = {"%s.%s" % (of[i]["object"], of[i]["name"]) for i in model["subsystems"]["weapons"]["slots"]["UpdateExplosions"]["objectWrites"]}
+        debris = {"Debris." + f["name"] for f in annotations()["objects"]["Debris"]["fields"]}
+        self.assertLessEqual(debris, writes)
+        self.assertIn("Debris.sizeX", writes)
+
+    def test_a_whole_struct_write_matches_the_type_or_a_view_of_a_kind(self):
+        ann = {"objects": {
+            "Box": {"type": "Box", "scope": "state", "fields": [{"name": "a", "kind": "i32"}]},
+            "Seen": {"type": "Seen", "scope": "state", "fields": [{"name": "b", "kind": "i32", "aliases": ["SeenView::b"]}]},
+            "Arg": {"type": "Arg", "scope": "value", "fields": [{"name": "c", "kind": "i32"}]}}}
+        self.assertEqual(rs.whole_struct_kinds("deref_write", "*Box", ann), ["Box"])
+        self.assertEqual(rs.whole_struct_kinds("deref_write", "*SeenView", ann), ["Seen"])
+        self.assertEqual(rs.whole_struct_kinds("deref_write", "*Arg", ann), [])
+        self.assertEqual(rs.whole_struct_kinds("deref_read", "*Box", ann), [])
+        self.assertEqual(rs.whole_struct_kinds("deref_write", "*int", ann), [])
+
     def test_a_ref_of_the_sim_globals_is_one_field(self):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])

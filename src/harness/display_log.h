@@ -25,6 +25,8 @@ int DlWants();
 int DlIsOn();
 void DlEnter();
 void DlLeave();
+void DlLockRegistries();
+void DlUnlockRegistries();
 int DlOffsetX();
 int DlOffsetY();
 

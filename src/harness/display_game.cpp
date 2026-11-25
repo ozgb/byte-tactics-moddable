@@ -874,6 +874,7 @@ static void DisplayLogGaf(const char* path, void* base)
     int j;
     if (DlIsOn() == 0 || base == 0)
         return;
+    DlLockRegistries();
     DlGafBegin(path, base);
     for (i = 0; i < (short)archive[1]; i++) {
         unsigned char* record = (unsigned char*)archive[3 + i];
@@ -884,6 +885,7 @@ static void DisplayLogGaf(const char* path, void* base)
             DlGafFrame(entry, j, (const void*)frame);
         }
     }
+    DlUnlockRegistries();
 }
 
 static void RegisterPieces(const char* stem, const char* piece, int depth)
@@ -912,7 +914,9 @@ static void DisplayLog3do(const char* path, void* root)
         n++;
     }
     stem[n] = '\0';
+    DlLockRegistries();
     RegisterPieces(stem, (const char*)root, 0);
+    DlUnlockRegistries();
 }
 
 static void DisplayLogFont(void* font, const char* name)

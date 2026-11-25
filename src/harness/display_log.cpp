@@ -10,9 +10,43 @@ static int g_dlDepth;
 static int g_dlOffX;
 static int g_dlOffY;
 
+static DWORD g_dlOwner;
+static CRITICAL_SECTION g_dlSection;
+static int g_dlLock;
+
+struct DlLock {
+    DlLock()
+    {
+        if (g_dlLock != 0)
+            EnterCriticalSection(&g_dlSection);
+    }
+    ~DlLock()
+    {
+        if (g_dlLock != 0)
+            LeaveCriticalSection(&g_dlSection);
+    }
+};
+
+void DlLockRegistries()
+{
+    if (g_dlLock != 0)
+        EnterCriticalSection(&g_dlSection);
+}
+
+void DlUnlockRegistries()
+{
+    if (g_dlLock != 0)
+        LeaveCriticalSection(&g_dlSection);
+}
+
+static int OnOwner()
+{
+    return GetCurrentThreadId() == g_dlOwner;
+}
+
 int DlWants()
 {
-    return g_dlOn != 0 && g_dlDepth == 0;
+    return g_dlOn != 0 && g_dlDepth == 0 && OnOwner();
 }
 
 int DlIsOn()
@@ -22,12 +56,14 @@ int DlIsOn()
 
 void DlEnter()
 {
-    g_dlDepth++;
+    if (g_dlOn != 0 && OnOwner())
+        g_dlDepth++;
 }
 
 void DlLeave()
 {
-    g_dlDepth--;
+    if (g_dlOn != 0 && OnOwner())
+        g_dlDepth--;
 }
 
 int DlOffsetX()
@@ -407,6 +443,7 @@ static void GafInsert(int index)
 
 void DlGafBegin(const char* path, const void* base)
 {
+    DlLock lock;
     int i;
     s_gafFile = InternLower(path, (int)strlen(path), 1);
     for (i = 0; i < s_gafBlockCount; i++) {
@@ -437,6 +474,7 @@ void DlGafBegin(const char* path, const void* base)
 
 void DlGafFrame(const char* entry, int index, const void* frame)
 {
+    DlLock lock;
     if (s_gafCount >= kMaxGafRecords)
         Fail("archive frames", "32768");
     GafRecord* r = &s_gaf[s_gafCount];
@@ -458,11 +496,13 @@ void DlGafFrame(const char* entry, int index, const void* frame)
 
 void DlRegisterSurface(const void* block, const unsigned char* pixels, int width, int height, int pitch, const char* name)
 {
+    DlLock lock;
     AddRegion(block, pixels, width, height, pitch, 1, name);
 }
 
 void DlRegisterFrame(const void* block, const unsigned char* pixels, int width, int height, const char* name)
 {
+    DlLock lock;
     int g = GafFind(block);
     if (g >= 0) {
         s_gaf[g].dead = 1;
@@ -484,6 +524,7 @@ static int s_pieceHash[kPieceHashSize];
 
 void DlRegisterModelPiece(const void* object, const char* stem, const char* piece)
 {
+    DlLock lock;
     unsigned slot = PtrHash(object) & (kPieceHashSize - 1);
     int found = -1;
     for (;;) {
@@ -523,6 +564,7 @@ static const Piece* FindPiece(const void* object)
 
 const char* DlModelName(const void* object, int* known)
 {
+    DlLock lock;
     const Piece* p = FindPiece(object);
     *known = p != 0;
     return p != 0 ? s_nameBytes + p->model : "-";
@@ -530,6 +572,7 @@ const char* DlModelName(const void* object, int* known)
 
 const char* DlPieceName(const void* object)
 {
+    DlLock lock;
     const Piece* p = FindPiece(object);
     return p != 0 ? s_nameBytes + p->name : "-";
 }
@@ -544,6 +587,7 @@ static int s_fontCount = 0;
 
 void DlRegisterFont(const void* font, const char* name)
 {
+    DlLock lock;
     for (int i = 0; i < s_fontCount; i++) {
         if (s_fonts[i].font == font) {
             s_fonts[i].name = InternLower(name, (int)strlen(name), 0);
@@ -559,6 +603,7 @@ void DlRegisterFont(const void* font, const char* name)
 
 void DlFontName(const void* font, char* out, int cap)
 {
+    DlLock lock;
     const char* name = "?";
     for (int i = 0; i < s_fontCount; i++) {
         if (s_fonts[i].font == font)
@@ -570,6 +615,7 @@ void DlFontName(const void* font, char* out, int cap)
 
 void DlFree(const void* block)
 {
+    DlLock lock;
     if (g_dlOn == 0)
         return;
     int r = FindByBlock(block);
@@ -649,6 +695,7 @@ static void Resolve(const DlSurface* s, Resolved* out)
 
 const unsigned char* DlSourceBase(const DlSurface* surface)
 {
+    DlLock lock;
     Resolved r;
     Resolve(surface, &r);
     return r.base;
@@ -656,6 +703,7 @@ const unsigned char* DlSourceBase(const DlSurface* surface)
 
 void DlSourceOffset(const DlSurface* surface, int* x, int* y)
 {
+    DlLock lock;
     Resolved r;
     Resolve(surface, &r);
     *x = r.offX;
@@ -876,6 +924,7 @@ void DlPutName(const char* bytes, int length)
 
 void DlPutTarget(const DlSurface* surface)
 {
+    DlLock lock;
     Resolved r;
     Resolve(surface, &r);
     DlPutRaw(s_nameBytes + r.name);
@@ -928,6 +977,7 @@ static void PutPictureName(const DlPicture* p)
 
 void DlPictureReads(const DlPicture* picture, const unsigned char** reads)
 {
+    DlLock lock;
     *reads = 0;
     if (GafLookup(picture->key) >= 0)
         return;
@@ -940,6 +990,7 @@ void DlPictureReads(const DlPicture* picture, const unsigned char** reads)
 
 void DlPutPicture(const DlPicture* picture)
 {
+    DlLock lock;
     PutPictureName(picture);
 }
 
@@ -957,6 +1008,7 @@ static void PutCursorName(const DlPicture* picture)
 
 int DlBegin(const char* kind, const DlSurface* dst, int x0, int y0, int x1, int y1, const unsigned char* reads)
 {
+    DlLock lock;
     if (s_itemCount >= kMaxItems)
         Fail("items in a frame", "32768");
     Resolved r;
@@ -1111,6 +1163,9 @@ void DlOpen(int listAll)
     setvbuf(s_list, s_listBuffer, _IOFBF, sizeof s_listBuffer);
     fprintf(s_list, "bt-display 1\n");
     s_listAll = listAll;
+    g_dlOwner = GetCurrentThreadId();
+    InitializeCriticalSection(&g_dlSection);
+    g_dlLock = 1;
     g_dlOn = 1;
 }
 
@@ -1136,6 +1191,7 @@ void DlClose()
 void DlFrameEnd(unsigned number, unsigned tick, unsigned steps, const unsigned char* palette, int list, const DlPicture* cursor,
                 int cursorX, int cursorY)
 {
+    DlLock lock;
     int i;
     char line[200];
     unsigned __int64 paletteHash = HashRun(palette, 1024);

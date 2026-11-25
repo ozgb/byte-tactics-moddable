@@ -568,7 +568,18 @@ unsigned short __stdcall RecFeaturesFindFeatureAtPos(Vec3* a0, Point16* a1, Poin
         ArgPending(s_call, "cell");
         ArgPending(s_call, "size");
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i features.FindFeatureAtPos");
+        ImportPending(line);
+        ImportPending(line);
+        ImportPending(line);
+    }
     unsigned short result = s_inner_features->FindFeatureAtPos(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -1950,7 +1961,21 @@ Unit* __stdcall RecUnitsCreateUnit(unsigned char a0, unsigned short a1, const Ve
         ArgValue(s_call, "mode", a4);
         ArgValue(s_call, "id", a5);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.CreateUnit");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValueStruct(line, ROK_VEC3, a2);
+        ImportValue(line, a3);
+        ImportValue(line, a4);
+        ImportValue(line, a5);
+    }
     Unit* result = s_inner_units->CreateUnit(a0, a1, a2, a3, a4, a5);
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_UNIT, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, result, "o");
     }
@@ -1978,7 +2003,16 @@ unsigned short __stdcall RecUnitsFindUnitTypeId(const char* a0)
     if (scope.Open()) {
         ArgValue(s_call, "name", (const char*)a0);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i units.FindUnitTypeId");
+        ImportValue(line, (const char*)a0);
+    }
     unsigned short result = s_inner_units->FindUnitTypeId(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -2284,9 +2318,10 @@ int __stdcall RecUnitsGetMovementLimits(MapMoveLimits* a0, int a1)
 int __stdcall RecPlayersApply(const PlayersEventHeader* a0, unsigned int a1)
 {
     ReplayRoots roots;
+    EventRoots(roots, RET_PLAYERS, a0, a1);
     SlotScope scope(RSL_PLAYERS_APPLY, SUB_PLAYERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "event");
+        ArgEvent(s_call, "event", RET_PLAYERS, a0, a1);
         ArgValue(s_call, "size", a1);
     }
     int result = s_inner_players->Apply(a0, a1);
@@ -2296,229 +2331,17 @@ int __stdcall RecPlayersApply(const PlayersEventHeader* a0, unsigned int a1)
     return result;
 }
 
-void __stdcall RecPlayersUpdatePlayers()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_UPDATEPLAYERS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_players->UpdatePlayers();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersLoadDefaultAIScript()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_LOADDEFAULTAISCRIPT, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_players->LoadDefaultAIScript();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersInitPlayers()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_INITPLAYERS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_players->InitPlayers();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersFreePlayers()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_FREEPLAYERS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_players->FreePlayers();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersInitPlayerResources()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_INITPLAYERRESOURCES, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_players->InitPlayerResources();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersLoadPlayerControllers(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_LOADPLAYERCONTROLLERS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_players->LoadPlayerControllers(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersLoadPlayers(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_LOADPLAYERS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_players->LoadPlayers(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersSavePlayers(HapiBank* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_SAVEPLAYERS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgHandle(s_call, "file", OBJ_BANK, a0);
-    }
-    s_inner_players->SavePlayers(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersRebuildAIFeatureCells()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_REBUILDAIFEATURECELLS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_players->RebuildAIFeatureCells();
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersSetupPlayerSlot(int a0, char a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_SETUPPLAYERSLOT, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgValue(s_call, "type", a1);
-    }
-    s_inner_players->SetupPlayerSlot(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersUpdateBlink()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_UPDATEBLINK, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-    }
-    s_inner_players->UpdateBlink();
-    if (scope.Open()) {
-    }
-}
-
 void __stdcall RecPlayersDeactivateConditions(MissionConditions* a0)
 {
     ReplayRoots roots;
+    roots.Add(ROK_MISSIONCONDITIONS, a0);
     SlotScope scope(RSL_PLAYERS_DEACTIVATECONDITIONS, SUB_PLAYERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "conditions");
+        ArgObject(s_call, "conditions", ROK_MISSIONCONDITIONS, a0);
     }
     s_inner_players->DeactivateConditions(a0);
     if (scope.Open()) {
     }
-}
-
-void __stdcall RecPlayersLoadConditions(MissionConditions* a0, HapiBank* a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_LOADCONDITIONS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "conditions");
-        ArgHandle(s_call, "file", OBJ_BANK, a1);
-    }
-    s_inner_players->LoadConditions(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersSaveConditions(MissionConditions* a0, HapiBank* a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_SAVECONDITIONS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "conditions");
-        ArgHandle(s_call, "file", OBJ_BANK, a1);
-    }
-    s_inner_players->SaveConditions(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersRegisterConditions(MissionConditions* a0, TdfFile* a1)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_REGISTERCONDITIONS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "conditions");
-        ArgPending(s_call, "mission");
-    }
-    s_inner_players->RegisterConditions(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersFreeConditions(MissionConditions* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_FREECONDITIONS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "conditions");
-    }
-    s_inner_players->FreeConditions(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersDeleteConditions(MissionConditions* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_DELETECONDITIONS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "conditions");
-    }
-    s_inner_players->DeleteConditions(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecPlayersUpdatePlayersOnStream(RandStream a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_UPDATEPLAYERSONSTREAM, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "stream", a0);
-    }
-    s_inner_players->UpdatePlayersOnStream(a0);
-    if (scope.Open()) {
-    }
-}
-
-MissionConditions* __stdcall RecPlayersNewConditions()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_NEWCONDITIONS, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-    }
-    MissionConditions* result = s_inner_players->NewConditions();
-    if (scope.Open()) {
-    }
-    return result;
 }
 
 int __stdcall RecPlayersUpdatePlayerHead(int a0)
@@ -2591,9 +2414,9 @@ void __stdcall RecPlayersInit(const PlayersMapInfo* a0, void* a1, unsigned int a
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PLAYERS_INIT, SUB_PLAYERS, roots);
+    RegionBind(SUB_PLAYERS, a1, a2);
     if (scope.Open()) {
         ArgValueStruct(s_call, "a", "info", ROK_PLAYERSMAPINFO, a0);
-        ArgPending(s_call, "region");
         ArgValue(s_call, "size", a2);
     }
     s_inner_players->Init(a0, a1, a2);
@@ -2609,20 +2432,9 @@ void* __stdcall RecPlayersShutdown()
     }
     void* result = s_inner_players->Shutdown();
     if (scope.Open()) {
+        ArgRegionResult(s_tail, result);
     }
     return result;
-}
-
-void __stdcall RecPlayersWriteState(const StateWriter* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_WRITESTATE, SUB_PLAYERS, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "writer");
-    }
-    s_inner_players->WriteState(a0);
-    if (scope.Open()) {
-    }
 }
 
 int __stdcall RecMapApply(const MapEventHeader* a0, unsigned int a1)
@@ -4403,7 +4215,14 @@ void __stdcall RecNetworkBroadcastPlayerInfo()
     SlotScope scope(RSL_NETWORK_BROADCASTPLAYERINFO, SUB_NETWORK, roots);
     if (scope.Open()) {
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.BroadcastPlayerInfo");
+    }
     s_inner_network->BroadcastPlayerInfo();
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4727,7 +4546,17 @@ void __stdcall RecNetworkSendShareMetal(unsigned char a0, unsigned char a1, floa
         ArgValue(s_call, "to", a1);
         ArgValue(s_call, "amount", a2);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendShareMetal");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+    }
     s_inner_network->SendShareMetal(a0, a1, a2);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4741,7 +4570,17 @@ void __stdcall RecNetworkSendShareEnergy(unsigned char a0, unsigned char a1, flo
         ArgValue(s_call, "to", a1);
         ArgValue(s_call, "amount", a2);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.SendShareEnergy");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+    }
     s_inner_network->SendShareEnergy(a0, a1, a2);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4776,7 +4615,15 @@ void __stdcall RecNetworkBroadcastPlayerEconomy(Player* a0)
     if (scope.Open()) {
         ArgObject(s_call, "player", ROK_PLAYER, a0);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i network.BroadcastPlayerEconomy");
+        ImportObject(line, ROK_PLAYER, a0);
+    }
     s_inner_network->BroadcastPlayerEconomy(a0);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
     if (scope.Open()) {
     }
 }
@@ -4814,6 +4661,46 @@ WeaponDef* __stdcall RecWeaponsFindWeaponByName(const char* a0)
     if (scope.Open()) {
     }
     return result;
+}
+
+int __stdcall RecMissionGetGameType()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETGAMETYPE, SUB_MISSION, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i mission.GetGameType");
+    }
+    int result = s_inner_mission->GetGameType();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecMissionGetMissionParams(MissionParams* a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_MISSION_GETMISSIONPARAMS, SUB_MISSION, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i mission.GetMissionParams");
+    }
+    s_inner_mission->GetMissionParams(a0);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgStruct(s_tail, "o", "out", ROK_MISSIONPARAMS, a0);
+    }
 }
 
 unsigned int __stdcall RecEconworldTick()
@@ -5254,6 +5141,28 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_SCRIPTS_GETSWEETSPOT)
             return true;
         return false;
+    case SUB_PLAYERS:
+        if (slot == RSL_MISSION_GETGAMETYPE)
+            return true;
+        if (slot == RSL_MISSION_GETMISSIONPARAMS)
+            return true;
+        if (slot == RSL_UNITS_FINDUNITTYPEID)
+            return true;
+        if (slot == RSL_UNITS_CREATEUNIT)
+            return true;
+        if (slot == RSL_MAP_GETCELLMEANHEIGHT)
+            return true;
+        if (slot == RSL_FEATURES_FINDFEATUREATPOS)
+            return true;
+        if (slot == RSL_NETWORK_BROADCASTPLAYERINFO)
+            return true;
+        if (slot == RSL_NETWORK_BROADCASTPLAYERECONOMY)
+            return true;
+        if (slot == RSL_NETWORK_SENDSHAREENERGY)
+            return true;
+        if (slot == RSL_NETWORK_SENDSHAREMETAL)
+            return true;
+        return false;
     case SUB_MAP:
         if (slot == RSL_LOS_RADAR_GETMAPCELL)
             return true;
@@ -5395,7 +5304,7 @@ void HookSeams(const bool* on)
         s_rec_features.FirstFeatureSpot = RecFeaturesFirstFeatureSpot;
     if (on[SUB_FEATURES])
         s_rec_features.UpdateFeatureSpot = RecFeaturesUpdateFeatureSpot;
-    if (on[SUB_FEATURES])
+    if (on[SUB_FEATURES] || on[SUB_PLAYERS])
         s_rec_features.FindFeatureAtPos = RecFeaturesFindFeatureAtPos;
     if (on[SUB_AI])
         s_rec_ai.Apply = RecAiApply;
@@ -5589,11 +5498,11 @@ void HookSeams(const bool* on)
         s_rec_units.SaveUnits = RecUnitsSaveUnits;
     if (on[SUB_UNITS])
         s_rec_units.LoadUnit = RecUnitsLoadUnit;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_PLAYERS])
         s_rec_units.CreateUnit = RecUnitsCreateUnit;
     if (on[SUB_UNITS])
         s_rec_units.FindUnitType = RecUnitsFindUnitType;
-    if (on[SUB_UNITS])
+    if (on[SUB_UNITS] || on[SUB_PLAYERS])
         s_rec_units.FindUnitTypeId = RecUnitsFindUnitTypeId;
     if (on[SUB_UNITS])
         s_rec_units.FindMissionUnit = RecUnitsFindMissionUnit;
@@ -5638,43 +5547,7 @@ void HookSeams(const bool* on)
     if (on[SUB_PLAYERS])
         s_rec_players.Apply = RecPlayersApply;
     if (on[SUB_PLAYERS])
-        s_rec_players.UpdatePlayers = RecPlayersUpdatePlayers;
-    if (on[SUB_PLAYERS])
-        s_rec_players.LoadDefaultAIScript = RecPlayersLoadDefaultAIScript;
-    if (on[SUB_PLAYERS])
-        s_rec_players.InitPlayers = RecPlayersInitPlayers;
-    if (on[SUB_PLAYERS])
-        s_rec_players.FreePlayers = RecPlayersFreePlayers;
-    if (on[SUB_PLAYERS])
-        s_rec_players.InitPlayerResources = RecPlayersInitPlayerResources;
-    if (on[SUB_PLAYERS])
-        s_rec_players.LoadPlayerControllers = RecPlayersLoadPlayerControllers;
-    if (on[SUB_PLAYERS])
-        s_rec_players.LoadPlayers = RecPlayersLoadPlayers;
-    if (on[SUB_PLAYERS])
-        s_rec_players.SavePlayers = RecPlayersSavePlayers;
-    if (on[SUB_PLAYERS])
-        s_rec_players.RebuildAIFeatureCells = RecPlayersRebuildAIFeatureCells;
-    if (on[SUB_PLAYERS])
-        s_rec_players.SetupPlayerSlot = RecPlayersSetupPlayerSlot;
-    if (on[SUB_PLAYERS])
-        s_rec_players.UpdateBlink = RecPlayersUpdateBlink;
-    if (on[SUB_PLAYERS])
         s_rec_players.DeactivateConditions = RecPlayersDeactivateConditions;
-    if (on[SUB_PLAYERS])
-        s_rec_players.LoadConditions = RecPlayersLoadConditions;
-    if (on[SUB_PLAYERS])
-        s_rec_players.SaveConditions = RecPlayersSaveConditions;
-    if (on[SUB_PLAYERS])
-        s_rec_players.RegisterConditions = RecPlayersRegisterConditions;
-    if (on[SUB_PLAYERS])
-        s_rec_players.FreeConditions = RecPlayersFreeConditions;
-    if (on[SUB_PLAYERS])
-        s_rec_players.DeleteConditions = RecPlayersDeleteConditions;
-    if (on[SUB_PLAYERS])
-        s_rec_players.UpdatePlayersOnStream = RecPlayersUpdatePlayersOnStream;
-    if (on[SUB_PLAYERS])
-        s_rec_players.NewConditions = RecPlayersNewConditions;
     if (on[SUB_PLAYERS])
         s_rec_players.UpdatePlayerHead = RecPlayersUpdatePlayerHead;
     if (on[SUB_PLAYERS])
@@ -5689,11 +5562,9 @@ void HookSeams(const bool* on)
         s_rec_players.Init = RecPlayersInit;
     if (on[SUB_PLAYERS])
         s_rec_players.Shutdown = RecPlayersShutdown;
-    if (on[SUB_PLAYERS])
-        s_rec_players.WriteState = RecPlayersWriteState;
     if (on[SUB_MAP])
         s_rec_map.Apply = RecMapApply;
-    if (on[SUB_MAP] || on[SUB_WEAPONS])
+    if (on[SUB_MAP] || on[SUB_WEAPONS] || on[SUB_PLAYERS])
         s_rec_map.GetCellMeanHeight = RecMapGetCellMeanHeight;
     if (on[SUB_MAP])
         s_rec_map.CanBuildAt = RecMapCanBuildAt;
@@ -5917,7 +5788,7 @@ void HookSeams(const bool* on)
         s_rec_files.BankReadBox = RecFilesBankReadBox;
     if (on[SUB_FILES])
         s_rec_files.BankWriteBox = RecFilesBankWriteBox;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_PLAYERS])
         s_rec_network.BroadcastPlayerInfo = RecNetworkBroadcastPlayerInfo;
     if (on[SUB_NETWORK])
         s_rec_network.SendNewUnit = RecNetworkSendNewUnit;
@@ -5951,18 +5822,22 @@ void HookSeams(const bool* on)
         s_rec_network.SendScriptCall = RecNetworkSendScriptCall;
     if (on[SUB_NETWORK] || on[SUB_WEAPONS])
         s_rec_network.SendScriptCallByName = RecNetworkSendScriptCallByName;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_PLAYERS])
         s_rec_network.SendShareMetal = RecNetworkSendShareMetal;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_PLAYERS])
         s_rec_network.SendShareEnergy = RecNetworkSendShareEnergy;
     if (on[SUB_NETWORK] || on[SUB_ECONOMY])
         s_rec_network.SendShareMapInfo = RecNetworkSendShareMapInfo;
-    if (on[SUB_NETWORK])
+    if (on[SUB_NETWORK] || on[SUB_PLAYERS])
         s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;
     if (on[SUB_NETWORK])
         s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
     if (on[SUB_WIND_METEORS])
         s_rec_weapons.FindWeaponByName = RecWeaponsFindWeaponByName;
+    if (on[SUB_PLAYERS])
+        s_rec_mission.GetGameType = RecMissionGetGameType;
+    if (on[SUB_PLAYERS])
+        s_rec_mission.GetMissionParams = RecMissionGetMissionParams;
     g_seams.wind_meteors = &s_rec_wind_meteors;
     g_seams.economy = &s_rec_economy;
     g_seams.features = &s_rec_features;
@@ -6009,6 +5884,8 @@ const EconomyWorldView* WrapWorld_econworld(const EconomyWorldView* inner)
 bool RecordsAlways(unsigned slot)
 {
     if (slot == RSL_ECONOMY_REGIONSIZE || slot == RSL_ECONOMY_INIT)
+        return true;
+    if (slot == RSL_PLAYERS_REGIONSIZE || slot == RSL_PLAYERS_INIT)
         return true;
     return false;
 }

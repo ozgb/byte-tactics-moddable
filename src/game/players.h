@@ -13,6 +13,8 @@ struct PlayersMapInfo;
 struct StateWriter;
 
 class HapiBank;
+class MissionConditions;
+class TdfFile;
 struct Gadget;
 struct Player;
 
@@ -41,6 +43,16 @@ int CountCombatPlayers();
 
 void __stdcall LoadPlayers(HapiBank* file);
 void __stdcall SavePlayers(HapiBank* file);
+
+void __stdcall SetupPlayerSlot(int player, char type);
+
+void __stdcall DeactivateConditionsNative(MissionConditions* self);
+void __stdcall LoadConditionsNative(MissionConditions* self, HapiBank* file);
+void __stdcall SaveConditionsNative(MissionConditions* self, HapiBank* file);
+void __stdcall RegisterConditionsNative(MissionConditions* self, TdfFile* mission);
+void __stdcall FreeConditionsNative(MissionConditions* self);
+void __stdcall DeleteConditionsNative(MissionConditions* self);
+MissionConditions* __stdcall NewConditionsNative(void);
 
 int __stdcall IsFootprintVisible(Player* player, int x, int y, int dx, int dy, short size);
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* u);

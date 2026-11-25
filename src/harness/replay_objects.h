@@ -159,6 +159,12 @@ unsigned ReplayFirstSnapshotDifference(const char* hex, const void* data, unsign
 unsigned ReplayCallbackDepth();
 const void* ReplayVptrOf(const void* object);
 const void* ReplayVtable(unsigned kind);
+struct ReplayExtraVtable {
+    unsigned offset;
+    const void* vtable;
+};
+unsigned ReplayExtraVtables(unsigned kind, ReplayExtraVtable* out);
+void ReplayStoreVtables(unsigned kind, void* object);
 const char* ReplayVtableName(unsigned kind);
 void ReplayFail(const char* message);
 const char* ReplayFailure();

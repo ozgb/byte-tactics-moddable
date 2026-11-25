@@ -31,6 +31,8 @@
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
 #include "../src/game/economy.h"
+#include "../src/game/players.h"
+#include "../src/game/players_events.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -1854,6 +1856,14 @@ int __fastcall ComputeMapChecksumSlot(Mission* self)
 int __fastcall GetTerrainLengthSlot(Mission* self)
 {
     return self->GetTerrainLength();
+}
+
+void __stdcall UpdatePlayersSlot()
+{
+}
+
+void __stdcall UpdatePlayersOnStreamSlot(RandStream)
+{
 }
 
 #include "replay_slots.h"
@@ -5113,6 +5123,85 @@ void* Fresh(unsigned size)
     return p;
 }
 
+void GoalSelfTest()
+{
+    printf("a kind whose vtable is the compiler's\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureGoalHolder* holder = (FixtureGoalHolder*)Fresh(sizeof(FixtureGoalHolder));
+    FixtureGoalA* a = new (Fresh(sizeof(FixtureGoalA))) FixtureGoalA();
+    FixtureGoalB* b = new (Fresh(sizeof(FixtureGoalB))) FixtureGoalB();
+    a->ticks = 4;
+    a->heading = -9;
+    b->ticks = 6;
+    b->count = 3;
+    holder->id = 2;
+    holder->goal = a;
+    Check(*(const void**)a == ReplayVtable(ROK_FIXTUREGOALA) && *(const void**)b == ReplayVtable(ROK_FIXTUREGOALB), "the vtable of the kind is the one the compiler gave the class");
+    Check(ReplayVtable(ROK_FIXTUREGOALA) != ReplayVtable(ROK_FIXTUREGOALB), "and each kind has its own");
+
+    unsigned char kinds[1] = { ROK_FIXTUREGOALHOLDER };
+    void* roots[1] = { holder };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* first = strdup(recorder.text.Data());
+    printf("%s", first);
+    Check(ReplayFailure() == nullptr, "an object of such a kind is recorded");
+    Check(strstr(first, "  r FixtureGoalHolder#1.goal FixtureGoalA#1\n") != nullptr && strstr(first, "  r FixtureGoalA#1.heading -9\n") != nullptr, "and named as the kind its vptr says");
+    holder->goal = b;
+    recorder.Record(kinds, roots, 1, sets);
+    char* second = strdup(recorder.text.Data());
+    Check(strstr(second, "  r FixtureGoalHolder#1.goal FixtureGoalB#1\n") != nullptr, "another kind of the base is named as its own");
+
+    ResetBlock();
+    RestoreText(first, sets);
+    FixtureGoalHolder* rebuilt = (FixtureGoalHolder*)ReplayResolveObject("FixtureGoalHolder#1", nullptr, g_objects, AllocObject);
+    FixtureGoalA* rebuiltA = (FixtureGoalA*)ReplayResolveObject("FixtureGoalA#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuiltA != nullptr && rebuilt->goal.get() == (FixtureGoalBase*)rebuiltA, "the object is rebuilt and linked");
+    if (rebuilt == nullptr || rebuiltA == nullptr) {
+        free(first);
+        free(second);
+        return;
+    }
+    Check(*(const void**)rebuiltA == ReplayVtable(ROK_FIXTUREGOALA) && rebuiltA->Kind() == 1, "it has the class's vtable, so a virtual call on it runs the class's method");
+    g_rootKinds[0] = ROK_FIXTUREGOALHOLDER;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored object compares equal");
+    *(const void**)rebuiltA = ReplayVtable(ROK_FIXTUREGOALB);
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("another vptr: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs > 0, "an object whose vptr is another kind's is a difference");
+    free(first);
+    free(second);
+
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureGoalHolder* twinHolder = (FixtureGoalHolder*)Fresh(sizeof(FixtureGoalHolder));
+    FixtureTwin* twin = new (Fresh(sizeof(FixtureTwin))) FixtureTwin();
+    twin->ticks = 9;
+    twin->count = 5;
+    twinHolder->id = 3;
+    twinHolder->goal = twin;
+    roots[0] = twinHolder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* third = strdup(recorder.text.Data());
+    Check(ReplayFailure() == nullptr && strstr(third, "  r FixtureGoalHolder#1.goal FixtureTwin#1\n") != nullptr, "a class with a second vtable is named as its kind by its first");
+    ResetBlock();
+    RestoreText(third, sets);
+    FixtureTwin* rebuiltTwin = (FixtureTwin*)ReplayResolveObject("FixtureTwin#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltTwin != nullptr && rebuiltTwin->Kind() == 3 && rebuiltTwin->count == 5, "it is rebuilt");
+    if (rebuiltTwin != nullptr)
+        Check(static_cast<FixtureScanBase*>(rebuiltTwin)->Scan() == 7, "with the vtable of its second base too, so a call through that base runs the class's method");
+    free(third);
+}
+
 void RefsSelfTest()
 {
     printf("an array of refs\n");
@@ -6385,6 +6474,7 @@ int SelfTest(const char* file)
     WeaponArgumentSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();
+    GoalSelfTest();
     BasedTableSelfTest();
     ElementSiteSelfTest();
     EmbedsSelfTest();

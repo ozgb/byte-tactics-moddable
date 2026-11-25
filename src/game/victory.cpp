@@ -13,6 +13,7 @@
 #include "victory_conditions.h"
 #include "../state/sim_globals.h"
 #include "victory.h"
+#include "players.h"
 #include "mission_conditions.h"
 
 typedef void* SimView_g_emptyText;
@@ -1127,4 +1128,39 @@ MissionConditions::MissionConditions()
     active = 1;
     victoryCount = 0;
     defeatCount = 0;
+}
+
+void __stdcall DeactivateConditionsNative(MissionConditions* self)
+{
+    self->Deactivate();
+}
+
+void __stdcall LoadConditionsNative(MissionConditions* self, HapiBank* file)
+{
+    self->LoadConditions(file);
+}
+
+void __stdcall SaveConditionsNative(MissionConditions* self, HapiBank* file)
+{
+    self->SaveConditions(file);
+}
+
+void __stdcall RegisterConditionsNative(MissionConditions* self, TdfFile* mission)
+{
+    self->RegisterConditions((ConditionParams*)mission);
+}
+
+void __stdcall FreeConditionsNative(MissionConditions* self)
+{
+    self->FreeConditions();
+}
+
+void __stdcall DeleteConditionsNative(MissionConditions* self)
+{
+    delete self;
+}
+
+MissionConditions* __stdcall NewConditionsNative(void)
+{
+    return new (kSim) MissionConditions;
 }

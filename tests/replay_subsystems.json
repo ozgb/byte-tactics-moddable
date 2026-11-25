@@ -52,5 +52,13 @@
       "expect": 2,
       "field": "region"
     }
+  },
+  "players": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_PLAYER_PERIOD=0x1f",
+      "recording": "skirmish2.txt",
+      "expect": 16,
+      "field": "region"
+    }
   }
 }

@@ -276,6 +276,17 @@ bool ReplayKindFits(unsigned declared, unsigned actual)
     return false;
 }
 
+void ReplayStoreVtables(unsigned kind, void* object)
+{
+    if (ReplayVtable(kind) == nullptr)
+        return;
+    *(const void**)object = ReplayVtable(kind);
+    ReplayExtraVtable extra[4];
+    unsigned count = ReplayExtraVtables(kind, extra);
+    for (unsigned i = 0; i < count; i++)
+        *(const void**)((char*)object + extra[i].offset) = extra[i].vtable;
+}
+
 unsigned ReplayConcreteKind(unsigned kind, const void* p)
 {
     const ReplayObjectKind& base = kReplayObjectKinds[kind];
@@ -1145,8 +1156,7 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
         if (p == nullptr && ordinal != 0 && alloc != nullptr) {
             p = alloc(kReplayObjectKinds[kind].size);
             memset(p, 0, kReplayObjectKinds[kind].size);
-            if (ReplayVtable(kind) != nullptr)
-                *(const void**)p = ReplayVtable(kind);
+            ReplayStoreVtables(kind, p);
             table.Bind((unsigned)kind, ordinal, p);
         }
     }
@@ -1170,8 +1180,7 @@ void* ReplayResolveObject(const char* text, unsigned* kindOut, ReplayObjectTable
             return nullptr;
     }
     p = first + element * site->stride;
-    if (ReplayVtable(site->kind) != nullptr)
-        *(const void**)p = ReplayVtable(site->kind);
+    ReplayStoreVtables(site->kind, p);
     FixSelf(site->kind, p);
     return p;
 }

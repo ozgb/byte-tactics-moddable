@@ -6,6 +6,32 @@ extern void (* const g_approachRadiusVtable[])();
 extern void (* const g_ringApproachVtable[])();
 extern void (* const g_pathOrderVtable[])();
 extern void (* const g_weaponAimCobVtable[])();
+extern void (* const g_vtsym_VictoryKillEnemyCommander[])() __asm__("??_7VictoryKillEnemyCommander@@6B@");
+extern void (* const g_vtsym_VictoryDestroyAllUnits[])() __asm__("??_7VictoryDestroyAllUnits@@6B@");
+extern void (* const g_vtsym_VictoryKillAllMobileUnits[])() __asm__("??_7VictoryKillAllMobileUnits@@6BMissionCondition@@@");
+extern void (* const g_vtsym_VictoryBuildUnitType[])() __asm__("??_7VictoryBuildUnitType@@6BMissionCondition@@@");
+extern void (* const g_vtsym_VictoryCaptureUnitType[])() __asm__("??_7VictoryCaptureUnitType@@6B@");
+extern void (* const g_vtsym_VictoryKillAllOfType[])() __asm__("??_7VictoryKillAllOfType@@6BMissionCondition@@@");
+extern void (* const g_vtsym_VictoryKillUnitType[])() __asm__("??_7VictoryKillUnitType@@6B@");
+extern void (* const g_vtsym_VictoryUnitTypePassesX[])() __asm__("??_7VictoryUnitTypePassesX@@6BMissionCondition@@@");
+extern void (* const g_vtsym_VictoryUnitTypePassesZ[])() __asm__("??_7VictoryUnitTypePassesZ@@6BMissionCondition@@@");
+extern void (* const g_vtsym_VictoryTimerRunsOut[])() __asm__("??_7VictoryTimerRunsOut@@6B@");
+extern void (* const g_vtsym_DefeatCommanderKilled[])() __asm__("??_7DefeatCommanderKilled@@6B@");
+extern void (* const g_vtsym_DefeatAllUnitsKilled[])() __asm__("??_7DefeatAllUnitsKilled@@6BMissionCondition@@@");
+extern void (* const g_vtsym_DefeatAllUnitsKilledOfType[])() __asm__("??_7DefeatAllUnitsKilledOfType@@6BMissionCondition@@@");
+extern void (* const g_vtsym_DefeatUnitTypeKilled[])() __asm__("??_7DefeatUnitTypeKilled@@6B@");
+extern void (* const g_vtsym_DefeatDeathTimerRunsOut[])() __asm__("??_7DefeatDeathTimerRunsOut@@6B@");
+extern void (* const g_vtsym_DefeatAnyUnitPassesX[])() __asm__("??_7DefeatAnyUnitPassesX@@6BMissionCondition@@@");
+extern void (* const g_vtsym_DefeatAnyUnitPassesZ[])() __asm__("??_7DefeatAnyUnitPassesZ@@6BMissionCondition@@@");
+extern void (* const g_vtsec_VictoryKillAllMobileUnits_UnitScanVisitor[])() __asm__("??_7VictoryKillAllMobileUnits@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_VictoryBuildUnitType_UnitScanVisitor[])() __asm__("??_7VictoryBuildUnitType@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_VictoryKillAllOfType_UnitScanVisitor[])() __asm__("??_7VictoryKillAllOfType@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_VictoryUnitTypePassesX_UnitScanVisitor[])() __asm__("??_7VictoryUnitTypePassesX@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_VictoryUnitTypePassesZ_UnitScanVisitor[])() __asm__("??_7VictoryUnitTypePassesZ@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_DefeatAllUnitsKilled_UnitScanVisitor[])() __asm__("??_7DefeatAllUnitsKilled@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_DefeatAllUnitsKilledOfType_UnitScanVisitor[])() __asm__("??_7DefeatAllUnitsKilledOfType@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_DefeatAnyUnitPassesX_UnitScanVisitor[])() __asm__("??_7DefeatAnyUnitPassesX@@6BUnitScanVisitor@@@");
+extern void (* const g_vtsec_DefeatAnyUnitPassesZ_UnitScanVisitor[])() __asm__("??_7DefeatAnyUnitPassesZ@@6BUnitScanVisitor@@@");
 
 const void* ReplayVtable(unsigned kind)
 {
@@ -18,6 +44,40 @@ const void* ReplayVtable(unsigned kind)
         return g_pathOrderVtable;
     case ROK_WEAPONAIMCOBCB:
         return g_weaponAimCobVtable;
+    case ROK_VICTORYKILLENEMYCOMMANDER:
+        return g_vtsym_VictoryKillEnemyCommander;
+    case ROK_VICTORYDESTROYALLUNITS:
+        return g_vtsym_VictoryDestroyAllUnits;
+    case ROK_VICTORYKILLALLMOBILEUNITS:
+        return g_vtsym_VictoryKillAllMobileUnits;
+    case ROK_VICTORYBUILDUNITTYPE:
+        return g_vtsym_VictoryBuildUnitType;
+    case ROK_VICTORYCAPTUREUNITTYPE:
+        return g_vtsym_VictoryCaptureUnitType;
+    case ROK_VICTORYKILLALLOFTYPE:
+        return g_vtsym_VictoryKillAllOfType;
+    case ROK_VICTORYKILLUNITTYPE:
+        return g_vtsym_VictoryKillUnitType;
+    case ROK_VICTORYUNITTYPEPASSESX:
+        return g_vtsym_VictoryUnitTypePassesX;
+    case ROK_VICTORYUNITTYPEPASSESZ:
+        return g_vtsym_VictoryUnitTypePassesZ;
+    case ROK_VICTORYTIMERRUNSOUT:
+        return g_vtsym_VictoryTimerRunsOut;
+    case ROK_DEFEATCOMMANDERKILLED:
+        return g_vtsym_DefeatCommanderKilled;
+    case ROK_DEFEATALLUNITSKILLED:
+        return g_vtsym_DefeatAllUnitsKilled;
+    case ROK_DEFEATALLUNITSKILLEDOFTYPE:
+        return g_vtsym_DefeatAllUnitsKilledOfType;
+    case ROK_DEFEATUNITTYPEKILLED:
+        return g_vtsym_DefeatUnitTypeKilled;
+    case ROK_DEFEATDEATHTIMERRUNSOUT:
+        return g_vtsym_DefeatDeathTimerRunsOut;
+    case ROK_DEFEATANYUNITPASSESX:
+        return g_vtsym_DefeatAnyUnitPassesX;
+    case ROK_DEFEATANYUNITPASSESZ:
+        return g_vtsym_DefeatAnyUnitPassesZ;
     default:
         return nullptr;
     }
@@ -34,7 +94,85 @@ const char* ReplayVtableName(unsigned kind)
         return "g_pathOrderVtable";
     case ROK_WEAPONAIMCOBCB:
         return "g_weaponAimCobVtable";
+    case ROK_VICTORYKILLENEMYCOMMANDER:
+        return "g_vtsym_VictoryKillEnemyCommander";
+    case ROK_VICTORYDESTROYALLUNITS:
+        return "g_vtsym_VictoryDestroyAllUnits";
+    case ROK_VICTORYKILLALLMOBILEUNITS:
+        return "g_vtsym_VictoryKillAllMobileUnits";
+    case ROK_VICTORYBUILDUNITTYPE:
+        return "g_vtsym_VictoryBuildUnitType";
+    case ROK_VICTORYCAPTUREUNITTYPE:
+        return "g_vtsym_VictoryCaptureUnitType";
+    case ROK_VICTORYKILLALLOFTYPE:
+        return "g_vtsym_VictoryKillAllOfType";
+    case ROK_VICTORYKILLUNITTYPE:
+        return "g_vtsym_VictoryKillUnitType";
+    case ROK_VICTORYUNITTYPEPASSESX:
+        return "g_vtsym_VictoryUnitTypePassesX";
+    case ROK_VICTORYUNITTYPEPASSESZ:
+        return "g_vtsym_VictoryUnitTypePassesZ";
+    case ROK_VICTORYTIMERRUNSOUT:
+        return "g_vtsym_VictoryTimerRunsOut";
+    case ROK_DEFEATCOMMANDERKILLED:
+        return "g_vtsym_DefeatCommanderKilled";
+    case ROK_DEFEATALLUNITSKILLED:
+        return "g_vtsym_DefeatAllUnitsKilled";
+    case ROK_DEFEATALLUNITSKILLEDOFTYPE:
+        return "g_vtsym_DefeatAllUnitsKilledOfType";
+    case ROK_DEFEATUNITTYPEKILLED:
+        return "g_vtsym_DefeatUnitTypeKilled";
+    case ROK_DEFEATDEATHTIMERRUNSOUT:
+        return "g_vtsym_DefeatDeathTimerRunsOut";
+    case ROK_DEFEATANYUNITPASSESX:
+        return "g_vtsym_DefeatAnyUnitPassesX";
+    case ROK_DEFEATANYUNITPASSESZ:
+        return "g_vtsym_DefeatAnyUnitPassesZ";
     default:
         return "";
+    }
+}
+
+unsigned ReplayExtraVtables(unsigned kind, ReplayExtraVtable* out)
+{
+    switch (kind) {
+    case ROK_VICTORYKILLALLMOBILEUNITS:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<VictoryKillAllMobileUnits*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_VictoryKillAllMobileUnits_UnitScanVisitor;
+        return 1;
+    case ROK_VICTORYBUILDUNITTYPE:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<VictoryBuildUnitType*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_VictoryBuildUnitType_UnitScanVisitor;
+        return 1;
+    case ROK_VICTORYKILLALLOFTYPE:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<VictoryKillAllOfType*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_VictoryKillAllOfType_UnitScanVisitor;
+        return 1;
+    case ROK_VICTORYUNITTYPEPASSESX:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<VictoryUnitTypePassesX*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_VictoryUnitTypePassesX_UnitScanVisitor;
+        return 1;
+    case ROK_VICTORYUNITTYPEPASSESZ:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<VictoryUnitTypePassesZ*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_VictoryUnitTypePassesZ_UnitScanVisitor;
+        return 1;
+    case ROK_DEFEATALLUNITSKILLED:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<DefeatAllUnitsKilled*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_DefeatAllUnitsKilled_UnitScanVisitor;
+        return 1;
+    case ROK_DEFEATALLUNITSKILLEDOFTYPE:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<DefeatAllUnitsKilledOfType*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_DefeatAllUnitsKilledOfType_UnitScanVisitor;
+        return 1;
+    case ROK_DEFEATANYUNITPASSESX:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<DefeatAnyUnitPassesX*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_DefeatAnyUnitPassesX_UnitScanVisitor;
+        return 1;
+    case ROK_DEFEATANYUNITPASSESZ:
+        out[0].offset = (unsigned)((const char*)static_cast<UnitScanVisitor*>(reinterpret_cast<DefeatAnyUnitPassesZ*>(0x1000)) - (const char*)0x1000);
+        out[0].vtable = g_vtsec_DefeatAnyUnitPassesZ_UnitScanVisitor;
+        return 1;
+    default:
+        return 0;
     }
 }

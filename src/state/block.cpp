@@ -191,6 +191,51 @@ void* AllocLocked(unsigned int size)
     return 0;
 }
 
+void* AllocAtLocked(unsigned int offset, unsigned int size)
+{
+    unsigned int need = ChunkSizeFor(size);
+    if ((offset & 7) != 0 || offset < kFirstChunk + kChunkHeader || need > Size() || offset - kChunkHeader > Size() - need)
+        return nullptr;
+    unsigned int at = offset - kChunkHeader;
+    unsigned int prev = 0;
+    for (unsigned int off = Head()->freeHead; off != 0 && off <= at; off = At(off)->aux) {
+        BlockChunk* c = At(off);
+        unsigned int sz = c->size & ~kFreeBit;
+        unsigned int lead = at - off;
+        if (lead + need > sz || (lead != 0 && lead < kMinChunk)) {
+            prev = off;
+            continue;
+        }
+        unsigned int tail = sz - lead - need;
+        if (tail != 0 && tail < kMinChunk) {
+            need += tail;
+            tail = 0;
+        }
+        unsigned int link = c->aux;
+        if (tail != 0) {
+            BlockChunk* rest = At(at + need);
+            rest->size = tail | kFreeBit;
+            rest->aux = link;
+            link = at + need;
+        }
+        if (lead != 0) {
+            c->size = lead | kFreeBit;
+            c->aux = link;
+        } else if (prev != 0) {
+            At(prev)->aux = link;
+        } else {
+            Head()->freeHead = link;
+        }
+        BlockChunk* chunk = At(at);
+        chunk->size = need;
+        chunk->aux = size;
+        memset((char*)chunk + kChunkHeader, 0, need - kChunkHeader);
+        CountUse(need);
+        return (char*)chunk + kChunkHeader;
+    }
+    return nullptr;
+}
+
 void FreeLocked(void* p)
 {
     BlockChunk* c = Lookup(p);
@@ -308,6 +353,15 @@ __declspec(noinline) void* __cdecl SimAlloc(unsigned int size)
     if (g_allocHooks != 0)
         g_allocHooks->added(p, size);
     return call.Result(p);
+}
+
+void* __cdecl SimAllocAt(unsigned int offset, unsigned int size)
+{
+    Guard guard;
+    void* p = AllocAtLocked(offset, size);
+    if (p != nullptr && g_allocHooks != nullptr)
+        g_allocHooks->added(p, size);
+    return p;
 }
 
 __declspec(noinline) void* __cdecl SimRealloc(void* p, unsigned int size)

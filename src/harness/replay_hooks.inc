@@ -38,9 +38,12 @@ const NetworkSeam* s_inner_network;
 NetworkSeam s_rec_network;
 const EconomyWorldView* s_inner_econworld;
 EconomyWorldView s_rec_econworld;
+const PathWorldView* s_inner_pathworld;
+PathWorldView s_rec_pathworld;
 bool s_hooked[SUB_COUNT];
 
 const EconomyWorldView* WrapWorldEconworld(const EconomyWorldView* inner);
+const PathWorldView* WrapWorldPathworld(const PathWorldView* inner);
 
 void __cdecl RecWindMeteorsUpdateWind(RandStream a0)
 {
@@ -159,6 +162,7 @@ void __stdcall RecEconomyInit(const EconMapInfo* a0, const EconomyWorldView* a1,
     RegionBind(SUB_ECONOMY, a2, a3);
     if (scope.Open()) {
         ArgValueStruct(s_call, "a", "map", ROK_ECONMAPINFO, a0);
+        ArgRegionOffset(s_call, "region", a2);
         ArgValue(s_call, "size", a3);
     }
     s_inner_economy->Init(a0, a1, a2, a3);
@@ -651,7 +655,7 @@ unsigned int __stdcall RecPathfindingRegionSize(const PathMapInfo* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_REGIONSIZE, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "map");
+        ArgValueStruct(s_call, "a", "map", ROK_PATHMAPINFO, a0);
     }
     unsigned int result = s_inner_pathfinding->RegionSize(a0);
     if (scope.Open()) {
@@ -664,9 +668,10 @@ void __stdcall RecPathfindingInit(const PathMapInfo* a0, void* a1, unsigned int 
 {
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_INIT, SUB_PATHFINDING, roots);
+    RegionBind(SUB_PATHFINDING, a1, a2);
     if (scope.Open()) {
-        ArgPending(s_call, "map");
-        ArgPending(s_call, "region");
+        ArgValueStruct(s_call, "a", "map", ROK_PATHMAPINFO, a0);
+        ArgRegionOffset(s_call, "region", a1);
         ArgValue(s_call, "size", a2);
     }
     s_inner_pathfinding->Init(a0, a1, a2);
@@ -682,6 +687,7 @@ void* __stdcall RecPathfindingShutdown()
     }
     void* result = s_inner_pathfinding->Shutdown();
     if (scope.Open()) {
+        ArgRegionResult(s_tail, result);
     }
     return result;
 }
@@ -691,7 +697,7 @@ void __stdcall RecPathfindingSubmit(const PathRequest* a0)
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_SUBMIT, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "request");
+        ArgStruct(s_call, "a", "request", ROK_PATHREQUEST, a0);
     }
     s_inner_pathfinding->Submit(a0);
     if (scope.Open()) {
@@ -703,7 +709,7 @@ void __stdcall RecPathfindingCancel(PathHandle a0)
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_CANCEL, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "requester");
+        ArgValue(s_call, "requester", a0);
     }
     s_inner_pathfinding->Cancel(a0);
     if (scope.Open()) {
@@ -756,28 +762,15 @@ int __stdcall RecPathfindingPoll(PathfindingEventHeader* a0, unsigned int a1, Pa
     ReplayRoots roots;
     SlotScope scope(RSL_PATHFINDING_POLL, SUB_PATHFINDING, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "out");
         ArgValue(s_call, "size", a1);
-        ArgPending(s_call, "points");
         ArgValue(s_call, "capacity", a3);
     }
     int result = s_inner_pathfinding->Poll(a0, a1, a2, a3);
     if (scope.Open()) {
+        ArgOutBytes(s_tail, "out", a0, (int)result, a1);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
-}
-
-void __stdcall RecPathfindingWriteState(const StateWriter* a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PATHFINDING_WRITESTATE, SUB_PATHFINDING, roots);
-    if (scope.Open()) {
-        ArgPending(s_call, "writer");
-    }
-    s_inner_pathfinding->WriteState(a0);
-    if (scope.Open()) {
-    }
 }
 
 int __stdcall RecWeaponsApply(const WeaponsEventHeader* a0, unsigned int a1)
@@ -1385,6 +1378,7 @@ void __stdcall RecLosRadarInit(const LosRadarMapInfo* a0, void* a1, unsigned int
     RegionBind(SUB_LOS_RADAR, a1, a2);
     if (scope.Open()) {
         ArgValueStruct(s_call, "a", "map", ROK_LOSRADARMAPINFO, a0);
+        ArgRegionOffset(s_call, "region", a1);
         ArgValue(s_call, "size", a2);
     }
     s_inner_los_radar->Init(a0, a1, a2);
@@ -1801,6 +1795,7 @@ void __stdcall RecPlayersInit(const PlayersMapInfo* a0, void* a1, unsigned int a
     RegionBind(SUB_PLAYERS, a1, a2);
     if (scope.Open()) {
         ArgValueStruct(s_call, "a", "info", ROK_PLAYERSMAPINFO, a0);
+        ArgRegionOffset(s_call, "region", a1);
         ArgValue(s_call, "size", a2);
     }
     s_inner_players->Init(a0, a1, a2);
@@ -3943,11 +3938,11 @@ int __stdcall RecFilesBankReadBox(HapiBank* a0, void* a1, int a2)
     SlotScope scope(RSL_FILES_BANKREADBOX, SUB_FILES, roots);
     if (scope.Open()) {
         ArgHandle(s_call, "self", OBJ_BANK, a0);
-        ArgPending(s_call, "dst");
         ArgValue(s_call, "len", a2);
     }
     int result = s_inner_files->BankReadBox(a0, a1, a2);
     if (scope.Open()) {
+        ArgOutBytes(s_tail, "dst", a1, (int)result, a2);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
@@ -4749,7 +4744,6 @@ int __stdcall RecMapUnitsInRange(const Vec3* a0, int a1, int a2, unsigned short*
         ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a0);
         ArgValue(s_call, "range", a1);
         ArgValue(s_call, "skip", a2);
-        ArgPending(s_call, "ids");
         ArgValue(s_call, "capacity", a4);
     }
     ReplayText line;
@@ -4768,6 +4762,7 @@ int __stdcall RecMapUnitsInRange(const Vec3* a0, int a1, int a2, unsigned short*
         FinishImport(line);
     }
     if (scope.Open()) {
+        ArgOutBytes(s_tail, "ids", a3, (int)result * 2, (a4 * 2));
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
@@ -5112,6 +5107,429 @@ void __stdcall RecEconworldEmit(const EconomyEventHeader* a0, unsigned int a1)
     }
 }
 
+unsigned int __stdcall RecPathworldTick()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_TICK, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.Tick");
+    }
+    unsigned int result = s_inner_pathworld->Tick();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+unsigned int __stdcall RecPathworldSearchStepLimit()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_SEARCHSTEPLIMIT, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.SearchStepLimit");
+    }
+    unsigned int result = s_inner_pathworld->SearchStepLimit();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPathworldPlayerCount()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_PLAYERCOUNT, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.PlayerCount");
+    }
+    int result = s_inner_pathworld->PlayerCount();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPathworldIsPlaying(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_ISPLAYING, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.IsPlaying");
+        ImportValue(line, a0);
+    }
+    int result = s_inner_pathworld->IsPlaying(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPathworldUnitsPerPlayer()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_UNITSPERPLAYER, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.UnitsPerPlayer");
+    }
+    int result = s_inner_pathworld->UnitsPerPlayer();
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+PathUnit __stdcall RecPathworldFirstUnit(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_FIRSTUNIT, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.FirstUnit");
+        ImportValue(line, a0);
+    }
+    PathUnit result = s_inner_pathworld->FirstUnit(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+PathUnit __stdcall RecPathworldLastUnit(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_LASTUNIT, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.LastUnit");
+        ImportValue(line, a0);
+    }
+    PathUnit result = s_inner_pathworld->LastUnit(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+PathUnit __stdcall RecPathworldNextUnit(PathUnit a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_NEXTUNIT, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "unit", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.NextUnit");
+        ImportValue(line, a0);
+    }
+    PathUnit result = s_inner_pathworld->NextUnit(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPathworldUnitState(PathUnit a0, PathUnitState* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_UNITSTATE, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "unit", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.UnitState");
+        ImportValue(line, a0);
+    }
+    int result = s_inner_pathworld->UnitState(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        if (result != 0) ImportOutInOut(line, "out", ROK_PATHUNITSTATE, a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        if (result != 0) ArgStruct(s_tail, "o", "out", ROK_PATHUNITSTATE, a1);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+PathClass __stdcall RecPathworldMoveClass(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_MOVECLASS, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "index", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.MoveClass");
+        ImportValue(line, a0);
+    }
+    PathClass result = s_inner_pathworld->MoveClass(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPathworldInBounds(PathClass a0, int a1, int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_INBOUNDS, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "moveClass", a0);
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.InBounds");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+    }
+    int result = s_inner_pathworld->InBounds(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPathworldPass(PathClass a0, int a1, int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_PASS, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "moveClass", a0);
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.Pass");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+    }
+    int result = s_inner_pathworld->Pass(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecPathworldSeenSize(int* a0, int* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_SEENSIZE, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.SeenSize");
+    }
+    s_inner_pathworld->SeenSize(a0, a1);
+    if (scope.Import()) {
+        ImportOutScalar(line, "width", a0);
+        ImportOutScalar(line, "height", a1);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+int __stdcall RecPathworldSeen(int a0, int a1, int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_SEEN, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.Seen");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+    }
+    int result = s_inner_pathworld->Seen(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPathworldLineOfSight(PathClass a0, int a1, int a2, int a3, int a4)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_LINEOFSIGHT, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "moveClass", a0);
+        ArgValue(s_call, "x0", a1);
+        ArgValue(s_call, "y0", a2);
+        ArgValue(s_call, "x1", a3);
+        ArgValue(s_call, "y1", a4);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.LineOfSight");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+        ImportValue(line, a3);
+        ImportValue(line, a4);
+    }
+    int result = s_inner_pathworld->LineOfSight(a0, a1, a2, a3, a4);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecPathworldTerrainPass(PathClass a0, int a1, int a2)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_TERRAINPASS, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "moveClass", a0);
+        ArgValue(s_call, "x", a1);
+        ArgValue(s_call, "y", a2);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.TerrainPass");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+        ImportValue(line, a2);
+    }
+    int result = s_inner_pathworld->TerrainPass(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void __stdcall RecPathworldBeginSearch(PathUnit a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_BEGINSEARCH, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "unit", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.BeginSearch");
+        ImportValue(line, a0);
+    }
+    s_inner_pathworld->BeginSearch(a0);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecPathworldEndSearch(PathUnit a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_PATHWORLD_ENDSEARCH, SUB_PATHWORLD, roots, false);
+    if (scope.Open()) {
+        ArgValue(s_call, "unit", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i pathworld.EndSearch");
+        ImportValue(line, a0);
+    }
+    s_inner_pathworld->EndSearch(a0);
+    if (scope.Import()) {
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+    }
+}
+
 bool IsImportOf(unsigned owner, unsigned slot)
 {
     switch (owner) {
@@ -5205,6 +5623,44 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_PLAYERS_LOADDEFAULTAISCRIPT)
             return true;
         if (slot == RSL_ECONOMY_GETENERGYUSE)
+            return true;
+        return false;
+    case SUB_PATHFINDING:
+        if (slot == RSL_PATHWORLD_TICK)
+            return true;
+        if (slot == RSL_PATHWORLD_SEARCHSTEPLIMIT)
+            return true;
+        if (slot == RSL_PATHWORLD_PLAYERCOUNT)
+            return true;
+        if (slot == RSL_PATHWORLD_ISPLAYING)
+            return true;
+        if (slot == RSL_PATHWORLD_UNITSPERPLAYER)
+            return true;
+        if (slot == RSL_PATHWORLD_FIRSTUNIT)
+            return true;
+        if (slot == RSL_PATHWORLD_LASTUNIT)
+            return true;
+        if (slot == RSL_PATHWORLD_NEXTUNIT)
+            return true;
+        if (slot == RSL_PATHWORLD_UNITSTATE)
+            return true;
+        if (slot == RSL_PATHWORLD_MOVECLASS)
+            return true;
+        if (slot == RSL_PATHWORLD_INBOUNDS)
+            return true;
+        if (slot == RSL_PATHWORLD_PASS)
+            return true;
+        if (slot == RSL_PATHWORLD_SEENSIZE)
+            return true;
+        if (slot == RSL_PATHWORLD_SEEN)
+            return true;
+        if (slot == RSL_PATHWORLD_LINEOFSIGHT)
+            return true;
+        if (slot == RSL_PATHWORLD_TERRAINPASS)
+            return true;
+        if (slot == RSL_PATHWORLD_BEGINSEARCH)
+            return true;
+        if (slot == RSL_PATHWORLD_ENDSEARCH)
             return true;
         return false;
     case SUB_WEAPONS:
@@ -5554,8 +6010,6 @@ void HookSeams(const bool* on)
         s_rec_pathfinding.Step = RecPathfindingStep;
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.Poll = RecPathfindingPoll;
-    if (on[SUB_PATHFINDING])
-        s_rec_pathfinding.WriteState = RecPathfindingWriteState;
     if (on[SUB_WEAPONS])
         s_rec_weapons.Apply = RecWeaponsApply;
     if (on[SUB_WEAPONS])
@@ -6011,6 +6465,7 @@ void HookSeams(const bool* on)
     g_seams.mission = &s_rec_mission;
     g_seams.files = &s_rec_files;
     g_seams.network = &s_rec_network;
+    g_seams.pathworld = const_cast<PathWorldView*>(WrapWorldPathworld(g_seams.pathworld));
 }
 
 const EconomyWorldView* WrapWorldEconworld(const EconomyWorldView* inner)
@@ -6037,9 +6492,38 @@ const EconomyWorldView* WrapWorldEconworld(const EconomyWorldView* inner)
     return &s_rec_econworld;
 }
 
+const PathWorldView* WrapWorldPathworld(const PathWorldView* inner)
+{
+    if (inner == nullptr || !(s_hooked[SUB_PATHFINDING]))
+        return inner;
+    s_inner_pathworld = inner;
+    s_rec_pathworld = *inner;
+    s_rec_pathworld.Tick = RecPathworldTick;
+    s_rec_pathworld.SearchStepLimit = RecPathworldSearchStepLimit;
+    s_rec_pathworld.PlayerCount = RecPathworldPlayerCount;
+    s_rec_pathworld.IsPlaying = RecPathworldIsPlaying;
+    s_rec_pathworld.UnitsPerPlayer = RecPathworldUnitsPerPlayer;
+    s_rec_pathworld.FirstUnit = RecPathworldFirstUnit;
+    s_rec_pathworld.LastUnit = RecPathworldLastUnit;
+    s_rec_pathworld.NextUnit = RecPathworldNextUnit;
+    s_rec_pathworld.UnitState = RecPathworldUnitState;
+    s_rec_pathworld.MoveClass = RecPathworldMoveClass;
+    s_rec_pathworld.InBounds = RecPathworldInBounds;
+    s_rec_pathworld.Pass = RecPathworldPass;
+    s_rec_pathworld.SeenSize = RecPathworldSeenSize;
+    s_rec_pathworld.Seen = RecPathworldSeen;
+    s_rec_pathworld.LineOfSight = RecPathworldLineOfSight;
+    s_rec_pathworld.TerrainPass = RecPathworldTerrainPass;
+    s_rec_pathworld.BeginSearch = RecPathworldBeginSearch;
+    s_rec_pathworld.EndSearch = RecPathworldEndSearch;
+    return &s_rec_pathworld;
+}
+
 bool RecordsAlways(unsigned slot)
 {
     if (slot == RSL_ECONOMY_REGIONSIZE || slot == RSL_ECONOMY_INIT)
+        return true;
+    if (slot == RSL_PATHFINDING_REGIONSIZE || slot == RSL_PATHFINDING_INIT)
         return true;
     if (slot == RSL_LOS_RADAR_REGIONSIZE || slot == RSL_LOS_RADAR_INIT)
         return true;

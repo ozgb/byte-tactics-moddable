@@ -812,10 +812,17 @@ unsigned __stdcall HarnessInputTime(unsigned live)
     return s_injecting ? s_injectMs : live;
 }
 
+int __stdcall HarnessDropsHostInput(unsigned msg)
+{
+    if (!s_testMode || s_injecting)
+        return 0;
+    return (msg >= WM_KEYFIRST && msg <= WM_KEYLAST) || (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST);
+}
+
 int __stdcall HarnessKeyState(int vk)
 {
     int state;
-    if (!InputScenario())
+    if (!s_testMode)
         return GetAsyncKeyState(vk);
     if (vk < 0 || vk >= 256)
         return 0;
@@ -826,7 +833,7 @@ int __stdcall HarnessKeyState(int vk)
 
 BOOL __stdcall HarnessGetCursorPos(POINT* pt)
 {
-    if (!InputScenario())
+    if (!s_testMode)
         return GetCursorPos(pt);
     pt->x = s_cursorX;
     pt->y = s_cursorY;
@@ -835,7 +842,7 @@ BOOL __stdcall HarnessGetCursorPos(POINT* pt)
 
 BOOL __stdcall HarnessSetCursorPos(int x, int y)
 {
-    if (!InputScenario())
+    if (!s_testMode)
         return SetCursorPos(x, y);
     s_cursorX = x;
     s_cursorY = y;

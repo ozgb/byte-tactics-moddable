@@ -443,6 +443,8 @@ static void DisplayLogOutline(void* dst, const int* rect, int colour, int lit)
     DlSurface d;
     Rect r;
     int x0, y0, x1, y1;
+    if (rect == 0)
+        return;
     Surfaceof(dst, &d);
     r.left = rect[0];
     r.top = rect[1];
@@ -575,7 +577,8 @@ static void DisplayLogText(void* dst, const unsigned char* text, int x, int y, i
     PutInt(RdI(display, DISP_KEY));
     PutXY(x, y);
     DlPutRaw(" ");
-    DlPutName((const char*)text, (int)strlen((const char*)text));
+    if (text != 0)
+        DlPutName((const char*)text, (int)strlen((const char*)text));
     DlEnd();
 }
 
@@ -964,11 +967,17 @@ static void LogDebris(void* surface, const char* inner, const char* obj, const s
     int oz = RdI(inner, 0x1e) - (RdI(g_game, GAME_SCROLL_Y) << 16);
     int sx = (short)((unsigned)ox >> 16) + 0x80;
     int sy = (short)((unsigned)oz >> 16) - ((short)((unsigned)oy >> 16) >> 1) + 0x20;
-    const char* unit = (const char*)RdP(obj, 0);
-    const char* player = (const char*)RdP(unit, 0x96);
-    const char* info = (const char*)RdP(player, 0x27);
-    if (PointInRect(g_game + GAME_RECT, sx, sy))
-        DisplayLogDebris(surface, RdP(inner, 0), RdU8(info, 0x96), ox, oy, oz, angles);
+    const char* unit;
+    const char* player = 0;
+    const char* info = 0;
+    if (!PointInRect(g_game + GAME_RECT, sx, sy))
+        return;
+    unit = (const char*)RdP(obj, 0);
+    if (unit != 0)
+        player = (const char*)RdP(unit, 0x96);
+    if (player != 0)
+        info = (const char*)RdP(player, 0x27);
+    DisplayLogDebris(surface, RdP(inner, 0), info != 0 ? RdU8(info, 0x96) : 0, ox, oy, oz, angles);
 }
 
 static void Dispatch(int kind, va_list ap)

@@ -205,6 +205,7 @@ int __stdcall AllocGrayTable(App_4b5980* d);
 int __stdcall AllocBlueTable(App_4b5980* d);
 long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam, unsigned int lparam);
 unsigned __stdcall HarnessInputTime(unsigned live);
+int __stdcall HarnessDropsHostInput(unsigned msg);
 void __stdcall PushKeyCode(int v);
 void __stdcall HandleVirtualKey(int v, int flag);
 void __stdcall PushMouseEvent(Event_4b5cc0* ev);
@@ -766,6 +767,8 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
                             unsigned int lparam)
 {
     Event_4b5cc0 e;
+    if (HarnessDropsHostInput(msg))
+        return 0;
     switch (msg) {
     case WM_CREATE:
         return 0;

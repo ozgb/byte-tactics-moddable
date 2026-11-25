@@ -23,7 +23,7 @@ generated file or the fuel pass that still names a source (SOURCE_NAME).
 `kit_name` in tools/oraclekit/code_tables.csv (table, entry, kit_name): the order type's name for `orderNotify`, the bit of
 `WeaponDef.flags` that selects the handler for `weaponFire`. The export is refused when an entry has no row or a row no entry.
 The copy also leaves out what only the replayer and its checks read, all of which names source globals, types and functions:
-the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable` or `vptr` of each kind, the
+the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable`, `vtable_symbol` or `vptr` of each kind, the
 `aliases`, `reachFirst` and `reachCount` of each field and slot argument, and each slot's `allOf`. A service, or a callback
 interface, whose name (or a method's) is a source identifier that no interface header, `layout.json`, the module manifest or a
 recording declares is left out too: no recording of the kit calls it. The schema then may name only what those files declare
@@ -110,7 +110,7 @@ CODE_TABLE_COLUMNS = ["table", "entry", "kit_name"]
 SLOT_SOURCE_FIELDS = ("functions", "through", "allOf")
 SERVICE_SOURCE_FIELDS = ("header", "pre", "effect", "id")
 SCHEMA_CHECK_ANNOTATIONS = ("exempt", "exempt_types", "rules")
-KIND_SOURCE_FIELDS = ("vtable", "vptr")
+KIND_SOURCE_FIELDS = ("vtable", "vtable_symbol", "vptr")
 FIELD_SOURCE_FIELDS = ("aliases", "reachFirst", "reachCount")
 FORBIDDEN = ("src/", "include/", "orig/", "lib/", "build/", "cmake/")
 TAG_PATTERNS = {"interfaces": re.compile(r"^interfaces-v(\d+)$"),

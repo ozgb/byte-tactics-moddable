@@ -987,7 +987,7 @@ class Polymorphic(unittest.TestCase):
         self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
         self.assertTrue(base.endswith('0, 0, 0, 3, 0, 0 },'), base)
-        self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT };", text)
+        self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT, ROK_FIXTUREGOALA, ROK_FIXTUREGOALB };", text)
         self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
         self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
 
@@ -1050,6 +1050,24 @@ class Polymorphic(unittest.TestCase):
         ann = annotations()
         ann["objects"]["OrderFx"]["kinds"].remove("PathOrder")
         self.assertTrue(any("PathOrder: has a vtable and is a kind of no base" in e for e in self.errors(ann)))
+
+    def test_a_vtable_symbol_names_the_compilers_vtable(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        self.assertIn('extern void (* const g_vtsym_FixtureGoalA[])() __asm__("??_7FixtureGoalA@@6B@");', files[rs.FIXTURE_VTABLES_CPP])
+        self.assertIn("    case ROK_FIXTUREGOALA:\n        return g_vtsym_FixtureGoalA;", files[rs.FIXTURE_VTABLES_CPP])
+        self.assertIn('static_assert(__is_polymorphic(FixtureGoalA), "FixtureGoalA has a vtable");', files[rs.FIXTURE_SCHEMA_H])
+
+    def test_a_vtable_symbol_is_the_mangled_vtable_of_the_type_and_the_only_vtable(self):
+        for change, message in (({"vtable_symbol": "g_goal"}, "FixtureGoalA: `vtable_symbol` is the mangled name"),
+                                ({"vtable_symbol": "??_7FixtureGoalB@@6B@"}, "FixtureGoalA: `vtable_symbol` ??_7FixtureGoalB@@6B@ is not the vtable of the type FixtureGoalA"),
+                                ({"vtable": "g_fixtureTimerVtable"}, "FixtureGoalA: has a `vtable` and a `vtable_symbol`")):
+            ann = annotations()
+            ann["objects"]["FixtureGoalA"].update(change)
+            self.assertTrue(any(message in e for e in self.errors(ann)), (change, self.errors(ann)))
+        ann = annotations()
+        del ann["objects"]["FixtureGoalA"]["vtable_symbol"]
+        self.assertTrue(any("FixtureGoalBase (base): the kind FixtureGoalA has no vtable" in e for e in self.errors(ann)))
 
     def test_a_code_field_is_an_index_in_its_table(self):
         files, errors, model = self.generated()
@@ -2388,7 +2406,7 @@ class ElementForms(unittest.TestCase):
         self.assertIn("case ROK_FIXTURECB:\n        return g_fixtureCbVtable;", text)
         self.assertIn('return "g_fixtureCbVtable";', text)
         self.assertIn("FixtureCb has a vptr that the code sets by hand", files[rs.FIXTURE_SCHEMA_H])
-        self.assertNotIn("Fixture", files[rs.VTABLES_CPP])
+        self.assertNotIn("FixtureCb", files[rs.VTABLES_CPP])
 
     def test_a_vptr_is_checked(self):
         for change, message in (({"vptr": "not a name"}, "FixtureCb: the vptr is the name of a global"),

@@ -96,6 +96,29 @@ public:
     int squad;
 };
 
+class FixtureGoalBase {
+public:
+    virtual int Kind() { return 0; }
+    unsigned short ticks;
+};
+
+class FixtureGoalA : public FixtureGoalBase {
+public:
+    virtual int Kind() { return 1; }
+    short heading;
+};
+
+class FixtureGoalB : public FixtureGoalBase {
+public:
+    virtual int Kind() { return 2; }
+    int count;
+};
+
+struct FixtureGoalHolder {
+    int id;
+    Ref<FixtureGoalBase> goal;
+};
+
 struct FixtureManager {
     int id;
     Ref<FixtureTimerBase> timers[4];

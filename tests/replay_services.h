@@ -434,18 +434,6 @@ int __stdcall ScheduleEconomySpend(const struct EconomySpend* spend)
     return atoi(result);
 }
 
-int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources)
-{
-    ReplayText t;
-    StartImport(t, RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
-    Space(t);
-    t.AddInt((int)(unsigned int)unit);
-    Space(t);
-    t.AddInt((int)(unsigned int)resources);
-    const char* result = Enter(t);
-    return atoi(result);
-}
-
 void __stdcall ScheduleMetalExtraction(unsigned int unit)
 {
     ReplayText t;
@@ -765,6 +753,18 @@ int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mas
     t.AddInt((int)mask);
     const char* result = EnterNested(t);
     PlayNestedCalls("services.ExecuteCommandText");
+    return atoi(result);
+}
+
+int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(unit), false);
+    Space(t);
+    t.AddInt((int)(unsigned int)resources);
+    const char* result = Enter(t);
     return atoi(result);
 }
 

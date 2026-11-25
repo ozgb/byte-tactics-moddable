@@ -38,7 +38,6 @@ enum ReplayImportId {
     RI_RECORD_SIM_EVENT,
     RI_SCHED_PUBLISH,
     RI_SCHEDULE_ECONOMY_SPEND,
-    RI_SCHEDULE_ECONOMY_REQUEST_GRANTED,
     RI_SCHEDULE_METAL_EXTRACTION,
     RI_SCHEDULE_UNITS_DELIVER,
     RI_EMIT,
@@ -64,6 +63,7 @@ enum ReplayImportId {
     RI_LOAD_OBJECT_3D,
     RI_GET_OBJECT_HEIGHT,
     RI_EXECUTE_COMMAND_TEXT,
+    RI_SCHEDULE_ECONOMY_REQUEST_GRANTED,
     RI_COUNT
 };
 
@@ -103,7 +103,6 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.RecordSimEvent",
     "services.SchedPublish",
     "services.ScheduleEconomySpend",
-    "services.ScheduleEconomyRequestGranted",
     "services.ScheduleMetalExtraction",
     "services.ScheduleUnitsDeliver",
     "services.Emit",
@@ -129,6 +128,7 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.LoadObject3d",
     "services.GetObjectHeight",
     "services.ExecuteCommandText",
+    "services.ScheduleEconomyRequestGranted",
 };
 
 #endif

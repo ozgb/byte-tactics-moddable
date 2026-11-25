@@ -344,15 +344,6 @@ void ReplayImportEnd(ReplayImport& c)
         AddResult(t, c.result);
         break;
     }
-    case RI_SCHEDULE_ECONOMY_REQUEST_GRANTED:
-    {
-        AddSpace(t);
-        t.AddInt(a[0].v.i);
-        AddSpace(t);
-        t.AddInt(a[1].v.i);
-        AddResult(t, c.result);
-        break;
-    }
     case RI_SCHEDULE_METAL_EXTRACTION:
     {
         AddSpace(t);
@@ -554,6 +545,15 @@ void ReplayImportEnd(ReplayImport& c)
         AddResult(t, c.result);
         t.AddText(s_nested);
         s_nested.Clear();
+        break;
+    }
+    case RI_SCHEDULE_ECONOMY_REQUEST_GRANTED:
+    {
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_UNIT, a[0].v.p, true);
+        AddSpace(t);
+        t.AddInt(a[1].v.i);
+        AddResult(t, c.result);
         break;
     }
     }

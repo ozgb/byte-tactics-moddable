@@ -3292,6 +3292,8 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
                 errors.append("%s: the argument %s has a `size` that names no int argument" % (where, a["param"]))
             elif m == "effect" and params.get(a.get("size"), {}).get("mode") != "int":
                 errors.append("%s: the argument %s needs a `size` that names an int argument" % (where, a["param"]))
+            if "ref" in a and (m != "object" or a["ref"] is not True or "cast" in a):
+                errors.append("%s: the argument %s has a `ref`, which is true on an object with no `cast` that is passed as its block offset" % (where, a.get("param")))
             if "reach" in a:
                 if m != "object":
                     errors.append("%s: the argument %s has a `reach` and is not an object" % (where, a.get("param")))
@@ -3332,6 +3334,8 @@ def service_arg_expr(s: dict, i: int, ctx: str) -> str:
     a = s["args"][i]
     if ctx == "definition":
         name = a.get("param", "this")
+        if a.get("ref"):
+            return "ReplayRefPtr(%s)" % name
         return "(%s)%s" % (a["cast"], name) if a.get("cast") else name
     v = "c.args[%d].v" % i
     if a["mode"] in ("stream", "int"):

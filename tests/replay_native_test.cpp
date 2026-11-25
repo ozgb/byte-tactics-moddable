@@ -18,6 +18,10 @@
 #include "../src/map/features.h"
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
+#include "../src/units/units_seam.h"
+#include "../src/units/unit_position.h"
+#include "../src/units/unit_commands.h"
+#include "../src/ingame/control_panel.h"
 #include "../src/map/terrain.h"
 #include "../src/mission/mission.h"
 #include "../src/map/spatial_bucket.h"
@@ -152,6 +156,8 @@ char g_takeDamageScriptName[12] = "TakeDamage";
 char g_hitByWeaponScriptName[12] = "HitByWeapon";
 char g_paralyzeMissionName[12] = "paralyze";
 
+UnitDef* __stdcall FindUnitType(const char* name);
+
 extern "C" int __cdecl bx_AngleOfVector(int x, int z);
 
 short __cdecl AngleOfVector(int x, int z)
@@ -169,6 +175,7 @@ short __cdecl AngleOfVector(int x, int z)
 #pragma comment(linker, "/alternatename:?GetWeaponPiecePosition@@YGXPAUUnit@@PAUVec3@@EH@Z=?GetWeaponPiecePosition@@YGXPAUObject@@PAUVec3@@EH@Z")
 #pragma comment(linker, "/alternatename:?InitGafSequence@@YGXPAUHandle@@PAUAnimSrc@@H@Z=?InitGafSequence@@YGXPAUHandle@@PAUGafEntry@@H@Z")
 #pragma comment(linker, "/alternatename:?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@HHPAUUnit@@@Z=?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@2HPAUUnit@@@Z")
+#pragma comment(linker, "/alternatename:?FindUnitType@@YGPAVUnitDef@@PBD@Z=?FindUnitType@@YGPAUUnitDefNameKeyView@@PBD@Z")
 #pragma comment(linker, "/alternatename:?SolveLaunchAngle@@YGFHHHHH@Z=?SolveLaunchAngle@@YGFHHHHM@Z")
 #pragma comment(linker, "/alternatename:?SubtractVec3@@YGXPAUVec3@@0PAH11@Z=?SubtractVec3@@YGXPAH0000@Z")
 #pragma comment(linker, "/alternatename:?WeaponCanReachPos@@YGHPAUUnit@@PAUVec3@@1E@Z=?WeaponCanReachPos@@YGHPAUUnit@@PAUReachPosVec3@@1H@Z")
@@ -2010,6 +2017,199 @@ void __stdcall UpdatePlayersSlot()
 
 void __stdcall UpdatePlayersOnStreamSlot(RandStream)
 {
+}
+
+
+int __stdcall UnitsNative_Apply(const UnitsEventHeader* event, unsigned int size)
+{
+    return UnitsApply(event, size);
+}
+
+void __stdcall UnitsNative_UpdateAllUnits()
+{
+}
+
+void __stdcall UnitsNative_UnitTypeSetAddTypeOrCategory(UnitTypeSet* self, const char* text, int* out)
+{
+}
+
+void __stdcall UnitsNative_AllocateUnitMemory()
+{
+}
+
+void __stdcall UnitsNative_FreeUnitMemory()
+{
+}
+
+void __stdcall UnitsNative_FreeUnitInfo()
+{
+}
+
+void __stdcall UnitsNative_RefreshUnitInfo()
+{
+}
+
+void __stdcall UnitsNative_LoadUnitTypes()
+{
+}
+
+void __stdcall UnitsNative_FreeUnitTypes()
+{
+}
+
+void __stdcall UnitsNative_LoadDownloadMenus()
+{
+}
+
+void __stdcall UnitsNative_FreeDownloadMenus()
+{
+}
+
+void __stdcall UnitsNative_FreeMovementClasses()
+{
+}
+
+void __stdcall UnitsNative_InitUnitCategories()
+{
+}
+
+void __stdcall UnitsNative_FreeUnitCategories()
+{
+}
+
+void __stdcall UnitsNative_KillAllUnits()
+{
+}
+
+void __stdcall UnitsNative_KillUnitsOfType(short id)
+{
+}
+
+void __stdcall UnitsNative_ReloadUnitType(unsigned short id)
+{
+}
+
+void __stdcall UnitsNative_KillUnit(Unit* unit, int cause)
+{
+}
+
+void __stdcall UnitsNative_LoadUnits(HapiBank* file)
+{
+}
+
+void __stdcall UnitsNative_SaveUnits(HapiBank* file)
+{
+}
+
+Unit* __stdcall UnitsNative_LoadUnit(unsigned short id, HapiBank* file)
+{
+    return nullptr;
+}
+
+Unit* __stdcall UnitsNative_CreateUnit(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
+{
+    return nullptr;
+}
+
+UnitDef* __stdcall UnitsNative_FindUnitType(const char* name)
+{
+    return FindUnitType(name);
+}
+
+unsigned short __stdcall UnitsNative_FindUnitTypeId(const char* name)
+{
+    return FindUnitTypeId(name);
+}
+
+Unit* __stdcall UnitsNative_FindMissionUnit(const char* name, const Ref<Unit>* units, int count, Unit* after)
+{
+    return nullptr;
+}
+
+int __stdcall UnitsNative_AddBuildProgress(Unit* builder, Unit* unit, float amount)
+{
+    return 0;
+}
+
+int __stdcall UnitsNative_AddRepairProgress(Unit* builder, Unit* unit, float amount)
+{
+    return AddRepairProgress(builder, unit, amount);
+}
+
+int __stdcall UnitsNative_CanLoad(Unit* unit, Unit* target)
+{
+    return unit->CanLoad(target);
+}
+
+int __stdcall UnitsNative_CanReclaim(Unit* unit, Unit* target)
+{
+    return unit->CanReclaim(target);
+}
+
+int __stdcall UnitsNative_CanRepair(Unit* unit, Unit* target)
+{
+    return unit->CanRepair(target);
+}
+
+void __stdcall UnitsNative_UnitRefUnlink(UnitRef* ref)
+{
+}
+
+void __stdcall UnitsNative_UpdateUnitHead(Unit* unit)
+{
+    UpdateUnitHead(unit);
+}
+
+int __stdcall UnitsNative_UpdateUnitBody(Unit* unit)
+{
+    return UpdateUnitBody(unit);
+}
+
+void __stdcall UnitsNative_UpdateUnitTail(Unit* unit, int moved)
+{
+}
+
+int __stdcall UnitsNative_GetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
+{
+    return 0;
+}
+
+void __stdcall UnitsNative_CreateFactoryIndex(int player)
+{
+}
+
+void __stdcall UnitsNative_FreeFactoryIndex(int player)
+{
+}
+
+void __stdcall UnitsNative_RefreshFactoryIndex(int player)
+{
+}
+
+void __stdcall UnitsNative_UnitRefInit(UnitRef* ref, Unit* unit, OrderBase* value)
+{
+}
+
+void __stdcall UnitsNative_UnitRefSetUnit(UnitRef* ref, Unit* unit)
+{
+}
+
+Unit* __stdcall UnitsNative_UnitRefGet(UnitRef* ref)
+{
+    return nullptr;
+}
+
+void __stdcall UnitsNative_UnitRefSetValue(UnitRef* ref, OrderBase* value)
+{
+}
+
+void __stdcall UnitsNative_WriteState(const StateWriter* writer)
+{
+}
+
+int __stdcall UnitsNative_GetMovementLimits(MapMoveLimits* out, int capacity)
+{
+    return 0;
 }
 
 #include "replay_slots.h"

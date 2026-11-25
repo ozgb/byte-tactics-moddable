@@ -47942,6 +47942,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapGet
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapInBounds
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SnapWorldPosToFootprint
+,HookSeams,src/harness/replay_hooks.inc,field_write,MissionSeam::GetMissionParams
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::ApplyPathEvent
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::GetMotionState
@@ -48080,50 +48081,14 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::GetWeaponTargetPos
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::GetWeaponTargetUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,TargetingSeam::SavedTargetPair
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AddBuildProgress
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AddRepairProgress
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::AllocateUnitMemory
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CanLoad
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CanReclaim
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CanRepair
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CreateFactoryIndex
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::CreateUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FindMissionUnit
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FindUnitType
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FindUnitTypeId
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeDownloadMenus
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeFactoryIndex
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeMovementClasses
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitCategories
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitInfo
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitMemory
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::FreeUnitTypes
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::GetFactoriesInRadius
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::GetMovementLimits
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::InitUnitCategories
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::KillAllUnits
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::KillUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::KillUnitsOfType
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::LoadDownloadMenus
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::LoadUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::LoadUnitTypes
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::LoadUnits
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::RefreshFactoryIndex
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::RefreshUnitInfo
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::ReloadUnitType
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::SaveUnits
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UnitRefGet
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UnitRefInit
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UnitRefSetUnit
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UnitRefSetValue
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UnitRefUnlink
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UnitTypeSetAddTypeOrCategory
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateAllUnits
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateUnitBody
 ,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateUnitHead
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::UpdateUnitTail
-,HookSeams,src/harness/replay_hooks.inc,field_write,UnitsSeam::WriteState
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,field_write,WeaponsSeam::FindWeaponByName
@@ -48284,6 +48249,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapGet
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapInBounds
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSnapWorldPosToFootprint
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMissionGetMissionParams
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementApplyPathEvent
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementGetMotionState
@@ -48405,50 +48371,14 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingGetWeaponTargetPos
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingGetWeaponTargetUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecTargetingSavedTargetPair
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAddBuildProgress
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAddRepairProgress
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsAllocateUnitMemory
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCanLoad
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCanReclaim
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCanRepair
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCreateFactoryIndex
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsCreateUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFindMissionUnit
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFindUnitType
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFindUnitTypeId
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeDownloadMenus
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeFactoryIndex
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeMovementClasses
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitCategories
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitInfo
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitMemory
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsFreeUnitTypes
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsGetFactoriesInRadius
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsGetMovementLimits
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsInitUnitCategories
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsKillAllUnits
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsKillUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsKillUnitsOfType
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsLoadDownloadMenus
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsLoadUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsLoadUnitTypes
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsLoadUnits
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsRefreshFactoryIndex
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsRefreshUnitInfo
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsReloadUnitType
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsSaveUnits
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUnitRefGet
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUnitRefInit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUnitRefSetUnit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUnitRefSetValue
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUnitRefUnlink
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUnitTypeSetAddTypeOrCategory
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateAllUnits
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateUnitBody
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateUnitHead
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsUpdateUnitTail
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecUnitsWriteState
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindTargetableProjectile
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecWeaponsFindWeaponByName
@@ -55506,6 +55436,18 @@ address,function,file,kind,target
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitDef *, Vec3 *) __attribute__((stdcall)) [MapSeam::SnapWorldPosToFootprint]"
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,ArgValueStruct
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,FinishImport
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,ImportResultValue
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,ReplayText::Add
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,SlotScope::Import
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,field_read,MissionSeam::GetMissionParams
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,function,
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,global_read,s_inner_mission
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,global_read,s_tail
+,RecMissionGetMissionParams,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(MissionParams *) __attribute__((stdcall)) [MissionSeam::GetMissionParams]
 ,RecMovementApply,src/harness/replay_hooks.inc,call,ArgPending
 ,RecMovementApply,src/harness/replay_hooks.inc,call,ArgValue
 ,RecMovementApply,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -56677,17 +56619,6 @@ address,function,file,kind,target
 ,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,global_read,s_inner_targeting
 ,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecTargetingSavedTargetPair,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, int) __attribute__((stdcall)) [TargetingSeam::SavedTargetPair]"
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,Add
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,field_read,UnitsSeam::AddBuildProgress
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,function,
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,global_read,s_tail
-,RecUnitsAddBuildProgress,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, Unit *, float) __attribute__((stdcall)) [UnitsSeam::AddBuildProgress]"
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,call,ArgValue
@@ -56699,22 +56630,6 @@ address,function,file,kind,target
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecUnitsAddRepairProgress,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, Unit *, float) __attribute__((stdcall)) [UnitsSeam::AddRepairProgress]"
-,RecUnitsAllocateUnitMemory,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsAllocateUnitMemory,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsAllocateUnitMemory,src/harness/replay_hooks.inc,field_read,UnitsSeam::AllocateUnitMemory
-,RecUnitsAllocateUnitMemory,src/harness/replay_hooks.inc,function,
-,RecUnitsAllocateUnitMemory,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsAllocateUnitMemory,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::AllocateUnitMemory]
-,RecUnitsApply,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsApply,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsApply,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsApply,src/harness/replay_hooks.inc,field_read,UnitsSeam::Apply
-,RecUnitsApply,src/harness/replay_hooks.inc,function,
-,RecUnitsApply,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsApply,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsApply,src/harness/replay_hooks.inc,global_read,s_tail
-,RecUnitsApply,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(const UnitsEventHeader *, unsigned int) __attribute__((stdcall)) [UnitsSeam::Apply]"
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsCanLoad,src/harness/replay_hooks.inc,call,ArgValue
@@ -56748,37 +56663,6 @@ address,function,file,kind,target
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecUnitsCanRepair,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(Unit *, Unit *) __attribute__((stdcall)) [UnitsSeam::CanRepair]"
-,RecUnitsCreateFactoryIndex,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsCreateFactoryIndex,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsCreateFactoryIndex,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsCreateFactoryIndex,src/harness/replay_hooks.inc,field_read,UnitsSeam::CreateFactoryIndex
-,RecUnitsCreateFactoryIndex,src/harness/replay_hooks.inc,function,
-,RecUnitsCreateFactoryIndex,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsCreateFactoryIndex,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsCreateFactoryIndex,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [UnitsSeam::CreateFactoryIndex]
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,ArgValueStruct
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,field_read,UnitsSeam::CreateUnit
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,function,
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,global_read,s_tail
-,RecUnitsCreateUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via Unit *(*const)(unsigned char, unsigned short, const Vec3 *, int, int, int) __attribute__((stdcall)) [UnitsSeam::CreateUnit]"
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,call,Add
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,field_read,UnitsSeam::FindMissionUnit
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,function,
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,global_read,s_tail
-,RecUnitsFindMissionUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via Unit *(*const)(const char *, const Ref<Unit> *, int, Unit *) __attribute__((stdcall)) [UnitsSeam::FindMissionUnit]"
 ,RecUnitsFindUnitType,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsFindUnitType,src/harness/replay_hooks.inc,call,ArgValue
 ,RecUnitsFindUnitType,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -56798,223 +56682,6 @@ address,function,file,kind,target
 ,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecUnitsFindUnitTypeId,src/harness/replay_hooks.inc,indirect_call,indirect via unsigned short (*const)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
-,RecUnitsFreeDownloadMenus,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsFreeDownloadMenus,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsFreeDownloadMenus,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeDownloadMenus
-,RecUnitsFreeDownloadMenus,src/harness/replay_hooks.inc,function,
-,RecUnitsFreeDownloadMenus,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsFreeDownloadMenus,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeDownloadMenus]
-,RecUnitsFreeFactoryIndex,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsFreeFactoryIndex,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsFreeFactoryIndex,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsFreeFactoryIndex,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeFactoryIndex
-,RecUnitsFreeFactoryIndex,src/harness/replay_hooks.inc,function,
-,RecUnitsFreeFactoryIndex,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsFreeFactoryIndex,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsFreeFactoryIndex,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [UnitsSeam::FreeFactoryIndex]
-,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeMovementClasses
-,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,function,
-,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsFreeMovementClasses,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeMovementClasses]
-,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeUnitCategories
-,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,function,
-,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsFreeUnitCategories,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeUnitCategories]
-,RecUnitsFreeUnitInfo,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsFreeUnitInfo,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsFreeUnitInfo,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeUnitInfo
-,RecUnitsFreeUnitInfo,src/harness/replay_hooks.inc,function,
-,RecUnitsFreeUnitInfo,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsFreeUnitInfo,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeUnitInfo]
-,RecUnitsFreeUnitMemory,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsFreeUnitMemory,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsFreeUnitMemory,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeUnitMemory
-,RecUnitsFreeUnitMemory,src/harness/replay_hooks.inc,function,
-,RecUnitsFreeUnitMemory,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsFreeUnitMemory,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeUnitMemory]
-,RecUnitsFreeUnitTypes,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsFreeUnitTypes,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsFreeUnitTypes,src/harness/replay_hooks.inc,field_read,UnitsSeam::FreeUnitTypes
-,RecUnitsFreeUnitTypes,src/harness/replay_hooks.inc,function,
-,RecUnitsFreeUnitTypes,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsFreeUnitTypes,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::FreeUnitTypes]
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,ArgValueStruct
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,field_read,UnitsSeam::GetFactoriesInRadius
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,function,
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,global_read,s_tail
-,RecUnitsGetFactoriesInRadius,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, const Vec3 *, int, Ref<Unit> *, int) __attribute__((stdcall)) [UnitsSeam::GetFactoriesInRadius]"
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,field_read,UnitsSeam::GetMovementLimits
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,function,
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,global_read,s_tail
-,RecUnitsGetMovementLimits,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(MapMoveLimits *, int) __attribute__((stdcall)) [UnitsSeam::GetMovementLimits]"
-,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,field_read,UnitsSeam::InitUnitCategories
-,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,function,
-,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsInitUnitCategories,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::InitUnitCategories]
-,RecUnitsKillAllUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsKillAllUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsKillAllUnits,src/harness/replay_hooks.inc,field_read,UnitsSeam::KillAllUnits
-,RecUnitsKillAllUnits,src/harness/replay_hooks.inc,function,
-,RecUnitsKillAllUnits,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsKillAllUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::KillAllUnits]
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,call,Add
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,field_read,UnitsSeam::KillUnit
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,function,
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsKillUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::KillUnit]"
-,RecUnitsKillUnitsOfType,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsKillUnitsOfType,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsKillUnitsOfType,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsKillUnitsOfType,src/harness/replay_hooks.inc,field_read,UnitsSeam::KillUnitsOfType
-,RecUnitsKillUnitsOfType,src/harness/replay_hooks.inc,function,
-,RecUnitsKillUnitsOfType,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsKillUnitsOfType,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsKillUnitsOfType,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(short) __attribute__((stdcall)) [UnitsSeam::KillUnitsOfType]
-,RecUnitsLoadDownloadMenus,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsLoadDownloadMenus,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsLoadDownloadMenus,src/harness/replay_hooks.inc,field_read,UnitsSeam::LoadDownloadMenus
-,RecUnitsLoadDownloadMenus,src/harness/replay_hooks.inc,function,
-,RecUnitsLoadDownloadMenus,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsLoadDownloadMenus,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::LoadDownloadMenus]
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ArgHandle
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,field_read,UnitsSeam::LoadUnit
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,function,
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,global_read,s_tail
-,RecUnitsLoadUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via Unit *(*const)(unsigned short, HapiBank *) __attribute__((stdcall)) [UnitsSeam::LoadUnit]"
-,RecUnitsLoadUnitTypes,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsLoadUnitTypes,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsLoadUnitTypes,src/harness/replay_hooks.inc,field_read,UnitsSeam::LoadUnitTypes
-,RecUnitsLoadUnitTypes,src/harness/replay_hooks.inc,function,
-,RecUnitsLoadUnitTypes,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsLoadUnitTypes,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::LoadUnitTypes]
-,RecUnitsLoadUnits,src/harness/replay_hooks.inc,call,ArgHandle
-,RecUnitsLoadUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsLoadUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsLoadUnits,src/harness/replay_hooks.inc,field_read,UnitsSeam::LoadUnits
-,RecUnitsLoadUnits,src/harness/replay_hooks.inc,function,
-,RecUnitsLoadUnits,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsLoadUnits,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsLoadUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [UnitsSeam::LoadUnits]
-,RecUnitsRefreshFactoryIndex,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsRefreshFactoryIndex,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsRefreshFactoryIndex,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsRefreshFactoryIndex,src/harness/replay_hooks.inc,field_read,UnitsSeam::RefreshFactoryIndex
-,RecUnitsRefreshFactoryIndex,src/harness/replay_hooks.inc,function,
-,RecUnitsRefreshFactoryIndex,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsRefreshFactoryIndex,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsRefreshFactoryIndex,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [UnitsSeam::RefreshFactoryIndex]
-,RecUnitsRefreshUnitInfo,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsRefreshUnitInfo,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsRefreshUnitInfo,src/harness/replay_hooks.inc,field_read,UnitsSeam::RefreshUnitInfo
-,RecUnitsRefreshUnitInfo,src/harness/replay_hooks.inc,function,
-,RecUnitsRefreshUnitInfo,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsRefreshUnitInfo,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::RefreshUnitInfo]
-,RecUnitsReloadUnitType,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsReloadUnitType,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsReloadUnitType,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsReloadUnitType,src/harness/replay_hooks.inc,field_read,UnitsSeam::ReloadUnitType
-,RecUnitsReloadUnitType,src/harness/replay_hooks.inc,function,
-,RecUnitsReloadUnitType,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsReloadUnitType,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsReloadUnitType,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(unsigned short) __attribute__((stdcall)) [UnitsSeam::ReloadUnitType]
-,RecUnitsSaveUnits,src/harness/replay_hooks.inc,call,ArgHandle
-,RecUnitsSaveUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsSaveUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsSaveUnits,src/harness/replay_hooks.inc,field_read,UnitsSeam::SaveUnits
-,RecUnitsSaveUnits,src/harness/replay_hooks.inc,function,
-,RecUnitsSaveUnits,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsSaveUnits,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsSaveUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(HapiBank *) __attribute__((stdcall)) [UnitsSeam::SaveUnits]
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefGet
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,function,
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,global_read,s_tail
-,RecUnitsUnitRefGet,src/harness/replay_hooks.inc,indirect_call,indirect via Unit *(*const)(UnitRef *) __attribute__((stdcall)) [UnitsSeam::UnitRefGet]
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,Add
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefInit
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,function,
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsUnitRefInit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitRef *, Unit *, OrderBase *) __attribute__((stdcall)) [UnitsSeam::UnitRefInit]"
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,Add
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefSetUnit
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,function,
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsUnitRefSetUnit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitRef *, Unit *) __attribute__((stdcall)) [UnitsSeam::UnitRefSetUnit]"
-,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefSetValue
-,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,function,
-,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsUnitRefSetValue,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitRef *, OrderBase *) __attribute__((stdcall)) [UnitsSeam::UnitRefSetValue]"
-,RecUnitsUnitRefUnlink,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsUnitRefUnlink,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsUnitRefUnlink,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsUnitRefUnlink,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitRefUnlink
-,RecUnitsUnitRefUnlink,src/harness/replay_hooks.inc,function,
-,RecUnitsUnitRefUnlink,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsUnitRefUnlink,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsUnitRefUnlink,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(UnitRef *) __attribute__((stdcall)) [UnitsSeam::UnitRefUnlink]
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,field_read,UnitsSeam::UnitTypeSetAddTypeOrCategory
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,function,
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsUnitTypeSetAddTypeOrCategory,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(UnitTypeSet *, const char *, int *) __attribute__((stdcall)) [UnitsSeam::UnitTypeSetAddTypeOrCategory]"
-,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,field_read,UnitsSeam::UpdateAllUnits
-,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,function,
-,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsUpdateAllUnits,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [UnitsSeam::UpdateAllUnits]
 ,RecUnitsUpdateUnitBody,src/harness/replay_hooks.inc,call,Add
 ,RecUnitsUpdateUnitBody,src/harness/replay_hooks.inc,call,ArgObject
 ,RecUnitsUpdateUnitBody,src/harness/replay_hooks.inc,call,ArgValue
@@ -57035,24 +56702,6 @@ address,function,file,kind,target
 ,RecUnitsUpdateUnitHead,src/harness/replay_hooks.inc,global_read,s_call
 ,RecUnitsUpdateUnitHead,src/harness/replay_hooks.inc,global_read,s_inner_units
 ,RecUnitsUpdateUnitHead,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [UnitsSeam::UpdateUnitHead]
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,call,Add
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,call,ArgObject
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,call,ArgValue
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,field_read,UnitsSeam::UpdateUnitTail
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,function,
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsUpdateUnitTail,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(Unit *, int) __attribute__((stdcall)) [UnitsSeam::UpdateUnitTail]"
-,RecUnitsWriteState,src/harness/replay_hooks.inc,call,ArgPending
-,RecUnitsWriteState,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecUnitsWriteState,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecUnitsWriteState,src/harness/replay_hooks.inc,field_read,UnitsSeam::WriteState
-,RecUnitsWriteState,src/harness/replay_hooks.inc,function,
-,RecUnitsWriteState,src/harness/replay_hooks.inc,global_read,s_call
-,RecUnitsWriteState,src/harness/replay_hooks.inc,global_read,s_inner_units
-,RecUnitsWriteState,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(const StateWriter *) __attribute__((stdcall)) [UnitsSeam::WriteState]
 ,RecWeaponsApply,src/harness/replay_hooks.inc,call,ArgEvent
 ,RecWeaponsApply,src/harness/replay_hooks.inc,call,ArgValue
 ,RecWeaponsApply,src/harness/replay_hooks.inc,call,EventRoots
@@ -59572,6 +59221,7 @@ address,function,file,kind,target
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,FatalError
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,HarnessTestMode
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Int
+,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Ptr
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::Result
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,ReplayImport::~ReplayImport
 ,ScheduleEconomyRequestGranted,src/seams/economy_world.cpp,call,SchedInboxHolds

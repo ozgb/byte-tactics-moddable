@@ -76,5 +76,13 @@
       "expect": 237,
       "field": "out.x"
     }
+  },
+  "units": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_PERCENT_SCALE=99",
+      "recording": "orders-guard-attacked.txt",
+      "expect": 25,
+      "field": "Unit#1.healthPercent"
+    }
   }
 }

@@ -188,13 +188,20 @@ the last line that named them, in the object form. An element that the walk also
 ```
 
 ```
-  r FixtureCell#40.unit 3
-  r FixtureCell#500.metal 9
-  r FixtureCell#12.flags 258
+  r FixtureCell#0+9000.unit 0*40 3 0*8959
+  r FixtureCell#0+9000.metal 0*500 9 0*8499
   r FixtureCell#7000.metal 5
+  r FixtureCell#12.flags 258
 ```
 
-The first two lines are among the 27,000 of the first record (three fields of 9000 cells); the last two are all of the second. A delta kind
+A read line names a run of elements when the field is a number (an integer, flags or an `f32`): `Kind#first+count.field` stands for
+the same field of the `count` elements from `first` on, and its value is their values in order, a value that repeats `n` times written
+`value*n`. The recorder writes the elements whose field changed (at the first record, every element) field by field, one line for each run
+of neighbours, and a run of one element in the plain form. A line ends once its values pass 1,000 characters, and the run goes on in the next
+line. Write lines, out lines and the fields that are not numbers keep one line for each element; a recording that names every
+element in the plain form replays as before.
+
+The first two lines are two of the three of the first record (one field of 9000 cells each); the last two are all of the second. A delta kind
 is a state kind with a table, and no `inside`, `kinds` or `vtable`. An element that the walk also reached by a pointer is recorded once.
 A kind that is not a delta, or a slot that is not all-of over it, behaves as before.
 The table member is not an untracked target: a row that touches it needs no `exempt` entry.

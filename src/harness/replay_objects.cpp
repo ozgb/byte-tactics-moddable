@@ -1725,6 +1725,120 @@ void CaptureObject(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table
     }
 }
 
+enum { MAX_RUN_LINE = 1000 };
+
+bool InRuns(const ReplayObjectField& f)
+{
+    return f.kind == RK_I32 || f.kind == RK_U32 || f.kind == RK_U16 || f.kind == RK_I16 || f.kind == RK_U8 || f.kind == RK_FLAGS || f.kind == RK_F32;
+}
+
+class ElementRun {
+public:
+    ElementRun(ReplayText& out, char tag, const ReplayObjectField& f) : out(out), tag(tag), f(f), count(0), repeat(0) {}
+    ~ElementRun()
+    {
+        first.Free();
+        values.Free();
+        last.Free();
+    }
+
+    void Add(const char* key, const char* value)
+    {
+        if (count == 0) {
+            first.Clear();
+            first.Add(key);
+            values.Clear();
+            last.Clear();
+            last.Add(value);
+            repeat = 1;
+        } else if (strcmp(last.Data(), value) == 0) {
+            repeat++;
+        } else {
+            AddToken();
+            last.Clear();
+            last.Add(value);
+            repeat = 1;
+        }
+        count++;
+        if (values.Size() > MAX_RUN_LINE)
+            End();
+    }
+
+    void End()
+    {
+        if (count == 0)
+            return;
+        out.Add("  ");
+        out.AddChar(tag);
+        out.AddChar(' ');
+        if (count == 1) {
+            out.Add(first.Data());
+            out.AddChar(' ');
+            out.Add(last.Data());
+            out.AddChar('\n');
+            count = 0;
+            return;
+        }
+        AddToken();
+        const char* name = first.Data();
+        unsigned object = first.Size() - (unsigned)strlen(f.name) - 1;
+        for (unsigned i = 0; i < object; i++)
+            out.AddChar(name[i]);
+        out.AddChar('+');
+        out.AddUnsigned(count);
+        out.AddChar('.');
+        out.Add(f.name);
+        out.Add(values.Data());
+        out.AddChar('\n');
+        count = 0;
+    }
+
+private:
+    ElementRun(const ElementRun&);
+    ElementRun& operator=(const ElementRun&);
+
+    void AddToken()
+    {
+        values.AddChar(' ');
+        values.Add(last.Data());
+        if (repeat > 1) {
+            values.AddChar('*');
+            values.AddUnsigned(repeat);
+        }
+    }
+
+    ReplayText& out;
+    char tag;
+    const ReplayObjectField& f;
+    ReplayText first;
+    ReplayText values;
+    ReplayText last;
+    unsigned count;
+    unsigned repeat;
+};
+
+void CaptureColumn(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, unsigned kind, unsigned char* base, unsigned elements, unsigned stride, const ReplayObjectField& f,
+                   char tag, ReplayText& key, ReplayText& value)
+{
+    ElementRun run(out, tag, f);
+    for (unsigned e = 0; e < elements; e++) {
+        void* object = base + e * stride;
+        ReplayObjectFieldKey(key, table, true, kind, object, f);
+        if (!ReplayFieldLive(f, object)) {
+            run.End();
+            if (known.Get(key.Data()) != nullptr)
+                known.Set(key.Data(), "");
+            continue;
+        }
+        ReplayFormatObjectField(f, object, table, true, value);
+        if (known.Changed(key.Data(), value.Data()))
+            run.Add(key.Data(), value.Data());
+        else
+            run.End();
+    }
+    run.End();
+}
+
 }
 
 void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable& table, const ReplayReach& reach, const unsigned short* set, unsigned count, char tag)
@@ -1743,13 +1857,19 @@ void ReplayCaptureObjects(ReplayText& out, ReplayKnown& known, ReplayObjectTable
         unsigned short mine[MAX_DELTA_FIELDS];
         unsigned n = 0;
         for (unsigned i = 0; i < count && n < MAX_DELTA_FIELDS; i++) {
-            if (kReplayObjectFields[set[i]].object == reach.deltaKind[d])
+            const ReplayObjectField& f = kReplayObjectFields[set[i]];
+            if (f.object == reach.deltaKind[d] && !(tag == 'r' && InRuns(f)))
                 mine[n++] = set[i];
         }
         if (!ReplayDeltaTable(reach, d, &kind, &base, &elements, &stride))
             continue;
-        for (unsigned e = 0; e < elements; e++)
+        for (unsigned e = 0; n != 0 && e < elements; e++)
             CaptureObject(out, known, table, nullptr, 0, kind, base + e * stride, mine, n, tag, key, value);
+        for (unsigned i = 0; i < count; i++) {
+            const ReplayObjectField& f = kReplayObjectFields[set[i]];
+            if (f.object == reach.deltaKind[d] && tag == 'r' && InRuns(f))
+                CaptureColumn(out, known, table, kind, base, elements, stride, f, tag, key, value);
+        }
     }
     key.Free();
     value.Free();

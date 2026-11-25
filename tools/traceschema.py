@@ -889,7 +889,7 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
     ("spotField_1421f", 0x1421F, 4, "HEAP", 0),
     ("scanIndex", 0x14257, 4, None, 0),
     ("mapFlags", 0x14281, 2, None, 0xFFF7),
-    ("endGameFlags", 0x3923B, 2, None, 0),
+    ("endGameFlags", 0x3923B, 2, None, 0xFFFC),
     ("uiOptionFlags", 0x37F2F, 2, None, 0x788),
 ]
 

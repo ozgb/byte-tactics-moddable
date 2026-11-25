@@ -13657,20 +13657,23 @@
     "declaration": "int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player);",
     "args": [
      {
-      "mode": "skip",
-      "param": "unit"
+      "mode": "object",
+      "param": "unit",
+      "kind": "UnitDef"
      },
      {
-      "mode": "skip",
-      "param": "cell"
+      "mode": "value",
+      "param": "cell",
+      "kind": "Point16"
      },
      {
       "mode": "int",
       "param": "type"
      },
      {
-      "mode": "skip",
-      "param": "player"
+      "mode": "object",
+      "param": "player",
+      "kind": "Player"
      }
     ],
     "result": "int",
@@ -13688,16 +13691,18 @@
     "declaration": "int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags);",
     "args": [
      {
-      "mode": "skip",
-      "param": "unit"
+      "mode": "object",
+      "param": "unit",
+      "kind": "UnitDef"
      },
      {
       "mode": "int",
       "param": "otherTypeId"
      },
      {
-      "mode": "skip",
-      "param": "cell"
+      "mode": "value",
+      "param": "cell",
+      "kind": "Point16"
      },
      {
       "mode": "int",

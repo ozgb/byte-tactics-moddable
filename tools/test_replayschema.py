@@ -3440,6 +3440,24 @@ class CompilerVtablesAndRefArrays(unittest.TestCase):
         self.assertEqual(rs.whole_struct_kinds("deref_read", "*Box", ann), [])
         self.assertEqual(rs.whole_struct_kinds("deref_write", "*int", ann), [])
 
+    def test_the_build_site_services_record_the_def_the_cell_and_the_player(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        inc = files[rs.SERVICES_INC]
+        at = inc.index("case RI_SCHEDULE_MAP_CAN_BUILD_AT:")
+        case = inc[at:inc.index("break;", at)]
+        self.assertIn("ReplayAddObjectName(t, Table(), ROK_UNITDEF, a[0].v.p, true);", case)
+        self.assertIn("ReplayAddValueOrNull(t, ROK_POINT16, a[1].v.p, Table());", case)
+        self.assertIn("ReplayAddObjectName(t, Table(), ROK_PLAYER, a[3].v.p, true);", case)
+        self.assertEqual(files[rs.SERVICES_SLOTS].count("ReplayAddValueOrNull(t, ROK_POINT16, &cell, g_objects);"), 2)
+
+    def test_a_value_argument_passed_by_value_is_taken_by_address(self):
+        s = {"declaration": "int __stdcall F(UnitDef* unit, Point16 cell, const Vec3* pos, Vec3& at);"}
+        self.assertTrue(rs.service_param_by_value(s, "cell"))
+        self.assertFalse(rs.service_param_by_value(s, "unit"))
+        self.assertFalse(rs.service_param_by_value(s, "pos"))
+        self.assertFalse(rs.service_param_by_value(s, "at"))
+
     def test_a_ref_of_the_sim_globals_is_one_field(self):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])

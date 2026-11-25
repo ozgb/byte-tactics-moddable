@@ -751,7 +751,13 @@ int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Pla
     ReplayText t;
     StartImport(t, RI_SCHEDULE_MAP_CAN_BUILD_AT);
     Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNITDEF, unit, false);
+    Space(t);
+    ReplayAddValueOrNull(t, ROK_POINT16, &cell, g_objects);
+    Space(t);
     t.AddInt((int)type);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, player, false);
     const char* result = Enter(t);
     const char* g_lastPlaceMetalSumText = OutValue("SimGlobals.g_lastPlaceMetalSum");
     if (g_lastPlaceMetalSumText != nullptr)
@@ -764,7 +770,11 @@ int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short oth
     ReplayText t;
     StartImport(t, RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT);
     Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNITDEF, unit, false);
+    Space(t);
     t.AddInt((int)otherTypeId);
+    Space(t);
+    ReplayAddValueOrNull(t, ROK_POINT16, &cell, g_objects);
     Space(t);
     t.AddInt((int)flags);
     const char* result = Enter(t);

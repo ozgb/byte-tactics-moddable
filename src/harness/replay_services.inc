@@ -543,7 +543,13 @@ void ReplayImportEnd(ReplayImport& c)
     case RI_SCHEDULE_MAP_CAN_BUILD_AT:
     {
         AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_UNITDEF, a[0].v.p, true);
+        AddSpace(t);
+        ReplayAddValueOrNull(t, ROK_POINT16, a[1].v.p, Table());
+        AddSpace(t);
         t.AddInt(a[2].v.i);
+        AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_PLAYER, a[3].v.p, true);
         AddResult(t, c.result);
         t.Add("\n  o SimGlobals.g_lastPlaceMetalSum ");
         t.AddInt(g_lastPlaceMetalSum);
@@ -552,7 +558,11 @@ void ReplayImportEnd(ReplayImport& c)
     case RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT:
     {
         AddSpace(t);
+        ReplayAddObjectName(t, Table(), ROK_UNITDEF, a[0].v.p, true);
+        AddSpace(t);
         t.AddInt(a[1].v.i);
+        AddSpace(t);
+        ReplayAddValueOrNull(t, ROK_POINT16, a[2].v.p, Table());
         AddSpace(t);
         t.AddInt(a[3].v.i);
         AddResult(t, c.result);

@@ -987,6 +987,15 @@ at first sight, and the replayer names the module's block the same way when it c
 An entry of `services` may list `outs` of the form `{"label": "SimGlobals.g_lastPlaceMetalSum", "sim": "g_lastPlaceMetalSum"}`: the recorder writes `o SimGlobals.g_lastPlaceMetalSum 2007`
 after the import line, and the replayer's answer stores the value in the global before it returns. `ScheduleMapCanBuildAt` and `ScheduleMapCanPlaceUnitFootprint` have it, since the map module
 leaves the metal under the footprint in that global and ai reads it right after the call.
+Their line also carries the unit type, the cell and, for `ScheduleMapCanBuildAt`, the player (`object` arguments of the kinds `UnitDef` and `Player`, and the
+`Point16` cell, passed by value, as a `value` argument), so the site a module picks is compared:
+
+```
+  i services.ScheduleMapCanBuildAt UnitDef#268 (33,19) 0 null = 0
+  o SimGlobals.g_lastPlaceMetalSum 223
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#268 0 (231,107) 1 = 0
+  o SimGlobals.g_lastPlaceMetalSum 2007
+```
 
 ## The schema and its annotations
 
@@ -1168,7 +1177,7 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `object` (`kind`, `reach`) | `Handle#1` | an object the import writes: its `reach` fields follow the result as `o Handle#1.index 0` lines, and the replayer restores them |
 | `allocated` | `alloc#3`, `PlayerInfo#1`, `alloc#?` | a block that an earlier alloc returned, `alloc#?` when none did |
 | `commandargs` | `["x","y"]` or `null` | the strings of the argument list of a command |
-| `value` (`kind`) | `(80,226,90599392,88473600,327630432,104857,-983040,163111,1)` or `null` | the fields of a value kind behind a pointer, in the schema's order, as the tuple a value argument of a slot is written as; a different effect fails the replay at the import |
+| `value` (`kind`) | `(80,226,90599392,88473600,327630432,104857,-983040,163111,1)` or `null` | the fields of a value kind behind a pointer, or passed by value (a `Point16` cell), in the schema's order, as the tuple a value argument of a slot is written as; a different effect fails the replay at the import |
 | `effect` (`size`) | `(112,Unit#3,0)` | the effect a module publishes (`services.Emit`): a struct behind a pointer whose kind is its first field, written as the value of the payload struct of that kind in the recorded subsystem's event table, from the first `size` bytes of the effect with the rest zero (see Event arguments); `size` names the int argument that follows it, `i services.Emit (112,Unit#3,0) 12` |
 
 | Result | Written as |

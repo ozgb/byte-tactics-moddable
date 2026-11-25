@@ -3368,6 +3368,16 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
     return errors
 
 
+def service_param_by_value(s: dict, name: str) -> bool:
+    """Whether the declaration passes the parameter by value, not through a pointer or a reference."""
+    inner = " ".join(s["declaration"].split()).rstrip(";").split("(", 1)[1].rsplit(")", 1)[0]
+    for p in split_params(inner):
+        m = re.match(r"^(.*?)\b(\w+)$", p.strip())
+        if m and m.group(2) == name:
+            return not re.search(r"[*&]", m.group(1))
+    return False
+
+
 def service_arg_expr(s: dict, i: int, ctx: str) -> str:
     """The C++ expression of argument i: the parameter in a definition, a field of the call in an answer."""
     a = s["args"][i]
@@ -3375,6 +3385,8 @@ def service_arg_expr(s: dict, i: int, ctx: str) -> str:
         name = a.get("param", "this")
         if a.get("ref"):
             return "ReplayRefPtr(%s)" % name
+        if a["mode"] == "value" and service_param_by_value(s, name):
+            return "&" + name
         return "(%s)%s" % (a["cast"], name) if a.get("cast") else name
     v = "c.args[%d].v" % i
     if a["mode"] in ("stream", "int"):

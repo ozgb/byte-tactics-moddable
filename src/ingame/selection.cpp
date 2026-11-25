@@ -547,6 +547,7 @@ int __stdcall GetOrderCursor(unsigned char type, Unit* unit, Unit* target, int* 
 
 #include "../units/squad.h"
 #include "../harness/harness.h"
+#include "../../interfaces/services.h"
 
 void __stdcall SendGroupCommand(OrdersGroupCommand* command)
 {

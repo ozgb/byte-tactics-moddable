@@ -9,6 +9,7 @@
 #include "../../interfaces/host.h"
 #include "../util/engine_services.h"
 #include "../../interfaces/economy.h"
+#include "../../interfaces/orders.h"
 
 #include "../game/game.h"
 #include "../mission/mission.h"

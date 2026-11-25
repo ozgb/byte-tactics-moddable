@@ -80,6 +80,7 @@ int __stdcall OrderModeTakesTarget(unsigned char type);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit,
                                        Unit* target, void* pos);
 void __stdcall HarnessUiOrder(unsigned char kind, int remove, const void* unit, const void* target, const int* pos, int typeId, int amount);
+void __stdcall HarnessUiCommand(int build, int mode, unsigned char kind, int remove, const void* target, const int* pos, int typeId, int amount);
 void __stdcall IssueOrCancelOrder(OrderType kind, int flag, Unit* unit,
                             Unit* target, int* pos, int typeId, int amount);
 
@@ -90,6 +91,8 @@ static inline MissionType Order(const char* name) { return MissionType(name); }
 void __stdcall IssueOrderToSelection(OrderTypeEntry* entry, unsigned char mode,
                             OrderType kind, int* pos, int typeId, int amount)
 {
+    HarnessUiCommand(0, mode, kind.index, (entry->flags_a >> 2) & 1,
+                     g_game->hoverUnitId ? (char*)g_game->units + 280 * g_game->hoverUnitId : 0, pos, typeId, amount);
     int flag_a = (entry->flags_a >> 2) & 1;
     Unit* except = 0;
     int flag_b;

@@ -420,6 +420,7 @@ void __stdcall DefaultCommandHandler(int args);
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 void __stdcall HarnessUiOrder(unsigned char kind, int remove, const void* unit, const void* target, const int* pos, int typeId, int amount);
 void __stdcall HarnessUiQueue(const char* name, const void* unit, int count);
+void __stdcall HarnessUiCommand(int build, int mode, unsigned char kind, int remove, const void* target, const int* pos, int typeId, int amount);
 BOOL __stdcall HarnessGetCursorPos(POINT* pt);
 void __stdcall IssueOrCancelOrder(MissionType kind, int remove, Unit* owner,
                             int id, Vec3* pos, int typeId, int amount);
@@ -536,6 +537,7 @@ void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
     Point16 cell = WorldToCell(pos, origin);
     CellToWorld(origin, cell, &pos);
     pos.y = g_game->boxStartHeight << 16;
+    HarnessUiCommand(1, 0, 0, remove, 0, (int*)&pos, index, 0);
 
     unsigned char team = g_game->localPlayer;
     Player* p = &g_game->players[team];

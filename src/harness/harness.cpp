@@ -4376,6 +4376,46 @@ void __stdcall HarnessUiCancel(unsigned char kind, const void* unit)
     fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
 }
 
+void __stdcall HarnessUiCommand(int build, int mode, unsigned char kind, int remove, const void* target, const int* pos, int typeId, int amount)
+{
+    unsigned char* u;
+    unsigned char* end;
+    int any = 0;
+    if (!UiLive())
+        return;
+    UiLineStart("command");
+    if (build) {
+        fprintf(s_ui, " build type");
+        UiUnitType((unsigned short)typeId);
+    } else {
+        fprintf(s_ui, " order mode %d kind %s", mode, mode ? "-" : UiOrderName(kind));
+    }
+    fprintf(s_ui, " units");
+    u = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;
+    end = (unsigned char*)g_game->players[g_game->localPlayer].unitsEnd;
+    for (; u != NULL && u <= end; u += UNIT_STRIDE) {
+        if (!(u[UNIT_FLAGS] & UNIT_SELECTED))
+            continue;
+        fprintf(s_ui, "%s%u", any ? "," : " ", UiUnitIndex(u));
+        any = 1;
+    }
+    if (!any)
+        fprintf(s_ui, " -");
+    if (!build) {
+        if (target != NULL)
+            fprintf(s_ui, " target %u", UiUnitIndex(target));
+        else
+            fprintf(s_ui, " target -");
+    }
+    if (pos != NULL)
+        fprintf(s_ui, " pos %d %d %d", pos[0] >> 16, pos[1] >> 16, pos[2] >> 16);
+    else
+        fprintf(s_ui, " pos -");
+    if (!build)
+        fprintf(s_ui, " param %d amount %d", typeId, amount);
+    fprintf(s_ui, " remove %d\n", remove != 0);
+}
+
 static void UiListUnits(int group, int selectedOnly)
 {
     unsigned char* u = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;

@@ -14,6 +14,35 @@ WeaponDef* __stdcall Imp_weapons_FindWeaponByName(const char* a0)
     return w;
 }
 
+int __stdcall Imp_weapons_WeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3)
+{
+    ReplayText t;
+    StartImport(t, "weapons.WeaponCanReachPos");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    AddStructIn(t, ROK_VEC3, a1);
+    Space(t);
+    AddStructIn(t, ROK_VEC3, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+Projectile* __stdcall Imp_weapons_FindTargetableProjectile(Unit* a0, unsigned int a1)
+{
+    ReplayText t;
+    StartImport(t, "weapons.FindTargetableProjectile");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    Projectile* o = (Projectile*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
+}
+
 int __stdcall Imp_weapons_GetWeaponRange(Unit* a0, unsigned int a1)
 {
     ReplayText t;
@@ -80,102 +109,203 @@ int __stdcall Imp_files_BankGetInteger(HapiBank* a0, const char* a1, int a2)
     return ParseResult<int>(r);
 }
 
-void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
+unsigned int __stdcall Imp_econworld_Tick()
 {
     ReplayText t;
-    StartImport(t, "features.GetFootprintCentre");
-    Space(t);
-    t.Add("?");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
+    StartImport(t, "econworld.Tick");
     const char* r = Enter(t);
-    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    return ParseResult<unsigned int>(r);
+}
+
+int __stdcall Imp_econworld_Difficulty()
+{
+    ReplayText t;
+    StartImport(t, "econworld.Difficulty");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_econworld_SharingEnabled()
+{
+    ReplayText t;
+    StartImport(t, "econworld.SharingEnabled");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+float __stdcall Imp_econworld_Wind()
+{
+    ReplayText t;
+    StartImport(t, "econworld.Wind");
+    const char* r = Enter(t);
+    return ParseResult<float>(r);
+}
+
+float __stdcall Imp_econworld_Tide()
+{
+    ReplayText t;
+    StartImport(t, "econworld.Tide");
+    const char* r = Enter(t);
+    return ParseResult<float>(r);
+}
+
+void __stdcall Imp_econworld_PlayerInfo(int a0, EconPlayerInfo* a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.PlayerInfo");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    *a1 = ParseValueText<EconPlayerInfo>(ROK_ECONPLAYERINFO, r);
     (void)r;
 }
 
-Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
+int __stdcall Imp_econworld_Allied(int a0, int a1)
 {
     ReplayText t;
-    StartImport(t, "los_radar.GetMapCell");
+    StartImport(t, "econworld.Allied");
     Space(t);
     ReplayValue(t, a0);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
-    Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
-    ApplyReach(o, ROK_CELL, ".metal");
-    return o;
+    return ParseResult<int>(r);
 }
 
-Cell* __stdcall Imp_los_radar_GetMapCellAtPosition(Vec3* a0)
+EconUnit __stdcall Imp_econworld_FirstUnit(int a0)
 {
     ReplayText t;
-    StartImport(t, "los_radar.GetMapCellAtPosition");
+    StartImport(t, "econworld.FirstUnit");
     Space(t);
-    t.Add("?");
+    ReplayValue(t, a0);
     const char* r = Enter(t);
-    Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
-    return o;
+    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
 }
 
-int __stdcall Imp_los_radar_IsPointVisible(Player* a0, Vec3* a1)
+EconUnit __stdcall Imp_econworld_LastUnit(int a0)
 {
     ReplayText t;
-    StartImport(t, "los_radar.IsPointVisible");
+    StartImport(t, "econworld.LastUnit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
+}
+
+EconUnit __stdcall Imp_econworld_NextUnit(EconUnit a0)
+{
+    ReplayText t;
+    StartImport(t, "econworld.NextUnit");
     Space(t);
-    t.Add("?");
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    const char* r = Enter(t);
+    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
+}
+
+int __stdcall Imp_econworld_UnitSlot(EconUnit a0)
+{
+    ReplayText t;
+    StartImport(t, "econworld.UnitSlot");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
 
-unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
+int __stdcall Imp_econworld_UnitInfo(EconUnit a0, EconUnitInfo* a1)
 {
     ReplayText t;
-    StartImport(t, "los_radar.SoundHeardMask");
+    StartImport(t, "econworld.UnitInfo");
     Space(t);
-    t.Add("at=");
-    AddVec3(t, a0);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
     const char* r = Enter(t);
-    return ParseResult<unsigned int>(r);
+    ApplyInOut(a1, "uinfo", ROK_ECONUNITINFO);
+    return ParseResult<int>(r);
 }
 
-int __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+void __stdcall Imp_econworld_TypeInfo(EconType a0, EconTypeInfo* a1)
 {
     ReplayText t;
-    StartImport(t, "los_radar.GetVisibleEnemiesInRadius");
+    StartImport(t, "econworld.TypeInfo");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    *a1 = ParseValueText<EconTypeInfo>(ROK_ECONTYPEINFO, r);
+    (void)r;
+}
+
+int __stdcall Imp_econworld_CellMetal(int a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.CellMetal");
     Space(t);
     ReplayValue(t, a0);
     Space(t);
-    t.Add("pos=");
-    AddVec3(t, a1);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_econworld_Emit(const EconomyEventHeader* a0, unsigned int a1)
+{
+    ReplayText t;
+    StartImport(t, "econworld.Emit");
+    Space(t);
+    ReplayAddEffect(t, RET_ECONOMY, a0, a1, g_objects);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendShareMapInfo(unsigned char a0, unsigned char a1)
+{
+    ReplayText t;
+    StartImport(t, "network.SendShareMapInfo");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendFeatureBurning(int a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "network.SendFeatureBurning");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendFeatureHit(WeaponDef* a0, int a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "network.SendFeatureHit");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
     Space(t);
     ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    return EnterList(t, a4, a5);
+    const char* r = Enter(t);
+    (void)r;
 }
 
-int __stdcall Imp_map_GetCellMeanHeight(Vec3* a0)
+void __stdcall Imp_network_SendFeatureKilled(int a0, int a1)
 {
     ReplayText t;
-    StartImport(t, "map.GetCellMeanHeight");
+    StartImport(t, "network.SendFeatureKilled");
     Space(t);
-    t.Add("?");
-    const char* r = Enter(t);
-    return ParseResult<int>(r);
-}
-
-int __stdcall Imp_map_GetGroundHeight(Vec3* a0)
-{
-    ReplayText t;
-    StartImport(t, "map.GetGroundHeight");
+    ReplayValue(t, a0);
     Space(t);
-    t.Add("pos=");
-    AddVec3Xz(t, a0);
+    ReplayValue(t, a1);
     const char* r = Enter(t);
-    return ParseResult<int>(r);
+    (void)r;
 }
 
 void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
@@ -262,6 +392,231 @@ void __stdcall Imp_network_SendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2
     (void)r;
 }
 
+void __stdcall Imp_network_BroadcastPlayerInfo()
+{
+    ReplayText t;
+    StartImport(t, "network.BroadcastPlayerInfo");
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_BroadcastPlayerEconomy(Player* a0)
+{
+    ReplayText t;
+    StartImport(t, "network.BroadcastPlayerEconomy");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendShareEnergy(unsigned char a0, unsigned char a1, float a2)
+{
+    ReplayText t;
+    StartImport(t, "network.SendShareEnergy");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendShareMetal(unsigned char a0, unsigned char a1, float a2)
+{
+    ReplayText t;
+    StartImport(t, "network.SendShareMetal");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.GetMapCell");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    ApplyReach(o, ROK_CELL, ".metal");
+    return o;
+}
+
+unsigned int __stdcall Imp_los_radar_SoundHeardMask(const Vec3* a0)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.SoundHeardMask");
+    Space(t);
+    t.Add("at=");
+    AddVec3(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<unsigned int>(r);
+}
+
+int __stdcall Imp_los_radar_GetSeenUnitsInRadius(int a0, const Vec3* a1, int a2, Ref<Unit>* a3, int a4)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.GetSeenUnitsInRadius");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    return EnterList(t, a3, a4);
+}
+
+int __stdcall Imp_los_radar_IsPointVisible(Player* a0, Vec3* a1)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.IsPointVisible");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a1);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+Cell* __stdcall Imp_los_radar_GetMapCellAtPosition(Vec3* a0)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.GetMapCellAtPosition");
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a0);
+    const char* r = Enter(t);
+    Cell* o = (Cell*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+int __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.GetVisibleEnemiesInRadius");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    t.Add("pos=");
+    AddVec3(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    return EnterList(t, a4, a5);
+}
+
+int __stdcall Imp_map_GetCellMeanHeight(Vec3* a0)
+{
+    ReplayText t;
+    StartImport(t, "map.GetCellMeanHeight");
+    Space(t);
+    t.Add("pos=");
+    AddVec3Xz(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_map_GetGroundHeight(Vec3* a0)
+{
+    ReplayText t;
+    StartImport(t, "map.GetGroundHeight");
+    Space(t);
+    t.Add("pos=");
+    AddVec3Xz(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_map_UnitsInRange(const Vec3* a0, int a1, int a2, unsigned short* a3, int a4)
+{
+    ReplayText t;
+    StartImport(t, "map.UnitsInRange");
+    Space(t);
+    AddValueStruct(t, ROK_VEC3, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    t.Add("?");
+    Space(t);
+    ReplayValue(t, a4);
+    const char* r = Enter(t);
+    ApplyBytes(a3, (a4 * 2), "ids");
+    return ParseResult<int>(r);
+}
+
+int __stdcall Imp_mission_GetGameType()
+{
+    ReplayText t;
+    StartImport(t, "mission.GetGameType");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+const char* __stdcall Imp_mission_GetNameSlot(int a0)
+{
+    ReplayText t;
+    StartImport(t, "mission.GetNameSlot");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    (void)r;
+    return (const char*)0;
+}
+
+void __stdcall Imp_mission_GetMissionParams(MissionParams* a0)
+{
+    ReplayText t;
+    StartImport(t, "mission.GetMissionParams");
+    const char* r = Enter(t);
+    *a0 = ParseValueText<MissionParams>(ROK_MISSIONPARAMS, r);
+    (void)r;
+}
+
+void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "pathfinding.CellsChanged");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+unsigned int __stdcall Imp_scripts_ObjectStateSize(Object3do* a0)
+{
+    ReplayText t;
+    StartImport(t, "scripts.ObjectStateSize");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, a0, false);
+    const char* r = Enter(t);
+    return ParseResult<unsigned int>(r);
+}
+
 void __stdcall Imp_scripts_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char a2)
 {
     ReplayText t;
@@ -336,16 +691,85 @@ void __stdcall Imp_scripts_GetSweetSpot(Unit* a0, Vec3* a1)
     (void)r;
 }
 
-void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
+int __stdcall Imp_orders_GetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3* a3)
 {
     ReplayText t;
-    StartImport(t, "pathfinding.CellsChanged");
+    StartImport(t, "orders.GetOrderType");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
+    Space(t);
+    AddStructIn(t, ROK_VEC3, a3);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_players_LoadDefaultAIScript()
+{
+    ReplayText t;
+    StartImport(t, "players.LoadDefaultAIScript");
+    const char* r = Enter(t);
+    (void)r;
+}
+
+double __stdcall Imp_economy_GetEnergyUse(EconType a0)
+{
+    ReplayText t;
+    StartImport(t, "economy.GetEnergyUse");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return ParseResult<double>(r);
+}
+
+void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
+{
+    ReplayText t;
+    StartImport(t, "features.GetFootprintCentre");
+    Space(t);
+    AddStructIn(t, ROK_POINT16, a0);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
+    const char* r = Enter(t);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    (void)r;
+}
+
+unsigned short __stdcall Imp_features_FindFeatureAtPos(Vec3* a0, Point16* a1, Point16* a2)
+{
+    ReplayText t;
+    StartImport(t, "features.FindFeatureAtPos");
+    Space(t);
+    AddStructIn(t, ROK_VEC3, a0);
+    const char* r = Enter(t);
+    ApplyInOut(a1, "cell", ROK_POINT16);
+    ApplyInOut(a2, "size", ROK_POINT16);
+    return ParseResult<unsigned short>(r);
+}
+
+unsigned short __stdcall Imp_units_FindUnitTypeId(const char* a0)
+{
+    ReplayText t;
+    StartImport(t, "units.FindUnitTypeId");
+    Space(t);
+    t.AddString((const char*)a0);
+    const char* r = Enter(t);
+    return ParseResult<unsigned short>(r);
+}
+
+Unit* __stdcall Imp_units_CreateUnit(unsigned char a0, unsigned short a1, const Vec3* a2, int a3, int a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "units.CreateUnit");
     Space(t);
     ReplayValue(t, a0);
     Space(t);
     ReplayValue(t, a1);
     Space(t);
-    ReplayValue(t, a2);
+    AddValueStruct(t, ROK_VEC3, a2);
     Space(t);
     ReplayValue(t, a3);
     Space(t);
@@ -353,9 +777,24 @@ void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsi
     Space(t);
     ReplayValue(t, a5);
     const char* r = Enter(t);
-    (void)r;
+    Unit* o = (Unit*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
 }
 
+WeaponsSeam g_import_weapons;
+FilesSeam g_import_files;
+EconomyWorldView g_import_econworld;
+NetworkSeam g_import_network;
+LosRadarSeam g_import_los_radar;
+MapSeam g_import_map;
+MissionSeam g_import_mission;
+PathfindingSeam g_import_pathfinding;
+ScriptsSeam g_import_scripts;
+OrdersSeam g_import_orders;
+PlayersSeam g_import_players;
+EconomySeam g_import_economy;
+FeaturesSeam g_import_features;
+UnitsSeam g_import_units;
 WindMeteorsSeam g_native_wind_meteors = {
     UpdateWindSlot,
     UpdateMeteors,
@@ -365,6 +804,64 @@ WindMeteorsSeam g_native_wind_meteors = {
     LoadMeteorDefaults,
     SaveMeteors,
     LoadMeteors,
+};
+
+EconomySeam g_native_economy = {
+    EconomyRegionSize,
+    EconomyInit,
+    EconomyShutdown,
+    EconomyApply,
+    EconomySpend,
+    EconomyUpdatePlayer,
+    EconomyUpdateMetalExtraction,
+    EconomyUpdateResourceSharing,
+    EconomyRequestGranted,
+    EconomyGetEnergyUse,
+    EconomyUnitAccount,
+    EconomyWriteState,
+};
+
+FeaturesSeam g_native_features = {
+    UpdateFeaturesSlot,
+    LoadFeatureFileList,
+    FreeFeatureFileList,
+    NopAfterFeatureEnum,
+    ResolveFeatureLinks,
+    InitFeatureAnimPool,
+    FreeFeaturePool,
+    PlaceMissionFeatures,
+    StampFeatureMetal,
+    GetCellFeature,
+    FindOrLoadFeatureType,
+    GetFootprintCentreSlot,
+    SaveFeatures,
+    LoadFeatures,
+    ApplyEvent,
+    PlaceEvent,
+    FeatureTypeCount,
+    AnimateFeatureType,
+    ScanFeatureCell,
+    FirstFeatureSpot,
+    UpdateFeatureSpot,
+    FindFeatureAtPos,
+};
+
+AiSeam g_native_ai = {
+    AiApply,
+    DumpPlayerAI,
+    ResetAIPlayers,
+    CreatePlayerAI,
+    DestroyPlayerAI,
+    UpdatePlayerAI,
+    RebuildFeatureCells,
+    ParseDownloadableAiWeightScripts,
+    ReparseAiWeightScriptsIfLimitNotSticky,
+    CreateSquads,
+    FreeSquads,
+    UpdateSquadsSlot,
+    CreateSquadManagerSlot,
+    FreeSquadManagerSlot,
+    WriteAiStateSlot,
 };
 
 WeaponsSeam g_native_weapons = {
@@ -398,6 +895,117 @@ TargetingSeam g_native_targeting = {
     SavedTargetPair,
 };
 
+LosRadarSeam g_native_los_radar = {
+    ApplyLosRadarEvent,
+    GetMapCell,
+    GetMapCellAtPosition,
+    GetOriginCellAtPosition,
+    ClampWorldPosToTerrain,
+    IsUnitVisibleToPlayer,
+    SoundHeardMask,
+    UpdateUnitLineOfSight,
+    RecordRadarUnits,
+    UpdateSensorRadarAndCloak,
+    RecordRadarMapped,
+    ExpireEyeballs,
+    LoadTntMap,
+    InitRadar,
+    FreeRadar,
+    FreeMapResources,
+    GetVisibleEnemiesInRadius,
+    HasReadyUnitInRange,
+    IsPointVisible,
+    GetSeenUnitsInRadius,
+    CreateUnitIndex,
+    FreeUnitIndex,
+    RefreshUnitIndex,
+    LosRadarRegionSize,
+    LosRadarInit,
+    LosRadarShutdown,
+    LosRadarSightCache,
+    LosRadarWriteState,
+    LoadMappingData,
+    SaveMappingData,
+};
+
+UnitsSeam g_native_units = {
+    UnitsNative_Apply,
+    UnitsNative_UpdateAllUnits,
+    UnitsNative_UnitTypeSetAddTypeOrCategory,
+    UnitsNative_AllocateUnitMemory,
+    UnitsNative_FreeUnitMemory,
+    UnitsNative_FreeUnitInfo,
+    UnitsNative_RefreshUnitInfo,
+    UnitsNative_LoadUnitTypes,
+    UnitsNative_FreeUnitTypes,
+    UnitsNative_LoadDownloadMenus,
+    UnitsNative_FreeDownloadMenus,
+    UnitsNative_FreeMovementClasses,
+    UnitsNative_InitUnitCategories,
+    UnitsNative_FreeUnitCategories,
+    UnitsNative_KillAllUnits,
+    UnitsNative_KillUnitsOfType,
+    UnitsNative_ReloadUnitType,
+    UnitsNative_KillUnit,
+    UnitsNative_LoadUnits,
+    UnitsNative_SaveUnits,
+    UnitsNative_LoadUnit,
+    UnitsNative_CreateUnit,
+    UnitsNative_FindUnitType,
+    UnitsNative_FindUnitTypeId,
+    UnitsNative_FindMissionUnit,
+    UnitsNative_AddBuildProgress,
+    UnitsNative_AddRepairProgress,
+    UnitsNative_CanLoad,
+    UnitsNative_CanReclaim,
+    UnitsNative_CanRepair,
+    UnitsNative_UnitRefUnlink,
+    UnitsNative_UpdateUnitHead,
+    UnitsNative_UpdateUnitBody,
+    UnitsNative_UpdateUnitTail,
+    UnitsNative_GetFactoriesInRadius,
+    UnitsNative_CreateFactoryIndex,
+    UnitsNative_FreeFactoryIndex,
+    UnitsNative_RefreshFactoryIndex,
+    UnitsNative_UnitRefInit,
+    UnitsNative_UnitRefSetUnit,
+    UnitsNative_UnitRefGet,
+    UnitsNative_UnitRefSetValue,
+    UnitsNative_WriteState,
+    UnitsNative_GetMovementLimits,
+};
+
+PlayersSeam g_native_players = {
+    PlayersApply,
+    UpdatePlayersSlot,
+    LoadDefaultAIScript,
+    InitPlayers,
+    FreePlayers,
+    InitPlayerResources,
+    LoadPlayerControllers,
+    LoadPlayers,
+    SavePlayers,
+    RebuildAIFeatureCells,
+    SetupPlayerSlot,
+    UpdateBlink,
+    DeactivateConditionsNative,
+    LoadConditionsNative,
+    SaveConditionsNative,
+    RegisterConditionsNative,
+    FreeConditionsNative,
+    DeleteConditionsNative,
+    UpdatePlayersOnStreamSlot,
+    NewConditionsNative,
+    UpdatePlayerHead,
+    UpdatePlayerBody,
+    UpdatePlayerTail,
+    UpdatePlayersFinish,
+    PlayersRegionSize,
+    PlayersInit,
+    PlayersShutdown,
+    PlayersWriteState,
+};
+
 MapSeam g_native_map = {
     ApplyMapEventSlot,
     UnitsInRange,
@@ -423,6 +1031,43 @@ MapSeam g_native_map = {
     RefreshUnitIfStaleSlot,
     WriteStateSlot,
     PathLockStamp,
+};
+
+MissionSeam g_native_mission = {
+    GetGameTypeSlot,
+    GetNameSlotSlot,
+    SetMissionType,
+    FreeOtaEnumCacheAndMission,
+    AdvanceMissionSlot,
+    GetCampaignNameSlot,
+    GetMissionIndexSlot,
+    GetMissionNameSlot,
+    GetStartPositionSlot,
+    LoadCampaignSlot,
+    LoadMissionByNameSlot,
+    MissionExistsSlot,
+    RefreshMapListSlot,
+    SelectMissionSlot,
+    ComputeMapChecksumSlot,
+    GetTerrainLengthSlot,
+    CountMissionsSlot,
+    GetCampaignMissionNameSlot,
+    CountStartPositionsSlot,
+    GetBriefingSlot,
+    GetDescriptionSlot,
+    GetPlanetSlot,
+    GetTerrainSizeTierSlot,
+    GetTranslatedNameSlot,
+    HasMissionNameSlot,
+    SelectSchemaSlot,
+    GetMissionParamsSlot,
+    CountMissionUnitsSlot,
+    GetMissionUnitSlot,
+    SetMissionUnitPositionSlot,
+    CountMissionFeaturesSlot,
+    GetMissionFeatureSlot,
+    GetMemorySlot,
+    GetNumPlayersSlot,
 };
 
 void Run_wind_meteors_UpdateWind()
@@ -488,6 +1133,396 @@ void Run_wind_meteors_LoadMeteors()
     g_seams.wind_meteors->LoadMeteors(p0);
 }
 
+unsigned int g_result_economy_RegionSize;
+
+void Run_economy_RegionSize()
+{
+    EconMapInfo p0 = EconMapInfo();
+    ParseValueArg("map", ROK_ECONMAPINFO, &p0);
+    SetClosing("result");
+    g_result_economy_RegionSize = g_seams.economy->RegionSize(&p0);
+}
+
+void After_economy_RegionSize()
+{
+    CompareResult(g_result_economy_RegionSize);
+}
+
+void Run_economy_Init()
+{
+    EconMapInfo p0 = EconMapInfo();
+    ParseValueArg("map", ROK_ECONMAPINFO, &p0);
+    EconomyWorldView* p1 = &g_import_econworld;
+    void* p2 = AllocRegion(ArgScalar<unsigned>("size"));
+    RegionBind(p2, ArgScalar<unsigned>("size"));
+    unsigned int p3 = ArgScalar<unsigned int>("size");
+    SetClosing(nullptr);
+    g_seams.economy->Init(&p0, p1, p2, p3);
+}
+
+void* g_result_economy_Shutdown;
+
+void Run_economy_Shutdown()
+{
+    SetClosing("result");
+    g_result_economy_Shutdown = g_seams.economy->Shutdown();
+}
+
+void After_economy_Shutdown()
+{
+    CompareRegionResult(g_result_economy_Shutdown);
+}
+
+int g_result_economy_Apply;
+
+void Run_economy_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_ECONOMY, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_economy_Apply = g_seams.economy->Apply((EconomyEventHeader*)p0, p1);
+}
+
+void After_economy_Apply()
+{
+    CompareResult(g_result_economy_Apply);
+}
+
+int g_result_economy_Spend;
+
+void Run_economy_Spend()
+{
+    struct EconomySpend p0;
+    memset(&p0, 0, sizeof p0);
+    ParseValueArg("spend", ROK_ECONOMYSPEND, &p0);
+    SetClosing("result");
+    g_result_economy_Spend = g_seams.economy->Spend(&p0);
+}
+
+void After_economy_Spend()
+{
+    CompareResult(g_result_economy_Spend);
+}
+
+void Run_economy_UpdatePlayerEconomy()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.economy->UpdatePlayerEconomy(p0);
+}
+
+void Run_economy_UpdateMetalExtraction()
+{
+    EconUnit p0 = ReplayRefOffset(ArgObject("unit", ROK_UNIT));
+    SetClosing(nullptr);
+    g_seams.economy->UpdateMetalExtraction(p0);
+}
+
+void Run_economy_UpdateResourceSharing()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.economy->UpdateResourceSharing(p0);
+}
+
+int g_result_economy_RequestGranted;
+
+void Run_economy_RequestGranted()
+{
+    EconUnit p0 = ReplayRefOffset(ArgObject("unit", ROK_UNIT));
+    unsigned int p1 = ArgScalar<unsigned int>("resources");
+    SetClosing("result");
+    g_result_economy_RequestGranted = g_seams.economy->RequestGranted(p0, p1);
+}
+
+void After_economy_RequestGranted()
+{
+    CompareResult(g_result_economy_RequestGranted);
+}
+
+double g_result_economy_GetEnergyUse;
+
+void Run_economy_GetEnergyUse()
+{
+    EconType p0 = ArgScalar<EconType>("type");
+    SetClosing("result");
+    g_result_economy_GetEnergyUse = g_seams.economy->GetEnergyUse(p0);
+}
+
+void After_economy_GetEnergyUse()
+{
+    CompareResult(g_result_economy_GetEnergyUse);
+}
+
+EconAccount g_out_economy_UnitAccount_1;
+
+void Run_economy_UnitAccount()
+{
+    EconUnit p0 = ReplayRefOffset(ArgObject("unit", ROK_UNIT));
+    memset(&g_out_economy_UnitAccount_1, 0, sizeof g_out_economy_UnitAccount_1);
+    SetClosing("out.");
+    g_seams.economy->UnitAccount(p0, &g_out_economy_UnitAccount_1);
+}
+
+void After_economy_UnitAccount()
+{
+    CompareStruct("out", ROK_ECONACCOUNT, &g_out_economy_UnitAccount_1);
+}
+
+unsigned short g_result_features_GetCellFeature;
+
+void Run_features_GetCellFeature()
+{
+    Cell* p0 = (Cell*)ArgObject("cell", ROK_CELL);
+    SetClosing("result");
+    g_result_features_GetCellFeature = g_seams.features->GetCellFeature(p0);
+}
+
+void After_features_GetCellFeature()
+{
+    CompareResult(g_result_features_GetCellFeature);
+}
+
+Vec3 g_out_features_GetFootprintCentre_2;
+
+void Run_features_GetFootprintCentre()
+{
+    Point16 p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("cell", ROK_POINT16, &p0);
+    Feature* p1 = (Feature*)ArgObject("def", ROK_FEATURE);
+    memset(&g_out_features_GetFootprintCentre_2, 0, sizeof g_out_features_GetFootprintCentre_2);
+    SetClosing("result");
+    g_seams.features->GetFootprintCentre(&p0, p1, &g_out_features_GetFootprintCentre_2);
+}
+
+void After_features_GetFootprintCentre()
+{
+    CompareValueResult(ROK_VEC3, &g_out_features_GetFootprintCentre_2);
+}
+
+int g_result_features_Apply;
+
+void Run_features_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_FEATURES, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_features_Apply = g_seams.features->Apply((FeaturesEventHeader*)p0, p1);
+}
+
+void After_features_Apply()
+{
+    CompareResult(g_result_features_Apply);
+}
+
+int g_result_features_Place;
+
+void Run_features_Place()
+{
+    FeaturesPlace p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("place", ROK_FEATURESPLACE, &p0);
+    SetClosing("result");
+    g_result_features_Place = g_seams.features->Place(&p0);
+}
+
+void After_features_Place()
+{
+    CompareResult(g_result_features_Place);
+}
+
+int g_result_features_FeatureTypeCount;
+
+void Run_features_FeatureTypeCount()
+{
+    SetClosing("result");
+    g_result_features_FeatureTypeCount = g_seams.features->FeatureTypeCount();
+}
+
+void After_features_FeatureTypeCount()
+{
+    CompareResult(g_result_features_FeatureTypeCount);
+}
+
+void Run_features_AnimateFeatureType()
+{
+    int p0 = ArgScalar<int>("type");
+    SetClosing(nullptr);
+    g_seams.features->AnimateFeatureType(p0);
+}
+
+void Run_features_ScanFeatureCell()
+{
+    SetClosing(nullptr);
+    g_seams.features->ScanFeatureCell();
+}
+
+int g_result_features_FirstFeatureSpot;
+
+void Run_features_FirstFeatureSpot()
+{
+    SetClosing("result");
+    g_result_features_FirstFeatureSpot = g_seams.features->FirstFeatureSpot();
+}
+
+void After_features_FirstFeatureSpot()
+{
+    CompareResult(g_result_features_FirstFeatureSpot);
+}
+
+int g_result_features_UpdateFeatureSpot;
+
+void Run_features_UpdateFeatureSpot()
+{
+    int p0 = ArgScalar<int>("spot");
+    SetClosing("result");
+    g_result_features_UpdateFeatureSpot = g_seams.features->UpdateFeatureSpot(p0);
+}
+
+void After_features_UpdateFeatureSpot()
+{
+    CompareResult(g_result_features_UpdateFeatureSpot);
+}
+
+Point16 g_out_features_FindFeatureAtPos_1;
+bool g_out_features_FindFeatureAtPos_1_null;
+Point16 g_out_features_FindFeatureAtPos_2;
+bool g_out_features_FindFeatureAtPos_2_null;
+unsigned short g_result_features_FindFeatureAtPos;
+
+void Run_features_FindFeatureAtPos()
+{
+    Vec3 p0;
+    memset(&p0, 0, sizeof p0);
+    ParseStruct("pos", ROK_VEC3, &p0);
+    memset(&g_out_features_FindFeatureAtPos_1, 0, sizeof g_out_features_FindFeatureAtPos_1);
+    g_out_features_FindFeatureAtPos_1_null = ParseNullOut("cell");
+    memset(&g_out_features_FindFeatureAtPos_2, 0, sizeof g_out_features_FindFeatureAtPos_2);
+    g_out_features_FindFeatureAtPos_2_null = ParseNullOut("size");
+    SetClosing("cell.", "size.", "result");
+    g_result_features_FindFeatureAtPos = g_seams.features->FindFeatureAtPos(&p0, g_out_features_FindFeatureAtPos_1_null ? nullptr : &g_out_features_FindFeatureAtPos_1, g_out_features_FindFeatureAtPos_2_null ? nullptr : &g_out_features_FindFeatureAtPos_2);
+}
+
+void After_features_FindFeatureAtPos()
+{
+    if (g_result_features_FindFeatureAtPos != 65535 && !g_out_features_FindFeatureAtPos_1_null) CompareStruct("cell", ROK_POINT16, &g_out_features_FindFeatureAtPos_1);
+    if (g_result_features_FindFeatureAtPos != 65535 && !g_out_features_FindFeatureAtPos_2_null) CompareStruct("size", ROK_POINT16, &g_out_features_FindFeatureAtPos_2);
+    CompareResult(g_result_features_FindFeatureAtPos);
+}
+
+int g_result_ai_Apply;
+
+void Run_ai_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_AI, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_ai_Apply = g_seams.ai->Apply((AiEventHeader*)p0, p1);
+}
+
+void After_ai_Apply()
+{
+    CompareResult(g_result_ai_Apply);
+}
+
+void Run_ai_DumpPlayerAI()
+{
+    int p0 = ArgScalar<int>("player");
+    TdfFile* p1 = (TdfFile*)ArgHandle("file");
+    SetClosing(nullptr);
+    g_seams.ai->DumpPlayerAI(p0, p1);
+}
+
+void Run_ai_ResetAIPlayers()
+{
+    SetClosing(nullptr);
+    g_seams.ai->ResetAIPlayers();
+}
+
+void Run_ai_CreatePlayerAI()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->CreatePlayerAI(p0);
+}
+
+void Run_ai_DestroyPlayerAI()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->DestroyPlayerAI(p0);
+}
+
+void Run_ai_UpdatePlayerAI()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->UpdatePlayerAI(p0);
+}
+
+void Run_ai_RebuildFeatureCells()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->RebuildFeatureCells(p0);
+}
+
+void Run_ai_ParseDownloadableAiWeightScripts()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->ParseDownloadableAiWeightScripts(p0);
+}
+
+void Run_ai_ReparseAiWeightScriptsIfLimitNotSticky()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->ReparseAiWeightScriptsIfLimitNotSticky(p0);
+}
+
+void Run_ai_CreateSquads()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.ai->CreateSquads(p0);
+}
+
+void Run_ai_FreeSquads()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.ai->FreeSquads(p0);
+}
+
+void Run_ai_UpdateSquads()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.ai->UpdateSquads(p0);
+}
+
+void Run_ai_CreateSquadManager()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.ai->CreateSquadManager(p0);
+}
+
+void Run_ai_FreeSquadManager()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    SetClosing(nullptr);
+    g_seams.ai->FreeSquadManager(p0);
+}
+
 int g_result_weapons_Apply;
 
 void Run_weapons_Apply()
@@ -505,11 +1540,32 @@ void After_weapons_Apply()
     CompareResult(g_result_weapons_Apply);
 }
 
+void Run_weapons_UpdateExplosions()
+{
+    SetClosing(nullptr);
+    g_seams.weapons->UpdateExplosions();
+}
+
 void Run_weapons_UpdateUnitWeapons()
 {
     Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
     SetClosing(nullptr);
     g_seams.weapons->UpdateUnitWeapons(p0);
+}
+
+WeaponDef* g_result_weapons_FindWeaponByName;
+
+void Run_weapons_FindWeaponByName()
+{
+    char p0_text[256];
+    ArgText("name", p0_text, sizeof p0_text);
+    SetClosing("result");
+    g_result_weapons_FindWeaponByName = g_seams.weapons->FindWeaponByName(p0_text);
+}
+
+void After_weapons_FindWeaponByName()
+{
+    CompareWeaponResult(g_result_weapons_FindWeaponByName);
 }
 
 int g_result_weapons_GetWeaponRange;
@@ -688,6 +1744,451 @@ void After_targeting_SavedTargetPair()
     CompareResult(g_result_targeting_SavedTargetPair);
 }
 
+int g_result_los_radar_Apply;
+
+void Run_los_radar_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_LOS_RADAR, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_los_radar_Apply = g_seams.los_radar->Apply((LosRadarEventHeader*)p0, p1);
+}
+
+void After_los_radar_Apply()
+{
+    CompareResult(g_result_los_radar_Apply);
+}
+
+Cell* g_result_los_radar_GetMapCell;
+
+void Run_los_radar_GetMapCell()
+{
+    int p0 = ArgScalar<int>("x");
+    int p1 = ArgScalar<int>("y");
+    SetClosing("result");
+    g_result_los_radar_GetMapCell = g_seams.los_radar->GetMapCell(p0, p1);
+}
+
+void After_los_radar_GetMapCell()
+{
+    CompareObjectResult(ROK_CELL, g_result_los_radar_GetMapCell);
+}
+
+Cell* g_result_los_radar_GetMapCellAtPosition;
+
+void Run_los_radar_GetMapCellAtPosition()
+{
+    Vec3 p0 = ArgScalar<Vec3>("pos");
+    SetClosing("result");
+    g_result_los_radar_GetMapCellAtPosition = g_seams.los_radar->GetMapCellAtPosition(&p0);
+}
+
+void After_los_radar_GetMapCellAtPosition()
+{
+    CompareObjectResult(ROK_CELL, g_result_los_radar_GetMapCellAtPosition);
+}
+
+Cell* g_result_los_radar_GetOriginCellAtPosition;
+
+void Run_los_radar_GetOriginCellAtPosition()
+{
+    Vec3 p0 = ArgScalar<Vec3>("pos");
+    SetClosing("result");
+    g_result_los_radar_GetOriginCellAtPosition = g_seams.los_radar->GetOriginCellAtPosition(&p0);
+}
+
+void After_los_radar_GetOriginCellAtPosition()
+{
+    CompareObjectResult(ROK_CELL, g_result_los_radar_GetOriginCellAtPosition);
+}
+
+Vec3 g_out_los_radar_ClampWorldPosToTerrain_2;
+
+void Run_los_radar_ClampWorldPosToTerrain()
+{
+    int p0 = ArgScalar<int>("x");
+    int p1 = ArgScalar<int>("y");
+    memset(&g_out_los_radar_ClampWorldPosToTerrain_2, 0, sizeof g_out_los_radar_ClampWorldPosToTerrain_2);
+    SetClosing("result");
+    g_seams.los_radar->ClampWorldPosToTerrain(p0, p1, &g_out_los_radar_ClampWorldPosToTerrain_2);
+}
+
+void After_los_radar_ClampWorldPosToTerrain()
+{
+    CompareValueResult(ROK_VEC3, &g_out_los_radar_ClampWorldPosToTerrain_2);
+}
+
+int g_result_los_radar_IsUnitVisibleToPlayer;
+
+void Run_los_radar_IsUnitVisibleToPlayer()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    Unit* p1 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing("result");
+    g_result_los_radar_IsUnitVisibleToPlayer = g_seams.los_radar->IsUnitVisibleToPlayer(p0, p1);
+}
+
+void After_los_radar_IsUnitVisibleToPlayer()
+{
+    CompareResult(g_result_los_radar_IsUnitVisibleToPlayer);
+}
+
+unsigned int g_result_los_radar_SoundHeardMask;
+
+void Run_los_radar_SoundHeardMask()
+{
+    Vec3 p0 = ArgScalar<Vec3>("at");
+    SetClosing("result");
+    g_result_los_radar_SoundHeardMask = g_seams.los_radar->SoundHeardMask(&p0);
+}
+
+void After_los_radar_SoundHeardMask()
+{
+    CompareResult(g_result_los_radar_SoundHeardMask);
+}
+
+void Run_los_radar_UpdateUnitLineOfSight()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.los_radar->UpdateUnitLineOfSight(p0);
+}
+
+void Run_los_radar_RecordRadarUnits()
+{
+    SetClosing(nullptr);
+    g_seams.los_radar->RecordRadarUnits();
+}
+
+void Run_los_radar_UpdateSensorRadarAndCloak()
+{
+    SetClosing(nullptr);
+    g_seams.los_radar->UpdateSensorRadarAndCloak();
+}
+
+void Run_los_radar_RecordRadarMapped()
+{
+    SetClosing(nullptr);
+    g_seams.los_radar->RecordRadarMapped();
+}
+
+void Run_los_radar_ExpireEyeballs()
+{
+    SetClosing(nullptr);
+    g_seams.los_radar->ExpireEyeballs();
+}
+
+int g_result_los_radar_HasReadyUnitInRange;
+
+void Run_los_radar_HasReadyUnitInRange()
+{
+    int p0 = ArgScalar<int>("player");
+    Vec3 p1 = Vec3();
+    ParseValueArg("pos", ROK_VEC3, &p1);
+    int p2 = ArgScalar<int>("range");
+    SetClosing("result");
+    g_result_los_radar_HasReadyUnitInRange = g_seams.los_radar->HasReadyUnitInRange(p0, &p1, p2);
+}
+
+void After_los_radar_HasReadyUnitInRange()
+{
+    CompareResult(g_result_los_radar_HasReadyUnitInRange);
+}
+
+int g_result_los_radar_IsPointVisible;
+
+void Run_los_radar_IsPointVisible()
+{
+    Player* p0 = (Player*)ArgObject("player", ROK_PLAYER);
+    Vec3 p1 = ArgScalar<Vec3>("pos");
+    SetClosing("result");
+    g_result_los_radar_IsPointVisible = g_seams.los_radar->IsPointVisible(p0, &p1);
+}
+
+void After_los_radar_IsPointVisible()
+{
+    CompareResult(g_result_los_radar_IsPointVisible);
+}
+
+void Run_los_radar_CreateUnitIndex()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.los_radar->CreateUnitIndex(p0);
+}
+
+void Run_los_radar_FreeUnitIndex()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.los_radar->FreeUnitIndex(p0);
+}
+
+void Run_los_radar_RefreshUnitIndex()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.los_radar->RefreshUnitIndex(p0);
+}
+
+unsigned int g_result_los_radar_RegionSize;
+
+void Run_los_radar_RegionSize()
+{
+    LosRadarMapInfo p0 = LosRadarMapInfo();
+    ParseValueArg("map", ROK_LOSRADARMAPINFO, &p0);
+    SetClosing("result");
+    g_result_los_radar_RegionSize = g_seams.los_radar->RegionSize(&p0);
+}
+
+void After_los_radar_RegionSize()
+{
+    CompareResult(g_result_los_radar_RegionSize);
+}
+
+void Run_los_radar_Init()
+{
+    LosRadarMapInfo p0 = LosRadarMapInfo();
+    ParseValueArg("map", ROK_LOSRADARMAPINFO, &p0);
+    void* p1 = AllocRegion(ArgScalar<unsigned>("size"));
+    RegionBind(p1, ArgScalar<unsigned>("size"));
+    unsigned int p2 = ArgScalar<unsigned int>("size");
+    SetClosing(nullptr);
+    g_seams.los_radar->Init(&p0, p1, p2);
+}
+
+void* g_result_los_radar_Shutdown;
+
+void Run_los_radar_Shutdown()
+{
+    SetClosing("result");
+    g_result_los_radar_Shutdown = g_seams.los_radar->Shutdown();
+}
+
+void After_los_radar_Shutdown()
+{
+    CompareRegionResult(g_result_los_radar_Shutdown);
+}
+
+UnitDef* g_result_units_FindUnitType;
+
+void Run_units_FindUnitType()
+{
+    char p0_text[256];
+    ArgText("name", p0_text, sizeof p0_text);
+    SetClosing("result");
+    g_result_units_FindUnitType = g_seams.units->FindUnitType(p0_text);
+}
+
+void After_units_FindUnitType()
+{
+    CompareObjectResult(ROK_UNITDEF, g_result_units_FindUnitType);
+}
+
+unsigned short g_result_units_FindUnitTypeId;
+
+void Run_units_FindUnitTypeId()
+{
+    char p0_text[256];
+    ArgText("name", p0_text, sizeof p0_text);
+    SetClosing("result");
+    g_result_units_FindUnitTypeId = g_seams.units->FindUnitTypeId(p0_text);
+}
+
+void After_units_FindUnitTypeId()
+{
+    CompareResult(g_result_units_FindUnitTypeId);
+}
+
+int g_result_units_AddRepairProgress;
+
+void Run_units_AddRepairProgress()
+{
+    Unit* p0 = (Unit*)ArgObject("builder", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("unit", ROK_UNIT);
+    float p2 = ArgScalar<float>("amount");
+    SetClosing("result");
+    g_result_units_AddRepairProgress = g_seams.units->AddRepairProgress(p0, p1, p2);
+}
+
+void After_units_AddRepairProgress()
+{
+    CompareResult(g_result_units_AddRepairProgress);
+}
+
+int g_result_units_CanLoad;
+
+void Run_units_CanLoad()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
+    SetClosing("result");
+    g_result_units_CanLoad = g_seams.units->CanLoad(p0, p1);
+}
+
+void After_units_CanLoad()
+{
+    CompareResult(g_result_units_CanLoad);
+}
+
+int g_result_units_CanReclaim;
+
+void Run_units_CanReclaim()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
+    SetClosing("result");
+    g_result_units_CanReclaim = g_seams.units->CanReclaim(p0, p1);
+}
+
+void After_units_CanReclaim()
+{
+    CompareResult(g_result_units_CanReclaim);
+}
+
+int g_result_units_CanRepair;
+
+void Run_units_CanRepair()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Unit* p1 = (Unit*)ArgObject("target", ROK_UNIT);
+    SetClosing("result");
+    g_result_units_CanRepair = g_seams.units->CanRepair(p0, p1);
+}
+
+void After_units_CanRepair()
+{
+    CompareResult(g_result_units_CanRepair);
+}
+
+void Run_units_UpdateUnitHead()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.units->UpdateUnitHead(p0);
+}
+
+int g_result_units_UpdateUnitBody;
+
+void Run_units_UpdateUnitBody()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing("result");
+    g_result_units_UpdateUnitBody = g_seams.units->UpdateUnitBody(p0);
+}
+
+void After_units_UpdateUnitBody()
+{
+    CompareResult(g_result_units_UpdateUnitBody);
+}
+
+int g_result_players_Apply;
+
+void Run_players_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_PLAYERS, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_players_Apply = g_seams.players->Apply((PlayersEventHeader*)p0, p1);
+}
+
+void After_players_Apply()
+{
+    CompareResult(g_result_players_Apply);
+}
+
+void Run_players_DeactivateConditions()
+{
+    MissionConditions* p0 = (MissionConditions*)ArgObject("conditions", ROK_MISSIONCONDITIONS);
+    SetClosing(nullptr);
+    g_seams.players->DeactivateConditions(p0);
+}
+
+int g_result_players_UpdatePlayerHead;
+
+void Run_players_UpdatePlayerHead()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing("result");
+    g_result_players_UpdatePlayerHead = g_seams.players->UpdatePlayerHead(p0);
+}
+
+void After_players_UpdatePlayerHead()
+{
+    CompareResult(g_result_players_UpdatePlayerHead);
+}
+
+int g_result_players_UpdatePlayerBody;
+
+void Run_players_UpdatePlayerBody()
+{
+    int p0 = ArgScalar<int>("player");
+    RandStream p1 = ArgStream("stream");
+    SetClosing("result");
+    g_result_players_UpdatePlayerBody = g_seams.players->UpdatePlayerBody(p0, p1);
+}
+
+void After_players_UpdatePlayerBody()
+{
+    CompareResult(g_result_players_UpdatePlayerBody);
+}
+
+void Run_players_UpdatePlayerTail()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.players->UpdatePlayerTail(p0);
+}
+
+void Run_players_UpdatePlayersFinish()
+{
+    SetClosing(nullptr);
+    g_seams.players->UpdatePlayersFinish();
+}
+
+unsigned int g_result_players_RegionSize;
+
+void Run_players_RegionSize()
+{
+    PlayersMapInfo p0 = PlayersMapInfo();
+    ParseValueArg("info", ROK_PLAYERSMAPINFO, &p0);
+    SetClosing("result");
+    g_result_players_RegionSize = g_seams.players->RegionSize(&p0);
+}
+
+void After_players_RegionSize()
+{
+    CompareResult(g_result_players_RegionSize);
+}
+
+void Run_players_Init()
+{
+    PlayersMapInfo p0 = PlayersMapInfo();
+    ParseValueArg("info", ROK_PLAYERSMAPINFO, &p0);
+    void* p1 = AllocRegion(ArgScalar<unsigned>("size"));
+    RegionBind(p1, ArgScalar<unsigned>("size"));
+    unsigned int p2 = ArgScalar<unsigned int>("size");
+    SetClosing(nullptr);
+    g_seams.players->Init(&p0, p1, p2);
+}
+
+void* g_result_players_Shutdown;
+
+void Run_players_Shutdown()
+{
+    SetClosing("result");
+    g_result_players_Shutdown = g_seams.players->Shutdown();
+}
+
+void After_players_Shutdown()
+{
+    CompareRegionResult(g_result_players_Shutdown);
+}
+
 int g_result_map_Apply;
 
 void Run_map_Apply()
@@ -709,9 +2210,7 @@ int g_result_map_GetCellMeanHeight;
 
 void Run_map_GetCellMeanHeight()
 {
-    Vec3 p0;
-    memset(&p0, 0, sizeof p0);
-    ParseStruct("pos", ROK_VEC3, &p0);
+    Vec3 p0 = ArgScalar<Vec3>("pos");
     SetClosing("result");
     g_result_map_GetCellMeanHeight = g_seams.map->GetCellMeanHeight(&p0);
 }
@@ -862,6 +2361,176 @@ void After_map_PassMapInBounds()
     CompareResult(g_result_map_PassMapInBounds);
 }
 
+int g_result_mission_GetGameType;
+
+void Run_mission_GetGameType()
+{
+    SetClosing("result");
+    g_result_mission_GetGameType = g_seams.mission->GetGameType();
+}
+
+void After_mission_GetGameType()
+{
+    CompareResult(g_result_mission_GetGameType);
+}
+
+const char* g_result_mission_GetNameSlot;
+
+void Run_mission_GetNameSlot()
+{
+    int p0 = ArgScalar<int>("index");
+    SetClosing("result");
+    g_result_mission_GetNameSlot = g_seams.mission->GetNameSlot(p0);
+}
+
+void After_mission_GetNameSlot()
+{
+    CompareResult((const char*)g_result_mission_GetNameSlot);
+}
+
+int g_result_mission_GetMissionIndex;
+
+void Run_mission_GetMissionIndex()
+{
+    SetClosing("result");
+    g_result_mission_GetMissionIndex = g_seams.mission->GetMissionIndex();
+}
+
+void After_mission_GetMissionIndex()
+{
+    CompareResult(g_result_mission_GetMissionIndex);
+}
+
+const char* g_result_mission_GetMissionName;
+
+void Run_mission_GetMissionName()
+{
+    SetClosing("result");
+    g_result_mission_GetMissionName = g_seams.mission->GetMissionName();
+}
+
+void After_mission_GetMissionName()
+{
+    CompareResult((const char*)g_result_mission_GetMissionName);
+}
+
+Vec3 g_out_mission_GetStartPosition_0;
+int g_result_mission_GetStartPosition;
+
+void Run_mission_GetStartPosition()
+{
+    memset(&g_out_mission_GetStartPosition_0, 0, sizeof g_out_mission_GetStartPosition_0);
+    int p1 = ArgScalar<int>("id");
+    SetClosing("out.", "result");
+    g_result_mission_GetStartPosition = g_seams.mission->GetStartPosition(&g_out_mission_GetStartPosition_0, p1);
+}
+
+void After_mission_GetStartPosition()
+{
+    if (g_result_mission_GetStartPosition != 0) CompareStruct("out", ROK_VEC3, &g_out_mission_GetStartPosition_0);
+    CompareResult(g_result_mission_GetStartPosition);
+}
+
+int g_result_mission_CountStartPositions;
+
+void Run_mission_CountStartPositions()
+{
+    SetClosing("result");
+    g_result_mission_CountStartPositions = g_seams.mission->CountStartPositions();
+}
+
+void After_mission_CountStartPositions()
+{
+    CompareResult(g_result_mission_CountStartPositions);
+}
+
+int g_result_mission_HasMissionName;
+
+void Run_mission_HasMissionName()
+{
+    SetClosing("result");
+    g_result_mission_HasMissionName = g_seams.mission->HasMissionName();
+}
+
+void After_mission_HasMissionName()
+{
+    CompareResult(g_result_mission_HasMissionName);
+}
+
+MissionParams g_out_mission_GetMissionParams_0;
+
+void Run_mission_GetMissionParams()
+{
+    memset(&g_out_mission_GetMissionParams_0, 0, sizeof g_out_mission_GetMissionParams_0);
+    SetClosing("result");
+    g_seams.mission->GetMissionParams(&g_out_mission_GetMissionParams_0);
+}
+
+void After_mission_GetMissionParams()
+{
+    CompareValueResult(ROK_MISSIONPARAMS, &g_out_mission_GetMissionParams_0);
+}
+
+int g_result_mission_CountMissionUnits;
+
+void Run_mission_CountMissionUnits()
+{
+    SetClosing("result");
+    g_result_mission_CountMissionUnits = g_seams.mission->CountMissionUnits();
+}
+
+void After_mission_CountMissionUnits()
+{
+    CompareResult(g_result_mission_CountMissionUnits);
+}
+
+MissionUnitInfo g_out_mission_GetMissionUnit_1;
+int g_result_mission_GetMissionUnit;
+
+void Run_mission_GetMissionUnit()
+{
+    int p0 = ArgScalar<int>("index");
+    memset(&g_out_mission_GetMissionUnit_1, 0, sizeof g_out_mission_GetMissionUnit_1);
+    SetClosing("out.", "result");
+    g_result_mission_GetMissionUnit = g_seams.mission->GetMissionUnit(p0, &g_out_mission_GetMissionUnit_1);
+}
+
+void After_mission_GetMissionUnit()
+{
+    if (g_result_mission_GetMissionUnit != 0) CompareStruct("out", ROK_MISSIONUNITINFO, &g_out_mission_GetMissionUnit_1);
+    CompareResult(g_result_mission_GetMissionUnit);
+}
+
+int g_result_mission_CountMissionFeatures;
+
+void Run_mission_CountMissionFeatures()
+{
+    SetClosing("result");
+    g_result_mission_CountMissionFeatures = g_seams.mission->CountMissionFeatures();
+}
+
+void After_mission_CountMissionFeatures()
+{
+    CompareResult(g_result_mission_CountMissionFeatures);
+}
+
+MissionFeatureInfo g_out_mission_GetMissionFeature_1;
+int g_result_mission_GetMissionFeature;
+
+void Run_mission_GetMissionFeature()
+{
+    int p0 = ArgScalar<int>("index");
+    memset(&g_out_mission_GetMissionFeature_1, 0, sizeof g_out_mission_GetMissionFeature_1);
+    SetClosing("out.", "result");
+    g_result_mission_GetMissionFeature = g_seams.mission->GetMissionFeature(p0, &g_out_mission_GetMissionFeature_1);
+}
+
+void After_mission_GetMissionFeature()
+{
+    if (g_result_mission_GetMissionFeature != 0) CompareStruct("out", ROK_MISSIONFEATUREINFO, &g_out_mission_GetMissionFeature_1);
+    CompareResult(g_result_mission_GetMissionFeature);
+}
+
 void PlayNestedCalls(const char* import)
 {
     NestedScope scope;
@@ -907,12 +2576,160 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_wind_meteors_LoadMeteors();
         return true;
     }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RegionSize") == 0) {
+        Run_economy_RegionSize();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Init") == 0) {
+        Run_economy_Init();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Shutdown") == 0) {
+        Run_economy_Shutdown();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_economy_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Spend") == 0) {
+        Run_economy_Spend();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdatePlayerEconomy") == 0) {
+        Run_economy_UpdatePlayerEconomy();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdateMetalExtraction") == 0) {
+        Run_economy_UpdateMetalExtraction();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UpdateResourceSharing") == 0) {
+        Run_economy_UpdateResourceSharing();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RequestGranted") == 0) {
+        Run_economy_RequestGranted();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "GetEnergyUse") == 0) {
+        Run_economy_GetEnergyUse();
+        return true;
+    }
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UnitAccount") == 0) {
+        Run_economy_UnitAccount();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetCellFeature") == 0) {
+        Run_features_GetCellFeature();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetFootprintCentre") == 0) {
+        Run_features_GetFootprintCentre();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_features_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "Place") == 0) {
+        Run_features_Place();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FeatureTypeCount") == 0) {
+        Run_features_FeatureTypeCount();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "AnimateFeatureType") == 0) {
+        Run_features_AnimateFeatureType();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "ScanFeatureCell") == 0) {
+        Run_features_ScanFeatureCell();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FirstFeatureSpot") == 0) {
+        Run_features_FirstFeatureSpot();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "UpdateFeatureSpot") == 0) {
+        Run_features_UpdateFeatureSpot();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FindFeatureAtPos") == 0) {
+        Run_features_FindFeatureAtPos();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_ai_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "DumpPlayerAI") == 0) {
+        Run_ai_DumpPlayerAI();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ResetAIPlayers") == 0) {
+        Run_ai_ResetAIPlayers();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreatePlayerAI") == 0) {
+        Run_ai_CreatePlayerAI();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "DestroyPlayerAI") == 0) {
+        Run_ai_DestroyPlayerAI();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "UpdatePlayerAI") == 0) {
+        Run_ai_UpdatePlayerAI();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "RebuildFeatureCells") == 0) {
+        Run_ai_RebuildFeatureCells();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ParseDownloadableAiWeightScripts") == 0) {
+        Run_ai_ParseDownloadableAiWeightScripts();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ReparseAiWeightScriptsIfLimitNotSticky") == 0) {
+        Run_ai_ReparseAiWeightScriptsIfLimitNotSticky();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreateSquads") == 0) {
+        Run_ai_CreateSquads();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "FreeSquads") == 0) {
+        Run_ai_FreeSquads();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "UpdateSquads") == 0) {
+        Run_ai_UpdateSquads();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreateSquadManager") == 0) {
+        Run_ai_CreateSquadManager();
+        return true;
+    }
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "FreeSquadManager") == 0) {
+        Run_ai_FreeSquadManager();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0) {
         Run_weapons_Apply();
         return true;
     }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateExplosions") == 0) {
+        Run_weapons_UpdateExplosions();
+        return true;
+    }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "UpdateUnitWeapons") == 0) {
         Run_weapons_UpdateUnitWeapons();
+        return true;
+    }
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "FindWeaponByName") == 0) {
+        Run_weapons_FindWeaponByName();
         return true;
     }
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0) {
@@ -959,6 +2776,154 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_targeting_SavedTargetPair();
         return true;
     }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_los_radar_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetMapCell") == 0) {
+        Run_los_radar_GetMapCell();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetMapCellAtPosition") == 0) {
+        Run_los_radar_GetMapCellAtPosition();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetOriginCellAtPosition") == 0) {
+        Run_los_radar_GetOriginCellAtPosition();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "ClampWorldPosToTerrain") == 0) {
+        Run_los_radar_ClampWorldPosToTerrain();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "IsUnitVisibleToPlayer") == 0) {
+        Run_los_radar_IsUnitVisibleToPlayer();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "SoundHeardMask") == 0) {
+        Run_los_radar_SoundHeardMask();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "UpdateUnitLineOfSight") == 0) {
+        Run_los_radar_UpdateUnitLineOfSight();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "RecordRadarUnits") == 0) {
+        Run_los_radar_RecordRadarUnits();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "UpdateSensorRadarAndCloak") == 0) {
+        Run_los_radar_UpdateSensorRadarAndCloak();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "RecordRadarMapped") == 0) {
+        Run_los_radar_RecordRadarMapped();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "ExpireEyeballs") == 0) {
+        Run_los_radar_ExpireEyeballs();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "HasReadyUnitInRange") == 0) {
+        Run_los_radar_HasReadyUnitInRange();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "IsPointVisible") == 0) {
+        Run_los_radar_IsPointVisible();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "CreateUnitIndex") == 0) {
+        Run_los_radar_CreateUnitIndex();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "FreeUnitIndex") == 0) {
+        Run_los_radar_FreeUnitIndex();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "RefreshUnitIndex") == 0) {
+        Run_los_radar_RefreshUnitIndex();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "RegionSize") == 0) {
+        Run_los_radar_RegionSize();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "Init") == 0) {
+        Run_los_radar_Init();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "Shutdown") == 0) {
+        Run_los_radar_Shutdown();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "FindUnitType") == 0) {
+        Run_units_FindUnitType();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "FindUnitTypeId") == 0) {
+        Run_units_FindUnitTypeId();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "AddRepairProgress") == 0) {
+        Run_units_AddRepairProgress();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanLoad") == 0) {
+        Run_units_CanLoad();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanReclaim") == 0) {
+        Run_units_CanReclaim();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanRepair") == 0) {
+        Run_units_CanRepair();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "UpdateUnitHead") == 0) {
+        Run_units_UpdateUnitHead();
+        return true;
+    }
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "UpdateUnitBody") == 0) {
+        Run_units_UpdateUnitBody();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_players_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "DeactivateConditions") == 0) {
+        Run_players_DeactivateConditions();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerHead") == 0) {
+        Run_players_UpdatePlayerHead();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerBody") == 0) {
+        Run_players_UpdatePlayerBody();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerTail") == 0) {
+        Run_players_UpdatePlayerTail();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayersFinish") == 0) {
+        Run_players_UpdatePlayersFinish();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "RegionSize") == 0) {
+        Run_players_RegionSize();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Init") == 0) {
+        Run_players_Init();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Shutdown") == 0) {
+        Run_players_Shutdown();
+        return true;
+    }
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "Apply") == 0) {
         Run_map_Apply();
         return true;
@@ -1003,6 +2968,54 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_map_PassMapInBounds();
         return true;
     }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetGameType") == 0) {
+        Run_mission_GetGameType();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetNameSlot") == 0) {
+        Run_mission_GetNameSlot();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionIndex") == 0) {
+        Run_mission_GetMissionIndex();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionName") == 0) {
+        Run_mission_GetMissionName();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetStartPosition") == 0) {
+        Run_mission_GetStartPosition();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountStartPositions") == 0) {
+        Run_mission_CountStartPositions();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "HasMissionName") == 0) {
+        Run_mission_HasMissionName();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionParams") == 0) {
+        Run_mission_GetMissionParams();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountMissionUnits") == 0) {
+        Run_mission_CountMissionUnits();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionUnit") == 0) {
+        Run_mission_GetMissionUnit();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountMissionFeatures") == 0) {
+        Run_mission_CountMissionFeatures();
+        return true;
+    }
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionFeature") == 0) {
+        Run_mission_GetMissionFeature();
+        return true;
+    }
     return false;
 }
 
@@ -1010,8 +3023,42 @@ void RunAfter(const char* subsystem, const char* slot)
 {
     if (strcmp(subsystem, "wind_meteors") == 0 && strcmp(slot, "LoadMeteorDefaults") == 0)
         After_wind_meteors_LoadMeteorDefaults();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RegionSize") == 0)
+        After_economy_RegionSize();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Shutdown") == 0)
+        After_economy_Shutdown();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Apply") == 0)
+        After_economy_Apply();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "Spend") == 0)
+        After_economy_Spend();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "RequestGranted") == 0)
+        After_economy_RequestGranted();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "GetEnergyUse") == 0)
+        After_economy_GetEnergyUse();
+    if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UnitAccount") == 0)
+        After_economy_UnitAccount();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetCellFeature") == 0)
+        After_features_GetCellFeature();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetFootprintCentre") == 0)
+        After_features_GetFootprintCentre();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "Apply") == 0)
+        After_features_Apply();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "Place") == 0)
+        After_features_Place();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FeatureTypeCount") == 0)
+        After_features_FeatureTypeCount();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FirstFeatureSpot") == 0)
+        After_features_FirstFeatureSpot();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "UpdateFeatureSpot") == 0)
+        After_features_UpdateFeatureSpot();
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "FindFeatureAtPos") == 0)
+        After_features_FindFeatureAtPos();
+    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "Apply") == 0)
+        After_ai_Apply();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "Apply") == 0)
         After_weapons_Apply();
+    if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "FindWeaponByName") == 0)
+        After_weapons_FindWeaponByName();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "GetWeaponRange") == 0)
         After_weapons_GetWeaponRange();
     if (strcmp(subsystem, "weapons") == 0 && strcmp(slot, "WeaponCanReachUnit") == 0)
@@ -1034,6 +3081,52 @@ void RunAfter(const char* subsystem, const char* slot)
         After_targeting_ChooseWeapon();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SavedTargetPair") == 0)
         After_targeting_SavedTargetPair();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "Apply") == 0)
+        After_los_radar_Apply();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetMapCell") == 0)
+        After_los_radar_GetMapCell();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetMapCellAtPosition") == 0)
+        After_los_radar_GetMapCellAtPosition();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetOriginCellAtPosition") == 0)
+        After_los_radar_GetOriginCellAtPosition();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "ClampWorldPosToTerrain") == 0)
+        After_los_radar_ClampWorldPosToTerrain();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "IsUnitVisibleToPlayer") == 0)
+        After_los_radar_IsUnitVisibleToPlayer();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "SoundHeardMask") == 0)
+        After_los_radar_SoundHeardMask();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "HasReadyUnitInRange") == 0)
+        After_los_radar_HasReadyUnitInRange();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "IsPointVisible") == 0)
+        After_los_radar_IsPointVisible();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "RegionSize") == 0)
+        After_los_radar_RegionSize();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "Shutdown") == 0)
+        After_los_radar_Shutdown();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "FindUnitType") == 0)
+        After_units_FindUnitType();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "FindUnitTypeId") == 0)
+        After_units_FindUnitTypeId();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "AddRepairProgress") == 0)
+        After_units_AddRepairProgress();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanLoad") == 0)
+        After_units_CanLoad();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanReclaim") == 0)
+        After_units_CanReclaim();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "CanRepair") == 0)
+        After_units_CanRepair();
+    if (strcmp(subsystem, "units") == 0 && strcmp(slot, "UpdateUnitBody") == 0)
+        After_units_UpdateUnitBody();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Apply") == 0)
+        After_players_Apply();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerHead") == 0)
+        After_players_UpdatePlayerHead();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerBody") == 0)
+        After_players_UpdatePlayerBody();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "RegionSize") == 0)
+        After_players_RegionSize();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Shutdown") == 0)
+        After_players_Shutdown();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "Apply") == 0)
         After_map_Apply();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetCellMeanHeight") == 0)
@@ -1054,67 +3147,223 @@ void RunAfter(const char* subsystem, const char* slot)
         After_map_PassMapGet();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "PassMapInBounds") == 0)
         After_map_PassMapInBounds();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetGameType") == 0)
+        After_mission_GetGameType();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetNameSlot") == 0)
+        After_mission_GetNameSlot();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionIndex") == 0)
+        After_mission_GetMissionIndex();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionName") == 0)
+        After_mission_GetMissionName();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetStartPosition") == 0)
+        After_mission_GetStartPosition();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountStartPositions") == 0)
+        After_mission_CountStartPositions();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "HasMissionName") == 0)
+        After_mission_HasMissionName();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionParams") == 0)
+        After_mission_GetMissionParams();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountMissionUnits") == 0)
+        After_mission_CountMissionUnits();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionUnit") == 0)
+        After_mission_GetMissionUnit();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "CountMissionFeatures") == 0)
+        After_mission_CountMissionFeatures();
+    if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetMissionFeature") == 0)
+        After_mission_GetMissionFeature();
 }
 
-WeaponsSeam g_import_weapons;
-FilesSeam g_import_files;
-FeaturesSeam g_import_features;
-LosRadarSeam g_import_los_radar;
-MapSeam g_import_map;
-NetworkSeam g_import_network;
-ScriptsSeam g_import_scripts;
-PathfindingSeam g_import_pathfinding;
 
 void BindSeams()
 {
     g_seams.wind_meteors = &g_native_wind_meteors;
+    g_seams.economy = &g_native_economy;
+    g_seams.features = &g_native_features;
+    g_seams.ai = &g_native_ai;
     g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
+    g_seams.los_radar = &g_native_los_radar;
+    g_seams.units = &g_native_units;
+    g_seams.players = &g_native_players;
     g_seams.map = &g_native_map;
+    g_seams.mission = &g_native_mission;
     g_seams.files = &g_import_files;
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
     g_import_files.BankSetInteger = Imp_files_BankSetInteger;
     g_import_files.BankGetInteger = Imp_files_BankGetInteger;
-    g_seams.features = &g_import_features;
-    g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
-    g_seams.los_radar = &g_import_los_radar;
-    g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
-    g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
-    g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
-    g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
-    g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+    g_import_econworld.Tick = Imp_econworld_Tick;
+    g_import_econworld.Difficulty = Imp_econworld_Difficulty;
+    g_import_econworld.SharingEnabled = Imp_econworld_SharingEnabled;
+    g_import_econworld.Wind = Imp_econworld_Wind;
+    g_import_econworld.Tide = Imp_econworld_Tide;
+    g_import_econworld.PlayerInfo = Imp_econworld_PlayerInfo;
+    g_import_econworld.Allied = Imp_econworld_Allied;
+    g_import_econworld.FirstUnit = Imp_econworld_FirstUnit;
+    g_import_econworld.LastUnit = Imp_econworld_LastUnit;
+    g_import_econworld.NextUnit = Imp_econworld_NextUnit;
+    g_import_econworld.UnitSlot = Imp_econworld_UnitSlot;
+    g_import_econworld.UnitInfo = Imp_econworld_UnitInfo;
+    g_import_econworld.TypeInfo = Imp_econworld_TypeInfo;
+    g_import_econworld.CellMetal = Imp_econworld_CellMetal;
+    g_import_econworld.Emit = Imp_econworld_Emit;
     g_seams.network = &g_import_network;
+    g_import_network.SendShareMapInfo = Imp_network_SendShareMapInfo;
+    g_import_network.SendFeatureBurning = Imp_network_SendFeatureBurning;
+    g_import_network.SendFeatureHit = Imp_network_SendFeatureHit;
+    g_import_network.SendFeatureKilled = Imp_network_SendFeatureKilled;
     g_import_network.SendProjectileDetonated = Imp_network_SendProjectileDetonated;
     g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;
     g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;
     g_import_network.SendWeaponFire = Imp_network_SendWeaponFire;
     g_import_network.SendWeaponFireAt = Imp_network_SendWeaponFireAt;
+    g_import_network.BroadcastPlayerInfo = Imp_network_BroadcastPlayerInfo;
+    g_import_network.BroadcastPlayerEconomy = Imp_network_BroadcastPlayerEconomy;
+    g_import_network.SendShareEnergy = Imp_network_SendShareEnergy;
+    g_import_network.SendShareMetal = Imp_network_SendShareMetal;
+    g_seams.pathfinding = &g_import_pathfinding;
+    g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     g_seams.scripts = &g_import_scripts;
+    g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
     g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
     g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;
     g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
     g_import_scripts.QueryScript = Imp_scripts_QueryScript;
     g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
-    g_seams.pathfinding = &g_import_pathfinding;
-    g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
+    g_seams.orders = &g_import_orders;
+    g_import_orders.GetOrderType = Imp_orders_GetOrderType;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
+        g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
+        g_import_weapons.FindTargetableProjectile = Imp_weapons_FindTargetableProjectile;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
     }
-    if (strcmp(g_subsystem, "weapons") == 0) {
+    if (strcmp(g_subsystem, "features") == 0) {
+        g_seams.los_radar = &g_import_los_radar;
+        g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+        g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+        g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
+        g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+        g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+        g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
     }
-    if (strcmp(g_subsystem, "targeting") == 0) {
+    if (strcmp(g_subsystem, "ai") == 0) {
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+        g_seams.los_radar = &g_import_los_radar;
+        g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+        g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+        g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
+        g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+        g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+        g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
+        g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
+        g_import_weapons.FindTargetableProjectile = Imp_weapons_FindTargetableProjectile;
+        g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
+        g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
+        g_seams.players = &g_import_players;
+        g_import_players.LoadDefaultAIScript = Imp_players_LoadDefaultAIScript;
+        g_seams.economy = &g_import_economy;
+        g_import_economy.GetEnergyUse = Imp_economy_GetEnergyUse;
+    }
+    if (strcmp(g_subsystem, "weapons") == 0) {
+        g_seams.features = &g_import_features;
+        g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
+        g_import_features.FindFeatureAtPos = Imp_features_FindFeatureAtPos;
+        g_seams.los_radar = &g_import_los_radar;
+        g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+        g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+        g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
+        g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+        g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+        g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+    }
+    if (strcmp(g_subsystem, "targeting") == 0) {
+        g_seams.los_radar = &g_import_los_radar;
+        g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+        g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+        g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
+        g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+        g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+        g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_seams.weapons = &g_import_weapons;
+        g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
+        g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
+        g_import_weapons.FindTargetableProjectile = Imp_weapons_FindTargetableProjectile;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+    }
+    if (strcmp(g_subsystem, "los_radar") == 0) {
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+    }
+    if (strcmp(g_subsystem, "units") == 0) {
+        g_seams.los_radar = &g_import_los_radar;
+        g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+        g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+        g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
+        g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+        g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+        g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+    }
+    if (strcmp(g_subsystem, "players") == 0) {
+        g_seams.mission = &g_import_mission;
+        g_import_mission.GetGameType = Imp_mission_GetGameType;
+        g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
+        g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+        g_seams.units = &g_import_units;
+        g_import_units.FindUnitTypeId = Imp_units_FindUnitTypeId;
+        g_import_units.CreateUnit = Imp_units_CreateUnit;
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+        g_seams.features = &g_import_features;
+        g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
+        g_import_features.FindFeatureAtPos = Imp_features_FindFeatureAtPos;
+    }
+    if (strcmp(g_subsystem, "map") == 0) {
+        g_seams.los_radar = &g_import_los_radar;
+        g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+        g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+        g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
+        g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+        g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+        g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
     }
 }

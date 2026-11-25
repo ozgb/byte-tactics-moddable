@@ -53,5 +53,6 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags);
 int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags);
 int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags);
 int __stdcall TeleportOrder(Unit* unit, Order* order, int unused);
+int __stdcall GroundPickupOrder(Unit* unit, Order* order, unsigned char flags);
 
 #endif

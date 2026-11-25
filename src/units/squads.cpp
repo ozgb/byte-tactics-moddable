@@ -30,8 +30,8 @@ void __stdcall CreateSquads(Player* owner)
         Squad* squad = &((Squad*)owner->groups.get())[i];
         squad->owner = owner;
         squad->index = i;
-        squad->field_8 = 0;
-        squad->field_c = 0;
+        squad->spare8 = 0;
+        squad->spareC = 0;
         new (&squad->items) BlockVector<Ref<Unit> >;
     }
 }

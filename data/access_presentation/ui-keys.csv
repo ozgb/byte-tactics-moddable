@@ -2,7 +2,7 @@ item,reader,function,container,every,after
 AddOrder: new Order,orders,OrdersApply,AddOrder: new Order,0,-
 BuildMenuPage::count,presentation,DisableUnavailableBuildMenuEntries,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
 BuildMenuPage::entries,presentation,DisableUnavailableBuildMenuEntries,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
-Debris::field_0,presentation,DrawExplosions,debris,0,
+Debris::obj,presentation,DrawExplosions,debris,0,
 Debris::pos,presentation,DrawExplosions,debris,0,
 Debris::ref1,presentation,ClipRects,debris,0,
 Debris::ref1,presentation,DrawExplosions,debris,0,

@@ -22,23 +22,24 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 #include "line_of_sight_index.h"
 #include "../../interfaces/state_writer.h"
 #include <stdio.h>
+#include "../state/sim_globals.h"
 
-static LosUnitIndex* s_index;
+#ifndef BT_REPLAY_INJECT_REFRESH_TICKS
+#define BT_REPLAY_INJECT_REFRESH_TICKS 0x1e
+#endif
 
 static LosUnitIndex* EnsureUnitIndex()
 {
-    if (s_index == nullptr) {
-        s_index = new (kSim) LosUnitIndex;
-        SimBlockTrack(reinterpret_cast<void**>(&s_index));
-    }
-    return s_index;
+    if (!g_losUnitIndex)
+        g_losUnitIndex = new (kSim) LosUnitIndex;
+    return g_losUnitIndex;
 }
 
 const LosUnitIndexEntry* LosUnitIndexOf(int player)
 {
-    if (s_index == nullptr)
+    if (!g_losUnitIndex)
         return nullptr;
-    return &s_index->players[player];
+    return &g_losUnitIndex->players[player];
 }
 
 static void WriteUnits(const StateWriter* w, const char* sizeName, const char* itemName, BlockVector<Ref<Unit> >& list)
@@ -52,10 +53,10 @@ static void WriteUnits(const StateWriter* w, const char* sizeName, const char* i
 
 void WriteLosUnitIndex(const StateWriter* w)
 {
-    if (s_index == nullptr)
+    if (!g_losUnitIndex)
         return;
     for (int i = 0; i < 10; i++) {
-        LosUnitIndexEntry& entry = s_index->players[i];
+        LosUnitIndexEntry& entry = g_losUnitIndex->players[i];
         if (!entry.live)
             continue;
         char name[32];
@@ -70,7 +71,7 @@ void WriteLosUnitIndex(const StateWriter* w)
 
 static LosUnitIndexEntry* EntryOf(int player)
 {
-    return &s_index->players[player];
+    return &g_losUnitIndex->players[player];
 }
 
 static void ReleaseUnits(BlockVector<Ref<Unit> >& list)
@@ -91,9 +92,9 @@ void __stdcall CreateUnitIndex(int player)
 
 void __stdcall FreeUnitIndex(int player)
 {
-    if (s_index == nullptr)
+    if (!g_losUnitIndex)
         return;
-    LosUnitIndexEntry& entry = s_index->players[player];
+    LosUnitIndexEntry& entry = g_losUnitIndex->players[player];
     ReleaseUnits(entry.visible);
     ReleaseUnits(entry.known);
     entry.live = 0;
@@ -101,10 +102,10 @@ void __stdcall FreeUnitIndex(int player)
 
 void __stdcall RefreshUnitIndex(int player)
 {
-    if (s_index == nullptr)
+    if (!g_losUnitIndex)
         return;
-    LosUnitIndexEntry& entry = s_index->players[player];
-    if (!entry.live || (unsigned int)g_game->ticks < entry.lastTick + 0x1e)
+    LosUnitIndexEntry& entry = g_losUnitIndex->players[player];
+    if (!entry.live || (unsigned int)g_game->ticks < entry.lastTick + BT_REPLAY_INJECT_REFRESH_TICKS)
         return;
     entry.visible.Clear();
     entry.known.Clear();

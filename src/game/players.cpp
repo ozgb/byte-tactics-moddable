@@ -53,6 +53,10 @@ struct UnitDef;
 #include "victory_conditions.h"
 #include "../harness/condition_class.h"
 
+#ifndef BT_REPLAY_INJECT_PLAYER_PERIOD
+#define BT_REPLAY_INJECT_PLAYER_PERIOD 0x1e
+#endif
+
 struct PlayersRegion {
     short endGameCountdown;
     int updateTime[10];
@@ -504,7 +508,7 @@ int __stdcall UpdatePlayerBody(int player, RandStream stream)
 
     if ((unsigned int)s_region->updateTime[bl] > (unsigned int)g_game->ticks)
         return 0;
-    s_region->updateTime[bl] += 0x1e;
+    s_region->updateTime[bl] += BT_REPLAY_INJECT_PLAYER_PERIOD;
 
     if (bl == g_game->localPlayer) {
         if (g_seams.mission->GetGameType() == 1) {

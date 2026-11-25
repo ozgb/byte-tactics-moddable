@@ -15,8 +15,13 @@
 #include "../src/game/game_state.h"
 #include "../src/map/meteors.h"
 #include "../src/map/feature_spot.h"
+#include "../src/map/features.h"
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
+#include "../src/units/units_seam.h"
+#include "../src/units/unit_position.h"
+#include "../src/units/unit_commands.h"
+#include "../src/ingame/control_panel.h"
 #include "../src/map/terrain.h"
 #include "../src/mission/mission.h"
 #include "../src/map/spatial_bucket.h"
@@ -30,6 +35,18 @@
 #include "../src/weapons/weapons_apply.h"
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
+#include "../src/game/economy.h"
+#include "../src/game/players.h"
+#include "../src/game/players_events.h"
+#include "../src/ai/ai_player.h"
+#include "../src/units/squads.h"
+#include "../src/orders/orders_seam.h"
+#include "../src/map/line_of_sight.h"
+#include "../src/map/line_of_sight_index.h"
+#include "../src/map/radar_capture.h"
+#include "../src/ingame/radar_picture.h"
+#include "../src/ingame/radar.h"
+#include "../src/ingame/info_panel.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -101,6 +118,14 @@ void __stdcall HarnessWeaponsEvent(const WeaponsEventHeader*, unsigned int, int)
 {
 }
 
+void __stdcall HarnessFeaturesEvent(const FeaturesEventHeader*, unsigned int, int)
+{
+}
+
+void __stdcall HarnessAiEvent(const AiEventHeader*, unsigned int, int)
+{
+}
+
 void __stdcall HarnessOrdersEvent(const OrdersEventHeader*, unsigned int, int)
 {
 }
@@ -144,6 +169,8 @@ char g_takeDamageScriptName[12] = "TakeDamage";
 char g_hitByWeaponScriptName[12] = "HitByWeapon";
 char g_paralyzeMissionName[12] = "paralyze";
 
+UnitDef* __stdcall FindUnitType(const char* name);
+
 extern "C" int __cdecl bx_AngleOfVector(int x, int z);
 
 short __cdecl AngleOfVector(int x, int z)
@@ -152,6 +179,7 @@ short __cdecl AngleOfVector(int x, int z)
 }
 
 #pragma comment(linker, "/alternatename:?AngleOfVector@@YAHHH@Z=?AngleOfVector@@YAFHH@Z")
+#pragma comment(linker, "/alternatename:?AddExplosionEffect@@YGXPAUVec3@@PAXHH@Z=?AddExplosionEffect@@YGXPAUVec3@@PAUGafSequence@@HH@Z")
 #pragma comment(linker, "/alternatename:?CalcAimAngles@@YGHPAUUnit@@PAUWeaponDef@@PAF2EPAUVec3@@@Z=?CalcAimAngles@@YGHPAUUnit@@0PAF1HPAUVec3@@@Z")
 #pragma comment(linker, "/alternatename:?CalcAimAngles@@YGHPAUUnit@@PAUWeaponDef@@PAG2EPAUVec3@@@Z=?CalcAimAngles@@YGHPAUUnit@@0PAF1HPAUVec3@@@Z")
 #pragma comment(linker, "/alternatename:?FindTargetableProjectile@@YGPAHPAUUnit@@E@Z=?FindTargetableProjectile@@YGPAUProjectile@@PAUInterceptorUnitView@@H@Z")
@@ -159,7 +187,16 @@ short __cdecl AngleOfVector(int x, int z)
 #pragma comment(linker, "/alternatename:?FireLineOfSightProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21@Z=?FireLineOfSightProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2H@Z")
 #pragma comment(linker, "/alternatename:?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21PAH@Z=?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2HH@Z")
 #pragma comment(linker, "/alternatename:?GetWeaponPiecePosition@@YGXPAUUnit@@PAUVec3@@EH@Z=?GetWeaponPiecePosition@@YGXPAUObject@@PAUVec3@@EH@Z")
+#pragma comment(linker, "/alternatename:?InitGafSequence@@YGXPAUHandle@@PAUAnimSrc@@H@Z=?InitGafSequence@@YGXPAUHandle@@PAUGafEntry@@H@Z")
+#pragma comment(linker, "/alternatename:?FindNearestEnemyUnit@SquadManager@@QAEPAUUnit@@UVec3@@@Z=?FindNearestEnemyUnit@SquadManager@@QAEPAUUnit@@HHH@Z")
+#pragma comment(linker, "/alternatename:?IsCountBelowAiLimit@@YGHHGH@Z=?IsCountBelowAiLimit@@YGHEGH@Z")
+#pragma comment(linker, "/alternatename:?ScaleUnitWeights@@YGXHPAVUnitTypeSet@@MH@Z=?ScaleUnitWeights@@YGXHPAIMH@Z")
+#pragma comment(linker, "/alternatename:?SetUnitLimits@@YGXHPAVUnitTypeSet@@HH@Z=?SetUnitLimits@@YGXHPAIHH@Z")
+#pragma comment(linker, "/alternatename:?OrderSquad@@YGXPAUPlayer@@HEHPAUUnit@@PAUVec3@@HH@Z=?OrderSquad@@YGXPAUPlayer@@HEHPAUUnit@@HHH@Z")
 #pragma comment(linker, "/alternatename:?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@HHPAUUnit@@@Z=?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@2HPAUUnit@@@Z")
+#pragma comment(linker, "/alternatename:?FindUnitType@@YGPAVUnitDef@@PBD@Z=?FindUnitType@@YGPAUUnitDefNameKeyView@@PBD@Z")
+#pragma comment(linker, "/alternatename:?InitGafSequence@@YGXPAUGafRef@@PAUGafSequence@@H@Z=?InitGafSequence@@YGXPAUHandle@@PAUGafEntry@@H@Z")
+#pragma comment(linker, "/alternatename:?StepGafSequence@@YGHPAUGafRef@@@Z=?StepGafSequence@@YGHPAUHandle@@@Z")
 #pragma comment(linker, "/alternatename:?SolveLaunchAngle@@YGFHHHHH@Z=?SolveLaunchAngle@@YGFHHHHM@Z")
 #pragma comment(linker, "/alternatename:?SubtractVec3@@YGXPAUVec3@@0PAH11@Z=?SubtractVec3@@YGXPAH0000@Z")
 #pragma comment(linker, "/alternatename:?WeaponCanReachPos@@YGHPAUUnit@@PAUVec3@@1E@Z=?WeaponCanReachPos@@YGHPAUUnit@@PAUReachPosVec3@@1H@Z")
@@ -297,7 +334,7 @@ int g_outCount;
 unsigned g_hash;
 int g_importsTotal;
 const char* g_closing[8];
-unsigned char g_rootKinds[REPLAY_MAX_ROOTS];
+unsigned short g_rootKinds[REPLAY_MAX_ROOTS];
 void* g_rootObjects[REPLAY_MAX_ROOTS];
 unsigned g_rootCount;
 const ReplaySlotSets* g_sets;
@@ -480,19 +517,44 @@ PassMap* PassMapEntries()
 
 #pragma pop_macro("g_passMaps")
 
+struct RegionBinding {
+    void* ptr;
+    unsigned size;
+};
+
+RegionBinding g_region;
+ReplayRegionView g_regionView;
+
+void* AllocRegion(unsigned size)
+{
+    return AllocObject(size);
+}
+
+void RegionBind(void* ptr, unsigned size)
+{
+    g_region.ptr = ptr;
+    g_region.size = size;
+    SimBlockTrack(&g_region.ptr);
+}
+
 unsigned char* BlockBase(const ReplayField& f)
 {
+    if (f.base == RB_REGION) {
+        g_regionView.size = g_region.size;
+        g_regionView.data = g_region.ptr == nullptr ? 0u : (unsigned)((unsigned char*)g_region.ptr - (unsigned char*)SimBlockBase());
+        return (unsigned char*)&g_regionView;
+    }
     return f.base == RB_GAME ? (unsigned char*)g_game : (unsigned char*)g_simGlobals;
 }
 
-void FormatField(const ReplayField& f, ReplayText& out)
+void FormatField(const ReplayField& f, ReplayText& out, bool assign = false)
 {
     out.Clear();
     if (f.base == RB_RNG) {
         out.AddHex32(f.offset == 2 ? *SeedWord() : *SimRandStream((int)f.offset));
         return;
     }
-    ReplayFormatObjectField(ReplayFieldView(f), BlockBase(f), g_objects, false, out);
+    ReplayFormatObjectField(ReplayFieldView(f), BlockBase(f), g_objects, assign, out);
 }
 
 bool RestoreField(const ReplayField& f, const char* value)
@@ -526,6 +588,8 @@ const ReplayField* FindBlockField(const char* name)
     const char* open = strchr(name, '[');
     if (open == nullptr)
         return FindField(name);
+    if (const ReplayField* whole = FindField(name))
+        return whole;
     char base[96];
     size_t length = (size_t)(open - name);
     if (length >= sizeof base)
@@ -701,6 +765,11 @@ template <> float ParseResult<float>(const char* text)
     return f;
 }
 
+template <> double ParseResult<double>(const char* text)
+{
+    return ParseF64(text);
+}
+
 void AddBytes(ReplayText& t, const void* p, int length)
 {
     ReplayBytes(t, p, length);
@@ -743,12 +812,17 @@ template <class T> void ApplyValues(std::vector<T, std::allocator<T> >* out, con
     }
 }
 
-void ApplyReach(void* object, unsigned kind, const char* suffix)
+bool ApplyReachField(void* object, unsigned kind, const char* suffix)
 {
     const char* value = OutValue(suffix);
     const ReplayObjectField* f = ReplayFindObjectField(kind, suffix + 1);
-    if (object != nullptr && value != nullptr && f != nullptr)
-        ReplayRestoreObjectField(*f, object, value, g_objects, AllocObject);
+    return object == nullptr || value == nullptr || f == nullptr || ReplayRestoreObjectField(*f, object, value, g_objects, AllocObject);
+}
+
+void ApplyReach(void* object, unsigned kind, const char* suffix)
+{
+    if (!ApplyReachField(object, kind, suffix))
+        Fatal(g_file, g_callIndex, "a value that cannot be restored", suffix);
 }
 
 const char* ArgLine(const char* name)
@@ -844,7 +918,7 @@ void* ArgObject(const char* name, unsigned kind)
     unsigned found = 0;
     void* p = value == nullptr ? nullptr : ReplayResolveObject(value, &found, g_objects, AllocObject);
     if (p != nullptr && found == kind && g_rootCount < REPLAY_MAX_ROOTS) {
-        g_rootKinds[g_rootCount] = (unsigned char)kind;
+        g_rootKinds[g_rootCount] = (unsigned short)kind;
         g_rootObjects[g_rootCount++] = p;
     }
     return p;
@@ -861,7 +935,9 @@ void* ArgWeapon(const char* name)
     return p;
 }
 
-void ParseStruct(const char* name, unsigned kind, void* object)
+char g_refusedKey[96];
+
+bool ParseStructFields(const char* name, unsigned kind, void* object)
 {
     for (unsigned i = 0; i < kReplayObjectFieldCount; i++) {
         const ReplayObjectField& f = kReplayObjectFields[i];
@@ -870,8 +946,12 @@ void ParseStruct(const char* name, unsigned kind, void* object)
         char key[96];
         sprintf(key, "%s.%s", name, f.name);
         const char* value = ArgLine(key);
-        if (value == nullptr || !ReplayRestoreObjectField(f, object, value, g_objects, AllocObject))
+        if (value == nullptr)
             continue;
+        if (!ReplayRestoreObjectField(f, object, value, g_objects, AllocObject)) {
+            strcpy(g_refusedKey, key);
+            return false;
+        }
         void* target = nullptr;
         if (f.kind == RK_REF) {
             unsigned offset = *(unsigned*)((unsigned char*)object + f.offset);
@@ -884,19 +964,34 @@ void ParseStruct(const char* name, unsigned kind, void* object)
             g_rootObjects[g_rootCount++] = target;
         }
     }
+    return true;
 }
 
-void ParseEvent(const char* name, unsigned table, void* buffer)
+void ParseStruct(const char* name, unsigned kind, void* object)
+{
+    if (!ParseStructFields(name, kind, object))
+        Fatal(g_file, g_callIndex, "a value that cannot be restored", g_refusedKey);
+}
+
+bool ParseEventFields(const char* name, unsigned table, void* buffer)
 {
     char key[96];
     sprintf(key, "%s.kind", name);
     const char* value = ArgLine(key);
     for (unsigned i = 0; value != nullptr && i < kReplayObjectFieldCount; i++) {
         const ReplayObjectField& f = kReplayObjectFields[i];
-        if (f.object == kReplayEventTables[table].header && strcmp(f.name, "kind") == 0)
-            ReplayRestoreObjectField(f, buffer, value, g_objects, AllocObject);
+        if (f.object == kReplayEventTables[table].header && strcmp(f.name, "kind") == 0 && !ReplayRestoreObjectField(f, buffer, value, g_objects, AllocObject)) {
+            strcpy(g_refusedKey, key);
+            return false;
+        }
     }
-    ParseStruct(name, ReplayEventObject(table, *(int*)buffer), buffer);
+    return ParseStructFields(name, ReplayEventObject(table, *(int*)buffer), buffer);
+}
+
+void ParseEvent(const char* name, unsigned table, void* buffer)
+{
+    if (!ParseEventFields(name, table, buffer))
+        Fatal(g_file, g_callIndex, "a value that cannot be restored", g_refusedKey);
 }
 
 void* ParseStructOpt(const char* name, unsigned kind, void* storage)
@@ -906,6 +1001,12 @@ void* ParseStructOpt(const char* name, unsigned kind, void* storage)
         return nullptr;
     ParseStruct(name, kind, storage);
     return storage;
+}
+
+bool ParseNullOut(const char* name)
+{
+    const char* value = ArgLine(name);
+    return value != nullptr && strcmp(value, "null") == 0;
 }
 
 struct StructsHolder {
@@ -943,6 +1044,14 @@ void ParseValueArg(const char* name, unsigned kind, void* object)
 void AddValueStruct(ReplayText& t, unsigned kind, const void* object)
 {
     ReplayAddValue(t, kind, object, g_objects);
+}
+
+void AddStructIn(ReplayText& t, unsigned kind, const void* p)
+{
+    if (p == nullptr)
+        t.Add("null");
+    else
+        AddValueStruct(t, kind, p);
 }
 
 template <class T> T ParseValueText(unsigned kind, const char* text)
@@ -1076,12 +1185,36 @@ void CompareObjectResult(unsigned kind, const void* object)
     value.Free();
 }
 
+void CompareRegionResult(const void* result)
+{
+    const char* value = result != nullptr && result == g_region.ptr ? "region" : "null";
+    HashText(value);
+    const char* recorded = OutLine("result");
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value) != 0)
+        Diff("result", recorded, value);
+}
+
 template <class T> void CompareResult(T result)
 {
     ReplayText value;
     ReplayValue(value, result);
     HashText(value.Data());
     CoreClosing("result", value.Data());
+    const char* recorded = OutLine("result");
+    if (recorded == nullptr)
+        recorded = "no such line";
+    if (strcmp(recorded, value.Data()) != 0)
+        Diff("result", recorded, value.Data());
+    value.Free();
+}
+
+void CompareWeaponResult(const void* weapon)
+{
+    ReplayText value;
+    ReplayAddWeapon(value, weapon);
+    HashText(value.Data());
     const char* recorded = OutLine("result");
     if (recorded == nullptr)
         recorded = "no such line";
@@ -1187,6 +1320,9 @@ void* SnapshotAnswer(const char* result, unsigned bytes, unsigned* offset)
     if (strncmp(result, "snapshot#", 9) != 0)
         return nullptr;
     unsigned ordinal = (unsigned)atoi(result + 9);
+    const char* plus = strchr(result, '+');
+    if (plus != nullptr)
+        g_captureUsed = (unsigned)atoi(plus + 1);
     unsigned size = (bytes + 7u) & ~7u;
     if (ordinal == 0 || ordinal > MAX_SNAPSHOTS || g_captureUsed + size > CAPTURE_ARENA_BYTES)
         Fatal(g_file, g_callIndex, "a snapshot that the replayer cannot allocate", result);
@@ -1649,6 +1785,21 @@ int __stdcall Native_fixture_Query(FixtureAmount* first, FixtureAmount* second)
     return first != nullptr ? first->amount : -1;
 }
 
+int __stdcall Native_fixture_Locate(FixtureAmount* first, FixtureAmount* second)
+{
+    if (first == nullptr)
+        return 0;
+    first->amount = 4;
+    if (second != nullptr)
+        second->amount = 9;
+    return 1;
+}
+
+WeaponDef* __stdcall Native_fixture_Pick()
+{
+    return &g_game->weapons[7];
+}
+
 int __stdcall Native_fixture_Strike(WeaponDef* weapon)
 {
     if (weapon == nullptr)
@@ -1704,6 +1855,182 @@ int __stdcall WeaponCanReachPosSlot(Unit* unit, Vec3* from, Vec3* to, int flags)
     return WeaponCanReachPos(unit, (ReachPosVec3*)from, (ReachPosVec3*)to, flags);
 }
 
+void __stdcall GetFootprintCentreSlot(const Point16* cell, Feature* def, Vec3* out)
+{
+    Point16 at = *cell;
+    *out = GetFootprintCentre(&at, def);
+}
+
+Mission* TheMission()
+{
+    return g_game->net.get();
+}
+
+int __stdcall GetGameTypeSlot()
+{
+    return TheMission()->GetGameType();
+}
+
+const char* __stdcall GetNameSlotSlot(int index)
+{
+    return TheMission()->GetNameSlot(index);
+}
+
+int __stdcall AdvanceMissionSlot()
+{
+    return TheMission()->AdvanceMission();
+}
+
+const char* __stdcall GetCampaignNameSlot()
+{
+    return TheMission()->GetCampaignName();
+}
+
+int __stdcall GetMissionIndexSlot()
+{
+    return TheMission()->GetMissionIndex();
+}
+
+const char* __stdcall GetMissionNameSlot()
+{
+    return TheMission()->GetMissionName();
+}
+
+int __stdcall GetStartPositionSlot(Vec3* out, int id)
+{
+    return TheMission()->GetStartPosition(out, id);
+}
+
+void __stdcall LoadCampaignSlot(const char* file)
+{
+    TheMission()->LoadCampaign(file);
+}
+
+int __stdcall LoadMissionByNameSlot(const char* name)
+{
+    return TheMission()->LoadMissionByName(name);
+}
+
+int __stdcall MissionExistsSlot(int index)
+{
+    return TheMission()->MissionExists(index);
+}
+
+void __stdcall RefreshMapListSlot(int multiplayer)
+{
+    TheMission()->RefreshMapList(multiplayer);
+}
+
+int __stdcall SelectMissionSlot(int index)
+{
+    return TheMission()->SelectMission(index);
+}
+
+int __stdcall ComputeMapChecksumSlot()
+{
+    return TheMission()->ComputeMapChecksum();
+}
+
+int __stdcall GetTerrainLengthSlot()
+{
+    return TheMission()->GetTerrainLength();
+}
+
+int __stdcall CountMissionsSlot()
+{
+    return TheMission()->CountMissions();
+}
+
+int __stdcall GetCampaignMissionNameSlot(int index, char* out, int size)
+{
+    return TheMission()->GetCampaignMissionName(index, out, size);
+}
+
+int __stdcall CountStartPositionsSlot()
+{
+    return TheMission()->CountStartPositions();
+}
+
+const char* __stdcall GetBriefingSlot()
+{
+    return TheMission()->GetBriefing();
+}
+
+const char* __stdcall GetDescriptionSlot()
+{
+    return TheMission()->GetDescription();
+}
+
+char* __stdcall GetPlanetSlot()
+{
+    return TheMission()->GetPlanet();
+}
+
+int __stdcall GetTerrainSizeTierSlot()
+{
+    return TheMission()->GetTerrainSizeTier();
+}
+
+const char* __stdcall GetTranslatedNameSlot()
+{
+    return TheMission()->GetTranslatedName();
+}
+
+int __stdcall HasMissionNameSlot()
+{
+    return TheMission()->HasMissionName() ? 1 : 0;
+}
+
+int __stdcall SelectSchemaSlot(int type, TdfFile* parser, char* schema)
+{
+    return TheMission()->SelectSchema(type, parser, schema);
+}
+
+void __stdcall GetMissionParamsSlot(MissionParams* out)
+{
+    TheMission()->GetParams(out);
+}
+
+int __stdcall CountMissionUnitsSlot()
+{
+    return TheMission()->CountUnits();
+}
+
+int __stdcall GetMissionUnitSlot(int index, MissionUnitInfo* out)
+{
+    return TheMission()->GetUnit(index, out);
+}
+
+void __stdcall SetMissionUnitPositionSlot(int index, Vec3* pos)
+{
+    TheMission()->SetUnitPosition(index, pos);
+}
+
+int __stdcall CountMissionFeaturesSlot()
+{
+    return TheMission()->CountFeatures();
+}
+
+int __stdcall GetMissionFeatureSlot(int index, MissionFeatureInfo* out)
+{
+    return TheMission()->GetFeature(index, out);
+}
+
+const char* __stdcall GetMemorySlot()
+{
+    return TheMission()->GetMemory();
+}
+
+const char* __stdcall GetNumPlayersSlot()
+{
+    return TheMission()->GetNumPlayers();
+}
+
+void __stdcall UpdateFeaturesSlot(void)
+{
+    abort();
+}
+
 void __cdecl UpdateWindSlot(RandStream stream)
 {
     UpdateWindOnStream(stream);
@@ -1739,6 +2066,34 @@ void __stdcall WriteStateSlot(const StateWriter* writer)
     MapWriteState(writer);
 }
 
+void __stdcall UpdateSquadsSlot(int player)
+{
+    SquadManager* manager = g_game->players[player].ai.get();
+    if (manager == nullptr)
+        return;
+    manager->TickIfActive();
+}
+
+void __stdcall CreateSquadManagerSlot(Player* player)
+{
+    player->ai = new (SimAlloc(64)) SquadManager(player);
+}
+
+void __stdcall FreeSquadManagerSlot(Player* player)
+{
+    SquadManager* manager = player->ai.get();
+    if (manager == nullptr)
+        return;
+    manager->DeleteTimers();
+    delete manager;
+    player->ai = nullptr;
+}
+
+void __stdcall WriteAiStateSlot(const StateWriter* writer)
+{
+    AiWriteState(writer);
+}
+
 WeaponDef* __stdcall FindWeaponByNameSlot(const char* name)
 {
     return (WeaponDef*)FindWeaponByName(name);
@@ -1762,16 +2117,6 @@ void __stdcall LoadWeaponsStateSlot(Unit* unit, int slot, const WeaponsSlotState
 void __stdcall SaveWeaponsStateSlot(Unit* unit, int slot, WeaponsSlotState* state)
 {
     WeaponsSaveState(unit, slot, state);
-}
-
-int __fastcall GetGameTypeSlot(Mission* self)
-{
-    return self->GetGameType();
-}
-
-const char* __stdcall GetNameSlotSlot(Mission* mission, int index)
-{
-    return mission->GetNameSlot(index);
 }
 
 void __fastcall SpatialBucketPrependUnitSlot(SpatialBucket* self, int unusedEdx, Unit* unit)
@@ -1804,64 +2149,205 @@ void __stdcall RefreshUnitIfStaleSlot(int moveClass, Unit* unit)
     PassMapEntries()[moveClass].RefreshUnitIfStale((UnitPassMapView*)unit);
 }
 
-int __fastcall AdvanceMissionSlot(Mission* self)
+void __stdcall UpdatePlayersSlot()
 {
-    return self->AdvanceMission();
 }
 
-const char* __fastcall GetCampaignNameSlot(Mission* self)
+void __stdcall UpdatePlayersOnStreamSlot(RandStream)
 {
-    return self->GetCampaignName();
 }
 
-int __fastcall GetMissionIndexSlot(Mission* self)
+
+int __stdcall UnitsNative_Apply(const UnitsEventHeader* event, unsigned int size)
 {
-    return self->GetMissionIndex();
+    return UnitsApply(event, size);
 }
 
-const char* __fastcall GetMissionNameSlot(Mission* self)
+void __stdcall UnitsNative_UpdateAllUnits()
 {
-    return self->GetMissionName();
 }
 
-int __fastcall GetStartPositionSlot(Mission* self, int unusedEdx, Vec3* out, int id)
+void __stdcall UnitsNative_UnitTypeSetAddTypeOrCategory(UnitTypeSet* self, const char* text, int* out)
 {
-    return self->GetStartPosition(out, id);
 }
 
-void __fastcall LoadCampaignSlot(Mission* self, int unusedEdx, const char* file)
+void __stdcall UnitsNative_AllocateUnitMemory()
 {
-    self->LoadCampaign(file);
 }
 
-int __fastcall LoadMissionByNameSlot(Mission* self, int unusedEdx, const char* name)
+void __stdcall UnitsNative_FreeUnitMemory()
 {
-    return self->LoadMissionByName(name);
 }
 
-int __fastcall MissionExistsSlot(Mission* self, int unusedEdx, int index)
+void __stdcall UnitsNative_FreeUnitInfo()
 {
-    return self->MissionExists(index);
 }
 
-void __fastcall RefreshMapListSlot(Mission* self, int unusedEdx, int multiplayer)
+void __stdcall UnitsNative_RefreshUnitInfo()
 {
-    self->RefreshMapList(multiplayer);
 }
 
-int __fastcall SelectMissionSlot(Mission* self, int unusedEdx, int index)
+void __stdcall UnitsNative_LoadUnitTypes()
 {
-    return self->SelectMission(index);
 }
 
-int __fastcall ComputeMapChecksumSlot(Mission* self)
+void __stdcall UnitsNative_FreeUnitTypes()
 {
-    return self->ComputeMapChecksum();
 }
 
-int __fastcall GetTerrainLengthSlot(Mission* self)
+void __stdcall UnitsNative_LoadDownloadMenus()
 {
-    return self->GetTerrainLength();
+}
+
+void __stdcall UnitsNative_FreeDownloadMenus()
+{
+}
+
+void __stdcall UnitsNative_FreeMovementClasses()
+{
+}
+
+void __stdcall UnitsNative_InitUnitCategories()
+{
+}
+
+void __stdcall UnitsNative_FreeUnitCategories()
+{
+}
+
+void __stdcall UnitsNative_KillAllUnits()
+{
+}
+
+void __stdcall UnitsNative_KillUnitsOfType(short id)
+{
+}
+
+void __stdcall UnitsNative_ReloadUnitType(unsigned short id)
+{
+}
+
+void __stdcall UnitsNative_KillUnit(Unit* unit, int cause)
+{
+}
+
+void __stdcall UnitsNative_LoadUnits(HapiBank* file)
+{
+}
+
+void __stdcall UnitsNative_SaveUnits(HapiBank* file)
+{
+}
+
+Unit* __stdcall UnitsNative_LoadUnit(unsigned short id, HapiBank* file)
+{
+    return nullptr;
+}
+
+Unit* __stdcall UnitsNative_CreateUnit(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
+{
+    return nullptr;
+}
+
+UnitDef* __stdcall UnitsNative_FindUnitType(const char* name)
+{
+    return FindUnitType(name);
+}
+
+unsigned short __stdcall UnitsNative_FindUnitTypeId(const char* name)
+{
+    return FindUnitTypeId(name);
+}
+
+Unit* __stdcall UnitsNative_FindMissionUnit(const char* name, const Ref<Unit>* units, int count, Unit* after)
+{
+    return nullptr;
+}
+
+int __stdcall UnitsNative_AddBuildProgress(Unit* builder, Unit* unit, float amount)
+{
+    return 0;
+}
+
+int __stdcall UnitsNative_AddRepairProgress(Unit* builder, Unit* unit, float amount)
+{
+    return AddRepairProgress(builder, unit, amount);
+}
+
+int __stdcall UnitsNative_CanLoad(Unit* unit, Unit* target)
+{
+    return unit->CanLoad(target);
+}
+
+int __stdcall UnitsNative_CanReclaim(Unit* unit, Unit* target)
+{
+    return unit->CanReclaim(target);
+}
+
+int __stdcall UnitsNative_CanRepair(Unit* unit, Unit* target)
+{
+    return unit->CanRepair(target);
+}
+
+void __stdcall UnitsNative_UnitRefUnlink(UnitRef* ref)
+{
+}
+
+void __stdcall UnitsNative_UpdateUnitHead(Unit* unit)
+{
+    UpdateUnitHead(unit);
+}
+
+int __stdcall UnitsNative_UpdateUnitBody(Unit* unit)
+{
+    return UpdateUnitBody(unit);
+}
+
+void __stdcall UnitsNative_UpdateUnitTail(Unit* unit, int moved)
+{
+}
+
+int __stdcall UnitsNative_GetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
+{
+    return 0;
+}
+
+void __stdcall UnitsNative_CreateFactoryIndex(int player)
+{
+}
+
+void __stdcall UnitsNative_FreeFactoryIndex(int player)
+{
+}
+
+void __stdcall UnitsNative_RefreshFactoryIndex(int player)
+{
+}
+
+void __stdcall UnitsNative_UnitRefInit(UnitRef* ref, Unit* unit, OrderBase* value)
+{
+}
+
+void __stdcall UnitsNative_UnitRefSetUnit(UnitRef* ref, Unit* unit)
+{
+}
+
+Unit* __stdcall UnitsNative_UnitRefGet(UnitRef* ref)
+{
+    return nullptr;
+}
+
+void __stdcall UnitsNative_UnitRefSetValue(UnitRef* ref, OrderBase* value)
+{
+}
+
+void __stdcall UnitsNative_WriteState(const StateWriter* writer)
+{
+}
+
+int __stdcall UnitsNative_GetMovementLimits(MapMoveLimits* out, int capacity)
+{
+    return 0;
 }
 
 #include "replay_slots.h"
@@ -1882,6 +2368,8 @@ void ResetBlock()
     g_known.Reset();
     g_objects.Reset();
     g_captureUsed = 0;
+    g_region.ptr = nullptr;
+    g_region.size = 0;
 }
 
 const ReplaySlotSets* FindSlot(const char* subsystem, const char* name)
@@ -2087,7 +2575,7 @@ void CompareObject(const ReplayReach* reach, unsigned at, unsigned kind, void* o
 void CompareObjects(const ReplaySlotSets* sets)
 {
     g_blobSeen.clear();
-    ReplayWalk(g_reach, g_objects, false, *sets, g_rootKinds, g_rootObjects, g_rootCount);
+    ReplayWalk(g_reach, g_objects, true, *sets, g_rootKinds, g_rootObjects, g_rootCount);
     ReplayText key;
     ReplayText value;
     for (unsigned at = 0; at < g_reach.count; at++) {
@@ -2201,7 +2689,7 @@ void CompareWrites(const char* file, const ReplaySlotSets* sets)
             CompareBlockVector(f);
             continue;
         }
-        FormatField(f, value);
+        FormatField(f, value, true);
         HashText(value.Data());
         const char* known = g_known.Get(f.name);
         if (known == nullptr)
@@ -2323,6 +2811,9 @@ void ReplayCall(const char* file, Outcome& out)
     g_hash = 2166136261u;
     g_sets = sets;
     ReplayAnswerHook() = ReplayAnswerImport;
+    ReplayEnsureAllOfTables(sets->allOf, sets->allOfCount, AllocObject);
+    if (g_game->unitsEnd.get() == nullptr && g_game->units.get() != nullptr && g_game->poolCount != 0)
+        g_game->unitsEnd = (Unit*)((unsigned char*)g_game->units.get() + g_game->poolCount * sizeof(Unit) - sizeof(Unit));
     bool ran = RunSlot(g_subsystem, slotText);
     ReplayAnswerHook() = nullptr;
     if (!ran)
@@ -2536,7 +3027,7 @@ void RecordGraph(ReplayText& text, ReplayKnown& known, void* player, const Repla
 {
     ReplayObjectTable* table = new ReplayObjectTable;
     ReplayReach* reach = new ReplayReach;
-    unsigned char kind = ROK_PLAYER;
+    unsigned short kind = ROK_PLAYER;
     ReplayWalk(*reach, *table, true, sets, &kind, &player, 1);
     ReplayCaptureObjects(text, known, *table, *reach, sets.objReads, sets.objReadCount, 'r');
     delete reach;
@@ -2706,7 +3197,7 @@ struct Recorder {
         delete table;
         text.Free();
     }
-    void Record(const unsigned char* kinds, void* const* roots, unsigned count, const ReplaySlotSets& sets)
+    void Record(const unsigned short* kinds, void* const* roots, unsigned count, const ReplaySlotSets& sets)
     {
         text.Clear();
         ReplayWalk(*reach, *table, true, sets, kinds, roots, count);
@@ -2800,7 +3291,7 @@ void TableSelfTest()
     movement->footprintX = 3;
     movement->maxSlope = 9;
 
-    unsigned char kinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
+    unsigned short kinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
     void* roots[2] = { shot, movement };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -2823,12 +3314,12 @@ void TableSelfTest()
     Check(rebuiltClass == &MovementEntries()[5] && rebuiltClass->maxSlope == 9, "an entry of the sim table is restored in place");
 
     Recorder again;
-    unsigned char againKinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
+    unsigned short againKinds[2] = { ROK_PROJECTILE, ROK_MOVEMENTCLASS };
     void* againRoots[2] = { rebuilt, rebuiltClass };
     again.Record(againKinds, againRoots, 2, sets);
     Check(strcmp(text, again.text.Data()) == 0, "the rebuilt tables record the same text");
 
-    memcpy(g_rootKinds, againKinds, 2);
+    memcpy(g_rootKinds, againKinds, sizeof againKinds);
     g_rootObjects[0] = rebuilt;
     g_rootObjects[1] = rebuiltClass;
     g_rootCount = 2;
@@ -2867,7 +3358,7 @@ void ArraySelfTest()
     for (int i = 0; i < 8; i++)
         cells[i] = 0x01020304u * (unsigned)(i + 1);
     movement->cells = cells;
-    unsigned char kinds[2] = { ROK_PLAYER, ROK_PASSMAP };
+    unsigned short kinds[2] = { ROK_PLAYER, ROK_PASSMAP };
     void* roots[2] = { player, movement };
 
     Recorder recorder;
@@ -2916,7 +3407,7 @@ void ArraySelfTest()
     Check(rebuilt != nullptr && rebuilt->exploredSize == 40 && rebuilt->explored.get() != nullptr && rebuilt->explored.get()[39] == 9 && rebuilt->explored.get()[40 - 1] == 9, "the last whole write wins");
     Check(rebuiltClass != nullptr && rebuiltClass->cells.get() != nullptr && rebuiltClass->cells.get()[3] == 0xdeadbeefu && rebuiltClass->cells.get()[2] == 0x01020304u * 3, "the delta is applied to the array the replayer kept");
 
-    unsigned char kind = ROK_PLAYER;
+    unsigned short kind = ROK_PLAYER;
     void* root = rebuilt;
     Recorder replayed;
     replayed.Record(&kind, &root, 1, sets);
@@ -2947,7 +3438,7 @@ void ArraySelfTest()
     for (int i = 0; i < 8; i++)
         rows[i] = 0x01010101u * (unsigned)(i + 1);
     partial->cells = rows;
-    unsigned char partialKind = ROK_PASSMAP;
+    unsigned short partialKind = ROK_PASSMAP;
     void* partialRoot = partial;
     Recorder partialRecorder;
     partialRecorder.Record(&partialKind, &partialRoot, 1, sets);
@@ -2977,7 +3468,7 @@ void ArraySelfTest()
     for (int i = 0; i < 1500; i++)
         field[i] = (unsigned char)i;
     wide->explored = field;
-    unsigned char wideKind = ROK_PLAYER;
+    unsigned short wideKind = ROK_PLAYER;
     void* wideRoot = wide;
     Recorder wideRecorder;
     ReplayText wideCalls;
@@ -3124,6 +3615,25 @@ void FormSelfTest()
     t.Clear();
     ReplayAddEvent(t, "event", RET_TARGETING, &aim, sizeof(TargetingEventHeader), g_objects);
     Check(strstr(t.Data(), "  a event.pos0 0\n") != nullptr, "an event copies exactly its size: the payload beyond it reads as zero");
+
+    printf("refused values\n");
+    LoadCall("  a event.kind 1\n  a event.unit FrameTable#?\n");
+    memset(buffer, 0, sizeof buffer);
+    Check(!ParseEventFields("event", RET_TARGETING, buffer) && strcmp(g_refusedKey, "event.unit") == 0, "an event field the restore refuses stops the replay at its name");
+    LoadCall("  a pos.x 1\n");
+    Vec3 refusedPos = Vec3();
+    Check(ParseStructFields("pos", ROK_VEC3, &refusedPos) && refusedPos.x == 1, "and a struct of fields it takes is restored");
+    TargetingSetUnit refusedUnit;
+    memset(&refusedUnit, 0, sizeof refusedUnit);
+    LoadCall("  a aim.target FrameTable#?\n");
+    Check(!ParseStructFields("aim", ROK_TARGETINGSETUNIT, &refusedUnit) && strcmp(g_refusedKey, "aim.target") == 0, "a struct field the restore refuses stops the replay");
+    g_outNames[0] = "out.target";
+    g_outValues[0] = "FrameTable#?";
+    g_outCount = 1;
+    Check(!ApplyReachField(&refusedUnit, ROK_TARGETINGSETUNIT, ".target"), "and so does a reached field it refuses");
+    g_outValues[0] = "null";
+    Check(ApplyReachField(&refusedUnit, ROK_TARGETINGSETUNIT, ".target"), "while null is restored");
+    g_outCount = 0;
 
     printf("arrays of structs\n");
     Point16 points[3] = { { 1, 2 }, { 3, 4 }, { -5, 6 } };
@@ -3399,6 +3909,24 @@ void ShapeSelfTest()
     Check(g_outCount == 1, "an o line named by the closing list is the call's, not the import's");
     SetClosing(nullptr);
 
+    printf("a nullable out value\n");
+    LoadCall("  i fixture.Locate = 1\n  o first (4)\n  o second (9)\n");
+    BeginImport();
+    FixtureAmount found = { 0 };
+    FixtureAmount foundSize = { 0 };
+    int located = Imp_fixture_Locate(&found, &foundSize);
+    Check(g_diffs == 0 && located == 1 && found.amount == 4 && foundSize.amount == 9, "the stub writes each o line back and the line holds no value going in");
+    LoadCall("  i fixture.Locate = 1\n  o first (4)\n  o second (9)\n");
+    BeginImport();
+    FixtureAmount partial = { 0 };
+    Imp_fixture_Locate(&partial, nullptr);
+    Check(g_diffs == 0 && partial.amount == 4, "a null pointer is skipped");
+    LoadCall("  i fixture.Locate = 0\n");
+    BeginImport();
+    FixtureAmount alone = { 7 };
+    Imp_fixture_Locate(&alone, nullptr);
+    Check(g_diffs == 0 && alone.amount == 7, "and a pointer with no o line is left alone");
+
     printf("in/out of the slot under replay\n");
     LoadCall("  a p2 (5)\n  o p2 (8)\n");
     FixtureAmount storage = { 0 };
@@ -3521,6 +4049,42 @@ void InOutRunnerSelfTest()
     After_fixture_Measure();
     printf("a scalar that came out differently: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "p4") == 0, "a replayed scalar that differs is reported at the argument");
+
+    printf("a weapon as the result of a slot\n");
+    LoadCall("  o result weapondef#7\n  o weapondef#7.flags 0\n");
+    BeginCompare();
+    Run_fixture_Pick();
+    After_fixture_Pick();
+    Check(g_diffs == 0, "a weapon result is compared by its name");
+    LoadCall("  o result weapondef#8\n");
+    BeginCompare();
+    Run_fixture_Pick();
+    After_fixture_Pick();
+    printf("another weapon: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "another weapon is reported at the result");
+
+    printf("a nullable out value of the slot under replay\n");
+    LoadCall("  a second null\n  o first.amount 4\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Locate();
+    After_fixture_Locate();
+    Check(g_diffs == 0, "a null out pointer is passed as null, and has no o line");
+    LoadCall("  o first.amount 4\n  o second.amount 9\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Locate();
+    After_fixture_Locate();
+    Check(g_diffs == 0, "and a pointer that is not null is compared with its o lines");
+    LoadCall("  a first null\n  a second null\n  o result 0\n");
+    BeginCompare();
+    Run_fixture_Locate();
+    After_fixture_Locate();
+    Check(g_diffs == 0, "a call whose result leaves the out values alone records none");
+    LoadCall("  o first.amount 5\n  o second.amount 9\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_Locate();
+    After_fixture_Locate();
+    printf("an out struct that came out differently: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "first.amount") == 0, "a replayed value that differs is reported at its field");
 }
 
 void WeaponArgumentSelfTest()
@@ -3838,7 +4402,7 @@ void VectorSelfTest()
     seen->index = 4;
     seen->units.PushBack(first);
     seen->units.PushBack(second);
-    unsigned char kind[2] = { ROK_PLAYERAI, ROK_FIXTURESEEN };
+    unsigned short kind[2] = { ROK_PLAYERAI, ROK_FIXTURESEEN };
     void* root[2] = { ai, seen };
     Recorder recorder;
     recorder.Record(kind, root, 2, sets);
@@ -4037,6 +4601,12 @@ void SnapshotSelfTest()
     CompareSnapshots();
     Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2.length") == 0, "and a buffer of another size");
     g_snapshotBytes[1] = 700;
+    unsigned later = 0;
+    unsigned char* placed = (unsigned char*)SnapshotAnswer("snapshot#1+5784", 56, &later);
+    Check(placed == g_captureArena + 5784 && later == 5784, "an offset after the ordinal is where the buffer is placed and the offset it answers");
+    g_captureUsed = 0;
+    placed = (unsigned char*)SnapshotAnswer("snapshot#2", 56, &later);
+    Check(placed == g_captureArena && later == 0, "a line with no offset follows the buffers of the call, from the start of the arena");
     free(body);
     t.Free();
     recorded.Free();
@@ -4047,6 +4617,16 @@ void BeginServices(const char* body)
     LoadCall(body);
     BeginImport();
     memset(g_snapshotData, 0, sizeof g_snapshotData);
+}
+
+void StringSelfTest()
+{
+    printf("a string field\n");
+    const ReplayObjectField* f = ReplayFindObjectField(ROK_WINDMETEORSPARAMS, "weapon");
+    WindMeteorsParams params;
+    memset(&params, 0, sizeof params);
+    Check(f != nullptr && ReplayRestoreObjectField(*f, &params, "\"METEOR\"", g_objects, AllocObject) && strcmp(params.params.weapon, "METEOR") == 0, "a quoted string is restored");
+    Check(f != nullptr && !ReplayRestoreObjectField(*f, &params, "x:4d455445", g_objects, AllocObject), "and bytes in its place are refused");
 }
 
 void FilesSelfTest()
@@ -4283,7 +4863,7 @@ void RawPointerSelfTest()
     cursor->value = 9;
     cursor->kind = 1;
     cursor->src = (GafEntry*)table;
-    unsigned char kinds[1] = { ROK_HANDLE };
+    unsigned short kinds[1] = { ROK_HANDLE };
     void* roots[1] = { cursor };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -4312,7 +4892,7 @@ void RawPointerSelfTest()
     Check(rebuilt != nullptr && rebuiltTable != nullptr && rebuilt->index == 2 && rebuilt->value == 9 && rebuilt->kind == 1, "the object is rebuilt");
     Check(rebuilt->src == (GafEntry*)rebuiltTable, "its ptr is the address of the replayer's own copy");
     Recorder again;
-    unsigned char againKinds[1] = { ROK_HANDLE };
+    unsigned short againKinds[1] = { ROK_HANDLE };
     void* againRoots[1] = { rebuilt };
     again.Record(againKinds, againRoots, 1, sets);
     Check(strcmp(text, again.text.Data()) == 0, "the rebuilt object records the same text");
@@ -4361,7 +4941,7 @@ void MaskedViewSelfTest()
     view->plain.count = 7;
     view->plain.total = 9;
     view->linked.def = Ref<UnitDef>(def);
-    unsigned char kinds[1] = { ROK_FIXTUREVIEW };
+    unsigned short kinds[1] = { ROK_FIXTUREVIEW };
     void* roots[1] = { view };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -4435,7 +5015,7 @@ void MaskedViewSelfTest()
     slave->master = Ref<FixtureView>(master);
     slave->ground.moved = 5;
     slave->narrow.low = 11;
-    unsigned char slaveKinds[2] = { ROK_FIXTURESLAVE, ROK_PLAYER };
+    unsigned short slaveKinds[2] = { ROK_FIXTURESLAVE, ROK_PLAYER };
     void* slaveRoots[2] = { slave, player };
     Recorder through;
     through.Record(slaveKinds, slaveRoots, 2, sets);
@@ -4487,7 +5067,7 @@ void FeatureTableSelfTest()
     g_game->features = table;
     g_game->featureCount = 3;
     table[3].anim.index = 2;
-    unsigned char kinds[1] = { ROK_HANDLE };
+    unsigned short kinds[1] = { ROK_HANDLE };
     void* roots[1] = { &table[3].anim };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -4511,7 +5091,7 @@ void FeatureTableSelfTest()
     g_game->spots = pool;
     Spot* spots = (Spot*)pool;
     spots[0].feature = 1;
-    unsigned char spotKinds[1] = { ROK_SPOT };
+    unsigned short spotKinds[1] = { ROK_SPOT };
     void* spotRoots[1] = { &spots[0] };
     Recorder spot;
     defs[1].noobject = 1;
@@ -4550,7 +5130,7 @@ void EmbeddedSiteSelfTest()
     holder->shadow.value = 6;
     holder->shadow.kind = 1;
     holder->shadow.src = (GafEntry*)frames;
-    unsigned char kinds[1] = { ROK_FIXTUREHOLDER };
+    unsigned short kinds[1] = { ROK_FIXTUREHOLDER };
     void* roots[1] = { holder };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -4636,7 +5216,7 @@ void UnnamedPtrSelfTest()
     view->flags = 1;
     view->linked.table = frames;
     cursor->src = (GafEntry*)frames;
-    unsigned char kinds[2] = { ROK_FIXTUREVIEW, ROK_HANDLE };
+    unsigned short kinds[2] = { ROK_FIXTUREVIEW, ROK_HANDLE };
     void* roots[2] = { view, cursor };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -4687,7 +5267,7 @@ void AllOfListSelfTest()
     g_game->players[2].id = 12;
     lanes[2].level = 9;
     unsigned short fields[2] = { FieldIndex(ROK_PLAYER, "id"), FieldIndex(ROK_FIXTURELANE, "level") };
-    unsigned char both[2] = { ROK_PLAYER, ROK_FIXTURELANE };
+    unsigned short both[2] = { ROK_PLAYER, ROK_FIXTURELANE };
     ReplaySlotSets sets = { "two", 0, nullptr, 0, nullptr, 0, fields, 2, fields, 2, both, 2 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -4743,7 +5323,7 @@ void DeltaTableSelfTest()
     table[500].metal = 9;
     unsigned short fields[5] = { FieldIndex(ROK_FIXTURECELL, "unit"), FieldIndex(ROK_FIXTURECELL, "metal"), FieldIndex(ROK_FIXTURECELL, "flags"), FieldIndex(ROK_FIXTURECELL, "occupant"),
                                  FieldIndex(ROK_UNIT, "health") };
-    unsigned char every[1] = { ROK_FIXTURECELL };
+    unsigned short every[1] = { ROK_FIXTURECELL };
     ReplaySlotSets sets = { "delta", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -4801,7 +5381,7 @@ void DeltaLimitSelfTest()
     table[40].flags = 7;
     table[41].flags = 3;
     unsigned short fields[4] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "cell"), FieldIndex(ROK_FIXTURECELL, "metal"), FieldIndex(ROK_FIXTURECELL, "flags") };
-    unsigned char every[2] = { ROK_FIXTURECELL, ROK_FIXTURELANE };
+    unsigned short every[2] = { ROK_FIXTURECELL, ROK_FIXTURELANE };
     ReplaySlotSets sets = { "limit", 0, nullptr, 0, nullptr, 0, fields, 4, fields, 4, every, 2 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -4850,7 +5430,7 @@ void UnconditionedUnitIdSelfTest()
     lanes[1].unit = 5;
     lanes[3].unit = 9;
     unsigned short fields[4] = { FieldIndex(ROK_FIXTURELANE, "unit"), FieldIndex(ROK_FIXTURELANE, "level"), FieldIndex(ROK_FIXTURELANE, "occupant"), FieldIndex(ROK_UNIT, "health") };
-    unsigned char every[1] = { ROK_FIXTURELANE };
+    unsigned short every[1] = { ROK_FIXTURELANE };
     ReplaySlotSets sets = { "unit", 0, nullptr, 0, nullptr, 0, fields, 4, fields, 4, every, 1 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -4946,6 +5526,59 @@ void GameRefSelfTest()
     free(text);
 }
 
+void GamePtrSelfTest()
+{
+    printf("a raw pointer field of Game\n");
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureView* view = (FixtureView*)SimAlloc(sizeof(FixtureView));
+    memset((void*)view, 0, sizeof(FixtureView));
+    view->flags = 4;
+    g_game->gaf_1480f = (void*)view;
+    unsigned char reads[1] = { RF_GAME_GAF_1480F };
+    unsigned short objects[1] = { FieldIndex(ROK_FIXTUREVIEW, "flags") };
+    ReplaySlotSets sets = { "ptr", 0, reads, 1, reads, 1, objects, 1, objects, 1 };
+    Recorder recorder;
+    RecordGameFields(recorder, sets);
+    char* text = strdup(recorder.text.Data());
+    printf("%s", text);
+    Check(strcmp(text, "  r Game.gaf_1480f FixtureView#1\n  r FixtureView#1.flags 4\n") == 0, "the target is named at first sight, and the walk reaches it");
+
+    view->flags = 6;
+    g_game->gaf_1480f = nullptr;
+    RecordGameFields(recorder, sets);
+    Check(strcmp(recorder.text.Data(), "  r Game.gaf_1480f null\n") == 0, "a null pointer is written null, and no object follows");
+
+    ResetBlock();
+    char* line = strchr(text, '\n');
+    *line = '\0';
+    Check(RestoreField(kReplayFields[RF_GAME_GAF_1480F], strchr(text + 4, ' ') + 1), "the pointer line restores");
+    *line = '\n';
+    RestoreText(line + 1, sets);
+    FixtureView* rebuilt = (FixtureView*)g_game->gaf_1480f;
+    Check(rebuilt != nullptr && rebuilt->flags == 4, "the replayer allocates the target and restores its fields");
+    if (rebuilt == nullptr) {
+        free(text);
+        return;
+    }
+    ReplayText now;
+    FormatField(kReplayFields[RF_GAME_GAF_1480F], now);
+    Check(strcmp(now.Data(), "FixtureView#1") == 0, "the restored pointer is written as it was");
+    g_rootCount = 0;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0, "the target compares equal through the Game field");
+    rebuilt->flags = 5;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureView#1.flags") == 0, "a changed field of the target is reported");
+    Check(RestoreField(kReplayFields[RF_GAME_GAF_1480F], "null") && g_game->gaf_1480f == nullptr, "null restores as null");
+    FormatField(kReplayFields[RF_GAME_GAF_1480F], now);
+    Check(strcmp(now.Data(), "null") == 0, "and is written null");
+    now.Free();
+    free(text);
+}
+
 void ExecuteCommandSelfTest()
 {
     printf("services: ExecuteCommandText\n");
@@ -5003,6 +5636,8 @@ void PolymorphicSelfTest()
     Order* second = (Order*)SimAlloc(sizeof(Order));
     memset((void*)first, 0, sizeof(Order));
     memset((void*)second, 0, sizeof(Order));
+    SetVtable(&first->link, ReplayVtable(ROK_PATHORDERATTACH));
+    SetVtable(&second->link, ReplayVtable(ROK_PATHORDERATTACH));
     ApproachRadius* area = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
     RingApproach* ring = (RingApproach*)SimAlloc(sizeof(RingApproach));
     memset((void*)area, 0, sizeof(ApproachRadius));
@@ -5022,7 +5657,7 @@ void PolymorphicSelfTest()
     second->attached = ring;
     second->next = first;
 
-    unsigned char kinds[2] = { ROK_ORDER, ROK_ORDER };
+    unsigned short kinds[2] = { ROK_ORDER, ROK_ORDER };
     void* roots[2] = { first, second };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -5048,12 +5683,12 @@ void PolymorphicSelfTest()
     Check(rebuiltArea->source.get() == rebuiltFirst && rebuiltSecond->next.get() == rebuiltFirst, "and the pointers between the kinds");
 
     Recorder again;
-    unsigned char againKinds[2] = { ROK_ORDER, ROK_ORDER };
+    unsigned short againKinds[2] = { ROK_ORDER, ROK_ORDER };
     void* againRoots[2] = { rebuiltFirst, rebuiltSecond };
     again.Record(againKinds, againRoots, 2, sets);
     Check(strcmp(text, again.text.Data()) == 0, "the rebuilt objects record the same text");
 
-    memcpy(g_rootKinds, againKinds, 2);
+    memcpy(g_rootKinds, againKinds, sizeof againKinds);
     g_rootObjects[0] = rebuiltFirst;
     g_rootObjects[1] = rebuiltSecond;
     g_rootCount = 2;
@@ -5101,7 +5736,7 @@ void PolymorphicSelfTest()
     unsigned selectable = CodeIndex("orderNotify", (const void*)MakeSelectableOrder);
     unsigned wait = CodeIndex("orderNotify", (const void*)WaitOrder);
     Check(stop != ~0u && selectable != ~0u && wait != ~0u && stop != selectable && selectable != wait, "the table lists the functions by their order of registration");
-    unsigned char entryKind = ROK_ORDERTABLEENTRY;
+    unsigned short entryKind = ROK_ORDERTABLEENTRY;
     void* entryRoot = entry;
     Recorder code;
     code.Record(&entryKind, &entryRoot, 1, sets);
@@ -5161,6 +5796,87 @@ void* Fresh(unsigned size)
     return p;
 }
 
+void GoalSelfTest()
+{
+    printf("a kind whose vtable is the compiler's\n");
+    ResetBlock();
+    ReplayClearFailure();
+    unsigned count = 0;
+    const unsigned short* all = AllStateFields(&count);
+    ReplaySlotSets sets = { "all", 0, nullptr, 0, nullptr, 0, all, count, all, count };
+    FixtureGoalHolder* holder = (FixtureGoalHolder*)Fresh(sizeof(FixtureGoalHolder));
+    FixtureGoalA* a = new (Fresh(sizeof(FixtureGoalA))) FixtureGoalA();
+    FixtureGoalB* b = new (Fresh(sizeof(FixtureGoalB))) FixtureGoalB();
+    a->ticks = 4;
+    a->heading = -9;
+    b->ticks = 6;
+    b->count = 3;
+    holder->id = 2;
+    holder->goal = a;
+    Check(*(const void**)a == ReplayVtable(ROK_FIXTUREGOALA) && *(const void**)b == ReplayVtable(ROK_FIXTUREGOALB), "the vtable of the kind is the one the compiler gave the class");
+    Check(ReplayVtable(ROK_FIXTUREGOALA) != ReplayVtable(ROK_FIXTUREGOALB), "and each kind has its own");
+
+    unsigned short kinds[1] = { ROK_FIXTUREGOALHOLDER };
+    void* roots[1] = { holder };
+    Recorder recorder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* first = strdup(recorder.text.Data());
+    printf("%s", first);
+    Check(ReplayFailure() == nullptr, "an object of such a kind is recorded");
+    Check(strstr(first, "  r FixtureGoalHolder#1.goal FixtureGoalA#1\n") != nullptr && strstr(first, "  r FixtureGoalA#1.heading -9\n") != nullptr, "and named as the kind its vptr says");
+    holder->goal = b;
+    recorder.Record(kinds, roots, 1, sets);
+    char* second = strdup(recorder.text.Data());
+    Check(strstr(second, "  r FixtureGoalHolder#1.goal FixtureGoalB#1\n") != nullptr, "another kind of the base is named as its own");
+
+    ResetBlock();
+    RestoreText(first, sets);
+    FixtureGoalHolder* rebuilt = (FixtureGoalHolder*)ReplayResolveObject("FixtureGoalHolder#1", nullptr, g_objects, AllocObject);
+    FixtureGoalA* rebuiltA = (FixtureGoalA*)ReplayResolveObject("FixtureGoalA#1", nullptr, g_objects, AllocObject);
+    Check(rebuilt != nullptr && rebuiltA != nullptr && rebuilt->goal.get() == (FixtureGoalBase*)rebuiltA, "the object is rebuilt and linked");
+    if (rebuilt == nullptr || rebuiltA == nullptr) {
+        free(first);
+        free(second);
+        return;
+    }
+    Check(*(const void**)rebuiltA == ReplayVtable(ROK_FIXTUREGOALA) && rebuiltA->Kind() == 1, "it has the class's vtable, so a virtual call on it runs the class's method");
+    g_rootKinds[0] = ROK_FIXTUREGOALHOLDER;
+    g_rootObjects[0] = rebuilt;
+    g_rootCount = 1;
+    BeginCompare();
+    CompareObjects(&sets);
+    Check(g_diffs == 0 && ReplayFailure() == nullptr, "the restored object compares equal");
+    *(const void**)rebuiltA = ReplayVtable(ROK_FIXTUREGOALB);
+    BeginCompare();
+    CompareObjects(&sets);
+    printf("another vptr: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs > 0, "an object whose vptr is another kind's is a difference");
+    free(first);
+    free(second);
+
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureGoalHolder* twinHolder = (FixtureGoalHolder*)Fresh(sizeof(FixtureGoalHolder));
+    FixtureTwin* twin = new (Fresh(sizeof(FixtureTwin))) FixtureTwin();
+    twin->ticks = 9;
+    twin->count = 5;
+    twinHolder->id = 3;
+    twinHolder->goal = twin;
+    roots[0] = twinHolder;
+    Recorder twinRecorder;
+    twinRecorder.Record(kinds, roots, 1, sets);
+    char* third = strdup(twinRecorder.text.Data());
+    printf("%s", third);
+    Check(ReplayFailure() == nullptr && strstr(third, "  r FixtureGoalHolder#1.goal FixtureTwin#1\n") != nullptr, "a class with a second vtable is named as its kind by its first");
+    ResetBlock();
+    RestoreText(third, sets);
+    FixtureTwin* rebuiltTwin = (FixtureTwin*)ReplayResolveObject("FixtureTwin#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltTwin != nullptr && rebuiltTwin->Kind() == 3 && rebuiltTwin->count == 5, "it is rebuilt");
+    if (rebuiltTwin != nullptr)
+        Check(static_cast<FixtureScanBase*>(rebuiltTwin)->Scan() == 7, "with the vtable of its second base too, so a call through that base runs the class's method");
+    free(third);
+}
+
 void RefsSelfTest()
 {
     printf("an array of refs\n");
@@ -5182,7 +5898,7 @@ void RefsSelfTest()
     manager->timers[0] = timer;
     manager->timers[2] = assault;
 
-    unsigned char kinds[1] = { ROK_FIXTUREMANAGER };
+    unsigned short kinds[1] = { ROK_FIXTUREMANAGER };
     void* roots[1] = { manager };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5262,7 +5978,7 @@ void BasedTableSelfTest()
     otherUser->tag = 11;
     otherUser->group = &otherGroups[1];
 
-    unsigned char kinds[4] = { ROK_FIXTUREOWNER, ROK_FIXTUREOWNER, ROK_FIXTUREUSER, ROK_FIXTUREUSER };
+    unsigned short kinds[4] = { ROK_FIXTUREOWNER, ROK_FIXTUREOWNER, ROK_FIXTUREUSER, ROK_FIXTUREUSER };
     void* roots[4] = { owner, other, user, otherUser };
     Recorder recorder;
     recorder.Record(kinds, roots, 4, sets);
@@ -5332,7 +6048,7 @@ void ElementSiteSelfTest()
         rig->slots[i].cb.ppVtbl = (void**)ReplayVtable(ROK_FIXTURECB);
     rig->slots[1].cb.done = 6;
     rig->slots[2].cb.done = 1;
-    unsigned char kinds[1] = { ROK_FIXTURERIG };
+    unsigned short kinds[1] = { ROK_FIXTURERIG };
     void* roots[1] = { rig };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5420,7 +6136,7 @@ void EmbedsSelfTest()
     script->channels[2].pc = 7;
     script->channels[2].state = -2;
     script->channels[3].stack = 99;
-    unsigned char kinds[1] = { ROK_FIXTURESCRIPT };
+    unsigned short kinds[1] = { ROK_FIXTURESCRIPT };
     void* roots[1] = { script };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5479,7 +6195,7 @@ void EmbeddedPolymorphicSelfTest()
     first->link.value = 3;
     second->link.owner = second;
     second->link.value = 4;
-    unsigned char kinds[2] = { ROK_FIXTUREORDER, ROK_FIXTUREORDER };
+    unsigned short kinds[2] = { ROK_FIXTUREORDER, ROK_FIXTUREORDER };
     void* roots[2] = { first, second };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -5563,9 +6279,9 @@ void CapacityTableSelfTest()
     eyes[3].pos.y = 6;
     unsigned short fields[7] = { FieldIndex(ROK_FIXTUREEYE, "owner"), FieldIndex(ROK_FIXTUREEYE, "screen"), FieldIndex(ROK_FIXTUREEYE, "x"), FieldIndex(ROK_FIXTUREEYE, "flag"),
                                  FieldIndex(ROK_FIXTUREEYE, "flagPtr"), FieldIndex(ROK_FIXTUREEYE, "pos"), FieldIndex(ROK_FIXTUREVIEW, "flags") };
-    unsigned char every[1] = { ROK_FIXTUREEYE };
+    unsigned short every[1] = { ROK_FIXTUREEYE };
     ReplaySlotSets sets = { "capacity", 0, nullptr, 0, nullptr, 0, fields, 7, fields, 7, every, 1 };
-    unsigned char kinds[1] = { ROK_FIXTUREEYE };
+    unsigned short kinds[1] = { ROK_FIXTUREEYE };
     void* roots[1] = { &eyes[3] };
     Recorder recorder;
     recorder.Record(kinds, roots, 1, sets);
@@ -5624,7 +6340,7 @@ void TrackedCountSelfTest()
     g_game->count_14367 = 3;
     unsigned short fields[1] = { FieldIndex(ROK_FIXTURETALLY, "value") };
     unsigned char reads[1] = { RF_GAME_COUNT_14367 };
-    unsigned char every[1] = { ROK_FIXTURETALLY };
+    unsigned short every[1] = { ROK_FIXTURETALLY };
     ReplaySlotSets tracked = { "tracked", 0, reads, 1, nullptr, 0, fields, 1, fields, 1, every, 1 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, tracked);
@@ -5662,7 +6378,7 @@ void SelfPointerSelfTest()
     eyes[1].pos.x = 3;
     unsigned short fields[5] = { FieldIndex(ROK_FIXTUREEYE, "screen"), FieldIndex(ROK_FIXTUREEYE, "x"), FieldIndex(ROK_FIXTUREEYE, "flag"), FieldIndex(ROK_FIXTUREEYE, "flagPtr"),
                                  FieldIndex(ROK_FIXTUREEYE, "pos") };
-    unsigned char every[1] = { ROK_FIXTUREEYE };
+    unsigned short every[1] = { ROK_FIXTUREEYE };
     ReplaySlotSets sets = { "self", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5, every, 1 };
     Recorder recorder;
     recorder.Record(nullptr, nullptr, 0, sets);
@@ -5719,7 +6435,7 @@ void SelfPointerSelfTest()
     unsigned short heapFields[6] = { FieldIndex(ROK_FIXTUREHEAP, "capacity"), FieldIndex(ROK_FIXTUREHEAP, "used"), FieldIndex(ROK_FIXTUREHEAP, "pool"), FieldIndex(ROK_FIXTUREHEAP, "top"),
                                      FieldIndex(ROK_FIXTURENODE, "key"), FieldIndex(ROK_FIXTURENODE, "pri") };
     ReplaySlotSets heapSets = { "heap", 0, nullptr, 0, nullptr, 0, heapFields, 6, heapFields, 6 };
-    unsigned char kinds[2] = { ROK_FIXTUREHEAP, ROK_FIXTURENODE };
+    unsigned short kinds[2] = { ROK_FIXTUREHEAP, ROK_FIXTURENODE };
     void* roots[2] = { heap, &nodes[2] };
     Recorder heapRecorder;
     heapRecorder.Record(kinds, roots, 2, heapSets);
@@ -5812,7 +6528,7 @@ void CStringSelfTest()
     for (int i = 0; i < 8; i++)
         fields[i] = FieldIndex(ROK_FIXTURENAMED, fieldNames[i]);
     ReplaySlotSets sets = { "named", 0, nullptr, 0, nullptr, 0, fields, 8, fields, 8 };
-    unsigned char kind = ROK_FIXTURENAMED;
+    unsigned short kind = ROK_FIXTURENAMED;
     void* root = named;
     Recorder recorder;
     recorder.Record(&kind, &root, 1, sets);
@@ -5911,7 +6627,7 @@ void BlobSelfTest()
     for (int i = 0; i < 6; i++)
         fields[i] = FieldIndex(ROK_FIXTUREPROGRAM, fieldNames[i]);
     ReplaySlotSets sets = { "program", 0, nullptr, 0, nullptr, 0, fields, 6, fields, 6 };
-    unsigned char kind = ROK_FIXTUREPROGRAM;
+    unsigned short kind = ROK_FIXTUREPROGRAM;
     void* root = program;
     Recorder recorder;
     ReplayText calls;
@@ -6001,7 +6717,7 @@ void SharedBlobSelfTest()
     for (int i = 0; i < 3; i++)
         fields[i] = FieldIndex(ROK_FIXTUREPROGRAM, fieldNames[i]);
     ReplaySlotSets sets = { "program", 0, nullptr, 0, nullptr, 0, fields, 3, fields, 3 };
-    unsigned char kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTUREPROGRAM };
+    unsigned short kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTUREPROGRAM };
     void* roots[2] = { first, second };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -6064,7 +6780,7 @@ void EmptyTargetSelfTest()
     memcpy(fields, programFields, sizeof programFields);
     memcpy(fields + 3, namedFields, sizeof namedFields);
     ReplaySlotSets sets = { "empty", 0, nullptr, 0, nullptr, 0, fields, 5, fields, 5 };
-    unsigned char kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTURENAMED };
+    unsigned short kinds[2] = { ROK_FIXTUREPROGRAM, ROK_FIXTURENAMED };
     void* roots[2] = { program, named };
     Recorder recorder;
     recorder.Record(kinds, roots, 2, sets);
@@ -6153,7 +6869,7 @@ void NestedVectorSelfTest()
     for (int i = 0; i < 3; i++)
         fields[i] = FieldIndex(ROK_FIXTURENEST, fieldNames[i]);
     ReplaySlotSets sets = { "nest", 0, nullptr, 0, nullptr, 0, fields, 3, fields, 3 };
-    unsigned char kind = ROK_FIXTURENEST;
+    unsigned short kind = ROK_FIXTURENEST;
     void* root = nest;
     Recorder recorder;
     ReplayText calls;
@@ -6367,6 +7083,59 @@ void GameWriteSelfTest()
     delete table;
 }
 
+void RegionSelfTest()
+{
+    printf("a module's region\n");
+    ResetBlock();
+    ReplayClearFailure();
+    const ReplayField& f = kReplayFields[RF_REGION];
+    Check(f.base == RB_REGION && f.kind == RK_ARRAY, "the region is a block field of its own base");
+    unsigned char* region = (unsigned char*)AllocObject(2048);
+    RegionBind(region, 2048);
+    region[600] = 0x11;
+    region[601] = 0x22;
+    ReplayKnown known;
+    ReplayText first;
+    ReplayText second;
+    ReplayText scratch;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayEmitField(first, known, *table, 'w', f.name, ReplayFieldView(f), BlockBase(f), scratch);
+    Check(strncmp(first.Data(), "  w region [2048]\n  w region 512:0000", 36) == 0, "a whole write names the length, and leaves out the zero chunks");
+    Check(CountLines(first.Data(), "  w region ") == 2 && strstr(first.Data(), " 1024:") == nullptr && strstr(first.Data(), " 1536:") == nullptr, "only the chunk with a non-zero byte follows");
+    region[2000] = 0x7f;
+    ReplayEmitField(second, known, *table, 'w', f.name, ReplayFieldView(f), BlockBase(f), scratch);
+    Check(strcmp(second.Data(), "  w region 2000:7f\n") == 0, "a later write is the changed run");
+
+    ReplayKnown replayed;
+    ReplayText lines;
+    lines.AddText(first);
+    lines.AddText(second);
+    for (const char* p = lines.Data(); *p != '\0';) {
+        const char* end = strchr(p, '\n');
+        char value[1300];
+        size_t n = (size_t)(end - (p + 11));
+        memcpy(value, p + 11, n);
+        value[n] = '\0';
+        Check(ReplayApplyArray(ReplayFieldView(f), nullptr, "region", value, replayed, false, nullptr), "a line of the region applies");
+        p = end + 1;
+    }
+    ReplayText now;
+    FormatField(f, now);
+    Check(strcmp(replayed.Get("region"), now.Data()) == 0, "the lines make the bytes the module left");
+    region[600] = 0x12;
+    FormatField(f, now);
+    BeginCompare();
+    if (strcmp(replayed.Get("region"), now.Data()) != 0)
+        Diff("region", replayed.Get("region"), now.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "region") == 0 && strstr(g_detail.Data(), "byte 600 of 2048: recorded 11, replayed 12") != nullptr, "a changed byte is reported at the region, with its byte");
+    first.Free();
+    second.Free();
+    lines.Free();
+    now.Free();
+    scratch.Free();
+    delete table;
+}
+
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
@@ -6380,6 +7149,7 @@ int SelfTest(const char* file)
     WeaponArgumentSelfTest();
     PolymorphicSelfTest();
     RefsSelfTest();
+    GoalSelfTest();
     BasedTableSelfTest();
     ElementSiteSelfTest();
     EmbedsSelfTest();
@@ -6388,6 +7158,7 @@ int SelfTest(const char* file)
     HeldCallbackSelfTest();
     VectorSelfTest();
     SnapshotSelfTest();
+    StringSelfTest();
     FilesSelfTest();
     CommandsSelfTest();
     SimPlumbingSelfTest();
@@ -6403,6 +7174,7 @@ int SelfTest(const char* file)
     DeltaLimitSelfTest();
     UnconditionedUnitIdSelfTest();
     GameRefSelfTest();
+    GamePtrSelfTest();
     ExecuteCommandSelfTest();
     CapacityTableSelfTest();
     TrackedCountSelfTest();
@@ -6416,6 +7188,7 @@ int SelfTest(const char* file)
     NestedVectorSelfTest();
     SimVectorSelfTest();
     GameWriteSelfTest();
+    RegionSelfTest();
     if (file == nullptr)
         return 0;
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

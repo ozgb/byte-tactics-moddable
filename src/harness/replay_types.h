@@ -1,7 +1,7 @@
 #ifndef HARNESS_REPLAY_TYPES_H
 #define HARNESS_REPLAY_TYPES_H
 
-enum ReplayBase { RB_GAME, RB_SIM, RB_RNG };
+enum ReplayBase { RB_GAME, RB_SIM, RB_RNG, RB_REGION };
 enum ReplayKind { RK_I32, RK_U32, RK_U16, RK_F32, RK_POINT16, RK_STRING, RK_WEAPON, RK_I16, RK_REF, RK_FLAGS, RK_U8, RK_F64, RK_BYTES, RK_EMBED, RK_UNITID, RK_ARRAY, RK_CODE, RK_VECTOR, RK_PTR, RK_REFS, RK_EMBEDS, RK_SELF, RK_SELFINDEX, RK_CBREF, RK_CBPTR, RK_CSTRING, RK_CSTRINGREF, RK_CSTRINGS, RK_BLOB };
 enum ReplayVectorMode { RV_OBJECT, RV_SCALAR, RV_VALUE, RV_CSTRING, RV_CSTRINGREF };
 enum { RT_ORDER = 0 };
@@ -30,7 +30,7 @@ struct ReplayArraySpec {
 
 struct ReplayVectorSpec {
     unsigned char mode;
-    unsigned char kind;
+    unsigned short kind;
     unsigned size;
 };
 
@@ -50,6 +50,11 @@ struct ReplaySelfSpec {
     unsigned stride;
 };
 
+struct ReplayRegionView {
+    unsigned size;
+    unsigned data;
+};
+
 struct ReplayField {
     const char* name;
     unsigned offset;
@@ -57,7 +62,7 @@ struct ReplayField {
     unsigned char base;
     unsigned char kind;
     unsigned short array;
-    unsigned char target;
+    unsigned short target;
 };
 
 struct ReplayElemSpec {
@@ -66,8 +71,8 @@ struct ReplayElemSpec {
 };
 
 struct ReplayInsideSite {
-    unsigned char kind;
-    unsigned char container;
+    unsigned short kind;
+    unsigned short container;
     unsigned offset;
     const char* member;
     unsigned stride;
@@ -95,7 +100,7 @@ struct ReplayObjectKind {
 
 struct ReplayEventKind {
     int kind;
-    unsigned char object;
+    unsigned short object;
 };
 
 struct ReplayEventTable {
@@ -113,7 +118,7 @@ struct ReplayCallbackType {
 
 struct ReplayAllocTag {
     const char* tag;
-    unsigned char kind;
+    unsigned short kind;
     unsigned size;
 };
 
@@ -126,7 +131,7 @@ struct ReplayCodeTable {
 struct ReplayCondition {
     unsigned short field;
     unsigned short via;
-    unsigned char kind;
+    unsigned short kind;
     unsigned mask;
     int value;
 };
@@ -135,9 +140,9 @@ struct ReplayObjectField {
     const char* name;
     unsigned offset;
     unsigned size;
-    unsigned char object;
+    unsigned short object;
     unsigned char kind;
-    unsigned char target;
+    unsigned short target;
     unsigned short rangeEnd;
     unsigned short rangeBegin;
     ReplayCondition when;
@@ -157,7 +162,7 @@ struct ReplaySlotSets {
     unsigned objReadCount;
     const unsigned short* objWrites;
     unsigned objWriteCount;
-    const unsigned char* allOf;
+    const unsigned short* allOf;
     unsigned allOfCount;
 };
 

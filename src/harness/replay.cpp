@@ -13,6 +13,7 @@
 #include "../../interfaces/rand_stream.h"
 #include "../game/los_helpers.h"
 #include "../state/game_rand.h"
+#include "../state/block.h"
 #include "../util/vec3.h"
 #include "../units/unit.h"
 #include "replay_text.h"
@@ -41,7 +42,7 @@ struct Recording {
 
 struct ReplayRoots {
     constexpr ReplayRoots() : count(0), kind(), object() {}
-    template <class T> void Add(unsigned char objectKind, T* p)
+    template <class T> void Add(unsigned short objectKind, T* p)
     {
         if (count < REPLAY_MAX_ROOTS && p != nullptr) {
             kind[count] = objectKind;
@@ -49,7 +50,7 @@ struct ReplayRoots {
         }
     }
     unsigned count;
-    unsigned char kind[REPLAY_MAX_ROOTS];
+    unsigned short kind[REPLAY_MAX_ROOTS];
     void* object[REPLAY_MAX_ROOTS];
 };
 
@@ -116,8 +117,35 @@ unsigned RandomSeed()
 
 #pragma pop_macro("g_randomSeed")
 
+struct RegionState {
+    void* ptr;
+    unsigned size;
+};
+
+RegionState s_regions[SUB_COUNT];
+ReplayRegionView s_regionView;
+
+void RegionBind(unsigned sub, void* ptr, unsigned size)
+{
+    s_regions[sub].ptr = ptr;
+    s_regions[sub].size = size;
+    SimBlockTrack(&s_regions[sub].ptr);
+}
+
+const unsigned char* RegionViewOf()
+{
+    const RegionState& r = s_regions[s_sub];
+    s_regionView.size = r.size;
+    s_regionView.data = r.ptr == nullptr ? 0u : (unsigned)((const unsigned char*)r.ptr - (const unsigned char*)SimBlockBase());
+    return (const unsigned char*)&s_regionView;
+}
+
+bool RecordsAlways(unsigned slot);
+
 const unsigned char* BlockBase(const ReplayField& f)
 {
+    if (f.base == RB_REGION)
+        return RegionViewOf();
     if (f.base == RB_GAME)
         return (const unsigned char*)g_game;
     return f.base == RB_SIM ? (const unsigned char*)g_simGlobals : nullptr;
@@ -168,7 +196,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
     s_slot = slot;
     s_sub = sub;
     s_tick = g_game == nullptr ? -1 : g_game->ticks;
-    s_recording = !r.windowed || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
+    s_recording = !r.windowed || RecordsAlways(slot) || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
     if (!s_recording)
         return;
     ReplayHandles().Reset();
@@ -303,6 +331,15 @@ void ArgObject(ReplayText& t, const char* name, unsigned kind, const void* p, co
 void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
 {
     ReplayAddStruct(t, tag, name, kind, p, Table());
+}
+
+void ArgNullOut(ReplayText& t, const char* name, const void* p)
+{
+    if (p != nullptr)
+        return;
+    t.Add("  a ");
+    t.Add(name);
+    t.Add(" null\n");
 }
 
 void ArgEvent(ReplayText& t, const char* name, unsigned table, const void* p, unsigned size)
@@ -508,10 +545,29 @@ void ImportValueStruct(ReplayText& t, unsigned kind, const void* p)
     ReplayAddValue(t, kind, p, Table());
 }
 
+void ImportStructIn(ReplayText& t, unsigned kind, const void* p)
+{
+    if (p == nullptr)
+        t.Add(" null");
+    else
+        ImportValueStruct(t, kind, p);
+}
+
 void ImportInOut(ReplayText& t, unsigned kind, const void* p)
 {
     t.AddChar(' ');
     ReplayAddInOut(t, kind, p, Table());
+}
+
+void ImportEffect(ReplayText& t, unsigned table, const void* p, unsigned size)
+{
+    t.AddChar(' ');
+    ReplayAddEffect(t, table, p, size, Table());
+}
+
+void ArgRegionResult(ReplayText& t, const void* result)
+{
+    t.Add(result != nullptr && result == s_regions[s_sub].ptr ? "  o result region\n" : "  o result null\n");
 }
 
 void ImportOutInOut(ReplayText& t, const char* name, unsigned kind, const void* p)
@@ -569,6 +625,32 @@ void ImportResultObject(ReplayText& t, unsigned kind, const void* p)
 {
     t.Add(" = ");
     ReplayAddObjectName(t, Table(), kind, p, true);
+}
+
+void ArgWeaponResult(ReplayText& t, const void* p, unsigned count, ...)
+{
+    t.Add("  o result ");
+    ReplayAddWeapon(t, p);
+    t.AddChar('\n');
+    if (p == nullptr)
+        return;
+    va_list names;
+    va_start(names, count);
+    for (unsigned n = 0; n < count; n++) {
+        const char* name = va_arg(names, const char*);
+        const ReplayObjectField* f = ReplayFindObjectField(ROK_WEAPONDEF, name);
+        if (f == nullptr)
+            continue;
+        t.Add("  o ");
+        ReplayAddWeapon(t, p);
+        t.AddChar('.');
+        t.Add(name);
+        t.AddChar(' ');
+        ReplayFormatObjectField(*f, p, Table(), true, s_field);
+        t.Add(s_field.Data());
+        t.AddChar('\n');
+    }
+    va_end(names);
 }
 
 void ImportResultWeapon(ReplayText& t, const void* p, unsigned count, ...)
@@ -633,7 +715,7 @@ void ImportOutUnits(ReplayText& t, const char* name, const std::vector<Unit*, st
     t.AddChar(']');
     if (n == 0)
         return;
-    std::vector<unsigned char> kinds(n, (unsigned char)ROK_UNIT);
+    std::vector<unsigned short> kinds(n, (unsigned short)ROK_UNIT);
     std::vector<void*> objects(n);
     for (unsigned i = 0; i < n; i++)
         objects[i] = (*units)[i];
@@ -746,7 +828,7 @@ void AddSpace(ReplayText& t)
     t.AddChar(' ');
 }
 
-void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes)
+void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes, unsigned offset)
 {
     t.Add(" = ");
     if (buffer == nullptr) {
@@ -755,6 +837,10 @@ void AddSnapshot(ReplayText& t, const void* buffer, unsigned bytes)
     }
     t.Add("snapshot#");
     t.AddUnsigned(s_snapshots.Add(buffer, bytes));
+    if (offset != 0) {
+        t.AddChar('+');
+        t.AddUnsigned(offset);
+    }
 }
 
 void AddAllocName(ReplayText& t, const void* p)
@@ -816,7 +902,7 @@ int ReplayConfigure(const char* value, char* error, int size)
     unsigned sub = 0;
     while (sub < kReplaySubsystemCount && strcmp(kReplaySubsystems[sub].name, subsystem) != 0)
         sub++;
-    if (sub == kReplaySubsystemCount) {
+    if (sub == kReplaySubsystemCount || kReplaySubsystems[sub].slotCount == 0) {
         _snprintf(error, size, ": %s is not a simulation subsystem", subsystem);
         return 0;
     }

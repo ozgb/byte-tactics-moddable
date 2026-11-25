@@ -146,7 +146,7 @@
         {"name": "angle_x", "offset": 76, "size": 2, "kind": "scalar", "target": null},
         {"name": "angle_y", "offset": 78, "size": 2, "kind": "scalar", "target": null},
         {"name": "angle_z", "offset": 80, "size": 2, "kind": "scalar", "target": null},
-        {"name": "flag", "offset": 82, "size": 2, "kind": "scalar", "target": null}
+        {"name": "flags", "offset": 82, "size": 2, "kind": "scalar", "target": null}
       ],
       "plan": [
         {"name": "obj", "offset": 0, "size": 4, "kind": "ref", "target": "piece"},

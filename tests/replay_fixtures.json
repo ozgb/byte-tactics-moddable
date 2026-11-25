@@ -7,6 +7,10 @@
    "kind": "ref",
    "target": "FixtureView"
   },
+  "gaf_1480f": {
+   "kind": "ptr",
+   "target": "FixtureView"
+  },
   "hotRadarCount": "i32",
   "count_14367": "i32"
  },
@@ -831,69 +835,77 @@
     }
    ]
   },
-  "FixtureLosTable": {
-   "type": "LosTable",
-   "scope": "value",
-   "fields": [
-    {
-     "name": "lines",
-     "kind": "vector",
-     "base": true,
-     "elem": {
-      "mode": "value",
-      "kind": "FixtureLosLine"
-     }
-    }
-   ]
+  "FixtureGoalBase": {
+   "type": "FixtureGoalBase",
+   "scope": "state",
+   "kinds": [
+    "FixtureGoalA",
+    "FixtureGoalB",
+    "FixtureTwin"
+   ],
+   "fields": []
   },
-  "FixtureLosLine": {
-   "type": "LosLine",
-   "scope": "value",
+  "FixtureGoalA": {
+   "type": "FixtureGoalA",
+   "scope": "state",
+   "vtable_symbol": "??_7FixtureGoalA@@6B@",
    "fields": [
     {
-     "name": "steps",
-     "kind": "vector",
-     "base": true,
-     "elem": {
-      "mode": "value",
-      "kind": "FixtureLosStep"
-     }
-    }
-   ]
-  },
-  "FixtureLosStep": {
-   "type": "LosStep",
-   "scope": "value",
-   "fields": [
-    {
-     "name": "a",
+     "name": "ticks",
      "kind": "u16"
     },
     {
-     "name": "b",
-     "kind": "u16"
+     "name": "heading",
+     "kind": "i16"
     }
    ]
   },
-  "FixtureOrderEntry": {
-   "type": "OrderTableEntry",
-   "scope": "value",
+  "FixtureGoalB": {
+   "type": "FixtureGoalB",
+   "scope": "state",
+   "vtable_symbol": "??_7FixtureGoalB@@6B@",
    "fields": [
     {
-     "name": "value",
-     "kind": "cstring"
+     "name": "ticks",
+     "kind": "u16"
     },
     {
-     "name": "name",
-     "kind": "cstring"
+     "name": "count",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureTwin": {
+   "type": "FixtureTwin",
+   "scope": "state",
+   "vtable_symbol": "??_7FixtureTwin@@6BFixtureGoalBase@@@",
+   "vtable_secondary": [
+    "FixtureScanBase"
+   ],
+   "fields": [
+    {
+     "name": "ticks",
+     "kind": "u16"
     },
     {
-     "name": "drawMask",
+     "name": "count",
+     "kind": "i32"
+    }
+   ]
+  },
+  "FixtureGoalHolder": {
+   "type": "FixtureGoalHolder",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "id",
      "kind": "i32"
     },
     {
-     "name": "flags",
-     "kind": "u32"
+     "name": "goal",
+     "kind": "ref",
+     "target": "FixtureGoalBase",
+     "poly": "FixtureGoalBase"
     }
    ]
   }
@@ -1087,6 +1099,49 @@
    "result": {
     "mode": "scalar"
    }
+  },
+  "Locate": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "FixtureAmount*",
+     "name": "first"
+    },
+    {
+     "type": "FixtureAmount*",
+     "name": "second"
+    }
+   ],
+   "args": {
+    "first": {
+     "mode": "struct",
+     "kind": "FixtureAmount",
+     "dir": "out",
+     "nullable": true,
+     "when": "result != 0"
+    },
+    "second": {
+     "mode": "struct",
+     "kind": "FixtureAmount",
+     "dir": "out",
+     "nullable": true,
+     "when": "result != 0"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "Pick": {
+   "ret": "WeaponDef*",
+   "params": [],
+   "args": {},
+   "result": {
+    "mode": "weapon",
+    "reach": [
+     "flags"
+    ]
+   }
   }
  },
  "inside": {
@@ -1101,20 +1156,5 @@
    }
   ]
  },
- "sim_fields": {
-  "g_losTables": {
-   "kind": "vector",
-   "elem": {
-    "mode": "value",
-    "kind": "FixtureLosTable"
-   }
-  },
-  "g_missionOrderTableVec": {
-   "kind": "vector",
-   "elem": {
-    "mode": "value",
-    "kind": "FixtureOrderEntry"
-   }
-  }
- }
+ "sim_fields": {}
 }

@@ -64,6 +64,7 @@ orderNotify,AttackUTypeOrder,AttackUType
 orderNotify,GuardNoMoveOrder,Guard_NoMove
 orderNotify,SelfRepairOrder,SelfRepair
 orderNotify,QMoveQPatrolOrder,QMove/QPatrol
+orderNotify,GroundPickupOrder,Ground_Pickup
 weaponFire,FireTurretWeapon,turret
 weaponFire,FireVLaunchWeapon,vLaunch
 weaponFire,FireLineOfSightWeapon,lineOfSight or selfProp

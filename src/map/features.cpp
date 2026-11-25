@@ -1004,6 +1004,10 @@ int __stdcall UpdateFeatureSpot(int i)
     return next;
 }
 
+#ifndef BT_REPLAY_INJECT_FEATURE_HP_BONUS
+#define BT_REPLAY_INJECT_FEATURE_HP_BONUS 0
+#endif
+
 // FUNCTION: 0x4244b0
 int __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
 {
@@ -1042,7 +1046,7 @@ int __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* weapon)
         }
     } else {
         int d = weapon->damage + cell->spot;
-        if (d >= f->damage) {
+        if (d >= f->damage + BT_REPLAY_INJECT_FEATURE_HP_BONUS) {
             KillFeature(x, z, 0);
             killed = 1;
         } else {

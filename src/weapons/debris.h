@@ -12,7 +12,7 @@ struct DebrisPiece;
 
 #pragma pack(push, 1)
 struct Debris {
-    Ref<DebrisPiece> field_0;
+    Ref<DebrisPiece> obj;
     Handle ref1;
     Handle ref2;
     Vec3 pos;
@@ -22,8 +22,13 @@ struct Debris {
     short angle_x;
     short angle_y;
     short angle_z;
-    unsigned short flag : 1;
-    unsigned short : 15;
+    union {
+        unsigned short flags;
+        struct {
+            unsigned short flag : 1;
+            unsigned short : 15;
+        };
+    };
 };
 
 struct DebrisPiece {

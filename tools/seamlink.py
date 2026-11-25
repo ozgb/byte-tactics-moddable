@@ -136,7 +136,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                   assignment rwsets records as the write itself, X87LeTest41, a template that compares two values, and
                   operator Unit *, operator Cell *, operator Feature *, operator UnitBucket *, operator UnitDef *, operator unsigned char * and
                   operator unsigned short *, the conversions of a Ref to the pointer it holds, and get and operator->, which read it, operator!=
-                  (which compares two Refs) and strlen, and for the pilot's own rowless_calls (los_radar's: operator[],
+                  (which compares two Refs) and strlen, and for the pilot's own rowless_calls (los_radar's: operator bool, operator[],
                   BlockVector::Begin, BlockVector::End, empty, size and push_back, the vectors its queries read and fill; map's: operator unsigned int *,
                   the conversion of a pass map's Ref that PassMapGet reads);
                   or has inline assembly.
@@ -322,7 +322,7 @@ LOS_RADAR = Pilot(
     engine_functions=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")),
     allowed_indirect=("MapSeam::GetGroundHeight", "LosRadarSeam::IsPointVisible"),
     filler_locals=(("IsUnitVisibleToPlayer", "Vec3"), ("IsUnitVisibleToPlayer", "<anon>")),
-    rowless_calls=("BlockVector::Begin", "BlockVector::End", "empty", "operator[]", "push_back", "size", "BlockVector::Size", "sprintf"),
+    rowless_calls=("operator bool", "BlockVector::Begin", "BlockVector::End", "empty", "operator[]", "push_back", "size", "BlockVector::Size", "sprintf"),
     setup=("LoadTntMap", "InitRadar", "FreeRadar", "FreeMapResources", "CreateUnitIndex", "FreeUnitIndex", "LoadMappingData", "SaveMappingData"),
     setup_callers=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
                    ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp"),

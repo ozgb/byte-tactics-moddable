@@ -43,6 +43,7 @@ g_losTables,g_losTables,,,
 pad_be2c,pad_be2c,,,
 g_randomSeed,g_randomSeed,,,
 pad_be3c,pad_be3c,,,
+g_losUnitIndex,g_losUnitIndex,,,
 g_missionOrderTableVec,g_missionOrderTableVec@src/orders/order_list.cpp,,,
 g_movementClasses,g_movementClasses,,,src/units/movement_class.cpp
 g_passMaps,g_passMaps,,,

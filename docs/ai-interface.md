@@ -260,7 +260,7 @@ default's report is required equal to the reference's.
 
 **The unit index is not ai's any more.** The visible, known and factory lists left `PlayerAI` (#991). los_radar holds,
 per player, the visible enemy list (`visible`), the known list (`known`, enemy units with flag 0x100) and `hasSpecial`,
-in a record it allocates in the sim block behind a tracked pointer (`src/map/line_of_sight_index.cpp`); units holds the
+in a record it allocates in the sim block behind the sim global `g_losUnitIndex` (`src/map/line_of_sight_index.cpp`); units holds the
 factory list (`src/units/factory_index.cpp`). Players' set-up creates and frees each beside ai's `PlayerAI`
 (`InitPlayerSlot`, `FreePlayers`), under the same condition. Every 30 ticks, from its own `lastTick`, the scheduler's
 players phase calls `los_radar.RefreshUnitIndex(player)` and then `units.RefreshFactoryIndex(player)` right before

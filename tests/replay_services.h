@@ -426,22 +426,10 @@ void __stdcall SchedPublish(int outbox, const void* event, unsigned int size)
     (void)r;
 }
 
-int __stdcall ScheduleEconomySpend(const EconomySpend* spend)
+int __stdcall ScheduleEconomySpend(const struct EconomySpend* spend)
 {
     ReplayText t;
     StartImport(t, RI_SCHEDULE_ECONOMY_SPEND);
-    const char* result = Enter(t);
-    return atoi(result);
-}
-
-int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources)
-{
-    ReplayText t;
-    StartImport(t, RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
-    Space(t);
-    t.AddInt((int)(unsigned int)unit);
-    Space(t);
-    t.AddInt((int)(unsigned int)resources);
     const char* result = Enter(t);
     return atoi(result);
 }
@@ -545,28 +533,6 @@ Unit* __stdcall ScheduleTargetingFireAtWill(Unit* unit)
     const char* result = Enter(t);
     Unit* o = (Unit*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
     return o;
-}
-
-int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player)
-{
-    ReplayText t;
-    StartImport(t, RI_SCHEDULE_MAP_CAN_BUILD_AT);
-    Space(t);
-    t.AddInt((int)type);
-    const char* result = Enter(t);
-    return atoi(result);
-}
-
-int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags)
-{
-    ReplayText t;
-    StartImport(t, RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT);
-    Space(t);
-    t.AddInt((int)otherTypeId);
-    Space(t);
-    t.AddInt((int)flags);
-    const char* result = Enter(t);
-    return atoi(result);
 }
 
 int __stdcall ScheduleMapPickReclaimable(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount)
@@ -765,6 +731,56 @@ int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mas
     t.AddInt((int)mask);
     const char* result = EnterNested(t);
     PlayNestedCalls("services.ExecuteCommandText");
+    return atoi(result);
+}
+
+int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int resources)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_ECONOMY_REQUEST_GRANTED);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(unit), false);
+    Space(t);
+    t.AddInt((int)(unsigned int)resources);
+    const char* result = Enter(t);
+    return atoi(result);
+}
+
+int __stdcall ScheduleMapCanBuildAt(UnitDef* unit, Point16 cell, short type, Player* player)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_MAP_CAN_BUILD_AT);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNITDEF, unit, false);
+    Space(t);
+    ReplayAddValueOrNull(t, ROK_POINT16, &cell, g_objects);
+    Space(t);
+    t.AddInt((int)type);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, player, false);
+    const char* result = Enter(t);
+    const char* g_lastPlaceMetalSumText = OutValue("SimGlobals.g_lastPlaceMetalSum");
+    if (g_lastPlaceMetalSumText != nullptr)
+        g_lastPlaceMetalSum = atoi(g_lastPlaceMetalSumText);
+    return atoi(result);
+}
+
+int __stdcall ScheduleMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, Point16 cell, int flags)
+{
+    ReplayText t;
+    StartImport(t, RI_SCHEDULE_MAP_CAN_PLACE_UNIT_FOOTPRINT);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNITDEF, unit, false);
+    Space(t);
+    t.AddInt((int)otherTypeId);
+    Space(t);
+    ReplayAddValueOrNull(t, ROK_POINT16, &cell, g_objects);
+    Space(t);
+    t.AddInt((int)flags);
+    const char* result = Enter(t);
+    const char* g_lastPlaceMetalSumText = OutValue("SimGlobals.g_lastPlaceMetalSum");
+    if (g_lastPlaceMetalSumText != nullptr)
+        g_lastPlaceMetalSum = atoi(g_lastPlaceMetalSumText);
     return atoi(result);
 }
 

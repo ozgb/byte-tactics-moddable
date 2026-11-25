@@ -78,8 +78,9 @@ also gives the warnings below). Kinds, one row per place:
                    directly is a wrapper and is not a row, its callers are. target:
                    `allocator` or `new Type`.
   time_read        a call of timeGetTime, GetTickCount, QueryPerformanceCounter,
-                   QueryPerformanceFrequency, host_time_ms, host_time_counter, GetSystemTime, GetSystemTimeAsFileTime,
-                   GetLocalTime, time, clock, localtime or _ftime, or of the source's
+                   QueryPerformanceFrequency, host_time_ms, host_time_counter, host_wall_seconds,
+                   GetSystemTime, GetSystemTimeAsFileTime, GetLocalTime, time, clock, localtime
+                   or _ftime, or of the source's
                    wrappers of them: GetTicks and GetMilliseconds (display.cpp),
                    GetTimeSeconds (debug_lib_4e1e50.cpp), and UpdateTimers and AddTimer,
                    which run the timer table by the clock. target: the function called.
@@ -139,7 +140,7 @@ WARNING_FLAGS = astcache.WARNING_FLAGS
 TIME_CALLS = {"timeGetTime", "GetTickCount", "QueryPerformanceCounter", "QueryPerformanceFrequency",
               "GetSystemTime", "GetSystemTimeAsFileTime", "GetLocalTime", "time", "clock", "localtime",
               "_ftime", "GetTicks", "GetMilliseconds", "GetTimeSeconds", "UpdateTimers", "AddTimer", "host_time_ms",
-              "host_time_counter"}
+              "host_time_counter", "host_wall_seconds"}
 THREAD_CALLS = {"CreateThread", "_beginthread", "_beginthreadex", "StartThread", "host_thread_start", "timeSetEvent", "SetTimer",
                 "CreateTimerQueueTimer", "QueueUserAPC", "EnumSessions", "EnumPlayers", "EnumConnections",
                 "EnumAddress", "EnumAddressTypes", "DirectPlayEnumerate", "DirectPlayEnumerateA",

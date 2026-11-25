@@ -13,7 +13,7 @@ GAME_LOGIC_DIRS, so a new function is covered before the csv is regenerated.
 Flagged, outside comments and string literals:
 
   * calls to wall-clock time: GetTicks, GetTickCount, timeGetTime, time,
-    QueryPerformanceCounter, host_time_ms, host_time_counter;
+    QueryPerformanceCounter, host_time_ms, host_time_counter, host_wall_seconds;
   * calls to the presentation random stream, HarnessViewRand;
   * any use of std::unordered_map, unordered_set and their multi variants,
     whose iteration order is unspecified;
@@ -90,7 +90,7 @@ ALLOWLIST: dict[tuple[int, str], str] = {
     (0x4917d0, "GetTicks"): LOAD_TIME,
     (0x4948e0, "GetTicks"): UI_TIME,
     (0x497180, "host_time_counter"): LOAD_TIME,
-    (0x497180, "time"): LOAD_TIME,
+    (0x497180, "host_wall_seconds"): LOAD_TIME,
     (0x49be60, "HarnessViewRand"): VIEW_ONLY,
     (0x4a2e40, "GetTicks"): UI_TIME,
     (0x4a3780, "GetTicks"): UI_TIME,
@@ -112,11 +112,10 @@ ALLOWLIST: dict[tuple[int, str], str] = {
     (0x4c4340, "pointer"): ARRAY_BOUND,
     (0x4cdb40, "HarnessViewRand"): VIEW_ONLY,
     (0x4d0f60, "pointer"): ARRAY_BOUND,
-    (0x4ded60, "time"): TIMER_LIB,
 }
 
 CLOCK_CALLS = ("GetTicks", "GetTickCount", "timeGetTime", "time", "QueryPerformanceCounter", "host_time_ms",
-               "host_time_counter")
+               "host_time_counter", "host_wall_seconds")
 VIEW_STREAM_CALLS = ("HarnessViewRand",)
 CALL = re.compile(r"(?<![\w])(" + "|".join(CLOCK_CALLS + VIEW_STREAM_CALLS) + r")\s*\(")
 UNORDERED = re.compile(r"\b(unordered_(?:multi)?(?:map|set))\b")

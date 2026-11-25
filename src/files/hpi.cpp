@@ -1075,11 +1075,11 @@ void __stdcall MakeDirectoryPath(const char* path)
     for (char* p = buf; *p; p++) {
         if (*p == '\\' || *p == '/') {
             *p = 0;
-            _mkdir(buf);
+            host_dir_create(buf);
             *p = '\\';
         }
     }
-    _mkdir(buf);
+    host_dir_create(buf);
 }
 
 static void ReleaseFileHandle(FileHandle* f)
@@ -1237,7 +1237,7 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
     {
     time_t now;
     struct tm* t;
-    now = time(0);
+    now = host_wall_seconds();
     t = localtime(&now);
     sprintf(year, "%i", t->tm_year + 1900);
     strcpy(copyright, "Copyright 0000 Cavedog Entertainment");

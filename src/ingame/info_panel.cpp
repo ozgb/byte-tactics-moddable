@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include "../../interfaces/ref.h"
+#include "../harness/display_game.h"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -1405,7 +1406,9 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
             st->unit = unit;
             unit->angles = spot->rot;
             unit->pos = spot->pos;
+            DisplayLogFeatureType(f->name);
             DrawUnit(dest, (UnitDrawView*)unit);
+            DisplayLogFeatureType(nullptr);
         }
     } else {
         if (f->over) {
@@ -1873,12 +1876,18 @@ static void DrawProjectedFaces(void* surface, Vec3* offset, short* angles, Vec3*
 void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
                             ProjectedModel* obj, short* angles)
 {
+    if (DisplayLogWants())
+        DisplayLogProjectile(surface, offset, obj, angles);
+    DisplayLogScope displayScope;
     DrawProjectedFaces(surface, offset, angles, obj->verts, obj->count, obj->prims, obj->faceCount, obj->firstFace);
 }
 
 void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
                             DebrisPiece* piece, short* angles)
 {
+    if (DisplayLogWants())
+        DisplayLogShard(surface, offset, piece, angles);
+    DisplayLogScope displayScope;
     Vec3* verts = piece->verts.get();
     Face* faces = piece->faces.get();
     if (verts == nullptr || faces == nullptr)

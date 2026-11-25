@@ -54900,7 +54900,6 @@ address,function,file,kind,target
 ,RecFeaturesApply,src/harness/replay_hooks.inc,call,EventRoots
 ,RecFeaturesApply,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFeaturesApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecFeaturesApply,src/harness/replay_hooks.inc,field_read,FeaturesEventHeader::kind
 ,RecFeaturesApply,src/harness/replay_hooks.inc,field_read,FeaturesSeam::Apply
 ,RecFeaturesApply,src/harness/replay_hooks.inc,function,
 ,RecFeaturesApply,src/harness/replay_hooks.inc,global_read,s_call

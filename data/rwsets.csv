@@ -353,6 +353,7 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,ScheduleMapCanPlaceUnitFootprint
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,WeaponsPublishDamage
+0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,get
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,call,operator UnitDef *
@@ -418,6 +419,7 @@ address,function,file,kind,target
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,Order::SetDeadlineTicks
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,RecordBuildMenuUpdate
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,WeaponsPublishAddStockpile
+0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,call,operator WeaponDef *
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,Order::count
 0x402b70,BuildWeaponOrder,src/orders/unit_orders.cpp,field_read,Order::progress
@@ -578,8 +580,9 @@ address,function,file,kind,target
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,WeaponsPublishRelease
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,Whole
-0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,_hypot
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,abs
+0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,operator bool
 0x4034a0,AttackChaseOrder,src/orders/unit_orders.cpp,call,operator->
@@ -658,7 +661,8 @@ address,function,file,kind,target
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WorldToCell
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,WorldToCell16
-0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,_hypot
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,operator bool
 0x403a20,MobileBuildOrder,src/orders/unit_orders.cpp,call,operator->
@@ -722,12 +726,13 @@ address,function,file,kind,target
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
+0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,bx_sqrt
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator bool
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator+
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator->
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,operator=
-0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,call,sqrt
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,deref_read,*Vec3
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::modelMaxX
 0x403f70,HelpBuildOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::modelMinX
@@ -771,7 +776,8 @@ address,function,file,kind,target
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,UnitDef::MetalCost
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
-0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,_hypot
+0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,get
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x404270,CaptureOrder,src/orders/unit_orders.cpp,call,operator bool
@@ -900,6 +906,7 @@ address,function,file,kind,target
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
+0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator Feature *
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator bool
 0x404ad0,ReclaimOrder,src/orders/unit_orders.cpp,call,operator->
@@ -962,6 +969,7 @@ address,function,file,kind,target
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,StartBuildingScript
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
+0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Cell *
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator Feature *
 0x404db0,ResurrectOrder,src/orders/unit_orders.cpp,call,operator FeatureSpot *
@@ -1065,7 +1073,8 @@ address,function,file,kind,target
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,WaitIfNotInBuildStance
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,WeaponsPublishClaim
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,Whole
-0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,_hypot
+0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,bx_ftol
+0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,bx_hypot
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,operator bool
 0x405300,RepairUnitOrder,src/orders/unit_orders.cpp,call,operator->
@@ -1358,6 +1367,7 @@ address,function,file,kind,target
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,OrdersPublishStartScript
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,RecordUnitSpeech
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,WaitIfCobBusy
+0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,bx_ftol
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,operator Unit *
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,operator bool
 0x406900,GroundUnloadOrder,src/orders/unit_orders.cpp,call,operator!=
@@ -1997,6 +2007,7 @@ address,function,file,kind,target
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,function,
 0x409730,PlayerAI::ComputeBaseWeights,src/ai/ai_player.cpp,global_read,g_game
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,BlockVector::Begin
+0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,bx_ftol
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,call,operator[]
 0x409dc0,ScaleUnitWeights,src/ai/ai_player.cpp,deref_read,*int
@@ -3464,7 +3475,9 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,bx_hypot
+0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,bx_sqrt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,get
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator UnitDef *
@@ -3473,7 +3486,6 @@ address,function,file,kind,target
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator->
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator=
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,operator[]
-0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,call,sqrt
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_escape,Order::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_escape,Unit::pos
 0x411f50,AirStrikeOrder,src/orders/vtol_orders.cpp,field_maybe_written,Order::pos
@@ -3541,7 +3553,8 @@ address,function,file,kind,target
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
-0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,get
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x412710,AirToGroundOrder,src/orders/vtol_orders.cpp,call,operator bool
@@ -3608,7 +3621,8 @@ address,function,file,kind,target
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,TargetingPublishSetUnit
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
-0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,get
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x412d40,AirToAirOrder,src/orders/vtol_orders.cpp,call,operator UnitMotion *
@@ -3679,7 +3693,8 @@ address,function,file,kind,target
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,UnitQueryBuffer::~UnitQueryBuffer
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishClaim
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,WeaponsPublishRelease
-0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,get
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator Player *
 0x413470,AirToGroundHoverOrder,src/orders/vtol_orders.cpp,call,operator Unit *
@@ -3917,6 +3932,7 @@ address,function,file,kind,target
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordReverseNanoParticles
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
+0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,bx_ftol
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator Feature *
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x414770,VtolReclaimOrder,src/orders/vtol_orders.cpp,call,operator->
@@ -4033,7 +4049,8 @@ address,function,file,kind,target
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,PrepVtolClimb
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,RecordNanoParticles
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,RecordUnitSpeech
-0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,_hypot
+0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,bx_ftol
+0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,bx_hypot
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator Unit *
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator bool
 0x414e70,VtolRepairUnitOrder,src/orders/vtol_orders.cpp,call,operator->
@@ -5503,6 +5520,7 @@ address,function,file,kind,target
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,EconRequestEnergyAndMetal
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,FinishConstruction
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,WeaponsPublishDamage
+0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,bx_ftol
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,call,get
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,deref_read,*unsigned char
 0x41ba60,AddBuildProgress,src/ingame/control_panel.cpp,deref_write,*unsigned char
@@ -8711,6 +8729,7 @@ address,function,file,kind,target
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,TdfFile::~TdfFile
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,Translate
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,UsesDataArchives
+0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,bx_ftol
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,floor
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,get
 0x42a8d0,LoadUnitInfo,src/units/unit_types.cpp,call,host_message
@@ -10973,6 +10992,7 @@ address,function,file,kind,target
 0x4385f0,StopBuildingScript,src/orders/order_queue.cpp,global_read,g_seams
 0x4385f0,StopBuildingScript,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(CobScript *, const char *) __attribute__((stdcall)) [ScriptsSeam::FindScript]"
 0x4385f0,StopBuildingScript,src/orders/order_queue.cpp,indirect_call,"indirect via int (*)(Unit *, short, char, int, int, int, int) __attribute__((stdcall)) [NetworkSeam::SendScriptCall]"
+0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,call,bx_ftol
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,call,get
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,call,operator->
 0x438650,ComputeReclaimDamagePulse,src/orders/order_queue.cpp,field_read,<anon>::q
@@ -50543,6 +50563,7 @@ address,function,file,kind,target
 ,Length,src/weapons/weapons.cpp,field_read,Vec3::z
 ,Length,src/weapons/weapons.cpp,field_write,Fixed::value
 ,Length,src/weapons/weapons.cpp,function,
+,LengthFloat,src/graphics/particles.cpp,call,bx_ftol
 ,LengthFloat,src/graphics/particles.cpp,call,bx_sqrt
 ,LengthFloat,src/graphics/particles.cpp,field_read,Vec3::x
 ,LengthFloat,src/graphics/particles.cpp,field_read,Vec3::y
@@ -51364,6 +51385,7 @@ address,function,file,kind,target
 ,Motion,src/movement/order_targets.cpp,call,operator UnitMotion *
 ,Motion,src/movement/order_targets.cpp,field_read,Unit::motion
 ,Motion,src/movement/order_targets.cpp,function,
+,MovableVec3::Length,src/ai/ai_player.cpp,call,bx_ftol
 ,MovableVec3::Length,src/ai/ai_player.cpp,call,bx_sqrt
 ,MovableVec3::Length,src/ai/ai_player.cpp,field_read,MovableVec3::x
 ,MovableVec3::Length,src/ai/ai_player.cpp,field_read,MovableVec3::y
@@ -61382,6 +61404,7 @@ address,function,file,kind,target
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,field_read,wasmtime_val_raw::i32
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,field_write,wasmtime_val_raw::i32
 ,TdfRecordGetFieldStringImport,src/wasm/wind_meteors_glue.cpp,function,
+,TeleportEndpoint::Length,src/graphics/particles.cpp,call,bx_ftol
 ,TeleportEndpoint::Length,src/graphics/particles.cpp,call,bx_sqrt
 ,TeleportEndpoint::Length,src/graphics/particles.cpp,field_read,TeleportEndpoint::x
 ,TeleportEndpoint::Length,src/graphics/particles.cpp,field_read,TeleportEndpoint::y

@@ -243,17 +243,17 @@ static MeteorParams g_params_storage;
 
 NOINLINE static int density_form(const MeteorParams *p)
 {
-    return (int)(30.0 / p->density);
+    return bx_ftol(30.0 / p->density);
 }
 
 NOINLINE static int duration_form(const MeteorParams *p)
 {
-    return (int)(p->duration * 30.0);
+    return bx_ftol(p->duration * 30.0);
 }
 
 NOINLINE static int interval_form(const MeteorParams *p)
 {
-    return (int)(p->interval * 30.0);
+    return bx_ftol(p->interval * 30.0);
 }
 
 typedef enum { FORM_DENSITY, FORM_DURATION, FORM_INTERVAL } Form;

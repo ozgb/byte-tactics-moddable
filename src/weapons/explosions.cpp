@@ -452,7 +452,6 @@ void __stdcall DrawExplosions(void* surface)
         int x = pos.x.parts.whole + 128;
         int y = pos.z.parts.whole - (pos.y.parts.whole >> 1) + 32;
         if (PointInRect(g_game->viewport, x, y)) {
-            if (d->obj) DrawModel3doProjected(surface, &pos, d->obj, &d->angle_x);
             if (d->obj) {
                 DlScope shardScope(DL_SHARD, surface, &pos, d->obj, &d->angle_x);
                 DrawModel3doProjected(surface, &pos, d->obj, &d->angle_x);
@@ -505,7 +504,7 @@ void __stdcall ExplodeUnitPieces(Unit* unit)
     }
 }
 
-extern int dlpad420f30_0, dlpad420f30_1, dlpad420f30_2, dlpad420f30_3, dlpad420f30_4, dlpad420f30_5, dlpad420f30_6, dlpad420f30_7, dlpad420f30_8;
+extern int dlpad420f30_0, dlpad420f30_1, dlpad420f30_2, dlpad420f30_3, dlpad420f30_4, dlpad420f30_5, dlpad420f30_6, dlpad420f30_7, dlpad420f30_8, dlpad420f30_9;
 // MATCH: use a local int pointer for the gravity subtraction so MSVC reloads vel.y after the position updates.
 // FUNCTION: 0x420f30
 void UpdateExplosions()

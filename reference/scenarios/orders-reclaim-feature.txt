@@ -1,0 +1,14 @@
+# Human Arm commander on The Pass reclaims a tree the console places; ten seconds.
+game_seed 976
+crt_seed 1976
+view_seed 2976
+map The Pass
+start_positions fixed
+ticks 300
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +now Film Chris Include Reload Assert
+console 2 +feature Tree1
+order 5 0:ARMCOM:1 reclaim 640 260

@@ -221,6 +221,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | orders-build-patrol | The Pass | 2 | 600 | Human Arm commander builds a solar collector, then patrols (`build`, `patrol`) |
 | orders-guard-reclaim | The Pass | 2 | 600 | Human Arm commander builds a solar collector, guards it, then reclaims it (`build`, `guard`, `reclaim`) |
 | orders-move-attack | The Pass | 2 | 600 | Human Arm commander moves, attacks the Core commander, then the whole slot moves (`move`, `attack`, `<slot>:all`) |
+| orders-reclaim-feature | The Pass | 2 | 300 | Human Arm commander reclaims a tree the console places (`feature`, `reclaim` at a position), so features' `ReclaimFeature` answers a RECLAIM event at tick 245 |
 | quad-fox-holes | Fox Holes | 4 | 7200 | Four players on Fox Holes, alternating sides, four minutes |
 | quad-king-of-the-hill | King of the Hill | 4 | 9000 | Four players on King of the Hill in two allied teams of two, five minutes |
 | quad-lava-highground | Lava Highground | 4 | 5400 | Four Arm players on Lava Highground, random start positions, three minutes |
@@ -311,6 +312,7 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | orders-guard-reclaim | judged | - |
 | orders-immediate | judged | - |
 | orders-move-attack | judged | - |
+| orders-reclaim-feature | judged | - |
 | orders-tier2-core | judged | - |
 | orders-tier2-spider | judged | - |
 | orders-tier2-vader | judged | - |
@@ -604,7 +606,7 @@ uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-di
 ```
 
 `--tier` is the same `--check` restricted to the 40 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 38,200 ticks of the 375,450 that the suite's 92 scenarios play (10.2%), none longer than 9000.
+`tools/reference.py`, 38,200 ticks of the 375,750 that the suite's 93 scenarios play (10.2%), none longer than 9000.
 A scenario's ticks here are those its stored trace holds, as `tools/coverage.py` counts them, so a mission that a
 victory condition ends early counts the ticks it played, not its `ticks` line. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how

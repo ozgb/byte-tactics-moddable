@@ -1395,11 +1395,9 @@ targeting:
 
 features:
 
-- `Apply` of RECLAIM: the slot leaves it `unrecorded` (#897); a feature reclaim needs a scenario that makes a unit reclaim one, which changes `reference/` and makes the full gate this issue's. The reclaim itself, which reads and writes economy's account and units, is reached only through it.
 - `Apply` of REMOVE and `Place`: no recorded window removes a feature by event or places one through the synchronous slot. Placing a feature is reached through `Apply` of PLACE (`orders-air-fights`, a model with a spot), and removing one through the replacement of a dead feature.
 - The start of a fire and the burning half of `UpdateFeatureSpot` (the smoke, the spread, the burn-out), and `ScanFeatureCell` seeding a feature: no recorded window holds a flamable feature hit by a fire-starting weapon, and no feature of these maps has a seed chance above 0.
-- `FindFeatureAtPos`: called by the reclaim and resurrect orders (the reclaim, resurrect and VTOL reclaim orders) and by the players' mining check, none of which a recorded window reaches; its `cell` and `size` are the nullable out form.
-- The network branches of the feature damage (`Game.netGameFlags`-dependent game type 3): the recordings are of games of type 2.
+- The network branches of the feature damage and the reclaim (`Game.netGameFlags`-dependent game type 3, `network.SendFeatureReclaimed`): the recordings are of games of type 2.
 - `FreeFeaturePool` and the other load slots (`LoadFeatureFileList`, `FreeFeatureFileList`, `NopAfterFeatureEnum`, `ResolveFeatureLinks`, `InitFeatureAnimPool`, `PlaceMissionFeatures`, `StampFeatureMetal`, `FindOrLoadFeatureType`, `LoadFeatures`) are `load class`; `SaveFeatures` is a query of a saved game, outside the tick; `UpdateFeatures` is the scheduler's phase driver, which calls the slots below it, each recorded on its own.
 
 mission:
@@ -1599,10 +1597,11 @@ of a chain are recorded whole before a cell's `occupant` reaches them with a lim
 wine build/modern/replay_inject_test.exe --expect 404 "import 1 los_radar.GetMapCell" tests/replay/features/commander-death.txt
 ```
 
-The recordings of features 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), both in a window of ticks. The first call that names a field of `Cell` writes it for every cell of the table (about 43 KB of each file, as runs), and the first that names a `Feature` or a `Spot` every element of those tables:
+The recordings of features 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), each in a window of ticks. The first call that names a field of `Cell` writes it for every cell of the table (about 43 KB of each file, as runs), and the first that names a `Feature` or a `Spot` every element of those tables:
 
 - `commander-death`, ticks 181 to 186 (2,637 calls): the death of the commander at tick 182 is 30 DAMAGE events (`Apply`: 29 kill their feature, outcome 1, and one does not), each kill places a spot with the death animation (`services.InitGafSequence`, `los_radar.GetMapCell`, the pool's lists and the cell's flags written), then `UpdateFeatureSpot` (145 calls, `services.StepGafSequence`) walks the used list, and the phase's `FeatureTypeCount`, `AnimateFeatureType` (399 types a tick), `ScanFeatureCell`, `FirstFeatureSpot` and `GetCellFeature` are called every tick.
 - `orders-air-fights`, ticks 708 to 713 (2,435 calls; `Apply`: 2 DAMAGE and 1 PLACE, all outcome 1): DAMAGE at tick 709 that kill features, and a PLACE of a feature with a model (`FEATURES_HAS_POS | FEATURES_HAS_ROT`, a spot with its piece state: `scripts.ObjectStateSize`, `services.SimAllocTagged "Object State"`, and the INIT_STATE and PASS_MAPS effects through `services.SchedPublish`), and 11 `UpdateFeatureSpot` calls.
+- `orders-reclaim-feature`, ticks 243 to 248 (2,425 calls; `Apply`: 1 RECLAIM, outcome 1): the commander reclaims the tree the console placed. `FindFeatureAtPos` (the reclaim order's check, every other tick: `cell` and `size` written, and, as it reads the cell `los_radar.GetMapCell` gives and the cell its offsets lead to, all-of over `Cell`), then at tick 245 RECLAIM names the unit (`a event.unit Unit#1`) and the position: two INCOME effects through `services.SchedPublish`, the kill of the feature with its reclaim spot (`services.InitGafSequence`), and `mission.GetGameType`; then `UpdateFeatureSpot` steps the spot.
 
 `replay_inject_test.exe` is also built with the start-shift injection of 15 (the 16 of `rules[i].x << 16` in `Mission::GetStartPosition`), and the divergence is reported at call 237 of `console-ilose` and at `out.x` (recorded 36700160, replayed 18350080):
 

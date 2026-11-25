@@ -308,6 +308,20 @@ void __stdcall Imp_network_SendFeatureKilled(int a0, int a1)
     (void)r;
 }
 
+void __stdcall Imp_network_SendFeatureReclaimed(Unit* a0, int a1, int a2)
+{
+    ReplayText t;
+    StartImport(t, "network.SendFeatureReclaimed");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
 {
     ReplayText t;
@@ -3568,6 +3582,7 @@ void BindSeams()
     g_import_network.SendFeatureBurning = Imp_network_SendFeatureBurning;
     g_import_network.SendFeatureHit = Imp_network_SendFeatureHit;
     g_import_network.SendFeatureKilled = Imp_network_SendFeatureKilled;
+    g_import_network.SendFeatureReclaimed = Imp_network_SendFeatureReclaimed;
     g_import_network.SendProjectileDetonated = Imp_network_SendProjectileDetonated;
     g_import_network.SendScriptCallByName = Imp_network_SendScriptCallByName;
     g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;

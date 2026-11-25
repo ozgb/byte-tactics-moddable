@@ -135,6 +135,16 @@ unsigned int __stdcall Imp_fixture_MakeGoal()
     return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
 }
 
+int __stdcall Imp_fixture_HandGoal(unsigned int a0)
+{
+    ReplayText t;
+    StartImport(t, "fixture.HandGoal");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0), false);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
 FixtureAmount g_inout_fixture_Query_0;
 bool g_inout_fixture_Query_0_null;
 FixtureAmount g_inout_fixture_Query_1;
@@ -269,4 +279,18 @@ void Run_fixture_MakeGoal()
 void After_fixture_MakeGoal()
 {
     CompareObjectResult(ROK_FIXTUREGOALBASE, ReplayRefPtr(g_result_fixture_MakeGoal));
+}
+
+int g_result_fixture_HandGoal;
+
+void Run_fixture_HandGoal()
+{
+    unsigned int p0 = ArgScalar<unsigned int>("goal");
+    SetClosing("result");
+    g_result_fixture_HandGoal = Native_fixture_HandGoal(p0);
+}
+
+void After_fixture_HandGoal()
+{
+    CompareResult(g_result_fixture_HandGoal);
 }

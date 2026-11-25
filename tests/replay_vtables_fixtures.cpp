@@ -39,6 +39,7 @@ extern void (* const g_vtsym_AiSearchGoal[])() __asm__("??_7AiSearchGoal@@6B@");
 extern void (* const g_vtsym_PatrolGoal[])() __asm__("??_7PatrolGoal@@6B@");
 extern void (* const g_vtsym_PackedPosGoal[])() __asm__("??_7PackedPosGoal@@6B@");
 extern void (* const g_vtsym_LiteGoal[])() __asm__("??_7LiteGoal@@6B@");
+extern void* g_orderFxVtable[];
 extern void (* const g_fixtureTimerVtable[])();
 extern void (* const g_fixtureAssaultVtable[])();
 extern void (* const g_fixtureCbVtable[])();
@@ -132,6 +133,8 @@ const void* ReplayVtable(unsigned kind)
         return g_vtsym_PackedPosGoal;
     case ROK_LITEGOAL:
         return g_vtsym_LiteGoal;
+    case ROK_PLAINORDERFX:
+        return g_orderFxVtable;
     case ROK_FIXTURETIMER:
         return g_fixtureTimerVtable;
     case ROK_FIXTUREASSAULT:
@@ -226,6 +229,8 @@ const char* ReplayVtableName(unsigned kind)
         return "g_vtsym_PackedPosGoal";
     case ROK_LITEGOAL:
         return "g_vtsym_LiteGoal";
+    case ROK_PLAINORDERFX:
+        return "g_orderFxVtable";
     case ROK_FIXTURETIMER:
         return "g_fixtureTimerVtable";
     case ROK_FIXTUREASSAULT:

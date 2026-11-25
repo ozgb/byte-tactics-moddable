@@ -416,7 +416,7 @@ A `ref` with no `ctype` is checked for its size only, as before. An array of ref
 the code stores itself, and that the type has no virtual member. The recorder checks the word whenever it names or walks an object of the kind, and ends the run with `a AimCallback has a vptr that
 is not <global>` when it differs, 0 included. `"vptr_unset": "<reason>"` on such a kind lets the word be 0 as well, for an object
 the code has not set up yet, which is then read as any other: `WeaponAimCobCb` has it, since a unit's aim callbacks hold 0 until
-weapons' `INIT_SLOTS` event stores the global. `replayschema.py --check` fails for a `vptr_unset` with no reason or on a kind with no `vptr`.
+weapons' `INIT_SLOTS` event stores the global. `vptr_unset` is allowed on an embedded kind with a `vtable` or `vtable_symbol` too (`PathOrderAttach` in a `PathOrder`, which the reference's set-up call has not yet constructed when its first call is recorded). `replayschema.py --check` fails for a `vptr_unset` with no reason or on a kind with neither.
 The word is never written; the replayer stores the address of its own copy of the global when it resolves the object.
 
 The store of the word is not checked: the replayer has the global in the word before the call, and the recording has no
@@ -449,6 +449,14 @@ A slot or import whose result is the block offset of an object, which it may hav
 
 An import's object starts zeroed, since the call that made it has no line to restore it from: the caller's later calls restore its fields from
 their `r` lines, once it is reachable. A `UnitRef*` argument is the object form for an embedded kind, named by its site (`a ref PathOrder#3.ref`).
+
+### A handle that the slot takes as a number and the import names as an object
+
+An argument or result of a slot with the scalar form that carries the block offset of an object (a `PathHandle` that pathfinding keeps as an opaque number
+and that its caller, movement, makes from the offset of a goal) takes an `import` key: `{"mode": "scalar", "import": {"mode": "object", "kind": "PathGoal", "poly": "PathGoal", "ref": true}}`.
+The slot side keeps the scalar, `a requester 5412896`, so that the module that owns the slot is recorded and replayed with the number it was given. The import side, the line a caller's call
+of the slot writes and the stub that answers it, uses the object form: `i pathfinding.Cancel AiSearchGoal#1`, and the stub compares the name of the object it is passed.
+The `import` is a `scalar`, `text` or `object` form of a state kind, on a scalar. `replayschema.py --check` fails for any other. The fixture `HandGoal` of `tests/replay_fixtures.json` is replayed by the self-test.
 
 ### A pointer or a ref that a member of the block holds
 
@@ -581,7 +589,9 @@ recorded call as `r` lines. `replayschema.py --check` fails for a name that is n
 `{"WeaponsAimDone.callback": "WeaponAimCobCb", "WeaponsStartScript.callback": "WeaponAimCobCb"}` makes `callback` of those
 two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). The check fails
 for a kind that is no state kind, for a member that is no `unsigned int` of a struct of the module's interface header, and for
-a member that is a unit ref already.
+a member that is a unit ref already, which is a member named `unit`, `target`, `source`, `attacker` or `builder` that the module does not list as a handle.
+A handle member (movement's `target`, an offset of an `OrderFx`) is named by `refs` as any other: a base kind takes the object form, `{"MovementTarget.target": {"kind": "OrderFx", "poly": "OrderFx"}}`, with the same kind in both keys, and the line is written
+and resolved as the concrete kind its vtable says (`a event.target ApproachRadius#1`).
 
 The `Emit` service, which a module calls to publish an effect, is one `value` followed by the `size` as an `int`
 (`i services.Emit (80,227,136162080,88473600,172703296,-139810,-983040,139810,1) 36`). The value is the payload as the

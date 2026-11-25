@@ -1847,6 +1847,11 @@ unsigned int __stdcall Native_fixture_MakeGoal()
     return ReplayRefOffset(goal);
 }
 
+int __stdcall Native_fixture_HandGoal(unsigned int goal)
+{
+    return (int)(goal != 0);
+}
+
 WeaponDef* __stdcall Native_fixture_Pick()
 {
     return &g_game->weapons[7];
@@ -5962,6 +5967,20 @@ void GoalSelfTest()
     LoadCall("  i fixture.MakeGoal = null\n");
     BeginImport();
     Check(Imp_fixture_MakeGoal() == 0, "and null returns 0");
+
+    printf("a handle the slot takes as a scalar and the import names as an object\n");
+    LoadCall("  a goal 777\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_HandGoal();
+    After_fixture_HandGoal();
+    Check(g_diffs == 0, "the slot side records and compares the number");
+    LoadCall("  i fixture.HandGoal FixtureGoalB#2 = 1\n");
+    BeginImport();
+    Check(Imp_fixture_HandGoal(made) == 1 && g_diffs == 0, "the import side passes the name of the object it was made as");
+    LoadCall("  i fixture.HandGoal FixtureGoalB#3 = 1\n");
+    BeginImport();
+    Imp_fixture_HandGoal(made);
+    Check(g_diffs != 0, "and a call with another object is a difference");
 }
 
 void RefsSelfTest()

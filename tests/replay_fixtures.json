@@ -1153,6 +1153,26 @@
     "poly": "FixtureGoalBase",
     "ref": true
    }
+  },
+  "HandGoal": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "unsigned int",
+     "name": "goal"
+    }
+   ],
+   "args": {
+    "goal": {
+     "mode": "scalar",
+     "import": {
+      "mode": "object",
+      "kind": "FixtureGoalBase",
+      "poly": "FixtureGoalBase",
+      "ref": true
+     }
+    }
+   }
   }
  },
  "inside": {

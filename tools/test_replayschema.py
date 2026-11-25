@@ -419,6 +419,23 @@ class TargetingForms(unittest.TestCase):
         self.assertIn('ImportOutVec3(line, "out", a1);', files[rs.HOOKS_H])
         self.assertIn('ApplyVec3(a1, "out");', files[rs.SLOTS_H])
 
+    def test_an_import_annotation_changes_only_the_import_side(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        shapes = files[rs.SHAPES_SLOTS]
+        self.assertIn("ReplayAddObjectName(t, g_objects, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0), false);", shapes)
+        self.assertIn('ArgScalar<unsigned int>("goal")', shapes)
+        hooks = files[rs.FIXTURE_HOOKS_INC]
+        body = hooks[hooks.index("RecFixtureHandGoal"):]
+        self.assertIn("ImportObject(line, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0));", body)
+        self.assertIn('ArgValue(s_call, "goal", a0);', body)
+
+    def test_an_import_annotation_is_for_a_scalar_and_a_known_form(self):
+        fixtures = json.loads(rs.FIXTURES_JSON.read_text())
+        fixtures["fixtures"]["HandGoal"]["args"]["goal"]["import"] = {"mode": "object", "kind": "NoSuchKind"}
+        errors = rs.generate(rs.read_rows(), None, fixtures=fixtures)[1]
+        self.assertTrue(any("`import` of the argument goal" in e for e in errors), errors)
+
     def test_a_unit_buffer_slot_without_playsas_records_itself_and_replays_itself(self):
         files, errors, model = self.generated()
         self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadius" in e], [])
@@ -3123,6 +3140,21 @@ class EventForms(unittest.TestCase):
         self.assertEqual(refs("WeaponsDamage"), {"unit": "Unit", "source": "Unit"})
         self.assertEqual(refs("WeaponsAttacked"), {"unit": "Unit", "attacker": "Unit"})
         self.assertEqual(refs("WeaponsDamageRecord"), {"unit": "Unit", "attacker": "Unit"})
+
+    def test_a_handle_member_may_lead_to_a_poly_kind_by_its_refs(self):
+        structs = rs.interface_structs("movement")
+        refs = {"MovementTarget.target": {"kind": "OrderFx", "poly": "OrderFx"}}
+        fields = {f["name"]: f for f in rs.flatten_event_fields(structs, "MovementTarget", refs=refs, handles=("target",))}
+        self.assertEqual((fields["target"]["kind"], fields["target"]["target"], fields["target"]["poly"]), ("ref", "OrderFx", "OrderFx"))
+        self.assertEqual(fields["unit"]["target"], "Unit")
+        plain = {f["name"]: f for f in rs.flatten_event_fields(structs, "MovementTarget", handles=("target",))}
+        self.assertNotEqual(plain["target"]["kind"], "ref")
+
+    def test_the_poly_form_of_refs_is_checked(self):
+        ann = annotations()
+        ann["subsystems"]["movement"]["slots"]["Apply"]["args"]["event"]["refs"]["MovementTarget.target"] = {"kind": "OrderFx", "poly": "Order"}
+        errors = rs.generate(rs.read_rows(), ann)[1]
+        self.assertTrue(any("with the same kind in both" in e for e in errors), errors)
 
     def test_a_kind_missing_from_the_table_is_an_error(self):
         kinds = dict(rs.EVENTS["targeting"]["kinds"])

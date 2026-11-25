@@ -788,8 +788,8 @@ def check_vptr(ann: dict) -> list[str]:
     errors = []
     taken = {vtable_name(spec): name for name, spec in ann["objects"].items() if has_vtable(spec)}
     for name, spec in ann["objects"].items():
-        if "vptr_unset" in spec and ("vptr" not in spec or not isinstance(spec["vptr_unset"], str) or not spec["vptr_unset"]):
-            errors.append("%s: `vptr_unset` is the reason a kind with a vptr may hold 0 in it" % name)
+        if "vptr_unset" in spec and (("vptr" not in spec and not (has_vtable(spec) and spec.get("inside"))) or not isinstance(spec["vptr_unset"], str) or not spec["vptr_unset"]):
+            errors.append("%s: `vptr_unset` is the reason a kind with a vptr, or an embedded kind with a vtable, may hold 0 in it" % name)
         if "vptr" not in spec:
             continue
         if not isinstance(spec["vptr"], str) or not VTABLE_NAME.match(spec["vptr"]):
@@ -1323,6 +1323,15 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
     errors = []
     kinds = ann["objects"]
     names = [a["name"] for a in args]
+    for item, label in [(a, "the argument %s" % a["name"]) for a in args] + [(result, "the result")]:
+        over = None if item is None else item.get("import")
+        if over is None:
+            continue
+        spec = kinds.get(over.get("kind")) if isinstance(over, dict) else None
+        if not isinstance(over, dict) or over.get("mode") not in ("object", "scalar", "text") or (over["mode"] == "object" and (spec is None or spec["scope"] != "state")):
+            errors.append("%s: `import` of %s is an object (a state kind), scalar or text form, which the import side records in place of the slot side's" % (where, label))
+        elif item.get("mode") != "scalar":
+            errors.append("%s: `import` of %s is for a scalar of the slot side" % (where, label))
 
     def value_kind(item: dict, label: str, pointer: bool) -> None:
         spec = kinds.get(item.get("kind"))
@@ -1588,7 +1597,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "vtable_symbol", "vtable_secondary", "vptr", "vptr_unset", "kinds", "delta"):
+        for key in ("vtable", "vtable_declared", "vtable_symbol", "vtable_secondary", "vptr", "vptr_unset", "kinds", "delta"):
             if spec.get(key):
                 entry[key] = spec[key]
         if spec.get("vtable_symbol"):
@@ -2476,6 +2485,17 @@ def self_buffer(s: dict):
     return None
 
 
+def import_view(s: dict) -> dict:
+    """The slot as its import side records it: an argument or the result with an `import` annotation takes that form there and keeps its own on the slot side."""
+    def side(a):
+        if a is None or "import" not in a:
+            return a
+        out = {k: v for k, v in a.items() if k in ("name", "type", "line", "param")}
+        out.update(a["import"])
+        return out
+    return {**s, "args": [side(a) for a in s["args"]], "result": side(s["result"])}
+
+
 def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: bool, unrecorded: bool = False,
             object_fields: list = ()) -> list[str]:
     params = ", ".join("%s a%d" % (raw_type(s, i), i) for i in range(len(s["args"])))
@@ -2543,7 +2563,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             head = 'line.Add("\\n    c %s.%s");' % (sub, slot)
         L.append("    if (%s) {" % condition)
         L.append("        " + head)
-        for i, a in enumerate(s["args"]):
+        for i, a in enumerate(import_view(s)["args"]):
             if own is None or i != own[1]:
                 L += ["        " + x for x in arg_out(a, i, "i", objects)]
         L.append("    }")
@@ -2558,7 +2578,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L.append("    cb%d.Stop();" % i)
         L.append("    if (scope.Import()) {")
         if res is not None and own is None:
-            L += ["        " + x for x in result_out(res, objects, "i")]
+            L += ["        " + x for x in result_out(import_view(s)["result"], objects, "i")]
         for i, a in enumerate(s["args"]):
             if is_value_out(a):
                 L.append("        ImportResultValue(line, ROK_%s, %s);" % (upper(a["kind"]), arg_var(a, i)))
@@ -2801,7 +2821,7 @@ def render_slots(ann: dict, model: dict) -> str:
         spec = subsystems[seam]
         for slot in slots:
             entry = {**spec["slots"], **imported_unrecorded(spec)}[slot]
-            L += list_stub(seam, slot, entry) if self_buffer(entry) is not None else import_stub(seam, slot, entry)
+            L += list_stub(seam, slot, entry) if self_buffer(entry) is not None else import_stub(seam, slot, import_view(entry))
         for slot, s in spec["slots"].items():
             if s.get("playsAs") in slots:
                 replays.setdefault(seam, []).append(slot)
@@ -3704,7 +3724,7 @@ def render_vtables(model: dict, fixtures: bool = False) -> str:
     headers = dict.fromkeys(h for h in map(declaring_header, secondary) if h)
     if headers:
         L[-1:-1] = ['#include "%s"' % callback_include(h, base) for h in headers]
-    L += ["extern void (* const %s[])()%s;" % (o.get("vtable") or o["vptr"], ' __asm__("%s")' % o["vtable_symbol"] if o.get("vtable_symbol") else "") for o in kinds]
+    L += [("extern void* %s[];" % o["vtable"] if o.get("vtable_declared") else "extern void (* const %s[])()%s;" % (o.get("vtable") or o["vptr"], ' __asm__("%s")' % o["vtable_symbol"] if o.get("vtable_symbol") else "")) for o in kinds]
     L += ["extern void (* const g_vtsec_%s_%s[])() __asm__(\"%s\");" % (o["type"], b, "??_7%s@@6B%s@@@" % (o["type"], b)) for o in kinds for b in o.get("vtable_secondary", [])]
     for fn, ret, expr in (("ReplayVtable", "const void*", "%s"), ("ReplayVtableName", "const char*", '"%s"')):
         L += ["", "%s %s(unsigned kind)" % (ret, fn), "{", "    switch (kind) {"]
@@ -3889,7 +3909,7 @@ def render_shapes(ann: dict) -> str:
     L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers, which define Native_fixture_<Slot> for each runner", ""]
     slots, _ = shape_slots(ann)
     for s in slots:
-        L += import_stub("fixture", s["name"], s)
+        L += import_stub("fixture", s["name"], import_view(s))
     for s in slots:
         if runnable(s):
             L += runner("fixture", s["name"], s, native_name(s["name"]))

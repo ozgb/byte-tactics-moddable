@@ -140,6 +140,42 @@
       "random": 4243,
       "random_total": 6000
     },
+    "compare_bytes": {
+      "dropped": 0,
+      "edge": 256,
+      "edge_total": 256,
+      "file": "compare_bytes.bin",
+      "inputs": [
+        [
+          "a",
+          "i32"
+        ]
+      ],
+      "outputs": [
+        [
+          "strcmpi",
+          "bytes256"
+        ],
+        [
+          "strnicmp1",
+          "bytes256"
+        ],
+        [
+          "strnicmp2",
+          "bytes256"
+        ],
+        [
+          "strncmp1",
+          "bytes256"
+        ],
+        [
+          "strncmp2",
+          "bytes256"
+        ]
+      ],
+      "random": 0,
+      "random_total": 0
+    },
     "cosine": {
       "dropped": 0,
       "edge": 65536,
@@ -358,7 +394,7 @@
     },
     "memmove": {
       "dropped": 0,
-      "edge": 1500,
+      "edge": 1818,
       "edge_total": 1818,
       "file": "memmove.bin",
       "inputs": [
@@ -650,8 +686,8 @@
     },
     "sprintf": {
       "dropped": 0,
-      "edge": 187,
-      "edge_total": 5658,
+      "edge": 5682,
+      "edge_total": 5682,
       "file": "sprintf.bin",
       "inputs": [
         [
@@ -663,16 +699,8 @@
           "str"
         ],
         [
-          "ints",
-          "bytes32"
-        ],
-        [
-          "dbls",
-          "bytes64"
-        ],
-        [
-          "strs",
-          "bytes512"
+          "args",
+          "str"
         ]
       ],
       "outputs": [
@@ -685,8 +713,8 @@
           "i32"
         ]
       ],
-      "random": 119,
-      "random_total": 7140
+      "random": 1018,
+      "random_total": 7220
     },
     "sqrt": {
       "dropped": 0,
@@ -786,8 +814,8 @@
     },
     "strcmpi": {
       "dropped": 0,
-      "edge": 6384,
-      "edge_total": 68671,
+      "edge": 3136,
+      "edge_total": 3136,
       "file": "strcmpi.bin",
       "inputs": [
         [
@@ -801,15 +829,11 @@
       ],
       "outputs": [
         [
-          "sign",
-          "i32"
-        ],
-        [
-          "raw",
+          "v",
           "i32"
         ]
       ],
-      "random": 2845,
+      "random": 3317,
       "random_total": 20000
     },
     "strcspn": {
@@ -858,8 +882,8 @@
     },
     "strncmp": {
       "dropped": 0,
-      "edge": 5310,
-      "edge_total": 148051,
+      "edge": 16981,
+      "edge_total": 16981,
       "file": "strncmp.bin",
       "inputs": [
         [
@@ -877,15 +901,11 @@
       ],
       "outputs": [
         [
-          "sign",
-          "i32"
-        ],
-        [
-          "raw",
+          "v",
           "i32"
         ]
       ],
-      "random": 2491,
+      "random": 2845,
       "random_total": 20000
     },
     "strncpy": {
@@ -914,8 +934,8 @@
     },
     "strnicmp": {
       "dropped": 0,
-      "edge": 5310,
-      "edge_total": 148051,
+      "edge": 16981,
+      "edge_total": 16981,
       "file": "strnicmp.bin",
       "inputs": [
         [
@@ -933,15 +953,11 @@
       ],
       "outputs": [
         [
-          "sign",
-          "i32"
-        ],
-        [
-          "raw",
+          "v",
           "i32"
         ]
       ],
-      "random": 2491,
+      "random": 2845,
       "random_total": 20000
     },
     "strrchr": {
@@ -994,7 +1010,7 @@
     },
     "strtok": {
       "dropped": 0,
-      "edge": 454,
+      "edge": 540,
       "edge_total": 540,
       "file": "strtok.bin",
       "inputs": [

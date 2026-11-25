@@ -11,10 +11,8 @@ sample of the random records), `vectors.json` (the manifest), `layouts.txt` (one
 types and its output types, comma separated, for readers without a JSON parser) and `README.md` (the record format,
 the sampling rule and one line per entry). The directory is exported to the data kit as `runtime/vectors/`.
 
-The directory stays within BUDGET bytes. The edge records of the library's own entries (LIBRARY) are kept whole. The
-random records of every entry are sampled to RANDOM_CAP bytes by a seeded rule (`strata`), and the edge records of
-the C semantics entries to EDGE_CAP bytes: the first EDGE_PREFIX bytes of records, which are the named special cases,
-then a sample of the rest by the same rule.
+The directory stays within BUDGET bytes. The edge records of every entry are kept whole, and the random records of
+every entry are sampled to RANDOM_CAP bytes by a seeded rule (`strata`).
 
 `check` fails (exit 1, one line per problem) when the manifest does not parse, a file's size is not its records'
 sizes, a count differs from the manifest, the budget is exceeded, a file is not in the manifest, or the README does
@@ -37,8 +35,6 @@ SCRATCH = ROOT / "build/scratch/runtimevectors"
 
 BUDGET = 8 * 1024 * 1024
 RANDOM_CAP = 80_000
-EDGE_CAP = 120_000
-EDGE_PREFIX = 60_000
 MASK = (1 << 64) - 1
 
 LIBRARY = ("sine", "cosine", "mul_hi", "scaled_sine", "scaled_cosine", "angle_of_vector", "rotate_point",
@@ -74,9 +70,10 @@ DESCRIPTIONS = {
     "load_sequence": "the load sequence: srand(seed), the 391606 rand draws the explosion setup makes, then the same shuffle of the first `size` (3 to 10) of the ints 0 to 9, as 10 little endian i32, then the next four values of rand",
     "atoi": "atoi of a string: white space of every kind, signs, leading zeros, trailing text, values around and past the int range and 2^32, high bytes",
     "itoa": "_itoa of a value in a radix: the text it writes",
-    "strcmpi": "_strcmpi of two strings: the sign (-1, 0, 1) and the raw result",
-    "strnicmp": "_strnicmp of two strings and a count: the sign and the raw result",
-    "strncmp": "strncmp of two strings and a count: the sign and the raw result",
+    "strcmpi": "_strcmpi of two strings: the result (-1, 0 or 1)",
+    "strnicmp": "_strnicmp of two strings and a count: the result (-1, 0 or 1)",
+    "strncmp": "strncmp of two strings and a count: the result (-1, 0 or 1)",
+    "compare_bytes": "every pair of strings of at most one byte: for the first string's byte `a` (0 to 255, 0 being the empty string), the results of _strcmpi, of _strnicmp with the counts 1 and 2 and of strncmp with the counts 1 and 2 against the second string of each byte b from 0 to 255, each output holding one signed byte (-1, 0 or 1) per b in order",
     "tolower": "tolower of an int from -128 to 255",
     "toupper": "toupper of an int from -128 to 255",
     "isspace": "isspace of an int from -1 to 255, the raw result; the results for -128 to -2 depend on memory before the library's table and are dropped",
@@ -90,7 +87,7 @@ DESCRIPTIONS = {
     "strcspn": "strcspn of a string and a set of characters, either possibly empty: the length of the prefix without them",
     "strtok": "strtok over a string in a 48 byte buffer filled with 0xAA beforehand, the first call with `delims`, the next calls with `delims2` until it returns null: the token count, `toks` as 24 pairs of i32 (offset in the buffer, length) of which the count's worth are used, then -1 (a null) or -2 and the offset a further call returns, and the buffer afterward",
     "memmove": "memmove within a 64 byte buffer holding byte i = (37 * i + 11) mod 256: the offset of the returned pointer and the buffer afterward, for overlapping and disjoint ranges",
-    "sprintf": "sprintf of a format with arguments: `kinds` has one letter per conversion argument in order (i an int taken from `ints`, f a double from `dbls`, s a string from `strs`, each indexed by the argument's position; `ints` is 8 little endian i32, `dbls` 8 f64, `strs` 8 strings of 64 bytes), and the outputs are the text written and the return value",
+    "sprintf": "sprintf of a format with arguments: `kinds` has one letter per conversion argument in order, and `args` holds the arguments in that order, an i (an int) as 4 bytes, an f (a double) as 8 and an s (a string) as a u32 length and its bytes; the outputs are the text written and the return value",
     "sscanf": "sscanf of a text with a format whose conversions are integers, words and sets (none is `%f`): the return value, the four ints stored (0x5a5a5a5a where nothing was stored) and the 64 bytes of the string buffer (0xAA where nothing was stored)",
     "ftol": "the conversion of a double to an int by the compiled code of the original program (a call to its _ftol); the result is the one the original gave, including for values out of range and for NaN",
 }
@@ -129,9 +126,8 @@ depend on memory).
 
 ## Sampling
 
-The library entries (sine to load_sequence below) keep every edge record. The other entries keep their first records
-whole up to 60000 bytes, which are the named special cases, and then a sample of the rest up to 120000 bytes in all.
-The random records of every entry are sampled to 80000 bytes, or kept whole when they are fewer. A sample of m of n
+Every entry keeps every edge record. The random records of every entry are sampled to 80000 bytes, or kept whole when
+they are fewer. A sample of m of n
 records takes one record from each of m strata, the stratum j being the indexes from floor(j * n / m) up to (not
 including) floor((j + 1) * n / m), and in it the index offset `mix(j) mod size` from the stratum's start, with `mix` the
 64-bit mixing function
@@ -273,27 +269,11 @@ def sample(data, types: list[str], cap: int) -> list[bytes]:
     return pick(data, types, total, strata(total, m))
 
 
-def edge_records(data, types: list[str], whole: bool) -> tuple[list[bytes], int]:
-    """The edge records to keep and the number of edge records in all: every one when whole or when they fit
-    EDGE_CAP, else the first EDGE_PREFIX bytes of records and a sample of the rest."""
+def edge_records(data, types: list[str]) -> list[bytes]:
+    """Every edge record of data."""
     if len(data) == 0:
-        return [], 0
-    records = pick(data, types, 0, list(range(count_records(data, types))))
-    if whole or len(data) <= EDGE_CAP:
-        return records, len(records)
-    prefix = []
-    used = 0
-    for r in records:
-        if used + len(r) > EDGE_PREFIX:
-            break
-        prefix.append(r)
-        used += len(r)
-    rest = records[len(prefix):]
-    rest_bytes = sum(len(r) for r in rest)
-    if used + rest_bytes <= EDGE_CAP:
-        return records, len(records)
-    m = max(1, min(len(rest), (EDGE_CAP - used) * len(rest) // rest_bytes))
-    return prefix + [rest[i] for i in strata(len(rest), m)], len(records)
+        return []
+    return pick(data, types, 0, list(range(count_records(data, types))))
 
 
 def memory_dependent(record: bytes) -> bool:
@@ -311,7 +291,8 @@ def build(scratch: Path, out: Path) -> dict:
         types = [t for _, t in inputs + outputs]
         edge_data = open_data(scratch / f"{name}.edge.bin")
         random_data = open_data(scratch / f"{name}.random.bin")
-        edge, edge_total = edge_records(edge_data, types, name in LIBRARY)
+        edge = edge_records(edge_data, types)
+        edge_total = len(edge)
         random_total = count_records(random_data, types) if len(random_data) else 0
         random = sample(random_data, types, RANDOM_CAP)
         dropped_file = scratch / f"{name}.dropped.txt"

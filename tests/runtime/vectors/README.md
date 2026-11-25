@@ -32,9 +32,8 @@ depend on memory).
 
 ## Sampling
 
-The library entries (sine to load_sequence below) keep every edge record. The other entries keep their first records
-whole up to 60000 bytes, which are the named special cases, and then a sample of the rest up to 120000 bytes in all.
-The random records of every entry are sampled to 80000 bytes, or kept whole when they are fewer. A sample of m of n
+Every entry keeps every edge record. The random records of every entry are sampled to 80000 bytes, or kept whole when
+they are fewer. A sample of m of n
 records takes one record from each of m strata, the stratum j being the indexes from floor(j * n / m) up to (not
 including) floor((j + 1) * n / m), and in it the index offset `mix(j) mod size` from the stratum's start, with `mix` the
 64-bit mixing function
@@ -69,24 +68,25 @@ their original order.
 - `shuffle` (526 edge, 25 random of 6094): the ints 1, 4, 7, ... (3 * index + 1) for size elements after the C++ library's shuffle of a range, drawing from rand seeded by `seed`, as `size` little endian i32 behind a u32 byte count, then the next four values of rand
 - `load_sequence` (64 edge, 1250 random of 2336): the load sequence: srand(seed), the 391606 rand draws the explosion setup makes, then the same shuffle of the first `size` (3 to 10) of the ints 0 to 9, as 10 little endian i32, then the next four values of rand
 - `atoi` (2460 edge, 4243 random of 6000): atoi of a string: white space of every kind, signs, leading zeros, trailing text, values around and past the int range and 2^32, high bytes
+- `compare_bytes` (256 edge, 0 random of 0): every pair of strings of at most one byte: for the first string's byte `a` (0 to 255, 0 being the empty string), the results of _strcmpi, of _strnicmp with the counts 1 and 2 and of strncmp with the counts 1 and 2 against the second string of each byte b from 0 to 255, each output holding one signed byte (-1, 0 or 1) per b in order
 - `ftol` (134 edge, 6666 random of 8000): the conversion of a double to an int by the compiled code of the original program (a call to its _ftol); the result is the one the original gave, including for values out of range and for NaN
 - `isalnum` (257 edge, 0 random of 0): isalnum of an int from -1 to 255, the raw result; the results for -128 to -2 are dropped
 - `isdigit` (257 edge, 0 random of 0): isdigit of an int from -1 to 255, the raw result; the results for -128 to -2 are dropped
 - `isspace` (257 edge, 0 random of 0): isspace of an int from -1 to 255, the raw result; the results for -128 to -2 depend on memory before the library's table and are dropped
 - `itoa` (755 edge, 4621 random of 8000): _itoa of a value in a radix: the text it writes
-- `memmove` (1500 edge, 1000 random of 12000): memmove within a 64 byte buffer holding byte i = (37 * i + 11) mod 256: the offset of the returned pointer and the buffer afterward, for overlapping and disjoint ranges
-- `sprintf` (187 edge, 119 random of 7140): sprintf of a format with arguments: `kinds` has one letter per conversion argument in order (i an int taken from `ints`, f a double from `dbls`, s a string from `strs`, each indexed by the argument's position; `ints` is 8 little endian i32, `dbls` 8 f64, `strs` 8 strings of 64 bytes), and the outputs are the text written and the return value
+- `memmove` (1818 edge, 1000 random of 12000): memmove within a 64 byte buffer holding byte i = (37 * i + 11) mod 256: the offset of the returned pointer and the buffer afterward, for overlapping and disjoint ranges
+- `sprintf` (5682 edge, 1018 random of 7220): sprintf of a format with arguments: `kinds` has one letter per conversion argument in order, and `args` holds the arguments in that order, an i (an int) as 4 bytes, an f (a double) as 8 and an s (a string) as a u32 length and its bytes; the outputs are the text written and the return value
 - `sscanf` (549 edge, 745 random of 5400): sscanf of a text with a format whose conversions are integers, words and sets (none is `%f`): the return value, the four ints stored (0x5a5a5a5a where nothing was stored) and the 64 bytes of the string buffer (0xAA where nothing was stored)
 - `strchr` (1452 edge, 4455 random of 10000): strchr of a string and a character (0 included): the offset of the match, or -1
-- `strcmpi` (6384 edge, 2845 random of 20000): _strcmpi of two strings: the sign (-1, 0, 1) and the raw result
+- `strcmpi` (3136 edge, 3317 random of 20000): _strcmpi of two strings: the result (-1, 0 or 1)
 - `strcspn` (4840 edge, 4036 random of 10000): strcspn of a string and a set of characters, either possibly empty: the length of the prefix without them
 - `strlwr` (259 edge, 2808 random of 6000): _strlwr of a string: the string after it
-- `strncmp` (5310 edge, 2491 random of 20000): strncmp of two strings and a count: the sign and the raw result
+- `strncmp` (16981 edge, 2845 random of 20000): strncmp of two strings and a count: the result (-1, 0 or 1)
 - `strncpy` (525 edge, 1909 random of 4000): strncpy of a source string and a count into a 24 byte destination filled with 0xAA beforehand: all 24 bytes after it, so the zero fill shows
-- `strnicmp` (5310 edge, 2491 random of 20000): _strnicmp of two strings and a count: the sign and the raw result
+- `strnicmp` (16981 edge, 2845 random of 20000): _strnicmp of two strings and a count: the result (-1, 0 or 1)
 - `strrchr` (1452 edge, 4455 random of 10000): strrchr of a string and a character (0 included): the offset of the match, or -1
 - `strstr` (4840 edge, 4036 random of 10000): strstr of a string and a needle: the offset of the match, or -1
-- `strtok` (454 edge, 286 random of 6000): strtok over a string in a 48 byte buffer filled with 0xAA beforehand, the first call with `delims`, the next calls with `delims2` until it returns null: the token count, `toks` as 24 pairs of i32 (offset in the buffer, length) of which the count's worth are used, then -1 (a null) or -2 and the offset a further call returns, and the buffer afterward
+- `strtok` (540 edge, 286 random of 6000): strtok over a string in a 48 byte buffer filled with 0xAA beforehand, the first call with `delims`, the next calls with `delims2` until it returns null: the token count, `toks` as 24 pairs of i32 (offset in the buffer, length) of which the count's worth are used, then -1 (a null) or -2 and the offset a further call returns, and the buffer afterward
 - `tolower` (384 edge, 0 random of 0): tolower of an int from -128 to 255
 - `toupper` (384 edge, 0 random of 0): toupper of an int from -128 to 255
 

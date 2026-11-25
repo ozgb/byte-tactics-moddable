@@ -366,6 +366,8 @@ owner's capacity field must come before the ref field in the owner's list, so th
   r FixtureEye#3.pos (5,6)
 ```
 
+A slot that is all-of over a kind with a capacity gets the whole table allocated before it runs, whether or not a line named an element, since the module may write past the live count (`AddEyeball` writes element `count_14277`).
+
 The replayer's table is outside the block, so a ref to it is the difference of two addresses, as any ref the module stores. A replay of a module that
 frees such a table frees the replayer's memory, which is why the module's allocator makes it. The replayer calls the exe's `operator new`, so such a table is for native replays; a WASM
 module has an allocator of its own that the host does not call.

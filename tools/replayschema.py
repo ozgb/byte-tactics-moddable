@@ -1736,7 +1736,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                         elif rule["rule"] in ("fields", "all-of"):
                             for tag, into, block in (("reads", obj_reads, reads), ("writes", obj_writes, writes)):
                                 for name in rule.get(tag, []):
-                                    k, fname = name.split(".", 1)
+                                    k, _, fname = name.partition(".")
                                     if name in field_index:
                                         block.add(name)
                                     elif (k, fname) not in object_index:
@@ -3365,7 +3365,8 @@ def render_service_end(services: list[dict]) -> str:
         pointer = "(c.result.kind == 1 ? c.result.v.p : nullptr)"
         outs_after = [(i, a) for i, a in enumerate(s["args"]) if a.get("reach")]
         if res == "snapshot":
-            L.append("        AddSnapshot(t, %s, (unsigned)a[%d].v.i);" % (pointer, index[s["bytes"]]))
+            offset_index = [i for i, p in enumerate(s["args"]) if p["param"] == s["offset"]][0]
+            L.append("        AddSnapshot(t, %s, (unsigned)a[%d].v.i, a[%d].v.p != nullptr && %s != nullptr ? *(const unsigned*)a[%d].v.p : 0);" % (pointer, index[s["bytes"]], offset_index, pointer, offset_index))
         elif res == "int":
             L.append("        AddResult(t, c.result);")
         elif res == "double":

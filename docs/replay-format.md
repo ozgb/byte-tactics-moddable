@@ -876,12 +876,13 @@ and a handle, numbered in the outermost call by first use, and the bytes follow 
   o snapshot#1 x:0100000002000000...
 ```
 
-No line is written for the offset, because it is the replayer's own. After the `w` lines and the closing `o` lines, the call has one
+The offset the engine's arena handed out follows the handle as `+offset` when it is not 0 (`= snapshot#2+5728`): the engine clears the arena between two calls that the recording does not
+show, so a buffer's offset, which the module passes on in an event (`RecordSimEvent`), is an input of the call. The replayer places the buffer at the offset and answers it; a line with no offset follows the buffers before it in the call, the first at the start of the arena. After the `w` lines and the closing `o` lines, the call has one
 `o snapshot#<n> x:<bytes>` line per snapshot it allocated, the buffer's bytes as the slot left them, with a long buffer in several
 lines of the same name, in order, of at most 512 bytes (the lines are joined). A null result (the arena was full) is `= null` and has no
 line.
 
-The replayer's answer allocates `bytes` from an arena of its own, zeroed, and returns that pointer and its own offset in `offset`. At
+The replayer's answer allocates `bytes` from an arena of its own, zeroed, at the recorded offset, and returns that pointer and the offset in `offset`. At
 slot exit it compares each buffer with the recorded bytes and reports a difference at `snapshot#<n>[<byte>]` (recorded and replayed
 byte), at `snapshot#<n>.length` when the sizes differ, and at `snapshot#<n>` when a snapshot was recorded and not allocated, or the
 other way round. The `o snapshot` lines are never the outputs of the import before them. The tool writes the recorder's and the
@@ -1252,6 +1253,16 @@ economy:
 - `Apply` of LOAD: only a loaded game publishes it (`load-midgame` is not recorded).
 - `GetEnergyUse` is recorded at tick 0 only (`console-iwin`, the whole run, 100 ticks): the unit type loader calls it, and a window cannot start before tick 1.
 
+los_radar:
+
+- `Apply` of SHARE_MAPPING and SHARE_RADAR, and `network.BroadcastPlayerInfo` (`CmdShareMapping`, `CmdShareRadar`): they act only in a network game (outcome 0 otherwise), and no scenario is one.
+- `Apply` of SHARE_MAP (`ShareMapInfo`), CELL_HEIGHTS and SIGHT_LOAD: no recorded scenario publishes them (the first comes from `UpdateResourceSharing` of a network game and the third from a loaded game, which the run-from-tick-0 recordings do not include).
+- The sight circle drawn from a frame of the `vismask` table, `GafFrame::pixelsOrLayers` (`mapFlags` bit 2 clear, `+lostype` off): `console-sight` reaches it and is not recorded, because the pixels of a GAF frame are loaded engine memory that the replayer would have to rebuild as a blob. The recorded scenarios all draw sight from the height-line tables (`Game.grid1`, `SimGlobals.g_losTables`).
+- `GetVisibleEnemiesInRadius` as a slot: its out buffer of units has no form in a slot (`units-buffer` is the form of an import), so the slot is `record: false` and targeting's recordings replay it as an import line.
+- The slots no recording calls at top level: `GetOriginCellAtPosition`, `IsUnitVisibleToPlayer`, `IsPointVisible`, `HasReadyUnitInRange`, `FreeUnitIndex` and `Shutdown`. The first four run only inside `RefreshUnitIndex`, `UpdateSensorRadarAndCloak` and the engine's own callers, and `HasReadyUnitInRange` needs a cloaking unit; the last two run when a match is unloaded.
+- `GetSeenUnitsInRadius`, `LoadMappingData`, `SaveMappingData`, `InitRadar`, `FreeRadar`, `LoadTntMap`, `FreeMapResources`: load class, or called by `ai` only.
+- The unit index (`LosUnitIndex`, `s_index` in `line_of_sight_index.cpp`) is module state outside the block, built by `CreateUnitIndex` at match load and rebuilt by `RefreshUnitIndex`, so a window cannot restore it: los_radar is recorded as whole runs from tick 0, and the index is checked through the results of `HasReadyUnitInRange` and of targeting's `GetVisibleEnemiesInRadius` imports.
+
 ## Replaying
 
 The native replay test replays a recording against the native module (`replay_native_test.exe`, built by
@@ -1300,6 +1311,12 @@ out `Vec3`:
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 356 pos.x tests/replay/targeting/skirmish4-long.txt
+```
+
+The recordings of los_radar are whole runs from tick 0 (no window): the unit index (`s_index` of `line_of_sight_index.cpp`) is module state outside the block, built by `CreateUnitIndex` at match load and rebuilt by `RefreshUnitIndex`, so a window could not restore it. `console-units` (300 ticks: `UpdateUnitLineOfSight` 725, `RecordRadarUnits` 301, `RefreshUnitIndex` 602, `Apply` 26 of UPDATE_UNIT once, REMOVE_UNIT 7, REVEAL_UNIT 7, ADD_EYEBALL 3, RECALCULATE once and SIGHT_RESET 7, `UpdateSensorRadarAndCloak` 11, `RecordRadarMapped` 11, `SoundHeardMask` 21, `GetMapCellAtPosition` 78) holds the eyeballs and the removals of units, and `sensors-sonar-jam` (150 ticks: `Apply` of REVEAL_UNIT 3, RECALCULATE once and SIGHT_RESET 3, `UpdateSensorRadarAndCloak` 6, the jamming and sonar paths of its visitors) the sensors. A radar capture is a snapshot (`services.SimCaptureAlloc`), with the arena offset of the engine after the handle. The injected change is the refresh period of the unit index, 0x3c ticks in place of 0x1e (`BT_REPLAY_INJECT_REFRESH_TICKS`), reported at call 530 of `console-units`, where the index is not rebuilt and its first `services.SimAlloc` is missing:
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 530 "import 0 services.SimAlloc" tests/replay/los_radar/console-units.txt
 ```
 
 The recordings of targeting, which the modern build runs as native code in every mode (it has no WASM module yet): `orders-guard-attacked` (units that guard and are attacked: every

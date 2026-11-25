@@ -436,6 +436,14 @@ void ReplayAddWeapon(ReplayText& t, const void* p)
     }
 }
 
+void ReplayEnsureAllOfTables(const unsigned char* kinds, unsigned count, ReplayAllocFn alloc)
+{
+    for (unsigned i = 0; i < count; i++) {
+        if (kReplayObjectKinds[kinds[i]].table != 0 && kReplayObjectKinds[kinds[i]].table != RT_ORDER)
+            EnsureTable(kinds[i], alloc);
+    }
+}
+
 void* ReplayParseWeapon(const char* value)
 {
     if (strncmp(value, "weapondef#", 10) != 0)

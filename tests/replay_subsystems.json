@@ -52,5 +52,13 @@
       "expect": 2,
       "field": "region"
     }
+  },
+  "los_radar": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_REFRESH_TICKS=0x3c",
+      "recording": "console-units.txt",
+      "expect": 530,
+      "field": "import 0 services.SimAlloc"
+    }
   }
 }

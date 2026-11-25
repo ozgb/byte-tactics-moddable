@@ -49,10 +49,13 @@ class legacy_los_radar:
         self.patch.start()
         ann = annotations()
         slots = ann["subsystems"]["los_radar"]["slots"]
+        slots["GetVisibleEnemiesInRadius"].pop("record")
+        slots["GetVisibleEnemiesInRadius"].pop("reason")
+        slots["GetVisibleEnemiesInRadius"]["functions"] = ["GetVisibleEnemiesInRadius", "EntryOf", "Unit::Ready"]
         reach = slots["GetVisibleEnemiesInRadius"]["args"]["out"]["reach"]
         slots["GetVisibleEnemiesInRadius"]["args"]["out"] = {"mode": "units", "dir": "out", "kind": "Unit", "reach": reach, "depth": 2}
         vec = slots["GetVisibleEnemiesInRadius"]["args"]
-        slots["GetVisibleEnemiesInRadiusList"] = {"playsAs": "GetVisibleEnemiesInRadius", "args": {
+        slots["GetVisibleEnemiesInRadiusList"] = {"playsAs": "GetVisibleEnemiesInRadius", "functions": ["GetVisibleEnemiesInRadius", "EntryOf", "Unit::Ready"], "args": {
             "pos": dict(vec["pos"]), "out": {"mode": "units-buffer", "dir": "out", "kind": "Unit", "capacity": "capacity"}}}
         return ann
 
@@ -161,7 +164,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("Apply(event)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "los_radar", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("Apply", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "ApplySlot"}})
@@ -197,7 +200,7 @@ class Unrecorded(unittest.TestCase):
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
         files, errors, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "los_radar", "weapons.UpdateUnitWeapons"))], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("FindWeaponByName", weapons["slots"])
         kept = weapons["unrecorded"]["FindWeaponByName"]
@@ -419,7 +422,7 @@ class TargetingForms(unittest.TestCase):
     def test_a_unit_buffer_slot_without_playsas_records_itself_and_replays_itself(self):
         files, errors, model = self.generated()
         self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadius" in e], [])
-        slot = model["subsystems"]["los_radar"]["slots"]["GetVisibleEnemiesInRadius"]
+        slot = model["subsystems"]["los_radar"]["unrecorded"]["GetVisibleEnemiesInRadius"]
         self.assertNotIn("playsAs", slot)
         self.assertEqual([a["mode"] for a in slot["args"]], ["scalar", "vec3", "scalar", "scalar", "units-buffer", "scalar"])
         out = slot["args"][4]
@@ -592,7 +595,7 @@ class IndirectCalls(unittest.TestCase):
 
     def pending(self, rows, ann=None, slot_name="WeaponCanReachUnit"):
         model, errors = build(rows, ann)
-        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
+        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "los_radar", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
@@ -1380,7 +1383,7 @@ class Snapshots(unittest.TestCase):
         text = rs.render_service_end([self.spec()])
         self.assertIn("case RI_SIM_CAPTURE_ALLOC:", text)
         self.assertIn("t.AddInt(a[0].v.i);", text)
-        self.assertIn("AddSnapshot(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (unsigned)a[0].v.i);", text)
+        self.assertIn("AddSnapshot(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (unsigned)a[0].v.i, a[1].v.p != nullptr && (c.result.kind == 1 ? c.result.v.p : nullptr) != nullptr ? *(const unsigned*)a[1].v.p : 0);", text)
 
     def test_the_offset_is_not_a_line(self):
         text = rs.render_service_end([self.spec()])
@@ -2616,25 +2619,26 @@ class SelfPointers(unittest.TestCase):
         files, errors, model = self.generated()
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
-        self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { offsetof(FixtureEye, pos), 0 },\n    { offsetof(FixtureEye, flag), 0 },\n"
+        self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { offsetof(Eye, screenPos), 0 },\n    { offsetof(Eye, flagB), 0 },\n    { offsetof(FixtureEye, pos), 0 },\n    { offsetof(FixtureEye, flag), 0 },\n"
                       "    { offsetof(FixtureHeap, pool), sizeof(FixtureNode) },\n};", text)
         row = [l for l in text.split("\n") if l.startswith('    { "screen", offsetof(FixtureEye, screen)')][0]
-        self.assertTrue(row.endswith("RK_SELF, 0, 0, 0, {}, 0, 0, 1 },"), row)
-        self.assertEqual([(x["name"], x["member"], x["index"]) for x in model["selfs"]], [("screen", "pos", False), ("flagPtr", "flag", False), ("top", "pool", True)])
+        self.assertTrue(row.endswith("RK_SELF, 0, 0, 0, {}, 0, 0, 3 },"), row)
+        self.assertEqual([(x["name"], x["member"], x["index"]) for x in model["selfs"]],
+                         [("screen", "screenPos", False), ("flagPtr", "flagB", False), ("screen", "pos", False), ("flagPtr", "flag", False), ("top", "pool", True)])
 
     def test_an_index_has_its_own_kind_and_a_target(self):
         files, _, _ = self.generated()
         row = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "top", offsetof(FixtureHeap, top)')][0]
-        self.assertTrue(row.endswith("RK_SELFINDEX, ROK_FIXTURENODE, 0, 0, {}, 0, 0, 3 },"), row)
+        self.assertTrue(row.endswith("RK_SELFINDEX, ROK_FIXTURENODE, 0, 0, {}, 0, 0, 5 },"), row)
 
     def test_the_header_checks_that_a_self_pointer_is_a_ref_to_a_member_that_exists(self):
         text = self.generated()[0][rs.SCHEMA_H]
         self.assertIn('static_assert(sizeof(((FixtureEye*)nullptr)->screen) == sizeof(unsigned), "FixtureEye::screen is a Ref");', text)
         self.assertIn('static_assert(sizeof(((FixtureEye*)nullptr)->pos) >= 1,', text)
 
-    def test_the_real_schema_has_no_self_pointer_and_an_empty_table(self):
+    def test_the_real_schema_has_the_two_self_pointers_of_an_eye(self):
         files, _, _ = rs.generate(rs.read_rows())
-        self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { 0, 0 },\n};", files[rs.SCHEMA_H])
+        self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { offsetof(Eye, screenPos), 0 },\n    { offsetof(Eye, flagB), 0 },\n};", files[rs.SCHEMA_H])
 
     def test_a_self_pointer_is_never_walked(self):
         self.assertNotIn("self", rs.WALKABLE)
@@ -2848,7 +2852,7 @@ class Blobs(unittest.TestCase):
         text = files[rs.FIXTURE_SCHEMA_H]
         row = [l for l in text.split("\n") if l.startswith('    { "entries[]", offsetof(FixtureProgram, entries)')][0]
         self.assertIn("RK_BLOB, ROK_ALLOC,", row)
-        self.assertTrue(row.endswith(", 9 },"), row)
+        self.assertTrue(row.endswith(", 10 },"), row)
 
     def test_the_bytes_are_a_raw_array_with_the_length_expression(self):
         text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
@@ -2911,10 +2915,11 @@ class NestedVectors(unittest.TestCase):
         self.assertIn('static_assert(sizeof(FixtureRow) == 16, "FixtureRow::cells is a block vector");', text)
         self.assertIn('static_assert(__is_same(FixtureRow::value_type, short), "FixtureRow::cells holds short");', text)
 
-    def test_the_real_schema_has_a_vector_in_no_value_kind(self):
+    def test_the_real_schema_has_vectors_in_the_value_kinds_of_the_los_tables_only(self):
         _, _, model = rs.generate(rs.read_rows())
         scopes = {o["name"]: o["scope"] for o in model["objects"]}
-        self.assertEqual([f for f in model["object_fields"] if f["kind"] == "vector" and scopes[f["object"]] == "value"], [])
+        self.assertEqual([(f["object"], f["name"]) for f in model["object_fields"] if f["kind"] == "vector" and scopes[f["object"]] == "value"],
+                         [("LosLine", "steps"), ("LosTable", "lines")])
 
     def test_an_object_vector_in_a_value_kind_is_refused(self):
         ann = annotations()
@@ -2947,7 +2952,7 @@ class SimVectors(unittest.TestCase):
         text = files[rs.FIXTURE_SCHEMA_H]
         self.assertIn('{ "SimGlobals.g_losTables", offsetof(SimGlobals, g_losTables), 16, RB_SIM, RK_VECTOR, 1 },', text)
         self.assertIn('{ "SimGlobals.g_missionOrderTableVec", offsetof(SimGlobals, g_missionOrderTableVec), 16, RB_SIM, RK_VECTOR, 2 },', text)
-        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"][:2]], [("value", "FixtureLosTable", "LosTable"), ("value", "FixtureOrderEntry", "OrderTableEntry")])
+        self.assertEqual([(v["mode"], v["kind"], v["ctype"]) for v in model["vectors"][:2]], [("value", "LosTable", "LosTable"), ("value", "FixtureOrderEntry", "OrderTableEntry")])
 
     def test_the_header_checks_the_member_type(self):
         text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
@@ -2955,9 +2960,9 @@ class SimVectors(unittest.TestCase):
         self.assertIn('static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_losTables)::value_type, LosTable), "SimGlobals.g_losTables holds LosTable");', text)
         self.assertIn('static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_missionOrderTableVec)::value_type, OrderTableEntry)', text)
 
-    def test_the_real_schema_has_no_vector_in_the_block(self):
+    def test_the_real_schema_has_the_los_tables_as_its_one_vector_in_the_block(self):
         files, _, model = rs.generate(rs.read_rows())
-        self.assertEqual([f["name"] for f in model["fields"] if f["kind"] == "vector"], [])
+        self.assertEqual([f["name"] for f in model["fields"] if f["kind"] == "vector"], ["SimGlobals.g_losTables"])
 
     def test_a_test_only_global_is_in_no_slot_set(self):
         real, _ = rs.build(rs.load_annotations(), rs.read_rows(), rs.read_assignment())

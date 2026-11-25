@@ -31,6 +31,13 @@
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
 #include "../src/game/economy.h"
+#include "../src/map/line_of_sight.h"
+#include "../src/map/line_of_sight_index.h"
+#include "../src/map/radar_capture.h"
+#include "../src/ingame/radar_picture.h"
+#include "../src/ingame/radar.h"
+#include "../src/ingame/info_panel.h"
+#include "../src/game/players.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -1179,6 +1186,9 @@ void* SnapshotAnswer(const char* result, unsigned bytes, unsigned* offset)
     if (strncmp(result, "snapshot#", 9) != 0)
         return nullptr;
     unsigned ordinal = (unsigned)atoi(result + 9);
+    const char* plus = strchr(result, '+');
+    if (plus != nullptr)
+        g_captureUsed = (unsigned)atoi(plus + 1);
     unsigned size = (bytes + 7u) & ~7u;
     if (ordinal == 0 || ordinal > MAX_SNAPSHOTS || g_captureUsed + size > CAPTURE_ARENA_BYTES)
         Fatal(g_file, g_callIndex, "a snapshot that the replayer cannot allocate", result);
@@ -2287,6 +2297,7 @@ void ReplayCall(const char* file, Outcome& out)
     g_hash = 2166136261u;
     g_sets = sets;
     ReplayAnswerHook() = ReplayAnswerImport;
+    ReplayEnsureAllOfTables(sets->allOf, sets->allOfCount, AllocObject);
     if (g_game->units.get() != nullptr && g_game->poolCount != 0)
         g_game->unitsEnd = (Unit*)((unsigned char*)g_game->units.get() + g_game->poolCount * sizeof(Unit) - sizeof(Unit));
     bool ran = RunSlot(g_subsystem, slotText);
@@ -3991,6 +4002,12 @@ void SnapshotSelfTest()
     CompareSnapshots();
     Check(g_diffs == 1 && strcmp(g_firstKey, "snapshot#2.length") == 0, "and a buffer of another size");
     g_snapshotBytes[1] = 700;
+    unsigned later = 0;
+    unsigned char* placed = (unsigned char*)SnapshotAnswer("snapshot#1+5784", 56, &later);
+    Check(placed == g_captureArena + 5784 && later == 5784, "an offset after the ordinal is where the buffer is placed and the offset it answers");
+    g_captureUsed = 0;
+    placed = (unsigned char*)SnapshotAnswer("snapshot#2", 56, &later);
+    Check(placed == g_captureArena && later == 0, "a line with no offset follows the buffers of the call, from the start of the arena");
     free(body);
     t.Free();
     recorded.Free();

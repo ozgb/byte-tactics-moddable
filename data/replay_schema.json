@@ -40,7 +40,25 @@
    },
    "gravity": "i32",
    "localPlayer": "u8",
-   "projectileCount": "i32"
+   "projectileCount": "i32",
+   "baseX": "i32",
+   "baseY": "i32",
+   "count_14277": "i32",
+   "numPlayers": "u16",
+   "flags_142f1": "u16",
+   "losTable": {
+    "kind": "ptr",
+    "target": "FrameTable"
+   },
+   "grid1.width": "u32",
+   "grid1.height": "u32",
+   "grid1.count": "u32",
+   "grid1.cells": {
+    "kind": "array",
+    "elem": "u8",
+    "ref": true,
+    "length": "grid1.count*2"
+   }
   },
   "sim_fields": {
    "g_meteorNextStrikeTime": [
@@ -102,7 +120,14 @@
    "g_lastPlaceMetalSum": [
     "i32",
     4
-   ]
+   ],
+   "g_losTables": {
+    "kind": "vector",
+    "elem": {
+     "mode": "value",
+     "kind": "LosTable"
+    }
+   }
   },
   "exempt": {
    "Game::weapons": "the weapon the recorder resolves through g_meteorWeapon and the import results",
@@ -124,7 +149,10 @@
    "<anon>::value": "a stack union that holds the height difference of a shot (the weapon flags word is read through the rule of the line-of-sight shot)",
    "g_aimScriptNames": "a constant table of script names",
    "g_fireScriptNames": "a constant table of script names",
-   "WeaponAimCobCb::ppVtbl": "the vtable word of a weapon's aim callback, which the kind's `vptr` checks and the replayer sets"
+   "WeaponAimCobCb::ppVtbl": "the vtable word of a weapon's aim callback, which the kind's `vptr` checks and the replayer sets",
+   "Game::unitsEnd": "derived by the replayer from units and poolCount, as units sets it once at match load",
+   "<anon>::words": "a union on the stack of IsUnitVisibleToPlayer",
+   "GafFrame::pixelsOrLayers": "read only when mapFlags bit 2 is 0, which no recorded scenario reaches"
   },
   "exempt_types": {
    "Ref<Unit>": "the handle of a unit, built from its pointer and turned back into it by the event of targeting",
@@ -137,7 +165,16 @@
    "ReachUnitVec3": "a view of Unit.pos, which the Unit::pos rule records, and the stack copies made from it",
    "UnitDamagePacket": "the damage packet DamageUnit builds on its stack and applies at once",
    "UnitDamagePacketOut": "the damage packet DamageUnit builds on its stack",
-   "WeaponSlotInitState": "the loop counter and the largest reload time of InitUnitWeaponSlots, on its stack"
+   "WeaponSlotInitState": "the loop counter and the largest reload time of InitUnitWeaponSlots, on its stack",
+   "SightQuery": "a sight query on the stack, or an eyeball read as one",
+   "LosUnitIndex": "the unit index, module state outside the block that CreateUnitIndex builds at match load and RefreshUnitIndex rebuilds",
+   "LosUnitIndexEntry": "an entry of the unit index, module state outside the block",
+   "DetectionVisitor": "the visitor of UpdateSensorRadarAndCloak, on its stack",
+   "RadarDrawCapture": "the capture buffer of the radar, recorded as its snapshot",
+   "RadarUnitCapture": "a unit of the capture buffer, recorded as its snapshot",
+   "RadarProjectileCapture": "a projectile of the capture buffer, recorded as its snapshot",
+   "RadarMappedCapture": "the mapped capture buffer, recorded as its snapshot",
+   "RadarWeaponCapture": "a weapon of the capture buffer, recorded as its snapshot"
   },
   "includes": [
    "../game/los_helpers.h",
@@ -444,7 +481,10 @@
      {
       "name": "posX",
       "kind": "i32",
-      "member": "pos.x"
+      "member": "pos.x",
+      "aliases": [
+       "Unit::xWhole"
+      ]
      },
      {
       "name": "posY",
@@ -457,7 +497,10 @@
      {
       "name": "posZ",
       "kind": "i32",
-      "member": "pos.z"
+      "member": "pos.z",
+      "aliases": [
+       "Unit::zWhole"
+      ]
      },
      {
       "name": "weapon0TargetX",
@@ -804,6 +847,10 @@
       "count": 3,
       "target": "WeaponAimCobCb",
       "member": "weapons[].aimCob"
+     },
+     {
+      "name": "recentlyDamagedTimer",
+      "kind": "u8"
      }
     ],
     "table": {
@@ -874,7 +921,11 @@
      },
      {
       "name": "flags1",
-      "kind": "flags"
+      "kind": "flags",
+      "aliases": [
+       "InterceptorDefFlags::bit29",
+       "UnitDefDetectionFlags::bit8"
+      ]
      },
      {
       "name": "range",
@@ -985,6 +1036,69 @@
       "member": "weapons[2]",
       "aliases": [
        "UnitDef::weapons"
+      ]
+     },
+     {
+      "name": "flags2",
+      "kind": "flags",
+      "aliases": [
+       "RadarUnitDefView::flags2"
+      ]
+     },
+     {
+      "name": "modelMaxY",
+      "kind": "i32"
+     },
+     {
+      "name": "modelMinX",
+      "kind": "i32"
+     },
+     {
+      "name": "modelMinZ",
+      "kind": "i32"
+     },
+     {
+      "name": "modelSizeX",
+      "kind": "i32"
+     },
+     {
+      "name": "modelSizeY",
+      "kind": "i32"
+     },
+     {
+      "name": "modelSizeZ",
+      "kind": "i32"
+     },
+     {
+      "name": "radardistance",
+      "kind": "i16",
+      "aliases": [
+       "RadarUnitDefView::radardistance"
+      ]
+     },
+     {
+      "name": "sonardistance",
+      "kind": "i16",
+      "aliases": [
+       "RadarUnitDefView::sonardistance"
+      ]
+     },
+     {
+      "name": "mincloakdistance",
+      "kind": "i16"
+     },
+     {
+      "name": "radardistancejam",
+      "kind": "i16",
+      "aliases": [
+       "RadarUnitDefView::radardistancejam"
+      ]
+     },
+     {
+      "name": "sonardistancejam",
+      "kind": "i16",
+      "aliases": [
+       "RadarUnitDefView::sonardistancejam"
       ]
      }
     ]
@@ -1128,7 +1242,20 @@
       "aliases": [
        "PlayerInfo::shareMetal",
        "PlayerInfo::shareEnergy",
-       "PlayerInfo::shareMapping"
+       "PlayerInfo::shareMapping",
+       "PlayerInfo::flags_97",
+       "PlayerInfo::shareRadar"
+      ]
+     },
+     {
+      "name": "color",
+      "kind": "u8"
+     },
+     {
+      "name": "flags",
+      "kind": "u16",
+      "aliases": [
+       "PlayerInfo::flags_9b"
       ]
      }
     ]
@@ -2817,6 +2944,114 @@
       "target": "Player"
      }
     ]
+   },
+   "Eye": {
+    "type": "Eye",
+    "scope": "state",
+    "table": {
+     "base": "game",
+     "member": "eyes",
+     "ref": true,
+     "count": "count_14277",
+     "capacity": 20
+    },
+    "fields": [
+     {
+      "name": "player",
+      "kind": "ref",
+      "target": "Player",
+      "ctype": "char"
+     },
+     {
+      "name": "screen",
+      "kind": "self",
+      "member": "screenPos"
+     },
+     {
+      "name": "x",
+      "kind": "i16"
+     },
+     {
+      "name": "flagA",
+      "kind": "u8"
+     },
+     {
+      "name": "flagB",
+      "kind": "u8"
+     },
+     {
+      "name": "flagPtr",
+      "kind": "self",
+      "member": "flagB"
+     },
+     {
+      "name": "posX",
+      "kind": "i32",
+      "member": "pos.x"
+     },
+     {
+      "name": "posY",
+      "kind": "i32",
+      "member": "pos.y"
+     },
+     {
+      "name": "posZ",
+      "kind": "i32",
+      "member": "pos.z"
+     },
+     {
+      "name": "expires",
+      "kind": "u32"
+     },
+     {
+      "name": "screenPos",
+      "kind": "point16"
+     }
+    ]
+   },
+   "LosStep": {
+    "type": "LosStep",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "a",
+      "kind": "u16"
+     },
+     {
+      "name": "b",
+      "kind": "u16"
+     }
+    ]
+   },
+   "LosLine": {
+    "type": "LosLine",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "steps",
+      "kind": "vector",
+      "base": true,
+      "elem": {
+       "mode": "value",
+       "kind": "LosStep"
+      }
+     }
+    ]
+   },
+   "LosTable": {
+    "type": "LosTable",
+    "scope": "value",
+    "fields": [
+     {
+      "name": "lines",
+      "kind": "vector",
+      "base": true,
+      "elem": {
+       "mode": "value",
+       "kind": "LosLine"
+      }
+     }
+    ]
    }
   },
   "rules": [
@@ -4247,6 +4482,722 @@
      "Player.metalUsage"
     ],
     "note": "written for the player the call settles only, and every player is walked"
+   },
+   {
+    "kind": "field_read",
+    "target": "SightQuery::cacheCell",
+    "rule": "fields",
+    "reads": [
+     "Eye.screenPos"
+    ],
+    "note": "an eyeball is read as a SightQuery"
+   },
+   {
+    "kind": "field_read",
+    "target": "SightQuery::eyeHeight",
+    "rule": "fields",
+    "reads": [
+     "Eye.flagA"
+    ],
+    "note": "an eyeball is read as a SightQuery"
+   },
+   {
+    "kind": "field_read",
+    "target": "SightQuery::frameIdx",
+    "rule": "fields",
+    "reads": [
+     "Eye.flagB"
+    ],
+    "note": "an eyeball is read as a SightQuery"
+   },
+   {
+    "kind": "field_read",
+    "target": "SightQuery::player",
+    "rule": "fields",
+    "reads": [
+     "Eye.player"
+    ],
+    "note": "an eyeball is read as a SightQuery"
+   },
+   {
+    "kind": "field_read",
+    "target": "SightQuery::sightDistance",
+    "rule": "fields",
+    "reads": [
+     "Eye.x"
+    ],
+    "note": "an eyeball is read as a SightQuery"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Vec3::x",
+    "rule": "fields",
+    "functions": [
+     "UpdateLineOfSight",
+     "AddEyeball",
+     "RecalculateLineOfSight",
+     "RevealNewUnit"
+    ],
+    "reads": [
+     "Unit.posX",
+     "Eye.posX"
+    ],
+    "note": "the address of the position of a unit or an eyeball"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Vec3::y",
+    "rule": "fields",
+    "functions": [
+     "UpdateLineOfSight",
+     "AddEyeball",
+     "RecalculateLineOfSight",
+     "RevealNewUnit"
+    ],
+    "reads": [
+     "Unit.posY",
+     "Eye.posY"
+    ],
+    "note": "the address of the position of a unit or an eyeball"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Vec3::y",
+    "rule": "fields",
+    "functions": [
+     "ClampWorldPosToTerrain"
+    ],
+    "reads": [],
+    "note": "a local position"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Vec3::z",
+    "rule": "fields",
+    "functions": [
+     "UpdateLineOfSight",
+     "AddEyeball",
+     "RecalculateLineOfSight",
+     "RevealNewUnit"
+    ],
+    "reads": [
+     "Unit.posZ",
+     "Eye.posZ"
+    ],
+    "note": "the address of the position of a unit or an eyeball"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Vec3::z",
+    "rule": "fields",
+    "functions": [
+     "ClampWorldPosToTerrain"
+    ],
+    "reads": [],
+    "note": "a local position"
+   },
+   {
+    "kind": "field_write",
+    "target": "Eye::pos",
+    "rule": "fields",
+    "reads": [
+     "Eye.posX",
+     "Eye.posY",
+     "Eye.posZ"
+    ],
+    "writes": [
+     "Eye.posX",
+     "Eye.posY",
+     "Eye.posZ"
+    ],
+    "note": "the position of an eyeball"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Eye::flagB",
+    "rule": "fields",
+    "reads": [
+     "Eye.flagB"
+    ],
+    "writes": [
+     "Eye.flagB"
+    ],
+    "note": "the frame of an eyeball is stored through its address"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Eye::screenPos",
+    "rule": "fields",
+    "reads": [
+     "Eye.screenPos"
+    ],
+    "writes": [
+     "Eye.screenPos"
+    ],
+    "note": "the cell of an eyeball is stored through its address"
+   },
+   {
+    "kind": "field_write",
+    "target": "ScreenPos::x",
+    "rule": "fields",
+    "reads": [
+     "Eye.screenPos"
+    ],
+    "writes": [
+     "Eye.screenPos"
+    ],
+    "note": "the cell of an eyeball"
+   },
+   {
+    "kind": "field_write",
+    "target": "ScreenPos::y",
+    "rule": "fields",
+    "reads": [
+     "Eye.screenPos"
+    ],
+    "writes": [
+     "Eye.screenPos"
+    ],
+    "note": "the cell of an eyeball"
+   },
+   {
+    "kind": "field_read",
+    "target": "MapViewFlags::bit0",
+    "rule": "fields",
+    "reads": [
+     "Game.mapFlags"
+    ],
+    "note": "a view of Game.mapFlags"
+   },
+   {
+    "kind": "field_read",
+    "target": "MapViewFlags::bit1",
+    "rule": "fields",
+    "reads": [
+     "Game.mapFlags"
+    ],
+    "note": "a view of Game.mapFlags"
+   },
+   {
+    "kind": "field_read",
+    "target": "MapViewFlags::bit2",
+    "rule": "fields",
+    "reads": [
+     "Game.mapFlags"
+    ],
+    "note": "a view of Game.mapFlags"
+   },
+   {
+    "kind": "field_read",
+    "target": "MapViewFlags::raw",
+    "rule": "fields",
+    "reads": [
+     "Game.mapFlags"
+    ],
+    "note": "a view of Game.mapFlags"
+   },
+   {
+    "kind": "field_read",
+    "target": "<anon>::flag2",
+    "rule": "fields",
+    "reads": [
+     "Game.mapFlags"
+    ],
+    "note": "a view of Game.mapFlags"
+   },
+   {
+    "kind": "field_write",
+    "target": "MapViewFlags::bit3",
+    "rule": "fields",
+    "reads": [
+     "Game.mapFlags"
+    ],
+    "writes": [
+     "Game.mapFlags"
+    ],
+    "note": "a view of Game.mapFlags"
+   },
+   {
+    "kind": "field_write",
+    "target": "MapViewFlags::raw",
+    "rule": "fields",
+    "reads": [
+     "Game.mapFlags"
+    ],
+    "writes": [
+     "Game.mapFlags"
+    ],
+    "note": "a view of Game.mapFlags"
+   },
+   {
+    "kind": "field_write",
+    "target": "<anon>::flag3",
+    "rule": "fields",
+    "reads": [
+     "Game.mapFlags"
+    ],
+    "writes": [
+     "Game.mapFlags"
+    ],
+    "note": "a view of Game.mapFlags"
+   },
+   {
+    "kind": "field_read",
+    "target": "Flags_142f1::rawByte",
+    "rule": "fields",
+    "reads": [
+     "Game.flags_142f1"
+    ],
+    "note": "a view of Game.flags_142f1"
+   },
+   {
+    "kind": "field_read",
+    "target": "<anon>::mapChanged",
+    "rule": "fields",
+    "reads": [
+     "Game.flags_142f1"
+    ],
+    "note": "a view of Game.flags_142f1"
+   },
+   {
+    "kind": "field_write",
+    "target": "Flags_142f1::mapChanged",
+    "rule": "fields",
+    "reads": [
+     "Game.flags_142f1"
+    ],
+    "writes": [
+     "Game.flags_142f1"
+    ],
+    "note": "a view of Game.flags_142f1"
+   },
+   {
+    "kind": "field_write",
+    "target": "Flags_142f1::rawByte",
+    "rule": "fields",
+    "reads": [
+     "Game.flags_142f1"
+    ],
+    "writes": [
+     "Game.flags_142f1"
+    ],
+    "note": "a view of Game.flags_142f1"
+   },
+   {
+    "kind": "field_write",
+    "target": "<anon>::flagA",
+    "rule": "fields",
+    "reads": [
+     "Game.flags_142f1"
+    ],
+    "writes": [
+     "Game.flags_142f1"
+    ],
+    "note": "a view of Game.flags_142f1"
+   },
+   {
+    "kind": "field_write",
+    "target": "<anon>::flags_142f1_mapChanged",
+    "rule": "fields",
+    "reads": [
+     "Game.flags_142f1"
+    ],
+    "writes": [
+     "Game.flags_142f1"
+    ],
+    "note": "a view of Game.flags_142f1"
+   },
+   {
+    "kind": "field_write",
+    "target": "<anon>::mapChanged",
+    "rule": "fields",
+    "reads": [
+     "Game.flags_142f1"
+    ],
+    "writes": [
+     "Game.flags_142f1"
+    ],
+    "note": "a view of Game.flags_142f1"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Game::viewDirtyFlags",
+    "rule": "fields",
+    "reads": [
+     "Game.flags_142f1"
+    ],
+    "writes": [
+     "Game.flags_142f1"
+    ],
+    "note": "a view of Game.flags_142f1"
+   },
+   {
+    "kind": "field_read",
+    "target": "Grid::cells",
+    "rule": "fields",
+    "reads": [
+     "Game.grid1.cells",
+     "Game.grid1.width",
+     "Game.grid1.height",
+     "Game.grid1.count"
+    ],
+    "note": "a view of Game.grid1"
+   },
+   {
+    "kind": "field_read",
+    "target": "Grid::width",
+    "rule": "fields",
+    "reads": [
+     "Game.grid1.cells",
+     "Game.grid1.width",
+     "Game.grid1.height",
+     "Game.grid1.count"
+    ],
+    "note": "a view of Game.grid1"
+   },
+   {
+    "kind": "field_read",
+    "target": "Grid::height",
+    "rule": "fields",
+    "reads": [
+     "Game.grid1.cells",
+     "Game.grid1.width",
+     "Game.grid1.height",
+     "Game.grid1.count"
+    ],
+    "note": "a view of Game.grid1"
+   },
+   {
+    "kind": "field_read",
+    "target": "FogGrid::cells",
+    "rule": "fields",
+    "reads": [
+     "Game.grid1.cells",
+     "Game.grid1.width",
+     "Game.grid1.height",
+     "Game.grid1.count"
+    ],
+    "note": "a view of Game.grid1"
+   },
+   {
+    "kind": "field_read",
+    "target": "FogGrid::width",
+    "rule": "fields",
+    "reads": [
+     "Game.grid1.cells",
+     "Game.grid1.width",
+     "Game.grid1.height",
+     "Game.grid1.count"
+    ],
+    "note": "a view of Game.grid1"
+   },
+   {
+    "kind": "field_read",
+    "target": "FogGrid::height",
+    "rule": "fields",
+    "reads": [
+     "Game.grid1.cells",
+     "Game.grid1.width",
+     "Game.grid1.height",
+     "Game.grid1.count"
+    ],
+    "note": "a view of Game.grid1"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Game::grid1",
+    "rule": "fields",
+    "reads": [
+     "Game.grid1.cells",
+     "Game.grid1.width",
+     "Game.grid1.height",
+     "Game.grid1.count"
+    ],
+    "note": "a view of Game.grid1"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*short",
+    "rule": "fields",
+    "functions": [
+     "AddEyeball",
+     "AddLineOfSight",
+     "ClampWorldPosToTerrain",
+     "RecalculateLineOfSight",
+     "RemoveLineOfSight",
+     "RevealAroundUnit",
+     "RevealNewUnit",
+     "UpdateLineOfSight"
+    ],
+    "reads": [
+     "region",
+     "Eye.screenPos",
+     "Unit.posY",
+     "Eye.posY"
+    ],
+    "note": "the sight cell and the high words of a position"
+   },
+   {
+    "kind": "deref_write",
+    "target": "*short",
+    "rule": "fields",
+    "functions": [
+     "RecalculateLineOfSight",
+     "RevealNewUnit",
+     "UpdateLineOfSight"
+    ],
+    "reads": [
+     "region",
+     "Eye.screenPos"
+    ],
+    "writes": [
+     "region",
+     "Eye.screenPos"
+    ],
+    "note": "the sight cell of a unit or an eyeball"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*unsigned char",
+    "rule": "fields",
+    "functions": [
+     "AddLineOfSight",
+     "RemoveLineOfSight",
+     "RevealAroundUnit"
+    ],
+    "reads": [
+     "region",
+     "Eye.flagB",
+     "Game.grid1.cells",
+     "Game.grid1.width",
+     "Game.grid1.height",
+     "Game.grid1.count",
+     "Player.explored",
+     "Player.exploredSize",
+     "Player.exploredWidth",
+     "Player.exploredHeight"
+    ],
+    "note": "the frame of the sight cache, the height range of grid1 and the explored cells"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*unsigned char",
+    "rule": "fields",
+    "functions": [
+     "ExploredOnRadar",
+     "IsExplored",
+     "RecordRadarMapped",
+     "SoundHeardMask"
+    ],
+    "reads": [
+     "Player.explored",
+     "Player.exploredSize",
+     "Player.exploredWidth",
+     "Player.exploredHeight"
+    ],
+    "note": "the explored cells of a player"
+   },
+   {
+    "kind": "deref_write",
+    "target": "*unsigned char",
+    "rule": "fields",
+    "functions": [
+     "AddLineOfSight",
+     "RemoveLineOfSight"
+    ],
+    "reads": [
+     "Player.explored",
+     "Player.exploredSize",
+     "Player.exploredWidth",
+     "Player.exploredHeight"
+    ],
+    "writes": [
+     "Player.explored"
+    ],
+    "note": "the explored cells of a player"
+   },
+   {
+    "kind": "deref_write",
+    "target": "*unsigned char",
+    "rule": "fields",
+    "functions": [
+     "RadarProjectileShown",
+     "RecordRadarMapped"
+    ],
+    "reads": [],
+    "writes": [],
+    "note": "the capture buffer, recorded as its snapshot"
+   },
+   {
+    "kind": "deref_read",
+    "target": "*unsigned short",
+    "rule": "fields",
+    "functions": [
+     "IsPointVisible",
+     "IsSeen",
+     "VisibleOnRadar",
+     "SoundHeardMask",
+     "RecordRadarMapped",
+     "ShareMapInfo",
+     "RevealAroundUnit"
+    ],
+    "reads": [
+     "Game.visibilityMask",
+     "Game.width",
+     "Game.height"
+    ],
+    "note": "the visibility mask"
+   },
+   {
+    "kind": "deref_write",
+    "target": "*unsigned short",
+    "rule": "fields",
+    "functions": [
+     "RevealAroundUnit",
+     "ShareMapInfo"
+    ],
+    "reads": [
+     "Game.visibilityMask",
+     "Game.width",
+     "Game.height"
+    ],
+    "writes": [
+     "Game.visibilityMask"
+    ],
+    "note": "the visibility mask"
+   },
+   {
+    "kind": "deref_write",
+    "target": "*unsigned short",
+    "rule": "fields",
+    "functions": [
+     "LosLine::GetLosLineStep"
+    ],
+    "reads": [],
+    "writes": [],
+    "note": "the step of a line, an out argument on the stack"
+   },
+   {
+    "kind": "field_escape",
+    "target": "Game::players_1b63_14b",
+    "rule": "all-of",
+    "object": "Player",
+    "note": "the players array: every player is a root of the call"
+   },
+   {
+    "kind": "field_escape",
+    "target": "LosSightCache::cell",
+    "rule": "fields",
+    "reads": [
+     "region"
+    ],
+    "writes": [
+     "region"
+    ],
+    "note": "the sight cache of a unit lives in the region"
+   },
+   {
+    "kind": "field_write",
+    "target": "LosSightCache::cell",
+    "rule": "fields",
+    "reads": [
+     "region"
+    ],
+    "writes": [
+     "region"
+    ],
+    "note": "the sight cache of a unit lives in the region"
+   },
+   {
+    "kind": "field_escape",
+    "target": "LosSightCache::frameIdx",
+    "rule": "fields",
+    "reads": [
+     "region"
+    ],
+    "writes": [
+     "region"
+    ],
+    "note": "the sight cache of a unit lives in the region"
+   },
+   {
+    "kind": "field_write",
+    "target": "LosSightCache::frameIdx",
+    "rule": "fields",
+    "reads": [
+     "region"
+    ],
+    "writes": [
+     "region"
+    ],
+    "note": "the sight cache of a unit lives in the region"
+   },
+   {
+    "kind": "field_escape",
+    "target": "LosUnitIndex::players",
+    "rule": "fields",
+    "reads": [],
+    "note": "the unit index is module state outside the block, rebuilt from the start of a run"
+   },
+   {
+    "kind": "field_read",
+    "target": "Game::eyes",
+    "rule": "all-of",
+    "object": "Eye",
+    "note": "every eyeball is a root of the call"
+   },
+   {
+    "kind": "field_read",
+    "target": "Game::cells",
+    "rule": "all-of",
+    "object": "Cell",
+    "functions": [
+     "GetMapCell",
+     "GetMapCellAtPosition",
+     "GetOriginCellAtPosition",
+     "UpdateCellHeightRange"
+    ],
+    "reads": [
+     "Cell.metal",
+     "Cell.height",
+     "Cell.high",
+     "Cell.low"
+    ],
+    "note": "the cell table: every cell is a root of the call, and GetMapCell hands its metal to the caller"
+   },
+   {
+    "kind": "deref_escape",
+    "target": "*Projectile",
+    "rule": "fields",
+    "functions": [
+     "RecordRadarUnits"
+    ],
+    "reads": [
+     "Projectile.positionX",
+     "Projectile.positionY",
+     "Projectile.positionZ",
+     "Projectile.owner",
+     "Projectile.type",
+     "Projectile.attacker"
+    ],
+    "note": "the position of a projectile is read through its Vec3Words view"
+   },
+   {
+    "kind": "field_read",
+    "target": "Game::units",
+    "rule": "all-of",
+    "object": "Unit",
+    "reads": [
+     "Game.poolCount"
+    ],
+    "functions": [
+     "CaptureUnit",
+     "RecalculateLineOfSight",
+     "RecordRadarUnits",
+     "RefreshUnitIndex",
+     "UpdateSensorRadarAndCloak"
+    ],
+    "note": "every unit is a root of the call, which walks the pool from the first slot to unitsEnd"
    }
   ],
   "subsystems": {
@@ -4850,18 +5801,48 @@
     }
    },
    "los_radar": {
-    "status": "pending",
+    "status": "complete",
     "slots": {
      "Apply": {
       "functions": [
-       "UpdateUnitLineOfSight",
+       "ApplyLosRadarEvent",
+       "AddEyeball",
+       "CmdShareMapping",
+       "CmdShareRadar",
+       "LosRadarEventSize",
+       "LosUnitOfHandle",
+       "RecalculateLineOfSight",
        "RemoveUnitLineOfSight",
        "RevealNewUnit",
-       "AddEyeball",
+       "ShareMapInfo",
+       "SightOf",
        "UpdateCellHeightRange",
-       "RecalculateLineOfSight",
-       "CmdShareMapping",
-       "CmdShareRadar"
+       "UpdateUnitLineOfSight",
+       "AddLineOfSight",
+       "RevealAroundUnit",
+       "UpdateLineOfSight",
+       "SightCellOf",
+       "SightFrameOf",
+       "RemoveLineOfSight",
+       "SumX",
+       "SumY",
+       "ExploredCell",
+       "LosLine::GetLosLineStep",
+       "LosLine::GetLosLineStepCount",
+       "LosTable::GetLosLine",
+       "LosTable::GetLosLineCount",
+       "LosTables::GetLosTable",
+       "LosTables::GetLosTableCount",
+       "LodRaw",
+       "RecordRadarUnits",
+       "CaptureUnit",
+       "Player_Get",
+       "RadarProjectileShown",
+       "RadarUnitShown",
+       "IsOnRadar",
+       "ExploredOnRadar",
+       "VisibleOnRadar",
+       "RecordRadarMapped"
       ],
       "args": {
        "event": {
@@ -4869,7 +5850,8 @@
         "events": "los_radar",
         "size": "size"
        }
-      }
+      },
+      "native": "ApplyLosRadarEvent"
      },
      "GetMapCell": {
       "result": {
@@ -4878,7 +5860,11 @@
        "reach": [
         "metal"
        ]
-      }
+      },
+      "functions": [
+       "GetMapCell"
+      ],
+      "native": "GetMapCell"
      },
      "SoundHeardMask": {
       "args": {
@@ -4886,7 +5872,12 @@
         "mode": "vec3",
         "label": "at"
        }
-      }
+      },
+      "functions": [
+       "SoundHeardMask",
+       "GetMapCell"
+      ],
+      "native": "SoundHeardMask"
      },
      "GetVisibleEnemiesInRadius": {
       "args": {
@@ -4910,21 +5901,263 @@
         ],
         "depth": 2
        }
-      }
+      },
+      "native": "GetVisibleEnemiesInRadius",
+      "record": false,
+      "reason": "its out buffer of units has no form in a slot; targeting's recordings replay it as the import line of targeting"
      },
      "GetSeenUnitsInRadius": {
       "record": false,
-      "reason": "called only by ai, which is not replayed; no recorded slot answers it"
+      "reason": "called only by ai, which is not replayed; no recorded slot answers it",
+      "native": "GetSeenUnitsInRadius"
      },
      "LoadMappingData": {
       "record": false,
-      "reason": "#660 part 3"
+      "reason": "load class",
+      "native": "LoadMappingData"
      },
      "SaveMappingData": {
       "record": false,
-      "reason": "#660 part 3"
+      "reason": "load class",
+      "native": "SaveMappingData"
+     },
+     "InitRadar": {
+      "record": false,
+      "reason": "load class",
+      "native": "InitRadar"
+     },
+     "FreeRadar": {
+      "record": false,
+      "reason": "load class",
+      "native": "FreeRadar"
+     },
+     "LoadTntMap": {
+      "record": false,
+      "reason": "load class",
+      "native": "LoadTntMap"
+     },
+     "FreeMapResources": {
+      "record": false,
+      "reason": "load class",
+      "native": "FreeMapResources"
+     },
+     "WriteState": {
+      "record": false,
+      "reason": "a dump query, called from the harness only",
+      "native": "LosRadarWriteState"
+     },
+     "SightCache": {
+      "record": false,
+      "reason": "a query of a saved game, outside the tick",
+      "native": "LosRadarSightCache"
+     },
+     "RegionSize": {
+      "functions": [
+       "LosRadarRegionSize"
+      ],
+      "native": "LosRadarRegionSize"
+     },
+     "Init": {
+      "functions": [
+       "LosRadarInit"
+      ],
+      "native": "LosRadarInit"
+     },
+     "Shutdown": {
+      "functions": [
+       "LosRadarShutdown"
+      ],
+      "native": "LosRadarShutdown"
+     },
+     "GetMapCellAtPosition": {
+      "functions": [
+       "GetMapCellAtPosition"
+      ],
+      "args": {
+       "pos": {
+        "mode": "vec3",
+        "label": "pos"
+       }
+      },
+      "native": "GetMapCellAtPosition"
+     },
+     "GetOriginCellAtPosition": {
+      "functions": [
+       "GetOriginCellAtPosition"
+      ],
+      "args": {
+       "pos": {
+        "mode": "vec3",
+        "label": "pos"
+       }
+      },
+      "native": "GetOriginCellAtPosition"
+     },
+     "ClampWorldPosToTerrain": {
+      "functions": [
+       "ClampWorldPosToTerrain"
+      ],
+      "args": {
+       "out": {
+        "mode": "value",
+        "kind": "Vec3",
+        "dir": "out"
+       }
+      },
+      "native": "ClampWorldPosToTerrain"
+     },
+     "IsUnitVisibleToPlayer": {
+      "functions": [
+       "IsUnitVisibleToPlayer",
+       "IsVisible",
+       "IsVisibleByMask",
+       "IsExplored",
+       "IsPointVisible",
+       "IsSeen",
+       "InsideExplored"
+      ],
+      "native": "IsUnitVisibleToPlayer"
+     },
+     "UpdateUnitLineOfSight": {
+      "functions": [
+       "UpdateUnitLineOfSight",
+       "SightCellOf",
+       "SightFrameOf",
+       "UpdateLineOfSight",
+       "SightOf",
+       "AddLineOfSight",
+       "RemoveLineOfSight",
+       "RevealAroundUnit",
+       "ExploredCell",
+       "LosLine::GetLosLineStep",
+       "LosLine::GetLosLineStepCount",
+       "LosTable::GetLosLine",
+       "LosTable::GetLosLineCount",
+       "LosTables::GetLosTable",
+       "LosTables::GetLosTableCount",
+       "LodRaw"
+      ],
+      "native": "UpdateUnitLineOfSight"
+     },
+     "RecordRadarUnits": {
+      "functions": [
+       "RecordRadarUnits",
+       "CaptureUnit",
+       "Player_Get",
+       "RadarProjectileShown",
+       "RadarUnitShown",
+       "IsOnRadar",
+       "ExploredOnRadar",
+       "VisibleOnRadar"
+      ],
+      "native": "RecordRadarUnits"
+     },
+     "UpdateSensorRadarAndCloak": {
+      "functions": [
+       "UpdateSensorRadarAndCloak",
+       "Game::Current",
+       "IsExplored",
+       "IsSeen",
+       "InsideExplored",
+       "DetectionVisitor::MarkUnitsInRadarOrSonarRadius",
+       "RadarJamVisitor::ApplyRadarJamFlag",
+       "SonarJamVisitor::ApplySonarJamFlag",
+       "HasReadyUnitInRange",
+       "EntryOf"
+      ],
+      "through": {
+       "virtual DetectionVisitor::MarkUnitsInRadarOrSonarRadius": [
+        "DetectionVisitor::MarkUnitsInRadarOrSonarRadius"
+       ],
+       "virtual RadarJamVisitor::ApplyRadarJamFlag": [
+        "RadarJamVisitor::ApplyRadarJamFlag"
+       ],
+       "virtual SonarJamVisitor::ApplySonarJamFlag": [
+        "SonarJamVisitor::ApplySonarJamFlag"
+       ]
+      },
+      "native": "UpdateSensorRadarAndCloak"
+     },
+     "RecordRadarMapped": {
+      "functions": [
+       "RecordRadarMapped"
+      ],
+      "native": "RecordRadarMapped"
+     },
+     "ExpireEyeballs": {
+      "functions": [
+       "ExpireEyeballs",
+       "RemoveLineOfSight",
+       "ExploredCell",
+       "LosLine::GetLosLineStep",
+       "LosLine::GetLosLineStepCount",
+       "LosTable::GetLosLine",
+       "LosTable::GetLosLineCount",
+       "LosTables::GetLosTable",
+       "LosTables::GetLosTableCount"
+      ],
+      "native": "ExpireEyeballs"
+     },
+     "HasReadyUnitInRange": {
+      "functions": [
+       "HasReadyUnitInRange",
+       "EntryOf"
+      ],
+      "native": "HasReadyUnitInRange"
+     },
+     "IsPointVisible": {
+      "functions": [
+       "IsPointVisible"
+      ],
+      "args": {
+       "pos": {
+        "mode": "vec3",
+        "label": "pos"
+       }
+      },
+      "native": "IsPointVisible"
+     },
+     "CreateUnitIndex": {
+      "functions": [
+       "CreateUnitIndex",
+       "EnsureUnitIndex"
+      ],
+      "native": "CreateUnitIndex"
+     },
+     "FreeUnitIndex": {
+      "functions": [
+       "FreeUnitIndex",
+       "ReleaseUnits"
+      ],
+      "native": "FreeUnitIndex"
+     },
+     "RefreshUnitIndex": {
+      "functions": [
+       "RefreshUnitIndex",
+       "IsUnitVisibleToPlayer",
+       "Unit::PlayerIndex",
+       "Unit::Ready",
+       "IsVisible",
+       "IsVisibleByMask",
+       "IsExplored",
+       "IsPointVisible",
+       "IsSeen",
+       "InsideExplored"
+      ],
+      "native": "RefreshUnitIndex"
      }
-    }
+    },
+    "issue": 1044,
+    "region": {
+     "size": "RegionSize",
+     "init": "Init",
+     "shutdown": "Shutdown"
+    },
+    "imports": [
+     "network.BroadcastPlayerInfo",
+     "map.GetGroundHeight",
+     "map.UnitsInRange"
+    ]
    },
    "orders": {
     "status": "pending",
@@ -5075,7 +6308,18 @@
      },
      "UnitsInRange": {
       "record": false,
-      "reason": "#660 part 3"
+      "reason": "#660 part 3",
+      "args": {
+       "ids": {
+        "mode": "bytes-out",
+        "length": "capacity",
+        "elem": "u16",
+        "resultElem": "u16"
+       }
+      },
+      "result": {
+       "mode": "scalar"
+      }
      },
      "LoadMetalPlotmap": {
       "record": false,
@@ -7021,6 +8265,16 @@
   {"name": "Game.gravity", "base": "game", "size": 4, "kind": "i32"},
   {"name": "Game.localPlayer", "base": "game", "size": 1, "kind": "u8"},
   {"name": "Game.projectileCount", "base": "game", "size": 4, "kind": "i32"},
+  {"name": "Game.baseX", "base": "game", "size": 4, "kind": "i32"},
+  {"name": "Game.baseY", "base": "game", "size": 4, "kind": "i32"},
+  {"name": "Game.count_14277", "base": "game", "size": 4, "kind": "i32"},
+  {"name": "Game.numPlayers", "base": "game", "size": 2, "kind": "u16"},
+  {"name": "Game.flags_142f1", "base": "game", "size": 2, "kind": "u16"},
+  {"name": "Game.losTable", "base": "game", "size": 4, "kind": "ptr", "target": "FrameTable"},
+  {"name": "Game.grid1.width", "base": "game", "size": 4, "kind": "u32"},
+  {"name": "Game.grid1.height", "base": "game", "size": 4, "kind": "u32"},
+  {"name": "Game.grid1.count", "base": "game", "size": 4, "kind": "u32"},
+  {"name": "Game.grid1.cells", "base": "game", "size": 4, "kind": "array", "array": 2},
   {"name": "SimGlobals.g_meteorNextStrikeTime", "base": "sim", "size": 4, "kind": "i32"},
   {"name": "SimGlobals.g_meteorWeaponName", "base": "sim", "size": 32, "kind": "string"},
   {"name": "SimGlobals.g_meteorSpawnMagnitude", "base": "sim", "size": 4, "kind": "i32"},
@@ -7036,18 +8290,19 @@
   {"name": "SimGlobals.g_meteorScheduleGap", "base": "sim", "size": 4, "kind": "i32"},
   {"name": "SimGlobals.g_lastPlaceHeight", "base": "sim", "size": 4, "kind": "i32"},
   {"name": "SimGlobals.g_lastPlaceMetalSum", "base": "sim", "size": 4, "kind": "i32"},
+  {"name": "SimGlobals.g_losTables", "base": "sim", "size": 16, "kind": "vector", "vector": 1},
   {"name": "rng.main", "base": "rng", "size": 4, "kind": "u32"},
   {"name": "rng.load", "base": "rng", "size": 4, "kind": "u32"},
   {"name": "rng.seed", "base": "rng", "size": 4, "kind": "u32"},
-  {"name": "region", "base": "region", "size": 4, "kind": "array", "array": 2}
+  {"name": "region", "base": "region", "size": 4, "kind": "array", "array": 3}
  ],
  "objects": [
-  {"name": "Player", "type": "Player", "scope": "state", "table": {"base": "game", "member": "players", "count": 10}, "inside": null, "fields": [{"name": "active", "kind": "i32"}, {"name": "id", "kind": "u32"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "unitsBegin", "kind": "ref", "target": "Unit"}, {"name": "unitsEnd", "kind": "ref", "target": "Unit", "range_end_of": "unitsBegin"}, {"name": "energyIncome", "kind": "f32"}, {"name": "energyUsage", "kind": "f32"}, {"name": "energyCapacity", "kind": "f32"}, {"name": "metalIncome", "kind": "f32"}, {"name": "metalUsage", "kind": "f32"}, {"name": "metalCapacity", "kind": "f32"}, {"name": "totalEnergyProduced", "kind": "f64"}, {"name": "totalMetalProduced", "kind": "f64"}, {"name": "totalEnergyConsumed", "kind": "f64"}, {"name": "totalMetalConsumed", "kind": "f64"}, {"name": "energyWasted", "kind": "f64"}, {"name": "metalWasted", "kind": "f64"}, {"name": "energyStorageBonus", "kind": "f32"}, {"name": "metalStorageBonus", "kind": "f32"}, {"name": "shareMetal", "kind": "f32"}, {"name": "shareEnergy", "kind": "f32"}, {"name": "info", "kind": "ref", "target": "PlayerInfo"}, {"name": "flags", "kind": "u16"}, {"name": "type", "kind": "u8"}, {"name": "index", "kind": "u8"}, {"name": "unitCount", "kind": "u16"}, {"name": "unitsCreated", "kind": "i32"}, {"name": "allied", "kind": "bytes", "size": 11}, {"name": "exploredSize", "kind": "i32"}, {"name": "explored", "kind": "array", "elem": "u8", "ref": true, "length": "exploredSize", "array": 3}, {"name": "exploredWidth", "kind": "i32"}, {"name": "exploredHeight", "kind": "i32"}, {"name": "econ", "kind": "ref", "target": "UnitResources", "ctype": "UnitResources"}]},
-  {"name": "Unit", "type": "Unit", "scope": "state", "table": {"base": "game", "member": "units", "ref": true, "count": "poolCount", "alloc": 5001}, "inside": null, "fields": [{"name": "health", "kind": "i16"}, {"name": "buildLeft", "kind": "f32"}, {"name": "def", "kind": "ref", "target": "UnitDef"}, {"name": "player", "kind": "ref", "target": "Player"}, {"name": "flags", "kind": "flags", "aliases": ["Unit::cloakOn", "Unit::fireOrder"]}, {"name": "activateFlags", "kind": "u8"}, {"name": "workTime", "kind": "i32"}, {"name": "extraction", "kind": "f32"}, {"name": "cell", "kind": "point16", "aliases": ["UnitPassMapView::a"]}, {"name": "footprint", "kind": "point16", "aliases": ["UnitPassMapView::b"]}, {"name": "script", "kind": "ref", "target": "CobScript"}, {"name": "id", "kind": "u16", "aliases": ["UnitInfo::id"]}, {"name": "unitDefIndex", "kind": "u16"}, {"name": "killCount", "kind": "u16"}, {"name": "playerIndex", "kind": "u8"}, {"name": "netDirtyFlags", "kind": "i16", "aliases": ["<anon>::b12"]}, {"name": "owner", "kind": "ref", "target": "Player"}, {"name": "motion", "kind": "ref", "target": "UnitMotion", "aliases": ["UnitPassMapView::unit"]}, {"name": "posX", "kind": "i32", "member": "pos.x"}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Unit::yWhole"]}, {"name": "posZ", "kind": "i32", "member": "pos.z"}, {"name": "weapon0TargetX", "kind": "i16", "member": "weapons[0].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon0TargetZ", "kind": "i16", "member": "weapons[0].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon0Def", "kind": "weapon", "member": "weapons[0].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon0Flags", "kind": "u8", "member": "weapons[0].flags", "aliases": ["UnitWeaponSlot::flags", "<anon>::bit1", "<anon>::bit4"]}, {"name": "weapon0TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[0].aimTargetXOrUnitId", "when": {"field": "weapon0TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 57, "condValue": -32768, "condKind": "Unit"}, {"name": "weapon1TargetX", "kind": "i16", "member": "weapons[1].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon1TargetZ", "kind": "i16", "member": "weapons[1].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon1Def", "kind": "weapon", "member": "weapons[1].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon1Flags", "kind": "u8", "member": "weapons[1].flags", "aliases": ["UnitWeaponSlot::flags", "<anon>::bit1", "<anon>::bit4"]}, {"name": "weapon1TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[1].aimTargetXOrUnitId", "when": {"field": "weapon1TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 62, "condValue": -32768, "condKind": "Unit"}, {"name": "weapon2TargetX", "kind": "i16", "member": "weapons[2].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon2TargetZ", "kind": "i16", "member": "weapons[2].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon2Def", "kind": "weapon", "member": "weapons[2].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon2Flags", "kind": "u8", "member": "weapons[2].flags", "aliases": ["UnitWeaponSlot::flags", "<anon>::bit1", "<anon>::bit4"]}, {"name": "weapon2TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[2].aimTargetXOrUnitId", "when": {"field": "weapon2TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 67, "condValue": -32768, "condKind": "Unit"}, {"name": "cobStateFlags", "kind": "u8", "aliases": ["Unit::bit2"]}, {"name": "cargo", "kind": "ref", "target": "Unit"}, {"name": "cargoNext", "kind": "ref", "target": "Unit"}, {"name": "carrier", "kind": "ref", "target": "Unit"}, {"name": "spatialBucket", "kind": "ref", "target": "SpatialBucket"}, {"name": "transportPiece", "kind": "u8"}, {"name": "heading", "kind": "i16"}, {"name": "pitch", "kind": "i16"}, {"name": "attacker", "kind": "ref", "target": "Unit"}, {"name": "lastAttackerSlot", "kind": "u8"}, {"name": "lastDamageType", "kind": "u8"}, {"name": "list", "kind": "ref", "target": "Order"}, {"name": "weapon0ReloadTimer", "kind": "u16", "member": "weapons[0].reloadTimer", "aliases": ["UnitWeaponSlot::reloadTimer"]}, {"name": "weapon0FireHeading", "kind": "i16", "member": "weapons[0].fireHeading", "aliases": ["UnitWeaponSlot::fireHeading"]}, {"name": "weapon0FirePitch", "kind": "i16", "member": "weapons[0].firePitch", "aliases": ["UnitWeaponSlot::firePitch"]}, {"name": "weapon0Stockpile", "kind": "u8", "member": "weapons[0].stockpile", "aliases": ["UnitWeaponSlot::stockpile"]}, {"name": "weapon0MuzzleDelta", "kind": "i32", "member": "weapons[0].muzzleAimFromDeltaZ", "aliases": ["UnitWeaponSlot::muzzleAimFromDeltaZ"]}, {"name": "weapon1ReloadTimer", "kind": "u16", "member": "weapons[1].reloadTimer", "aliases": ["UnitWeaponSlot::reloadTimer"]}, {"name": "weapon1FireHeading", "kind": "i16", "member": "weapons[1].fireHeading", "aliases": ["UnitWeaponSlot::fireHeading"]}, {"name": "weapon1FirePitch", "kind": "i16", "member": "weapons[1].firePitch", "aliases": ["UnitWeaponSlot::firePitch"]}, {"name": "weapon1Stockpile", "kind": "u8", "member": "weapons[1].stockpile", "aliases": ["UnitWeaponSlot::stockpile"]}, {"name": "weapon1MuzzleDelta", "kind": "i32", "member": "weapons[1].muzzleAimFromDeltaZ", "aliases": ["UnitWeaponSlot::muzzleAimFromDeltaZ"]}, {"name": "weapon2ReloadTimer", "kind": "u16", "member": "weapons[2].reloadTimer", "aliases": ["UnitWeaponSlot::reloadTimer"]}, {"name": "weapon2FireHeading", "kind": "i16", "member": "weapons[2].fireHeading", "aliases": ["UnitWeaponSlot::fireHeading"]}, {"name": "weapon2FirePitch", "kind": "i16", "member": "weapons[2].firePitch", "aliases": ["UnitWeaponSlot::firePitch"]}, {"name": "weapon2Stockpile", "kind": "u8", "member": "weapons[2].stockpile", "aliases": ["UnitWeaponSlot::stockpile"]}, {"name": "weapon2MuzzleDelta", "kind": "i32", "member": "weapons[2].muzzleAimFromDeltaZ", "aliases": ["UnitWeaponSlot::muzzleAimFromDeltaZ"]}, {"name": "aimCob", "kind": "embeds", "count": 3, "target": "WeaponAimCobCb", "member": "weapons[].aimCob", "elems": 1}]},
-  {"name": "UnitDef", "type": "UnitDef", "scope": "state", "table": {"base": "game", "member": "defs", "ref": true, "count": "unitDefCount", "alloc": 1024}, "inside": null, "fields": [{"name": "energymake", "kind": "f32"}, {"name": "windgenerator", "kind": "f32"}, {"name": "tidalgenerator", "kind": "f32"}, {"name": "energyuse", "kind": "f32"}, {"name": "metalmake", "kind": "f32"}, {"name": "extractsMetal", "kind": "f32", "aliases": ["UnitDefMetalWindView::extractsMetal"]}, {"name": "cloakcost", "kind": "f32"}, {"name": "cloakcostmoving", "kind": "f32"}, {"name": "energystorage", "kind": "f32"}, {"name": "metalstorage", "kind": "f32"}, {"name": "makesMetal", "kind": "u8"}, {"name": "flags1", "kind": "flags"}, {"name": "range", "kind": "i16"}, {"name": "categories", "kind": "ref", "target": "UnitTypeSet"}, {"name": "weaponCategories0", "kind": "ref", "member": "weaponCategories[0]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories1", "kind": "ref", "member": "weaponCategories[1]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories2", "kind": "ref", "member": "weaponCategories[2]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "footprintx", "kind": "i16"}, {"name": "footprintz", "kind": "i16"}, {"name": "yardmap", "kind": "array", "elem": "u8", "ref": true, "length": "footprintx*footprintz", "array": 4}, {"name": "draft", "kind": "u8"}, {"name": "maxslope", "kind": "u8"}, {"name": "maxwaterslope", "kind": "u8"}, {"name": "maxwaterdepth", "kind": "i16"}, {"name": "minwaterdepth", "kind": "i16"}, {"name": "mobile", "kind": "u8"}, {"name": "damagemodifier", "kind": "i32"}, {"name": "maxHealth", "kind": "u32"}, {"name": "modelMaxYHigh", "kind": "i16"}, {"name": "weapons0", "kind": "weapon", "member": "weapons[0]", "aliases": ["UnitDef::weapons"]}, {"name": "weapons1", "kind": "weapon", "member": "weapons[1]", "aliases": ["UnitDef::weapons"]}, {"name": "weapons2", "kind": "weapon", "member": "weapons[2]", "aliases": ["UnitDef::weapons"]}]},
+  {"name": "Player", "type": "Player", "scope": "state", "table": {"base": "game", "member": "players", "count": 10}, "inside": null, "fields": [{"name": "active", "kind": "i32"}, {"name": "id", "kind": "u32"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "unitsBegin", "kind": "ref", "target": "Unit"}, {"name": "unitsEnd", "kind": "ref", "target": "Unit", "range_end_of": "unitsBegin"}, {"name": "energyIncome", "kind": "f32"}, {"name": "energyUsage", "kind": "f32"}, {"name": "energyCapacity", "kind": "f32"}, {"name": "metalIncome", "kind": "f32"}, {"name": "metalUsage", "kind": "f32"}, {"name": "metalCapacity", "kind": "f32"}, {"name": "totalEnergyProduced", "kind": "f64"}, {"name": "totalMetalProduced", "kind": "f64"}, {"name": "totalEnergyConsumed", "kind": "f64"}, {"name": "totalMetalConsumed", "kind": "f64"}, {"name": "energyWasted", "kind": "f64"}, {"name": "metalWasted", "kind": "f64"}, {"name": "energyStorageBonus", "kind": "f32"}, {"name": "metalStorageBonus", "kind": "f32"}, {"name": "shareMetal", "kind": "f32"}, {"name": "shareEnergy", "kind": "f32"}, {"name": "info", "kind": "ref", "target": "PlayerInfo"}, {"name": "flags", "kind": "u16"}, {"name": "type", "kind": "u8"}, {"name": "index", "kind": "u8"}, {"name": "unitCount", "kind": "u16"}, {"name": "unitsCreated", "kind": "i32"}, {"name": "allied", "kind": "bytes", "size": 11}, {"name": "exploredSize", "kind": "i32"}, {"name": "explored", "kind": "array", "elem": "u8", "ref": true, "length": "exploredSize", "array": 4}, {"name": "exploredWidth", "kind": "i32"}, {"name": "exploredHeight", "kind": "i32"}, {"name": "econ", "kind": "ref", "target": "UnitResources", "ctype": "UnitResources"}]},
+  {"name": "Unit", "type": "Unit", "scope": "state", "table": {"base": "game", "member": "units", "ref": true, "count": "poolCount", "alloc": 5001}, "inside": null, "fields": [{"name": "health", "kind": "i16"}, {"name": "buildLeft", "kind": "f32"}, {"name": "def", "kind": "ref", "target": "UnitDef"}, {"name": "player", "kind": "ref", "target": "Player"}, {"name": "flags", "kind": "flags", "aliases": ["Unit::cloakOn", "Unit::fireOrder"]}, {"name": "activateFlags", "kind": "u8"}, {"name": "workTime", "kind": "i32"}, {"name": "extraction", "kind": "f32"}, {"name": "cell", "kind": "point16", "aliases": ["UnitPassMapView::a"]}, {"name": "footprint", "kind": "point16", "aliases": ["UnitPassMapView::b"]}, {"name": "script", "kind": "ref", "target": "CobScript"}, {"name": "id", "kind": "u16", "aliases": ["UnitInfo::id"]}, {"name": "unitDefIndex", "kind": "u16"}, {"name": "killCount", "kind": "u16"}, {"name": "playerIndex", "kind": "u8"}, {"name": "netDirtyFlags", "kind": "i16", "aliases": ["<anon>::b12"]}, {"name": "owner", "kind": "ref", "target": "Player"}, {"name": "motion", "kind": "ref", "target": "UnitMotion", "aliases": ["UnitPassMapView::unit"]}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Unit::xWhole"]}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Unit::yWhole"]}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Unit::zWhole"]}, {"name": "weapon0TargetX", "kind": "i16", "member": "weapons[0].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon0TargetZ", "kind": "i16", "member": "weapons[0].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon0Def", "kind": "weapon", "member": "weapons[0].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon0Flags", "kind": "u8", "member": "weapons[0].flags", "aliases": ["UnitWeaponSlot::flags", "<anon>::bit1", "<anon>::bit4"]}, {"name": "weapon0TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[0].aimTargetXOrUnitId", "when": {"field": "weapon0TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 57, "condValue": -32768, "condKind": "Unit"}, {"name": "weapon1TargetX", "kind": "i16", "member": "weapons[1].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon1TargetZ", "kind": "i16", "member": "weapons[1].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon1Def", "kind": "weapon", "member": "weapons[1].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon1Flags", "kind": "u8", "member": "weapons[1].flags", "aliases": ["UnitWeaponSlot::flags", "<anon>::bit1", "<anon>::bit4"]}, {"name": "weapon1TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[1].aimTargetXOrUnitId", "when": {"field": "weapon1TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 62, "condValue": -32768, "condKind": "Unit"}, {"name": "weapon2TargetX", "kind": "i16", "member": "weapons[2].aimTargetXOrUnitId", "aliases": ["UnitWeaponSlot::aimTargetXOrUnitId", "AimTargetPair::a"]}, {"name": "weapon2TargetZ", "kind": "i16", "member": "weapons[2].aimTargetZOrUnitSentinel", "aliases": ["UnitWeaponSlot::aimTargetZOrUnitSentinel", "AimTargetPair::b"]}, {"name": "weapon2Def", "kind": "weapon", "member": "weapons[2].weapon", "aliases": ["UnitWeaponSlot::weapon"]}, {"name": "weapon2Flags", "kind": "u8", "member": "weapons[2].flags", "aliases": ["UnitWeaponSlot::flags", "<anon>::bit1", "<anon>::bit4"]}, {"name": "weapon2TargetUnit", "kind": "unitid", "target": "Unit", "member": "weapons[2].aimTargetXOrUnitId", "when": {"field": "weapon2TargetZ", "equals": -32768}, "reach": ["Unit.unitDefIndex", "Unit.motion", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "depth": 2, "reachFirst": 0, "reachCount": 5, "condField": 67, "condValue": -32768, "condKind": "Unit"}, {"name": "cobStateFlags", "kind": "u8", "aliases": ["Unit::bit2"]}, {"name": "cargo", "kind": "ref", "target": "Unit"}, {"name": "cargoNext", "kind": "ref", "target": "Unit"}, {"name": "carrier", "kind": "ref", "target": "Unit"}, {"name": "spatialBucket", "kind": "ref", "target": "SpatialBucket"}, {"name": "transportPiece", "kind": "u8"}, {"name": "heading", "kind": "i16"}, {"name": "pitch", "kind": "i16"}, {"name": "attacker", "kind": "ref", "target": "Unit"}, {"name": "lastAttackerSlot", "kind": "u8"}, {"name": "lastDamageType", "kind": "u8"}, {"name": "list", "kind": "ref", "target": "Order"}, {"name": "weapon0ReloadTimer", "kind": "u16", "member": "weapons[0].reloadTimer", "aliases": ["UnitWeaponSlot::reloadTimer"]}, {"name": "weapon0FireHeading", "kind": "i16", "member": "weapons[0].fireHeading", "aliases": ["UnitWeaponSlot::fireHeading"]}, {"name": "weapon0FirePitch", "kind": "i16", "member": "weapons[0].firePitch", "aliases": ["UnitWeaponSlot::firePitch"]}, {"name": "weapon0Stockpile", "kind": "u8", "member": "weapons[0].stockpile", "aliases": ["UnitWeaponSlot::stockpile"]}, {"name": "weapon0MuzzleDelta", "kind": "i32", "member": "weapons[0].muzzleAimFromDeltaZ", "aliases": ["UnitWeaponSlot::muzzleAimFromDeltaZ"]}, {"name": "weapon1ReloadTimer", "kind": "u16", "member": "weapons[1].reloadTimer", "aliases": ["UnitWeaponSlot::reloadTimer"]}, {"name": "weapon1FireHeading", "kind": "i16", "member": "weapons[1].fireHeading", "aliases": ["UnitWeaponSlot::fireHeading"]}, {"name": "weapon1FirePitch", "kind": "i16", "member": "weapons[1].firePitch", "aliases": ["UnitWeaponSlot::firePitch"]}, {"name": "weapon1Stockpile", "kind": "u8", "member": "weapons[1].stockpile", "aliases": ["UnitWeaponSlot::stockpile"]}, {"name": "weapon1MuzzleDelta", "kind": "i32", "member": "weapons[1].muzzleAimFromDeltaZ", "aliases": ["UnitWeaponSlot::muzzleAimFromDeltaZ"]}, {"name": "weapon2ReloadTimer", "kind": "u16", "member": "weapons[2].reloadTimer", "aliases": ["UnitWeaponSlot::reloadTimer"]}, {"name": "weapon2FireHeading", "kind": "i16", "member": "weapons[2].fireHeading", "aliases": ["UnitWeaponSlot::fireHeading"]}, {"name": "weapon2FirePitch", "kind": "i16", "member": "weapons[2].firePitch", "aliases": ["UnitWeaponSlot::firePitch"]}, {"name": "weapon2Stockpile", "kind": "u8", "member": "weapons[2].stockpile", "aliases": ["UnitWeaponSlot::stockpile"]}, {"name": "weapon2MuzzleDelta", "kind": "i32", "member": "weapons[2].muzzleAimFromDeltaZ", "aliases": ["UnitWeaponSlot::muzzleAimFromDeltaZ"]}, {"name": "aimCob", "kind": "embeds", "count": 3, "target": "WeaponAimCobCb", "member": "weapons[].aimCob", "elems": 1}, {"name": "recentlyDamagedTimer", "kind": "u8"}]},
+  {"name": "UnitDef", "type": "UnitDef", "scope": "state", "table": {"base": "game", "member": "defs", "ref": true, "count": "unitDefCount", "alloc": 1024}, "inside": null, "fields": [{"name": "energymake", "kind": "f32"}, {"name": "windgenerator", "kind": "f32"}, {"name": "tidalgenerator", "kind": "f32"}, {"name": "energyuse", "kind": "f32"}, {"name": "metalmake", "kind": "f32"}, {"name": "extractsMetal", "kind": "f32", "aliases": ["UnitDefMetalWindView::extractsMetal"]}, {"name": "cloakcost", "kind": "f32"}, {"name": "cloakcostmoving", "kind": "f32"}, {"name": "energystorage", "kind": "f32"}, {"name": "metalstorage", "kind": "f32"}, {"name": "makesMetal", "kind": "u8"}, {"name": "flags1", "kind": "flags", "aliases": ["InterceptorDefFlags::bit29", "UnitDefDetectionFlags::bit8"]}, {"name": "range", "kind": "i16"}, {"name": "categories", "kind": "ref", "target": "UnitTypeSet"}, {"name": "weaponCategories0", "kind": "ref", "member": "weaponCategories[0]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories1", "kind": "ref", "member": "weaponCategories[1]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "weaponCategories2", "kind": "ref", "member": "weaponCategories[2]", "target": "UnitTypeSet", "aliases": ["UnitDef::weaponCategories"]}, {"name": "footprintx", "kind": "i16"}, {"name": "footprintz", "kind": "i16"}, {"name": "yardmap", "kind": "array", "elem": "u8", "ref": true, "length": "footprintx*footprintz", "array": 5}, {"name": "draft", "kind": "u8"}, {"name": "maxslope", "kind": "u8"}, {"name": "maxwaterslope", "kind": "u8"}, {"name": "maxwaterdepth", "kind": "i16"}, {"name": "minwaterdepth", "kind": "i16"}, {"name": "mobile", "kind": "u8"}, {"name": "damagemodifier", "kind": "i32"}, {"name": "maxHealth", "kind": "u32"}, {"name": "modelMaxYHigh", "kind": "i16"}, {"name": "weapons0", "kind": "weapon", "member": "weapons[0]", "aliases": ["UnitDef::weapons"]}, {"name": "weapons1", "kind": "weapon", "member": "weapons[1]", "aliases": ["UnitDef::weapons"]}, {"name": "weapons2", "kind": "weapon", "member": "weapons[2]", "aliases": ["UnitDef::weapons"]}, {"name": "flags2", "kind": "flags", "aliases": ["RadarUnitDefView::flags2"]}, {"name": "modelMaxY", "kind": "i32"}, {"name": "modelMinX", "kind": "i32"}, {"name": "modelMinZ", "kind": "i32"}, {"name": "modelSizeX", "kind": "i32"}, {"name": "modelSizeY", "kind": "i32"}, {"name": "modelSizeZ", "kind": "i32"}, {"name": "radardistance", "kind": "i16", "aliases": ["RadarUnitDefView::radardistance"]}, {"name": "sonardistance", "kind": "i16", "aliases": ["RadarUnitDefView::sonardistance"]}, {"name": "mincloakdistance", "kind": "i16"}, {"name": "radardistancejam", "kind": "i16", "aliases": ["RadarUnitDefView::radardistancejam"]}, {"name": "sonardistancejam", "kind": "i16", "aliases": ["RadarUnitDefView::sonardistancejam"]}]},
   {"name": "weapondef", "type": "WeaponDef", "scope": "index", "table": null, "inside": null, "fields": [{"name": "flags", "kind": "flags", "member": "flags.value", "aliases": ["WeaponDefTargetView::field_111", "<anon>::ballistic", "<anon>::burnBlow", "<anon>::commandFire", "<anon>::interceptor", "<anon>::lineOfSight", "<anon>::noAutoRange", "<anon>::selfProp", "<anon>::startSmoke", "<anon>::stockpile", "<anon>::targetable", "<anon>::toAirWeapon", "<anon>::turret", "<anon>::vLaunch", "<anon>::waterWeapon"]}, {"name": "speed", "kind": "i32", "aliases": ["WeaponDefTargetView::radius"]}, {"name": "acceleration", "kind": "i32"}, {"name": "accuracy", "kind": "i16"}, {"name": "burst", "kind": "u16"}, {"name": "coverage", "kind": "i32"}, {"name": "energyPerShot", "kind": "f32"}, {"name": "metalPerShot", "kind": "f32"}, {"name": "pitch", "kind": "f32", "aliases": ["WeaponDef::field_c8"]}, {"name": "index", "kind": "u8"}, {"name": "lifetime", "kind": "u16"}, {"name": "pitchTolerance", "kind": "u16"}, {"name": "range", "kind": "i32"}, {"name": "reloadTime", "kind": "u16"}, {"name": "sound", "kind": "u16"}, {"name": "startSpeed", "kind": "i32"}, {"name": "tolerance", "kind": "u16"}]},
   {"name": "MeteorShowerParams", "type": "MeteorShowerParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "weapon", "kind": "string", "size": 32}, {"name": "radius", "kind": "i32"}, {"name": "density", "kind": "f32"}, {"name": "duration", "kind": "f32"}, {"name": "interval", "kind": "f32"}]},
-  {"name": "PlayerInfo", "type": "PlayerInfo", "scope": "state", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "u8"}, {"name": "flags_97_wide", "kind": "u16", "aliases": ["PlayerInfo::shareMetal", "PlayerInfo::shareEnergy", "PlayerInfo::shareMapping"]}]},
+  {"name": "PlayerInfo", "type": "PlayerInfo", "scope": "state", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "u8"}, {"name": "flags_97_wide", "kind": "u16", "aliases": ["PlayerInfo::shareMetal", "PlayerInfo::shareEnergy", "PlayerInfo::shareMapping", "PlayerInfo::flags_97", "PlayerInfo::shareRadar"]}, {"name": "color", "kind": "u8"}, {"name": "flags", "kind": "u16", "aliases": ["PlayerInfo::flags_9b"]}]},
   {"name": "SpatialBucket", "type": "SpatialBucket", "scope": "state", "table": {"base": "game", "member": "cells_1429f", "ref": true, "count": "width_142a3*height_142a7"}, "inside": null, "delta": true, "fields": [{"name": "head", "kind": "ref", "target": "Unit", "aliases": ["UnitBucket::first"]}]},
   {"name": "OverflowBucket", "type": "SpatialBucket", "scope": "state", "table": null, "inside": null, "fields": [{"name": "head", "kind": "ref", "target": "Unit", "aliases": ["UnitBucket::first"]}]},
   {"name": "Cell", "type": "Cell", "scope": "state", "table": {"base": "game", "member": "cells", "ref": true, "count": "width*height"}, "inside": null, "delta": true, "fields": [{"name": "metal", "kind": "u8"}, {"name": "unit", "kind": "u16"}, {"name": "unit2", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "high", "kind": "u8"}, {"name": "low", "kind": "u8"}, {"name": "feature", "kind": "u16"}, {"name": "offsetY", "kind": "u8"}, {"name": "offsetX", "kind": "u8"}, {"name": "flags", "kind": "u8"}, {"name": "occupant", "kind": "unitid", "target": "Unit", "member": "unit", "reach": ["Unit.flags", "Unit.player", "Player.active", "Player.type", "Unit.motion", "UnitMotion.pathLockStamp"], "depth": 2, "reachFirst": 5, "reachCount": 6}, {"name": "occupant2", "kind": "unitid", "target": "Unit", "member": "unit2", "reach": ["Unit.flags", "Unit.player", "Player.active", "Player.type", "Unit.motion", "UnitMotion.pathLockStamp"], "depth": 2, "reachFirst": 5, "reachCount": 6}]},
@@ -7057,7 +8312,7 @@
   {"name": "UnitTypeSet", "type": "UnitTypeSet", "scope": "state", "table": null, "inside": null, "fields": [{"name": "bits", "kind": "bytes", "size": 64}]},
   {"name": "Projectile", "type": "Projectile", "scope": "state", "table": {"base": "game", "member": "projectiles", "ref": true, "count": 300, "alloc": 300}, "inside": null, "fields": [{"name": "speed", "kind": "i32"}, {"name": "spawnTick", "kind": "i32"}, {"name": "attacker", "kind": "ref", "target": "Unit"}, {"name": "active", "kind": "i16"}, {"name": "owner", "kind": "u8"}, {"name": "type", "kind": "weapon"}, {"name": "positionX", "kind": "i32", "member": "position.x", "aliases": ["Projectile::position"]}, {"name": "positionY", "kind": "i32", "member": "position.y", "aliases": ["Projectile::position"]}, {"name": "positionZ", "kind": "i32", "member": "position.z", "aliases": ["Projectile::position"]}, {"name": "startX", "kind": "i32", "member": "start.x", "aliases": ["Projectile::start"]}, {"name": "startY", "kind": "i32", "member": "start.y", "aliases": ["Projectile::start"]}, {"name": "startZ", "kind": "i32", "member": "start.z", "aliases": ["Projectile::start"]}, {"name": "directionX", "kind": "i32", "member": "direction.x", "aliases": ["Projectile::direction"]}, {"name": "directionY", "kind": "i32", "member": "direction.y", "aliases": ["Projectile::direction"]}, {"name": "directionZ", "kind": "i32", "member": "direction.z", "aliases": ["Projectile::direction"]}, {"name": "targetX", "kind": "i32", "member": "target.x", "aliases": ["Projectile::target"]}, {"name": "targetY", "kind": "i32", "member": "target.y", "aliases": ["Projectile::target"]}, {"name": "targetZ", "kind": "i32", "member": "target.z", "aliases": ["Projectile::target"]}, {"name": "anglesHeading", "kind": "u16", "member": "angles.heading", "aliases": ["Angles16::heading"]}, {"name": "anglesPitch", "kind": "i16", "member": "angles.pitch", "aliases": ["Angles16::pitch"]}, {"name": "range", "kind": "u32"}, {"name": "time", "kind": "i32"}, {"name": "nextSmokeTick", "kind": "i32"}, {"name": "targetUnit", "kind": "ref", "target": "Unit", "member": "targetUnitPtr", "aliases": ["Projectile::targetUnit", "Projectile::targetUnitPtr"]}, {"name": "interceptedProjectile", "kind": "ref", "target": "Projectile"}, {"name": "piece", "kind": "u16"}, {"name": "flags", "kind": "u16"}]},
   {"name": "MovementClass", "type": "MovementClass", "scope": "state", "table": {"base": "sim", "member": "g_movementClasses.entries", "count": 32}, "inside": null, "fields": [{"name": "footprintX", "kind": "i16"}, {"name": "maxSlope", "kind": "u8"}, {"name": "name", "kind": "ptr", "target": "alloc", "aliases": []}, {"name": "footprintZ", "kind": "i16"}, {"name": "maxWaterDepth", "kind": "i16"}, {"name": "minWaterDepth", "kind": "i16"}, {"name": "badSlope", "kind": "u8"}, {"name": "maxWaterSlope", "kind": "u8"}, {"name": "badWaterSlope", "kind": "u8"}]},
-  {"name": "PassMap", "type": "PassMap", "scope": "state", "table": {"base": "sim", "member": "g_passMaps.entries", "count": 32}, "inside": null, "fields": [{"name": "footprintX", "kind": "i16"}, {"name": "footprintZ", "kind": "i16"}, {"name": "maxWaterDepth", "kind": "i16"}, {"name": "minWaterDepth", "kind": "i16"}, {"name": "maxSlope", "kind": "u8"}, {"name": "badSlope", "kind": "u8"}, {"name": "maxWaterSlope", "kind": "u8"}, {"name": "badWaterSlope", "kind": "u8"}, {"name": "defined", "kind": "i32"}, {"name": "width", "kind": "u32"}, {"name": "height", "kind": "u32"}, {"name": "cells", "kind": "array", "elem": "u32", "ref": true, "length": "width*(height+15>>4)", "array": 5}, {"name": "lastTick", "kind": "u32"}]},
+  {"name": "PassMap", "type": "PassMap", "scope": "state", "table": {"base": "sim", "member": "g_passMaps.entries", "count": 32}, "inside": null, "fields": [{"name": "footprintX", "kind": "i16"}, {"name": "footprintZ", "kind": "i16"}, {"name": "maxWaterDepth", "kind": "i16"}, {"name": "minWaterDepth", "kind": "i16"}, {"name": "maxSlope", "kind": "u8"}, {"name": "badSlope", "kind": "u8"}, {"name": "maxWaterSlope", "kind": "u8"}, {"name": "badWaterSlope", "kind": "u8"}, {"name": "defined", "kind": "i32"}, {"name": "width", "kind": "u32"}, {"name": "height", "kind": "u32"}, {"name": "cells", "kind": "array", "elem": "u32", "ref": true, "length": "width*(height+15>>4)", "array": 6}, {"name": "lastTick", "kind": "u32"}]},
   {"name": "MapMoveLimits", "type": "MapMoveLimits", "scope": "value", "table": null, "inside": null, "fields": [{"name": "index", "kind": "i32"}, {"name": "footprintX", "kind": "i16"}, {"name": "footprintZ", "kind": "i16"}, {"name": "maxWaterDepth", "kind": "i16"}, {"name": "minWaterDepth", "kind": "i16"}, {"name": "maxSlope", "kind": "u8"}, {"name": "badSlope", "kind": "u8"}, {"name": "maxWaterSlope", "kind": "u8"}, {"name": "badWaterSlope", "kind": "u8"}]},
   {"name": "Point16", "type": "Point16", "scope": "value", "table": null, "inside": null, "fields": [{"name": "x", "kind": "i16"}, {"name": "y", "kind": "i16"}]},
   {"name": "MissionType", "type": "MissionType", "scope": "value", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u8"}]},
@@ -7069,15 +8324,15 @@
   {"name": "Order", "type": "Order", "scope": "state", "table": null, "inside": null, "fields": [{"name": "state", "kind": "u8"}, {"name": "attached", "kind": "ref", "target": "OrderFx", "poly": "OrderFx"}, {"name": "next", "kind": "ref", "target": "Order"}, {"name": "kind", "kind": "u8", "member": "kind.index"}, {"name": "ticks", "kind": "i32"}]},
   {"name": "OrderTableEntry", "type": "OrderTableEntry", "scope": "state", "table": null, "inside": null, "fields": [{"name": "notify", "kind": "code", "table": "orderNotify", "codeTable": 0}, {"name": "markerAnim", "kind": "u8"}, {"name": "flags", "kind": "u32"}]},
   {"name": "KeyedCell", "type": "KeyedCell", "scope": "value", "table": null, "inside": null, "fields": [{"name": "pos", "kind": "point16"}, {"name": "key", "kind": "f32"}]},
-  {"name": "PlayerAI", "type": "PlayerAI", "scope": "state", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u8"}, {"name": "cells", "kind": "vector", "elem": {"mode": "value", "kind": "KeyedCell"}, "vector": 1}, {"name": "counts", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}, "vector": 2}]},
+  {"name": "PlayerAI", "type": "PlayerAI", "scope": "state", "table": null, "inside": null, "fields": [{"name": "index", "kind": "u8"}, {"name": "cells", "kind": "vector", "elem": {"mode": "value", "kind": "KeyedCell"}, "vector": 2}, {"name": "counts", "kind": "vector", "elem": {"mode": "scalar", "type": "short"}, "vector": 3}]},
   {"name": "alloc", "type": "char", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "Gaf", "type": "char", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "FrameTable", "type": "FrameTable", "scope": "state", "table": null, "inside": null, "fields": [{"name": "count", "kind": "u16"}]},
   {"name": "GafFrame", "type": "GafFrame", "scope": "state", "table": null, "inside": null, "fields": [{"name": "width", "kind": "u16"}, {"name": "height", "kind": "u16"}, {"name": "xOffset", "kind": "i16"}, {"name": "yOffset", "kind": "i16"}, {"name": "transparency", "kind": "u8"}]},
   {"name": "Object3do", "type": "Object3do", "scope": "state", "table": null, "inside": null, "fields": [{"name": "vertexCount", "kind": "i32"}, {"name": "box_x", "kind": "i32"}, {"name": "box_y", "kind": "i32"}, {"name": "box_z", "kind": "i32"}]},
   {"name": "Handle", "type": "Handle", "scope": "state", "table": null, "inside": [{"kind": "Feature", "member": "anim"}, {"kind": "Feature", "member": "shadowAnim"}, {"kind": "Spot", "member": "anim"}, {"kind": "Spot", "member": "shadow"}], "fields": [{"name": "index", "kind": "u16", "aliases": ["Spot::frame"]}, {"name": "value", "kind": "u16"}, {"name": "kind", "kind": "u8"}, {"name": "src", "kind": "ptr", "target": "FrameTable", "aliases": ["Spot::animIndex"]}]},
-  {"name": "Feature", "type": "Feature", "scope": "state", "table": {"base": "game", "member": "features", "ref": true, "count": "featureCount", "alloc": 2048}, "inside": null, "fields": [{"name": "name", "kind": "string", "size": 128}, {"name": "description", "kind": "string", "size": 20}, {"name": "footprint", "kind": "point16", "aliases": ["Feature::footprintX", "Feature::footprintZ"]}, {"name": "object", "kind": "ptr", "target": "Object3do", "when": {"field": "flags16", "mask": 1, "equals": 0}, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "filename", "kind": "string", "size": 16, "when": {"field": "flags16", "mask": 1, "equals": 1}, "condMask": 1, "condField": 310, "condValue": 1, "condKind": "Feature"}, {"name": "anims", "kind": "ptr", "target": "Gaf"}, {"name": "seq", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::animTable"]}, {"name": "seqshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::shadowTable"]}, {"name": "seqburn", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqburnshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqdie", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqdieshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamate", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamateshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "anim", "kind": "embed", "target": "Handle"}, {"name": "shadowAnim", "kind": "embed", "target": "Handle"}, {"name": "burnweapon", "kind": "weapon"}, {"name": "burnTime", "kind": "u16"}, {"name": "damage", "kind": "u16"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "dead", "kind": "u16"}, {"name": "burnt", "kind": "u16"}, {"name": "reclamate", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "spreadChance", "kind": "u8"}, {"name": "seedChance", "kind": "u8"}, {"name": "seedSpread", "kind": "u8"}, {"name": "flags16", "kind": "u16", "aliases": ["Feature::flags", "Feature::flagsHigh", "Feature::lowBits", "Feature::steep", "Feature::drawn", "Feature::over", "Feature::flipAnim", "Feature::flipShadow", "Feature::unknown_bits", "Feature::noobject", "Feature::animating", "Feature::animtrans", "Feature::shadtrans", "Feature::flamable", "Feature::geothermal", "Feature::blocking", "Feature::reclaimable", "Feature::autoreclaimable", "Feature::indestructible", "Feature::nodisplayinfo", "Feature::nodrawundergray", "Feature::bits12"]}]},
-  {"name": "Spot", "type": "Spot", "scope": "state", "table": {"base": "game", "member": "spots", "ref": true, "count": 2048, "alloc": 2048}, "inside": null, "fields": [{"name": "prev", "kind": "i16"}, {"name": "next", "kind": "i16"}, {"name": "anim", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::anim"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 1, "condKind": "Feature"}, {"name": "shadow", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::shadow"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 1, "condKind": "Feature"}, {"name": "state", "kind": "ref", "target": "ModelState", "aliases": ["FeatureSpot::state"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 325, "condMask": 1, "condField": 310, "condValue": 0, "condKind": "Feature"}, {"name": "rot", "kind": "bytes", "size": 6, "aliases": ["FeatureSpot::rot"]}, {"name": "damage", "kind": "u16"}, {"name": "cell", "kind": "point16", "aliases": ["Spot::x", "Spot::z", "FeatureSite::x", "FeatureSite::y"]}, {"name": "feature", "kind": "u16", "aliases": ["FeatureSite::entry"]}, {"name": "timer", "kind": "u8", "aliases": ["Spot::burnTime", "Spot::animBits", "Spot::animHi", "Spot::animLo"]}, {"name": "flags", "kind": "u8", "aliases": ["Spot::used", "Spot::reclaimed", "Spot::hasShadow", "Spot::noSend", "Spot::bit4", "Spot::bits5", "FeatureSpot::spotFlags"]}]},
+  {"name": "Feature", "type": "Feature", "scope": "state", "table": {"base": "game", "member": "features", "ref": true, "count": "featureCount", "alloc": 2048}, "inside": null, "fields": [{"name": "name", "kind": "string", "size": 128}, {"name": "description", "kind": "string", "size": 20}, {"name": "footprint", "kind": "point16", "aliases": ["Feature::footprintX", "Feature::footprintZ"]}, {"name": "object", "kind": "ptr", "target": "Object3do", "when": {"field": "flags16", "mask": 1, "equals": 0}, "condMask": 1, "condField": 325, "condValue": 0, "condKind": "Feature"}, {"name": "filename", "kind": "string", "size": 16, "when": {"field": "flags16", "mask": 1, "equals": 1}, "condMask": 1, "condField": 325, "condValue": 1, "condKind": "Feature"}, {"name": "anims", "kind": "ptr", "target": "Gaf"}, {"name": "seq", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::animTable"]}, {"name": "seqshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::shadowTable"]}, {"name": "seqburn", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqburnshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::burn", "Feature::animIds"]}, {"name": "seqdie", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqdieshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamate", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "seqreclamateshad", "kind": "ptr", "target": "FrameTable", "aliases": ["Feature::death", "Feature::animIds"]}, {"name": "anim", "kind": "embed", "target": "Handle"}, {"name": "shadowAnim", "kind": "embed", "target": "Handle"}, {"name": "burnweapon", "kind": "weapon"}, {"name": "burnTime", "kind": "u16"}, {"name": "damage", "kind": "u16"}, {"name": "energy", "kind": "f32"}, {"name": "metal", "kind": "f32"}, {"name": "dead", "kind": "u16"}, {"name": "burnt", "kind": "u16"}, {"name": "reclamate", "kind": "u16"}, {"name": "height", "kind": "u8"}, {"name": "spreadChance", "kind": "u8"}, {"name": "seedChance", "kind": "u8"}, {"name": "seedSpread", "kind": "u8"}, {"name": "flags16", "kind": "u16", "aliases": ["Feature::flags", "Feature::flagsHigh", "Feature::lowBits", "Feature::steep", "Feature::drawn", "Feature::over", "Feature::flipAnim", "Feature::flipShadow", "Feature::unknown_bits", "Feature::noobject", "Feature::animating", "Feature::animtrans", "Feature::shadtrans", "Feature::flamable", "Feature::geothermal", "Feature::blocking", "Feature::reclaimable", "Feature::autoreclaimable", "Feature::indestructible", "Feature::nodisplayinfo", "Feature::nodrawundergray", "Feature::bits12"]}]},
+  {"name": "Spot", "type": "Spot", "scope": "state", "table": {"base": "game", "member": "spots", "ref": true, "count": 2048, "alloc": 2048}, "inside": null, "fields": [{"name": "prev", "kind": "i16"}, {"name": "next", "kind": "i16"}, {"name": "anim", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::anim"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 1, "condKind": "Feature"}, {"name": "shadow", "kind": "embed", "target": "Handle", "aliases": ["FeatureSpot::shadow"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 1}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 1, "condKind": "Feature"}, {"name": "state", "kind": "ref", "target": "ModelState", "aliases": ["FeatureSpot::state"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 0, "condKind": "Feature"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 0, "condKind": "Feature"}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 0, "condKind": "Feature"}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Spot::pos", "Spot::pos2", "FeatureSpot::pos"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 0, "condKind": "Feature"}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 0, "condKind": "Feature"}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 0, "condKind": "Feature"}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Spot::vel", "FeatureSpot::vel"], "when": {"via": "feature", "kind": "Feature", "field": "flags16", "mask": 1, "equals": 0}, "condVia": 340, "condMask": 1, "condField": 325, "condValue": 0, "condKind": "Feature"}, {"name": "rot", "kind": "bytes", "size": 6, "aliases": ["FeatureSpot::rot"]}, {"name": "damage", "kind": "u16"}, {"name": "cell", "kind": "point16", "aliases": ["Spot::x", "Spot::z", "FeatureSite::x", "FeatureSite::y"]}, {"name": "feature", "kind": "u16", "aliases": ["FeatureSite::entry"]}, {"name": "timer", "kind": "u8", "aliases": ["Spot::burnTime", "Spot::animBits", "Spot::animHi", "Spot::animLo"]}, {"name": "flags", "kind": "u8", "aliases": ["Spot::used", "Spot::reclaimed", "Spot::hasShadow", "Spot::noSend", "Spot::bit4", "Spot::bits5", "FeatureSpot::spotFlags"]}]},
   {"name": "Pool", "type": "Pool", "scope": "state", "table": {"base": "game", "member": "pool", "count": 1}, "inside": null, "fields": [{"name": "entries", "kind": "ref", "target": "Spot"}, {"name": "featureUnit", "kind": "ref", "target": "alloc"}, {"name": "usedHead", "kind": "i32"}, {"name": "restHead", "kind": "i32"}, {"name": "freeHead", "kind": "i32"}]},
   {"name": "ModelState", "type": "ModelState", "scope": "state", "table": null, "inside": null, "fields": []},
   {"name": "Mission", "type": "Mission", "scope": "state", "table": null, "inside": null, "fields": []},
@@ -7091,6 +8346,10 @@
   {"name": "LosRadarMapInfo", "type": "LosRadarMapInfo", "scope": "value", "table": null, "inside": null, "fields": [{"name": "unitSlots", "kind": "i32"}]},
   {"name": "EconAccount", "type": "EconAccount", "scope": "value", "table": null, "inside": null, "fields": [{"name": "energyMake", "kind": "f32", "member": "energy.make"}, {"name": "energyUse", "kind": "f32", "member": "energy.use"}, {"name": "energyUsepaid", "kind": "f32", "member": "energy.usePaid"}, {"name": "energyStall", "kind": "f32", "member": "energy.stall"}, {"name": "energyMakeprev", "kind": "f32", "member": "energy.makePrev"}, {"name": "energyUseprev", "kind": "f32", "member": "energy.usePrev"}, {"name": "metalMake", "kind": "f32", "member": "metal.make"}, {"name": "metalUse", "kind": "f32", "member": "metal.use"}, {"name": "metalUsepaid", "kind": "f32", "member": "metal.usePaid"}, {"name": "metalStall", "kind": "f32", "member": "metal.stall"}, {"name": "metalMakeprev", "kind": "f32", "member": "metal.makePrev"}, {"name": "metalUseprev", "kind": "f32", "member": "metal.usePrev"}]},
   {"name": "UnitResources", "type": "UnitResources", "scope": "state", "table": null, "inside": null, "fields": [{"name": "energyMake", "kind": "f32"}, {"name": "energyUse", "kind": "f32"}, {"name": "energyUsePaid", "kind": "f32"}, {"name": "energyStall", "kind": "f32"}, {"name": "energyMakePrev", "kind": "f32"}, {"name": "energyUsePrev", "kind": "f32"}, {"name": "metalMake", "kind": "f32"}, {"name": "metalUse", "kind": "f32"}, {"name": "metalUsePaid", "kind": "f32"}, {"name": "metalStall", "kind": "f32"}, {"name": "metalMakePrev", "kind": "f32"}, {"name": "metalUsePrev", "kind": "f32"}, {"name": "player", "kind": "ref", "target": "Player"}]},
+  {"name": "Eye", "type": "Eye", "scope": "state", "table": {"base": "game", "member": "eyes", "ref": true, "count": "count_14277", "capacity": 20}, "inside": null, "fields": [{"name": "player", "kind": "ref", "target": "Player", "ctype": "char"}, {"name": "screen", "kind": "self", "member": "screenPos", "selfspec": 1}, {"name": "x", "kind": "i16"}, {"name": "flagA", "kind": "u8"}, {"name": "flagB", "kind": "u8"}, {"name": "flagPtr", "kind": "self", "member": "flagB", "selfspec": 2}, {"name": "posX", "kind": "i32", "member": "pos.x"}, {"name": "posY", "kind": "i32", "member": "pos.y"}, {"name": "posZ", "kind": "i32", "member": "pos.z"}, {"name": "expires", "kind": "u32"}, {"name": "screenPos", "kind": "point16"}]},
+  {"name": "LosStep", "type": "LosStep", "scope": "value", "table": null, "inside": null, "fields": [{"name": "a", "kind": "u16"}, {"name": "b", "kind": "u16"}]},
+  {"name": "LosLine", "type": "LosLine", "scope": "value", "table": null, "inside": null, "fields": [{"name": "steps", "kind": "vector", "base": true, "elem": {"mode": "value", "kind": "LosStep"}, "vector": 4}]},
+  {"name": "LosTable", "type": "LosTable", "scope": "value", "table": null, "inside": null, "fields": [{"name": "lines", "kind": "vector", "base": true, "elem": {"mode": "value", "kind": "LosLine"}, "vector": 5}]},
   {"name": "WindMeteorsEventHeader", "type": "WindMeteorsEventHeader", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32"}]},
   {"name": "WindMeteorsParams", "type": "WindMeteorsParams", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "weapon", "kind": "string", "size": 32, "member": "params.weapon"}, {"name": "radius", "kind": "i32", "member": "params.radius"}, {"name": "density", "kind": "f32", "member": "params.density"}, {"name": "duration", "kind": "f32", "member": "params.duration"}, {"name": "interval", "kind": "f32", "member": "params.interval"}]},
   {"name": "WindMeteorsLimits", "type": "WindMeteorsLimits", "scope": "value", "table": null, "inside": null, "fields": [{"name": "kind", "kind": "i32", "member": "h.kind"}, {"name": "min", "kind": "i32"}, {"name": "max", "kind": "i32"}]},
@@ -7329,35 +8588,28 @@
    }
   },
   "los_radar": {
-   "header": {"interface": "interfaces/los_radar.h", "struct": "LosRadarSeam", "version": [5, 0], "status": "pending", "imports": [], "unrecorded": {"GetSeenUnitsInRadius": {"reason": "called only by ai, which is not replayed; no recorded slot answers it", "native": "GetSeenUnitsInRadius"}, "LoadMappingData": {"reason": "#660 part 3", "native": "LoadMappingData"}, "SaveMappingData": {"reason": "#660 part 3", "native": "SaveMappingData"}}, "pending": {"untracked": 35, "ruleless": 22, "unresolvedSlots": ["InitRadar", "FreeRadar", "RegionSize", "Init", "Shutdown", "SightCache", "WriteState"], "unannotatedArgs": ["GetMapCellAtPosition(pos)", "GetOriginCellAtPosition(pos)", "ClampWorldPosToTerrain(out)", "IsPointVisible(pos)", "Init(region)", "Shutdown result", "SightCache(out)", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/los_radar.h", "struct": "LosRadarSeam", "version": [5, 0], "status": "complete", "imports": ["network.BroadcastPlayerInfo", "map.GetGroundHeight", "map.UnitsInRange"], "region": {"size": "RegionSize", "init": "Init", "shutdown": "Shutdown"}, "issue": 1044, "unrecorded": {"LoadTntMap": {"reason": "load class", "native": "LoadTntMap"}, "InitRadar": {"reason": "load class", "native": "InitRadar"}, "FreeRadar": {"reason": "load class", "native": "FreeRadar"}, "FreeMapResources": {"reason": "load class", "native": "FreeMapResources"}, "GetVisibleEnemiesInRadius": {"reason": "its out buffer of units has no form in a slot; targeting's recordings replay it as the import line of targeting", "native": "GetVisibleEnemiesInRadius", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}, {"name": "radius", "type": "int", "line": "radius", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}, {"name": "out", "type": "Ref<Unit>*", "line": "out", "mode": "units-buffer", "dir": "out", "kind": "Unit", "capacity": "capacity", "reach": ["Unit.flags", "Unit.def", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.posX", "Unit.posZ", "UnitDef.flags1"], "depth": 2, "reachFirst": 11, "reachCount": 7}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "GetSeenUnitsInRadius": {"reason": "called only by ai, which is not replayed; no recorded slot answers it", "native": "GetSeenUnitsInRadius"}, "SightCache": {"reason": "a query of a saved game, outside the tick", "native": "LosRadarSightCache"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "LosRadarWriteState"}, "LoadMappingData": {"reason": "load class", "native": "LoadMappingData"}, "SaveMappingData": {"reason": "load class", "native": "SaveMappingData"}}},
    "slots": {
-    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["UpdateUnitLineOfSight", "RemoveUnitLineOfSight", "RevealNewUnit", "AddEyeball", "UpdateCellHeightRange", "RecalculateLineOfSight", "CmdShareMapping", "CmdShareRadar"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.flags_2a44", "Game.seaLevel", "Game.visibilityMask", "Game.playerIndex"], "writes": [], "objectReads": ["Player.active", "Player.info", "Player.type", "Player.index", "Player.exploredSize", "Player.explored", "Unit.def", "Unit.player", "Unit.cell", "Unit.footprint", "Unit.unitDefIndex", "UnitDef.range", "UnitDef.modelMaxYHigh", "PlayerInfo.flags_97_wide", "Cell.height", "FrameTable.count", "GafFrame.xOffset", "GafFrame.yOffset"], "objectWrites": ["PlayerInfo.flags_97_wide", "Cell.high", "Cell.low"], "allOf": ["Player"], "args": [{"name": "event", "type": "LosRadarEventHeader*", "line": "event", "mode": "event", "events": "los_radar", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
-    "GetMapCell": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetMapCell"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell", "reach": ["metal"]}, "native": "GetMapCell"},
-    "GetMapCellAtPosition": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetMapCellAtPosition"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell"}, "native": "GetMapCellAtPosition"},
-    "GetOriginCellAtPosition": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetOriginCellAtPosition"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.feature", "Cell.offsetY", "Cell.offsetX"], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell"}, "native": "GetOriginCellAtPosition"},
-    "ClampWorldPosToTerrain": {"conv": "__stdcall", "ret": "void", "functions": ["ClampWorldPosToTerrain"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}, {"name": "out", "type": "Vec3*", "line": "out", "mode": "pending"}], "result": null, "native": "ClampWorldPosToTerrain"},
-    "IsUnitVisibleToPlayer": {"conv": "__stdcall", "ret": "int", "functions": ["IsUnitVisibleToPlayer"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsUnitVisibleToPlayer"},
-    "SoundHeardMask": {"conv": "__stdcall", "ret": "unsigned int", "functions": ["SoundHeardMask"], "reads": ["Game.visibilityMask", "Game.mapFlags"], "writes": [], "objectReads": ["Player.explored", "Player.exploredWidth", "Player.exploredHeight"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "at", "type": "Vec3*", "line": "at", "mode": "vec3", "label": "at"}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "SoundHeardMask"},
-    "UpdateUnitLineOfSight": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateUnitLineOfSight"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.def", "Unit.player", "UnitDef.range", "UnitDef.modelMaxYHigh"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "UpdateUnitLineOfSight"},
-    "RecordRadarUnits": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarUnits"], "reads": ["Game.uiOptionFlags", "Game.projectileCount"], "writes": [], "objectReads": ["Player.info", "Unit.unitDefIndex", "Projectile.owner"], "objectWrites": [], "allOf": ["Projectile"], "args": [], "result": null, "native": "RecordRadarUnits"},
-    "UpdateSensorRadarAndCloak": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateSensorRadarAndCloak"], "reads": ["Game.ticks", "Game.mapFlags", "Game.playerIndex"], "writes": [], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.index", "Player.allied", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ"], "objectWrites": ["Unit.flags"], "allOf": ["Player"], "args": [], "result": null, "native": "UpdateSensorRadarAndCloak"},
-    "RecordRadarMapped": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarMapped"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.playerIndex"], "writes": [], "objectReads": ["Player.explored"], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "RecordRadarMapped"},
-    "ExpireEyeballs": {"conv": "__stdcall", "ret": "void", "functions": ["ExpireEyeballs"], "reads": ["Game.ticks"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "ExpireEyeballs"},
-    "LoadTntMap": {"conv": "__stdcall", "ret": "void", "functions": ["LoadTntMap"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "LoadTntMap"},
-    "InitRadar": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "InitRadar"},
-    "FreeRadar": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "FreeRadar"},
-    "FreeMapResources": {"conv": "__stdcall", "ret": "void", "functions": ["FreeMapResources"], "reads": ["Game.visibilityMask"], "writes": ["Game.visibilityMask"], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "FreeMapResources"},
-    "GetVisibleEnemiesInRadius": {"conv": "__stdcall", "ret": "int", "functions": ["GetVisibleEnemiesInRadius"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}, {"name": "radius", "type": "int", "line": "radius", "mode": "scalar"}, {"name": "flags", "type": "int", "line": "flags", "mode": "scalar"}, {"name": "out", "type": "Ref<Unit>*", "line": "out", "mode": "units-buffer", "dir": "out", "kind": "Unit", "capacity": "capacity", "reach": ["Unit.flags", "Unit.def", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.posX", "Unit.posZ", "UnitDef.flags1"], "depth": 2, "reachFirst": 11, "reachCount": 7}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetVisibleEnemiesInRadius"},
-    "HasReadyUnitInRange": {"conv": "__stdcall", "ret": "int", "functions": ["HasReadyUnitInRange"], "reads": [], "writes": [], "objectReads": ["Unit.flags"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "HasReadyUnitInRange"},
-    "IsPointVisible": {"conv": "__stdcall", "ret": "int", "functions": ["IsPointVisible"], "reads": ["Game.visibilityMask", "Game.playerIndex"], "writes": [], "objectReads": ["Player.exploredWidth", "Player.exploredHeight"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "pending"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPointVisible"},
-    "CreateUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["CreateUnitIndex"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "CreateUnitIndex"},
-    "FreeUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["FreeUnitIndex"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "FreeUnitIndex"},
-    "RefreshUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["RefreshUnitIndex"], "reads": ["Game.ticks"], "writes": [], "objectReads": ["Player.index", "Player.allied", "Unit.buildLeft", "Unit.def", "Unit.flags", "Unit.activateFlags", "UnitDef.flags1"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "RefreshUnitIndex"},
-    "RegionSize": {"conv": "__stdcall", "ret": "unsigned int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "LosRadarMapInfo*", "line": "map", "mode": "value", "kind": "LosRadarMapInfo", "byPointer": true}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "RegionSize"},
-    "Init": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "LosRadarMapInfo*", "line": "map", "mode": "value", "kind": "LosRadarMapInfo", "byPointer": true}, {"name": "region", "type": "void*", "line": "region", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": null, "native": "Init"},
-    "Shutdown": {"conv": "__stdcall", "ret": "void*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "void*", "mode": "pending"}, "native": "Shutdown"},
-    "SightCache": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "out", "type": "LosSightCache*", "line": "out", "mode": "pending"}], "result": null, "native": "SightCache"},
-    "WriteState": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "writer", "type": "StateWriter*", "line": "writer", "mode": "pending"}], "result": null, "native": "WriteState"}
+    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["ApplyLosRadarEvent", "AddEyeball", "CmdShareMapping", "CmdShareRadar", "LosRadarEventSize", "LosUnitOfHandle", "RecalculateLineOfSight", "RemoveUnitLineOfSight", "RevealNewUnit", "ShareMapInfo", "SightOf", "UpdateCellHeightRange", "UpdateUnitLineOfSight", "AddLineOfSight", "RevealAroundUnit", "UpdateLineOfSight", "SightCellOf", "SightFrameOf", "RemoveLineOfSight", "SumX", "SumY", "ExploredCell", "LosLine::GetLosLineStep", "LosLine::GetLosLineStepCount", "LosTable::GetLosLine", "LosTable::GetLosLineCount", "LosTables::GetLosTable", "LosTables::GetLosTableCount", "LodRaw", "RecordRadarUnits", "CaptureUnit", "Player_Get", "RadarProjectileShown", "RadarUnitShown", "IsOnRadar", "ExploredOnRadar", "VisibleOnRadar", "RecordRadarMapped"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.flags_2a44", "Game.seaLevel", "Game.uiOptionFlags", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "Game.projectileCount", "Game.count_14277", "Game.flags_142f1", "Game.losTable", "Game.grid1.width", "Game.grid1.height", "Game.grid1.count", "Game.grid1.cells", "SimGlobals.g_losTables", "region"], "writes": ["Game.visibilityMask", "Game.mapFlags", "Game.count_14277", "Game.flags_142f1", "SimGlobals.g_losTables", "region"], "objectReads": ["Player.active", "Player.info", "Player.type", "Player.index", "Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Stockpile", "Unit.weapon1Stockpile", "Unit.weapon2Stockpile", "Unit.recentlyDamagedTimer", "UnitDef.flags1", "UnitDef.range", "UnitDef.modelMaxYHigh", "UnitDef.flags2", "UnitDef.radardistance", "UnitDef.sonardistance", "UnitDef.radardistancejam", "UnitDef.sonardistancejam", "weapondef.flags", "weapondef.coverage", "PlayerInfo.flags_97_wide", "PlayerInfo.color", "Cell.metal", "Cell.height", "Cell.high", "Cell.low", "Projectile.attacker", "Projectile.owner", "Projectile.type", "Projectile.positionX", "Projectile.positionY", "Projectile.positionZ", "FrameTable.count", "GafFrame.width", "GafFrame.height", "GafFrame.xOffset", "GafFrame.yOffset", "GafFrame.transparency", "Eye.player", "Eye.screen", "Eye.x", "Eye.flagA", "Eye.flagB", "Eye.flagPtr", "Eye.posX", "Eye.posY", "Eye.posZ", "Eye.screenPos"], "objectWrites": ["Player.explored", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "PlayerInfo.flags_97_wide", "Cell.high", "Cell.low", "Eye.player", "Eye.screen", "Eye.x", "Eye.flagA", "Eye.flagB", "Eye.flagPtr", "Eye.posX", "Eye.posY", "Eye.posZ", "Eye.expires", "Eye.screenPos"], "allOf": ["Player", "Unit", "Cell", "Projectile", "Eye"], "args": [{"name": "event", "type": "LosRadarEventHeader*", "line": "event", "mode": "event", "events": "los_radar", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyLosRadarEvent"},
+    "GetMapCell": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetMapCell"], "reads": ["Game.width", "Game.height", "region"], "writes": ["region"], "objectReads": ["Cell.metal", "Cell.height", "Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell", "reach": ["metal"]}, "native": "GetMapCell"},
+    "GetMapCellAtPosition": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetMapCellAtPosition"], "reads": ["Game.width", "Game.height", "region"], "writes": ["region"], "objectReads": ["Cell.metal", "Cell.height", "Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell"}, "native": "GetMapCellAtPosition"},
+    "GetOriginCellAtPosition": {"conv": "__stdcall", "ret": "Cell*", "functions": ["GetOriginCellAtPosition"], "reads": ["Game.width", "Game.height", "region"], "writes": ["region"], "objectReads": ["Cell.metal", "Cell.height", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}], "result": {"type": "Cell*", "mode": "object", "kind": "Cell"}, "native": "GetOriginCellAtPosition"},
+    "ClampWorldPosToTerrain": {"conv": "__stdcall", "ret": "void", "functions": ["ClampWorldPosToTerrain"], "reads": ["Game.seaLevel", "Game.baseX", "Game.baseY", "region"], "writes": ["region"], "objectReads": ["Unit.posY", "Eye.posY", "Eye.screenPos"], "objectWrites": [], "allOf": [], "args": [{"name": "x", "type": "int", "line": "x", "mode": "scalar"}, {"name": "y", "type": "int", "line": "y", "mode": "scalar"}, {"name": "out", "type": "Vec3*", "line": "out", "mode": "value", "kind": "Vec3", "dir": "out"}], "result": null, "native": "ClampWorldPosToTerrain"},
+    "IsUnitVisibleToPlayer": {"conv": "__stdcall", "ret": "int", "functions": ["IsUnitVisibleToPlayer", "IsVisible", "IsVisibleByMask", "IsExplored", "IsPointVisible", "IsSeen", "InsideExplored"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "region"], "writes": ["region"], "objectReads": ["Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "UnitDef.modelMaxY", "UnitDef.modelMinX", "UnitDef.modelMinZ", "UnitDef.modelSizeX", "UnitDef.modelSizeY", "UnitDef.modelSizeZ"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsUnitVisibleToPlayer"},
+    "SoundHeardMask": {"conv": "__stdcall", "ret": "unsigned int", "functions": ["SoundHeardMask", "GetMapCell"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.mapFlags", "region"], "writes": ["region"], "objectReads": ["Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Cell.metal", "Cell.height", "Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Player", "Cell"], "args": [{"name": "at", "type": "Vec3*", "line": "at", "mode": "vec3", "label": "at"}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "SoundHeardMask"},
+    "UpdateUnitLineOfSight": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateUnitLineOfSight", "SightCellOf", "SightFrameOf", "UpdateLineOfSight", "SightOf", "AddLineOfSight", "RemoveLineOfSight", "RevealAroundUnit", "ExploredCell", "LosLine::GetLosLineStep", "LosLine::GetLosLineStepCount", "LosTable::GetLosLine", "LosTable::GetLosLineCount", "LosTables::GetLosTable", "LosTables::GetLosTableCount", "LodRaw"], "reads": ["Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.flags_142f1", "Game.losTable", "Game.grid1.width", "Game.grid1.height", "Game.grid1.count", "Game.grid1.cells", "SimGlobals.g_losTables", "region"], "writes": ["Game.visibilityMask", "Game.mapFlags", "Game.flags_142f1", "SimGlobals.g_losTables", "region"], "objectReads": ["Player.index", "Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.def", "Unit.player", "Unit.posX", "Unit.posY", "Unit.posZ", "UnitDef.range", "UnitDef.modelMaxYHigh", "FrameTable.count", "GafFrame.width", "GafFrame.height", "GafFrame.xOffset", "GafFrame.yOffset", "GafFrame.transparency", "Eye.player", "Eye.x", "Eye.flagA", "Eye.flagB", "Eye.posX", "Eye.posY", "Eye.posZ", "Eye.screenPos"], "objectWrites": ["Player.explored", "Eye.screenPos"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "UpdateUnitLineOfSight"},
+    "RecordRadarUnits": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarUnits", "CaptureUnit", "Player_Get", "RadarProjectileShown", "RadarUnitShown", "IsOnRadar", "ExploredOnRadar", "VisibleOnRadar"], "reads": ["Game.width", "Game.height", "Game.uiOptionFlags", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "Game.projectileCount", "region"], "writes": ["region"], "objectReads": ["Player.info", "Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.def", "Unit.flags", "Unit.activateFlags", "Unit.id", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Def", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1Def", "Unit.weapon1Flags", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Stockpile", "Unit.weapon1Stockpile", "Unit.weapon2Stockpile", "Unit.recentlyDamagedTimer", "UnitDef.flags1", "UnitDef.flags2", "UnitDef.radardistance", "UnitDef.sonardistance", "UnitDef.radardistancejam", "UnitDef.sonardistancejam", "weapondef.flags", "weapondef.coverage", "PlayerInfo.color", "Projectile.attacker", "Projectile.owner", "Projectile.type", "Projectile.positionX", "Projectile.positionY", "Projectile.positionZ"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": ["Player", "Unit", "Projectile"], "args": [], "result": null, "native": "RecordRadarUnits"},
+    "UpdateSensorRadarAndCloak": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateSensorRadarAndCloak", "Game::Current", "IsExplored", "IsSeen", "InsideExplored", "DetectionVisitor::MarkUnitsInRadarOrSonarRadius", "RadarJamVisitor::ApplyRadarJamFlag", "SonarJamVisitor::ApplySonarJamFlag", "HasReadyUnitInRange", "EntryOf"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "Game.numPlayers", "region"], "writes": ["region"], "objectReads": ["Player.active", "Player.unitsBegin", "Player.unitsEnd", "Player.info", "Player.type", "Player.index", "Player.allied", "Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.unitDefIndex", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "UnitDef.flags1", "UnitDef.flags2", "UnitDef.modelMaxY", "UnitDef.radardistance", "UnitDef.sonardistance", "UnitDef.mincloakdistance", "UnitDef.radardistancejam", "UnitDef.sonardistancejam", "PlayerInfo.flags_97_wide", "PlayerInfo.flags"], "objectWrites": ["Unit.flags"], "allOf": ["Player", "Unit"], "args": [], "result": null, "native": "UpdateSensorRadarAndCloak"},
+    "RecordRadarMapped": {"conv": "__stdcall", "ret": "void", "functions": ["RecordRadarMapped"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.playerIndex", "Game.flags_142f1", "region"], "writes": ["Game.flags_142f1", "region"], "objectReads": ["Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight"], "objectWrites": [], "allOf": ["Player"], "args": [], "result": null, "native": "RecordRadarMapped"},
+    "ExpireEyeballs": {"conv": "__stdcall", "ret": "void", "functions": ["ExpireEyeballs", "RemoveLineOfSight", "ExploredCell", "LosLine::GetLosLineStep", "LosLine::GetLosLineStepCount", "LosTable::GetLosLine", "LosTable::GetLosLineCount", "LosTables::GetLosTable", "LosTables::GetLosTableCount"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.mapFlags", "Game.playerIndex", "Game.count_14277", "Game.flags_142f1", "Game.losTable", "Game.grid1.width", "Game.grid1.height", "Game.grid1.count", "Game.grid1.cells", "SimGlobals.g_losTables", "region"], "writes": ["Game.mapFlags", "Game.count_14277", "Game.flags_142f1", "SimGlobals.g_losTables", "region"], "objectReads": ["Player.index", "Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.posY", "GafFrame.width", "GafFrame.height", "GafFrame.transparency", "Eye.player", "Eye.x", "Eye.flagB", "Eye.posY", "Eye.expires", "Eye.screenPos"], "objectWrites": ["Player.explored"], "allOf": ["Eye"], "args": [], "result": null, "native": "ExpireEyeballs"},
+    "HasReadyUnitInRange": {"conv": "__stdcall", "ret": "int", "functions": ["HasReadyUnitInRange", "EntryOf"], "reads": ["region"], "writes": ["region"], "objectReads": ["Unit.flags"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "HasReadyUnitInRange"},
+    "IsPointVisible": {"conv": "__stdcall", "ret": "int", "functions": ["IsPointVisible"], "reads": ["Game.width", "Game.height", "Game.visibilityMask", "Game.playerIndex", "region"], "writes": ["region"], "objectReads": ["Player.exploredWidth", "Player.exploredHeight"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "Player*", "line": "player", "mode": "object", "kind": "Player"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos"}], "result": {"type": "int", "mode": "scalar"}, "native": "IsPointVisible"},
+    "CreateUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["CreateUnitIndex", "EnsureUnitIndex"], "reads": ["region"], "writes": ["region"], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "CreateUnitIndex"},
+    "FreeUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["FreeUnitIndex", "ReleaseUnits"], "reads": ["region"], "writes": ["region"], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "FreeUnitIndex"},
+    "RefreshUnitIndex": {"conv": "__stdcall", "ret": "void", "functions": ["RefreshUnitIndex", "IsUnitVisibleToPlayer", "Unit::PlayerIndex", "Unit::Ready", "IsVisible", "IsVisibleByMask", "IsExplored", "IsPointVisible", "IsSeen", "InsideExplored"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.visibilityMask", "Game.mapFlags", "Game.playerIndex", "Game.poolCount", "region"], "writes": ["region"], "objectReads": ["Player.index", "Player.allied", "Player.exploredSize", "Player.explored", "Player.exploredWidth", "Player.exploredHeight", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.flags", "Unit.activateFlags", "UnitDef.flags1", "UnitDef.modelMaxY", "UnitDef.modelMinX", "UnitDef.modelMinZ", "UnitDef.modelSizeX", "UnitDef.modelSizeY", "UnitDef.modelSizeZ"], "objectWrites": [], "allOf": ["Player", "Unit"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "RefreshUnitIndex"},
+    "RegionSize": {"conv": "__stdcall", "ret": "unsigned int", "functions": ["LosRadarRegionSize"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "LosRadarMapInfo*", "line": "map", "mode": "value", "kind": "LosRadarMapInfo", "byPointer": true}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "LosRadarRegionSize"},
+    "Init": {"conv": "__stdcall", "ret": "void", "functions": ["LosRadarInit"], "reads": [], "writes": ["region"], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "LosRadarMapInfo*", "line": "map", "mode": "value", "kind": "LosRadarMapInfo", "byPointer": true}, {"name": "region", "type": "void*", "line": "region", "mode": "region"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": null, "native": "LosRadarInit"},
+    "Shutdown": {"conv": "__stdcall", "ret": "void*", "functions": ["LosRadarShutdown"], "reads": ["region"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "void*", "mode": "region"}, "native": "LosRadarShutdown"}
    }
   },
   "orders": {
@@ -7377,7 +8629,7 @@
    }
   },
   "units": {
-   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [7, 0], "status": "pending", "imports": [], "pending": {"untracked": 52, "ruleless": 21, "unresolvedSlots": ["Apply", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink", "UnitRefInit", "UnitRefSetUnit", "WriteState"], "unannotatedArgs": ["Apply(event)", "UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "UnitRefUnlink(ref)", "GetFactoriesInRadius(out)", "UnitRefInit(ref)", "UnitRefInit(value)", "UnitRefSetUnit(ref)", "UnitRefGet(ref)", "UnitRefSetValue(ref)", "UnitRefSetValue(value)", "WriteState(writer)", "GetMovementLimits(out)"]}},
+   "header": {"interface": "interfaces/units.h", "struct": "UnitsSeam", "version": [7, 0], "status": "pending", "imports": [], "pending": {"untracked": 47, "ruleless": 21, "unresolvedSlots": ["Apply", "UnitTypeSetAddTypeOrCategory", "UnitRefUnlink", "UnitRefInit", "UnitRefSetUnit", "WriteState"], "unannotatedArgs": ["Apply(event)", "UnitTypeSetAddTypeOrCategory(self)", "UnitTypeSetAddTypeOrCategory(out)", "FindMissionUnit(units)", "UnitRefUnlink(ref)", "GetFactoriesInRadius(out)", "UnitRefInit(ref)", "UnitRefInit(value)", "UnitRefSetUnit(ref)", "UnitRefGet(ref)", "UnitRefSetValue(ref)", "UnitRefSetValue(value)", "WriteState(writer)", "GetMovementLimits(out)"]}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "UnitsEventHeader*", "line": "event", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
     "UpdateAllUnits": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateAllUnits"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateAllUnits"},
@@ -7386,7 +8638,7 @@
     "FreeUnitMemory": {"conv": "__stdcall", "ret": "void", "functions": ["FreeUnitMemory"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "FreeUnitMemory"},
     "FreeUnitInfo": {"conv": "__stdcall", "ret": "void", "functions": ["FreeUnitInfo"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "FreeUnitInfo"},
     "RefreshUnitInfo": {"conv": "__stdcall", "ret": "void", "functions": ["RefreshUnitInfo"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "RefreshUnitInfo"},
-    "LoadUnitTypes": {"conv": "__stdcall", "ret": "void", "functions": ["LoadUnitTypes"], "reads": [], "writes": [], "objectReads": ["UnitDef.flags1"], "objectWrites": ["MovementClass.name"], "allOf": ["UnitDef"], "args": [], "result": null, "native": "LoadUnitTypes"},
+    "LoadUnitTypes": {"conv": "__stdcall", "ret": "void", "functions": ["LoadUnitTypes"], "reads": [], "writes": [], "objectReads": ["UnitDef.flags1", "UnitDef.modelMaxY"], "objectWrites": ["UnitDef.modelMaxY", "UnitDef.modelSizeY", "MovementClass.name"], "allOf": ["UnitDef"], "args": [], "result": null, "native": "LoadUnitTypes"},
     "FreeUnitTypes": {"conv": "__stdcall", "ret": "void", "functions": ["FreeUnitTypes"], "reads": [], "writes": [], "objectReads": ["UnitDef.yardmap"], "objectWrites": ["UnitDef.yardmap"], "allOf": ["UnitDef"], "args": [], "result": null, "native": "FreeUnitTypes"},
     "LoadDownloadMenus": {"conv": "__stdcall", "ret": "void", "functions": ["LoadDownloadMenus"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": ["UnitDef"], "args": [], "result": null, "native": "LoadDownloadMenus"},
     "FreeDownloadMenus": {"conv": "__stdcall", "ret": "void", "functions": ["FreeDownloadMenus"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "FreeDownloadMenus"},
@@ -7398,20 +8650,20 @@
     "ReloadUnitType": {"conv": "__stdcall", "ret": "void", "functions": ["ReloadUnitType"], "reads": [], "writes": [], "objectReads": ["UnitDef.flags1"], "objectWrites": [], "allOf": [], "args": [{"name": "id", "type": "unsigned short", "line": "id", "mode": "scalar"}], "result": null, "native": "ReloadUnitType"},
     "KillUnit": {"conv": "__stdcall", "ret": "void", "functions": ["KillUnit"], "reads": [], "writes": [], "objectReads": ["Player.active", "Player.info", "Player.flags", "Player.type", "Unit.health", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.flags", "Unit.script", "Unit.id", "Unit.playerIndex", "Unit.attacker", "Unit.lastAttackerSlot", "UnitDef.maxHealth"], "objectWrites": ["Player.flags"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "cause", "type": "int", "line": "cause", "mode": "scalar"}], "result": null, "native": "KillUnit"},
     "LoadUnits": {"conv": "__stdcall", "ret": "void", "functions": ["LoadUnits"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "LoadUnits"},
-    "SaveUnits": {"conv": "__stdcall", "ret": "void", "functions": ["SaveUnits"], "reads": [], "writes": [], "objectReads": ["Unit.health", "Unit.def", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.extraction", "Unit.footprint", "Unit.script", "Unit.id", "Unit.killCount", "Unit.playerIndex", "Unit.netDirtyFlags", "Unit.motion", "Unit.cobStateFlags", "Unit.carrier", "Unit.transportPiece", "Unit.attacker", "Unit.lastAttackerSlot", "Unit.lastDamageType"], "objectWrites": [], "allOf": [], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "SaveUnits"},
-    "LoadUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["LoadUnit"], "reads": [], "writes": [], "objectReads": ["Unit.flags", "Unit.workTime", "Unit.footprint", "Unit.script", "Unit.cobStateFlags", "Unit.attacker", "Unit.lastAttackerSlot", "Unit.lastDamageType"], "objectWrites": ["Unit.health", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.extraction", "Unit.killCount", "Unit.netDirtyFlags", "Unit.cobStateFlags", "Unit.transportPiece", "Unit.attacker", "Unit.lastAttackerSlot", "Unit.lastDamageType"], "allOf": [], "args": [{"name": "id", "type": "unsigned short", "line": "id", "mode": "scalar"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "LoadUnit"},
+    "SaveUnits": {"conv": "__stdcall", "ret": "void", "functions": ["SaveUnits"], "reads": [], "writes": [], "objectReads": ["Unit.health", "Unit.def", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.extraction", "Unit.footprint", "Unit.script", "Unit.id", "Unit.killCount", "Unit.playerIndex", "Unit.netDirtyFlags", "Unit.motion", "Unit.cobStateFlags", "Unit.carrier", "Unit.transportPiece", "Unit.attacker", "Unit.lastAttackerSlot", "Unit.lastDamageType", "Unit.recentlyDamagedTimer"], "objectWrites": [], "allOf": [], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "SaveUnits"},
+    "LoadUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["LoadUnit"], "reads": [], "writes": [], "objectReads": ["Unit.flags", "Unit.workTime", "Unit.footprint", "Unit.script", "Unit.cobStateFlags", "Unit.attacker", "Unit.lastAttackerSlot", "Unit.lastDamageType"], "objectWrites": ["Unit.health", "Unit.flags", "Unit.activateFlags", "Unit.workTime", "Unit.extraction", "Unit.killCount", "Unit.netDirtyFlags", "Unit.cobStateFlags", "Unit.transportPiece", "Unit.attacker", "Unit.lastAttackerSlot", "Unit.lastDamageType", "Unit.recentlyDamagedTimer"], "allOf": [], "args": [{"name": "id", "type": "unsigned short", "line": "id", "mode": "scalar"}, {"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "LoadUnit"},
     "CreateUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["CreateUnit"], "reads": [], "writes": [], "objectReads": ["Player.unitsBegin", "Player.unitsEnd", "Player.unitCount", "Player.unitsCreated", "Unit.def", "Unit.unitDefIndex", "Unit.lastDamageType", "UnitDef.flags1", "UnitDef.mobile"], "objectWrites": ["Player.unitCount", "Player.unitsCreated", "Unit.lastDamageType"], "allOf": [], "args": [{"name": "player", "type": "unsigned char", "line": "player", "mode": "scalar"}, {"name": "typeId", "type": "unsigned short", "line": "typeId", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "finished", "type": "int", "line": "finished", "mode": "scalar"}, {"name": "mode", "type": "int", "line": "mode", "mode": "scalar"}, {"name": "id", "type": "int", "line": "id", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "CreateUnit"},
     "FindUnitType": {"conv": "__stdcall", "ret": "UnitDef*", "functions": ["FindUnitType"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": ["UnitDef"], "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "UnitDef*", "mode": "object", "kind": "UnitDef"}, "native": "FindUnitType"},
     "FindUnitTypeId": {"conv": "__stdcall", "ret": "unsigned short", "functions": ["FindUnitTypeId"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": ["UnitDef"], "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}], "result": {"type": "unsigned short", "mode": "scalar"}, "native": "FindUnitTypeId"},
     "FindMissionUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindMissionUnit"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "name", "type": "char*", "line": "name", "mode": "text"}, {"name": "units", "type": "Ref<Unit>*", "line": "units", "mode": "pending"}, {"name": "count", "type": "int", "line": "count", "mode": "scalar"}, {"name": "after", "type": "Unit*", "line": "after", "mode": "object", "kind": "Unit"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindMissionUnit"},
     "AddBuildProgress": {"conv": "__stdcall", "ret": "int", "functions": ["AddBuildProgress"], "reads": [], "writes": [], "objectReads": ["Unit.health", "Unit.buildLeft", "Unit.def", "Unit.flags", "Unit.playerIndex", "UnitDef.maxHealth"], "objectWrites": ["Unit.health", "Unit.buildLeft", "Unit.flags"], "allOf": [], "args": [{"name": "builder", "type": "Unit*", "line": "builder", "mode": "object", "kind": "Unit"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "amount", "type": "float", "line": "amount", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "AddBuildProgress"},
     "AddRepairProgress": {"conv": "__stdcall", "ret": "int", "functions": ["AddRepairProgress"], "reads": [], "writes": [], "objectReads": ["Unit.health", "Unit.def", "UnitDef.maxHealth"], "objectWrites": [], "allOf": [], "args": [{"name": "builder", "type": "Unit*", "line": "builder", "mode": "object", "kind": "Unit"}, {"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "amount", "type": "float", "line": "amount", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "AddRepairProgress"},
-    "CanLoad": {"conv": "__stdcall", "ret": "int", "functions": ["Unit::CanLoad"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.buildLeft", "Unit.def", "Unit.flags", "Unit.motion", "UnitDef.flags1", "UnitDef.footprintx", "UnitDef.minwaterdepth"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanLoad"},
+    "CanLoad": {"conv": "__stdcall", "ret": "int", "functions": ["Unit::CanLoad"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.buildLeft", "Unit.def", "Unit.flags", "Unit.motion", "UnitDef.flags1", "UnitDef.footprintx", "UnitDef.minwaterdepth", "UnitDef.flags2", "UnitDef.modelMaxY"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanLoad"},
     "CanReclaim": {"conv": "__stdcall", "ret": "int", "functions": ["Unit::CanReclaim"], "reads": [], "writes": [], "objectReads": ["Unit.def"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanReclaim"},
-    "CanRepair": {"conv": "__stdcall", "ret": "int", "functions": ["Unit::CanRepair"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.health", "Unit.def", "Unit.flags", "Unit.posY", "UnitDef.flags1", "UnitDef.maxwaterdepth", "UnitDef.maxHealth", "UnitDef.modelMaxYHigh"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanRepair"},
+    "CanRepair": {"conv": "__stdcall", "ret": "int", "functions": ["Unit::CanRepair"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.health", "Unit.def", "Unit.flags", "Unit.posY", "UnitDef.flags1", "UnitDef.maxwaterdepth", "UnitDef.maxHealth", "UnitDef.modelMaxYHigh", "UnitDef.flags2"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "target", "type": "Unit*", "line": "target", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "CanRepair"},
     "UnitRefUnlink": {"conv": "__stdcall", "ret": "void", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "ref", "type": "UnitRef*", "line": "ref", "mode": "pending"}], "result": null, "native": "UnitRefUnlink"},
     "UpdateUnitHead": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateUnitHead"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": null, "native": "UpdateUnitHead"},
-    "UpdateUnitBody": {"conv": "__stdcall", "ret": "int", "functions": ["UpdateUnitBody"], "reads": ["Game.ticks", "Game.seaLevel"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.health", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.posY", "Unit.carrier", "UnitDef.maxHealth"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "UpdateUnitBody"},
+    "UpdateUnitBody": {"conv": "__stdcall", "ret": "int", "functions": ["UpdateUnitBody"], "reads": ["Game.ticks", "Game.seaLevel"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.health", "Unit.buildLeft", "Unit.def", "Unit.player", "Unit.posY", "Unit.carrier", "Unit.recentlyDamagedTimer", "UnitDef.maxHealth"], "objectWrites": ["Unit.recentlyDamagedTimer"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "int", "mode": "scalar"}, "native": "UpdateUnitBody"},
     "UpdateUnitTail": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateUnitTail"], "reads": [], "writes": [], "objectReads": ["Unit.lastDamageType"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "moved", "type": "int", "line": "moved", "mode": "scalar"}], "result": null, "native": "UpdateUnitTail"},
     "GetFactoriesInRadius": {"conv": "__stdcall", "ret": "int", "functions": ["GetFactoriesInRadius"], "reads": [], "writes": [], "objectReads": ["Unit.def", "Unit.activateFlags", "UnitDef.flags1"], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "radius", "type": "int", "line": "radius", "mode": "scalar"}, {"name": "out", "type": "Ref<Unit>*", "line": "out", "mode": "pending"}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetFactoriesInRadius"},
     "CreateFactoryIndex": {"conv": "__stdcall", "ret": "void", "functions": ["CreateFactoryIndex"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "CreateFactoryIndex"},
@@ -7426,7 +8678,7 @@
    }
   },
   "players": {
-   "header": {"interface": "interfaces/players.h", "struct": "PlayersSeam", "version": [5, 0], "status": "pending", "imports": [], "pending": {"untracked": 32, "ruleless": 11, "unresolvedSlots": ["Apply", "DeactivateConditions", "DeleteConditions", "NewConditions", "RegionSize", "Init", "Shutdown", "WriteState"], "unannotatedArgs": ["Apply(event)", "DeactivateConditions(conditions)", "LoadConditions(conditions)", "SaveConditions(conditions)", "RegisterConditions(conditions)", "RegisterConditions(mission)", "FreeConditions(conditions)", "DeleteConditions(conditions)", "NewConditions result", "Init(region)", "Shutdown result", "WriteState(writer)"]}},
+   "header": {"interface": "interfaces/players.h", "struct": "PlayersSeam", "version": [5, 0], "status": "pending", "imports": [], "pending": {"untracked": 28, "ruleless": 11, "unresolvedSlots": ["Apply", "DeactivateConditions", "DeleteConditions", "NewConditions", "RegionSize", "Init", "Shutdown", "WriteState"], "unannotatedArgs": ["Apply(event)", "DeactivateConditions(conditions)", "LoadConditions(conditions)", "SaveConditions(conditions)", "RegisterConditions(conditions)", "RegisterConditions(mission)", "FreeConditions(conditions)", "DeleteConditions(conditions)", "NewConditions result", "Init(region)", "Shutdown result", "WriteState(writer)"]}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "event", "type": "PlayersEventHeader*", "line": "event", "mode": "pending"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "Apply"},
     "UpdatePlayers": {"conv": "__stdcall", "ret": "void", "functions": ["UpdatePlayers"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdatePlayers"},
@@ -7435,8 +8687,8 @@
     "FreePlayers": {"conv": "__stdcall", "ret": "void", "functions": ["FreePlayers"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": ["Player"], "args": [], "result": null, "native": "FreePlayers"},
     "InitPlayerResources": {"conv": "__stdcall", "ret": "void", "functions": ["InitPlayerResources"], "reads": [], "writes": [], "objectReads": ["Player.info"], "objectWrites": ["Player.energy", "Player.metal"], "allOf": ["Player"], "args": [], "result": null, "native": "InitPlayerResources"},
     "LoadPlayerControllers": {"conv": "__stdcall", "ret": "void", "functions": ["LoadPlayerControllers"], "reads": [], "writes": [], "objectReads": [], "objectWrites": ["Player.type"], "allOf": ["Player"], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "LoadPlayerControllers"},
-    "LoadPlayers": {"conv": "__stdcall", "ret": "void", "functions": ["LoadPlayers"], "reads": ["Game.localPlayer"], "writes": ["Game.playerIndex", "Game.localPlayer"], "objectReads": ["Player.info"], "objectWrites": ["Player.energy", "Player.metal", "Player.totalEnergyProduced", "Player.totalMetalProduced", "Player.totalEnergyConsumed", "Player.totalMetalConsumed", "Player.energyWasted", "Player.metalWasted", "Player.energyStorageBonus", "Player.metalStorageBonus", "Player.type", "Player.allied"], "allOf": ["Player"], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "LoadPlayers"},
-    "SavePlayers": {"conv": "__stdcall", "ret": "void", "functions": ["SavePlayers"], "reads": ["Game.localPlayer"], "writes": [], "objectReads": ["Player.energy", "Player.metal", "Player.totalEnergyProduced", "Player.totalMetalProduced", "Player.totalEnergyConsumed", "Player.totalMetalConsumed", "Player.energyWasted", "Player.metalWasted", "Player.energyStorageBonus", "Player.metalStorageBonus", "Player.info", "Player.type"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "SavePlayers"},
+    "LoadPlayers": {"conv": "__stdcall", "ret": "void", "functions": ["LoadPlayers"], "reads": ["Game.localPlayer"], "writes": ["Game.playerIndex", "Game.localPlayer"], "objectReads": ["Player.info"], "objectWrites": ["Player.energy", "Player.metal", "Player.totalEnergyProduced", "Player.totalMetalProduced", "Player.totalEnergyConsumed", "Player.totalMetalConsumed", "Player.energyWasted", "Player.metalWasted", "Player.energyStorageBonus", "Player.metalStorageBonus", "Player.type", "Player.allied", "PlayerInfo.color"], "allOf": ["Player"], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "LoadPlayers"},
+    "SavePlayers": {"conv": "__stdcall", "ret": "void", "functions": ["SavePlayers"], "reads": ["Game.localPlayer"], "writes": [], "objectReads": ["Player.energy", "Player.metal", "Player.totalEnergyProduced", "Player.totalMetalProduced", "Player.totalEnergyConsumed", "Player.totalMetalConsumed", "Player.energyWasted", "Player.metalWasted", "Player.energyStorageBonus", "Player.metalStorageBonus", "Player.info", "Player.type", "PlayerInfo.color"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "file", "type": "HapiBank*", "line": "file", "mode": "handle", "kind": "bank"}], "result": null, "native": "SavePlayers"},
     "RebuildAIFeatureCells": {"conv": "__stdcall", "ret": "void", "functions": ["RebuildAIFeatureCells"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "RebuildAIFeatureCells"},
     "SetupPlayerSlot": {"conv": "__stdcall", "ret": "void", "functions": ["SetupPlayerSlot"], "reads": [], "writes": [], "objectReads": ["Player.active", "Player.info", "Player.type"], "objectWrites": ["Player.active", "Player.id", "Player.type", "Player.index", "Player.allied", "PlayerInfo.kind"], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "type", "type": "char", "line": "type", "mode": "scalar"}], "result": null, "native": "SetupPlayerSlot"},
     "UpdateBlink": {"conv": "__stdcall", "ret": "void", "functions": ["UpdateBlink"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdateBlink"},
@@ -7449,7 +8701,7 @@
     "UpdatePlayersOnStream": {"conv": "__stdcall", "ret": "void", "functions": ["UpdatePlayersOnStream"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "stream", "type": "RandStream", "line": "stream", "mode": "stream"}], "result": null, "native": "UpdatePlayersOnStream"},
     "NewConditions": {"conv": "__stdcall", "ret": "MissionConditions*", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "MissionConditions*", "mode": "pending"}, "native": "NewConditions"},
     "UpdatePlayerHead": {"conv": "__stdcall", "ret": "int", "functions": ["UpdatePlayerHead"], "reads": [], "writes": [], "objectReads": ["Player.active", "Player.type", "Player.index"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "UpdatePlayerHead"},
-    "UpdatePlayerBody": {"conv": "__stdcall", "ret": "int", "functions": ["UpdatePlayerBody"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.mapFlags", "Game.localPlayer", "rng.main", "rng.load", "rng.seed"], "writes": ["Game.mapFlags", "rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.info", "Player.type", "Player.index", "Player.unitCount", "Player.unitsCreated", "Unit.playerIndex"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "stream", "type": "RandStream", "line": "stream", "mode": "stream"}], "result": {"type": "int", "mode": "scalar"}, "native": "UpdatePlayerBody"},
+    "UpdatePlayerBody": {"conv": "__stdcall", "ret": "int", "functions": ["UpdatePlayerBody"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.mapFlags", "Game.localPlayer", "Game.baseX", "Game.baseY", "rng.main", "rng.load", "rng.seed"], "writes": ["Game.mapFlags", "rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.info", "Player.type", "Player.index", "Player.unitCount", "Player.unitsCreated", "Unit.playerIndex", "PlayerInfo.flags"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}, {"name": "stream", "type": "RandStream", "line": "stream", "mode": "stream"}], "result": {"type": "int", "mode": "scalar"}, "native": "UpdatePlayerBody"},
     "UpdatePlayerTail": {"conv": "__stdcall", "ret": "void", "functions": ["UpdatePlayerTail"], "reads": ["Game.playerIndex"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "UpdatePlayerTail"},
     "UpdatePlayersFinish": {"conv": "__stdcall", "ret": "void", "functions": ["UpdatePlayersFinish"], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": null, "native": "UpdatePlayersFinish"},
     "RegionSize": {"conv": "__stdcall", "ret": "unsigned int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "info", "type": "PlayersMapInfo*", "line": "info", "mode": "value", "kind": "PlayersMapInfo", "byPointer": true}], "result": {"type": "unsigned int", "mode": "scalar"}, "native": "RegionSize"},
@@ -7459,7 +8711,7 @@
    }
   },
   "map": {
-   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [9, 0], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange"}, "FreePassMaps": {"reason": "#660 part 3", "native": "FreePassMaps"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "RefreshMovedUnits": {"reason": "#660 part 3", "native": "RefreshMovedUnitsSlot"}, "RefreshUnitIfStale": {"reason": "#660 part 3", "native": "RefreshUnitIfStaleSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}, "PathLockStamp": {"reason": "a query of a saved game, outside the tick", "native": "PathLockStamp"}}},
+   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [9, 0], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}, {"name": "skip", "type": "int", "line": "skip", "mode": "scalar"}, {"name": "ids", "type": "unsigned short*", "line": "ids", "mode": "bytes-out", "length": "capacity", "elem": "u16", "resultElem": "u16", "lengthIndex": 4}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "FreePassMaps": {"reason": "#660 part 3", "native": "FreePassMaps"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "RefreshMovedUnits": {"reason": "#660 part 3", "native": "RefreshMovedUnitsSlot"}, "RefreshUnitIfStale": {"reason": "#660 part 3", "native": "RefreshUnitIfStaleSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}, "PathLockStamp": {"reason": "a query of a saved game, outside the tick", "native": "PathLockStamp"}}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["ApplyMapEvent", "MapUnitOfHandle", "MapPoint", "AddUnitToMap", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "PassMap::Refresh", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "SetOwner", "UnlinkBucketUnit", "RemoveUnitFromMap", "RefreshPassMapsForUnit", "VisitObjectsInArea", "ClearFootprintAndUnlink", "ForceNeighborFootprintReclaim", "SetYardOpen", "ClaimFootprintCells", "IsFootprintClear", "RefreshAllPassMaps", "SpatialBucket::PrependUnit", "SpatialBucket::UnlinkUnit"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket"], "writes": [], "objectReads": ["Player.active", "Player.type", "Unit.def", "Unit.player", "Unit.flags", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.cobStateFlags", "Unit.cargo", "Unit.cargoNext", "Unit.carrier", "Unit.spatialBucket", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "PassMap.footprintX", "PassMap.footprintZ", "PassMap.maxWaterDepth", "PassMap.minWaterDepth", "PassMap.maxSlope", "PassMap.badSlope", "PassMap.maxWaterSlope", "PassMap.badWaterSlope", "PassMap.defined", "PassMap.width", "PassMap.height", "PassMap.cells", "PassMap.lastTick", "Feature.flags16"], "objectWrites": ["Unit.flags", "Unit.cobStateFlags", "Unit.cargoNext", "Unit.spatialBucket", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "PassMap.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "PassMap", "Feature"], "args": [{"name": "event", "type": "MapEventHeader*", "line": "event", "mode": "event", "events": "map", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyMapEventSlot"},
     "GetCellMeanHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetCellMeanHeight", "GetCellCachedWidth", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "in"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetCellMeanHeight"},

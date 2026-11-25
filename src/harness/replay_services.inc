@@ -445,7 +445,7 @@ void ReplayImportEnd(ReplayImport& c)
     {
         AddSpace(t);
         t.AddInt(a[0].v.i);
-        AddSnapshot(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (unsigned)a[0].v.i);
+        AddSnapshot(t, (c.result.kind == 1 ? c.result.v.p : nullptr), (unsigned)a[0].v.i, a[1].v.p != nullptr && (c.result.kind == 1 ? c.result.v.p : nullptr) != nullptr ? *(const unsigned*)a[1].v.p : 0);
         break;
     }
     case RI_FIND_SLOT_BY_DPID:

@@ -18,8 +18,6 @@ typedef short bx_i16;
 typedef unsigned short bx_u16;
 /* A signed 32-bit integer. */
 typedef int bx_i32;
-/* A signed 32-bit integer. */
-typedef int bx_i32;
 /* An unsigned 32-bit integer. */
 typedef unsigned int bx_u32;
 /* A signed 64-bit integer. */

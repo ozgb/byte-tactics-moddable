@@ -249,7 +249,7 @@ Coverage: 79.8% of functions (87 of 109), 75.6% of lines, 72.9% of branches; 22 
 
 **Sim writes.** 31 items in all, 26 after leaving out the shared value types (Vec3, Point, Point16, Fixed) and per-file copies of a struct (names ending in an address). The most used:
 
-`SquadTimer::next` (sim); `PlayerAI::lastTick` (sim); `SquadManager::countdown` (sim); `Player::groups` (mixed); `SquadManager::cursor` (sim); `SquadManager::nextAction` (mixed); `g_aiCommandsEnabled` (sim); `PlayerAI::builders` (sim); `PlayerAI::centre` (sim); `Squad::index` (sim); `Squad::field_8` (sim); `Squad::field_c` (sim)
+`SquadTimer::next` (sim); `PlayerAI::lastTick` (sim); `SquadManager::countdown` (sim); `Player::groups` (mixed); `SquadManager::cursor` (sim); `SquadManager::nextAction` (mixed); `g_aiCommandsEnabled` (sim); `PlayerAI::builders` (sim); `PlayerAI::centre` (sim); `Squad::index` (sim); `Squad::spare8` (sim); `Squad::spareC` (sim)
 
 **Sim reads.** 128 items only read, 127 named. The most used (`g_game`, the root pointer, left out):
 

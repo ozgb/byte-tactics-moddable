@@ -77,7 +77,7 @@ enum PathEventKind {
     PATH_EVENT_FINISHED = 2
 };
 
-// The kinds of event the engine publishes to pathfinding; each is an intent, applied as it is published.
+// The kinds of event the engine publishes to pathfinding; each is queued, and delivered to the handler at once when published outside a tick.
 enum PathfindingEventKind {
     // Sets the search work per tick, and the search scale when the implementation has one (PathfindingSetSearch).
     PATHFINDING_SET_SEARCH = 448

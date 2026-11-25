@@ -325,6 +325,52 @@ void __stdcall Imp_network_SendWeaponFireAt(unsigned char a0, Vec3* a1, Vec3* a2
     (void)r;
 }
 
+void __stdcall Imp_network_BroadcastPlayerInfo()
+{
+    ReplayText t;
+    StartImport(t, "network.BroadcastPlayerInfo");
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_BroadcastPlayerEconomy(Player* a0)
+{
+    ReplayText t;
+    StartImport(t, "network.BroadcastPlayerEconomy");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendShareEnergy(unsigned char a0, unsigned char a1, float a2)
+{
+    ReplayText t;
+    StartImport(t, "network.SendShareEnergy");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_network_SendShareMetal(unsigned char a0, unsigned char a1, float a2)
+{
+    ReplayText t;
+    StartImport(t, "network.SendShareMetal");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    ReplayValue(t, a2);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, Vec3* a2)
 {
     ReplayText t;
@@ -336,6 +382,20 @@ void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, V
     const char* r = Enter(t);
     *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
     (void)r;
+}
+
+unsigned short __stdcall Imp_features_FindFeatureAtPos(Vec3* a0, Point16* a1, Point16* a2)
+{
+    ReplayText t;
+    StartImport(t, "features.FindFeatureAtPos");
+    Space(t);
+    t.Add("?");
+    Space(t);
+    t.Add("?");
+    Space(t);
+    t.Add("?");
+    const char* r = Enter(t);
+    return ParseResult<unsigned short>(r);
 }
 
 Cell* __stdcall Imp_los_radar_GetMapCell(int a0, int a1)
@@ -497,6 +557,55 @@ void __stdcall Imp_scripts_GetSweetSpot(Unit* a0, Vec3* a1)
     (void)r;
 }
 
+int __stdcall Imp_mission_GetGameType()
+{
+    ReplayText t;
+    StartImport(t, "mission.GetGameType");
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void __stdcall Imp_mission_GetMissionParams(MissionParams* a0)
+{
+    ReplayText t;
+    StartImport(t, "mission.GetMissionParams");
+    Space(t);
+    t.Add("?");
+    const char* r = Enter(t);
+    (void)r;
+}
+
+unsigned short __stdcall Imp_units_FindUnitTypeId(const char* a0)
+{
+    ReplayText t;
+    StartImport(t, "units.FindUnitTypeId");
+    Space(t);
+    t.AddString((const char*)a0);
+    const char* r = Enter(t);
+    return ParseResult<unsigned short>(r);
+}
+
+Unit* __stdcall Imp_units_CreateUnit(unsigned char a0, unsigned short a1, const Vec3* a2, int a3, int a4, int a5)
+{
+    ReplayText t;
+    StartImport(t, "units.CreateUnit");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    Space(t);
+    AddValueStruct(t, ROK_VEC3, a2);
+    Space(t);
+    ReplayValue(t, a3);
+    Space(t);
+    ReplayValue(t, a4);
+    Space(t);
+    ReplayValue(t, a5);
+    const char* r = Enter(t);
+    Unit* o = (Unit*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
+}
+
 void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
 {
     ReplayText t;
@@ -525,6 +634,8 @@ FeaturesSeam g_import_features;
 LosRadarSeam g_import_los_radar;
 MapSeam g_import_map;
 ScriptsSeam g_import_scripts;
+MissionSeam g_import_mission;
+UnitsSeam g_import_units;
 PathfindingSeam g_import_pathfinding;
 WindMeteorsSeam g_native_wind_meteors = {
     UpdateWindSlot,
@@ -581,6 +692,37 @@ TargetingSeam g_native_targeting = {
     FindBestTargetIfFireAtWill,
     ChooseWeaponSlot,
     SavedTargetPair,
+};
+
+PlayersSeam g_native_players = {
+    PlayersApply,
+    UpdatePlayersSlot,
+    LoadDefaultAIScript,
+    InitPlayers,
+    FreePlayers,
+    InitPlayerResources,
+    LoadPlayerControllers,
+    LoadPlayers,
+    SavePlayers,
+    RebuildAIFeatureCells,
+    SetupPlayerSlot,
+    UpdateBlink,
+    DeactivateConditionsNative,
+    LoadConditionsNative,
+    SaveConditionsNative,
+    RegisterConditionsNative,
+    FreeConditionsNative,
+    DeleteConditionsNative,
+    UpdatePlayersOnStreamSlot,
+    NewConditionsNative,
+    UpdatePlayerHead,
+    UpdatePlayerBody,
+    UpdatePlayerTail,
+    UpdatePlayersFinish,
+    PlayersRegionSize,
+    PlayersInit,
+    PlayersShutdown,
+    PlayersWriteState,
 };
 
 MapSeam g_native_map = {
@@ -1011,6 +1153,111 @@ void After_targeting_SavedTargetPair()
     CompareResult(g_result_targeting_SavedTargetPair);
 }
 
+int g_result_players_Apply;
+
+void Run_players_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_PLAYERS, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_players_Apply = g_seams.players->Apply((PlayersEventHeader*)p0, p1);
+}
+
+void After_players_Apply()
+{
+    CompareResult(g_result_players_Apply);
+}
+
+void Run_players_DeactivateConditions()
+{
+    MissionConditions* p0 = (MissionConditions*)ArgObject("conditions", ROK_MISSIONCONDITIONS);
+    SetClosing(nullptr);
+    g_seams.players->DeactivateConditions(p0);
+}
+
+int g_result_players_UpdatePlayerHead;
+
+void Run_players_UpdatePlayerHead()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing("result");
+    g_result_players_UpdatePlayerHead = g_seams.players->UpdatePlayerHead(p0);
+}
+
+void After_players_UpdatePlayerHead()
+{
+    CompareResult(g_result_players_UpdatePlayerHead);
+}
+
+int g_result_players_UpdatePlayerBody;
+
+void Run_players_UpdatePlayerBody()
+{
+    int p0 = ArgScalar<int>("player");
+    RandStream p1 = ArgStream("stream");
+    SetClosing("result");
+    g_result_players_UpdatePlayerBody = g_seams.players->UpdatePlayerBody(p0, p1);
+}
+
+void After_players_UpdatePlayerBody()
+{
+    CompareResult(g_result_players_UpdatePlayerBody);
+}
+
+void Run_players_UpdatePlayerTail()
+{
+    int p0 = ArgScalar<int>("player");
+    SetClosing(nullptr);
+    g_seams.players->UpdatePlayerTail(p0);
+}
+
+void Run_players_UpdatePlayersFinish()
+{
+    SetClosing(nullptr);
+    g_seams.players->UpdatePlayersFinish();
+}
+
+unsigned int g_result_players_RegionSize;
+
+void Run_players_RegionSize()
+{
+    PlayersMapInfo p0 = PlayersMapInfo();
+    ParseValueArg("info", ROK_PLAYERSMAPINFO, &p0);
+    SetClosing("result");
+    g_result_players_RegionSize = g_seams.players->RegionSize(&p0);
+}
+
+void After_players_RegionSize()
+{
+    CompareResult(g_result_players_RegionSize);
+}
+
+void Run_players_Init()
+{
+    PlayersMapInfo p0 = PlayersMapInfo();
+    ParseValueArg("info", ROK_PLAYERSMAPINFO, &p0);
+    void* p1 = AllocRegion(ArgScalar<unsigned>("size"));
+    RegionBind(p1, ArgScalar<unsigned>("size"));
+    unsigned int p2 = ArgScalar<unsigned int>("size");
+    SetClosing(nullptr);
+    g_seams.players->Init(&p0, p1, p2);
+}
+
+void* g_result_players_Shutdown;
+
+void Run_players_Shutdown()
+{
+    SetClosing("result");
+    g_result_players_Shutdown = g_seams.players->Shutdown();
+}
+
+void After_players_Shutdown()
+{
+    CompareRegionResult(g_result_players_Shutdown);
+}
+
 int g_result_map_Apply;
 
 void Run_map_Apply()
@@ -1326,6 +1573,42 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_targeting_SavedTargetPair();
         return true;
     }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_players_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "DeactivateConditions") == 0) {
+        Run_players_DeactivateConditions();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerHead") == 0) {
+        Run_players_UpdatePlayerHead();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerBody") == 0) {
+        Run_players_UpdatePlayerBody();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerTail") == 0) {
+        Run_players_UpdatePlayerTail();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayersFinish") == 0) {
+        Run_players_UpdatePlayersFinish();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "RegionSize") == 0) {
+        Run_players_RegionSize();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Init") == 0) {
+        Run_players_Init();
+        return true;
+    }
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Shutdown") == 0) {
+        Run_players_Shutdown();
+        return true;
+    }
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "Apply") == 0) {
         Run_map_Apply();
         return true;
@@ -1415,6 +1698,16 @@ void RunAfter(const char* subsystem, const char* slot)
         After_targeting_ChooseWeapon();
     if (strcmp(subsystem, "targeting") == 0 && strcmp(slot, "SavedTargetPair") == 0)
         After_targeting_SavedTargetPair();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Apply") == 0)
+        After_players_Apply();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerHead") == 0)
+        After_players_UpdatePlayerHead();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "UpdatePlayerBody") == 0)
+        After_players_UpdatePlayerBody();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "RegionSize") == 0)
+        After_players_RegionSize();
+    if (strcmp(subsystem, "players") == 0 && strcmp(slot, "Shutdown") == 0)
+        After_players_Shutdown();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "Apply") == 0)
         After_map_Apply();
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "GetCellMeanHeight") == 0)
@@ -1444,6 +1737,7 @@ void BindSeams()
     g_seams.economy = &g_native_economy;
     g_seams.weapons = &g_native_weapons;
     g_seams.targeting = &g_native_targeting;
+    g_seams.players = &g_native_players;
     g_seams.map = &g_native_map;
     g_seams.files = &g_import_files;
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
@@ -1471,8 +1765,13 @@ void BindSeams()
     g_import_network.SendUnitDamage = Imp_network_SendUnitDamage;
     g_import_network.SendWeaponFire = Imp_network_SendWeaponFire;
     g_import_network.SendWeaponFireAt = Imp_network_SendWeaponFireAt;
+    g_import_network.BroadcastPlayerInfo = Imp_network_BroadcastPlayerInfo;
+    g_import_network.BroadcastPlayerEconomy = Imp_network_BroadcastPlayerEconomy;
+    g_import_network.SendShareEnergy = Imp_network_SendShareEnergy;
+    g_import_network.SendShareMetal = Imp_network_SendShareMetal;
     g_seams.features = &g_import_features;
     g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
+    g_import_features.FindFeatureAtPos = Imp_features_FindFeatureAtPos;
     g_seams.los_radar = &g_import_los_radar;
     g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
     g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
@@ -1485,6 +1784,12 @@ void BindSeams()
     g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
     g_import_scripts.QueryScript = Imp_scripts_QueryScript;
     g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
+    g_seams.mission = &g_import_mission;
+    g_import_mission.GetGameType = Imp_mission_GetGameType;
+    g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
+    g_seams.units = &g_import_units;
+    g_import_units.FindUnitTypeId = Imp_units_FindUnitTypeId;
+    g_import_units.CreateUnit = Imp_units_CreateUnit;
     g_seams.pathfinding = &g_import_pathfinding;
     g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
     if (strcmp(g_subsystem, "wind_meteors") == 0) {
@@ -1503,6 +1808,11 @@ void BindSeams()
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+    }
+    if (strcmp(g_subsystem, "players") == 0) {
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;

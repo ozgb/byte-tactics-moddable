@@ -515,7 +515,8 @@ def check_table(kind: str, spec: dict, errors: list[str]) -> dict:
 
 
 VTABLE_NAME = re.compile(r"^[A-Za-z_]\w*$")
-VTABLE_SYMBOL = re.compile(r"^\?\?_7[A-Za-z_][\w@]*@@6B@$")
+VTABLE_SYMBOL = re.compile(r"^\?\?_7[A-Za-z_]\w*@@6B(?:[A-Za-z_]\w*@@)?@$")
+BASE_NAME = re.compile(r"^[A-Za-z_]\w*$")
 
 
 def has_vtable(spec: dict) -> bool:
@@ -562,10 +563,14 @@ def check_polymorphic(ann: dict) -> list[str]:
         elif "vtable_symbol" in spec:
             if not isinstance(spec["vtable_symbol"], str) or not VTABLE_SYMBOL.match(spec["vtable_symbol"]):
                 errors.append("%s: `vtable_symbol` is the mangled name of the class's vtable, `??_7<Class>@@6B@`" % name)
-            elif spec["vtable_symbol"] != "??_7%s@@6B@" % spec["type"]:
+            elif not spec["vtable_symbol"].startswith("??_7%s@@6B" % spec["type"]):
                 errors.append("%s: `vtable_symbol` %s is not the vtable of the type %s" % (name, spec["vtable_symbol"], spec["type"]))
         elif not isinstance(spec["vtable"], str) or not VTABLE_NAME.match(spec["vtable"]):
             errors.append("%s: the vtable is the name of a global" % name)
+        secondary = spec.get("vtable_secondary")
+        if secondary is not None and ("vtable_symbol" not in spec or not isinstance(secondary, list) or not secondary
+                                      or not all(isinstance(b, str) and BASE_NAME.match(b) for b in secondary) or len(set(secondary)) != len(secondary)):
+            errors.append("%s: `vtable_secondary` is a list of the base classes that hold a vtable of their own, on a kind with a `vtable_symbol`" % name)
         if vtable_name(spec) in seen:
             errors.append("%s: the vtable %s is also the vtable of %s" % (name, vtable_name(spec), seen[vtable_name(spec)]))
         else:
@@ -922,6 +927,8 @@ def tracked(target: str, game: dict, sim: dict, aliases: dict | None = None) -> 
         return "Game." + target[6:]
     if target.startswith("Game::") and target[6:] in (aliases or {}):
         return "Game." + aliases[target[6:]]
+    if target in (aliases or {}):
+        return "Game." + aliases[target]
     if target in sim:
         return "SimGlobals." + target
     return None
@@ -1543,7 +1550,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "vtable_symbol", "vptr", "vptr_unset", "kinds", "delta"):
+        for key in ("vtable", "vtable_symbol", "vtable_secondary", "vptr", "vptr_unset", "kinds", "delta"):
             if spec.get(key):
                 entry[key] = spec[key]
         if spec.get("vtable_symbol"):
@@ -2226,6 +2233,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L.append('static_assert(__is_base_of(%s, %s), "%s is a kind of %s");' % (o["type"], types[k], k, o["name"]))
         if o.get("vtable"):
             L.append('static_assert(__is_polymorphic(%s), "%s has a vtable");' % (o["type"], o["name"]))
+        for b in o.get("vtable_secondary", []):
+            L.append('static_assert(__is_base_of(%s, %s) && __is_polymorphic(%s), "%s has a vtable of its base %s");' % (b, o["type"], b, o["name"], b))
         if o.get("vptr"):
             L.append('static_assert(!__is_polymorphic(%s) && sizeof(%s) >= sizeof(void*), "%s has a vptr that the code sets by hand");' % (o["type"], o["type"], o["name"]))
     L += ["", "enum ReplaySubsystemId {"]
@@ -3559,11 +3568,21 @@ def render_vtables(model: dict, fixtures: bool = False) -> str:
     else:
         L = [GENERATED, '#include "replay_schema.h"', '#include "replay_objects.h"', ""]
     L += ["extern void (* const %s[])()%s;" % (o.get("vtable") or o["vptr"], ' __asm__("%s")' % o["vtable_symbol"] if o.get("vtable_symbol") else "") for o in kinds]
+    L += ["extern void (* const g_vtsec_%s_%s[])() __asm__(\"%s\");" % (o["type"], b, "??_7%s@@6B%s@@@" % (o["type"], b)) for o in kinds for b in o.get("vtable_secondary", [])]
     for fn, ret, expr in (("ReplayVtable", "const void*", "%s"), ("ReplayVtableName", "const char*", '"%s"')):
         L += ["", "%s %s(unsigned kind)" % (ret, fn), "{", "    switch (kind) {"]
         for o in kinds:
             L += ["    case ROK_%s:" % upper(o["name"]), "        return %s;" % (expr % (o.get("vtable") or o["vptr"]))]
         L += ["    default:", "        return %s;" % ("nullptr" if ret == "const void*" else '""'), "    }", "}"]
+    L += ["", "unsigned ReplayExtraVtables(unsigned kind, ReplayExtraVtable* out)", "{", "    switch (kind) {"]
+    for o in kinds:
+        if o.get("vtable_secondary"):
+            L.append("    case ROK_%s:" % upper(o["name"]))
+            for i, b in enumerate(o["vtable_secondary"]):
+                L.append("        out[%d].offset = (unsigned)((const char*)static_cast<%s*>(reinterpret_cast<%s*>(0x1000)) - (const char*)0x1000);" % (i, b, o["type"]))
+                L.append("        out[%d].vtable = g_vtsec_%s_%s;" % (i, o["type"], b))
+            L.append("        return %d;" % len(o["vtable_secondary"]))
+    L += ["    default:", "        return 0;", "    }", "}"]
     return "\n".join(L) + "\n"
 
 

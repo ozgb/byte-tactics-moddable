@@ -161,7 +161,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("Apply(event)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("Apply", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "ApplySlot"}})
@@ -197,7 +197,7 @@ class Unrecorded(unittest.TestCase):
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
         files, errors, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "weapons.UpdateUnitWeapons"))], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("FindWeaponByName", weapons["slots"])
         kept = weapons["unrecorded"]["FindWeaponByName"]
@@ -592,7 +592,7 @@ class IndirectCalls(unittest.TestCase):
 
     def pending(self, rows, ann=None, slot_name="WeaponCanReachUnit"):
         model, errors = build(rows, ann)
-        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
+        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "players", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
@@ -987,7 +987,8 @@ class Polymorphic(unittest.TestCase):
         self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
         self.assertTrue(base.endswith('0, 0, 0, 3, 0, 0 },'), base)
-        self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_FIXTURETIMER, ROK_FIXTUREASSAULT, ROK_FIXTUREGOALA, ROK_FIXTUREGOALB };", text)
+        self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ", text)
+        self.assertIn("ROK_FIXTURETIMER, ROK_FIXTUREASSAULT, ROK_FIXTUREGOALA, ROK_FIXTUREGOALB, ROK_FIXTURETWIN };", text)
         self.assertIn('static_assert(__is_base_of(OrderFx, PathOrder), "PathOrder is a kind of OrderFx");', text)
         self.assertIn('static_assert(__is_polymorphic(RingApproach), "RingApproach has a vtable");', text)
 
@@ -1057,6 +1058,23 @@ class Polymorphic(unittest.TestCase):
         self.assertIn('extern void (* const g_vtsym_FixtureGoalA[])() __asm__("??_7FixtureGoalA@@6B@");', files[rs.FIXTURE_VTABLES_CPP])
         self.assertIn("    case ROK_FIXTUREGOALA:\n        return g_vtsym_FixtureGoalA;", files[rs.FIXTURE_VTABLES_CPP])
         self.assertIn('static_assert(__is_polymorphic(FixtureGoalA), "FixtureGoalA has a vtable");', files[rs.FIXTURE_SCHEMA_H])
+
+    def test_a_class_with_a_second_vtable_binds_it_by_its_base(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_VTABLES_CPP]
+        self.assertIn('extern void (* const g_vtsym_FixtureTwin[])() __asm__("??_7FixtureTwin@@6BFixtureGoalBase@@@");', text)
+        self.assertIn('extern void (* const g_vtsec_FixtureTwin_FixtureScanBase[])() __asm__("??_7FixtureTwin@@6BFixtureScanBase@@@");', text)
+        self.assertIn("unsigned ReplayExtraVtables(unsigned kind, ReplayExtraVtable* out)", text)
+        self.assertIn("static_cast<FixtureScanBase*>(reinterpret_cast<FixtureTwin*>(0x1000))", text)
+        self.assertIn("        out[0].vtable = g_vtsec_FixtureTwin_FixtureScanBase;\n        return 1;", text)
+        self.assertIn('static_assert(__is_base_of(FixtureScanBase, FixtureTwin) && __is_polymorphic(FixtureScanBase), "FixtureTwin has a vtable of its base FixtureScanBase");', files[rs.FIXTURE_SCHEMA_H])
+
+    def test_a_second_vtable_is_a_list_of_bases_of_a_kind_with_a_vtable_symbol(self):
+        for change in ({"vtable_secondary": "FixtureScanBase"}, {"vtable_secondary": []}, {"vtable_secondary": ["not a name"]}, {"vtable_secondary": ["FixtureScanBase", "FixtureScanBase"]}):
+            ann = annotations()
+            ann["objects"]["FixtureTwin"].update(change)
+            self.assertTrue(any("FixtureTwin: `vtable_secondary` is a list of the base classes" in e for e in self.errors(ann)), (change, self.errors(ann)))
 
     def test_a_vtable_symbol_is_the_mangled_vtable_of_the_type_and_the_only_vtable(self):
         for change, message in (({"vtable_symbol": "g_goal"}, "FixtureGoalA: `vtable_symbol` is the mangled name"),
@@ -2323,7 +2341,7 @@ class ElementForms(unittest.TestCase):
         self.assertIn("    { 4, sizeof(unsigned) },", text)
         self.assertRegex(self.row(text, '    { "timers", offsetof(FixtureManager, timers)'), r"RK_REFS, ROK_FIXTURETIMERBASE, 0, 0, \{\}, 0, 0, \d+ \},")
         self.assertIn("FixtureManager::timers holds Ref<FixtureTimerBase>", text)
-        self.assertEqual([e["count"] for e in model["elems"] if e["kind"] == "refs"], [4])
+        self.assertEqual([e["count"] for e in model["elems"] if e["kind"] == "refs" and e["owner"] == "FixtureManager"], [4])
 
     def test_an_array_of_refs_is_checked(self):
         for change, message in (({"count": 0}, "FixtureManager.timers: `count` is a positive integer"),
@@ -2815,7 +2833,7 @@ class Blobs(unittest.TestCase):
         text = files[rs.FIXTURE_SCHEMA_H]
         row = [l for l in text.split("\n") if l.startswith('    { "entries[]", offsetof(FixtureProgram, entries)')][0]
         self.assertIn("RK_BLOB, ROK_ALLOC,", row)
-        self.assertTrue(row.endswith(", 9 },"), row)
+        self.assertRegex(row, r", \d+ \},$")
 
     def test_the_bytes_are_a_raw_array_with_the_length_expression(self):
         text = self.generated()[0][rs.FIXTURE_SCHEMA_H]

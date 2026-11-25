@@ -549,7 +549,7 @@ SaveGameFile,src/game/settings_campaign.cpp,game,default:src/game/,
 LoadCampaignRegistryName,src/game/settings_campaign.cpp,game,default:src/game/,
 SaveCampaignRegistryName,src/game/settings_campaign.cpp,game,default:src/game/,
 SaveAllMissionsSetting,src/game/settings_campaign.cpp,game,default:src/game/,
-SaveNumSkirmishPlayers,src/game/settings_campaign.cpp,players,name:Player,
+SaveNumSkirmishPlayers,src/game/settings_campaign.cpp,game,name:Player,game
 AssignRange,src/map/los_tables.cpp,los_radar,file:src/map/los_tables,
 AssignRangeBack,src/map/los_tables.cpp,los_radar,file:src/map/los_tables,
 DamageTableEntry::AssignPair,src/map/los_tables.cpp,los_radar,file:src/map/los_tables,
@@ -1262,10 +1262,10 @@ ReportGameEventCallback,src/ingame/info_panel.cpp,presentation,presentation,
 ShowGameMessage,src/ingame/info_panel.cpp,presentation,presentation,
 AllocScoreTables,src/frontend/reporter.cpp,presentation,presentation,
 EnableReporter,src/frontend/reporter.cpp,presentation,presentation,
-IsReporterDllLoaded,src/game/statistics.cpp,players,file:src/game/statistics,
+IsReporterDllLoaded,src/game/statistics.cpp,game,file:src/game/statistics,game
 LoadReporterDll,src/frontend/reporter.cpp,presentation,presentation,
 ShutdownScoreTables,src/frontend/reporter.cpp,presentation,presentation,
-FillScoreTables,src/game/statistics.cpp,players,file:src/game/statistics,
+FillScoreTables,src/game/statistics.cpp,game,file:src/game/statistics,game
 ReportGameEvent,src/network/unit_sync.cpp,network,file:src/network/,
 ReportGameChat,src/network/unit_sync.cpp,network,file:src/network/,
 ReportIntervalTimer,src/network/unit_sync.cpp,network,file:src/network/,
@@ -1611,7 +1611,7 @@ GetCellPosition,src/map/terrain.cpp,map,file:src/map/terrain,
 ClampPositionToMap,src/units/units.cpp,units,default:src/units/,
 ShareMapInfo,src/map/line_of_sight.cpp,los_radar,file:src/map/line_of_sight,los_radar
 AllocateUnitMemory,src/units/units.cpp,units,default:src/units/,
-ComparePlayers,src/units/units.cpp,players,name:Player,
+ComparePlayers,src/units/units.cpp,units,name:Player,units
 FreeUnitMemory,src/units/units.cpp,units,default:src/units/,
 InitUnitFromType,src/units/units.cpp,units,default:src/units/,
 InitUnitScript,src/units/units.cpp,units,default:src/units/,
@@ -4337,7 +4337,7 @@ PlayerAccountOf,src/game/economy.cpp,economy,file:src/game/economy,
 PlayerAt,src/harness/harness.cpp,harness,folder:src/harness/,
 PlayerGridView::at,src/map/line_of_sight.cpp,los_radar,file:src/map/line_of_sight,
 PlayerReady,src/network/net_game.cpp,network,file:src/network/,
-PlayerRecordAt,src/game/game_load.cpp,players,name:Player,
+PlayerRecordAt,src/game/game_load.cpp,game,name:Player,game
 PlayerSlotOf,src/game/players.cpp,players,file:src/game/players,
 Player_Get,src/map/radar_capture.cpp,los_radar,file:src/map/radar,
 PlayersApply,src/game/players_events.cpp,players,file:src/game/players,
@@ -5422,9 +5422,9 @@ UpdateMeteorsThunk,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 UpdatePlayerAIIdle,src/ai/ai_idle.cpp,ai,file:src/ai/,
 UpdatePlayerBody,src/game/players.cpp,players,file:src/game/players,
 UpdatePlayerTail,src/game/players.cpp,players,file:src/game/players,
-UpdatePlayers,src/seams/native.cpp,players,folder:src/seams/,players
+UpdatePlayers,src/seams/native.cpp,seams,folder:src/seams/,seams
 UpdatePlayersFinish,src/game/players.cpp,players,file:src/game/players,
-UpdatePlayersOnStream,src/seams/native.cpp,players,folder:src/seams/,players
+UpdatePlayersOnStream,src/seams/native.cpp,seams,folder:src/seams/,seams
 UpdateSquadsIdle,src/ai/ai_idle.cpp,ai,file:src/ai/,
 UpdateSquadsNative,src/seams/native.cpp,seams,folder:src/seams/,
 UpdateSubState,src/frontend/frontend.cpp,presentation,presentation,

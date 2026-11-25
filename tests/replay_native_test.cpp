@@ -31,6 +31,8 @@
 #include "../src/weapons/weapon_types.h"
 #include "../src/weapons/explosions.h"
 #include "../src/game/economy.h"
+#include "../src/game/players.h"
+#include "../src/game/players_events.h"
 #include "../src/harness/replay_services.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
@@ -1854,6 +1856,14 @@ int __fastcall ComputeMapChecksumSlot(Mission* self)
 int __fastcall GetTerrainLengthSlot(Mission* self)
 {
     return self->GetTerrainLength();
+}
+
+void __stdcall UpdatePlayersSlot()
+{
+}
+
+void __stdcall UpdatePlayersOnStreamSlot(RandStream)
+{
 }
 
 #include "replay_slots.h"
@@ -5170,6 +5180,26 @@ void GoalSelfTest()
     Check(g_diffs > 0, "an object whose vptr is another kind's is a difference");
     free(first);
     free(second);
+
+    ResetBlock();
+    ReplayClearFailure();
+    FixtureGoalHolder* twinHolder = (FixtureGoalHolder*)Fresh(sizeof(FixtureGoalHolder));
+    FixtureTwin* twin = new (Fresh(sizeof(FixtureTwin))) FixtureTwin();
+    twin->ticks = 9;
+    twin->count = 5;
+    twinHolder->id = 3;
+    twinHolder->goal = twin;
+    roots[0] = twinHolder;
+    recorder.Record(kinds, roots, 1, sets);
+    char* third = strdup(recorder.text.Data());
+    Check(ReplayFailure() == nullptr && strstr(third, "  r FixtureGoalHolder#1.goal FixtureTwin#1\n") != nullptr, "a class with a second vtable is named as its kind by its first");
+    ResetBlock();
+    RestoreText(third, sets);
+    FixtureTwin* rebuiltTwin = (FixtureTwin*)ReplayResolveObject("FixtureTwin#1", nullptr, g_objects, AllocObject);
+    Check(rebuiltTwin != nullptr && rebuiltTwin->Kind() == 3 && rebuiltTwin->count == 5, "it is rebuilt");
+    if (rebuiltTwin != nullptr)
+        Check(static_cast<FixtureScanBase*>(rebuiltTwin)->Scan() == 7, "with the vtable of its second base too, so a call through that base runs the class's method");
+    free(third);
 }
 
 void RefsSelfTest()

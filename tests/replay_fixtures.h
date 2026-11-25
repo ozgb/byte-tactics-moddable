@@ -114,6 +114,18 @@ public:
     int count;
 };
 
+class FixtureScanBase {
+public:
+    virtual int Scan() { return 0; }
+};
+
+class FixtureTwin : public FixtureGoalBase, public FixtureScanBase {
+public:
+    virtual int Kind() { return 3; }
+    virtual int Scan() { return 7; }
+    int count;
+};
+
 struct FixtureGoalHolder {
     int id;
     Ref<FixtureGoalBase> goal;

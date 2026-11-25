@@ -1188,6 +1188,28 @@ template <class T> void CompareInOutScalar(const char* name, const T* object)
     value.Free();
 }
 
+void BindObjectResult(unsigned kind, void* object)
+{
+    if (object == nullptr)
+        return;
+    unsigned actual = ReplayConcreteKind(kind, object);
+    if (actual == kReplayObjectKindCount)
+        return;
+    const char* recorded = OutLine("result");
+    const char* hash = recorded == nullptr ? nullptr : strchr(recorded, '#');
+    size_t length = strlen(kReplayObjectKinds[actual].name);
+    if (g_objects.Find(actual, object) == 0 && hash != nullptr && (size_t)(hash - recorded) == length && strncmp(recorded, kReplayObjectKinds[actual].name, length) == 0
+        && kReplayObjectKinds[actual].table == RT_ORDER && hash[1] >= '1' && hash[1] <= '9') {
+        unsigned ordinal = (unsigned)atoi(hash + 1);
+        if (ordinal <= REPLAY_MAX_OBJECTS && g_objects.Pointer(actual, ordinal) == nullptr)
+            g_objects.Bind(actual, ordinal, object);
+    }
+    if (g_rootCount < REPLAY_MAX_ROOTS) {
+        g_rootKinds[g_rootCount] = (unsigned short)actual;
+        g_rootObjects[g_rootCount++] = object;
+    }
+}
+
 void CompareObjectResult(unsigned kind, const void* object)
 {
     ReplayText value;
@@ -1810,6 +1832,18 @@ int __stdcall Native_fixture_Locate(FixtureAmount* first, FixtureAmount* second)
     if (second != nullptr)
         second->amount = 9;
     return 1;
+}
+
+bool g_makeGoalB;
+
+unsigned int __stdcall Native_fixture_MakeGoal()
+{
+    unsigned size = g_makeGoalB ? sizeof(FixtureGoalB) : sizeof(FixtureGoalA);
+    void* at = SimAlloc(size);
+    memset(at, 0, size);
+    FixtureGoalBase* goal = g_makeGoalB ? (FixtureGoalBase*)new (at) FixtureGoalB() : new (at) FixtureGoalA();
+    goal->ticks = 4;
+    return ReplayRefOffset(goal);
 }
 
 WeaponDef* __stdcall Native_fixture_Pick()
@@ -5892,6 +5926,41 @@ void GoalSelfTest()
     if (rebuiltTwin != nullptr)
         Check(static_cast<FixtureScanBase*>(rebuiltTwin)->Scan() == 7, "with the vtable of its second base too, so a call through that base runs the class's method");
     free(third);
+
+    printf("an object that a slot creates and returns as its offset\n");
+    ResetBlock();
+    g_makeGoalB = false;
+    g_rootCount = 0;
+    LoadCall("  o result FixtureGoalA#1\n");
+    BeginCompare();
+    Run_fixture_MakeGoal();
+    After_fixture_MakeGoal();
+    Check(g_diffs == 0 && g_rootCount == 1 && g_rootKinds[0] == ROK_FIXTUREGOALA, "it takes the recorded name and is walked as a root");
+    ResetBlock();
+    g_makeGoalB = true;
+    g_rootCount = 0;
+    LoadCall("  o result FixtureGoalA#1\n");
+    BeginCompare();
+    Run_fixture_MakeGoal();
+    After_fixture_MakeGoal();
+    printf("another kind: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "an object of another kind is reported at the result");
+    g_makeGoalB = false;
+
+    printf("an object that an import creates and returns as its offset\n");
+    ResetBlock();
+    LoadCall("  i fixture.MakeGoal = FixtureGoalB#2\n");
+    BeginImport();
+    unsigned made = Imp_fixture_MakeGoal();
+    FixtureGoalB* madeB = (FixtureGoalB*)ReplayRefPtr(made);
+    Check(g_diffs == 0 && madeB != nullptr && *(const void**)madeB == ReplayVtable(ROK_FIXTUREGOALB), "the stub allocates the recorded kind in the block, with its vtable");
+    Check(madeB != nullptr && madeB->Kind() == 2, "so a virtual call on it runs the class's method");
+    LoadCall("  i fixture.MakeGoal = FixtureGoalB#2\n");
+    BeginImport();
+    Check(Imp_fixture_MakeGoal() == made, "a name it has made returns the same offset");
+    LoadCall("  i fixture.MakeGoal = null\n");
+    BeginImport();
+    Check(Imp_fixture_MakeGoal() == 0, "and null returns 0");
 }
 
 void RefsSelfTest()

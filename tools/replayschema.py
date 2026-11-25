@@ -2749,7 +2749,9 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
         if mode == "scalar":
             return ['ArgValue(s_tail, "result", result, "o");']
         if mode == "object":
-            return ['ArgObject(s_tail, "result", ROK_%s, %s, "o");' % (upper(res["kind"]), "ReplayRefPtr(result)" if res.get("ref") else "result")]
+            if res.get("ref"):
+                return ['ArgObject(s_tail, "result", ROK_%s, ReplayRefPtr(result), "o");' % upper(res["kind"]), 'ResultRoot(ROK_%s, ReplayRefPtr(result));' % upper(res["kind"])]
+            return ['ArgObject(s_tail, "result", ROK_%s, result, "o");' % upper(res["kind"])]
         if mode == "value":
             return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, &result);' % upper(res["kind"])]
         if mode == "region":
@@ -3140,6 +3142,8 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
         g = "g_result_%s_%s" % (sub, slot)
         head.append("%s %s;" % (s["ret"], g))
         L.append("    %s = %s;" % (g, expr))
+        if res["mode"] == "object" and res.get("ref"):
+            L.append("    BindObjectResult(ROK_%s, ReplayRefPtr(%s));" % (upper(res["kind"]), g))
         if res["mode"] == "object":
             after.append("    CompareObjectResult(ROK_%s, %s);" % (upper(res["kind"]), "ReplayRefPtr(%s)" % g if res.get("ref") else g))
         elif res["mode"] == "scalar":

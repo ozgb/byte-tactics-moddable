@@ -127,6 +127,14 @@ WeaponDef* __stdcall Imp_fixture_Pick()
     return w;
 }
 
+unsigned int __stdcall Imp_fixture_MakeGoal()
+{
+    ReplayText t;
+    StartImport(t, "fixture.MakeGoal");
+    const char* r = Enter(t);
+    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
+}
+
 FixtureAmount g_inout_fixture_Query_0;
 bool g_inout_fixture_Query_0_null;
 FixtureAmount g_inout_fixture_Query_1;
@@ -247,4 +255,18 @@ void Run_fixture_Pick()
 void After_fixture_Pick()
 {
     CompareWeaponResult(g_result_fixture_Pick);
+}
+
+unsigned int g_result_fixture_MakeGoal;
+
+void Run_fixture_MakeGoal()
+{
+    SetClosing("result");
+    g_result_fixture_MakeGoal = Native_fixture_MakeGoal();
+    BindObjectResult(ROK_FIXTUREGOALBASE, ReplayRefPtr(g_result_fixture_MakeGoal));
+}
+
+void After_fixture_MakeGoal()
+{
+    CompareObjectResult(ROK_FIXTUREGOALBASE, ReplayRefPtr(g_result_fixture_MakeGoal));
 }

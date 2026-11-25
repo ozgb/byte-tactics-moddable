@@ -328,6 +328,15 @@ void ArgObject(ReplayText& t, const char* name, unsigned kind, const void* p, co
     t.AddChar('\n');
 }
 
+void ResultRoot(unsigned kind, const void* p)
+{
+    if (p == nullptr)
+        return;
+    unsigned actual = ReplayConcreteKind(kind, p);
+    if (actual != kReplayObjectKindCount)
+        s_roots.Add((unsigned short)actual, p);
+}
+
 void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
 {
     ReplayAddStruct(t, tag, name, kind, p, Table());

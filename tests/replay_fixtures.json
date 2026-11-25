@@ -1142,6 +1142,17 @@
      "flags"
     ]
    }
+  },
+  "MakeGoal": {
+   "ret": "unsigned int",
+   "params": [],
+   "args": {},
+   "result": {
+    "mode": "object",
+    "kind": "FixtureGoalBase",
+    "poly": "FixtureGoalBase",
+    "ref": true
+   }
   }
  },
  "inside": {

@@ -436,6 +436,20 @@ A slot or import argument of another pointer type (`Callback*`) whose object is 
 `a callback Unit#3.weapons[1].callbacks`, as any object argument is. `mode: callback` stays for the interfaces of `callbacks` with virtual methods, and the import handle that carries
 the same object is named the same way.
 
+### An object returned as its offset
+
+A slot or import whose result is the block offset of an object, which it may have just made (`unsigned int` holding a `Ref`), is
+`{"mode": "object", "ref": true, "kind": "OrderFx", "poly": "OrderFx"}`: `poly` is given when the kind is a base, as for an argument. The result is written
+`o result PathOrder#3` (`i movement.NewPathOrderAt Order#2 ... = PathOrder#3` for an import), named as the concrete kind its vtable says, and `null` for 0.
+
+| Side | The replayer |
+|---|---|
+| a slot | binds the object the module returned to the recorded name when the name is new and the kinds agree, and walks it as a root of the call: the recording writes its fields as `w` lines, and they are compared as any other. Another kind, or a name already bound to another object, is a difference at `result` |
+| an import | resolves the name, allocating an object of the named kind in the block (zeroed, with its vtable) the first time, and returns its offset; a name it has made returns the same offset |
+
+An import's object starts zeroed, since the call that made it has no line to restore it from: the caller's later calls restore its fields from
+their `r` lines, once it is reachable. A `UnitRef*` argument is the object form for an embedded kind, named by its site (`a ref PathOrder#3.ref`).
+
 ### A pointer or a ref that a member of the block holds
 
 A member of `Game` or `SimGlobals` that is a raw pointer (`Game.src1`, `Game.lists[3]`), or an array of refs (`g_explodedPieces`, 100 `Ref<ExplodedPiece>`), has no block field kind of its own. It is a table of a kind whose

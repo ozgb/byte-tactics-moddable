@@ -4923,6 +4923,7 @@ EconUnit __stdcall RecEconworldFirstUnit(int a0)
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
+        ResultRoot(ROK_UNIT, ReplayRefPtr(result));
     }
     return result;
 }
@@ -4946,6 +4947,7 @@ EconUnit __stdcall RecEconworldLastUnit(int a0)
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
+        ResultRoot(ROK_UNIT, ReplayRefPtr(result));
     }
     return result;
 }
@@ -4970,6 +4972,7 @@ EconUnit __stdcall RecEconworldNextUnit(EconUnit a0)
     }
     if (scope.Open()) {
         ArgObject(s_tail, "result", ROK_UNIT, ReplayRefPtr(result), "o");
+        ResultRoot(ROK_UNIT, ReplayRefPtr(result));
     }
     return result;
 }

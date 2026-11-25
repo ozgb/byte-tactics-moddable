@@ -13,7 +13,8 @@ enum {
     RSL_FIXTURE_STRIKE = RSL_COUNT + 6,
     RSL_FIXTURE_NOTIFY = RSL_COUNT + 7,
     RSL_FIXTURE_LOCATE = RSL_COUNT + 8,
-    RSL_FIXTURE_PICK = RSL_COUNT + 9
+    RSL_FIXTURE_PICK = RSL_COUNT + 9,
+    RSL_FIXTURE_MAKEGOAL = RSL_COUNT + 10
 };
 
 struct FixtureSeam {
@@ -27,6 +28,7 @@ struct FixtureSeam {
     int (__stdcall* Notify)(FixtureNotify*, Callback*, int);
     int (__stdcall* Locate)(FixtureAmount*, FixtureAmount*);
     WeaponDef* (__stdcall* Pick)();
+    unsigned int (__stdcall* MakeGoal)();
 };
 
 const FixtureSeam* s_inner_fixture;
@@ -282,6 +284,28 @@ WeaponDef* __stdcall RecFixturePick()
     return result;
 }
 
+unsigned int __stdcall RecFixtureMakeGoal()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FIXTURE_MAKEGOAL, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.MakeGoal");
+    }
+    unsigned int result = s_inner_fixture->MakeGoal();
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_FIXTUREGOALBASE, ReplayRefPtr(result));
+        FinishImport(line);
+    }
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_FIXTUREGOALBASE, ReplayRefPtr(result), "o");
+        ResultRoot(ROK_FIXTUREGOALBASE, ReplayRefPtr(result));
+    }
+    return result;
+}
+
 FixtureSeam s_rec_fixture = {
     RecFixtureFillGoals,
     RecFixturePlaceAt,
@@ -293,4 +317,5 @@ FixtureSeam s_rec_fixture = {
     RecFixtureNotify,
     RecFixtureLocate,
     RecFixturePick,
+    RecFixtureMakeGoal,
 };

@@ -272,6 +272,11 @@ In test mode the exe also writes `ui.txt` beside `trace.txt`: the input it deliv
 selection, the camera scroll and the count of view-stream draws after each tick (format in docs/ui-log.md on `moddable`). The harness's own `order` lines are not logged.
 `--traces` stores each run's `ui.txt` in `reference/ui/<scenario>.txt`.
 
+It also writes `display.txt`, the digest of every frame's display list, and `displaylist.txt`, the full display lists of the
+frames of the `frames` ticks (or of the tick of `-testdisplay <tick>`, or of every frame with `-testdisplay all`); the format is in
+docs/display-log.md on `moddable`. `--traces` stores each run's `display.txt` in `reference/display/<scenario>.txt`, and for a
+scenario with a `frames` line its `displaylist.txt` in `reference/displaylists/<scenario>.txt`.
+
 ## Console commands
 
 A scenario can type a console command, as the chat line does. One `console` line per command:

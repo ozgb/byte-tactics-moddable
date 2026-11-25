@@ -52299,7 +52299,7 @@ address,function,file,kind,target
 ,OrdersApply,src/orders/orders_apply.cpp,field_read,OrdersAdd::target
 ,OrdersApply,src/orders/orders_apply.cpp,field_read,OrdersAdd::type
 ,OrdersApply,src/orders/orders_apply.cpp,field_read,OrdersAttacked::attacker
-,OrdersApply,src/orders/orders_apply.cpp,field_read,OrdersCancel::order
+,OrdersApply,src/orders/orders_apply.cpp,field_read,OrdersCancel::type
 ,OrdersApply,src/orders/orders_apply.cpp,field_read,OrdersEventHeader::kind
 ,OrdersApply,src/orders/orders_apply.cpp,field_read,OrdersEventHeader::unit
 ,OrdersApply,src/orders/orders_apply.cpp,field_read,OrdersParalyze::ticks

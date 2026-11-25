@@ -183,6 +183,28 @@ class HostLintTest(unittest.TestCase):
         self.assertIn("src/gone.cpp", found[0])
         self.assertIn("does not exist", found[0])
 
+    def test_host_only_calls_outside_host_fail(self):
+        for call, entry in [("_mkdir(buf);", "host_dir_create"), ("mkdir(buf);", "host_dir_create"),
+                            ("t = time(0);", "host_wall_seconds"), ("t = ::time (NULL);", "host_wall_seconds"),
+                            ("t = std::time(0);", "host_wall_seconds"), ("raise(SIGABRT);", "host_exit")]:
+            with self.subTest(call=call):
+                self.write("src/game/a.cpp", f"void f()\n{{\n    {call}\n}}\n")
+                found = self.lint()
+                self.assertEqual(len(found), 1)
+                self.assertIn("src/game/a.cpp:3:", found[0])
+                self.assertIn(entry, found[0])
+
+    def test_host_only_calls_lookalikes_pass(self):
+        self.write("src/game/a.cpp", "#include <time.h>\n"
+                   "// time(0) in a comment\n/* raise(SIGABRT) */\n"
+                   'const char* s = "_mkdir(x)";\n'
+                   "void f() { host_window_raise(); e._Doraise(); p->time(); o.time(); A::time(); start_time(); }\n")
+        self.assertEqual(self.lint(), [])
+
+    def test_host_only_calls_in_host_pass(self):
+        self.write("src/host/win32/a.cpp", "int f() { return time(0) + _mkdir(\"a\"); }\n")
+        self.assertEqual(self.lint(), [])
+
     def test_main_exit_codes(self):
         self.write("tests/a.cpp", "#include <windows.h>\n")
         with contextlib.redirect_stdout(io.StringIO()) as out:

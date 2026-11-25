@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include "../../interfaces/host.h"
 #include "../util/tdf.h"
 
 class Mission;
@@ -484,7 +484,7 @@ void __stdcall SaveGameScreenHandler(Gui* gadget)
     if (strlen(text) != 0) {
         save.games = (int)FindGadgetChecked(entries, "GAMES");
         BuildDataPath(g_game->saveName_38c6b, g_savegameDir, text, "SAV");
-        SaveGameFile(g_game->saveName_38c6b, text, time(0));
+        SaveGameFile(g_game->saveName_38c6b, text, host_wall_seconds());
     }
 }
 

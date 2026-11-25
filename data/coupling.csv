@@ -479,6 +479,7 @@ files,platform,call,SetOutOfMemoryHandler,2
 files,platform,call,StringRef::~StringRef,2
 files,platform,call,host_atomic_exchange,2
 files,platform,call,host_dir_close,8
+files,platform,call,host_dir_create,1
 files,platform,call,host_dir_first,1
 files,platform,call,host_dir_next,1
 files,platform,call,host_event_set,2
@@ -494,6 +495,7 @@ files,platform,call,host_file_size,6
 files,platform,call,host_file_truncate,1
 files,platform,call,host_file_write,7
 files,platform,call,host_thread_id,2
+files,platform,call,host_wall_seconds,1
 files,platform,shared_write,Display::count,2
 files,platform,shared_write,Display::files,2
 files,platform,shared_write,_finddata_t::attrib,1
@@ -942,6 +944,7 @@ game,platform,call,host_crash_report,3
 game,platform,call,host_crash_set_cleanup,1
 game,platform,call,host_debug_break,1
 game,platform,call,host_dir_set_current,1
+game,platform,call,host_exit,1
 game,platform,call,host_fatal,1
 game,platform,call,host_file_close,3
 game,platform,call,host_file_config_int,1
@@ -970,6 +973,7 @@ game,platform,call,host_thread_id,1
 game,platform,call,host_thread_start,1
 game,platform,call,host_time_counter,1
 game,platform,call,host_time_ms,1
+game,platform,call,host_wall_seconds,3
 game,platform,call,host_window_place,2
 game,platform,call,operator delete,6
 game,platform,call,operator new,5
@@ -1903,6 +1907,7 @@ harness,platform,call,host_mutex_lock,3
 harness,platform,call,host_mutex_unlock,3
 harness,platform,call,host_thread_id,3
 harness,platform,call,host_time_counter,1
+harness,platform,call,host_wall_seconds,1
 harness,platform,call,operator new,3
 harness,platform,shared_write,Player::type,2
 harness,platform,shared_write,Seams::weapons,1
@@ -3087,6 +3092,7 @@ network,platform,call,host_thread_set_priority,2
 network,platform,call,host_thread_start,1
 network,platform,call,host_time_ms,2
 network,platform,call,host_user_name,2
+network,platform,call,host_wall_seconds,1
 network,platform,call,operator delete,20
 network,platform,call,operator new,17
 network,platform,call,operator==,8

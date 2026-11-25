@@ -1821,7 +1821,7 @@ harness,network,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,network,shared_write,Seams::mission,7
 harness,network,shared_write,Seams::movement,1
 harness,network,shared_write,Seams::scripts,3
-harness,orders,call,Add,100
+harness,orders,call,Add,101
 harness,orders,call,FindOrderByType,1
 harness,orders,indirect,OrdersWriteState,1
 harness,orders,shared_write,FeaturesSeam::FindFeatureAtPos,3

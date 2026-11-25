@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>
-#include <time.h>
 #include "../../interfaces/host.h"
 #include "../util/engine_services.h"
 #include "../state/game_rand.h"
@@ -198,7 +197,7 @@ void __cdecl LoadMatch(void*)
 
     perfCount = host_time_counter();
     SeedRandom(HarnessGameSeed((unsigned int)perfCount + (unsigned int)(perfCount >> 32)));
-    GameSrand(RAND_STREAM_LOAD, HarnessCrtSeed((unsigned)time(NULL)));
+    GameSrand(RAND_STREAM_LOAD, HarnessCrtSeed(host_wall_seconds()));
     g_game->ticks = 0;
 
     const PlayerInfo* hostInfo = nullptr;

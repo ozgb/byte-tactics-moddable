@@ -398,7 +398,6 @@ void BlockInfo::SetName(char* newName)
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <ctype.h>
 #include <math.h>
 #include <yvals.h>
@@ -471,8 +470,7 @@ CommandLineNumber::CommandLineNumber(char* name, int a, int def, char* sw)
 void AbortProgram(void)
 {
     NopAbortHook();
-    raise(SIGABRT);
-    _exit(3);
+    host_exit(3);
 }
 
 extern char* g_debugKeywords[19];

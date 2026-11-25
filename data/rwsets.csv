@@ -17307,13 +17307,13 @@ address,function,file,kind,target
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,host_net_init_defaults
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,host_net_init_lobbied_connection
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,host_user_name
+0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,host_wall_seconds
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,localtime
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,sprintf
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,strcpy
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,strlen
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,strncat
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,strncpy
-0x457710,InitLobbiedConnection,src/network/net_game.cpp,call,time
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,field_escape,Game::net_14
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,field_maybe_written,Game::net_14
 0x457710,InitLobbiedConnection,src/network/net_game.cpp,field_read,DplConnectionView::desc
@@ -29868,9 +29868,9 @@ address,function,file,kind,target
 0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,call,SetDescListCleanupFlag
 0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,call,ShowSavedGameInfo
 0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,call,SkipTextLines
+0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,call,host_wall_seconds
 0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,call,sprintf
 0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,call,strlen
-0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,call,time
 0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,deref_read,*Flags_2a44
 0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,field_escape,<anon>::text
 0x492df0,SaveGameScreenHandler,src/game/savegame.cpp,field_escape,Game::message_519
@@ -30938,13 +30938,13 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,call,get
 0x497180,LoadMatch,src/game/game_load.cpp,call,host_sleep_ms
 0x497180,LoadMatch,src/game/game_load.cpp,call,host_time_counter
+0x497180,LoadMatch,src/game/game_load.cpp,call,host_wall_seconds
 0x497180,LoadMatch,src/game/game_load.cpp,call,operator PlayerInfo *
 0x497180,LoadMatch,src/game/game_load.cpp,call,operator delete
 0x497180,LoadMatch,src/game/game_load.cpp,call,operator->
 0x497180,LoadMatch,src/game/game_load.cpp,call,operator=
 0x497180,LoadMatch,src/game/game_load.cpp,call,random_shuffle
 0x497180,LoadMatch,src/game/game_load.cpp,call,sprintf
-0x497180,LoadMatch,src/game/game_load.cpp,call,time
 0x497180,LoadMatch,src/game/game_load.cpp,deref_read,*LoadingFlags
 0x497180,LoadMatch,src/game/game_load.cpp,deref_read,*LoadingPlayerRecord
 0x497180,LoadMatch,src/game/game_load.cpp,field_escape,Game::loadingFlags
@@ -32709,12 +32709,11 @@ address,function,file,kind,target
 0x49e6f0,InstallOutOfMemoryHandler,src/game/main.cpp,function,
 0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,NopAbortHook
 0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,ReportViaException
-0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,_exit
+0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,host_exit
 0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,host_file_close
 0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,host_file_open_append
 0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,host_file_write
 0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,host_message
-0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,raise
 0x49e700,OutOfMemoryHandler,src/game/main.cpp,call,strlen
 0x49e700,OutOfMemoryHandler,src/game/main.cpp,function,
 0x49e830,GameMain,src/game/main.cpp,call,CreateGameObject
@@ -32757,10 +32756,10 @@ address,function,file,kind,target
 0x49e830,GameMain,src/game/main.cpp,call,host_setting_get
 0x49e830,GameMain,src/game/main.cpp,call,host_setting_set
 0x49e830,GameMain,src/game/main.cpp,call,host_time_ms
+0x49e830,GameMain,src/game/main.cpp,call,host_wall_seconds
 0x49e830,GameMain,src/game/main.cpp,call,operator new
 0x49e830,GameMain,src/game/main.cpp,call,strcpy
 0x49e830,GameMain,src/game/main.cpp,call,strlen
-0x49e830,GameMain,src/game/main.cpp,call,time
 0x49e830,GameMain,src/game/main.cpp,field_read,<anon>::quitting
 0x49e830,GameMain,src/game/main.cpp,field_read,Display::active
 0x49e830,GameMain,src/game/main.cpp,field_read,Game::cdMode
@@ -38334,7 +38333,7 @@ address,function,file,kind,target
 0x4bcee0,RestoreStartDirectory,src/files/hpi.cpp,call,_chdir
 0x4bcee0,RestoreStartDirectory,src/files/hpi.cpp,field_escape,Display::cwd
 0x4bcee0,RestoreStartDirectory,src/files/hpi.cpp,function,
-0x4bcf00,MakeDirectoryPath,src/files/hpi.cpp,call,_mkdir
+0x4bcf00,MakeDirectoryPath,src/files/hpi.cpp,call,host_dir_create
 0x4bcf00,MakeDirectoryPath,src/files/hpi.cpp,call,strcpy
 0x4bcf00,MakeDirectoryPath,src/files/hpi.cpp,deref_read,*char
 0x4bcf00,MakeDirectoryPath,src/files/hpi.cpp,deref_write,*char
@@ -38361,6 +38360,7 @@ address,function,file,kind,target
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,host_file_create
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,host_file_seek
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,host_file_write
+0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,host_wall_seconds
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,localtime
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,memset
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,sprintf
@@ -38368,7 +38368,6 @@ address,function,file,kind,target
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,strlen
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,strncpy
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,strstr
-0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,call,time
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,deref_read,*unsigned char
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,deref_write,*unsigned char
 0x4bd160,HAPI_PackDirectory,src/files/hpi.cpp,field_read,HapiBuf::buf
@@ -41605,8 +41604,7 @@ address,function,file,kind,target
 0x4da040,CommandLineNumber::CommandLineNumber,src/debug/debug_lib.cpp,field_write,CommandLineNumber::value
 0x4da040,CommandLineNumber::CommandLineNumber,src/debug/debug_lib.cpp,function,
 0x4da0c0,AbortProgram,src/debug/debug_lib.cpp,call,NopAbortHook
-0x4da0c0,AbortProgram,src/debug/debug_lib.cpp,call,_exit
-0x4da0c0,AbortProgram,src/debug/debug_lib.cpp,call,raise
+0x4da0c0,AbortProgram,src/debug/debug_lib.cpp,call,host_exit
 0x4da0c0,AbortProgram,src/debug/debug_lib.cpp,function,
 0x4da0e0,IsDebugKeyword,src/debug/debug_lib.cpp,call,_strnicmp
 0x4da0e0,IsDebugKeyword,src/debug/debug_lib.cpp,call,strlen
@@ -47211,12 +47209,12 @@ address,function,file,kind,target
 ,HarnessInit,src/harness/harness.cpp,call,_control87
 ,HarnessInit,src/harness/harness.cpp,call,_strnicmp
 ,HarnessInit,src/harness/harness.cpp,call,host_log
+,HarnessInit,src/harness/harness.cpp,call,host_wall_seconds
 ,HarnessInit,src/harness/harness.cpp,call,isspace
 ,HarnessInit,src/harness/harness.cpp,call,memcpy
 ,HarnessInit,src/harness/harness.cpp,call,memset
 ,HarnessInit,src/harness/harness.cpp,call,sprintf
 ,HarnessInit,src/harness/harness.cpp,call,strcpy
-,HarnessInit,src/harness/harness.cpp,call,time
 ,HarnessInit,src/harness/harness.cpp,deref_read,*char
 ,HarnessInit,src/harness/harness.cpp,field_read,Seams::ai
 ,HarnessInit,src/harness/harness.cpp,field_write,Seams::ai
@@ -64701,6 +64699,10 @@ address,function,file,kind,target
 ,host_dir_close,src/host/win32/files.cpp,call,free
 ,host_dir_close,src/host/win32/files.cpp,field_read,HostDir::entries
 ,host_dir_close,src/host/win32/files.cpp,function,
+,host_dir_create,src/host/win32/files.cpp,call,_mkdir
+,host_dir_create,src/host/win32/files.cpp,call,_stat
+,host_dir_create,src/host/win32/files.cpp,field_read,_stat::st_mode
+,host_dir_create,src/host/win32/files.cpp,function,
 ,host_dir_first,src/host/win32/files.cpp,call,FillEntry
 ,host_dir_first,src/host/win32/files.cpp,call,_findclose
 ,host_dir_first,src/host/win32/files.cpp,call,_findfirst
@@ -65376,6 +65378,8 @@ address,function,file,kind,target
 ,host_time_ms,src/host/win32/time.cpp,function,
 ,host_user_name,src/host/win32/process.cpp,call,GetUserNameA
 ,host_user_name,src/host/win32/process.cpp,function,
+,host_wall_seconds,src/host/win32/time.cpp,call,time
+,host_wall_seconds,src/host/win32/time.cpp,function,
 ,host_win32_window,src/host/win32/window.cpp,function,
 ,host_win32_window,src/host/win32/window.cpp,global_read,g_hwnd
 ,host_window_client_origin,src/host/win32/window.cpp,call,ClientToScreen

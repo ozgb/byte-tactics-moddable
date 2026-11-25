@@ -2983,7 +2983,7 @@ static const TraceField kGameScalarFields[] = {
     { "spotField_1421f", 0x1421f, 4, TF_POINTER, TT_HEAP, 0x0 },
     { "scanIndex", 0x14257, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "mapFlags", 0x14281, 2, TF_SCALAR, TT_NONE, 0xfff7 },
-    { "endGameFlags", 0x3923b, 2, TF_SCALAR, TT_NONE, 0x0 },
+    { "endGameFlags", 0x3923b, 2, TF_SCALAR, TT_NONE, 0xfffc },
     { "uiOptionFlags", 0x37f2f, 2, TF_SCALAR, TT_NONE, 0x788 },
 };
 

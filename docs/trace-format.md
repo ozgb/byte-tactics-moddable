@@ -494,7 +494,8 @@ for each field F of game_scalars, in order:   hash F at game+F.offset
 for each entry G of globals.game, in order:   hash G
 END
 ```
-Dump: `game.<name>`. Masked fields are dumped as masked.
+Dump: `game.<name>`. Masked fields are dumped as masked. `endGameFlags` is masked with 0xfffc: bits 0 and 1, the debug
+display and debug mode, are view state (`docs/state.md`, "The debug bits of endGameFlags").
 
 ### 8.2 map cells (section 11)
 

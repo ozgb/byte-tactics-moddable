@@ -72,6 +72,7 @@ TARGET_NAMES = ["", "heap", "unit", "player", "unitdef", "weapondef", "projectil
                 "node", "moveclass", "order", "orderfx", "link"]
 GAME_MASK_REASONS: dict[str, str] = {
     "mapFlags": "bit 3 is cleared by the camera, which is presentation",
+    "endGameFlags": "bits 0 and 1, the debug display and debug mode, are view state: presentation sets them and reads them",
     "uiOptionFlags": "only bits 3 and 7 to 10, the treedeath and cheat toggles the simulation reads, are kept",
 }
 
@@ -945,7 +946,7 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
     ("spotField_1421f", 0x1421F, 4, "HEAP", 0),
     ("scanIndex", 0x14257, 4, None, 0),
     ("mapFlags", 0x14281, 2, None, 0xFFF7),
-    ("endGameFlags", 0x3923B, 2, None, 0),
+    ("endGameFlags", 0x3923B, 2, None, 0xFFFC),
     ("uiOptionFlags", 0x37F2F, 2, None, 0x788),
 ]
 

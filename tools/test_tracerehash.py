@@ -650,7 +650,7 @@ class TailWriteTest(unittest.TestCase):
 
 
 class SelectionTest(unittest.TestCase):
-    """The selection, bit 0x10 of a unit's flags, is view state: setting it between two ticks changes no row (#1050)."""
+    """The selection (bit 0x10 of a unit's flags) and the debug bits (bits 0 and 1 of endGameFlags) are view state: setting them between two ticks changes no row (#1050)."""
 
     FIXTURE = Path(__file__).resolve().parent / "testdata/tracerehash/orders-build-patrol-24"
 
@@ -661,9 +661,9 @@ class SelectionTest(unittest.TestCase):
         cls.blocks = tr.parse_dump(tr.read_text(f"{cls.FIXTURE}.dump.txt.xz"), cls.schema.data["trace_format"])
         cls.trace = tr.parse_trace_rows(tr.read_text(f"{cls.FIXTURE}.trace.txt"))
 
-    def rows_with_flags(self, bit):
+    def rows_with_flags(self, bit, field="units[1].flags"):
         def change(path, value):
-            return (path, "0x%08x" % (int(value, 16) ^ bit)) if path == "units[1].flags" else (path, value)
+            return (path, "0x%0*x" % (len(value) - 2, int(value, 16) ^ bit)) if path == field else (path, value)
         blocks = {key: [change(path, value) for path, value in lines] for key, lines in self.blocks.items()}
         return {phase: f"{value:016x}" for _, phase, value in tr.rehash(self.schema, blocks)}
 
@@ -672,6 +672,17 @@ class SelectionTest(unittest.TestCase):
         got = self.rows_with_flags(0x10)
         for phase, value in got.items():
             self.assertEqual(value, self.trace[(24, phase)], phase)
+
+    def test_the_debug_bits_change_no_row(self):
+        self.assertEqual(int(dict(self.blocks[(24, "tick")])["game.endGameFlags"], 16) & 3, 0)
+        for bit in (1, 2):
+            got = self.rows_with_flags(bit, "game.endGameFlags")
+            for phase, value in got.items():
+                self.assertEqual(value, self.trace[(24, phase)], (bit, phase))
+
+    def test_the_game_over_bit_changes_the_rows(self):
+        got = self.rows_with_flags(4, "game.endGameFlags")
+        self.assertNotEqual(got["tick"], self.trace[(24, "tick")])
 
     def test_the_selectable_bit_changes_the_rows(self):
         got = self.rows_with_flags(0x20)

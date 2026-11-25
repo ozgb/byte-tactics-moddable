@@ -178,6 +178,18 @@ Who touches the bit:
   `LoadUnit` (unit_save.cpp) restores it from the save.
 - The harness reads it for the UI log's `select` record.
 
+## The debug bits of endGameFlags
+
+Bits 0 and 1 of `endGameFlags` (+0x3923b) are view state too: bit 0 is the debug display (`INFO ON`) and bit 1 debug
+mode. The trace masks them out of the game scalars (mask 0xfffc). The word's other bits are the simulation's (bit 2,
+the game is over, and bit 3, set when a saved game is chosen to load), so the rows of `data/state_classes.csv` keep class `sim`.
+
+- Presentation sets them: `HandleGameKey` (keys.cpp) flips bit 1 and clears bit 0 with it, and `HandleDebugHotkey`
+  (game_dialogs.cpp) flips bit 0. It reads them in the panels (info_panel.cpp) and the keys (keys.cpp).
+- Game logic reads bit 1 once: `CmdDebugBreak` (console_commands.cpp), a console command, which with the cheats on
+  runs the out-of-memory tests. Nothing in the tick reads either bit.
+- Game logic writes them once: `InitGame` (game_state.cpp) clears both.
+
 ## Determinism findings
 
 - **`g_timeoutTimerStart`** is set from wall-clock `GetTicks()` in `CheckPlayerTimeouts` (net_game.cpp), and `IsTimedOut` reads it. This is network only and already a #40 task.

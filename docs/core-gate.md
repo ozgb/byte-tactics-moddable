@@ -213,7 +213,9 @@ it is stored.
 - one directory of the host shared with it, at the same path inside the machine: the inputs directory, the core and its
   module, and the files the core writes. Nothing else of the host is visible in the machine;
 - each run of the core is one command executed in the machine, with a time limit of 120 seconds;
-- the gate reads `OUT` from the shared directory and compares it with the stored vectors on the host. The stored values
+- the gate writes every input, the calls of every vector included, into the shared directory before the core first
+  runs, and nothing after. It reads each `OUT` without following a link the core made, through descriptors of the
+  inputs directory taken before the first run, and compares it with the stored vectors on the host. The stored values
   never enter the machine, and only `result.json` crosses back to the clean room, as for a module
   (`docs/module-abi.md`, section 15, and `docs/cleanroom.md`, "Gate").
 
@@ -226,6 +228,8 @@ it is stored.
 | crashes, or exits with a status other than 0 | `failed`, `reason` `exit status N` (a signal is reported as its negative number) |
 | runs past the time limit | `failed`, `reason` `timed out after 120 s`; the gate stops waiting for it, and the machine is deleted at the end of the gate run |
 | writes no `OUT`, or a line that is not a call name, a tab and JSON | `failed`, `reason` `no output file` or `malformed output: ...` |
+| leaves at `OUT` something other than a regular file (a link, a directory, a pipe), or replaces a directory on its path with one | `failed`, `reason` `OUT is not a regular file` |
+| writes an `OUT` of more than 256 MiB | `failed`, `reason` `OUT is larger than 268435456 bytes` |
 | can't be started | `failed`, `reason` `could not start the core: ...` |
 
 **The mailbox.** Through the mailbox of the clean room, a request is `outbox/ID/core` (the executable),

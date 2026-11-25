@@ -36,10 +36,23 @@ if mode == "hang":
     time.sleep(60)
 if mode == "nofile":
     sys.exit(0)
+first = os.path.basename(calls_path) == "0.calls"
+runs = os.path.dirname(calls_path)
+if mode == "outlink":
+    os.symlink(os.environ["FAKE_TARGET"], out_path)
+    sys.exit(0)
+if mode == "plant" and first:
+    for name in os.listdir(runs):
+        if name.endswith(".calls") and name != "0.calls":
+            os.remove(os.path.join(runs, name))
+            os.symlink(os.environ["FAKE_TARGET"], os.path.join(runs, name))
 calls = [l.rstrip("\\n").split("\\t") for l in open(calls_path, newline="")]
 for v in json.load(open(%(dir)r + "/" + group + ".json"))["vectors"]:
     if v["calls"] == calls:
         res = v["results"]
+        if mode == "runslink" and first:
+            os.rename(runs, runs + ".old")
+            os.symlink(os.environ["FAKE_TARGET"], runs)
         with open(out_path, "w") as f:
             if mode == "malformed":
                 f.write("no tab here\\n")
@@ -69,9 +82,45 @@ class Fake(unittest.TestCase):
     def tearDownClass(cls) -> None:
         shutil.rmtree(cls.tmp)
 
-    def run_fake(self, mode: str, group: str = "commands") -> dict:
-        env = {**os.environ, "FAKE_MODE": mode}
-        return coregate.judge(lambda inputs: [sys.executable, str(self.script)], self.module, (group, "play"), env=env)
+    def run_fake(self, mode: str, group: str = "commands", target: Path | None = None, jobs: int = 8) -> dict:
+        env = {**os.environ, "FAKE_MODE": mode, "FAKE_TARGET": str(target)}
+        return coregate.judge(lambda inputs: [sys.executable, str(self.script)], self.module, (group, "play"), env=env,
+                              jobs=jobs)
+
+    def host_file(self) -> Path:
+        """A file outside the inputs directory, written as an OUT line a gate that followed links would report."""
+        where = Path(tempfile.mkdtemp(dir=self.tmp))
+        marker = where / "marker"
+        marker.write_text('deliver\t"HOST-SECRET-MARKER"\n')
+        return marker
+
+    def test_out_link_is_not_followed(self) -> None:
+        marker = self.host_file()
+        result = self.run_fake("outlink", target=marker)
+        self.assertEqual({v["reason"] for v in result["vectors"].values()}, {"OUT is not a regular file"})
+        self.assertNotIn("HOST-SECRET-MARKER", json.dumps(result))
+
+    def test_planted_calls_link_is_not_written(self) -> None:
+        marker = self.host_file()
+        before = marker.read_bytes()
+        result = self.run_fake("plant", target=marker, jobs=1)
+        self.assertEqual(marker.read_bytes(), before)
+        self.assertEqual(sorted(os.listdir(marker.parent)), ["marker"])
+        self.assertNotIn("HOST-SECRET-MARKER", json.dumps(result))
+        states = [v["status"] for v in result["vectors"].values()]
+        self.assertEqual(states[0], "equal")
+        self.assertTrue(all(s == "failed" for s in states[1:]))
+
+    def test_runs_link_is_not_followed(self) -> None:
+        marker = self.host_file()
+        before = marker.read_bytes()
+        result = self.run_fake("runslink", target=marker.parent, jobs=1)
+        self.assertEqual(marker.read_bytes(), before)
+        self.assertEqual(sorted(os.listdir(marker.parent)), ["0.out", "marker"])
+        first = next(iter(result["vectors"].values()))
+        self.assertEqual(first, {"status": "failed", "reason": "OUT is not a regular file"})
+        self.assertTrue(all(v["status"] == "failed" for v in result["vectors"].values()))
+        self.assertNotIn("HOST-SECRET-MARKER", json.dumps(result))
 
     def test_equal(self) -> None:
         for group in coregate.JUDGED:
@@ -109,7 +158,7 @@ class Fake(unittest.TestCase):
         self.assertNotIn("b9da8a7f2d638968", json.dumps(result))
 
     def test_files_gate_that_cannot_run_is_failed(self) -> None:
-        with mock.patch.object(coregate.filesgate, "judge", side_effect=coregate.CouldNotRun("no fixtures")):
+        with mock.patch.object(coregate.filesgate, "stored_groups", side_effect=coregate.CouldNotRun("no fixtures")):
             result = coregate.judge(lambda inputs: [sys.executable, str(self.script)], self.module, ("files",))
         self.assertEqual(result["groups"]["files"], {"status": "failed", "vectors": 0, "reason": "no fixtures"})
         self.assertEqual(result["verdict"], "failed")

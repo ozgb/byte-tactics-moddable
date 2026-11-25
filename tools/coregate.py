@@ -6,8 +6,11 @@
 
 A core answers `CORE GROUP CALLS OUT` as docs/core-gate.md states. Each vector of reference/core/<group>.json is one run:
 the gate copies reference/core/ to an inputs directory (unpacking each `.xz`, adding data/trace_schema.json and the
-module as `module.wasm`), writes the vector's calls to CALLS, runs the core there, and compares each line of OUT with the
-stored result on the host. The `files` group is the files gate's (tools/filesgate.py), run on the same core.
+module as `module.wasm`, and the files gate's fixtures), writes every vector's CALLS, and only then runs the core there,
+once for each vector. It writes nothing into that directory once the core has run, and reads each OUT through
+descriptors taken before, following no link: a core shares the directory read-write, and a link it makes must not
+lead the host to a file of its own. Each line of OUT is compared with the stored result on the host. The `files` group
+is the files gate's vectors (tools/filesgate.py), run the same way.
 
 A submitted core runs only inside a machine of the clean-room image with no network (tools/cleanroom/coresandbox.py);
 nothing of the stored values enters it. `--trusted` runs the in-repo engine, tools/coreadapter.py, directly, and takes
@@ -24,6 +27,7 @@ import json
 import lzma
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -42,6 +46,7 @@ SCHEMA = ROOT / "data" / "trace_schema.json"
 TRUSTED_MODULE = ROOT / "build" / "modern" / "wind_meteors.wasm"
 FORMAT = 1
 TIMEOUT = 120
+OUT_LIMIT = 256 << 20
 JUDGED = ("hash", "rand", "events", "commands", "loader", "fuel", "host")
 GROUPS = (*JUDGED, "files", "play")
 
@@ -65,26 +70,75 @@ def make_inputs(where: Path, module: Path) -> None:
     shutil.copyfile(module, where / "module.wasm")
 
 
-def run_vector(core: list[str], inputs: Path, group: str, index: int, calls: list[list[str]], env=None) -> dict:
+def write_calls(inputs: Path, jobs: list[tuple[str, list[str], list[list[str]]]]) -> None:
+    """Every vector's calls file, written before the core first runs: the gate writes nothing into the share after."""
+    for n, (_, _, calls) in enumerate(jobs):
+        (inputs / "runs" / ("%d.calls" % n)).write_text(calls_text(calls), newline="")
+
+
+def read_out(inputs_fd: int, name: str) -> str:
+    """OUT through descriptors taken before the core ran, following no link the core made: a regular file, capped."""
+    runs = os.open("runs", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=inputs_fd)
+    try:
+        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=runs)
+    finally:
+        os.close(runs)
+    try:
+        st = os.fstat(fd)
+        if not stat.S_ISREG(st.st_mode):
+            raise NotRegular()
+        if st.st_size > OUT_LIMIT:
+            raise ValueError("OUT is larger than %d bytes" % OUT_LIMIT)
+        with os.fdopen(fd, "rb", closefd=False) as f:
+            data = f.read(OUT_LIMIT + 1)
+        if len(data) > OUT_LIMIT:
+            raise ValueError("OUT is larger than %d bytes" % OUT_LIMIT)
+        return data.decode("latin-1")
+    finally:
+        os.close(fd)
+
+
+class NotRegular(Exception):
+    pass
+
+
+def run_one(argv: list[str], inputs: Path, inputs_fd: int, n: int, env=None) -> dict:
     """Run one vector in the inputs directory: {"lines": [...]} or {"failed": reason}."""
     runs = inputs / "runs"
-    cpath, opath = runs / ("%s-%d.calls" % (group, index)), runs / ("%s-%d.out" % (group, index))
-    cpath.write_text(calls_text(calls), newline="")
     try:
-        proc = subprocess.run(core + [group, str(cpath), str(opath)], cwd=inputs, stdin=subprocess.DEVNULL,
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=TIMEOUT, env=env)
+        proc = subprocess.run(argv + [str(runs / ("%d.calls" % n)), str(runs / ("%d.out" % n))], cwd=inputs,
+                              stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                              timeout=TIMEOUT, env=env)
     except subprocess.TimeoutExpired:
         return {"failed": "timed out after %d s" % TIMEOUT}
     except OSError as e:
         return {"failed": "could not start the core: %s" % e}
     if proc.returncode != 0:
         return {"failed": "exit status %d" % proc.returncode}
-    if not opath.is_file():
-        return {"failed": "no output file"}
     try:
-        return {"lines": parse_out(opath.read_text(encoding="latin-1"))}
+        text = read_out(inputs_fd, "%d.out" % n)
+    except FileNotFoundError:
+        return {"failed": "no output file"}
+    except (NotRegular, OSError):
+        return {"failed": "OUT is not a regular file"}
+    except ValueError as e:
+        return {"failed": str(e)}
+    try:
+        return {"lines": parse_out(text)}
     except ValueError as e:
         return {"failed": "malformed output: %s" % e}
+
+
+def run_all(core, inputs: Path, jobs: list[tuple[str, list[str], list[list[str]]]], env=None, workers: int = 8) -> list[dict]:
+    """Run each (key, arguments before CALLS and OUT, calls) job; every host input is written before the first run."""
+    write_calls(inputs, jobs)
+    inputs_fd = os.open(inputs, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        argv = core(inputs)
+        with concurrent.futures.ThreadPoolExecutor(workers) as pool:
+            return list(pool.map(lambda nj: run_one(argv + nj[1][1], inputs, inputs_fd, nj[0], env), enumerate(jobs)))
+    finally:
+        os.close(inputs_fd)
 
 
 def stored(groups) -> dict[str, dict]:
@@ -96,6 +150,10 @@ def stored(groups) -> dict[str, dict]:
 
 def status_of(states: list[str]) -> str:
     return "equal" if all(s == "equal" for s in states) else "failed" if "failed" in states else "differs"
+
+
+def verdict(calls: list[list[str]], want: list, run: dict) -> dict:
+    return {"status": "failed", "reason": run["failed"]} if "failed" in run else compare(calls, want, run["lines"])
 
 
 def judge(core, module: Path, groups=GROUPS, scratch: Path | None = None, env=None, jobs: int = 8) -> dict:
@@ -111,27 +169,35 @@ def judge(core, module: Path, groups=GROUPS, scratch: Path | None = None, env=No
         inputs = Path(tmp) / "inputs"
         (inputs / "runs").mkdir(parents=True)
         make_inputs(inputs, module)
-        jobs_list = [(g, i, v) for g in judged for i, v in enumerate(data[g]["vectors"])]
-        with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
-            runs = list(pool.map(lambda j: run_vector(core(inputs), inputs, j[0], j[1], j[2]["calls"], env), jobs_list))
-        for (g, _, v), run in zip(jobs_list, runs):
-            vectors["%s/%s" % (g, v["name"])] = {"status": "failed", "reason": run["failed"]} if "failed" in run \
-                else compare(v["calls"], v["results"], run["lines"])
+        work = [("%s/%s" % (g, v["name"]), [g], v) for g in judged for v in data[g]["vectors"]]
+        files_data, files_problem = {}, None
+        if "files" in groups:
+            fixtures = inputs / "fixtures"
+            try:
+                files_data = filesgate.stored_groups()
+                problems = filesgate.build_fixtures(fixtures)
+                if problems:
+                    raise CouldNotRun("filesgate: the rebuilt fixtures differ from reference/files/fixtures.json:\n"
+                                      + "\n".join(problems))
+            except CouldNotRun as e:
+                files_data, files_problem = {}, str(e)
+            work += [("files/%s/%s" % (fg, v["name"]), ["files", "--game", str(fixtures / v["fixture"])], v)
+                     for fg in filesgate.GROUPS if fg in files_data for v in files_data[fg]["vectors"]]
+        runs = run_all(core, inputs, [(key, args, v["calls"]) for key, args, v in work], env, jobs)
+        for (key, _, v), run in zip(work, runs):
+            vectors[key] = verdict(v["calls"], v["results"], run)
         for g in judged:
             states = [vectors["%s/%s" % (g, v["name"])]["status"] for v in data[g]["vectors"]]
             group_status[g] = {"status": status_of(states), "vectors": len(states)}
-        if "files" in groups:
-            old = tempfile.tempdir
-            tempfile.tempdir = tmp
-            try:
-                files = filesgate.judge(core(inputs), env=env)
-                group_status["files"] = {"status": files["verdict"], "vectors": len(files["vectors"]),
-                                         "groups": files["groups"]}
-                vectors.update({"files/" + k: v for k, v in files["vectors"].items()})
-            except CouldNotRun as e:
-                group_status["files"] = {"status": "failed", "vectors": 0, "reason": str(e)}
-            finally:
-                tempfile.tempdir = old
+        if files_problem is not None:
+            group_status["files"] = {"status": "failed", "vectors": 0, "reason": files_problem}
+        elif "files" in groups:
+            inner = {}
+            for fg in filesgate.GROUPS:
+                states = [vectors["files/%s/%s" % (fg, v["name"])]["status"] for v in files_data[fg]["vectors"]]
+                inner[fg] = {"status": status_of(states), "vectors": len(states)}
+            group_status["files"] = {"status": status_of([s["status"] for s in inner.values()]),
+                                     "vectors": sum(s["vectors"] for s in inner.values()), "groups": inner}
     if "play" in groups:
         group_status["play"] = {"status": "not_judged"}
     return {
@@ -191,22 +257,22 @@ def record() -> None:
         inputs = Path(tmp)
         (inputs / "runs").mkdir()
         make_inputs(inputs, TRUSTED_MODULE)
+        cases = {g: json.loads((CASES / (g + ".json")).read_text()) for g in JUDGED}
+        work = [(g, c) for g in JUDGED for c in cases[g] for _ in range(2)]
+        runs = run_all(trusted_core, inputs, [(g, [g], c["calls"]) for g, c in work])
+        vectors: dict[str, list] = {g: [] for g in JUDGED}
+        for k in range(0, len(work), 2):
+            g, case = work[k]
+            pair = runs[k:k + 2]
+            for run in pair:
+                if "failed" in run:
+                    raise SystemExit("coregate: %s/%s failed: %s" % (g, case["name"], run["failed"]))
+            if not same(pair[0]["lines"], pair[1]["lines"]):
+                raise SystemExit("coregate: %s/%s differs between two runs" % (g, case["name"]))
+            vectors[g].append({"name": case["name"], "calls": case["calls"], "results": pair[0]["lines"]})
         for g in JUDGED:
-            cases = json.loads((CASES / (g + ".json")).read_text())
-            jobs = [(i, c) for i, c in enumerate(cases)]
-            with concurrent.futures.ThreadPoolExecutor(8) as pool:
-                runs = list(pool.map(lambda j: [run_vector(trusted_core(), inputs, g, 2 * j[0] + k, j[1]["calls"])
-                                                for k in range(2)], jobs))
-            vectors = []
-            for (_, case), pair in zip(jobs, runs):
-                for run in pair:
-                    if "failed" in run:
-                        raise SystemExit("coregate: %s/%s failed: %s" % (g, case["name"], run["failed"]))
-                if not same(pair[0]["lines"], pair[1]["lines"]):
-                    raise SystemExit("coregate: %s/%s differs between two runs" % (g, case["name"]))
-                vectors.append({"name": case["name"], "calls": case["calls"], "results": pair[0]["lines"]})
-            (VECTORS / (g + ".json")).write_text(dump({"format": FORMAT, "group": g, "vectors": vectors}))
-            print("coregate: wrote %s (%d vectors)" % (g, len(vectors)))
+            (VECTORS / (g + ".json")).write_text(dump({"format": FORMAT, "group": g, "vectors": vectors[g]}))
+            print("coregate: wrote %s (%d vectors)" % (g, len(vectors[g])))
 
 
 def dump(body: dict) -> str:

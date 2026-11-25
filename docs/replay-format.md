@@ -1344,7 +1344,6 @@ economy:
 
 - `UpdateResourceSharing` and its `network.SendShareMapInfo` import: it returns unless `Game.netGameFlags` bit 0 is set, and a share needs a remote partner. No scenario is a network game, and no play-test recording is stored.
 - `Shutdown`: the game calls it when a match is unloaded, which no scenario run does before it ends. The form is replayed by the self-test.
-- `Apply` of LOAD: only a loaded game publishes it (`load-midgame` is not recorded).
 - `GetEnergyUse` is recorded at tick 0 only (`console-iwin`, the whole run, 100 ticks): the unit type loader calls it, and a window cannot start before tick 1.
 
 players:

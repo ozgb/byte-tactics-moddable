@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -234,6 +235,45 @@ class Fake(unittest.TestCase):
             self.assertEqual(e.exception.code, 2, argv)
 
 
+ECHO = """
+import json, sys
+group, calls_path, out_path = sys.argv[1:4]
+closing = ("o params.", "o result ")
+with open(out_path, "w") as out:
+    for call in [l.rstrip("\\n").split("\\t") for l in open(calls_path, newline="")]:
+        entries = []
+        for line in open(call[1]).read().split("\\n"):
+            if line.startswith("call "):
+                entries.append([])
+            elif line.startswith("  w ") or line.startswith(closing, 2):
+                entries[-1].append(line[2:])
+        out.write("replay\\t" + json.dumps(entries) + "\\n")
+"""
+
+
+class Echo(unittest.TestCase):
+    """A core that echoes a recording's own `w` and closing `o` lines, hosting no module, fails the host group."""
+
+    def test_echo_of_the_full_recording_would_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            script, calls, out = Path(tmp) / "echo.py", Path(tmp) / "calls", Path(tmp) / "out"
+            script.write_text(ECHO)
+            for v in coregate.stored(["host"])["host"]["vectors"]:
+                full = coregate.ROOT / "tests" / "replay" / "wind_meteors" / Path(v["calls"][0][1]).name
+                calls.write_text(coregate.calls_text([["replay", str(full), "module.wasm"]]))
+                subprocess.run([sys.executable, str(script), "host", str(calls), str(out)], check=True)
+                self.assertEqual(json.loads(out.read_text().split("\t", 1)[1]), v["results"][0][1], v["name"])
+
+    def test_echo_of_the_gate_inputs_differs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            script = Path(tmp) / "echo.py"
+            script.write_text(ECHO)
+            result = coregate.judge(lambda inputs: [sys.executable, str(script)], coregate.ROOT / "tools" / "coregate.py",
+                                    ("host",))
+        self.assertEqual(result["groups"]["host"]["status"], "differs")
+        self.assertTrue(all(v["status"] == "differs" for v in result["vectors"].values()))
+
+
 @unittest.skipUnless(ENGINE and shutil.which("wine"), "needs the modern build's adapters and wine")
 class Engine(unittest.TestCase):
     """The in-repo engine is equal, and each fault makes its group differ."""
@@ -272,6 +312,51 @@ class Engine(unittest.TestCase):
                 self.assertEqual(result["groups"]["runtime"]["status"], "differs")
                 self.assertEqual(result["vectors"]["runtime/" + entry]["line"], 1)
                 self.assertEqual(result["vectors"]["runtime/" + other]["status"], "equal")
+
+
+def group_file(*vectors: tuple[str, list]) -> bytes:
+    return coregate.dump({"format": 1, "group": "commands", "vectors": [
+        {"name": n, "calls": [["c"]], "results": r} for n, r in vectors]}).encode()
+
+
+class Frozen(unittest.TestCase):
+    path = "reference/core/commands.json"
+    base = {path: group_file(("a", ["1"]), ("b", ["2"])), "reference/core/commands/a.txt": b"x"}
+
+    def failures(self, head: dict, unfrozen: set = frozenset()) -> list[str]:
+        return coregate.frozen_failures(self.base, {**self.base, **head}, unfrozen)
+
+    def test_a_changed_vector_fails(self):
+        self.assertEqual(self.failures({self.path: group_file(("a", ["1"]), ("b", ["3"]))}),
+                         ["reference/core/commands.json: vector b changed"])
+
+    def test_a_removed_vector_or_group_fails(self):
+        self.assertEqual(self.failures({self.path: group_file(("a", ["1"]))}),
+                         ["reference/core/commands.json: vector b removed"])
+        self.assertEqual(len(self.failures({self.path: None})), 2)
+
+    def test_an_added_vector_passes(self):
+        self.assertEqual(self.failures({self.path: group_file(("a", ["1"]), ("b", ["2"]), ("c", ["4"]))}), [])
+
+    def test_a_changed_input_file_fails(self):
+        self.assertEqual(self.failures({"reference/core/commands/a.txt": b"y"}),
+                         ["reference/core/commands/a.txt: changed"])
+        self.assertEqual(self.failures({"reference/core/commands/a.txt": None}),
+                         ["reference/core/commands/a.txt: removed"])
+
+    def test_a_group_with_a_new_row_may_change(self):
+        head = {self.path: group_file(("a", ["9"])), "reference/core/commands/a.txt": b"y"}
+        self.assertEqual(self.failures(head, {"commands"}), [])
+        self.assertEqual(len(self.failures(head, {"hash"})), 3)
+
+    def test_only_an_added_or_edited_row_unfreezes(self):
+        row = {self.path: {"header": self.path, "major": "", "decision": "#1"}}
+        edited = {self.path: {"header": self.path, "major": "", "decision": "#2"}}
+        empty = {self.path: {"header": self.path, "major": "", "decision": ""}}
+        self.assertEqual(coregate.unfrozen_groups({}, row), {"commands"})
+        self.assertEqual(coregate.unfrozen_groups(row, edited), {"commands"})
+        self.assertEqual(coregate.unfrozen_groups(row, row), set())
+        self.assertEqual(coregate.unfrozen_groups({}, empty), set())
 
 
 if __name__ == "__main__":

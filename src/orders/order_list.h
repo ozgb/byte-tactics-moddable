@@ -1,6 +1,7 @@
 #ifndef ORDER_LIST_H
 #define ORDER_LIST_H
 class MissionType;
+struct Order;
 struct Unit;
 struct Vec3;
 
@@ -44,5 +45,7 @@ int __stdcall GetOrderTarget(int);
 
 void __stdcall IssueOrCancelOrder(unsigned char kind, int remove, Unit* owner, int id, int* pos, int param_6, int param_7);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner, Unit* target, Vec3* pos, int, int);
+
+void __stdcall DeleteOrder(Unit* owner, Order* node);
 
 #endif

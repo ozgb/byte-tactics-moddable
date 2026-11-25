@@ -2,7 +2,7 @@
 
 A test-mode run of the game can be fed raw input (key presses, characters and mouse
 events) by tick, and writes `ui.txt` beside `trace.txt`. The log lists the input it
-delivered, every order and queued build the game's own interface turned that input
+delivered, every group command, order and queued build the game's own interface turned that input
 into, the control groups it made and recalled, and the selection and camera after
 each tick. Two builds conform when the same input gives the same log, so a
 re-implementation of the interface is judged on its behaviour alone: nothing in the log depends on
@@ -86,11 +86,22 @@ interface did with the input.
 | `scroll` | `<x> <z>` | The camera scroll, at tick 1 and at the end of any tick where it differs from the last `scroll` line. Every scenario logs it (see below). |
 | `view` | `<draws>` | The number of draws made so far from the view random stream, counted from the start of the run, at the end of any tick where it differs from the last `view` line. A draw made between two steps counts into the next tick. See below. |
 | `select` | `<units>` | The local player's selected units, at tick 1 and at the end of any tick where the selection differs from the last `select` line. |
+| `command` | `order mode <M> kind <KIND or -> units <units> target <T or -> pos <x> <y> <z> or - param <N> amount <A> remove <0 or 1>`, or `build type <TYPE> units <units> pos <x> <y> <z> remove <0 or 1>` | One click that orders the selection, as the one group command it sends. See below. |
 | `order` | `<KIND> unit <U> target <T or -> pos <x> <y> <z> or - type <NAME or -> param <N or -> amount <A> remove <0 or 1>` | One order given to one unit. See below. |
 | `qbuild` | `<U> <TYPE> <count>` | A click in a factory's build menu changed the build queue of unit `U` by `count` (1 or 5, negative for a right click) of the unit type, or missile, named `TYPE` by the button. |
 | `cancel` | `<KIND> unit <U>` | The interface cancelled a queued order of kind `KIND` of unit `U` (the self-destruct toggle). |
 | `group` | `<n> <units>` | Control group `n` was made: the units now in it. |
 | `groupsel` | `<n> <units>` | Control group `n` was recalled: the units in it before the selection changed. |
+
+The `command` record is the click before any unit gets an order: one line for each
+order the interface gives the selection, before that order's `order` lines. `order` is
+an order click: `mode` is the cursor's order mode (0 when the order type is given
+directly), and `kind` is the order type's name when `mode` is 0 and `-` otherwise.
+`build` is a build site placed for the selected builders, with `TYPE` the unit type. `units`
+are the selected units of the local player, every one of them whether or not it takes
+the order (`-` for none); `target` is the unit under the cursor or `-`; `param` and
+`amount` are the order's number and count as the interface passed them. The orders
+module's expansion of the command gives the `order` lines that follow it.
 
 The `order` record has one line for each unit that gets the order, after the game has
 spread a position over a group of selected units. `KIND` is the game's name of the
@@ -101,9 +112,9 @@ order builds, for the building orders, otherwise `-`; `param` is the order's num
 orders. `amount` is the order's count. `remove` is 1 when the player held Shift: the
 order joins the queue instead of replacing it, and repeating a queued order cancels it.
 
-Orders the scenario's own `order` lines give are not in the log, being the
-scenario's and not the interface's; an order a `console` line types (the chat line)
-is.
+Commands and orders the scenario's own `order` lines give are not in the log, being the
+scenario's and not the interface's; a command a `console` line types (the chat line)
+is, with its orders.
 
 ## What the check compares
 

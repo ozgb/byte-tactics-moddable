@@ -1,0 +1,6 @@
+header,major,decision
+interfaces/files.h,3,#1042
+interfaces/rand_stream.h,1,#1042
+interfaces/services.h,4,#1042
+interfaces/sim_events.h,1,#1042
+interfaces/state_writer.h,1,#1042

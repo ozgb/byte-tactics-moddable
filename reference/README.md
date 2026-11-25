@@ -188,6 +188,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | allied-victory | Metal Heck | 4 | 2400 | Game type 3: players 0 and 1 allied against players 2 and 3, whose commanders self-destruct, so allied victory ends the run early |
 | commander-death | The Pass | 2 | 1800 | The human Arm commander self-destructs, so commander death ends the run about 150 ticks later |
 | console-economy | The Pass | 2 | 200 | Console: resources (`atm`, `nometal`, `noenergy`, `give`), the share commands, the AI toggle (`ai`) and the player switches (`control`, `view`) |
+| console-edge | The Pass | 2 | 1500 | Console: `edge` cuts the playable width and height in at tick 2, so the computer players' build range is smaller from tick 990, and puts them back with its defaults at tick 1200 |
 | console-features | The Pass | 2 | 300 | Console: `feature`, `burnone`, `burnall`, `treedeath`, `meteor` (a shower, meteors on and off) and `sealevel` |
 | console-ilose | The Pass | 2 | 100 | Console: `ilose`, so the local side loses its units and the run ends at tick 30 |
 | console-iwin | The Pass | 2 | 100 | Console: `iwin`, so the other side loses its units and the run ends at tick 30 |
@@ -220,6 +221,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | orders-build-patrol | The Pass | 2 | 600 | Human Arm commander builds a solar collector, then patrols (`build`, `patrol`) |
 | orders-guard-reclaim | The Pass | 2 | 600 | Human Arm commander builds a solar collector, guards it, then reclaims it (`build`, `guard`, `reclaim`) |
 | orders-move-attack | The Pass | 2 | 600 | Human Arm commander moves, attacks the Core commander, then the whole slot moves (`move`, `attack`, `<slot>:all`) |
+| orders-reclaim-feature | The Pass | 2 | 300 | Human Arm commander reclaims a tree the console places (`feature`, `reclaim` at a position), so features' `ReclaimFeature` answers a RECLAIM event at tick 245 |
 | quad-fox-holes | Fox Holes | 4 | 7200 | Four players on Fox Holes, alternating sides, four minutes |
 | quad-king-of-the-hill | King of the Hill | 4 | 9000 | Four players on King of the Hill in two allied teams of two, five minutes |
 | quad-lava-highground | Lava Highground | 4 | 5400 | Four Arm players on Lava Highground, random start positions, three minutes |
@@ -263,11 +265,12 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | conditions-dark-side | judged | - |
 | conditions-shore-to-shore | judged | - |
 | console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
+| console-edge | judged | - |
 | console-features | left out | console commands that are not events: `treedeath` |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
 | console-sight | left out | console commands that are not events: `los`, `lostype`, `mapping`, `radar`, `nowisee`, `view`, `reloadaiprofiles` |
-| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search`, `edge` |
+| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search` |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |
 | duel-pass-dark | judged | - |
@@ -309,6 +312,7 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | orders-guard-reclaim | judged | - |
 | orders-immediate | judged | - |
 | orders-move-attack | judged | - |
+| orders-reclaim-feature | judged | - |
 | orders-tier2-core | judged | - |
 | orders-tier2-spider | judged | - |
 | orders-tier2-vader | judged | - |
@@ -602,7 +606,7 @@ uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-di
 ```
 
 `--tier` is the same `--check` restricted to the 40 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 38,200 ticks of the 373,950 that the suite's 91 scenarios play (10.2%), none longer than 9000.
+`tools/reference.py`, 38,200 ticks of the 375,750 that the suite's 93 scenarios play (10.2%), none longer than 9000.
 A scenario's ticks here are those its stored trace holds, as `tools/coverage.py` counts them, so a mission that a
 victory condition ends early counts the ticks it played, not its `ticks` line. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how

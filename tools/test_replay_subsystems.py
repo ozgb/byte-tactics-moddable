@@ -74,6 +74,16 @@ class Rows(unittest.TestCase):
     def test_only_an_entry_with_a_self_test_has_a_self_row(self):
         self.assertEqual(rs.rows(self.entries, "self"), [["replay_wind_self", "wind", "s.txt"]])
 
+    def test_a_list_of_injects_has_a_row_and_a_log_each(self):
+        entries = {"ai": {"inject": [entry()["inject"], dict(entry()["inject"], expect=5, field="g", recording="b.txt")]}}
+        self.assertEqual(rs.rows(entries, "inject"), [["replay_ai_inject", "ai", "3", "f", "a.txt"], ["replay_ai_inject_2", "ai", "5", "g", "b.txt"]])
+
+    def test_every_recording_of_a_list_of_injects_must_exist(self):
+        with tempfile.TemporaryDirectory() as root:
+            tree(root, {"ai": ["a.txt"]})
+            errors = rs.check({"ai": {"inject": [entry()["inject"], dict(entry()["inject"], recording="b.txt")]}}, root)
+        self.assertEqual(errors, ["tests/replay/ai/b.txt does not exist"])
+
     def test_log_names_can_be_overridden(self):
         entries = {"wind": entry(log_names={"native": "replay_native", "wasm_inject": "replay_wasm_inject"})}
         self.assertEqual(rs.rows(entries, "native"), [["replay_native", "wind"]])

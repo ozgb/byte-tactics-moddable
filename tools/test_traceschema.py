@@ -313,7 +313,7 @@ class SchemaJsonTest(unittest.TestCase):
             self.assertEqual(int(found.group(1)), len(self.model[module.key]["kinds"]))
         self.assertIn("{ \"target\", offsetof(TargetingSetUnit, target), 4, TF_REF, TT_UNIT, 0 },", self.header)
         self.assertIn("{ 96, \"TARGETING_SET_UNIT\", sizeof(TargetingSetUnit), kEventTargetingSetUnit, 5 },", self.header)
-        self.assertIn("#define TRACE_EVENT_MAX_BYTES 80", self.header)
+        self.assertIn("#define TRACE_EVENT_MAX_BYTES 112", self.header)
 
     def test_a_header_with_an_unknown_payload_is_refused(self):
         module = ts.EventModule("x", 1, "X", "targeting.h", "TargetingEventHeader", ["TargetingEventKind"], {})

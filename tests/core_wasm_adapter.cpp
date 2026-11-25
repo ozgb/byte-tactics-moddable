@@ -131,7 +131,7 @@ const char* ClassOfTrap(const char* text)
         return "unreachable";
     if (Has(cause, "out of bounds memory access"))
         return "memory_access";
-    if (Has(cause, "divide by zero") || Has(cause, "integer overflow"))
+    if (Has(cause, "divide by zero") || Has(cause, "integer overflow") || Has(cause, "invalid conversion to integer"))
         return "divide";
     if (Has(cause, "uninitialized element") || Has(cause, "indirect call type mismatch") || Has(cause, "table access"))
         return "table";
@@ -385,7 +385,6 @@ void DoCall(int argc, char** argv)
     if (!klass) {
         Names none;
         klass = ClassOfLoaderError(text, &none);
-        ErrorLine("call", klass, names);
     }
     if (HasExport(m, "__fuel_get") && Fuel(m) < 0)
         klass = "out_of_fuel";

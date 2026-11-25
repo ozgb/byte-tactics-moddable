@@ -1438,6 +1438,10 @@ int __stdcall FireDroppedWeapon(Unit* unit, UnitWeaponSlot* aim,
 
 void __stdcall InitProjectile(Projectile*, void*, void*, int, int, void*);
 
+#ifndef BT_REPLAY_INJECT_SPAWN_TICK
+#define BT_REPLAY_INJECT_SPAWN_TICK 0
+#endif
+
 // FUNCTION: 0x49df10
 int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag)
 {
@@ -1449,7 +1453,7 @@ int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag)
     }
     if (!proj)
         return 0;
-    InitProjectile(proj, weapon, a, 0, g_game->ticks, 0);
+    InitProjectile(proj, weapon, a, 0, g_game->ticks + BT_REPLAY_INJECT_SPAWN_TICK, 0);
     proj->direction = *b;
     if (flag) {
         unsigned char team = weapon->index;

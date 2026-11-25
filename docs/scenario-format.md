@@ -37,8 +37,11 @@ describes, plays it tick by tick, writes the outputs of section 7 and exits.
 
 - **Seeds.** The game-logic random generator, the C runtime's `rand` and the presentation random generator
   (screen shake, particles and menu effects, which game logic never reads) start from `game_seed`,
-  `crt_seed` and `view_seed`. The game-logic generator and `rand` are seeded again at the start of the match
-  with the same values. Game logic reads no clock: its time is the tick.
+  `crt_seed` and `view_seed`. The main stream of `rand` (`RAND_STREAM_MAIN`) is seeded from `crt_seed` once, when the
+  program starts, and is not seeded again at the start of the match: the match starts from whatever the main stream
+  holds then. The start of the match (the match load) seeds the game-logic generator (the generator of `RandomInt`)
+  from `game_seed` and the load stream of `rand` (`RAND_STREAM_LOAD`) from `crt_seed`. Game logic reads no clock: its
+  time is the tick.
 - **Memory.** Every new allocation is zero before the game uses it, and memory grown by a reallocation is zero
   from the old size up to the new size (`docs/trace-format.md`, section 11, "Zero fill"). The reference run
   passes the game's `-memset=0` switch for the first rule. A run with `-memset=0xcdcdcdcd` fills each new
@@ -303,8 +306,9 @@ the game cannot load, exits with status 2 and a message that names the file.
   the start of the game and not from the save (`load-midgame` has `ticks 1800`, like `save-midgame`). The run
   exits with status 2 if `ticks` is not greater than the saved tick, and the same holds for the ticks of
   `quirks_tamper` and `quirks_reach`.
-- **What differs from an uninterrupted game.** The save does not hold the random streams, and the load seeds
-  them again, so the loaded game does not match the uninterrupted one. Compare it with the stored traces of the
+- **What differs from an uninterrupted game.** The save does not hold the random streams. The run seeds them as
+  every run does (the main stream when the program starts, the game-logic generator and the load stream when the
+  match loads), so the loaded game does not match the uninterrupted one. Compare it with the stored traces of the
   loading scenario (`docs/reference-traces.md`, "A loaded game's trace").
 
 ## 6. Quirk flags

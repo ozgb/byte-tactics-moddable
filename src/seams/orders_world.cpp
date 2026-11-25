@@ -6,10 +6,12 @@
 #include "../../interfaces/weapons.h"
 #include "../../interfaces/movement.h"
 #include "../../interfaces/orders.h"
+#include "../../interfaces/ref.h"
 #include "../util/engine_services.h"
 #include "../game/game.h"
 #include "../units/unit_def.h"
 #include "../game/orders_events.h"
+#include "../harness/harness.h"
 #include "orders_world.h"
 
 #include "../../link/globals.h"
@@ -18,6 +20,25 @@ void OrdersInbox(const void* event, unsigned int size)
 {
     const OrdersEventHeader* e = static_cast<const OrdersEventHeader*>(event);
     HarnessOrdersEvent(e, size, g_seams.orders->Apply(e, size));
+}
+
+void OrdersOnCommand(const void* event, unsigned int size)
+{
+    if (size >= sizeof(OrdersAdd)) {
+        const OrdersAdd* p = static_cast<const OrdersAdd*>(event);
+        Ref<Unit> unit;
+        unit.offset = p->h.unit;
+        Ref<Unit> target;
+        target.offset = p->target;
+        HarnessUiOrder((unsigned char)p->type, p->queue, unit.get(), target.get(), p->hasPos ? p->pos : nullptr, p->params[0], p->params[1]);
+    }
+    OrdersInbox(event, size);
+}
+
+void OrdersOnGroupCommand(const void* event, unsigned int size)
+{
+    const OrdersEventHeader* e = static_cast<const OrdersEventHeader*>(event);
+    HarnessOrdersEvent(e, size, g_seams.orders->ExpandGroupCommand(static_cast<const OrdersGroupCommand*>(event), size));
 }
 
 void OrdersOnAiAddOrder(const void* event, unsigned int size)

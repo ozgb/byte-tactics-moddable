@@ -195,7 +195,7 @@ void* AllocAtLocked(unsigned int offset, unsigned int size)
 {
     unsigned int need = ChunkSizeFor(size);
     if ((offset & 7) != 0 || offset < kFirstChunk + kChunkHeader || need > Size() || offset - kChunkHeader > Size() - need)
-        return 0;
+        return nullptr;
     unsigned int at = offset - kChunkHeader;
     unsigned int prev = 0;
     for (unsigned int off = Head()->freeHead; off != 0 && off <= at; off = At(off)->aux) {
@@ -233,7 +233,7 @@ void* AllocAtLocked(unsigned int offset, unsigned int size)
         CountUse(need);
         return (char*)chunk + kChunkHeader;
     }
-    return 0;
+    return nullptr;
 }
 
 void FreeLocked(void* p)
@@ -359,7 +359,7 @@ void* __cdecl SimAllocAt(unsigned int offset, unsigned int size)
 {
     Guard guard;
     void* p = AllocAtLocked(offset, size);
-    if (p != 0 && g_allocHooks != 0)
+    if (p != nullptr && g_allocHooks != nullptr)
         g_allocHooks->added(p, size);
     return p;
 }

@@ -15,8 +15,13 @@ such as the walk over the units in range) is walked as written, so the seam call
 caller uses its value and whether what it runs writes state; each `immediate` row of data/dependencies.csv is placed
 at the first write step before a read step (Splits). LOOPS and TICK_STEPS describe the loops and the tick's engine
 steps in behavioural terms; --check also fails when a pass, loop or engine step has no description or a description
-has no pass, loop or step, and when an immediate row cannot be placed. The page goes into the oracle kit, so it
-names entry points and subsystems only, never another function or a source file.
+has no pass, loop or step, and when an immediate row cannot be placed. The Load section lists the entry points that
+LOAD_FUNCTION (the load of a match) calls, in the order of its call sites, each with its LOAD_STEPS text (what it reads
+of an earlier step's results), and the hand-written LOAD_DRAWS; --check fails when an entry point has no text or a
+text no entry point. The Routes section is the scheduler's route
+table (src/game/routes.cpp) in its order, each row as publisher, kind, subscriber and whether it is synchronous, with
+the inbox order of the scheduler's modules. The page goes into the oracle kit, so it names entry points, subsystems
+and the event kinds of the interface headers only, never another function or a source file.
 """
 
 from __future__ import annotations
@@ -25,6 +30,7 @@ import argparse
 import csv
 import os
 import re
+import textwrap
 import sys
 from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
@@ -78,6 +84,9 @@ ROUTE_REASON = "route table entry"
 VISITOR_REASON = "visitor passed at "
 ROUTE_ROW = re.compile(r"\{SCHED_(\w+), \w+, SCHED_(\w+), (\w+), ([01])\}")
 ROUTES = "src/game/routes.cpp"
+ROUTE_KIND_ROW = re.compile(r"\{SCHED_(\w+), (\w+), SCHED_(\w+), \w+, ([01])\}")
+SCHED_MODULES = ROOT / "src" / "util" / "engine_services.h"
+SCHED_MODULE = re.compile(r"\bSCHED_(\w+) = (\d+),")
 OUTBOX_ARG = re.compile(r"(?:Publish\w*|EmitFrom)\(\s*SCHED_(\w+)")
 ENGINE = {"presentation", "harness", "network", "files"}
 
@@ -507,6 +516,7 @@ class Program:
                     self.methods.add("%s::%s" % (tables[table], slot))
         self.handlers = {r["target"] for r in edges if r["reason"].startswith(ROUTE_REASON)}
         self.routes = [(p.lower(), s.lower(), h, sync == "1") for p, s, h, sync in ROUTE_ROW.findall(sources.get(ROUTES, ""))]
+        self.route_source = sources.get(ROUTES, "")
         self.outboxes = outboxes(self.fns, sources)
         self.passers: dict[tuple[str, str], set[str]] = defaultdict(set)
         self.visitor_hits = 0
@@ -783,6 +793,14 @@ class Program:
                 out |= f.items
         return out
 
+    def load(self) -> list[Node] | None:
+        """The entry points the load of a match calls, each once, in order, without the deliveries of the inboxes; None
+        when the program has no LOAD_FUNCTION."""
+        fns = self.fns.get(LOAD_FUNCTION, [])
+        if not fns:
+            return None
+        return [n for n in distinct(self.expand(fns[0], "game"), kinds=("entry",)) if not n.label.endswith(".Apply")]
+
     def tick(self) -> tuple[Fn, dict[str, tuple[int, int]]]:
         """The function that plays one tick, and the lines of each phase in it."""
         for fns in self.fns.values():
@@ -925,7 +943,7 @@ def build(program: Program) -> dict:
             fn = find_pass(program, program.entry(step.slot)[1], step.sub)
             if fn is not None:
                 passes += pass_tree(program, fn, step.sub, phase, step.label)
-    return {"phases": phases, "passes": passes}
+    return {"phases": phases, "passes": passes, "load": program.load()}
 
 
 VALUE_TYPES = {"Vec3", "Vec3f", "Vector3s", "Point", "Point16", "Fixed", "PathPoint", "<anon>"}
@@ -1290,6 +1308,95 @@ LOOPS = {
     ("meteors", 1): "the meteor shower once per tick: the pass has one entity.",
 }
 SILENT_INTENTS: dict[str, str] = {}
+LOAD_FUNCTION = "LoadBattleAssets"
+LOAD_INTRO = """\
+Before its first tick, the load of a match calls the entry points below once each, in this order. The engine's own
+work between them (presentation, file reads, the allocation of the regions) is left out, and so are the deliveries of
+the inboxes: the load runs outside the tick, so what it publishes is delivered at once (Routes). The mission is loaded
+before these steps. After them come the start units (a skirmish's commanders or a mission's units) or a saved game,
+and then the players phase once, through `players.UpdatePlayersOnStream` on the load stream. The last column names
+what a step reads that an earlier step of another subsystem made; a later step that reads it must stay after it."""
+LOAD_STEPS = {
+    "features.LoadFeatureFileList": "nothing: it reads every feature definition file and keeps them until "
+                                    "`features.FreeFeatureFileList`",
+    "units.InitUnitCategories": "nothing: it does nothing",
+    "features.NopAfterFeatureEnum": "nothing: it does nothing",
+    "weapons.AllocWeaponArray": "nothing: it allocates the table of projectiles",
+    "weapons.LoadWeaponTypes": "nothing: it reads the weapon definitions",
+    "los_radar.LoadTntMap": "the feature definitions `features.LoadFeatureFileList` read: it loads, in order, each "
+                            "feature type the map file names, then each feature of the mission it places that is not "
+                            "loaded yet, and a feature type's burn weapon is looked up in the weapon types of "
+                            "`weapons.LoadWeaponTypes`. It reads the mission's parameters (wind, gravity, tides, "
+                            "surface metal) and publishes, from `engine`, the wind limits (`WIND_METEORS_LIMITS`) and, "
+                            "unless a saved game is loading, the map's features (`FEATURES_PLACE`)",
+    "units.LoadUnitTypes": "the weapon types of `weapons.LoadWeaponTypes` (each unit type's three weapons and its "
+                           "explosion and self-destruct weapons, by name) and the feature definitions of "
+                           "`features.LoadFeatureFileList` (each unit type's corpse, loaded as a feature type after "
+                           "the map's). It also loads the movement classes",
+    "units.LoadDownloadMenus": "nothing of another subsystem: it matches the build menus to units' own types",
+    "units.AllocateUnitMemory": "nothing of another subsystem: it allocates the unit slots, 10 times the units a player "
+                                "may have, and one more",
+    "features.ResolveFeatureLinks": "the feature types `los_radar.LoadTntMap` and `units.LoadUnitTypes` loaded, in "
+                                    "index order: for each it loads the dead, reclaimed and burnt types its definition "
+                                    "names, which are then resolved in turn, so the index of every feature type "
+                                    "follows from the order of these three steps. A type it loads looks up its burn "
+                                    "weapon in the weapon types of `weapons.LoadWeaponTypes`",
+    "features.FreeFeatureFileList": "nothing: the feature definitions are freed",
+    "units.GetMovementLimits": "nothing of another subsystem: it returns the limits of the movement classes "
+                               "`units.LoadUnitTypes` loaded, which the engine passes to `map.BuildAllPassMaps`",
+    "map.BuildAllPassMaps": "the limits `units.GetMovementLimits` returned; the map cells `los_radar.LoadTntMap` made "
+                            "(their heights, the sea level and the feature on each cell); and whether each feature "
+                            "type blocks, of the types `los_radar.LoadTntMap`, `units.LoadUnitTypes` and "
+                            "`features.ResolveFeatureLinks` loaded",
+    "wind_meteors.UpdateWind": "the wind limits `los_radar.LoadTntMap` published. Just before it the engine publishes "
+                               "`WIND_METEORS_RESET`, and the step runs as the wind phase does (wind_meteors' inbox "
+                               "first), on the load stream (`RAND_STREAM_LOAD`)",
+    "mission.GetGameType": "nothing",
+    "wind_meteors.InitMeteors": "the weapon types of `weapons.LoadWeaponTypes` (the meteor weapon, by name)",
+    "los_radar.InitRadar": "nothing of another subsystem",
+    "pathfinding.RegionSize": "the engine's map record: the size of the map, which `los_radar.LoadTntMap` set, the "
+                              "unit slots of `units.AllocateUnitMemory`, and the number of movement classes, which the "
+                              "engine counts through `MoveClass` of `PathWorldView` over the classes "
+                              "`units.LoadUnitTypes` loaded",
+    "economy.RegionSize": "the unit slots of `units.AllocateUnitMemory`",
+    "players.RegionSize": "nothing",
+    "los_radar.RegionSize": "the unit slots of `units.AllocateUnitMemory`. The engine then grows the state block by "
+                            "what each region of these four steps needs beyond the one 3.1c's module asks for",
+    "economy.Init": "nothing: it takes its region",
+    "los_radar.Init": "nothing: it takes its region",
+    "players.Init": "nothing: it takes its region",
+    "players.InitPlayers": "for each player slot in use, ai's records (`ai.CreateSquads`, `ai.CreateSquadManager`, "
+                           "`ai.CreatePlayerAI`), which read the unit types of `units.LoadUnitTypes` and the size of "
+                           "the map, and the per-player indexes of units and los_radar (`units.CreateFactoryIndex`, "
+                           "`los_radar.CreateUnitIndex`); then the mission's AI script runs as commands, and ai reads "
+                           "the weight scripts of each active computer player",
+    "pathfinding.Init": "the map record of `pathfinding.RegionSize`",
+    "weapons.InitExplosions": "nothing of another subsystem; it makes the load's draws from the load stream (below)",
+}
+LOAD_DRAWS = """\
+### Draws from the load stream
+
+The load stream of `rand` (`RAND_STREAM_LOAD`) is seeded when the load of a match starts (`docs/scenario-format.md`,
+Seeds), and only the load draws from it, in this order:
+
+1. `wind_meteors.UpdateWind`: no draw. It draws only when its counter is below the tick count, and both are 0 here
+   (`WIND_METEORS_RESET` has just set the counter), so it leaves the wind off.
+1. `weapons.InitExplosions`: 391,606 draws, one for each pixel of the frames of its three explosion animations, frame
+   by frame and row by row: 12 square frames of 64 pixels down to 20 in steps of 4 (23,456 draws), then 15 of 128 down
+   to 30 in steps of 7 (107,335), then 15 of 200 down to 46 in steps of 11 (260,815). A draw v adds (v * 10) / 0x8000
+   to its pixel's distance from the centre. The game logic never reads the frames, but the draws move the stream.
+1. After the steps above, in a skirmish that is not a saved game and whose start positions are not fixed, the engine
+   shuffles the start positions. The players placed are each player slot, in slot order, that is active, whose type is
+   1, 2 or 3 and whose index is not 10; say there are n. When n is 2 or less the engine first draws one value v and
+   shuffles only when (v * 2) / 0x8000 is not 0; when n is above 2 it shuffles with no such draw. The shuffle holds the
+   slot numbers of those players in slot order, as entries 0 to n - 1, and for each entry i from 1 to n - 1 makes one
+   `shuffle` draw for a range of i (`docs/core-gate.md`, rand) and swaps entry i with the entry the draw names, so
+   entry 1 always swaps with entry 0: n - 1 draws. Player k of those placed, counted from 0 in slot order, then starts
+   at the start position whose number entry k holds.
+1. `players.UpdatePlayersOnStream`: no draw. The stream reaches only the defeat check, which draws nothing.
+
+Nothing else draws from the load stream: the tick draws from the main stream, and no row of the trace hashes the load
+stream (`docs/core-gate.md`, rand), so a wrong count of draws shows only in the start positions of the third item."""
 LIMITS = """\
 The orders are read from the program, not from a run. That decides what they claim:
 
@@ -1550,6 +1657,14 @@ class Page:
             out.append("the tick calls %s, which TICK_STEPS does not describe" % name)
         for name in sorted(set(TICK_STEPS) - engine):
             out.append("TICK_STEPS describes %s, which the tick does not call" % name)
+        if self.built["load"] is None:
+            out.append("no function %s holds the load of a match (LOAD_FUNCTION)" % LOAD_FUNCTION)
+        load = [n.label for n in self.built["load"] or []]
+        for label in load:
+            if label not in LOAD_STEPS:
+                out.append("the load calls %s, which LOAD_STEPS does not describe" % label)
+        for label in sorted(set(LOAD_STEPS) - set(load)):
+            out.append("LOAD_STEPS describes %s, which the load does not call" % label)
         silent = self.silent_intents()
         for label in silent:
             if label not in SILENT_INTENTS:
@@ -1563,16 +1678,47 @@ class Page:
         return out
 
 
+def route_rows(source: str) -> list[list[str]]:
+    """The route table of the scheduler, a row per route in its order: publisher, kind, subscriber, delivery."""
+    return [[p.lower(), code(kind), s.lower(), "synchronous" if sync == "1" else "queued"]
+            for p, kind, s, sync in ROUTE_KIND_ROW.findall(source)]
+
+
+def routes_section(source: str, modules: str) -> list[str]:
+    """The Routes section: the rules of delivery and the route table."""
+    order = [name.lower() for name, _ in sorted(SCHED_MODULE.findall(modules), key=lambda m: int(m[1]))]
+    inboxes = ("An inbox is delivered in the order it was filled: at the end of each phase and of the tick, the inboxes in "
+               "the order %s, and again from the first while any of them holds an effect (the `Apply (once)` steps of The "
+               "tick); before each step of the subscriber that the lists above show after a delivery to it; and before a "
+               "synchronous delivery to the same subscriber. No inbox holds an effect when the tick ends." % ", ".join(order))
+    return [
+        "## Routes", "",
+        "Which subsystem receives each effect a subsystem publishes, and when. A subsystem publishes an effect to its own",
+        "outbox (`engine` is the engine's: the console, the load of a match, the network, the harness), and the effect goes",
+        "to each row below with that outbox and the effect's kind, in the order of the rows; an outbox and kind with no",
+        "row go to no subsystem. What a subscriber does with an effect is stated by its interface (its header in",
+        "`interfaces/` and its interface page).",
+        "",
+        "- **synchronous:** the effect is delivered before the publish returns: first what the subscriber's inbox holds,",
+        "  then the effect.",
+        "- **queued:** published inside the tick, the effect is copied to the subscriber's inbox, which holds 1024 effects",
+        "  and is delivered first when a publish finds it full. Published outside the tick (between two ticks, or before",
+        "  the first), it is delivered at once, as a synchronous route's is.",
+        "",
+    ] + textwrap.wrap(inboxes, 117) + [""] \
+        + table(["publisher", "kind", "subscriber", "delivery"], route_rows(source)) + [""]
+
+
 def render(page: Page) -> str:
     """docs/schedule.md."""
     lines = [
         "# The order of effects",
         "",
         "What 3.1c does in one tick, in what order, and where one subsystem's write is read by another before the tick",
-        "ends. The scheduler of the clean-room engine (#180) owns this order: reads are views, writes are events, and",
-        "where a write is read back inside one entity's update, either the entry point is split there or the event is",
-        "applied before the module continues. Generated by the schedule tool from the program and the access log; do not",
-        "edit by hand.",
+        "ends; and what the load of a match does before the first tick. The scheduler of the clean-room engine (#180)",
+        "owns this order: reads are views, writes are events, and where a write is read back inside one entity's update,",
+        "either the entry point is split there or the event is applied before the module continues. Generated by the",
+        "schedule tool from the program and the access log; do not edit by hand.",
         "",
         "## Terms",
         "",
@@ -1611,6 +1757,10 @@ def render(page: Page) -> str:
         "",
     ]
     lines += table(["phase", "name", "what runs, in order"], page.tick_rows())
+    lines += ["", "## The load", "", LOAD_INTRO.rstrip("\n"), ""]
+    lines += table(["step", "entry point", "what it reads that an earlier step of another subsystem made"],
+                   [[str(i), code(n.label), LOAD_STEPS.get(n.label, "")] for i, n in enumerate(page.built["load"] or [], 1)])
+    lines += ["", LOAD_DRAWS.rstrip("\n")]
     lines += ["", "## Passes", ""]
     for p in page.built["passes"]:
         if p.name == "tail":
@@ -1685,7 +1835,8 @@ def render(page: Page) -> str:
               "receives (`made / received`, counting each caller and entry point once per class), then the immediate edges",
               "it writes and reads, and how many of its edges fall inside one entity's update.", ""]
     lines += table(["subsystem"] + CLASSES + ["edges written", "edges read", "inside an entity"], page.summary_rows())
-    lines += ["", "## Limits", "", LIMITS.rstrip("\n")]
+    lines += [""] + routes_section(page.program.route_source, SCHED_MODULES.read_text())
+    lines += ["## Limits", "", LIMITS.rstrip("\n")]
     return "\n".join(lines) + "\n"
 
 

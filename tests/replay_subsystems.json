@@ -38,12 +38,20 @@
     }
   },
   "weapons": {
-    "inject": {
-      "define": "BT_REPLAY_INJECT_RELOAD_BASE=150",
-      "recording": "orders-guard-attacked.txt",
-      "expect": 344,
-      "field": "Unit#2.weapon0ReloadTimer"
-    }
+    "inject": [
+      {
+        "define": "BT_REPLAY_INJECT_RELOAD_BASE=150",
+        "recording": "orders-guard-attacked.txt",
+        "expect": 393,
+        "field": "Unit#2.weapon0ReloadTimer"
+      },
+      {
+        "define": "BT_REPLAY_INJECT_SPAWN_TICK=1",
+        "recording": "console-features.txt",
+        "expect": 8,
+        "field": "Projectile#0.spawnTick"
+      }
+    ]
   },
   "economy": {
     "inject": {

@@ -495,5 +495,45 @@ class ServicesImportsTest(unittest.TestCase):
             self.assertEqual(abidiff.imports_results(Path(tmp), {"modules": []}), [])
 
 
+def frozen(text: str, rows: str) -> abidiff.Result:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "interfaces").mkdir()
+        (root / "interfaces/t.h").write_text(text)
+        (result,) = abidiff.check_frozen(abidiff.frozen_rows("header,major,decision\n" + rows), root)
+    return result
+
+
+class FrozenTest(unittest.TestCase):
+    row = "interfaces/t.h,1,#1042\n"
+
+    def test_a_frozen_major_bump_fails(self):
+        result = frozen(header([SLOT_A], major=2), self.row)
+        self.assertFalse(result.ok)
+        self.assertEqual(result.summary, "FAIL (frozen at major 1 by #1042, header is at major 2)")
+
+    def test_a_bump_that_moves_the_row_passes(self):
+        result = frozen(header([SLOT_A], major=2), "interfaces/t.h,2,https://example.invalid/decision\n")
+        self.assertTrue(result.ok, result)
+        self.assertEqual(result.summary, "ok (frozen at major 2 by https://example.invalid/decision)")
+
+    def test_a_minor_bump_passes(self):
+        self.assertTrue(frozen(header([SLOT_A, SLOT_B], minor=1), self.row).ok)
+
+    def test_a_removed_header_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (result,) = abidiff.check_frozen(abidiff.frozen_rows("header,major,decision\n" + self.row), Path(tmp))
+        self.assertFalse(result.ok)
+
+    def test_vector_rows_are_not_headers(self):
+        rows = abidiff.frozen_rows("header,major,decision\nreference/core/commands.json,,#1091\n")
+        self.assertEqual(abidiff.check_frozen(rows, Path("/nonexistent")), [])
+
+    def test_the_stored_rows_hold(self):
+        results = abidiff.check_frozen(abidiff.frozen_rows(abidiff.FROZEN.read_text()), abidiff.ROOT)
+        self.assertEqual(len(results), 5)
+        self.assertTrue(all(r.ok for r in results), results)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -97,12 +97,12 @@ The class is the one of section 3. Command words are compared in any case.
 | --- | --- | --- | --- |
 | `give` | events | always | PLAYERS_TRANSFER |
 | `meteor` | events | skirmish | WIND_METEORS_ENABLE, WIND_METEORS_DISABLE, WIND_METEORS_START |
-| `assign` | events | cheat | ORDERS_COMMAND |
+| `assign` | events | cheat | ORDERS_GROUP_COMMAND |
 | `atm` | converted | skirmish | PLAYERS_SET_STORE |
 | `nometal` | converted | always | PLAYERS_SET_STORE |
 | `noenergy` | converted | always | PLAYERS_SET_STORE |
 | `sealevel` | converted | cheat | MAP_SET_SEA_LEVEL |
-| `edge` | direct | cheat | none |
+| `edge` | converted | cheat | MAP_SET_EDGE |
 | `iwin` | converted | cheat | PLAYERS_KILL_UNITS, PLAYERS_END_GAME |
 | `ilose` | converted | cheat | PLAYERS_KILL_UNITS, PLAYERS_END_GAME |
 | `ai` | converted | cheat | PLAYERS_SET_TYPE |
@@ -156,18 +156,20 @@ Each command below says its guards and then its events, in publication order. "T
   outcome 0).
 - **`meteor [n]`.** One word: WIND_METEORS_START. More than one word: WIND_METEORS_ENABLE when argument 1 is not 0, else
   WIND_METEORS_DISABLE. The events are the header alone.
-- **`assign <order type name> [a] [b]`.** The local player's selected units (the units whose selected bit 0x10 of
-  `flags` is set, in the order of the unit array) get ORDERS_COMMAND as section 6.2 says it is given for an order with no
-  mode and no position: `type` is what `MissionTypeFromName` answers for word 1 (nothing at all when it answers 0),
-  `params[0]` is argument 1 read as a number (0 for a name), `params[1]` is argument 2, `queue` is bit 2 of the key flags
-  of the interface's last mouse event (0 when the run has no `input` line). No unit is selected in a scenario of
-  section 7, so no event is published.
+- **`assign <order type name> [a] [b]`.** Nothing at all when `MissionTypeFromName` answers 0 for word 1. Else one
+  ORDERS_GROUP_COMMAND for the local player's selected units, as section 6.2 says it is built for an order with no mode
+  and no position: `type` is that order type, `params[0]` is argument 1 read as a number (0 for a name), `params[1]` is
+  argument 2, `queue` is bit 2 of the key flags of the interface's last mouse event (0 when the run has no `input`
+  line), and `target` the unit under the cursor (0 for none). The command is published when no unit is selected too,
+  with no bit set; no unit is selected in a scenario of section 7, so its expansion publishes no ORDERS_COMMAND.
 - **`atm`.** Arguments are ignored. Two events: PLAYERS_SET_STORE with `player` the viewing player (`playerIndex`),
   `resource` 0, `add` 1, `amount` 1000; then the same with `resource` 1.
 - **`nometal [player [amount]]`, `noenergy [player [amount]]`.** `player` is the local player when the line has one
   word, else argument 1 cut to a byte. Nothing unless it is a player that exists. PLAYERS_SET_STORE with `player`,
   `resource` 1 (`nometal`) or 0 (`noenergy`), `add` 0, `amount` argument 2 (default 0) as a float.
 - **`sealevel [n]`.** MAP_SET_SEA_LEVEL with `level` argument 1 (default 0), always.
+- **`edge [x [z]]`.** MAP_SET_EDGE with `x` argument 1 (default 32) and `z` argument 2 (default 128), always. (With no
+  argument the playable width and height are what the match started with.)
 - **`iwin`.** `s` is the side of the local player (0 Arm, 1 Core). PLAYERS_KILL_UNITS with `player` 0 when `s` is 1, else
   1; then PLAYERS_END_GAME with `victory` 1.
 - **`ilose`.** PLAYERS_KILL_UNITS with `player` the side of the local player (0 or 1, used as a slot number); then
@@ -208,10 +210,6 @@ These are written by the game directly or through a module's own function, not b
 - **`los`, `lostype`, `mapping`, `nowisee`.** They change `mapFlags`: `los` flips bit 1, `lostype` bit 2, `mapping` bit 0,
   and `nowisee` clears bits 0 and 1. Then LOS_RADAR_RECALCULATE with `reset` 0 for `los` and `lostype` and 1 for `mapping` and
   `nowisee`.
-- **`edge [w [h]]`.** Always: the playable width of the map becomes the map's width in cells times 16 minus argument 1
-  (default 32), and the playable height the map's height in cells times 16 minus argument 2 (default 128). (With no
-  argument it is what the match started with.) It is not an event because the map module's state for the replay format
-  does not hold these fields yet.
 - **`reloadaiprofiles`.** The AI players are reset and their profiles loaded again, which runs the AI script's own
   console lines (`plan`, `weight`, `limit` and the others the script holds), each publishing its AI event as section 4.2
   would. It is not an event because an event whose handling runs console lines would put the console inside the
@@ -261,25 +259,25 @@ given to the order.
 
 | Order | Mode | Target | Events |
 | --- | --- | --- | --- |
-| `move` | 2 | yes | ORDERS_COMMAND |
-| `attack` | 3 | yes | ORDERS_COMMAND |
-| `dgun` | 4 | yes | ORDERS_COMMAND |
-| `unload` | 5 | no | ORDERS_COMMAND |
-| `load` | 6 | yes | ORDERS_COMMAND |
-| `guard` | 7 | yes | ORDERS_COMMAND |
-| `repair` | 8 | yes | ORDERS_COMMAND |
-| `patrol` | 9 | yes | ORDERS_COMMAND |
-| `teleport` | 11 | yes | ORDERS_COMMAND |
-| `reclaim` | 12 | yes | ORDERS_COMMAND |
-| `capture` | 13 | yes | ORDERS_COMMAND |
-| `build` | 14 | no | ORDERS_COMMAND |
-| `stop` | - | no | ORDERS_COMMAND |
-| `cloak` | - | no | ORDERS_COMMAND |
-| `activate` | - | no | ORDERS_COMMAND |
-| `deactivate` | - | no | ORDERS_COMMAND |
-| `movestate` | - | no | ORDERS_COMMAND |
-| `firestate` | - | no | ORDERS_COMMAND |
-| `selfdestruct` | - | no | ORDERS_CANCEL, or ORDERS_COMMAND |
+| `move` | 2 | yes | ORDERS_GROUP_COMMAND |
+| `attack` | 3 | yes | ORDERS_GROUP_COMMAND |
+| `dgun` | 4 | yes | ORDERS_GROUP_COMMAND |
+| `unload` | 5 | no | ORDERS_GROUP_COMMAND |
+| `load` | 6 | yes | ORDERS_GROUP_COMMAND |
+| `guard` | 7 | yes | ORDERS_GROUP_COMMAND |
+| `repair` | 8 | yes | ORDERS_GROUP_COMMAND |
+| `patrol` | 9 | yes | ORDERS_GROUP_COMMAND |
+| `teleport` | 11 | yes | ORDERS_GROUP_COMMAND |
+| `reclaim` | 12 | yes | ORDERS_GROUP_COMMAND |
+| `capture` | 13 | yes | ORDERS_GROUP_COMMAND |
+| `build` | 14 | no | ORDERS_GROUP_BUILD |
+| `stop` | - | no | ORDERS_GROUP_COMMAND |
+| `cloak` | - | no | ORDERS_GROUP_COMMAND |
+| `activate` | - | no | ORDERS_GROUP_COMMAND |
+| `deactivate` | - | no | ORDERS_GROUP_COMMAND |
+| `movestate` | - | no | ORDERS_GROUP_COMMAND |
+| `firestate` | - | no | ORDERS_GROUP_COMMAND |
+| `selfdestruct` | - | no | ORDERS_CANCEL, or ORDERS_GROUP_COMMAND |
 | `qbuild` | - | no | ORDERS_QUEUE_BUILD |
 
 ### 6.2 The units and the events
@@ -289,8 +287,8 @@ the slot, in the order of the unit array (a unit is live when its unit type numb
 unit of the slot. The line is refused with status 2 when it names no unit (fewer than n live units of the type, or none),
 when a unit type name is unknown, when a unit target selector names no live unit, or when the position (given, or taken
 from the target unit) has `x` not below the playable width or `z` not below the playable height. The slot is the local
-player and the viewing player while the order is given. The units that get an event are the named units (the selection),
-and each event goes in the order of the unit array.
+player and the viewing player while the order is given. The named units are the selection: they, and no other live unit of
+the slot, have the selected bit 0x10 of `flags` set while the order is given (a unit that is not live keeps its bit).
 
 **The position.** `x z` of the line, or for a unit target the target's position in whole world units (its 16.16
 coordinate shifted right by 16, arithmetically). `pos[0]` is x times 65536, `pos[2]` is z times 65536, and `pos[1]` is the
@@ -298,11 +296,30 @@ ground height there raised to the sea level, times 65536, as in section 5 (no fo
 position and no target (`stop`, `cloak`, `activate`, `deactivate`, `movestate`, `firestate`, `selfdestruct`, `qbuild`)
 has no position: `hasPos` 0 and `pos` 0.
 
+**The group command.** Every kind but `qbuild` publishes one event for the whole selection, as a click of the
+interface does (`selfdestruct` only when it cancels nothing, below): ORDERS_GROUP_COMMAND, or ORDERS_GROUP_BUILD for
+`build`, with the payload `OrdersGroupCommand`:
+
+- `unit` (the header's) is the first unit of the slot's range of the unit array (the player's `unitsBegin`).
+- `units` is a bit set: bit `i` (bit `i % 32` of word `i / 32`) is set when the unit `i` records after `unit` is
+  selected, for every unit of the slot's range. A range holds at most 500 units (the unit limit), below the 512 bits.
+- `mode` is the kind's mode of section 6.1 (0 for a kind with none, and for `build`); `type` is the order type of a kind
+  with no mode (below) and 0 for one with a mode.
+- `queue` is 1 when the line has a `+` and else 0, for every kind but `build` (0, the `+` changes nothing for it).
+- `target` is the line's unit target (0 for none), whether or not the kind passes it on; 0 for `build`.
+- `hasPos` and `pos` are the position above (`hasPos` 0 and `pos` 0 for a kind with none; for `build`, the site below).
+- `params` is 0 and 0, but for `movestate`, `firestate` and `build` (below).
+
+The orders module consumes the command with its interface slot `ExpandGroupCommand`, which publishes an ORDERS_COMMAND
+for each unit it orders to the orders module's own outbox; each is delivered at once (section 1), in publication order,
+and the command's outcome is their count. A mod may replace the slot (a formation); the default is 3.1c's rule, which
+the rest of this section states as the ORDERS_COMMAND events it publishes, and with it the traces equal the stored ones.
+
 **The kinds with a mode** (`move`, `attack`, `dgun`, `unload`, `load`, `guard`, `repair`, `patrol`, `teleport`,
 `reclaim`, `capture`). Let the *target* be the line's unit target when the mode takes one (every mode but 5, 10 and
 14) and the line has one, else none. The target is not ordered itself: it is left out of the selection. Let `n` be
-the number of selected units but the target. Nothing is published when `n` is 0. Else, for each such unit `u` in
-array order:
+the number of selected units but the target. The expansion publishes nothing when `n` is 0. Else, for each such unit `u`
+in array order:
 
 1. `type` is `GetOrderType(mode, u, target, position)`. Nothing for `u` when it is 0.
 2. Nothing for `u` when `type` is the order type "Standing_FireOrder" and the unit type of `u` lacks the data flag
@@ -323,8 +340,8 @@ array order:
 The target of a mode that does not take one (5, 14) is never an event target; an `unload` whose line names a unit
 uses only its position.
 
-**The kinds with no mode.** The units are the selection, `n` is their number, and for each in array order one
-ORDERS_COMMAND with `unit`, `queue` as above, `target` 0, `hasPos` 0 and `pos` 0, and
+**The kinds with no mode.** The units are the selection, `n` is their number, and the expansion publishes for each in
+array order one ORDERS_COMMAND with `unit`, `queue` as above, `target` 0, `hasPos` 0 and `pos` 0, and
 - `stop`: `type` is `MissionTypeFromName("STOP")`, `params` 0 and 0.
 - `cloak on`: "CLOAK_ON"; `cloak off`: "CLOAK_OFF"; `activate`: "ACTIVATE"; `deactivate`: "DEACTIVATE"; `params` 0 and 0.
 - `movestate n`: "STANDING_MOVEORDER", `params[0]` n (0, 1 or 2), `params[1]` 0; skipped for a unit as step 2 says.
@@ -332,8 +349,8 @@ ORDERS_COMMAND with `unit`, `queue` as above, `target` 0, `hasPos` 0 and `pos` 0
 
 **`selfdestruct`** toggles. In the order of the unit array, for each selected unit that already has an order of the type
 `MissionTypeFromName("SELFDESTRUCT")` in its order list: ORDERS_CANCEL with `unit` and `type` that type. When no selected
-unit had one, nothing was cancelled, and each selected unit gets an ORDERS_COMMAND of that type as the kinds with no mode
-do, `params` 0 and 0 (and `queue` from the `+`).
+unit had one, nothing was cancelled, and the line publishes ORDERS_GROUP_COMMAND with `type` that type, as the kinds
+with no mode do: each selected unit gets an ORDERS_COMMAND of that type, `params` 0 and 0 (and `queue` from the `+`).
 
 **`qbuild <unit type> [n]`.** For each selected unit in array order, ORDERS_QUEUE_BUILD with `unit`, `count` n (default 1,
 1 to 99) and `name` the unit type as written in the line (at most 31 characters, zero-terminated). The name must be a unit type
@@ -346,11 +363,13 @@ the map's `CanBuildAt` for that unit type, that cell, type 0 and the ordering pl
 blocked, too steep, not visible or not explored to that player, and the other rules of that slot). Else the site's
 position is `pos[0] = (fx + cx*2) << 19`, `pos[2] = (fz + cz*2) << 19` and `pos[1]` the height that `CanBuildAt` left in its
 placement record (the lowest ground height under the cells of the footprint that the yard map marks as ground level, or the
-sea level minus the unit type's `draft` when it has none) times 65536. For each selected unit in array order whose unit type has bit 0x40 of
-`flags1` (builder): ORDERS_COMMAND with `unit`, `type` `MissionTypeFromName("MOBILEBUILD")` when bit 0x800 of its unit
-type's `flags1` is clear, else `MissionTypeFromName("VTOL_MOBILEBUILD")`, `queue` 0 (the `+` changes nothing for `build`),
-`target` 0, `hasPos` 1, `pos` the site, `params[0]` the unit type's number and `params[1]` 0. A selected unit that is not a
-builder gets nothing.
+sea level minus the unit type's `draft` when it has none) times 65536. The line publishes ORDERS_GROUP_BUILD with `queue`
+0, `target` 0, `hasPos` 1, `pos` the site, `params[0]` the unit type's number and `params[1]` 0. Its expansion publishes,
+for each selected unit in array order whose unit type has bit 0x40 of `flags1` (builder): ORDERS_COMMAND with `unit`,
+`type` `MissionTypeFromName("MOBILEBUILD")` when bit 0x800 of its unit type's `flags1` is clear, else
+`MissionTypeFromName("VTOL_MOBILEBUILD")` when the unit type is `flying` (nothing otherwise), `queue` 0, `target` 0,
+`hasPos` 1, `pos` the site, `params[0]` the unit type's number and `params[1]` 0. A selected unit that is not a builder
+gets nothing.
 
 ## 7. The scenarios of the core's verdict
 
@@ -369,11 +388,12 @@ one of those, and a scenario that uses a console command or an order kind that t
 | conditions-dark-side | judged | - |
 | conditions-shore-to-shore | judged | - |
 | console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
+| console-edge | judged | - |
 | console-features | left out | console commands that are not events: `treedeath` |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
 | console-sight | left out | console commands that are not events: `los`, `lostype`, `mapping`, `radar`, `nowisee`, `view`, `reloadaiprofiles` |
-| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search`, `edge` |
+| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search` |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |
 | duel-pass-dark | judged | - |
@@ -415,6 +435,7 @@ one of those, and a scenario that uses a console command or an order kind that t
 | orders-guard-reclaim | judged | - |
 | orders-immediate | judged | - |
 | orders-move-attack | judged | - |
+| orders-reclaim-feature | judged | - |
 | orders-tier2-core | judged | - |
 | orders-tier2-spider | judged | - |
 | orders-tier2-vader | judged | - |

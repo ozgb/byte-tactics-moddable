@@ -170,21 +170,16 @@ void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
     CellToWorld(origin, cell, &pos);
     pos.y = g_game->boxStartHeight << 16;
 
-    unsigned char team = g_game->localPlayer;
-    Player* p = &g_game->players[team];
-    for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
-        if ((u->flags & 0x10) && (((UnitDef*)u->def.get())->flags1 & 0x40)) {
-            if (!(((UnitDef*)u->def.get())->flags1 & 0x800)) {
-                HarnessUiOrder(g_seams.orders->MissionTypeFromName("MOBILEBUILD"), remove, u, nullptr, (int*)&pos, index, 0);
-                OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, g_seams.orders->MissionTypeFromName("MOBILEBUILD"), remove, nullptr, &pos, index, 0);
-            } else {
-                if (((UnitDef*)u->def.get())->flying) {
-                    HarnessUiOrder(g_seams.orders->MissionTypeFromName("VTOL_MOBILEBUILD"), remove, u, nullptr, (int*)&pos, index, 0);
-                    OrdersPublishAdd(SCHED_ENGINE, ORDERS_COMMAND, u, g_seams.orders->MissionTypeFromName("VTOL_MOBILEBUILD"), remove, nullptr, &pos, index, 0);
-                }
-            }
-        }
-    }
+    OrdersGroupCommand command;
+    memset(&command, 0, sizeof(command));
+    command.h.kind = ORDERS_GROUP_BUILD;
+    command.queue = remove;
+    command.hasPos = 1;
+    command.pos[0] = pos.x;
+    command.pos[1] = pos.y;
+    command.pos[2] = pos.z;
+    command.params[0] = index;
+    SendGroupCommand(&command);
 }
 
 // FUNCTION: 0x4197d0

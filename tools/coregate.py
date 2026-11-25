@@ -3,6 +3,7 @@
     uv run tools/coregate.py CORE --sandbox IMAGE --module MODULE.wasm [--group G] [--out DIR]   # a submitted core
     uv run tools/coregate.py --trusted [--group G] [--out DIR]                                     # the in-repo engine
     uv run tools/coregate.py record                                                                # remake reference/core/
+    uv run tools/coregate.py --check-frozen [--base REF]                                           # refuse a change to a stored vector
 
 A core answers `CORE GROUP CALLS OUT` as docs/core-gate.md states. Each vector of reference/core/<group>.json is one run:
 the gate copies reference/core/ to an inputs directory (unpacking each `.xz`, adding data/trace_schema.json and the
@@ -17,6 +18,12 @@ A submitted core runs only inside a machine of the clean-room image with no netw
 nothing of the stored values enters it. `--trusted` runs the in-repo engine, tools/coreadapter.py, directly, and takes
 no CORE: a submitted core is never run on the host. `record` writes the vectors of tools/corecases/ from the in-repo
 engine, and refuses a vector that two runs disagree on.
+
+`--check-frozen` (#1089) compares reference/core/ with REF (default: the merge base of HEAD and origin/moddable) and
+fails on a vector of <group>.json that changed or was removed, keyed by its name, and on a file of reference/core/<group>/
+that changed or was removed. Added vectors, files and groups pass. A group may change only when the pull request adds or
+edits its row in data/frozen_interfaces.csv (`header` reference/core/<group>.json, with a decision): a row left from an
+earlier change unfreezes nothing.
 """
 
 from __future__ import annotations
@@ -39,6 +46,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import filesgate
+from abidiff import frozen_rows
 from filesgate import CouldNotRun, compare, kit_tag, parse_out, same
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -56,6 +64,8 @@ RECORDED = tuple(g for g in JUDGED if g != "runtime")
 FIXED = {"i32": "<i", "u32": "<I", "f64": "<Q"}
 BYTES = re.compile(r"bytes([1-9][0-9]*)")
 GROUPS = (*JUDGED, "files", "play")
+BASE_BRANCH = "origin/moddable"
+FROZEN = "data/frozen_interfaces.csv"
 
 
 def calls_text(calls: list[list[str]]) -> str:
@@ -363,6 +373,87 @@ def report(result: dict, out: Path) -> int:
     return 0 if result["verdict"] == "equal" else 1
 
 
+def git_bytes(*args: str) -> bytes | None:
+    """The output of a git command, or None when it fails."""
+    run = subprocess.run(["git", *args], cwd=ROOT, capture_output=True)
+    return run.stdout if run.returncode == 0 else None
+
+
+def vector_group(path: str) -> str | None:
+    """The group a path of reference/core/ belongs to: <group>.json, or a file under <group>/."""
+    parts = path.split("/")
+    if len(parts) == 3 and parts[2].endswith(".json"):
+        return parts[2][:-len(".json")]
+    return parts[2] if len(parts) > 3 else None
+
+
+def changed_vectors(old: bytes, new: bytes | None) -> list[str]:
+    """The names of the vectors of a stored group file that new changes or removes."""
+    have = {v["name"]: v for v in json.loads(new)["vectors"]} if new is not None else {}
+    out = []
+    for v in json.loads(old)["vectors"]:
+        if v["name"] not in have:
+            out.append("vector %s removed" % v["name"])
+        elif have[v["name"]] != v:
+            out.append("vector %s changed" % v["name"])
+    return out
+
+
+def unfrozen_groups(old_rows: dict[str, dict], new_rows: dict[str, dict]) -> set[str]:
+    """The groups whose row of data/frozen_interfaces.csv is added or edited, with a decision."""
+    return {vector_group(path) for path, row in new_rows.items()
+            if path.startswith("reference/core/") and row.get("decision") and old_rows.get(path) != row}
+
+
+def frozen_failures(base: dict[str, bytes], head: dict[str, bytes | None], unfrozen: set[str]) -> list[str]:
+    """One line for each change to an existing vector or input file of a group not unfrozen. base holds the changed
+    paths that exist at the baseline, head the same paths now (None when removed)."""
+    out = []
+    for path in sorted(base):
+        group = vector_group(path)
+        if group is None or group in unfrozen:
+            continue
+        new = head.get(path)
+        if path.count("/") == 2:
+            out += ["%s: %s" % (path, line) for line in changed_vectors(base[path], new)]
+        elif new != base[path]:
+            out.append("%s: %s" % (path, "removed" if new is None else "changed"))
+    return out
+
+
+def check_frozen(ref: str | None) -> int:
+    if ref is None:
+        found = git_bytes("merge-base", "HEAD", BASE_BRANCH)
+        if found is None:
+            print("coregate: no merge base with %s" % BASE_BRANCH, file=sys.stderr)
+            return 2
+        ref = found.decode().strip()
+    listed = git_bytes("diff", "--no-renames", "--name-only", ref, "--", "reference/core/")
+    if listed is None:
+        print("coregate: can't diff reference/core/ with %s" % ref, file=sys.stderr)
+        return 2
+    base: dict[str, bytes] = {}
+    head: dict[str, bytes | None] = {}
+    for path in listed.decode().splitlines():
+        old = git_bytes("show", "%s:%s" % (ref, path))
+        if old is None:
+            continue
+        base[path] = old
+        head[path] = (ROOT / path).read_bytes() if (ROOT / path).exists() else None
+    old_rows = frozen_rows((git_bytes("show", "%s:%s" % (ref, FROZEN)) or b"").decode())
+    new_rows = frozen_rows((ROOT / FROZEN).read_text()) if (ROOT / FROZEN).exists() else {}
+    unfrozen = unfrozen_groups(old_rows, new_rows)
+    failures = frozen_failures(base, head, unfrozen)
+    for line in failures:
+        print("  " + line)
+    if failures:
+        print("coregate: frozen vectors changed since %s: a group changes only with its row in %s and a decision" % (ref[:12], FROZEN))
+        return 1
+    print("coregate: no frozen vector changed since %s%s" % (
+        ref[:12], " (unfrozen by %s: %s)" % (FROZEN, ", ".join(sorted(unfrozen))) if unfrozen else ""))
+    return 0
+
+
 def main() -> None:
     if sys.argv[1:2] == ["record"]:
         os.environ.setdefault("WINEDEBUG", "-all")
@@ -375,7 +466,15 @@ def main() -> None:
     parser.add_argument("--trusted", action="store_true")
     parser.add_argument("--group", action="append", choices=GROUPS)
     parser.add_argument("--out", type=Path, default=ROOT / "build" / "core-gate")
+    parser.add_argument("--check-frozen", action="store_true")
+    parser.add_argument("--base", metavar="REF")
     args = parser.parse_args()
+    if args.check_frozen:
+        if args.core or args.sandbox or args.module or args.trusted:
+            parser.error("--check-frozen takes no CORE, --sandbox, --module or --trusted")
+        sys.exit(check_frozen(args.base))
+    if args.base:
+        parser.error("--base goes with --check-frozen")
     groups = tuple(args.group or GROUPS)
     os.environ.setdefault("WINEDEBUG", "-all")
     try:

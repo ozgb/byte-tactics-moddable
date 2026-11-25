@@ -16,8 +16,10 @@ and pieces, and drawing surfaces by name.
 ## Frames
 
 The game draws one frame after it has run the game ticks of one pass of its main loop. The
-battle view, the menus and the loading screens all draw through the same items, and every
-frame the run draws is in the log, whatever screen it shows. The scenarios of the suite
+battle view, the frontend's menus, the in-game menus and the loading screens all draw
+through the same items (there is no item for a menu's buttons or lists: they are the
+pictures, rectangles and text they draw), and every frame the run draws is in the log,
+whatever screen it shows. The scenarios of the suite
 show the battle view after a few frames of the loading screen.
 
 A frame is identified by its number, counted from 1 for the first frame the run draws, and
@@ -65,10 +67,12 @@ is the one of `docs/trace-format.md`, section 3, applied once to the bytes, writ
 `HB(bytes)`).
 
 The cursor line closes the frame. It names the picture the display shows as the mouse
-cursor and the position of the mouse, which is where the picture's origin is put (the
-picture's own offset is applied as for a `sprite`). The frame dump leaves the cursor out;
-its picture is a decision of the presentation (the order the cursor would give), so it is
-judged here. The game steps an animated cursor by the wall clock, not by ticks or frames, so
+cursor and the position of the mouse when the frame ends, which is where the picture's
+origin is put (the picture's own offset is applied as for a `sprite`). The mouse starts in
+the middle of the screen, at 320 240, and moves with the scenario's input and where the game
+puts it (a scroll by the mouse puts it back where it started). The frame dump leaves the
+cursor out; its picture is a decision of the presentation (the order the cursor would give),
+so it is judged here. The game steps an animated cursor by the wall clock, not by ticks or frames, so
 the line names the cursor's GAF entry, `<file>:<entry>`, without the frame. When the display
 shows no cursor the line is `cursor - - -`.
 
@@ -258,6 +262,6 @@ the log leaves out:
 - **Draws on the game's other threads.** While a game loads, the game makes pictures on a
   thread of its own (the minimap's small picture among them), and the cursor's thread draws
   the cursor. Only what the game draws on its main thread, the one that draws the frames, is
-  an item.
+  an item. The minimap's units drawn while the game loads are among these.
 - **The options screen's backdrop.** When the options screen opens, the game copies the
   frame under it into a surface of its own with no drawing item.

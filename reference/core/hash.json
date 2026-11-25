@@ -1,0 +1,9 @@
+{"format": 1, "group": "hash", "vectors": [
+ {"name": "edges-economy-targeting-200",
+  "calls": [
+   ["rows", "hash/edges-economy-targeting-200.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", [[200, "units", "b9da8a7f2d638968"], [200, "projectiles", "b9da8a7f2d638968"], [200, "explosions", "b9da8a7f2d638968"], [200, "players", "6e4a5c1aa81d062a"], [200, "features", "6e4a5c1aa81d062a"], [200, "wind", "6e4a5c1aa81d062a"], [200, "meteors", "6e4a5c1aa81d062a"], [200, "world", "7a39d8e373d8008a"], [200, "tick", "040f6b1ab612b06b"]]]
+  ]}
+]}

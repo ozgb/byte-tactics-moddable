@@ -1,0 +1,12 @@
+[
+ {
+  "name": "edges-economy-targeting-200",
+  "calls": [
+   [
+    "rows",
+    "hash/edges-economy-targeting-200.txt",
+    "trace_schema.json"
+   ]
+  ]
+ }
+]

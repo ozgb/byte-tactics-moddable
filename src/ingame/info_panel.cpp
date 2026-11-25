@@ -1014,9 +1014,10 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
             res.metal = res.maxMetal;
         if (res.energy > res.maxEnergy)
             res.energy = res.maxEnergy;
-        static unsigned int s_incomesShownAt = ~0u;
-        if (pl->displayTimer != s_incomesShownAt) {
-            s_incomesShownAt = pl->displayTimer;
+        static unsigned int s_incomesShownAt[11] = {~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u};
+        int shown = g_game->playerIndex;
+        if (pl->displayTimer != s_incomesShownAt[shown]) {
+            s_incomesShownAt[shown] = pl->displayTimer;
             res.metalIncome = pl->energyIncome;
             res.metalUse = pl->energyUsage;
             res.energyIncome = pl->metalIncome;

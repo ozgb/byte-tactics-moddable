@@ -1663,7 +1663,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "ticks", offsetof(OrdersParalyze, ticks), sizeof(((OrdersParalyze*)nullptr)->ticks), ROK_ORDERSPARALYZE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(OrdersCancel, h.kind), sizeof(((OrdersCancel*)nullptr)->h.kind), ROK_ORDERSCANCEL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(OrdersCancel, h.unit), sizeof(((OrdersCancel*)nullptr)->h.unit), ROK_ORDERSCANCEL, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
-    { "order", offsetof(OrdersCancel, order), sizeof(((OrdersCancel*)nullptr)->order), ROK_ORDERSCANCEL, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "type", offsetof(OrdersCancel, type), sizeof(((OrdersCancel*)nullptr)->type), ROK_ORDERSCANCEL, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(OrdersSetStateBits, h.kind), sizeof(((OrdersSetStateBits*)nullptr)->h.kind), ROK_ORDERSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(OrdersSetStateBits, h.unit), sizeof(((OrdersSetStateBits*)nullptr)->h.unit), ROK_ORDERSSETSTATEBITS, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "mask", offsetof(OrdersSetStateBits, mask), sizeof(((OrdersSetStateBits*)nullptr)->mask), ROK_ORDERSSETSTATEBITS, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -2592,7 +2592,7 @@ static_assert(sizeof(((OrdersParalyze*)nullptr)->h.unit) == 4, "OrdersParalyze::
 static_assert(sizeof(((OrdersParalyze*)nullptr)->ticks) == 4, "OrdersParalyze::ticks has the size the schema says");
 static_assert(sizeof(((OrdersCancel*)nullptr)->h.kind) == 4, "OrdersCancel::kind has the size the schema says");
 static_assert(sizeof(((OrdersCancel*)nullptr)->h.unit) == 4, "OrdersCancel::unit has the size the schema says");
-static_assert(sizeof(((OrdersCancel*)nullptr)->order) == 4, "OrdersCancel::order has the size the schema says");
+static_assert(sizeof(((OrdersCancel*)nullptr)->type) == 4, "OrdersCancel::type has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->h.kind) == 4, "OrdersSetStateBits::kind has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->h.unit) == 4, "OrdersSetStateBits::unit has the size the schema says");
 static_assert(sizeof(((OrdersSetStateBits*)nullptr)->mask) == 4, "OrdersSetStateBits::mask has the size the schema says");

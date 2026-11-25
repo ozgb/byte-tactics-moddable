@@ -50,12 +50,12 @@ inline void OrdersPublishAdd(int outbox, int kind, Unit* unit, int type, int que
 }
 
 template <class U>
-inline void OrdersPublishCancel(int outbox, U* unit, int order)
+inline void OrdersPublishCancel(int outbox, U* unit, int type)
 {
     OrdersCancel event;
     memset(&event, 0, sizeof(event));
     event.h = OrdersHeaderOf(ORDERS_CANCEL, unit);
-    event.order = order;
+    event.type = type;
     SchedPublish(outbox, &event, sizeof(event));
 }
 

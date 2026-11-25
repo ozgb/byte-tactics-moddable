@@ -2262,7 +2262,7 @@ static_assert(sizeof(OrdersCancel) == 12, "OrdersCancel");
 static const TraceField kEventOrdersCancel[] = {
     { "kind", offsetof(OrdersCancel, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
     { "unit", offsetof(OrdersCancel, h.unit), 4, TF_REF, TT_UNIT, 0 },
-    { "order", offsetof(OrdersCancel, order), 4, TF_HANDLE, TT_NONE, 0 },
+    { "type", offsetof(OrdersCancel, type), 4, TF_SCALAR, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
 static_assert(sizeof(OrdersSetStateBits) == 16, "OrdersSetStateBits");

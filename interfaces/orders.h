@@ -127,7 +127,7 @@ struct OrdersCancel {
     // The kind and the unit.
     OrdersEventHeader h;
     // The order type, as GetOrderType returns it, truncated to a byte.
-    int order;
+    int type;
 };
 
 // The payload of STATUS_FLAGS.

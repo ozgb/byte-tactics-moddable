@@ -135,7 +135,7 @@ header alone. `Apply(event, size)` refuses an event smaller than its kind's payl
 | STATUS_FLAGS 292 | `OrdersStatusFlags` | `order` (a block offset), `flags` |
 | ATTACKED 293 | `OrdersAttacked` | `attacker` (a block offset, 0 for none) |
 | PARALYZE 294 | `OrdersParalyze` | `ticks` |
-| CANCEL 296 | `OrdersCancel` | `order`: the order type (a byte) whose first order in the unit's list is deleted; outcome 1, or 0 when the unit has none |
+| CANCEL 296 | `OrdersCancel` | `type`: the order type (a byte) whose first order in the unit's list is deleted; outcome 1, or 0 when the unit has none |
 
 ## 3. Effects out of orders
 

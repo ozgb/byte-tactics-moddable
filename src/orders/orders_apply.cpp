@@ -130,7 +130,7 @@ int __stdcall OrdersApply(const OrdersEventHeader* e, unsigned int size)
         break;
     }
     case ORDERS_CANCEL: {
-        Order* order = FindOrderByType(unit, (unsigned char)reinterpret_cast<const OrdersCancel*>(e)->order);
+        Order* order = FindOrderByType(unit, (unsigned char)reinterpret_cast<const OrdersCancel*>(e)->type);
         if (order == nullptr)
             return 0;
         DeleteOrder(unit, order);

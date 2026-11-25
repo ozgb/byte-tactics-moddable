@@ -331,7 +331,7 @@ ORDERS_COMMAND with `unit`, `queue` as above, `target` 0, `hasPos` 0 and `pos` 0
 - `firestate n`: "STANDING_FIREORDER", the same, with step 2's test.
 
 **`selfdestruct`** toggles. In the order of the unit array, for each selected unit that already has an order of the type
-`MissionTypeFromName("SELFDESTRUCT")` in its order list: ORDERS_CANCEL with `unit` and `order` that type. When no selected
+`MissionTypeFromName("SELFDESTRUCT")` in its order list: ORDERS_CANCEL with `unit` and `type` that type. When no selected
 unit had one, nothing was cancelled, and each selected unit gets an ORDERS_COMMAND of that type as the kinds with no mode
 do, `params` 0 and 0 (and `queue` from the `+`).
 

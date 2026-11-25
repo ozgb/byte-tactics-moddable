@@ -1,0 +1,238 @@
+address,callee,reaches,inputs,verdict
+0x4010b0,sprintf,save,fmt:%04x,spec
+0x401110,sprintf,state,fmt:%04x,spec
+0x40c250,sprintf,none,,drop: debug dump file only
+0x415fa0,sprintf,trace,fmt:%%;fmt:%3d;fmt:%4d;fmt:%d;negative,spec
+0x416860,_strcmpi,state,,drop: only a fixed ASCII literal is compared
+0x416bd0,_strcmpi,state,,drop: only fixed ASCII literals are compared
+0x417430,sprintf,save,fmt:%s,spec
+0x417600,_strcmpi,none,,drop: only a fixed ASCII literal is compared
+0x417600,sprintf,none,,drop: screenshot directory path only
+0x4177e0,sprintf,state,fmt:%s,spec
+0x417890,sprintf,state,fmt:%s,spec
+0x418310,_itoa,trace,,"drop: value is an unsigned byte, never negative"
+0x418cd0,sprintf,trace,fmt:%s,spec
+0x418d90,sprintf,trace,fmt:%s,spec
+0x418e50,sprintf,trace,fmt:%s,spec
+0x418fd0,sprintf,trace,fmt:%s,spec
+0x419090,sprintf,trace,fmt:%s,spec
+0x419340,sprintf,trace,fmt:%d;negative,spec
+0x419400,sprintf,trace,fmt:%d;negative,spec
+0x4194d0,sprintf,trace,fmt:%s,spec
+0x4199b0,sprintf,trace,fmt:%d,spec
+0x419b00,strstr,state,,drop: only fixed ASCII literal needles
+0x4224b0,_strcmpi,state,,drop: only fixed ASCII literals are compared
+0x4224b0,sprintf,none,,drop: error text only
+0x4224b0,strncmp,state,truncate,spec
+0x4224b0,strncpy,state,pad;truncate,spec
+0x422dd0,_strcmpi,state,high-byte,spec
+0x422e40,_strcmpi,state,high-byte,spec
+0x422ea0,_strcmpi,state,high-byte,spec
+0x423160,_strcmpi,state,high-byte,spec
+0x424890,strncpy,save,pad;truncate,spec
+0x424c00,_strcmpi,state,high-byte,spec
+0x4290f0,sprintf,state,fmt:%s,spec
+0x429470,_strnicmp,state,truncate,spec
+0x429470,strncpy,state,pad;truncate,spec
+0x429700,_strcmpi,state,high-byte,spec
+0x42a440,_strcmpi,state,,drop: only a fixed ASCII literal is compared
+0x42bf40,_strcmpi,state,high-byte,spec
+0x42bf40,atoi,state,empty;overflow;sign;trailing;whitespace,spec
+0x42d2e0,_strcmpi,state,fold-order;high-byte;order,spec
+0x42d2e0,sprintf,state,fmt:%d;fmt:%s,spec
+0x42d2e0,strncpy,state,truncate,spec
+0x42db60,_strcmpi,state,fold-order;high-byte;order,spec
+0x42dcf0,_strcmpi,state,high-byte,spec
+0x42dcf0,sprintf,none,,drop: the result is unused
+0x42e440,_strcmpi,state,fold-order;high-byte;order,spec
+0x431740,_strcmpi,state,high-byte,spec
+0x4326b0,sprintf,save,fmt:%s;unknown-format,spec
+0x433380,sprintf,state,fmt:%d,spec
+0x4336f0,atoi,state,empty;overflow;sign;trailing;whitespace,spec
+0x4336f0,sprintf,state,fmt:%d,spec
+0x4336f0,strtok,state,tokenizer-state,spec
+0x435430,sprintf,state,fmt:%s,spec
+0x435760,sprintf,trace,fmt:%d,spec
+0x435a20,_strcmpi,state,high-byte,spec
+0x435a20,_strlwr,state,high-byte,spec
+0x435a20,strncpy,state,pad;truncate,spec
+0x435c60,sprintf,state,fmt:%d,spec
+0x435da0,_strcmpi,trace,high-byte,spec
+0x435da0,_strlwr,state,high-byte,spec
+0x435da0,sprintf,state,fmt:%d;fmt:%s,spec
+0x436860,_strcmpi,state,,drop: only fixed ASCII literals are compared
+0x436860,_strnicmp,state,truncate,spec
+0x436860,sprintf,state,fmt:%i,spec
+0x436c30,_strnicmp,state,truncate,spec
+0x436c30,atoi,state,overflow;trailing,spec
+0x436c30,isdigit,state,high-byte,spec
+0x438760,_strcmpi,state,fold-order;high-byte;order,spec
+0x439740,sprintf,trace,fmt:%d,spec
+0x43a420,_strcmpi,state,fold-order;order,spec
+0x43a420,sprintf,state,fmt:%4d;fmt:%s,spec
+0x43a940,_strcmpi,state,fold-order;order,spec
+0x43a970,sprintf,save,fmt:%4d;fmt:%s,spec
+0x43dd70,sprintf,save,fmt:%04x,spec
+0x43de30,sprintf,state,fmt:%04x,spec
+0x440420,_strcmpi,state,high-byte,spec
+0x446fb0,sprintf,trace,fmt:%d,spec
+0x44f940,sprintf,none,,drop: the result is unused
+0x44f9c0,sprintf,none,,drop: the result is unused
+0x450380,sprintf,trace,fmt:%s,spec
+0x451090,strncpy,none,truncate,drop: reaches no compared output
+0x453360,strncpy,trace,pad;truncate,spec
+0x453640,sprintf,trace,fmt:%d;negative;unknown-format,spec
+0x453d40,_strcmpi,state,high-byte,spec
+0x453d40,sprintf,trace,fmt:%s;unknown-format,spec
+0x453d40,strncpy,state,pad;truncate,spec
+0x45a950,_strcmpi,state,high-byte,spec
+0x463ca0,strncpy,trace,truncate,spec
+0x463e50,sprintf,trace,fmt:%s,spec
+0x464290,sprintf,state,unknown-format,spec
+0x465fb0,sprintf,state,fmt:%i,spec
+0x466050,sprintf,state,fmt:%i,spec
+0x468380,sprintf,trace,fmt:%1.1f,spec
+0x4689c0,sprintf,trace,fmt:%+d;fmt:%.1f;fmt:%02d;fmt:%d;fmt:%s;negative;unknown-format,spec
+0x468cf0,sprintf,trace,fmt:%02d;fmt:%d;fmt:%s,spec
+0x46a860,_strcmpi,trace,,drop: only a fixed ASCII literal is compared
+0x46a860,sprintf,trace,fmt:%.0f;fmt:%.1f;fmt:%d;fmt:%s;negative,spec
+0x46a860,strncpy,trace,truncate,spec
+0x47bd70,sprintf,trace,fmt:%s,spec
+0x47f1a0,_strcmpi,trace,high-byte,spec
+0x47f610,_strcmpi,trace,high-byte,spec
+0x47fd70,sprintf,trace,fmt:%s,spec
+0x483610,sprintf,none,,drop: error text only
+0x4864b0,_strcmpi,state,high-byte,spec
+0x4866d0,_strcmpi,state,high-byte,spec
+0x4866d0,sprintf,trace,unknown-format,spec
+0x487080,sprintf,state,fmt:%04x;fmt:%i,spec
+0x4876c0,sprintf,save,fmt:%04x;fmt:%i,spec
+0x487af0,_strcmpi,state,high-byte,spec
+0x487bf0,isspace,state,high-byte,spec
+0x487bf0,sscanf,state,empty;fmt:%[a-zA-Z0-9.];fmt:%[a-zA-Z0-9_.];fmt:%d;fmt:%f;overflow;sign;trailing;whitespace,spec
+0x487bf0,strcspn,state,,drop: only a fixed non-empty set
+0x487bf0,strncpy,state,,"drop: count equals the token length, nothing truncated or padded"
+0x488310,sprintf,none,,drop: error text only
+0x488a50,_strcmpi,state,fold-order;high-byte;order,spec
+0x488b10,_strcmpi,state,fold-order;high-byte;order,spec
+0x488c50,_strcmpi,state,fold-order;high-byte;order,spec
+0x488e70,sscanf,state,fmt:%n;fmt:%s;high-byte;whitespace,spec
+0x48e010,_strcmpi,state,fold-order;high-byte;order,spec
+0x48e010,sscanf,state,empty;fmt:%[a-zA-Z];fmt:%i;overflow;sign;trailing;whitespace,spec
+0x48ea40,_strcmpi,state,high-byte,spec
+0x48eeb0,_strcmpi,state,high-byte,spec
+0x48efb0,_strcmpi,state,high-byte,spec
+0x48f0f0,_strcmpi,state,high-byte,spec
+0x48f250,_strcmpi,state,high-byte,spec
+0x48f370,_strcmpi,state,high-byte,spec
+0x48f4c0,_strcmpi,state,high-byte,spec
+0x48f6b0,_strcmpi,state,high-byte,spec
+0x48f8c0,_strcmpi,state,high-byte,spec
+0x48f9d0,_strcmpi,state,high-byte,spec
+0x490df0,sprintf,trace,fmt:%c;fmt:%d;fmt:%s;negative,spec
+0x4948e0,sprintf,trace,fmt:%d,spec
+0x495930,atoi,none,empty;overflow;sign;trailing,drop: reaches no compared output
+0x495930,sprintf,none,,drop: screenshot file name only
+0x496ee0,sprintf,none,,drop: error text only
+0x497180,sprintf,state,fmt:%s,spec
+0x499cd0,_strcmpi,state,fold-order;high-byte;order,spec
+0x49e5b0,_strcmpi,state,high-byte,spec
+0x49e700,strrchr,none,,drop: reaches only error text
+0x49fdf0,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x49fe60,strstr,state,,drop: only fixed ASCII literal needles
+0x49ff90,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x4a0010,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x4a0300,strncmp,state,,drop: only fixed short ASCII gadget names reach it
+0x4a0570,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x4a05e0,tolower,state,high-byte,spec
+0x4a09c0,strncpy,trace,pad;truncate,spec
+0x4a0bf0,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x4a0d00,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x4a1080,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x4a2580,_itoa,trace,negative,spec
+0x4a2e40,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x4a32a0,strncmp,trace,,drop: only fixed short ASCII gadget names reach it
+0x4a3780,strncmp,state,truncate,spec
+0x4a4440,tolower,state,high-byte,spec
+0x4a4440,toupper,state,high-byte,spec
+0x4a4660,_itoa,trace,,"drop: value is a loading/stat counter, never negative"
+0x4a56b0,strstr,trace,high-byte,spec
+0x4a5f40,strchr,trace,high-byte,spec
+0x4a5f40,strstr,trace,high-byte,spec
+0x4a6ae0,tolower,state,high-byte,spec
+0x4a6ae0,toupper,state,high-byte,spec
+0x4a81e0,sprintf,trace,fmt:%d,spec
+0x4a81e0,strncmp,trace,truncate,spec
+0x4a81e0,strncpy,trace,truncate,spec
+0x4a9830,strncmp,state,truncate,spec
+0x4a99c0,strncmp,state,truncate,spec
+0x4a9b90,strncmp,state,truncate,spec
+0x4a9fd0,strncmp,state,truncate,spec
+0x4a9fd0,toupper,state,high-byte,spec
+0x4aa8f0,_strnicmp,state,truncate,spec
+0x4aa8f0,strncmp,trace,truncate,spec
+0x4aa8f0,strncpy,trace,truncate,spec
+0x4ab060,_strnicmp,state,,drop: only fixed ASCII literals reach it
+0x4ab1b0,strncpy,trace,truncate,spec
+0x4ab720,isalnum,save,,drop: only ASCII 0x20..0x7f reaches it
+0x4abd90,strncpy,trace,truncate,spec
+0x4abd90,strtok,trace,tokenizer-state,spec
+0x4ad350,strncpy,trace,,drop: the key is always empty after the memset
+0x4adc70,atoi,state,empty;overflow;sign;trailing;whitespace,spec
+0x4adc70,strncpy,trace,pad;truncate,spec
+0x4aeac0,strncpy,trace,pad;truncate,spec
+0x4b39c0,strncpy,save,,drop: only a fixed 8-char literal reaches it
+0x4b4560,_strcmpi,state,,drop: only program-generated ASCII names reach it
+0x4b4910,_strcmpi,state,,drop: only program-generated ASCII names reach it
+0x4b4a80,_strcmpi,state,,drop: only program-generated ASCII names reach it
+0x4b73e0,atoi,state,empty;overflow;sign;trailing,spec
+0x4b7440,isspace,state,high-byte,spec
+0x4b74f0,atoi,state,empty;overflow;sign;trailing,spec
+0x4b7760,_strcmpi,none,,drop: only fixed ASCII literals reach it
+0x4b7900,_strcmpi,state,,drop: lookup in a fixed ASCII table; membership does not depend on the order
+0x4b8d40,_strcmpi,state,high-byte,spec
+0x4bb2e0,strncpy,none,truncate,drop: result only reaches error report text
+0x4bb4e0,_strcmpi,state,high-byte,spec
+0x4bb4e0,strchr,state,,drop: only a fixed backslash is searched
+0x4bb4e0,strncpy,state,,"drop: count equals the segment length, nothing truncated or padded"
+0x4bb7c0,sprintf,none,,drop: error text only
+0x4bc370,toupper,state,high-byte,spec
+0x4bc800,_strcmpi,state,high-byte,spec
+0x4bc800,strchr,state,,drop: only a fixed backslash is searched
+0x4bc800,strncpy,state,,"drop: count equals the segment length, nothing truncated or padded"
+0x4bcb50,sprintf,state,fmt:%s,spec
+0x4c14f0,strncpy,trace,truncate,spec
+0x4c3410,_strcmpi,state,high-byte,spec
+0x4c35c0,memmove,none,,drop: exception message text only
+0x4c3740,memmove,none,,drop: exception message text only
+0x4c3950,memmove,none,,drop: exception message text only
+0x4c3af0,memmove,none,,drop: exception message text only
+0x4c3cc0,memmove,none,,drop: exception message text only
+0x4c3e40,_strcmpi,state,fold-order;high-byte;order,spec
+0x4c3e40,sprintf,none,,drop: error text only
+0x4c3e40,strchr,state,,"drop: only fixed ASCII delimiters (], =, ;) are searched"
+0x4c4420,strncpy,state,pad;truncate,spec
+0x4c4470,_strcmpi,state,,drop: only fixed ASCII literals reach it
+0x4c4630,_strcmpi,state,fold-order;high-byte;order,spec
+0x4c46c0,_strcmpi,state,fold-order;high-byte;order,spec
+0x4c46c0,atoi,state,empty;overflow;sign;trailing;whitespace,spec
+0x4c4760,_strcmpi,state,fold-order;high-byte;order,spec
+0x4c4800,_strcmpi,state,fold-order;high-byte;order,spec
+0x4c48c0,_strcmpi,state,fold-order;high-byte;order,spec
+0x4c48c0,strncpy,state,pad;truncate,spec
+0x4c49a0,memmove,none,,drop: exception message text only
+0x4c5840,_strcmpi,trace,high-byte,spec
+0x4c9290,_strlwr,state,high-byte,spec
+0x4ceb60,sprintf,none,,drop: host audio command text only
+0x4d01b0,strncmp,trace,,drop: 4-byte compare with fixed ASCII literals
+0x4d02a0,strncmp,trace,,drop: 4-byte compare with fixed ASCII literals
+0x4d8e60,sprintf,none,,drop: crash report text only
+0x4d8e60,strrchr,none,,drop: reaches only the crash report text
+0x4d9ca0,sprintf,none,,drop: crash report text only
+0x4d9f60,_strnicmp,state,truncate,spec
+0x4d9f60,isspace,state,high-byte,spec
+0x4da040,sscanf,none,,drop: debug switch only
+0x4da3f0,memmove,none,overlap,drop: crash report text only
+0x4de180,strrchr,none,,drop: reaches only debug symbol search paths
+0x4ded60,sprintf,none,,drop: crash report text only
+0x4ded60,strncpy,none,truncate,drop: crash report text only

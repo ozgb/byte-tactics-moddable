@@ -431,6 +431,30 @@ add_custom_command(
   COMMAND_EXPAND_LISTS)
 add_custom_target(core_state_adapter DEPENDS "${CMAKE_BINARY_DIR}/core_state_adapter.exe")
 
+add_library(core_runtime_adapter_objects OBJECT tests/core_runtime_adapter.c)
+target_include_directories(core_runtime_adapter_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(core_runtime_adapter_objects PRIVATE ${GAME_COMPILE_OPTIONS} /Gd)
+add_custom_command(
+  OUTPUT "${CMAKE_BINARY_DIR}/core_runtime_adapter.exe"
+  COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/core_runtime_adapter.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
+          $<TARGET_OBJECTS:core_runtime_adapter_objects> $<TARGET_FILE:bitexact> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+          "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS core_runtime_adapter_objects bitexact $<TARGET_OBJECTS:core_runtime_adapter_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+  COMMAND_EXPAND_LISTS)
+add_custom_target(core_runtime_adapter DEPENDS "${CMAKE_BINARY_DIR}/core_runtime_adapter.exe")
+
+add_library(core_console_adapter_objects OBJECT src/game/console_commands.cpp src/util/commands.cpp src/graphics/surface.cpp src/map/los_tables.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/core_console_adapter.cpp)
+target_include_directories(core_console_adapter_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(core_console_adapter_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(core_console_adapter_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+add_custom_command(
+  OUTPUT "${CMAKE_BINARY_DIR}/core_console_adapter.exe"
+  COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/core_console_adapter.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no /force:unresolved
+          $<TARGET_OBJECTS:core_console_adapter_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/LIBCPMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS core_console_adapter_objects $<TARGET_OBJECTS:core_console_adapter_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+  COMMAND_EXPAND_LISTS)
+add_custom_target(core_console_adapter DEPENDS "${CMAKE_BINARY_DIR}/core_console_adapter.exe")
+
 add_library(core_wasm_adapter_objects OBJECT src/host/win32/library.cpp tests/core_wasm_adapter.cpp)
 target_include_directories(core_wasm_adapter_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}" "${CMAKE_SOURCE_DIR}/lib/wasmloader" "${CMAKE_SOURCE_DIR}/third_party/wasmtime/include")
 target_compile_options(core_wasm_adapter_objects PRIVATE ${GAME_COMPILE_OPTIONS})

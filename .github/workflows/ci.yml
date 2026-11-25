@@ -419,7 +419,7 @@ jobs:
           cmake --build build/files --target files_adapter
           uv run tools/test_filesgate.py
           uv run tools/filesgate.py check --out build/files-gate
-          cmake --build build/modern --target core_state_adapter core_wasm_adapter
+          cmake --build build/modern --target core_state_adapter core_wasm_adapter core_console_adapter core_runtime_adapter
           uv run tools/corefixtures.py check
           uv run tools/test_coregate.py
           uv run tools/coregate.py --trusted --out build/core-gate

@@ -13,6 +13,7 @@ import rwsets
 
 SOURCE = """struct Game { int tick; int wind; short pad; int values[4]; };
 struct Unit { int hp; Game* game; };
+struct Flagged { struct { unsigned a : 1; } bits; };
 extern Game* g_game;
 extern int g_count;
 extern int g_other;
@@ -44,6 +45,8 @@ void Increment() { g_other++; }
 
 // FUNCTION: 0x401030
 void FieldThroughPointer(Unit* u) { u->hp = u->game->tick; g_game->values[2] = 3; }
+
+void SetBit(Flagged* f) { f->bits.a = 1; }
 
 // FUNCTION: 0x401040
 int Indirect(Table* t, int x) { return g_handlers[x](x) + t->fire(x); }
@@ -156,6 +159,9 @@ class RwsetsTest(unittest.TestCase):
         self.assertEqual(self.by_function["FieldThroughPointer"], {
             ("field_write", "Unit::hp"), ("field_read", "Unit::game"), ("field_read", "Game::tick"),
             ("global_read", "g_game"), ("field_write", "Game::values")})
+
+    def test_a_bit_of_an_unnamed_struct_is_also_an_access_of_the_member_that_holds_it(self):
+        self.assertEqual(self.by_function["SetBit"], {("field_write", "<anon>::a"), ("member_write", "Flagged::bits")})
 
     def test_a_lambda_capture_is_not_a_field(self):
         source = ("struct Unit { int hp; };\ntemplate <class F> void Each(F f) { f(0); }\n"

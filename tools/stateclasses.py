@@ -231,14 +231,19 @@ PRESENTATION_DIRS = ("src/graphics/", "src/sound/", "src/gui/", "src/frontend/",
 NON_GAME_DIRS = ("src/debug/", "src/harness/")
 SIM_IN_PRESENTATION_DIRS = ["StepGafSequence"]
 
-ANON_BITS = re.compile(r"^<anon>::bits?\d*_([0-9a-f]+)$")
-PRESENTATION_WRITE_KINDS = ("field_write", "global_write")
+SIM_RECORDS = ("Unit", "Player", "Order", "Feature", "Projectile")
+CONSOLE_FILE = "src/game/console_commands.cpp"
+CONSOLE_HANDLER = re.compile(r'^\s*\{"\w+",.*?(\w+),\s*\d+\s*\}', re.M)
+PRESENTATION_WRITE_KINDS = ("field_write", "member_write", "global_write")
 
 MATCH_SETUP = "match setup before the first tick"
+SELECTION = "selection, #1050"
+BATTLE_ROOM = "battle room setup, outside a match"
 PRESENTATION_SIM_WRITES = [
     ("HandleNewGameClick", "Game::difficulty", MATCH_SETUP),
     ("HandleEndMissionClick", "Game::difficulty", MATCH_SETUP),
-    ("HandleEndMissionClick", "<anon>::bit2_3923b", "clears the game-over bit before the next mission starts"),
+    ("HandleEndMissionClick", "Game::bits_3923b_2", "clears the game-over bit before the next mission starts"),
+    ("HandleEndMissionClick", "Game::bits_2a44", "mission-end net game bits, before the next mission starts"),
     ("HandleFrontendDebugKey", "Game::difficulty", "debug key in the menus, outside a match"),
     ("HandleBattleRoomClick", "Game::difficulty", MATCH_SETUP),
     ("HandleRestartDialogClick", "Game::difficulty", MATCH_SETUP),
@@ -247,7 +252,39 @@ PRESENTATION_SIM_WRITES = [
     ("HandleSkirmishClick", "Game::numPlayers", MATCH_SETUP),
     ("HandleSelectGameClick", "Game::netGameFlags", MATCH_SETUP),
     ("OpenBattleRoom", "Game::commanderDeath", MATCH_SETUP),
-    ("HandleDebugHotkey", "<anon>::bit0_3923b", "debug display bit, read only by presentation"),
+    ("HandleDebugHotkey", "Game::bits_3923b_1", "debug bits, #1050"),
+    ("ClearSelection", "Unit::flags", SELECTION),
+    ("ClearUnitSelectFlags", "Unit::flags", SELECTION),
+    ("ClickSelectHoverUnit", "Unit::flags", SELECTION),
+    ("CycleSelection", "Unit::flags", SELECTION),
+    ("DeselectIfIneligible", "Unit::flags", SELECTION),
+    ("DispatchOrdersPanelPageFlags", "Unit::flags", SELECTION),
+    ("SelectAllIdleUnits", "Unit::flags", SELECTION),
+    ("SelectAllVisibleUnits", "Unit::flags", SELECTION),
+    ("SelectSquad", "Unit::flags", SELECTION),
+    ("SelectUnitsByCategory", "Unit::flags", SELECTION),
+    ("SelectUnitsInBox", "Unit::flags", SELECTION),
+    ("StepBuildMenuPageBack", "Unit::flags", SELECTION),
+    ("ClickSelectHoverUnit", "Unit::selected", SELECTION),
+    ("FocusCommander", "Unit::selected", SELECTION),
+    ("SelectUnitsInBox", "Unit::selected", SELECTION),
+    ("BlitFeatureGaf", "Unit::angles", "stages the scratch unit g_game->unit for drawing"),
+    ("BlitFeatureGaf", "Unit::pos", "stages the scratch unit g_game->unit for drawing"),
+    ("BlitFeatureGaf", "Unit::state", "stages the scratch unit g_game->unit for drawing"),
+    ("DrawScorePanel", "Player::rank", "score panel ranking, #1050"),
+    ("DrawWeaponCoverage", "Order::flags_42", "debug draw marks the order it draws, #1050"),
+    ("OpenSelectGameDialog", "Player::rejectReason", "join screen, outside a match"),
+    ("CyclePlayerAlliance", "Player::alliance", BATTLE_ROOM),
+    ("CyclePlayerAllianceInBattleRoom", "Player::alliance", BATTLE_ROOM),
+    ("HandleBattleRoomClick", "Player::alliance", BATTLE_ROOM),
+    ("HandleAlliesClick", "Player::allied", BATTLE_ROOM),
+    ("HandleBattleRoomClick", "Player::allied", BATTLE_ROOM),
+    ("SyncMutualAlliances", "Player::allied", BATTLE_ROOM),
+    ("SyncMutualAlliances", "Player::alliedBy", BATTLE_ROOM),
+    ("HandleBattleRoomClick", "Player::id", BATTLE_ROOM),
+    ("CompactActivePlayerSlots", "Player::active", BATTLE_ROOM),
+    ("SwapPlayerSlots", "Player::active", BATTLE_ROOM),
+    ("SwapPlayerSlots", "Player::index", BATTLE_ROOM),
 ]
 
 PLATFORM_TYPE = re.compile(r"\b(HWND|HDC|HANDLE|HINSTANCE|HMODULE|HBITMAP|HPALETTE|HFONT|HICON|HCURSOR|HKEY|"
@@ -1135,31 +1172,46 @@ def read_subsystems(path: Path = SUBSYSTEMS) -> dict[tuple[str, str], str]:
         return {(r["function"], r["file"]): r["subsystem"] for r in csv.DictReader(f)}
 
 
+def console_command_functions(path: Path = ROOT / CONSOLE_FILE) -> set[str]:
+    """The handlers of the console command table, which run from the console, outside a tick."""
+    return set(CONSOLE_HANDLER.findall(path.read_text()))
+
+
 def presentation_sim_writes(rwsets_rows: list[list[str]], subsystems: dict[tuple[str, str], str],
-                            classes: list[dict], globals_rows: list[dict]) -> list[tuple[str, str]]:
-    """The (function, target) pairs where presentation code writes a global or Game field of class sim."""
+                            classes: list[dict], globals_rows: list[dict],
+                            sim_targets: set[str] | None = None, console: set[str] | None = None
+                            ) -> list[tuple[str, str]]:
+    """The (function, target) pairs where presentation code writes a global or field that is sim state.
+
+    Presentation code is the presentation subsystem's functions in a presentation folder and the
+    console command handlers. A Game field or global is sim by its class. A bit field of an unnamed
+    struct is checked as the member that holds it (rwsets records both). A field of any other
+    record of SIM_RECORDS is sim when the walks of the phases and of the load read or write it
+    (sim_targets), because state_classes.csv classes no single field of a record; the other
+    records (vectors, gaf frames, layers) are shared by sim and presentation code.
+    """
     by_name = defaultdict(list)
-    by_address = defaultdict(list)
     for row in classes:
         if row["kind"] == "game-region":
             for name in row["name"].split("|"):
                 by_name[name].append(row["class"])
-            by_address[int(row["address"], 16)].append(row["class"])
     state = {(r["kind"], r["name"]): r["class"] for r in classes}
     joiner = Items([], globals_rows)
+    sim_targets = sim_targets or set()
+    console = console or set()
 
     def target_classes(kind: str, target: str) -> list[str]:
         if kind == "global_write":
             return [state.get(joiner.join(target) or ("", ""), "")]
-        m = ANON_BITS.match(target)
-        if m:
-            return by_address.get(int(m.group(1), 16), [])
-        return by_name.get(target[len("Game::"):], []) if target.startswith("Game::") else []
+        if target.startswith("Game::"):
+            return by_name.get(target[len("Game::"):], [])
+        return ["sim"] if target in sim_targets and target.startswith(tuple(r + "::" for r in SIM_RECORDS)) else []
 
     found = set()
     for _, function, file, kind, target in rwsets_rows:
-        if kind in PRESENTATION_WRITE_KINDS and file.startswith(PRESENTATION_DIRS) \
-                and subsystems.get((function, file)) == "presentation":
+        presentation = (file.startswith(PRESENTATION_DIRS) and subsystems.get((function, file)) == "presentation") \
+            or (file == CONSOLE_FILE and function in console)
+        if kind in PRESENTATION_WRITE_KINDS and presentation:
             classes_of = target_classes(kind, target)
             if classes_of and all(c == "sim" for c in classes_of):
                 found.add((function, target))
@@ -1221,9 +1273,11 @@ def main() -> None:
             print("\n".join(bad))
             print("stateclasses: %d const rows break the const rule (docs/state.md)" % len(bad))
             sys.exit(1)
-        rwsets_rows, _ = hazards.load_graph()
-        errors = presentation_write_errors(presentation_sim_writes(rwsets_rows, read_subsystems(), old,
-                                                                   read_globals()))
+        rwsets_rows, graph = hazards.load_graph()
+        sim = Walks(rwsets_rows, graph).sim
+        sim_targets = {t for _, f, _, k, t in rwsets_rows if k.startswith(("field_", "member_")) and f in sim}
+        errors = presentation_write_errors(presentation_sim_writes(
+            rwsets_rows, read_subsystems(), old, read_globals(), sim_targets, console_command_functions()))
         if errors:
             print("\n".join(errors))
             print("stateclasses: %d presentation writes of sim state (add an event, or list it in "

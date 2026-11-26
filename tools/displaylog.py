@@ -124,10 +124,10 @@ class Picture:
 def parse_picture(number: int, line: str) -> Picture:
     """The picture of a `picture <name> <x offset> <y offset> <transparent index> <pixels>` line; an Error when it is not well formed."""
     words = line.split(" ")
-    if len(words) != 6 or not words[1].startswith("@"):
-        raise Error(f"line {number} is not a picture line: `{line}`")
+    if len(words) != 6 or words[1][:1] not in ("@", "?"):
+        raise Error(f"line {number} is not a picture line: `{line[:200]}`")
     try:
-        size = words[1].split(":")[1]
+        size = words[1].lstrip("?").split(":")[-2]
         width, height = (int(v) for v in size.split("x"))
         x_offset, y_offset, transparency = int(words[2]), int(words[3]), int(words[4])
         pixels = bytes.fromhex(words[5])

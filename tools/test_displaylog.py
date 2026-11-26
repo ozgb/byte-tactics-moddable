@@ -349,6 +349,11 @@ class PictureTest(unittest.TestCase):
         self.assertEqual((found[name].x_offset, found[name].y_offset, found[name].transparency), (-3, 4, 9))
         self.assertEqual((found[name].width, found[name].height, found[name].pixels), (2, 2, bytes([1, 2, 3, 4])))
 
+    def test_a_picture_known_by_no_name_has_a_picture_line(self):
+        pixels = bytes([5, 6])
+        line = f"picture ?2x1:{displaylog.hash_bytes(pixels):016x} 0 0 0 0506"
+        self.assertEqual(displaylog.pictures(listing(frame(line)))[line.split(" ")[1]].pixels, pixels)
+
     def test_a_picture_line_is_not_an_item_nor_in_the_digest(self):
         name, line = picture_line()
         item = f"sprite screen 0 0 2 2 {name} 0 0"

@@ -124,12 +124,15 @@ into `reference/commands/`.
 
 `--check` compares each run's `display.txt`, the digest of every frame it drew, line by line with
 `reference/display/<scenario>.txt` and names the first frame that differs, and for a scenario with a `frames` line it
-compares the run's `displaylist.txt` with `reference/displaylists/<scenario>.txt` and names the first frame and item that
-differ (format and meaning in [docs/display-log.md](../docs/display-log.md)). `--tier` compares the tier's digests and
+compares the run's `displaylist.txt` with `reference/displaylists/<scenario>.txt.xz` (every frame up to the last
+`frames` tick, xz compressed) and names the first frame and item that differ (format and meaning in
+[docs/display-log.md](../docs/display-log.md)). With a game directory, `--check` also replays the stored lists
+(`tools/displayreplay.py --check`): the exe draws each list from blank targets and every frame it draws at a `frames`
+tick must equal the stored frame, byte for byte. `--tier` compares the tier's digests and
 the full `--check` all of them. When a digest differs at a frame no stored list holds, the check plays the reference
 build of the stored traces and the exe with `-testdisplay <tick>` and names the first differing item
 (`tools/tracediff.py --display`). A stored file with no scenario fails, and a scenario with no stored digest is only
-counted. `--traces` copies the files the reference branch wrote into `reference/display/` and
+counted. `--traces` copies the files the reference branch wrote into `reference/display/` and, compressed with xz,
 `reference/displaylists/`.
 
 ## Traces

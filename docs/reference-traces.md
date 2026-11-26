@@ -422,7 +422,7 @@ and so on), and this page is updated to name it. The current tag is
   choose how it is drawn, and every frame up to the last `frames` tick, stored xz compressed in
   `reference/displaylists/<scenario>.txt.xz` (ten lists). Drawn from blank targets, the lists give the stored frames
   byte for byte (`tools/displayreplay.py --check`). Every display digest changes; the traces of the 93 are those of
-  v45 but for their commit line, which names c14a8f660, the reference commit that writes the 1.1 log. The sounds, UI
+  v45 but for their commit line, which names 80fc5d17e, the reference merge of #1126 that writes the 1.1 log. The sounds, UI
   logs, interface commands, events and frames of the 93 are those of v45, and the saves decode equal to v45's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the

@@ -1,6 +1,6 @@
 bt-digest 9
 trace_format bt-trace 9
-commit c14a8f6609c61b1d4ae17141708414615884c321
+commit 80fc5d17ebee898c3a81a04fc9426f9f29fa82d3
 scenario reference/scenarios/console-ilose.txt
 game_seed 456
 crt_seed 1456

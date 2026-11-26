@@ -1948,6 +1948,12 @@ static const TraceField kEventAiLimit[] = {
     { "types", offsetof(AiLimit, types), 64, TF_BYTES, TT_NONE, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(AiEventHeader) == 8, "AiEventHeader");
+static const TraceField kEventAiReloadProfiles[] = {
+    { "kind", offsetof(AiEventHeader, kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(AiEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(AiAddOrder) == 44, "AiAddOrder");
 static const TraceField kEventAiEffectAddOrder[] = {
     { "kind", offsetof(AiAddOrder, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -1997,13 +2003,14 @@ static const TraceEventKind kAiKinds[] = {
     { 227, "AI_PLAN", sizeof(AiPlan), kEventAiPlan, 4 },
     { 228, "AI_WEIGHT", sizeof(AiWeight), kEventAiWeight, 6 },
     { 229, "AI_LIMIT", sizeof(AiLimit), kEventAiLimit, 6 },
+    { 230, "AI_RELOAD_PROFILES", sizeof(AiEventHeader), kEventAiReloadProfiles, 3 },
     { 240, "AI_EFFECT_ADD_ORDER", sizeof(AiAddOrder), kEventAiEffectAddOrder, 9 },
     { 241, "AI_EFFECT_QUEUE_BUILD", sizeof(AiQueueBuild), kEventAiEffectQueueBuild, 5 },
     { 243, "AI_EFFECT_STOP", sizeof(AiStop), kEventAiEffectStop, 4 },
     { 245, "AI_EFFECT_ACTIVATE", sizeof(AiActivate), kEventAiEffectActivate, 5 },
     { 246, "AI_EFFECT_SET_STATES", sizeof(AiSetStates), kEventAiEffectSetStates, 5 },
 };
-static const TraceEventModule kAiEvents = { "aiEvents", 42, kAiKinds, 10 };
+static const TraceEventModule kAiEvents = { "aiEvents", 42, kAiKinds, 11 };
 
 static_assert(sizeof(WeaponsDamage) == 24, "WeaponsDamage");
 static const TraceField kEventWeaponsDamage[] = {

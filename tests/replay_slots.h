@@ -19,7 +19,7 @@ int __stdcall Imp_weapons_WeaponCanReachPos(Unit* a0, Vec3* a1, Vec3* a2, int a3
     ReplayText t;
     StartImport(t, "weapons.WeaponCanReachPos");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     AddStructIn(t, ROK_VEC3, a1);
     Space(t);
@@ -35,7 +35,7 @@ Projectile* __stdcall Imp_weapons_FindTargetableProjectile(Unit* a0, unsigned in
     ReplayText t;
     StartImport(t, "weapons.FindTargetableProjectile");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -48,7 +48,7 @@ int __stdcall Imp_weapons_GetWeaponRange(Unit* a0, unsigned int a1)
     ReplayText t;
     StartImport(t, "weapons.GetWeaponRange");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -60,9 +60,9 @@ int __stdcall Imp_weapons_WeaponCanReachUnit(Unit* a0, Unit* a1, unsigned char a
     ReplayText t;
     StartImport(t, "weapons.WeaponCanReachUnit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     Space(t);
     ReplayValue(t, a2);
     const char* r = Enter(t);
@@ -197,7 +197,7 @@ EconUnit __stdcall Imp_econworld_NextUnit(EconUnit a0)
     ReplayText t;
     StartImport(t, "econworld.NextUnit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), true);
     const char* r = Enter(t);
     return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
 }
@@ -207,7 +207,7 @@ int __stdcall Imp_econworld_UnitSlot(EconUnit a0)
     ReplayText t;
     StartImport(t, "econworld.UnitSlot");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), true);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -217,7 +217,7 @@ int __stdcall Imp_econworld_UnitInfo(EconUnit a0, EconUnitInfo* a1)
     ReplayText t;
     StartImport(t, "econworld.UnitInfo");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(a0), true);
     const char* r = Enter(t);
     ApplyInOut(a1, "uinfo", ROK_ECONUNITINFO);
     return ParseResult<int>(r);
@@ -287,7 +287,7 @@ void __stdcall Imp_network_SendFeatureHit(WeaponDef* a0, int a1, int a2)
     ReplayText t;
     StartImport(t, "network.SendFeatureHit");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, true);
     Space(t);
     ReplayValue(t, a1);
     Space(t);
@@ -313,7 +313,7 @@ void __stdcall Imp_network_SendFeatureReclaimed(Unit* a0, int a1, int a2)
     ReplayText t;
     StartImport(t, "network.SendFeatureReclaimed");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     Space(t);
@@ -327,9 +327,9 @@ void __stdcall Imp_network_SendProjectileDetonated(Unit* a0, Projectile* a1)
     ReplayText t;
     StartImport(t, "network.SendProjectileDetonated");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PROJECTILE, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_PROJECTILE, a1, true);
     const char* r = Enter(t);
     (void)r;
 }
@@ -339,7 +339,7 @@ int __stdcall Imp_network_SendScriptCallByName(Unit* a0, const char* a1, char a2
     ReplayText t;
     StartImport(t, "network.SendScriptCallByName");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     t.AddString((const char*)a1);
     Space(t);
@@ -361,9 +361,9 @@ void __stdcall Imp_network_SendUnitDamage(Unit* a0, Unit* a1, int a2, int a3, un
     ReplayText t;
     StartImport(t, "network.SendUnitDamage");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     Space(t);
     ReplayValue(t, a2);
     Space(t);
@@ -379,11 +379,11 @@ void __stdcall Imp_network_SendWeaponFire(Unit* a0, UnitWeaponSlot* a1, Unit* a2
     ReplayText t;
     StartImport(t, "network.SendWeaponFire");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     t.Add("?");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, true);
     Space(t);
     t.Add("?");
     Space(t);
@@ -419,7 +419,7 @@ void __stdcall Imp_network_BroadcastPlayerEconomy(Player* a0)
     ReplayText t;
     StartImport(t, "network.BroadcastPlayerEconomy");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, true);
     const char* r = Enter(t);
     (void)r;
 }
@@ -496,7 +496,7 @@ int __stdcall Imp_los_radar_IsPointVisible(Player* a0, Vec3* a1)
     ReplayText t;
     StartImport(t, "los_radar.IsPointVisible");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, true);
     Space(t);
     t.Add("pos=");
     AddVec3(t, a1);
@@ -550,9 +550,9 @@ int __stdcall Imp_los_radar_IsUnitVisibleToPlayer(Player* a0, Unit* a1)
     ReplayText t;
     StartImport(t, "los_radar.IsUnitVisibleToPlayer");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_PLAYER, a0, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -646,12 +646,32 @@ void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsi
     (void)r;
 }
 
+void __stdcall Imp_pathfinding_Submit(const PathRequest* a0)
+{
+    ReplayText t;
+    StartImport(t, "pathfinding.Submit");
+    Space(t);
+    AddValueStruct(t, ROK_PATHREQUESTREFS, a0);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_pathfinding_Cancel(PathHandle a0)
+{
+    ReplayText t;
+    StartImport(t, "pathfinding.Cancel");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PATHGOAL, ReplayRefPtr(a0), true);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 unsigned int __stdcall Imp_scripts_ObjectStateSize(Object3do* a0)
 {
     ReplayText t;
     StartImport(t, "scripts.ObjectStateSize");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, a0, true);
     const char* r = Enter(t);
     return ParseResult<unsigned int>(r);
 }
@@ -661,7 +681,7 @@ void __stdcall Imp_scripts_GetAimFromPosition(Unit* a0, Vec3* a1, unsigned char 
     ReplayText t;
     StartImport(t, "scripts.GetAimFromPosition");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a2);
     const char* r = Enter(t);
@@ -674,7 +694,7 @@ void __stdcall Imp_scripts_GetPieceOffset(Unit* a0, int a1, Vec3* a2)
     ReplayText t;
     StartImport(t, "scripts.GetPieceOffset");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -687,7 +707,7 @@ void __stdcall Imp_scripts_GetPiecePosition(Unit* a0, int a1, Vec3* a2)
     ReplayText t;
     StartImport(t, "scripts.GetPiecePosition");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     Space(t);
     ReplayValue(t, a1);
     const char* r = Enter(t);
@@ -700,7 +720,7 @@ int __stdcall Imp_scripts_QueryScript(CobScript* a0, const char* a1, int* a2, in
     ReplayText t;
     StartImport(t, "scripts.QueryScript");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_COBSCRIPT, a0, true);
     Space(t);
     t.AddString((const char*)a1);
     Space(t);
@@ -724,9 +744,22 @@ void __stdcall Imp_scripts_GetSweetSpot(Unit* a0, Vec3* a1)
     ReplayText t;
     StartImport(t, "scripts.GetSweetSpot");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
     const char* r = Enter(t);
     ApplyVec3(a1, "out");
+    (void)r;
+}
+
+void __stdcall Imp_scripts_GetPieceAngles(Unit* a0, int a1, Angles16* a2)
+{
+    ReplayText t;
+    StartImport(t, "scripts.GetPieceAngles");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a0, true);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    *a2 = ParseValueText<Angles16>(ROK_ANGLES16, r);
     (void)r;
 }
 
@@ -737,21 +770,13 @@ int __stdcall Imp_orders_GetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3
     Space(t);
     ReplayValue(t, a0);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, false);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a2, true);
     Space(t);
     AddStructIn(t, ROK_VEC3, a3);
     const char* r = Enter(t);
     return ParseResult<int>(r);
-}
-
-void __stdcall Imp_players_LoadDefaultAIScript()
-{
-    ReplayText t;
-    StartImport(t, "players.LoadDefaultAIScript");
-    const char* r = Enter(t);
-    (void)r;
 }
 
 double __stdcall Imp_economy_GetEnergyUse(EconType a0)
@@ -968,7 +993,7 @@ void __stdcall Imp_features_GetFootprintCentre(const Point16* a0, Feature* a1, V
     Space(t);
     AddStructIn(t, ROK_POINT16, a0);
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, false);
+    ReplayAddObjectName(t, g_objects, ROK_FEATURE, a1, true);
     const char* r = Enter(t);
     *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
     (void)r;
@@ -1017,6 +1042,55 @@ Unit* __stdcall Imp_units_CreateUnit(unsigned char a0, unsigned short a1, const 
     return o;
 }
 
+Unit* __stdcall Imp_units_LoadUnit(unsigned short a0, HapiBank* a1)
+{
+    ReplayText t;
+    StartImport(t, "units.LoadUnit");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    AddObject(t, OBJ_BANK, a1);
+    const char* r = Enter(t);
+    Unit* o = (Unit*)ReplayResolveObject(r, nullptr, g_objects, AllocObject);
+    return o;
+}
+
+void __stdcall Imp_units_UnitRefUnlink(UnitRef* a0)
+{
+    ReplayText t;
+    StartImport(t, "units.UnitRefUnlink");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, true);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_units_UnitRefSetUnit(UnitRef* a0, Unit* a1)
+{
+    ReplayText t;
+    StartImport(t, "units.UnitRefSetUnit");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, true);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_units_UnitRefInit(UnitRef* a0, Unit* a1, OrderBase* a2)
+{
+    ReplayText t;
+    StartImport(t, "units.UnitRefInit");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PATHORDERATTACH, a0, true);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, a1, true);
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_ORDER, a2, true);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 WeaponsSeam g_import_weapons;
 FilesSeam g_import_files;
 EconomyWorldView g_import_econworld;
@@ -1027,7 +1101,6 @@ MissionSeam g_import_mission;
 PathfindingSeam g_import_pathfinding;
 ScriptsSeam g_import_scripts;
 OrdersSeam g_import_orders;
-PlayersSeam g_import_players;
 EconomySeam g_import_economy;
 PathWorldView g_import_pathworld;
 FeaturesSeam g_import_features;
@@ -1099,6 +1172,7 @@ AiSeam g_native_ai = {
     CreateSquadManagerSlot,
     FreeSquadManagerSlot,
     WriteAiStateSlot,
+    LoadAIProfiles,
 };
 
 PathfindingSeam g_native_pathfinding = {
@@ -1309,6 +1383,29 @@ ScriptsSeam g_native_scripts = {
     ScriptsNative_LoadScriptState,
     ScriptsNative_DeleteScript,
     ScriptsWriteState,
+};
+
+MovementSeam g_native_movement = {
+    MovementApply,
+    MovementUpdateMotion,
+    MovementApplyPathEvent,
+    MovementGetMotionState,
+    MovementReadNetState,
+    MovementHasNetState,
+    MovementWriteNetState,
+    MovementNewPathOrderAt,
+    MovementNewPathOrderToUnit,
+    MovementNewPathOrderToUnitAt,
+    MovementNewPathOrderToUnitAtAngle,
+    MovementNewAirManeuverOrder,
+    MovementNewApproachRadius,
+    MovementNewRingApproach,
+    MovementNewPointMarker,
+    MovementLoadTarget,
+    MovementSaveTarget,
+    MovementTargetType,
+    MovementUnitTarget,
+    MovementWriteState,
 };
 
 MissionSeam g_native_mission = {
@@ -1718,12 +1815,6 @@ void Run_ai_DumpPlayerAI()
     g_seams.ai->DumpPlayerAI(p0, p1);
 }
 
-void Run_ai_ResetAIPlayers()
-{
-    SetClosing(nullptr);
-    g_seams.ai->ResetAIPlayers();
-}
-
 void Run_ai_CreatePlayerAI()
 {
     int p0 = ArgScalar<int>("player");
@@ -1750,20 +1841,6 @@ void Run_ai_RebuildFeatureCells()
     int p0 = ArgScalar<int>("player");
     SetClosing(nullptr);
     g_seams.ai->RebuildFeatureCells(p0);
-}
-
-void Run_ai_ParseDownloadableAiWeightScripts()
-{
-    int p0 = ArgScalar<int>("player");
-    SetClosing(nullptr);
-    g_seams.ai->ParseDownloadableAiWeightScripts(p0);
-}
-
-void Run_ai_ReparseAiWeightScriptsIfLimitNotSticky()
-{
-    int p0 = ArgScalar<int>("player");
-    SetClosing(nullptr);
-    g_seams.ai->ReparseAiWeightScriptsIfLimitNotSticky(p0);
 }
 
 void Run_ai_CreateSquads()
@@ -2977,6 +3054,216 @@ void Run_scripts_RunScripts()
     g_seams.scripts->RunScripts(p0, p1);
 }
 
+int g_result_movement_Apply;
+
+void Run_movement_Apply()
+{
+    unsigned char p0[REPLAY_EVENT_MAX];
+    memset(p0, 0, sizeof p0);
+    ParseEvent("event", RET_MOVEMENT, p0);
+    unsigned int p1 = ArgScalar<unsigned int>("size");
+    SetClosing("result");
+    g_result_movement_Apply = g_seams.movement->Apply((MovementEventHeader*)p0, p1);
+}
+
+void After_movement_Apply()
+{
+    CompareResult(g_result_movement_Apply);
+}
+
+void Run_movement_UpdateMotion()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.movement->UpdateMotion(p0);
+}
+
+int g_result_movement_HasNetState;
+
+void Run_movement_HasNetState()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing("result");
+    g_result_movement_HasNetState = g_seams.movement->HasNetState(p0);
+}
+
+void After_movement_HasNetState()
+{
+    CompareResult(g_result_movement_HasNetState);
+}
+
+unsigned int g_result_movement_NewPathOrderAt;
+
+void Run_movement_NewPathOrderAt()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("order", ROK_ORDER));
+    Vec3 p1 = Vec3();
+    ParseValueArg("pos", ROK_VEC3, &p1);
+    SetClosing("result");
+    g_result_movement_NewPathOrderAt = g_seams.movement->NewPathOrderAt(p0, &p1);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPathOrderAt));
+}
+
+void After_movement_NewPathOrderAt()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPathOrderAt));
+}
+
+unsigned int g_result_movement_NewPathOrderToUnit;
+
+void Run_movement_NewPathOrderToUnit()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("order", ROK_ORDER));
+    Unit* p1 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing("result");
+    g_result_movement_NewPathOrderToUnit = g_seams.movement->NewPathOrderToUnit(p0, p1);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPathOrderToUnit));
+}
+
+void After_movement_NewPathOrderToUnit()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPathOrderToUnit));
+}
+
+unsigned int g_result_movement_NewPathOrderToUnitAt;
+
+void Run_movement_NewPathOrderToUnitAt()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("order", ROK_ORDER));
+    Unit* p1 = (Unit*)ArgObject("unit", ROK_UNIT);
+    Vec3 p2 = Vec3();
+    ParseValueArg("pos", ROK_VEC3, &p2);
+    SetClosing("result");
+    g_result_movement_NewPathOrderToUnitAt = g_seams.movement->NewPathOrderToUnitAt(p0, p1, &p2);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPathOrderToUnitAt));
+}
+
+void After_movement_NewPathOrderToUnitAt()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPathOrderToUnitAt));
+}
+
+unsigned int g_result_movement_NewPathOrderToUnitAtAngle;
+
+void Run_movement_NewPathOrderToUnitAtAngle()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("order", ROK_ORDER));
+    Unit* p1 = (Unit*)ArgObject("unit", ROK_UNIT);
+    short p2 = ArgScalar<short>("angle");
+    SetClosing("result");
+    g_result_movement_NewPathOrderToUnitAtAngle = g_seams.movement->NewPathOrderToUnitAtAngle(p0, p1, p2);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPathOrderToUnitAtAngle));
+}
+
+void After_movement_NewPathOrderToUnitAtAngle()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPathOrderToUnitAtAngle));
+}
+
+unsigned int g_result_movement_NewAirManeuverOrder;
+
+void Run_movement_NewAirManeuverOrder()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("order", ROK_ORDER));
+    Vec3 p1 = Vec3();
+    ParseValueArg("from", ROK_VEC3, &p1);
+    Vec3 p2 = Vec3();
+    ParseValueArg("to", ROK_VEC3, &p2);
+    SetClosing("result");
+    g_result_movement_NewAirManeuverOrder = g_seams.movement->NewAirManeuverOrder(p0, &p1, &p2);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewAirManeuverOrder));
+}
+
+void After_movement_NewAirManeuverOrder()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewAirManeuverOrder));
+}
+
+unsigned int g_result_movement_NewApproachRadius;
+
+void Run_movement_NewApproachRadius()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("order", ROK_ORDER));
+    int p1 = ArgScalar<int>("x");
+    int p2 = ArgScalar<int>("y");
+    int p3 = ArgScalar<int>("radius");
+    SetClosing("result");
+    g_result_movement_NewApproachRadius = g_seams.movement->NewApproachRadius(p0, p1, p2, p3);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewApproachRadius));
+}
+
+void After_movement_NewApproachRadius()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewApproachRadius));
+}
+
+unsigned int g_result_movement_NewRingApproach;
+
+void Run_movement_NewRingApproach()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("order", ROK_ORDER));
+    int p1 = ArgScalar<int>("x");
+    int p2 = ArgScalar<int>("y");
+    int p3 = ArgScalar<int>("inner");
+    int p4 = ArgScalar<int>("outer");
+    SetClosing("result");
+    g_result_movement_NewRingApproach = g_seams.movement->NewRingApproach(p0, p1, p2, p3, p4);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewRingApproach));
+}
+
+void After_movement_NewRingApproach()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewRingApproach));
+}
+
+unsigned int g_result_movement_NewPointMarker;
+
+void Run_movement_NewPointMarker()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("order", ROK_ORDER));
+    Point16 p1 = Point16();
+    ParseValueArg("pos", ROK_POINT16, &p1);
+    Point16 p2 = Point16();
+    ParseValueArg("size", ROK_POINT16, &p2);
+    SetClosing("result");
+    g_result_movement_NewPointMarker = g_seams.movement->NewPointMarker(p0, &p1, &p2);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPointMarker));
+}
+
+void After_movement_NewPointMarker()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_NewPointMarker));
+}
+
+int g_result_movement_TargetType;
+
+void Run_movement_TargetType()
+{
+    unsigned int p0 = ReplayRefOffset(ArgObject("target", ROK_ORDERFX));
+    SetClosing("result");
+    g_result_movement_TargetType = g_seams.movement->TargetType(p0);
+}
+
+void After_movement_TargetType()
+{
+    CompareResult(g_result_movement_TargetType);
+}
+
+unsigned int g_result_movement_UnitTarget;
+
+void Run_movement_UnitTarget()
+{
+    Unit* p0 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing("result");
+    g_result_movement_UnitTarget = g_seams.movement->UnitTarget(p0);
+    BindObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_UnitTarget));
+}
+
+void After_movement_UnitTarget()
+{
+    CompareObjectResult(ROK_ORDERFX, ReplayRefPtr(g_result_movement_UnitTarget));
+}
+
 int g_result_mission_GetGameType;
 
 void Run_mission_GetGameType()
@@ -3284,10 +3571,6 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_ai_DumpPlayerAI();
         return true;
     }
-    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ResetAIPlayers") == 0) {
-        Run_ai_ResetAIPlayers();
-        return true;
-    }
     if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreatePlayerAI") == 0) {
         Run_ai_CreatePlayerAI();
         return true;
@@ -3302,14 +3585,6 @@ bool RunSlot(const char* subsystem, const char* slot)
     }
     if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "RebuildFeatureCells") == 0) {
         Run_ai_RebuildFeatureCells();
-        return true;
-    }
-    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ParseDownloadableAiWeightScripts") == 0) {
-        Run_ai_ParseDownloadableAiWeightScripts();
-        return true;
-    }
-    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ReparseAiWeightScriptsIfLimitNotSticky") == 0) {
-        Run_ai_ReparseAiWeightScriptsIfLimitNotSticky();
         return true;
     }
     if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreateSquads") == 0) {
@@ -3680,6 +3955,58 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_scripts_RunScripts();
         return true;
     }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "Apply") == 0) {
+        Run_movement_Apply();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "UpdateMotion") == 0) {
+        Run_movement_UpdateMotion();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "HasNetState") == 0) {
+        Run_movement_HasNetState();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPathOrderAt") == 0) {
+        Run_movement_NewPathOrderAt();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPathOrderToUnit") == 0) {
+        Run_movement_NewPathOrderToUnit();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPathOrderToUnitAt") == 0) {
+        Run_movement_NewPathOrderToUnitAt();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPathOrderToUnitAtAngle") == 0) {
+        Run_movement_NewPathOrderToUnitAtAngle();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewAirManeuverOrder") == 0) {
+        Run_movement_NewAirManeuverOrder();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewApproachRadius") == 0) {
+        Run_movement_NewApproachRadius();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewRingApproach") == 0) {
+        Run_movement_NewRingApproach();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPointMarker") == 0) {
+        Run_movement_NewPointMarker();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "TargetType") == 0) {
+        Run_movement_TargetType();
+        return true;
+    }
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "UnitTarget") == 0) {
+        Run_movement_UnitTarget();
+        return true;
+    }
     if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetGameType") == 0) {
         Run_mission_GetGameType();
         return true;
@@ -3885,6 +4212,30 @@ void RunAfter(const char* subsystem, const char* slot)
         After_scripts_CreateObjectState();
     if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "CreatePlayerObjectState") == 0)
         After_scripts_CreatePlayerObjectState();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "Apply") == 0)
+        After_movement_Apply();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "HasNetState") == 0)
+        After_movement_HasNetState();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPathOrderAt") == 0)
+        After_movement_NewPathOrderAt();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPathOrderToUnit") == 0)
+        After_movement_NewPathOrderToUnit();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPathOrderToUnitAt") == 0)
+        After_movement_NewPathOrderToUnitAt();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPathOrderToUnitAtAngle") == 0)
+        After_movement_NewPathOrderToUnitAtAngle();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewAirManeuverOrder") == 0)
+        After_movement_NewAirManeuverOrder();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewApproachRadius") == 0)
+        After_movement_NewApproachRadius();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewRingApproach") == 0)
+        After_movement_NewRingApproach();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "NewPointMarker") == 0)
+        After_movement_NewPointMarker();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "TargetType") == 0)
+        After_movement_TargetType();
+    if (strcmp(subsystem, "movement") == 0 && strcmp(slot, "UnitTarget") == 0)
+        After_movement_UnitTarget();
     if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetGameType") == 0)
         After_mission_GetGameType();
     if (strcmp(subsystem, "mission") == 0 && strcmp(slot, "GetNameSlot") == 0)
@@ -3926,6 +4277,7 @@ void BindSeams()
     g_seams.players = &g_native_players;
     g_seams.map = &g_native_map;
     g_seams.scripts = &g_native_scripts;
+    g_seams.movement = &g_native_movement;
     g_seams.mission = &g_native_mission;
     g_seams.files = &g_import_files;
     g_import_files.BankOpenAccount = Imp_files_BankOpenAccount;
@@ -4010,6 +4362,8 @@ void BindSeams()
         g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
         g_seams.pathfinding = &g_import_pathfinding;
         g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
+        g_import_pathfinding.Submit = Imp_pathfinding_Submit;
+        g_import_pathfinding.Cancel = Imp_pathfinding_Cancel;
         g_seams.scripts = &g_import_scripts;
         g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
         g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
@@ -4017,6 +4371,7 @@ void BindSeams()
         g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
         g_import_scripts.QueryScript = Imp_scripts_QueryScript;
         g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
+        g_import_scripts.GetPieceAngles = Imp_scripts_GetPieceAngles;
     }
     if (strcmp(g_subsystem, "ai") == 0) {
         g_seams.mission = &g_import_mission;
@@ -4038,8 +4393,6 @@ void BindSeams()
         g_import_weapons.FindTargetableProjectile = Imp_weapons_FindTargetableProjectile;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
-        g_seams.players = &g_import_players;
-        g_import_players.LoadDefaultAIScript = Imp_players_LoadDefaultAIScript;
         g_seams.economy = &g_import_economy;
         g_import_economy.GetEnergyUse = Imp_economy_GetEnergyUse;
     }
@@ -4071,6 +4424,7 @@ void BindSeams()
         g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
         g_import_scripts.QueryScript = Imp_scripts_QueryScript;
         g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
+        g_import_scripts.GetPieceAngles = Imp_scripts_GetPieceAngles;
     }
     if (strcmp(g_subsystem, "targeting") == 0) {
         g_seams.los_radar = &g_import_los_radar;
@@ -4099,6 +4453,7 @@ void BindSeams()
         g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
         g_import_scripts.QueryScript = Imp_scripts_QueryScript;
         g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
+        g_import_scripts.GetPieceAngles = Imp_scripts_GetPieceAngles;
     }
     if (strcmp(g_subsystem, "los_radar") == 0) {
         g_seams.map = &g_import_map;
@@ -4133,6 +4488,10 @@ void BindSeams()
         g_seams.units = &g_import_units;
         g_import_units.FindUnitTypeId = Imp_units_FindUnitTypeId;
         g_import_units.CreateUnit = Imp_units_CreateUnit;
+        g_import_units.LoadUnit = Imp_units_LoadUnit;
+        g_import_units.UnitRefUnlink = Imp_units_UnitRefUnlink;
+        g_import_units.UnitRefSetUnit = Imp_units_UnitRefSetUnit;
+        g_import_units.UnitRefInit = Imp_units_UnitRefInit;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
@@ -4162,6 +4521,8 @@ void BindSeams()
         g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
         g_seams.pathfinding = &g_import_pathfinding;
         g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
+        g_import_pathfinding.Submit = Imp_pathfinding_Submit;
+        g_import_pathfinding.Cancel = Imp_pathfinding_Cancel;
     }
     if (strcmp(g_subsystem, "scripts") == 0) {
         g_seams.map = &g_import_map;
@@ -4177,5 +4538,30 @@ void BindSeams()
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
         g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
+    }
+    if (strcmp(g_subsystem, "movement") == 0) {
+        g_seams.units = &g_import_units;
+        g_import_units.FindUnitTypeId = Imp_units_FindUnitTypeId;
+        g_import_units.CreateUnit = Imp_units_CreateUnit;
+        g_import_units.LoadUnit = Imp_units_LoadUnit;
+        g_import_units.UnitRefUnlink = Imp_units_UnitRefUnlink;
+        g_import_units.UnitRefSetUnit = Imp_units_UnitRefSetUnit;
+        g_import_units.UnitRefInit = Imp_units_UnitRefInit;
+        g_seams.map = &g_import_map;
+        g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
+        g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
+        g_import_map.UnitsInRange = Imp_map_UnitsInRange;
+        g_seams.scripts = &g_import_scripts;
+        g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
+        g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
+        g_import_scripts.GetPieceOffset = Imp_scripts_GetPieceOffset;
+        g_import_scripts.GetPiecePosition = Imp_scripts_GetPiecePosition;
+        g_import_scripts.QueryScript = Imp_scripts_QueryScript;
+        g_import_scripts.GetSweetSpot = Imp_scripts_GetSweetSpot;
+        g_import_scripts.GetPieceAngles = Imp_scripts_GetPieceAngles;
+        g_seams.pathfinding = &g_import_pathfinding;
+        g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
+        g_import_pathfinding.Submit = Imp_pathfinding_Submit;
+        g_import_pathfinding.Cancel = Imp_pathfinding_Cancel;
     }
 }

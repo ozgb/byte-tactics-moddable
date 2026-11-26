@@ -55,6 +55,7 @@
 #include "../src/ai/ai_player.h"
 #include "../src/units/squads.h"
 #include "../src/orders/orders_seam.h"
+#include "../src/movement/movement_seam.h"
 #include "../src/map/line_of_sight.h"
 #include "../src/map/line_of_sight_index.h"
 #include "../src/map/radar_capture.h"
@@ -168,6 +169,8 @@ Seams g_seams;
 const TurnCostTable g_turnCosts = { { 0, 40, 60, 80, 100, 80, 60, 40 } };
 signed char g_dirDeltaX[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
 signed char g_dirDeltaZ[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+signed char g_rangeByPitchTable[11] __asm__("_g_rangeByPitchTable") = { 25, 55, 70, 85, 100, 100, 75, 50, 25, 20, 15 };
+__asm__(".globl \"?g_slopeSpeedFactor@@3PACA\"\n\t.set \"?g_slopeSpeedFactor@@3PACA\", _g_rangeByPitchTable+5");
 
 SimGlobals& SimCreate()
 {
@@ -198,6 +201,13 @@ extern "C" int __cdecl bx_AngleOfVector(int x, int z);
 short __cdecl AngleOfVector(int x, int z)
 {
     return (short)bx_AngleOfVector(x, z);
+}
+
+extern "C" void __cdecl bx_RotatePoint2D(short angle, int* xz);
+
+void __cdecl RotatePoint2D(short angle, int* xz)
+{
+    bx_RotatePoint2D(angle, xz);
 }
 
 #pragma comment(linker, "/alternatename:?AngleOfVector@@YAHHH@Z=?AngleOfVector@@YAFHH@Z")
@@ -356,6 +366,7 @@ char* g_text;
 char* g_lines[MAX_LINES];
 int g_lineCount;
 char g_subsystem[48];
+bool g_importChanges;
 const char* g_file = "";
 
 int g_callIndex;
@@ -563,16 +574,51 @@ struct RegionBinding {
 RegionBinding g_region;
 ReplayRegionView g_regionView;
 
+struct RegionClash {
+    unsigned first;
+    unsigned end;
+    bool found;
+};
+
+const unsigned kRegionChunkHeader = 8;
+const unsigned kRegionFirstChunk = 64;
+
+void __cdecl FindRegionClash(void* payload, unsigned int, void* context)
+{
+    RegionClash& clash = *(RegionClash*)context;
+    unsigned first = (unsigned)((unsigned char*)payload - (unsigned char*)SimBlockBase()) - kRegionChunkHeader;
+    unsigned chunk = *(const unsigned*)((const unsigned char*)payload - kRegionChunkHeader) & ~1u;
+    if (first < clash.end && clash.first < first + chunk)
+        clash.found = true;
+}
+
 void* PlaceRegion(unsigned offset, unsigned size, char* why)
 {
     void* p = SimAllocAt(offset, size);
     if (p != nullptr)
         return p;
     unsigned block = SimBlockSize();
-    if (offset > block || size > block - offset)
-        sprintf(why, "block offset %u (%u bytes) is past the block's end at %u", offset, size, block);
+    unsigned need = size > block ? block + kMinChunk : ((size + 7) & ~7u) + kRegionChunkHeader;
+    if (need < kMinChunk)
+        need = kMinChunk;
+    if (offset < kRegionFirstChunk + kRegionChunkHeader) {
+        sprintf(why, "block offset %u (%u bytes) puts its chunk header inside the block's own header of %u bytes", offset, size, kRegionFirstChunk);
+        return nullptr;
+    }
+    if ((offset & 7) != 0) {
+        sprintf(why, "block offset %u (%u bytes) is not 8-byte aligned", offset, size);
+        return nullptr;
+    }
+    if (need > block || offset - kRegionChunkHeader > block - need) {
+        sprintf(why, "block offset %u (%u bytes) is past the block's end at %u, with its %u-byte chunk", offset, size, block, need);
+        return nullptr;
+    }
+    RegionClash clash = { offset - kRegionChunkHeader, offset - kRegionChunkHeader + need, false };
+    SimBlockForEach(FindRegionClash, &clash);
+    if (clash.found)
+        sprintf(why, "block offset %u (%u bytes) is not free: it clashes with another allocation", offset, size);
     else
-        sprintf(why, "block offset %u (%u bytes) is not free: it clashes with another allocation, or is not 8-byte aligned", offset, size);
+        sprintf(why, "block offset %u (%u bytes) lies in a free range that would leave a leading remainder under %u bytes", offset, size, kMinChunk);
     return nullptr;
 }
 
@@ -727,6 +773,8 @@ const ReplayField* RngField(const char* name)
     return nullptr;
 }
 
+void RestoreImportObject(const char* name, const char* value);
+
 const char* Enter(const ReplayText& actual)
 {
     if (g_loading)
@@ -772,6 +820,8 @@ const char* Enter(const ReplayText& actual)
         const ReplayField* f = RngField(g_outNames[i]);
         if (f != nullptr)
             RestoreField(*f, g_outValues[i]);
+        else
+            RestoreImportObject(g_outNames[i], g_outValues[i]);
     }
     unsigned n = (unsigned)strlen(actual.Data());
     if (strncmp(recorded, actual.Data(), n) == 0 && (recorded[n] == '\0' || strncmp(recorded + n, " = ", 3) == 0))
@@ -1237,8 +1287,8 @@ template <class T> void ApplyOutScalar(T* dst, const char* name)
 
 void CompareBytes(const char* name, const unsigned char* bytes, int count, int length)
 {
-    if (count > length)
-        count = length;
+    if (count > length || bytes == nullptr)
+        count = bytes == nullptr ? 0 : length;
     const char* recorded = OutLine(name);
     if (count <= 0) {
         if (recorded != nullptr)
@@ -1298,6 +1348,28 @@ template <class T> void CompareInOutScalar(const char* name, const T* object)
     if (strcmp(recorded, value.Data()) != 0)
         Diff(name, recorded, value.Data());
     value.Free();
+}
+
+void BindObjectResult(unsigned kind, void* object)
+{
+    if (object == nullptr)
+        return;
+    unsigned actual = ReplayConcreteKind(kind, object);
+    if (actual == kReplayObjectKindCount)
+        Fatal(g_file, g_callIndex, "an object result whose kind its vtable does not tell", ReplayFailure() != nullptr ? ReplayFailure() : kReplayObjectKinds[kind].name);
+    const char* recorded = OutLine("result");
+    const char* hash = recorded == nullptr ? nullptr : strchr(recorded, '#');
+    size_t length = strlen(kReplayObjectKinds[actual].name);
+    if (g_objects.Find(actual, object) == 0 && hash != nullptr && (size_t)(hash - recorded) == length && strncmp(recorded, kReplayObjectKinds[actual].name, length) == 0
+        && kReplayObjectKinds[actual].table == RT_ORDER && hash[1] >= '1' && hash[1] <= '9') {
+        unsigned ordinal = (unsigned)atoi(hash + 1);
+        if (ordinal <= REPLAY_MAX_OBJECTS && g_objects.Pointer(actual, ordinal) == nullptr)
+            g_objects.Bind(actual, ordinal, object);
+    }
+    if (g_rootCount < REPLAY_MAX_ROOTS) {
+        g_rootKinds[g_rootCount] = (unsigned short)actual;
+        g_rootObjects[g_rootCount++] = object;
+    }
 }
 
 void CompareObjectResult(unsigned kind, const void* object)
@@ -1959,6 +2031,23 @@ int __stdcall Native_fixture_Locate(FixtureAmount* first, FixtureAmount* second)
     return 1;
 }
 
+bool g_makeGoalB;
+
+unsigned int __stdcall Native_fixture_MakeGoal()
+{
+    unsigned size = g_makeGoalB ? sizeof(FixtureGoalB) : sizeof(FixtureGoalA);
+    void* at = SimAlloc(size);
+    memset(at, 0, size);
+    FixtureGoalBase* goal = g_makeGoalB ? (FixtureGoalBase*)new (at) FixtureGoalB() : new (at) FixtureGoalA();
+    goal->ticks = 4;
+    return ReplayRefOffset(goal);
+}
+
+int __stdcall Native_fixture_HandGoal(unsigned int goal)
+{
+    return (int)(goal != 0);
+}
+
 WeaponDef* __stdcall Native_fixture_Pick()
 {
     return &g_game->weapons[7];
@@ -2016,7 +2105,7 @@ int __stdcall Native_fixture_Drain(void* out, unsigned int size)
     unsigned int n = size < 3 ? size : 3;
     for (unsigned int k = 0; k < n; k++)
         bytes[k] = (unsigned char)(0x10 + k);
-    return (int)n;
+    return 3;
 }
 
 int __stdcall Native_fixture_Gather(int* points, int capacity)
@@ -3127,6 +3216,28 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     return true;
 }
 
+const char* ImportObjectProblem(const char* name, const ReplaySlotSets& sets)
+{
+    LineKey k;
+    if (!ParseLineKey(name, k) || k.field == nullptr)
+        return "an object line after an import that names no object field";
+    if (!InObjectSet(sets.objReads, sets.objReadCount, k.field))
+        return "an object line after an import whose field the slot does not read";
+    if (InObjectSet(sets.objWrites, sets.objWriteCount, k.field))
+        return "an object line after an import whose field the slot writes, which its w lines compare";
+    return nullptr;
+}
+
+void RestoreImportObject(const char* name, const char* value)
+{
+    if (!g_importChanges || g_sets == nullptr || strchr(name, '#') == nullptr)
+        return;
+    const char* problem = ImportObjectProblem(name, *g_sets);
+    if (problem != nullptr)
+        Fatal(g_file, g_callIndex, problem, name);
+    RestoreObjectLine(name, value, g_file, g_sets, name);
+}
+
 bool ObjectLineIsCondition(const char* name)
 {
     LineKey k;
@@ -3622,6 +3733,7 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
     }
     if (known == nullptr)
         Fatal(file, 0, "not a simulation subsystem", g_subsystem);
+    g_importChanges = known->recordsImportChanges != 0;
     if (tail[0] != '\0' || !known->complete)
         Fatal(file, 0, "the annotations of this subsystem are not complete, so its recordings cannot be replayed", g_subsystem);
     char want[32];
@@ -4298,6 +4410,21 @@ void FormSelfTest()
     t.Clear();
     ReplayAddEvent(t, "event", RET_TARGETING, &aim, sizeof(TargetingEventHeader), g_objects);
     Check(strstr(t.Data(), "  a event.pos0 0\n") != nullptr, "an event copies exactly its size: the payload beyond it reads as zero");
+
+    printf("an event that holds the offset of a polymorphic object\n");
+    LoadCall("  a event.kind 326\n  a event.unit null\n  a event.target ApproachRadius#1\n");
+    memset(buffer, 0, sizeof buffer);
+    ParseEvent("event", RET_MOVEMENT, buffer);
+    MovementTarget* targetBack = (MovementTarget*)buffer;
+    void* radius = ReplayRefPtr(targetBack->target);
+    Check(targetBack->h.kind == MOVEMENT_SET_TARGET && radius != nullptr && *(const void**)radius == ReplayVtable(ROK_APPROACHRADIUS), "the target is the offset of an object of the named kind, with its vtable");
+    t.Clear();
+    ReplayAddEvent(t, "event", RET_MOVEMENT, buffer, sizeof(MovementTarget), g_objects);
+    Check(strstr(t.Data(), "  a event.target ApproachRadius#1\n") != nullptr, "and is written as the kind its vtable says");
+    LoadCall("  a event.kind 326\n  a event.unit null\n  a event.target null\n");
+    memset(buffer, 0, sizeof buffer);
+    ParseEvent("event", RET_MOVEMENT, buffer);
+    Check(targetBack->target == 0, "and null is 0");
 
     printf("refused values\n");
     LoadCall("  a event.kind 1\n  a event.unit FrameTable#?\n");
@@ -6657,6 +6784,80 @@ void GoalSelfTest()
     if (rebuiltTwin != nullptr)
         Check(static_cast<FixtureScanBase*>(rebuiltTwin)->Scan() == 7, "with the vtable of its second base too, so a call through that base runs the class's method");
     free(third);
+
+    printf("an object that a slot creates and returns as its offset\n");
+    ResetBlock();
+    g_makeGoalB = false;
+    g_rootCount = 0;
+    LoadCall("  o result FixtureGoalA#1\n");
+    BeginCompare();
+    Run_fixture_MakeGoal();
+    After_fixture_MakeGoal();
+    Check(g_diffs == 0 && g_rootCount == 1 && g_rootKinds[0] == ROK_FIXTUREGOALA, "it takes the recorded name and is walked as a root");
+    ResetBlock();
+    g_makeGoalB = true;
+    g_rootCount = 0;
+    LoadCall("  o result FixtureGoalA#1\n");
+    BeginCompare();
+    Run_fixture_MakeGoal();
+    After_fixture_MakeGoal();
+    printf("another kind: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "result") == 0, "an object of another kind is reported at the result");
+    g_makeGoalB = false;
+
+    printf("an object that an import creates and returns as its offset\n");
+    ResetBlock();
+    LoadCall("  i fixture.MakeGoal = FixtureGoalB#2\n");
+    BeginImport();
+    unsigned made = Imp_fixture_MakeGoal();
+    FixtureGoalB* madeB = (FixtureGoalB*)ReplayRefPtr(made);
+    Check(g_diffs == 0 && madeB != nullptr && *(const void**)madeB == ReplayVtable(ROK_FIXTUREGOALB), "the stub allocates the recorded kind in the block, with its vtable");
+    Check(madeB != nullptr && madeB->Kind() == 2, "so a virtual call on it runs the class's method");
+    LoadCall("  i fixture.MakeGoal = FixtureGoalB#2\n");
+    BeginImport();
+    Check(Imp_fixture_MakeGoal() == made, "a name it has made returns the same offset");
+    LoadCall("  i fixture.MakeGoal = null\n");
+    BeginImport();
+    Check(Imp_fixture_MakeGoal() == 0, "and null returns 0");
+
+    printf("a handle the slot takes as a scalar and the import names as an object\n");
+    LoadCall("  a goal 777\n  o result 1\n");
+    BeginCompare();
+    Run_fixture_HandGoal();
+    After_fixture_HandGoal();
+    Check(g_diffs == 0, "the slot side records and compares the number");
+    LoadCall("  i fixture.HandGoal FixtureGoalB#2 = 1\n");
+    BeginImport();
+    Check(Imp_fixture_HandGoal(made) == 1 && g_diffs == 0, "the import side passes the name of the object it was made as");
+    LoadCall("  i fixture.HandGoal FixtureGoalB#3 = 1\n");
+    BeginImport();
+    Imp_fixture_HandGoal(made);
+    Check(g_diffs != 0, "and a call with another object is a difference");
+
+    printf("an object field that an import changes\n");
+    ResetBlock();
+    unsigned short goalReads[2] = { FieldIndex(ROK_FIXTUREGOALA, "ticks"), FieldIndex(ROK_FIXTUREGOALA, "heading") };
+    unsigned short goalWrites[1] = { FieldIndex(ROK_FIXTUREGOALA, "heading") };
+    ReplaySlotSets goalSets = { "goal", 0, nullptr, 0, nullptr, 0, goalReads, 2, goalWrites, 1 };
+    const ReplaySlotSets* outerSets = g_sets;
+    g_sets = &goalSets;
+    bool outerImportChanges = g_importChanges;
+    g_importChanges = true;
+    LoadCall("  i fixture.MakeGoal = FixtureGoalA#1\n  o FixtureGoalA#1.ticks 9\n");
+    BeginImport();
+    FixtureGoalA* changed = (FixtureGoalA*)ReplayRefPtr(Imp_fixture_MakeGoal());
+    Check(g_diffs == 0 && changed != nullptr && changed->ticks == 9, "the stub sets a field the slot reads from its line after the import");
+    Check(ImportObjectProblem("FixtureGoalA#1.ticks", goalSets) == nullptr, "and the line is one it can place");
+    const char* unparsed = ImportObjectProblem("FixtureGoalA#1.nosuchfield", goalSets);
+    Check(unparsed != nullptr && strstr(unparsed, "names no object field") != nullptr, "a line that names no field of the kind is fatal");
+    ReplaySlotSets ticksOnly = { "ticks", 0, nullptr, 0, nullptr, 0, goalReads, 1, nullptr, 0 };
+    const char* unread = ImportObjectProblem("FixtureGoalA#1.heading", ticksOnly);
+    Check(unread != nullptr && strstr(unread, "does not read") != nullptr, "so is a line for a field the slot does not read");
+    const char* written = ImportObjectProblem("FixtureGoalA#1.heading", goalSets);
+    Check(written != nullptr && strstr(written, "the slot writes") != nullptr, "and a line for a field the slot writes, so the slot's own result is always compared");
+    Check(changed != nullptr && changed->heading == 0, "none of which changes the object");
+    g_importChanges = outerImportChanges;
+    g_sets = outerSets;
 }
 
 void RefsSelfTest()
@@ -7955,11 +8156,11 @@ void OutFormsSelfTest()
     Run_fixture_Drain();
     After_fixture_Drain();
     Check(g_diffs == 0, "a slot's out bytes replay equal, as long as the result");
-    LoadCall("  a size 2\n  o out x:1011\n  o result 2\n");
+    LoadCall("  a size 2\n  o out x:1011\n  o result 3\n");
     BeginCompare();
     Run_fixture_Drain();
     After_fixture_Drain();
-    Check(g_diffs == 0, "and a smaller buffer is as long as its size");
+    Check(g_diffs == 0, "and a result larger than the buffer is as long as its size");
     LoadCall("  a size 8\n  o out x:101113\n  o result 3\n");
     BeginCompare();
     Run_fixture_Drain();
@@ -7971,11 +8172,11 @@ void OutFormsSelfTest()
     Run_fixture_Drain();
     After_fixture_Drain();
     Check(g_diffs == 1 && strcmp(g_firstKey, "out") == 0, "a missing o line is a difference");
-    LoadCall("  a size 0\n  o result 0\n");
+    LoadCall("  a size 0\n  o result 3\n");
     BeginCompare();
     Run_fixture_Drain();
     After_fixture_Drain();
-    Check(g_diffs == 0, "a call with no bytes has no o line");
+    Check(g_diffs == 0, "a call with no bytes has no o line, whatever its result");
 
     printf("a scratch buffer\n");
     LoadCall("  a capacity 64\n  o result 64\n");
@@ -8061,6 +8262,15 @@ void RegionSelfTest()
     Check(PlaceRegion(offset + 1024, 64, why) == nullptr && strstr(why, "block offset 2098176 (64 bytes) is not free") != nullptr, "a second region that clashes with it is refused, naming its offset");
     Check(PlaceRegion((unsigned)((unsigned char*)g_game - (unsigned char*)SimBlockBase()), 64, why) == nullptr && strstr(why, "is not free") != nullptr, "a region at the offset of the replayer's own Game is refused");
     Check(PlaceRegion(SimBlockSize() - 32, 64, why) == nullptr && strstr(why, "is past the block's end") != nullptr, "a region that passes the block's end is refused, naming its offset");
+    Check(PlaceRegion(offset + 4096 + 16, 64, why) == nullptr && strstr(why, "lies in a free range that would leave a leading remainder under 16 bytes") != nullptr, "a region too close to the start of a free range is refused as such, not as a clash");
+    Check(PlaceRegion(offset + 8196, 64, why) == nullptr && strstr(why, "is not 8-byte aligned") != nullptr, "and a region off the 8-byte grid as that");
+    Check(PlaceRegion(40, 16, why) == nullptr && strstr(why, "inside the block's own header of 64 bytes") != nullptr, "a region whose chunk header would sit in the block's header is refused as such");
+    Check(PlaceRegion(SimBlockSize(), 0, why) == nullptr && strstr(why, "is past the block's end") != nullptr, "and one that passes the block's end only with its smallest chunk is past the end");
+    void* after = PlaceRegion(offset + 8192, 64, why);
+    void* folded = PlaceRegion(offset + 4096 + 8, 4072, why);
+    Check(after != nullptr && folded != nullptr && (*(const unsigned*)((const unsigned char*)folded - 8) & ~1u) == 4088, "a region that leaves a tail under 16 bytes takes the tail into its chunk");
+    SimFree(after);
+    Check(PlaceRegion(offset + 8184, 64, why) == nullptr && strstr(why, "is not free") != nullptr, "so a region whose header lands in that tail clashes with it, not with a leading remainder");
 }
 
 
@@ -8870,12 +9080,6 @@ int __stdcall GetCobChecksum(int key);
 int __stdcall GetCobChecksum(void* param)
 {
     return GetCobChecksum((int)param);
-}
-
-extern "C" void __cdecl bx_RotatePoint2D(short angle, int* xz);
-void __cdecl RotatePoint2D(short angle, int* xy)
-{
-    bx_RotatePoint2D(angle, xy);
 }
 
 Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to)

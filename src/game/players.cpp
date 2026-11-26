@@ -316,31 +316,10 @@ guard:
     }
 }
 
-#include "../util/commands.h"
-#include "../graphics/object_pool.h"
-
 // FUNCTION: 0x4648e0
 void LoadDefaultAIScript()
 {
-    int size;
-    const char* name = g_seams.mission->GetNameSlot(7);
-    char* text = (char*)HAPI_LoadFile(name, &size);
-    if (text == 0) {
-        text = (char*)HAPI_LoadFile("ai\\default.txt", &size);
-    }
-    if (text != 0) {
-        CommandArgs vars;
-        vars.InitArgs();
-        ExecuteCommandText(text, size, &vars, -1);
-        GameFreeThunk(text);
-    }
-    for (int i = 0; i < 10; i++) {
-        Player* p = &g_game->players[i];
-        if (p->active && p->type == 2) {
-            g_seams.ai->ParseDownloadableAiWeightScripts(i);
-            g_seams.ai->ReparseAiWeightScriptsIfLimitNotSticky(i);
-        }
-    }
+    g_seams.ai->LoadProfiles();
 }
 
 // FUNCTION: 0x464990
@@ -352,7 +331,7 @@ void InitPlayers()
             InitPlayerSlot(p);
         }
     }
-    LoadDefaultAIScript();
+    g_seams.ai->LoadProfiles();
 }
 
 // FUNCTION: 0x4649d0

@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem ai 6.0
+subsystem ai 6.1
 call 250 UpdateSquads
   r Game.mapFlags 15
   r Game.baseX 3584

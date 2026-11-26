@@ -87,7 +87,7 @@ int __stdcall Imp_fixture_Strike(WeaponDef* a0)
     ReplayText t;
     StartImport(t, "fixture.Strike");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_WEAPONDEF, a0, true);
     const char* r = Enter(t);
     return ParseResult<int>(r);
 }
@@ -97,7 +97,7 @@ int __stdcall Imp_fixture_Notify(FixtureNotify* a0, Callback* a1, int a2)
     ReplayText t;
     StartImport(t, "fixture.Notify");
     Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_FIXTURENOTIFY, a0, false);
+    ReplayAddObjectName(t, g_objects, ROK_FIXTURENOTIFY, a0, true);
     Space(t);
     AddObject(t, OBJ_CALLBACK + RCB_CALLBACK, a1);
     Space(t);
@@ -149,6 +149,14 @@ void* __stdcall Imp_fixture_Lookup(int a0)
     return (void*)ParseLoadResult(RL_FIXTURE_SCRIPT, r);
 }
 
+unsigned int __stdcall Imp_fixture_MakeGoal()
+{
+    ReplayText t;
+    StartImport(t, "fixture.MakeGoal");
+    const char* r = Enter(t);
+    return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
+}
+
 int __stdcall Imp_fixture_Drain(void* a0, unsigned int a1)
 {
     ReplayText t;
@@ -182,6 +190,16 @@ void __stdcall Imp_fixture_Dims(int* a0, int* a1)
     ApplyOutScalar(a0, "width");
     ApplyOutScalar(a1, "height");
     (void)r;
+}
+
+int __stdcall Imp_fixture_HandGoal(unsigned int a0)
+{
+    ReplayText t;
+    StartImport(t, "fixture.HandGoal");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0), true);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
 }
 
 FixtureAmount g_inout_fixture_Query_0;
@@ -335,6 +353,20 @@ void After_fixture_Lookup()
     CompareLoadResult(RL_FIXTURE_SCRIPT, g_result_fixture_Lookup);
 }
 
+unsigned int g_result_fixture_MakeGoal;
+
+void Run_fixture_MakeGoal()
+{
+    SetClosing("result");
+    g_result_fixture_MakeGoal = Native_fixture_MakeGoal();
+    BindObjectResult(ROK_FIXTUREGOALBASE, ReplayRefPtr(g_result_fixture_MakeGoal));
+}
+
+void After_fixture_MakeGoal()
+{
+    CompareObjectResult(ROK_FIXTUREGOALBASE, ReplayRefPtr(g_result_fixture_MakeGoal));
+}
+
 unsigned char* g_bytes_fixture_Drain_0;
 int g_bytes_fixture_Drain_0_length;
 int g_result_fixture_Drain;
@@ -369,4 +401,18 @@ void Run_fixture_Gather()
 void After_fixture_Gather()
 {
     CompareResult(g_result_fixture_Gather);
+}
+
+int g_result_fixture_HandGoal;
+
+void Run_fixture_HandGoal()
+{
+    unsigned int p0 = ArgScalar<unsigned int>("goal");
+    SetClosing("result");
+    g_result_fixture_HandGoal = Native_fixture_HandGoal(p0);
+}
+
+void After_fixture_HandGoal()
+{
+    CompareResult(g_result_fixture_HandGoal);
 }

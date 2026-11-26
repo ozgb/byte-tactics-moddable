@@ -164,7 +164,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("Apply(event)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("Apply", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "ApplySlot"}})
@@ -200,7 +200,7 @@ class Unrecorded(unittest.TestCase):
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
         files, errors, model = rs.generate(rs.read_rows(), ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("FindWeaponByName", weapons["slots"])
         kept = weapons["unrecorded"]["FindWeaponByName"]
@@ -419,6 +419,32 @@ class TargetingForms(unittest.TestCase):
         self.assertIn('ImportOutVec3(line, "out", a1);', files[rs.HOOKS_H])
         self.assertIn('ApplyVec3(a1, "out");', files[rs.SLOTS_H])
 
+    def test_an_import_annotation_changes_only_the_import_side(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        shapes = files[rs.SHAPES_SLOTS]
+        self.assertIn("ReplayAddObjectName(t, g_objects, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0), true);", shapes)
+        self.assertIn('ArgScalar<unsigned int>("goal")', shapes)
+        hooks = files[rs.FIXTURE_HOOKS_INC]
+        body = hooks[hooks.index("RecFixtureHandGoal"):]
+        self.assertIn("ImportObject(line, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0));", body)
+        self.assertIn('ArgValue(s_call, "goal", a0);', body)
+
+    def test_an_object_an_import_annotation_names_is_a_root_of_the_import_side_only(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        hooks = files[rs.FIXTURE_HOOKS_INC]
+        body = hooks[hooks.index("RecFixtureHandGoal"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("ReplayRoots importRoots = roots;\n        importRoots.Add(ROK_FIXTUREGOALBASE, ReplayRefPtr(a0));\n        FinishImport(line, importRoots);", body)
+        self.assertNotIn("    roots.Add(", body)
+
+    def test_an_import_annotation_is_for_a_scalar_and_a_known_form(self):
+        fixtures = json.loads(rs.FIXTURES_JSON.read_text())
+        fixtures["fixtures"]["HandGoal"]["args"]["goal"]["import"] = {"mode": "object", "kind": "NoSuchKind"}
+        errors = rs.generate(rs.read_rows(), None, fixtures=fixtures)[1]
+        self.assertTrue(any("`import` of the argument goal" in e for e in errors), errors)
+
     def test_a_unit_buffer_slot_without_playsas_records_itself_and_replays_itself(self):
         files, errors, model = self.generated()
         self.assertEqual([e for e in errors if "GetVisibleEnemiesInRadius" in e], [])
@@ -608,7 +634,7 @@ class IndirectCalls(unittest.TestCase):
 
     def pending(self, rows, ann=None, slot_name="WeaponCanReachUnit"):
         model, errors = build(rows, ann)
-        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "players", "ai", "orders", "los_radar", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
+        return [e for e in errors if ("pending indirect" in e or "through" in e) and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], model["subsystems"]["weapons"]["slots"].get(slot_name)
 
     def economy(self, **changes):
         ann = annotations()
@@ -1015,7 +1041,7 @@ class Polymorphic(unittest.TestCase):
         self.assertIn("    case ROK_APPROACHRADIUS:\n        return g_approachRadiusVtable;", vtables)
         self.assertIn('    case ROK_APPROACHRADIUS:\n        return "g_approachRadiusVtable";', vtables)
         base = [l for l in text.split("\n") if l.startswith('    { "OrderFx",')][0]
-        self.assertTrue(base.endswith('0, 0, 0, 3, 0, 0 },'), base)
+        self.assertTrue(base.endswith('0, 0, 0, 6, 0, 0 },'), base)
         self.assertIn("kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ", text)
         self.assertIn("ROK_PLAINTIMER, ROK_ASSAULTTIMER, ", text)
         self.assertIn("ROK_FIXTURETIMER, ROK_FIXTUREASSAULT, ROK_FIXTUREGOALA, ROK_FIXTUREGOALB, ROK_FIXTURETWIN };", text)
@@ -1224,7 +1250,7 @@ class Callbacks(unittest.TestCase):
         self.assertIn("ImportCallback(line, cb2, RCB_CALLBACK, a2);", body)
         self.assertLess(body.index("s_inner_scripts->StartScriptWithArgsByIndex"), body.index("cb2.Stop();"))
         self.assertLess(body.index("cb2.Stop();"), body.index("line.AddText(cb2.Lines());"))
-        self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line);"))
+        self.assertLess(body.index("line.AddText(cb2.Lines());"), body.index("FinishImport(line, roots);"))
 
     def test_the_stub_plays_the_calls_after_it_matches_the_i_line(self):
         files, _, _ = self.generated(self.with_import())
@@ -1626,15 +1652,15 @@ class ReentrantServices(unittest.TestCase):
         self.assertIn('PlayNestedCalls("services.ExecuteCommandText");', answers)
 
     def nested_generated(self):
-        """The generator's output with a command slot CmdPlan added to the movement seam, as the Cmd slots were before #964 took them out of the interfaces."""
+        """The generator's output with a command slot CmdPlan added to the orders seam, as the Cmd slots were before #964 took them out of the interfaces."""
         ann = annotations()
-        ann["subsystems"]["movement"].setdefault("slots", {})["CmdPlan"] = {"args": {"args": {"mode": "argv"}}}
+        ann["subsystems"]["orders"].setdefault("slots", {})["CmdPlan"] = {"args": {"args": {"mode": "argv"}}}
         with tempfile.TemporaryDirectory() as d:
             for h in rs.INTERFACES.glob("*.h"):
                 (Path(d) / h.name).write_text(h.read_text())
-            ai = Path(d) / "movement.h"
+            ai = Path(d) / "orders.h"
             text = ai.read_text()
-            start = text.index("struct MovementSeam {")
+            start = text.index("struct OrdersSeam {")
             end = text.index("\n};", start)
             ai.write_text(text[:end] + "\n    void (__stdcall* CmdPlan)(CommandArgs* args);" + text[end:])
             with mock.patch.object(rs, "INTERFACES", Path(d)):
@@ -1643,24 +1669,24 @@ class ReentrantServices(unittest.TestCase):
     def test_a_command_slot_is_nested_and_a_slot_that_is_not_a_command_is_not(self):
         files, errors, model = self.nested_generated()
         self.assertEqual(errors, [])
-        slots = model["subsystems"]["movement"]["slots"]
+        slots = model["subsystems"]["orders"]["slots"]
         self.assertTrue(rs.nestable("CmdPlan", slots["CmdPlan"]))
         self.assertFalse(rs.nestable("UpdateWind", model["subsystems"]["wind_meteors"]["slots"]["UpdateWind"]))
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecMovementCmdPlan("):]
+        body = hooks[hooks.index("RecOrdersCmdPlan("):]
         body = body[:body.index("\n}\n")]
-        self.assertIn('line.Add("\\n    c movement.CmdPlan");', body)
+        self.assertIn('line.Add("\\n    c orders.CmdPlan");', body)
         self.assertIn("ImportArgv(line, a0);", body)
         self.assertIn("FinishNested(line);", body)
-        self.assertIn("bool IsNestedSlot(unsigned slot)\n{\n    switch (slot) {\n    case RSL_MOVEMENT_CMDPLAN:", hooks)
-        self.assertIn("if (on[SUB_MOVEMENT] || any)\n        s_rec_movement.CmdPlan = RecMovementCmdPlan;", hooks)
+        self.assertIn("bool IsNestedSlot(unsigned slot)\n{\n    switch (slot) {\n    case RSL_ORDERS_CMDPLAN:", hooks)
+        self.assertIn("if (on[SUB_ORDERS] || any)\n        s_rec_orders.CmdPlan = RecOrdersCmdPlan;", hooks)
 
     def test_the_replayer_makes_the_nested_calls_through_the_seam_table(self):
         _, _, model = self.nested_generated()
-        player = "\n".join(rs.nested_player({"movement": {"slots": {"CmdPlan": model["subsystems"]["movement"]["slots"]["CmdPlan"]}}}))
+        player = "\n".join(rs.nested_player({"orders": {"slots": {"CmdPlan": model["subsystems"]["orders"]["slots"]["CmdPlan"]}}}))
         self.assertIn("void PlayNestedCalls(const char* import)", player)
-        self.assertIn('if (CallbackIs(name, "movement.CmdPlan")) {', player)
-        self.assertIn("g_seams.movement->CmdPlan(&p0.args);", player)
+        self.assertIn('if (CallbackIs(name, "orders.CmdPlan")) {', player)
+        self.assertIn("g_seams.orders->CmdPlan(&p0.args);", player)
 
     def test_a_length_for_the_text_names_an_int_argument(self):
         ann = annotations()
@@ -2636,7 +2662,17 @@ class ElementForms(unittest.TestCase):
         for kind, value in (("FixtureCb", ""), ("FixtureCb", True), ("FixtureCell", "a reason")):
             ann = annotations()
             ann["objects"][kind]["vptr_unset"] = value
-            self.has(ann, "%s: `vptr_unset` is the reason a kind with a vptr may hold 0 in it" % kind)
+            self.has(ann, "%s: `vptr_unset` is the reason a kind with a vptr, or an embedded kind with a vtable, may hold 0 in it" % kind)
+
+    def test_import_objects_is_a_reason_and_reaches_the_subsystem_row(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "movement", \d+, \d+, \d+, \d+, \d+, RET_MOVEMENT, 1 \},')
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "weapons", \d+, \d+, \d+, \d+, \d+, RET_WEAPONS, 0 \},')
+        for value in ("", True):
+            ann = annotations()
+            ann["subsystems"]["weapons"]["import_objects"] = value
+            self.has(ann, "weapons: import_objects needs a reason")
 
     def test_an_embedded_polymorphic_kind_has_a_vtable_and_a_site(self):
         files, errors, _ = self.generated()
@@ -3377,6 +3413,21 @@ class EventForms(unittest.TestCase):
         self.assertEqual(refs("WeaponsDamage"), {"unit": "Unit", "source": "Unit"})
         self.assertEqual(refs("WeaponsAttacked"), {"unit": "Unit", "attacker": "Unit"})
         self.assertEqual(refs("WeaponsDamageRecord"), {"unit": "Unit", "attacker": "Unit"})
+
+    def test_a_handle_member_may_lead_to_a_poly_kind_by_its_refs(self):
+        structs = rs.interface_structs("movement")
+        refs = {"MovementTarget.target": {"kind": "OrderFx", "poly": "OrderFx"}}
+        fields = {f["name"]: f for f in rs.flatten_event_fields(structs, "MovementTarget", refs=refs, handles=("target",))}
+        self.assertEqual((fields["target"]["kind"], fields["target"]["target"], fields["target"]["poly"]), ("ref", "OrderFx", "OrderFx"))
+        self.assertEqual(fields["unit"]["target"], "Unit")
+        plain = {f["name"]: f for f in rs.flatten_event_fields(structs, "MovementTarget", handles=("target",))}
+        self.assertNotEqual(plain["target"]["kind"], "ref")
+
+    def test_the_poly_form_of_refs_is_checked(self):
+        ann = annotations()
+        ann["subsystems"]["movement"]["slots"]["Apply"]["args"]["event"]["refs"]["MovementTarget.target"] = {"kind": "OrderFx", "poly": "Order"}
+        errors = rs.generate(rs.read_rows(), ann)[1]
+        self.assertTrue(any("with the same kind in both" in e for e in errors), errors)
 
     def test_a_kind_missing_from_the_table_is_an_error(self):
         kinds = dict(rs.EVENTS["targeting"]["kinds"])

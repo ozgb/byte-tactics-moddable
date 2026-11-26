@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
@@ -241,6 +242,96 @@ const ReplaySlotSets& SetsOfKind(unsigned slot, int kind)
     return kReplaySlots[slot];
 }
 
+const void** s_freed;
+unsigned s_freedCount;
+unsigned s_freedCapacity;
+
+int FreedIndex(const void* p)
+{
+    for (unsigned i = 0; i < s_freedCount; i++) {
+        if (s_freed[i] == p)
+            return (int)i;
+    }
+    return -1;
+}
+
+bool Freed(const void* p)
+{
+    return FreedIndex(p) >= 0;
+}
+
+void MarkFreed(const void* p)
+{
+    if (Freed(p))
+        return;
+    if (s_freed == nullptr || s_freedCount == s_freedCapacity) {
+        unsigned wanted = s_freedCapacity == 0 ? 64 : s_freedCapacity * 2;
+        const void** grown = (const void**)realloc((void*)s_freed, wanted * sizeof(const void*));
+        if (grown == nullptr) {
+            abort();
+            return;
+        }
+        s_freed = grown;
+        s_freedCapacity = wanted;
+    }
+    s_freed[s_freedCount++] = p;
+}
+
+void MarkAllocated(const void* p)
+{
+    int at = FreedIndex(p);
+    if (at >= 0)
+        s_freed[at] = s_freed[--s_freedCount];
+}
+
+void AddLiveRoots(ReplayRoots& to, const ReplayRoots& from)
+{
+    for (unsigned i = 0; i < from.count; i++) {
+        if (!Freed(from.object[i]))
+            to.Add(from.kind[i], from.object[i]);
+    }
+}
+
+unsigned short s_importChanged[kReplayObjectFieldCount];
+ReplayReach s_importReach;
+
+void ImportObjects(ReplayText& t, const ReplayRoots* extra)
+{
+    if (!s_recording || !kReplaySubsystems[s_sub].recordsImportChanges)
+        return;
+    Recording& r = *s_rec[s_sub];
+    const ReplaySlotSets& sets = SetsOfKind(s_slot, s_kind);
+    unsigned n = 0;
+    for (unsigned i = 0; i < sets.objReadCount; i++) {
+        bool written = false;
+        for (unsigned j = 0; j < sets.objWriteCount && !written; j++)
+            written = sets.objWrites[j] == sets.objReads[i];
+        if (!written)
+            s_importChanged[n++] = sets.objReads[i];
+    }
+    if (n == 0)
+        return;
+    ReplayRoots roots;
+    AddLiveRoots(roots, s_roots);
+    if (extra != nullptr)
+        AddLiveRoots(roots, *extra);
+    ReplayWalk(s_importReach, r.table, true, sets, roots.kind, roots.object, roots.count);
+    ReplayCaptureObjects(t, r.known, r.table, s_importReach, s_importChanged, n, 'o');
+}
+
+void ImportServiceObjects(ReplayText& t, const ReplayImport& c)
+{
+    if (!s_recording || !kReplaySubsystems[s_sub].recordsImportChanges)
+        return;
+    if (c.id == RI_SIM_FREE) {
+        MarkFreed(c.args[0].v.p);
+        return;
+    }
+    if ((c.id == RI_SIM_ALLOC || c.id == RI_SIM_ALLOC_TAGGED || c.id == RI_SIM_CAPTURE_ALLOC) && c.result.kind == 1)
+        MarkAllocated(c.result.v.p);
+    ImportObjects(t, nullptr);
+}
+
 void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)
 {
     Recording& r = *s_rec[sub];
@@ -259,6 +350,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)
     s_call.Clear();
     s_tail.Clear();
     s_roots = roots;
+    s_freedCount = 0;
     if (s_tick >= 0) {
         s_field.Clear();
         s_field.AddInt(s_tick);
@@ -381,6 +473,15 @@ void ArgObject(ReplayText& t, const char* name, unsigned kind, const void* p, co
     t.AddChar(' ');
     ReplayAddObjectName(t, Table(), kind, p, true);
     t.AddChar('\n');
+}
+
+void ResultRoot(unsigned kind, const void* p)
+{
+    if (p == nullptr)
+        return;
+    unsigned actual = ReplayConcreteKind(kind, p);
+    if (actual != kReplayObjectKindCount)
+        s_roots.Add((unsigned short)actual, p);
 }
 
 void ArgStruct(ReplayText& t, const char* tag, const char* name, unsigned kind, const void* p)
@@ -779,22 +880,26 @@ void ImportBytes(ReplayText& t, const void* p, int length)
 
 void ImportOutBytes(ReplayText& t, const char* name, const void* p, int count, int length)
 {
+    if (count > length)
+        count = length;
     if (count <= 0 || p == nullptr)
         return;
     t.Add("\n  o ");
     t.Add(name);
     t.AddChar(' ');
-    ReplayBytes(t, p, count < length ? count : length);
+    ReplayBytes(t, p, count);
 }
 
 void ArgOutBytes(ReplayText& t, const char* name, const void* p, int count, int length)
 {
+    if (count > length)
+        count = length;
     if (count <= 0 || p == nullptr)
         return;
     t.Add("  o ");
     t.Add(name);
     t.AddChar(' ');
-    ReplayBytes(t, p, count < length ? count : length);
+    ReplayBytes(t, p, count);
     t.AddChar('\n');
 }
 
@@ -950,11 +1055,12 @@ void FinishNested(ReplayText& line)
     line.Free();
 }
 
-void FinishImport(ReplayText& line)
+void FinishImport(ReplayText& line, const ReplayRoots& roots)
 {
     s_call.AddText(line);
     s_call.AddChar('\n');
     line.Free();
+    ImportObjects(s_call, &roots);
 }
 
 #include "replay_hooks.inc"

@@ -212,6 +212,7 @@ void __stdcall SetUnitLimits(int player, UnitTypeSet* set, int value, int param_
 #include "pathfind.h"
 
 #include "../util/commands.h"
+#include "../files/files_api.h"
 int __stdcall GetWeaponRange(Unit*, unsigned char);
 int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
 
@@ -380,6 +381,9 @@ int __stdcall AiApply(const AiEventHeader* event, unsigned int size)
         if (g_aiCommandsEnabled == 0)
             return 0;
         SetLimits(reinterpret_cast<const AiLimit*>(event));
+        return 1;
+    case AI_RELOAD_PROFILES:
+        ResetAIPlayers();
         return 1;
     }
     return 0;
@@ -1419,6 +1423,54 @@ int __stdcall IsUnderLimit(int player, unsigned short index, int value)
 }
 #pragma auto_inline(on)
 
+static void RunProfileLine(CommandArgs* line)
+{
+    char empty[1] = {0};
+    const char* word = line->GetArg(0, empty);
+    if (!_strcmpi(word, "plan")) {
+        int bits = 0;
+        for (int i = 1; i < line->count; ++i) {
+            if (!_strcmpi(line->GetArg(1, empty), "any")) bits |= 8;
+            if (!_strcmpi(line->GetArg(i, empty), "easy")) bits |= 1;
+            if (!_strcmpi(line->GetArg(i, empty), "medium")) bits |= 2;
+            if (!_strcmpi(line->GetArg(i, empty), "hard")) bits |= 4;
+        }
+        SetAiCommandsEnabled(bits);
+    } else if (!_strcmpi(word, "weight")) {
+        AiWeight e;
+        memset(&e, 0, sizeof(e));
+        UnitTypeSet set;
+        g_seams.units->UnitTypeSetAddTypeOrCategory(&set, line->GetArg(1, empty), &e.fix);
+        memcpy(e.types, set.bits, sizeof(e.types));
+        e.scale = line->GetFloatArg(2, 0);
+        ScaleWeights(&e);
+    } else if (!_strcmpi(word, "limit")) {
+        AiLimit e;
+        memset(&e, 0, sizeof(e));
+        UnitTypeSet set;
+        g_seams.units->UnitTypeSetAddTypeOrCategory(&set, line->GetArg(1, empty), &e.fix);
+        memcpy(e.types, set.bits, sizeof(e.types));
+        e.limit = line->GetIntArg(2, 0);
+        SetLimits(&e);
+    }
+}
+
+static void RunProfileText(char* text, int len)
+{
+    CommandArgs line;
+    line.InitArgs();
+    while (len > 0) {
+        int n = 0;
+        while (n < len && text[n] != '\n')
+            n++;
+        line.Tokenize(text, text + n);
+        if (line.count >= 1)
+            RunProfileLine(&line);
+        text += n + 1;
+        len -= n + 1;
+    }
+}
+
 // FUNCTION: 0x409f80
 void __stdcall ParseDownloadableAiWeightScripts(int player)
 {
@@ -1429,11 +1481,8 @@ void __stdcall ParseDownloadableAiWeightScripts(int player)
         if (((Flags241*)&def->flags1)->downloadable) {
             if (p->vec_bd[i].value != 1) {
                 int len = strlen(def->aiWeight);
-                if (len != 0) {
-                    CommandArgs vars;
-                    vars.InitArgs();
-                    ExecuteCommandText(def->aiWeight, len, &vars, -1);
-                }
+                if (len != 0)
+                    RunProfileText(def->aiWeight, len);
             }
         }
     }
@@ -1449,12 +1498,29 @@ void __stdcall ReparseAiWeightScriptsIfLimitNotSticky(int player)
         if (((Flags241*)&def->flags1)->downloadable) {
             if (p->locked[i].value != 1) {
                 int len = strlen(def->aiWeight);
-                if (len != 0) {
-                    CommandArgs vars;
-                    vars.InitArgs();
-                    ExecuteCommandText(def->aiWeight, len, &vars, -1);
-                }
+                if (len != 0)
+                    RunProfileText(def->aiWeight, len);
             }
+        }
+    }
+}
+
+void __stdcall LoadAIProfiles()
+{
+    int size;
+    const char* name = g_seams.mission->GetNameSlot(7);
+    char* text = (char*)HAPI_LoadFile(name, &size);
+    if (!text)
+        text = (char*)HAPI_LoadFile("ai\\default.txt", &size);
+    if (text) {
+        RunProfileText(text, size);
+        GameFreeThunk(text);
+    }
+    for (int i = 0; i < 10; i++) {
+        Player* p = &g_game->players[i];
+        if (p->active && p->type == 2) {
+            ParseDownloadableAiWeightScripts(i);
+            ReparseAiWeightScriptsIfLimitNotSticky(i);
         }
     }
 }
@@ -1467,7 +1533,7 @@ void ResetAIPlayers()
             g_playerAI[i]->InitUnitTables();
         }
     }
-    g_seams.players->LoadDefaultAIScript();
+    LoadAIProfiles();
 }
 
 // FUNCTION: 0x40a150

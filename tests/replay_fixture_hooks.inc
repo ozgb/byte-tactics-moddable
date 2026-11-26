@@ -16,9 +16,11 @@ enum {
     RSL_FIXTURE_PICK = RSL_COUNT + 9,
     RSL_FIXTURE_ATTACH = RSL_COUNT + 10,
     RSL_FIXTURE_LOOKUP = RSL_COUNT + 11,
-    RSL_FIXTURE_DRAIN = RSL_COUNT + 12,
-    RSL_FIXTURE_GATHER = RSL_COUNT + 13,
-    RSL_FIXTURE_DIMS = RSL_COUNT + 14
+    RSL_FIXTURE_MAKEGOAL = RSL_COUNT + 12,
+    RSL_FIXTURE_DRAIN = RSL_COUNT + 13,
+    RSL_FIXTURE_GATHER = RSL_COUNT + 14,
+    RSL_FIXTURE_DIMS = RSL_COUNT + 15,
+    RSL_FIXTURE_HANDGOAL = RSL_COUNT + 16
 };
 
 struct FixtureSeam {
@@ -34,9 +36,11 @@ struct FixtureSeam {
     WeaponDef* (__stdcall* Pick)();
     int (__stdcall* Attach)(void*, void*);
     void* (__stdcall* Lookup)(int);
+    unsigned int (__stdcall* MakeGoal)();
     int (__stdcall* Drain)(void*, unsigned int);
     int (__stdcall* Gather)(int*, int);
     void (__stdcall* Dims)(int*, int*);
+    int (__stdcall* HandGoal)(unsigned int);
 };
 
 const FixtureSeam* s_inner_fixture;
@@ -56,7 +60,7 @@ void __stdcall RecFixtureFillGoals(int a0, std::vector<FixtureSpan, std::allocat
     s_inner_fixture->FillGoals(a0, a1);
     if (scope.Import()) {
         ImportOutValues(line, "goals", ROK_FIXTURESPAN, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
@@ -77,7 +81,7 @@ int __stdcall RecFixturePlaceAt(void* a0)
     int result = s_inner_fixture->PlaceAt(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -104,7 +108,7 @@ int __stdcall RecFixtureQuery(FixtureAmount* a0, FixtureAmount* a1)
         ImportResult(line, result);
         ImportOutInOut(line, "first", ROK_FIXTUREAMOUNT, a0);
         ImportOutInOut(line, "second", ROK_FIXTUREAMOUNT, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgInOutExit(s_tail, "first", ROK_FIXTUREAMOUNT, a0);
@@ -132,7 +136,7 @@ int __stdcall RecFixtureReadIds(void* a0)
     int result = s_inner_fixture->ReadIds(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -158,7 +162,7 @@ int __stdcall RecFixtureFillIds(void* a0)
     if (scope.Import()) {
         ImportResult(line, result);
         ImportOutBytes(line, "ids", a0, (int)result, (len0 * 4));
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgOutBytes(s_tail, "ids", a0, (int)result, (len0 * 4));
@@ -189,7 +193,7 @@ int __stdcall RecFixtureMeasure(int* a0, short* a1, unsigned char* a2)
         ImportOutInOutScalar(line, "p2", a0);
         ImportOutInOutScalar(line, "p3", a1);
         ImportOutInOutScalar(line, "p4", a2);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgInOutScalarExit(s_tail, "p2", a0);
@@ -216,7 +220,7 @@ int __stdcall RecFixtureStrike(WeaponDef* a0)
     int result = s_inner_fixture->Strike(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -261,7 +265,7 @@ int __stdcall RecFixtureLocate(FixtureAmount* a0, FixtureAmount* a1)
         ImportResult(line, result);
         if (result != 0) ImportOutInOut(line, "first", ROK_FIXTUREAMOUNT, a0);
         if (result != 0) ImportOutInOut(line, "second", ROK_FIXTUREAMOUNT, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         if (result != 0 && a0 != nullptr) ArgStruct(s_tail, "o", "first", ROK_FIXTUREAMOUNT, a0);
@@ -284,7 +288,7 @@ WeaponDef* __stdcall RecFixturePick()
     WeaponDef* result = s_inner_fixture->Pick();
     if (scope.Import()) {
         ImportResultWeapon(line, result, 1, "flags");
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgWeaponResult(s_tail, result, 1, "flags");
@@ -309,7 +313,7 @@ int __stdcall RecFixtureAttach(void* a0, void* a1)
     int result = s_inner_fixture->Attach(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -332,10 +336,32 @@ void* __stdcall RecFixtureLookup(int a0)
     void* result = s_inner_fixture->Lookup(a0);
     if (scope.Import()) {
         ImportResultLoad(line, RL_FIXTURE_SCRIPT, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgLoadResult(s_tail, RL_FIXTURE_SCRIPT, result);
+    }
+    return result;
+}
+
+unsigned int __stdcall RecFixtureMakeGoal()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FIXTURE_MAKEGOAL, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.MakeGoal");
+    }
+    unsigned int result = s_inner_fixture->MakeGoal();
+    if (scope.Import()) {
+        ImportResultObject(line, ROK_FIXTUREGOALBASE, ReplayRefPtr(result));
+        FinishImport(line, roots);
+    }
+    if (scope.Open()) {
+        ArgObject(s_tail, "result", ROK_FIXTUREGOALBASE, ReplayRefPtr(result), "o");
+        ResultRoot(ROK_FIXTUREGOALBASE, ReplayRefPtr(result));
     }
     return result;
 }
@@ -357,7 +383,7 @@ int __stdcall RecFixtureDrain(void* a0, unsigned int a1)
     if (scope.Import()) {
         ImportResult(line, result);
         ImportOutBytes(line, "out", a0, (int)result, a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgOutBytes(s_tail, "out", a0, (int)result, a1);
@@ -382,7 +408,7 @@ int __stdcall RecFixtureGather(int* a0, int a1)
     int result = s_inner_fixture->Gather(a0, a1);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
@@ -404,10 +430,35 @@ void __stdcall RecFixtureDims(int* a0, int* a1)
     if (scope.Import()) {
         ImportOutScalar(line, "width", a0);
         ImportOutScalar(line, "height", a1);
-        FinishImport(line);
+        FinishImport(line, roots);
     }
     if (scope.Open()) {
     }
+}
+
+int __stdcall RecFixtureHandGoal(unsigned int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FIXTURE_HANDGOAL, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "goal", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.HandGoal");
+        ImportObject(line, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0));
+    }
+    int result = s_inner_fixture->HandGoal(a0);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        ReplayRoots importRoots = roots;
+        importRoots.Add(ROK_FIXTUREGOALBASE, ReplayRefPtr(a0));
+        FinishImport(line, importRoots);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
 }
 
 FixtureSeam s_rec_fixture = {
@@ -423,7 +474,9 @@ FixtureSeam s_rec_fixture = {
     RecFixturePick,
     RecFixtureAttach,
     RecFixtureLookup,
+    RecFixtureMakeGoal,
     RecFixtureDrain,
     RecFixtureGather,
     RecFixtureDims,
+    RecFixtureHandGoal,
 };

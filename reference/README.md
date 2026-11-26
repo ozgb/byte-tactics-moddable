@@ -281,7 +281,7 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | console-features | judged | - |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
-| console-sight | left out | console commands that are not events: `view`, `reloadaiprofiles` |
+| console-sight | left out | console commands that are not events: `view` |
 | console-units | judged | - |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |

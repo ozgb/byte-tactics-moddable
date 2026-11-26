@@ -7,13 +7,13 @@ struct StateWriter;
 // Major version of the ai interface, changed when a slot is removed or its signature changes.
 #define AI_VERSION_MAJOR 6
 // Minor version of the ai interface, changed when a slot is added.
-#define AI_VERSION_MINOR 0
+#define AI_VERSION_MINOR 1
 
 // The fields every ai event and effect starts with.
 struct AiEventHeader {
     // An AiEventKind or an AiEffectKind.
     int kind;
-    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none: PLAN, WEIGHT and LIMIT name none), as economy's events give a unit.
+    // The unit the kind is about, as its block offset (an offset from the block base, 0 for none: PLAN, WEIGHT, LIMIT and RELOAD_PROFILES name none), as economy's events give a unit.
     unsigned int unit;
 };
 
@@ -28,7 +28,9 @@ enum AiEventKind {
     // When the AI commands are on, scales the build weight (0 to 100) of each unit type of a set for every player with a squad manager, unless a fixing WEIGHT fixed it (AiWeight); outcome 1, or 0 when the commands are off.
     AI_WEIGHT = 228,
     // When the AI commands are on, sets the build limit of each unit type of a set for every active computer player, unless a fixing LIMIT fixed it (AiLimit); outcome 1, or 0 when the commands are off.
-    AI_LIMIT = 229
+    AI_LIMIT = 229,
+    // Resets the unit tables of every active computer player, then loads the AI profiles as LoadProfiles does; the header alone; outcome 1.
+    AI_RELOAD_PROFILES = 230
 };
 
 // The kinds of effect ai publishes to its outbox, for the modules that subscribe to them; each is a plain request, and the subscriber decides what it does with it.
@@ -157,7 +159,7 @@ struct AiSeam {
     int (__stdcall* Apply)(const AiEventHeader* event, unsigned int size);
     // Writes a report on the AI of a player to a file. Hooks: none.
     void (__stdcall* DumpPlayerAI)(int player, void* file);
-    // Resets the unit tables of the computer players and loads the default AI script again. Hooks: none.
+    // Resets the unit tables of the computer players and loads the AI profiles again, as RELOAD_PROFILES does. Hooks: none.
     void (__stdcall* ResetAIPlayers)(void);
     // Creates the AI state of a player. Hooks: none.
     void (__stdcall* CreatePlayerAI)(int player);
@@ -183,6 +185,8 @@ struct AiSeam {
     void (__stdcall* FreeSquadManager)(Player* player);
     // Writes ai's state as records of the trace, which the engine dumps and does not hash. Hooks: none.
     void (__stdcall* WriteState)(const StateWriter* writer);
+    // Loads the AI profiles of the match: the plan, weight and limit lines of the AI script the mission names (else ai\default.txt), then for each active computer player the ai_weight lines of the downloadable unit types; a line of any other word does nothing. Hooks: none.
+    void (__stdcall* LoadProfiles)(void);
 };
 
 #endif

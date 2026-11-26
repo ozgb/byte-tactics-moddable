@@ -26,7 +26,10 @@ reference/README.md) and passes when it exits with status 0 within
 audio sink, screenshots or dialog checks, and only wine needs to be installed. The trace the exe writes (trace.txt, and dump.txt
 with `--testdump <tick>`; display.txt and displaylist.txt, with `--testdisplay <tick>|all` adding that frame or every frame to the list) is copied to the run's directory. `--put DEST SRC` places a file in the run's game copy
 before the exe starts, and `--collect PATH` copies a file the game wrote there (the `save` key's
-`savegame/harness.sav`) to the run's directory, both with `--testmode`. Every `--testmode` run passes the game's
+`savegame/harness.sav`) to the run's directory, both with `--testmode`. `--testcommands FILE` places FILE, a `commands.txt`
+that a run of the same scenario on the same exe wrote, in the game copy and runs the exe with `-testcommands`: the run
+plays the file's commands instead of the scenario's `spawn`, `order`, `console` and `input` lines (docs/commands.md,
+section 2.2). Every `--testmode` run passes the game's
 own `-memset=0` switch, which makes GameAlloc (and so operator new) zero new memory. `--poison` passes
 `-memset=0xcdcdcdcd` instead, which fills it with 0xCD. `--blockscan` adds `-blockscan` (every tick) and copies
 blockptrs.txt too; `--blockscan-every N` adds `-blockscan=N`;
@@ -92,6 +95,7 @@ ACCESS_LOG_FILES = ("accesslog.attr", "accesslog.items", "accesslog.defer")
 NATIVE_MODULES_SWITCH = "-modules=native"
 ZERO_FILL_SWITCH = "-memset=0"
 POISON_SWITCH = "-memset=0xcdcdcdcd"
+TESTCOMMANDS_FILE = "testcommands.txt"
 EXES = {
     "orig": ROOT / "orig/TotalA.exe",
     "modern": ROOT / "build/modern/TotalA.exe",
@@ -575,6 +579,8 @@ class Instance:
             args += ["-testdump", str(self.run.testdump)]
         if self.run.testmode and self.run.testdisplay is not None:
             args += ["-testdisplay", self.run.testdisplay]
+        if self.run.testmode and self.run.testcommands:
+            args += ["-testcommands", TESTCOMMANDS_FILE]
         if self.run.testmode:
             args += [POISON_SWITCH if self.run.poison else ZERO_FILL_SWITCH]
         if self.run.native_modules and runs_wasm_modules(self.run.exes[min(self.index, len(self.run.exes)) - 1]):
@@ -1034,7 +1040,7 @@ class Run:
                  windowed: bool = False, put: list[tuple[str, Path]] | None = None,
                  collect: list[str] | None = None, xserver: bool = False, native_modules: bool = False,
                  framedump: bool = False, blockscan_verify: bool = False, record: str | None = None,
-                 testdisplay: str | None = None):
+                 testdisplay: str | None = None, testcommands: bool = False):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -1048,6 +1054,7 @@ class Run:
         self.testmode = testmode
         self.testdump = testdump
         self.testdisplay = testdisplay
+        self.testcommands = testcommands
         self.poison = poison
         self.blockscan = blockscan
         self.blockscan_verify = blockscan_verify
@@ -1590,6 +1597,8 @@ def main() -> None:
                     help="--testmode: also run with -testdump TICK, which writes dump.txt")
     ap.add_argument("--testdisplay", metavar="TICK|all",
                     help="--testmode: also run with -testdisplay TICK (or all), which writes that frame's items (every frame's) to displaylist.txt")
+    ap.add_argument("--testcommands", metavar="FILE",
+                    help="--testmode: play the commands of FILE (a run's commands.txt) instead of the scenario's (-testcommands)")
     ap.add_argument("--poison", action="store_true",
                     help="--testmode: fill new game allocations with 0xCD (the game's -memset switch)")
     ap.add_argument("--blockscan", action="store_true",
@@ -1672,6 +1681,12 @@ def main() -> None:
         if not Path(src).is_file():
             ap.error(f"--put: {src} is not a file")
         put.append((dest, Path(src).resolve()))
+    if args.testcommands is not None:
+        if not args.testmode:
+            ap.error("--testcommands needs --testmode")
+        if not Path(args.testcommands).is_file():
+            ap.error(f"--testcommands: {args.testcommands} is not a file")
+        put.append((TESTCOMMANDS_FILE, Path(args.testcommands).resolve()))
     for path in [d for d, _ in put] + args.collect:
         if Path(path).is_absolute() or ".." in Path(path).parts:
             ap.error(f"{path} must be a path inside the game directory")
@@ -1747,7 +1762,7 @@ def main() -> None:
                                 args.windowed, put if sc is testmode else None,
                                 args.collect if sc is testmode else None, args.xserver and sc is testmode,
                                 args.native_modules, args.framedump, args.blockscan_verify, args.record,
-                                args.testdisplay if sc is testmode else None))
+                                args.testdisplay if sc is testmode else None, args.testcommands is not None and sc is testmode))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

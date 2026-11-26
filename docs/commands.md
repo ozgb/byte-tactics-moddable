@@ -15,6 +15,10 @@ never repeats that.
 - The commands of one tick are delivered in the order of `docs/scenario-format.md`, section 4: the `spawn` lines, then
   the `order` lines, then the `console` lines, each group in file order. (`input` lines come after the console lines,
   are not commands of this page, and no scenario of section 7 has one.)
+- The interface's records (section 8) come first. The interface acts after tick `N` has finished, so its records of
+  that moment precede tick `N + 1`: they are delivered before the `spawn` lines of tick `N + 1`, in the order the
+  interface published them. A core delivers them at the start of tick `N + 1`, as it does the scripted lines, and so
+  does a run played from the command log (section 2.2).
 - Every command publishes its events to the engine's outbox. An event published while no tick is running reaches
   the module that handles its kind at once: the module consumes it in its `Apply`, in the order of publication, before
   the next event of the command is published. An event that a handler publishes while it consumes one is delivered at
@@ -66,6 +70,8 @@ commands were delivered: a scripted `spawn`, `order` or `console` line, or one e
 
 Format 1 had neither the `units` line nor the interface's records.
 
+A core is played from the file by section 2.2: each line's events, at its tick, in the file's order.
+
 ### 2.1 The interface's records, decoded
 
 A payload holds a unit as a ref, its offset in the state block, which another build with another block layout does
@@ -103,6 +109,38 @@ that was in the group.
 it, line by line, with the stored one, naming the first record that differs. A scenario with `input` lines must have
 a stored file, a scenario without them must have none and its run must have no interface record, and a stored file
 with no scenario fails.
+
+### 2.2 Playing a core from the file
+
+The file is an input as well as a record: a core that publishes each line's events at the line's tick gives the
+traces of the run that wrote it, without the presentation and without the scenario's commands.
+
+- **The switch.** A test-mode run started with `-testcommands <file>` (`tools/playtest.py --testcommands`) plays
+  `<file>`, the `commands.txt` that a run of the same scenario on the same build wrote. It still reads and checks the
+  scenario's `spawn`, `order`, `console` and `input` lines but delivers none of them; every other line of the scenario
+  acts as usual.
+- **The units line** must equal the build's (status 2 otherwise): a payload holds a unit as a ref into that build's
+  block (section 2.1), so the file is played on the build that wrote it.
+- **Delivery.** At the start of each tick, before its first phase, the run takes the file's lines of that tick in the
+  file's order, which is the order of section 1 (the interface's records first, then the scripted lines). For each
+  line it publishes each `<KIND> <hex>` pair's bytes, in order, to the engine's outbox, as one command: the kind is
+  the payload's first four bytes, and the name is not read. A line whose tick is below the tick being started, or that
+  is not in the format of section 2, stops the run with status 2. Lines after the last tick are not played.
+- **Its own log.** The run writes `commands.txt` as any run does, each line with the key, line field and count of the
+  line it played. A file played to the end is written again byte for byte, so its decoded records (section 2.1) are
+  the stored ones.
+- **What it cannot carry.** A console command of section 4.3 is not an event and one of section 4.4 touches only the
+  presentation: neither leaves anything in the file. The presentation, with no `input` lines, does nothing, so a write
+  of the interface that is not an event and that the trace hashes makes the run differ from the scenario. That is
+  what the check below finds.
+
+`tools/reference.py --check` plays each scenario with `input` lines a second time, from the `commands.txt` of its own
+run in the same mode (the run `<scenario>+commands`). The run must give the scenario's stored traces, and its
+`commands.txt` must decode to `reference/commands/<scenario>.txt`. `REPLAY_LEFT_OUT` in that tool lists the
+scenarios whose run from the file still differs, each with the hashed field and its issue: their run is played and
+its records judged, its traces are reported as `left` and not judged, and an entry whose run turns equal fails until
+it is removed. All eight `ui-` scenarios are listed for now: their only difference is bits 6 and 7 of `Unit.flags`
+(`selectState`), which the selection writes and #1132 masks.
 
 ## 3. Reading a console line
 

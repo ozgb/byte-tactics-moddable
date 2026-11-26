@@ -12,6 +12,9 @@ Each run's display.txt is compared, line by line, with reference/display/<scenar
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
 It also compares the harness.sav of each scenario with a `save` line with
 reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
+Each scenario with `input` lines is played again from its own run's commands.txt (`<scenario>+commands`, docs/commands.md,
+section 2.2, and reference/README.md, "Interface commands"): it must give the stored traces and decode to the stored interface
+records, except that the traces of a scenario of REPLAY_LEFT_OUT are reported and not judged.
 A run that ends before the stored trace does is reported as `EARLY <scenario>: ended at tick T of N (<exit code, signal or timeout>)`, with
 the host's fatal line if the run left one, and fails the check without running tracediff (reference/README.md).
 On the first difference it builds the reference from the commit the trace
@@ -176,6 +179,19 @@ FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
 UI_LOGS: dict[str, str | None] = {}
 INTERFACE_LOGS: dict[str, str | None] = {}
+COMMAND_TEXTS: dict[str, str | None] = {}
+REPLAY_SUFFIX = "+commands"
+SELECT_STATE = "Unit.flags bits 6 and 7 (selectState), which the selection writes, are still hashed (#1132)"
+REPLAY_LEFT_OUT = {
+    "ui-build-menu": SELECT_STATE,
+    "ui-build-place": SELECT_STATE,
+    "ui-click-select": SELECT_STATE,
+    "ui-drag-select": SELECT_STATE,
+    "ui-groups": SELECT_STATE,
+    "ui-keys": SELECT_STATE,
+    "ui-left-click-orders": SELECT_STATE,
+    "ui-right-click": SELECT_STATE,
+}
 EVENT_LOGS: dict[str, str | None] = {}
 DISPLAY_LOGS: dict[str, str | None] = {}
 DISPLAY_LISTS: dict[str, str | None] = {}
@@ -500,6 +516,21 @@ def mode_of(key: str) -> str | None:
 def mode_view(store: dict, scenarios: dict[str, Path], mode: str | None) -> dict:
     """The entries of a per-run store (keyed as tag does) that belong to `mode`, keyed by the plain scenario name."""
     return {name: store[tag(name, mode)] for name in scenarios if tag(name, mode) in store}
+
+
+def replay_name(name: str) -> str:
+    """The name of the run of scenario `name` played from the commands.txt of its own run (docs/commands.md, section 2.2)."""
+    return name + REPLAY_SUFFIX
+
+
+def replay_source(name: str) -> str | None:
+    """The scenario whose commands.txt the run `name` plays (see replay_name), or None for a scenario's own run."""
+    return name[:-len(REPLAY_SUFFIX)] if name.endswith(REPLAY_SUFFIX) else None
+
+
+def with_replays(scenarios: dict[str, Path]) -> dict[str, Path]:
+    """The runs from commands.txt of the scenarios with `input` lines, by replay_name, each with its scenario's file."""
+    return {replay_name(name): path for name, path in scenarios.items() if interfacelog.has_input(path.read_text())}
 
 
 def default_modes(both_modes: bool) -> tuple[str | None, ...]:
@@ -911,7 +942,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   keep_always: bool = False, scans: dict[str, str | None] | None = None,
                   scan_every: int = 1, retry_any: bool = False, save_to: Path | None = None,
                   load_from: Path | None = None, watch: "Watch | None" = None,
-                  mode: str | None = None, column: int = DIGEST) -> tuple[dict[str, str], list[tuple[int, str, str]], float, Path | None]:
+                  mode: str | None = None, column: int = DIGEST, name: str | None = None,
+                  testcommands: Path | None = None) -> tuple[dict[str, str], list[tuple[int, str, str]], float, Path | None]:
     """Run the scenario under Wine: the trace header, the digest of each tick, the seconds taken.
 
     With `want` (the stored header and digests), a run that differs is kept: the last element is the
@@ -937,8 +969,13 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
 
     With `mode` ("wasm" or "native"), the run's modules run in that mode whatever BT_NATIVE_MODULES says, and its
     sound log, frames, save, scan and fuel are stored under tag(scenario, mode).
+
+    With `testcommands` (a commands.txt), the run plays that file's commands instead of the scenario's, and `name` (the
+    run's name in place of the scenario's, see replay_name) keys what it stores. The commands.txt of a run of a scenario
+    with `input` lines is stored in COMMAND_TEXTS under its key.
     """
-    key = tag(scenario.stem, mode)
+    stem = name or scenario.stem
+    key = tag(stem, mode)
     ticks = scenario_ticks(scenario)
     rate = RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK if scans is not None and scan_every == 1 else RUN_TICKS_PER_SECOND
     timeout = RUN_SECONDS_BASE + ticks / rate
@@ -954,20 +991,22 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
             if mode is not None:
                 extra["env"] = dict(os.environ, BT_NATIVE_MODULES="1" if mode == "native" else "0")
             if load_from is not None:
-                extra["put"] = tracediff.save_put(load_from, scenario.stem, load_from.name)
+                extra["put"] = tracediff.save_put(load_from, stem, load_from.name)
+            if testcommands is not None:
+                extra["testcommands"] = testcommands
             run = tracediff.play(exe, scenario, game_dir, None, timeout, poison, scan_every if scans is not None else 0, **extra)
             break
         except tracediff.Error as e:
             if (watch is not None and watch.halted.is_set()) or attempt == RUN_ATTEMPTS - 1 or not (retry_any or should_retry(str(e))):
-                early = failed_early(e, scenario.stem, key, end) if want is not None and not (watch is not None and watch.halted.is_set()) else None
+                early = failed_early(e, stem, key, end) if want is not None and not (watch is not None and watch.halted.is_set()) else None
                 if early is not None:
                     if watch is not None:
                         watch.halt(key, str(early), 0, time.time() - t0, None, early=True)
                     raise early from e
                 raise
-            failed = keep_failed_attempt(e, scenario.stem)
+            failed = keep_failed_attempt(e, stem)
             where = f" [failed attempt kept: {failed.relative_to(ROOT)}]" if failed else ""
-            print(f"{scenario.stem}: run failed, trying again: {last_lines(e)}{where}", flush=True)
+            print(f"{stem}: run failed, trying again: {last_lines(e)}{where}", flush=True)
     elapsed = time.time() - t0
     if watch is not None:
         watch.finished(key)
@@ -983,6 +1022,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         commands_log = run / COMMANDS_FILE
         INTERFACE_LOGS[key] = (
             interfacelog.decode(commands_log.read_text(), trace_schema()) if commands_log.is_file() else None)
+        if testcommands is None and scenario.is_file() and interfacelog.has_input(scenario.read_text()):
+            COMMAND_TEXTS[key] = commands_log.read_text() if commands_log.is_file() else None
         events_log = run / EVENTS_FILE
         EVENT_LOGS[key] = event_digest(events_log)
         display_log = run / DISPLAY_FILE
@@ -997,7 +1038,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         trace = tracediff.need(run, "trace.txt")
         last, cut = trace_end(trace)
         if cut or (want is not None and last < end):
-            kept = keep_run(run, scenario.stem, f"-{mode}" if mode else "", logs=True)
+            kept = keep_run(run, stem, f"-{mode}" if mode else "", logs=True)
             early = early_exit(run, key, end, kept)
             if watch is not None:
                 watch.halt(key, str(early), last, elapsed, kept, early=True)
@@ -1012,7 +1053,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
             scans[key] = scanned.read_text() if scanned.is_file() else None
         diff = difference(want, header, digests, column) if want is not None else None
         if keep_always or diff:
-            kept = keep_run(run, scenario.stem, ("-alloff" if keep_always else "") + (f"-{mode}" if mode else ""))
+            kept = keep_run(run, stem, ("-alloff" if keep_always else "") + (f"-{mode}" if mode else ""))
         if watch is not None and diff:
             watch.halt(key, diff, len(digests), elapsed, kept)
     finally:
@@ -1058,6 +1099,11 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
     With `watch`, scenarios not yet started are skipped once the watch halts, and the runs it stopped are not failures.
     `column` is passed on to play_scenario.
 
+    A run named by replay_name plays the commands.txt that its scenario's own run in the same mode wrote (COMMAND_TEXTS),
+    and starts as soon as that run has finished, as a loader does; it fails without running when that run failed or
+    wrote none. A run from commands.txt of a scenario in REPLAY_LEFT_OUT is played without `expected` and `watch`, so
+    that its known difference neither keeps its trace nor stops the other runs.
+
     The longest scenarios start first; a scenario with a `load` line starts as soon as the scenario it names has finished
     (ahead of the scenarios not yet started), in its mode and with any `parallel`: the scenario it names saves a game (the `save` key), the run's savegame/harness.sav and savegame/harness.opt are copied out of its game
     copy into a temporary directory, and put into the loading run's own game copy. A loader whose saver is not among
@@ -1070,6 +1116,9 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
     keys = [tag(name, mode) for mode in modes for name in scenarios]
     loads = {tag(name, mode): (tag(saver, mode) if (saver := tracediff.scenario_load(path)) is not None else None)
              for mode in modes for name, path in scenarios.items()}
+    sources = {tag(name, mode): tag(source, mode) for mode in modes for name in scenarios
+               if (source := replay_source(name)) is not None}
+    after = {key: sources.get(key) or loads[key] for key in keys}
     (ROOT / "build/scratch").mkdir(parents=True, exist_ok=True)
     saves = Path(tempfile.mkdtemp(prefix="saves-", dir=ROOT / "build/scratch"))
 
@@ -1087,6 +1136,15 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
             return str(e)
         return None
 
+    def commands_file(key: str) -> Path:
+        source = sources[key]
+        text = COMMAND_TEXTS.get(source)
+        if source not in keys or source in errors or text is None:
+            raise tracediff.Error(f"{key}: {source} failed to run or wrote no {COMMANDS_FILE}")
+        path = saves / (re.sub(r"[^A-Za-z0-9+-]", "_", key) + ".txt")
+        path.write_text(text)
+        return path
+
     def one(key: str) -> None:
         if watch is not None and watch.halted.is_set():
             return
@@ -1096,13 +1154,15 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
             if problem:
                 raise tracediff.Error(problem)
             saver = loads[key]
+            replay = {"name": name, "testcommands": commands_file(key)} if key in sources else {}
+            listed = replay_source(name) in REPLAY_LEFT_OUT
             with run_slot():
-                results[key] = play_scenario(exe, scenarios[name], game_dir, (expected or {}).get(name), poison, keep_always, scans, scan_every, retry_any,
+                results[key] = play_scenario(exe, scenarios[name], game_dir, None if listed else (expected or {}).get(name), poison, keep_always, scans, scan_every, retry_any,
                                              save_to=saves / key if key in loads.values() else None,
                                              load_from=saves / saver if saver else None,
-                                             **({"watch": watch} if watch is not None else {}),
+                                             **({"watch": watch} if watch is not None and not listed else {}),
                                              **({"mode": mode} if mode is not None else {}),
-                                             **({"column": column} if column != DIGEST else {}))
+                                             **({"column": column} if column != DIGEST else {}), **replay)
         except (tracediff.Error, OSError) as e:
             if watch is not None and watch.halted.is_set():
                 return
@@ -1122,17 +1182,17 @@ def play_all(exe: Path, scenarios: dict[str, Path], game_dir: str | None, parall
 
     ordered = sorted(keys, key=longest_first)
     cond = threading.Condition()
-    pending = [k for k in ordered if loads[k] is None]
-    waiting = [k for k in ordered if loads[k] is not None]
+    pending = [k for k in ordered if after[k] is None]
+    waiting = [k for k in ordered if after[k] is not None]
     ready: list[str] = []
     finished: set[str] = set()
     running = 0
     crashes: list[BaseException] = []
 
     def promote() -> None:
-        """Move the loaders whose saver has finished (or is not played at all) from `waiting` to `ready`; the caller holds `cond`."""
+        """Move the loaders and runs from commands.txt whose saver or source has finished (or is not played at all) from `waiting` to `ready`; the caller holds `cond`."""
         for k in list(waiting):
-            if loads[k] not in keys or loads[k] in finished:
+            if after[k] not in keys or after[k] in finished:
                 waiting.remove(k)
                 ready.append(k)
 
@@ -1657,6 +1717,10 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     base = played
     if quirks is not None:
         played = with_quirks(played, quirks, scratch / "quirks")
+    replays = with_replays(scenarios) if quirks is None and roundtrip is None and steps_per_frame is None else {}
+    if replays:
+        played = {**played, **replays}
+        expected = {**expected, **{name: expected[replay_source(name)] for name in replays}}
     off_results: dict[str, tuple] = {}
     off_failed: dict[str, str] = {}
     failed: dict[str, str] = {}
@@ -1686,7 +1750,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         watching.set()
         shutil.rmtree(scratch, ignore_errors=True)
     wall = time.time() - t0
-    if watch is not None and watch.found and len(results) < len(scenarios) * len(modes):
+    if watch is not None and watch.found and len(results) < (len(scenarios) + len(replays)) * len(modes):
         found = watch.found
         where = f" [kept: {found.kept.relative_to(ROOT)}]" if found.kept else ""
         trace = f" [trace: {shown(found.trace)}]" if found.trace else ""
@@ -1694,10 +1758,12 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         note = recheck(found, column)
         if note:
             print(note)
-        print(f"stopped: {len(scenarios) * len(modes) - len(results)} scenarios not finished")
+        print(f"stopped: {(len(scenarios) + len(replays)) * len(modes) - len(results)} scenarios not finished")
         if found.early:
             print("tracediff not run: the run ended early, so there is no complete trace to compare")
             sys.exit(1)
+        if replay_source(untag(found.name)) is not None:
+            report_replay_divergence()
         if mode_of(found.name) == "native":
             os.environ["BT_NATIVE_MODULES"] = "1"
         report_divergence(untag(found.name), expected, exe, scenarios, poison, game_dir, end_of_tick)
@@ -1720,7 +1786,12 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
             if diff:
                 bad.append(key)
     total = len(scenarios) * len(modes)
+    replay_bad, replay_stale, replay_lines = replay_report(replays, modes, results, expected, column)
+    if replays:
+        print("\n".join(replay_lines[:-1]))
     print(f"{total - len(bad)} of {total} scenarios equal, total {clock(wall)}")
+    if replays:
+        print(replay_lines[-1])
     if end_of_tick:
         print(every_row_line(every_row, total))
     sound_bad = ui_bad = events_bad = display_bad = frame_bad = save_bad = 0
@@ -1736,6 +1807,12 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         print("\n".join(label + line for line in ui_lines))
         interface_names, interface_lines = interface_report(scenarios, interface_view, COMMANDS)
         print("\n".join(label + line for line in interface_lines))
+        if replays:
+            sources = {replay_source(name): scenarios[replay_source(name)] for name in replays}
+            replay_view = {source: INTERFACE_LOGS.get(tag(replay_name(source), mode)) for source in sources}
+            replay_names, replay_lines = interface_report(sources, replay_view, COMMANDS)
+            print("\n".join(f"{label}from {COMMANDS_FILE}: {line}" for line in replay_lines))
+            interface_names += replay_names
         events_names, events_lines = events_report(scenarios, mode_view(EVENT_LOGS, scenarios, mode), EVENTS, end_of_tick)
         print("\n".join(label + line for line in events_lines))
         display_names, display_lines = display_report(scenarios, mode_view(DISPLAY_LOGS, scenarios, mode), DISPLAYS, end_of_tick)
@@ -1766,6 +1843,10 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         elif instrumented:
             print(f"{label}block pointers: not scanned, access-log build")
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
+    if not bad and replay_bad:
+        report_replay_divergence()
+    if not bad and replay_stale:
+        sys.exit(1)
     if not bad:
         if first_events is not None:
             report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir, end_of_tick)
@@ -1780,6 +1861,47 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     if mode_of(bad[0]) == "native":
         os.environ["BT_NATIVE_MODULES"] = "1"
     report_divergence(untag(bad[0]), expected, exe, scenarios, poison, game_dir, end_of_tick)
+
+
+def replay_report(replays: dict[str, Path], modes: tuple[str | None, ...], results: dict[str, tuple],
+                  expected: dict[str, tuple], column: int = DIGEST) -> tuple[list[str], list[str], list[str]]:
+    """(the runs from commands.txt that differ, the runs of REPLAY_LEFT_OUT that are equal, the report lines).
+
+    A run of a scenario in REPLAY_LEFT_OUT that differs is a `left` line with its reason, and fails nothing. The last
+    line counts the runs.
+    """
+    bad: list[str] = []
+    stale: list[str] = []
+    lines: list[str] = []
+    listed = 0
+    for mode in modes:
+        for name in replays:
+            key = tag(name, mode)
+            header, digests, elapsed, kept = results[key]
+            diff = difference(expected[name], header, digests, column)
+            reason = REPLAY_LEFT_OUT.get(replay_source(name))
+            where = f" [kept: {kept.relative_to(ROOT)}]" if kept else ""
+            if reason and diff:
+                listed += 1
+                lines.append(f"left {key} ({len(digests)} ticks, {clock(elapsed)}) {diff}: {reason}")
+            elif reason:
+                stale.append(key)
+                lines.append(f"DIFF {key} ({len(digests)} ticks, {clock(elapsed)}) equal, but REPLAY_LEFT_OUT lists it: remove it")
+            else:
+                lines.append(f"{'DIFF' if diff else 'ok':4} {key} ({len(digests)} ticks, {clock(elapsed)})" + (f" {diff}{where}" if diff else ""))
+                if diff:
+                    bad.append(key)
+    runs = len(replays) * len(modes)
+    lines.append(f"{runs - len(bad) - len(stale) - listed} of {runs} runs from {COMMANDS_FILE} equal, {listed} left out (REPLAY_LEFT_OUT)")
+    return bad, stale, lines
+
+
+def report_replay_divergence() -> None:
+    """Say why no tracediff follows a run from commands.txt that differs, then exit 1."""
+    print(f"\ntracediff not run: a run from {COMMANDS_FILE} has no reference build to compare with. Its scenario's own run "
+          "is equal, so a write of the interface or the console that is not an event is still hashed "
+          "(docs/commands.md, section 2.2): compare the kept trace with the scenario's own run (tools/tracediff.py --traces).")
+    sys.exit(1)
 
 
 def report_divergence(name: str, expected: dict[str, tuple], exe: Path, scenarios: dict[str, Path], poison: bool,

@@ -53,10 +53,13 @@ SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
 UIS = ROOT / "reference/ui"
 UI_FILE = "ui.txt"
+COMMANDS = ROOT / "reference/commands"
+INTERFACE_FILE = "interface.txt"
 EVENTS = ROOT / "reference/events"
 EVENTS_FILE = "events.txt"
 SOUND_LOGS: dict[str, str | None] = {}
 UI_LOGS: dict[str, str | None] = {}
+INTERFACE_LOGS: dict[str, str | None] = {}
 EVENT_LOGS: dict[str, str | None] = {}
 DISPLAYS = ROOT / "reference/display"
 DISPLAY_FILE = "display.txt"
@@ -186,6 +189,11 @@ def default_parallel() -> int:
     return max(1, min(MAX_PARALLEL, (os.cpu_count() or 2) // 2))
 
 
+def has_input(scenario: Path) -> bool:
+    """Whether a scenario file has an `input` line."""
+    return any(line.split()[:1] == ["input"] for line in scenario.read_text().splitlines())
+
+
 def scenario_ticks(scenario: Path) -> int:
     """The scenario's `ticks` value, or a tracediff.Error if it has none that parses."""
     for line in scenario.read_text().splitlines():
@@ -276,7 +284,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {"collect": (SOUND_FILE, UI_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAY_LIST_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
+            extra: dict = {"collect": (SOUND_FILE, UI_FILE, INTERFACE_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAY_LIST_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
                                 *dict.fromkeys((*(tracediff.SAVE_FILES if save_to is not None else ()),
                                                 *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if load_from is not None:
@@ -299,6 +307,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         SOUND_LOGS[scenario.stem] = sound_log.read_text() if sound_log.is_file() else None
         ui_log = run / UI_FILE
         UI_LOGS[scenario.stem] = ui_log.read_text() if ui_log.is_file() else None
+        interface_log = run / INTERFACE_FILE
+        INTERFACE_LOGS[scenario.stem] = interface_log.read_text() if interface_log.is_file() else None
         events_log = run / EVENTS_FILE
         EVENT_LOGS[scenario.stem] = events_log.read_text() if events_log.is_file() else None
         display_log = run / DISPLAY_FILE
@@ -420,6 +430,9 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
         if UI_LOGS.get(name) is None:
             fail(f"{name}: the run wrote no {UI_FILE}; the stored UI logs are untouched")
     for name in results:
+        if has_input(scenarios[name]) and INTERFACE_LOGS.get(name) is None:
+            fail(f"{name}: the run wrote no {INTERFACE_FILE}; the stored interface commands are untouched")
+    for name in results:
         if EVENT_LOGS.get(name) is None:
             fail(f"{name}: the run wrote no {EVENTS_FILE}; the stored event logs are untouched")
     for name in results:
@@ -446,6 +459,13 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
     for name in results:
         (UIS / f"{name}.txt").write_text(UI_LOGS[name])
     print(f"{len(results)} UI logs written to {UIS.relative_to(ROOT)}")
+    COMMANDS.mkdir(parents=True, exist_ok=True)
+    for old in COMMANDS.glob("*.txt"):
+        old.unlink()
+    inputs = [name for name in results if has_input(scenarios[name])]
+    for name in inputs:
+        (COMMANDS / f"{name}.txt").write_text(INTERFACE_LOGS[name])
+    print(f"{len(inputs)} interface command logs written to {COMMANDS.relative_to(ROOT)}")
     EVENTS.mkdir(parents=True, exist_ok=True)
     for old in EVENTS.glob("*.txt"):
         old.unlink()

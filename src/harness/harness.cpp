@@ -110,6 +110,8 @@ static int s_eventPhase = -1;
 static int s_eventSuppress = 0;
 static char s_uiBuffer[4096];
 static int s_uiMute = 0;
+static FILE* s_iface = NULL;
+static int s_ifaceOpen = 0;
 enum { FRAME_LIMIT = 64 };
 static unsigned s_frameTicks[FRAME_LIMIT];
 static unsigned s_frameCount = 0;
@@ -1689,6 +1691,7 @@ void HarnessAfterStep()
     if (!s_testMode)
         return;
     UiEndOfTick();
+    s_ifaceOpen = 1;
     s_stepEnded = 1;
 }
 
@@ -1716,6 +1719,9 @@ void HarnessEndOfTick()
     if (s_ui != NULL)
         fclose(s_ui);
     s_ui = NULL;
+    if (s_iface != NULL)
+        fclose(s_iface);
+    s_iface = NULL;
     DlClose();
     if (!gameOver && s_displayTickLine != 0 && !s_displayTickDone) {
         sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_displayTick);
@@ -4309,6 +4315,7 @@ void HarnessBeforeStep()
     if (!s_testMode)
         return;
     s_eventPhase = 0;
+    s_ifaceOpen = 0;
     unsigned tick = GameU32(GAME_TICK);
     int i;
     if (s_gameType == 3) {
@@ -4359,107 +4366,93 @@ static void UiLineStart(const char* what)
     fprintf(s_ui, "%u %s", GameU32(GAME_TICK), what);
 }
 
-static const char* UiOrderName(unsigned char kind)
+static int IfaceLive()
 {
-    const char* name = (const char*)ReadU32At((unsigned)g_missionOrderTableBegin + kind * ORDER_TABLE_STRIDE, ORDER_TABLE_NAME);
-    return name != NULL && name[0] != '\0' ? name : "-";
+    return s_testMode && s_iface != NULL && s_ifaceOpen;
 }
 
-static int UiKindTakesUnitType(const char* name)
+static void IfaceStart(const char* kind, const void* unit)
 {
-    return _stricmp(name, "MOBILEBUILD") == 0 || _stricmp(name, "VTOL_MOBILEBUILD") == 0 || _stricmp(name, "BUILDINGBUILD") == 0;
+    fprintf(s_iface, "%u %s unit ", GameU32(GAME_TICK) + 1, kind);
+    if (unit != NULL)
+        fprintf(s_iface, "%u", UiUnitIndex(unit));
+    else
+        fprintf(s_iface, "-");
 }
 
-static void UiUnitType(unsigned short defIndex)
+static void IfaceBytes(const char* name, const void* bytes, int size)
 {
-    const char* name = NULL;
-    if (defIndex != 0 && defIndex < GameU32(GAME_DEF_COUNT))
-        name = (const char*)GameU32(GAME_DEFS) + defIndex * UNITDEF_STRIDE + UNITDEF_NAME;
-    fprintf(s_ui, " %s", name != NULL ? name : "-");
+    int i;
+    fprintf(s_iface, " %s ", name);
+    for (i = 0; i < size; i++)
+        fprintf(s_iface, "%02x", ((const unsigned char*)bytes)[i]);
 }
 
 void __stdcall HarnessUiOrder(unsigned char kind, int remove, const void* unit, const void* target, const int* pos, int typeId, int amount)
 {
-    const char* name;
-    if (!UiLive())
-        return;
-    name = UiOrderName(kind);
-    UiLineStart("order");
-    fprintf(s_ui, " %s unit %u target ", name, UiUnitIndex(unit));
-    if (target != NULL)
-        fprintf(s_ui, "%u", UiUnitIndex(target));
-    else
-        fprintf(s_ui, "-");
-    if (pos != NULL)
-        fprintf(s_ui, " pos %d %d %d", pos[0] >> 16, pos[1] >> 16, pos[2] >> 16);
-    else
-        fprintf(s_ui, " pos -");
-    fprintf(s_ui, " type");
-    if (UiKindTakesUnitType(name))
-        UiUnitType((unsigned short)typeId);
-    else
-        fprintf(s_ui, " -");
-    if (UiKindTakesUnitType(name))
-        fprintf(s_ui, " param -");
-    else
-        fprintf(s_ui, " param %d", typeId);
-    fprintf(s_ui, " amount %d remove %d\n", amount, remove != 0);
 }
 
 void __stdcall HarnessUiQueue(const char* name, const void* unit, int count)
 {
-    if (!UiLive())
+    char bytes[32];
+    if (!IfaceLive())
         return;
-    UiLineStart("qbuild");
-    fprintf(s_ui, " %u %s %d\n", UiUnitIndex(unit), name, count);
+    memset(bytes, 0, sizeof bytes);
+    strncpy(bytes, name, sizeof bytes - 1);
+    IfaceStart("ORDERS_QUEUE_BUILD", unit);
+    fprintf(s_iface, " count %d", count);
+    IfaceBytes("name", bytes, sizeof bytes);
+    fprintf(s_iface, "\n");
 }
 
 void __stdcall HarnessUiCancel(unsigned char kind, const void* unit)
 {
-    if (!UiLive())
+    if (!IfaceLive())
         return;
-    UiLineStart("cancel");
-    fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
+    IfaceStart("ORDERS_CANCEL", unit);
+    fprintf(s_iface, " type %d\n", kind);
 }
 
 void __stdcall HarnessUiCommand(int build, int mode, unsigned char kind, int remove, const void* target, const int* pos, int typeId, int amount)
 {
+    unsigned char* first;
     unsigned char* u;
     unsigned char* end;
-    int any = 0;
-    if (!UiLive())
+    int zero[3] = {0, 0, 0};
+    int params[2];
+    unsigned units[16];
+    if (!IfaceLive())
         return;
-    UiLineStart("command");
-    if (build) {
-        fprintf(s_ui, " build type");
-        UiUnitType((unsigned short)typeId);
-    } else {
-        fprintf(s_ui, " order mode %d kind %s", mode, mode ? "-" : UiOrderName(kind));
-    }
-    fprintf(s_ui, " units");
-    u = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;
+    first = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;
     end = (unsigned char*)g_game->players[g_game->localPlayer].unitsEnd;
-    for (; u != NULL && u <= end; u += UNIT_STRIDE) {
+    memset(units, 0, sizeof units);
+    for (u = first; u != NULL && u <= end; u += UNIT_STRIDE) {
+        int i = (int)((u - first) / UNIT_STRIDE);
         if (!(u[UNIT_FLAGS] & UNIT_SELECTED))
             continue;
-        fprintf(s_ui, "%s%u", any ? "," : " ", UiUnitIndex(u));
-        any = 1;
+        if (i >= 512)
+            Fail("testmode: a selection has more units than a group command holds\n");
+        units[i >> 5] |= 1u << (i & 31);
     }
-    if (!any)
-        fprintf(s_ui, " -");
-    if (!build) {
-        if (target != NULL)
-            fprintf(s_ui, " target %u", UiUnitIndex(target));
-        else
-            fprintf(s_ui, " target -");
+    if (build) {
+        mode = 0;
+        kind = 0;
+        target = NULL;
+        amount = 0;
     }
-    if (pos != NULL)
-        fprintf(s_ui, " pos %d %d %d", pos[0] >> 16, pos[1] >> 16, pos[2] >> 16);
+    params[0] = typeId;
+    params[1] = amount;
+    IfaceStart(build ? "ORDERS_GROUP_BUILD" : "ORDERS_GROUP_COMMAND", first);
+    fprintf(s_iface, " mode %d type %d queue %d target ", mode, mode ? 0 : kind, remove != 0);
+    if (target != NULL)
+        fprintf(s_iface, "%u", UiUnitIndex(target));
     else
-        fprintf(s_ui, " pos -");
-    if (!build)
-        fprintf(s_ui, " param %d amount %d", typeId, amount);
-    fprintf(s_ui, " remove %d\n", remove != 0);
+        fprintf(s_iface, "-");
+    fprintf(s_iface, " hasPos %d", pos != NULL);
+    IfaceBytes("pos", pos != NULL ? pos : zero, sizeof zero);
+    IfaceBytes("params", params, sizeof params);
+    IfaceBytes("units", units, sizeof units);
+    fprintf(s_iface, "\n");
 }
 
 static void UiListUnits(int group, int selectedOnly)
@@ -5044,7 +5037,11 @@ static void OpenTrace(unsigned controlWord)
     if (s_ui == NULL)
         Fail("testmode: cannot write ui.txt\n");
     setvbuf(s_ui, s_uiBuffer, _IOFBF, sizeof s_uiBuffer);
-    fprintf(s_ui, "bt-ui 1\n");
+    fprintf(s_ui, "bt-ui 2\n");
+    s_iface = fopen("interface.txt", "wb");
+    if (s_iface == NULL)
+        Fail("testmode: cannot write interface.txt\n");
+    fprintf(s_iface, "bt-interface 1\n");
     DlOpen(s_displayAll);
     s_events = fopen("events.txt", "wb");
     if (s_events == NULL)

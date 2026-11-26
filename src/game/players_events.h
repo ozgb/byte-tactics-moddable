@@ -65,6 +65,24 @@ inline void PlayersPublishSetType(int outbox, int player, int type)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void PlayersPublishSetControl(int outbox, int player)
+{
+    PlayersSetPlayer event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = PLAYERS_SET_CONTROL;
+    event.player = player;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void PlayersPublishSetView(int outbox, int player)
+{
+    PlayersSetPlayer event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = PLAYERS_SET_VIEW;
+    event.player = player;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 inline void PlayersPublishEndGame(int outbox, int victory)
 {
     PlayersEndGame event;

@@ -171,7 +171,7 @@ In short:
 
 ## Running the lead and the maintainer
 
-The plan is run by two Claude sessions with distinct roles: `/lead` implements issues and `/maintainer` reviews, merges and grooms. Each runs in its own clone, started with `BT_ROLE` set; `docs/team.md` has the setup and how the two work together.
+The plan is run by two Claude sessions with distinct roles: `/lead` implements issues and `/maintainer` reviews, merges and grooms. Each runs in its own clone, started with `BT_ROLE` set; `docs/team.md` has the setup and how the two work together. To run a lead on your own machine, under your own GitHub account, follow `docs/remote-lead.md`.
 
 ## Changing the plan
 

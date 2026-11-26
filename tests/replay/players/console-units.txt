@@ -28015,6 +28015,7 @@ call 150 Apply
   i services.SchedPublish 4 12
   o rng.seed 0x11be71a6
   i services.SchedPublish 4 12
+  w Game.playerIndex 0
   o result 1
 call 150 Apply
   r Unit#251.flags 0x90e44021
@@ -28063,7 +28064,6 @@ call 150 UpdatePlayerBody
   w region 4:b4
   o result 2
 call 150 UpdatePlayerTail
-  r Game.playerIndex 0
   r SimGlobals.g_economyPacketTick 0
   a player 0
   i mission.GetGameType = 2

@@ -27849,6 +27849,7 @@ call 30 Apply
   a size 12
   i services.SchedPublish 4 12
   o rng.seed 0x35d84e00
+  w Game.playerIndex 0
   o result 1
 call 30 Apply
   r Unit#251.flags 0x90e44021
@@ -27889,7 +27890,6 @@ call 30 UpdatePlayerBody
   w region 0:0400 4:3c
   o result 1
 call 30 UpdatePlayerTail
-  r Game.playerIndex 0
   r SimGlobals.g_economyPacketTick 0
   a player 0
   i mission.GetGameType = 2

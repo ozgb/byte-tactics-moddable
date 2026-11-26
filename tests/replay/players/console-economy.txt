@@ -27849,6 +27849,7 @@ call 10 Apply
   a event.add 1
   a event.amount f32:0x447a0000
   a size 24
+  w Game.playerIndex 0
   w Player#0.energy f32:0x44fa0000
   o result 1
 call 10 Apply
@@ -28696,7 +28697,6 @@ call 30 UpdatePlayerBody
   w region 4:3c
   o result 2
 call 30 UpdatePlayerTail
-  r Game.playerIndex 0
   r SimGlobals.g_economyPacketTick 0
   a player 0
   i mission.GetGameType = 2
@@ -30841,4 +30841,1675 @@ call 81 UpdatePlayerHead
   a player 9
   o result 0
 call 81 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 82 UpdatePlayerHead
+  a player 0
+  o result 1
+call 82 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 82 UpdatePlayerHead
+  a player 1
+  o result 1
+call 82 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 82 UpdatePlayerHead
+  a player 2
+  o result 0
+call 82 UpdatePlayerHead
+  a player 3
+  o result 0
+call 82 UpdatePlayerHead
+  a player 4
+  o result 0
+call 82 UpdatePlayerHead
+  a player 5
+  o result 0
+call 82 UpdatePlayerHead
+  a player 6
+  o result 0
+call 82 UpdatePlayerHead
+  a player 7
+  o result 0
+call 82 UpdatePlayerHead
+  a player 8
+  o result 0
+call 82 UpdatePlayerHead
+  a player 9
+  o result 0
+call 82 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 83 UpdatePlayerHead
+  a player 0
+  o result 1
+call 83 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 83 UpdatePlayerHead
+  a player 1
+  o result 1
+call 83 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 83 UpdatePlayerHead
+  a player 2
+  o result 0
+call 83 UpdatePlayerHead
+  a player 3
+  o result 0
+call 83 UpdatePlayerHead
+  a player 4
+  o result 0
+call 83 UpdatePlayerHead
+  a player 5
+  o result 0
+call 83 UpdatePlayerHead
+  a player 6
+  o result 0
+call 83 UpdatePlayerHead
+  a player 7
+  o result 0
+call 83 UpdatePlayerHead
+  a player 8
+  o result 0
+call 83 UpdatePlayerHead
+  a player 9
+  o result 0
+call 83 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 84 UpdatePlayerHead
+  a player 0
+  o result 1
+call 84 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 84 UpdatePlayerHead
+  a player 1
+  o result 1
+call 84 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 84 UpdatePlayerHead
+  a player 2
+  o result 0
+call 84 UpdatePlayerHead
+  a player 3
+  o result 0
+call 84 UpdatePlayerHead
+  a player 4
+  o result 0
+call 84 UpdatePlayerHead
+  a player 5
+  o result 0
+call 84 UpdatePlayerHead
+  a player 6
+  o result 0
+call 84 UpdatePlayerHead
+  a player 7
+  o result 0
+call 84 UpdatePlayerHead
+  a player 8
+  o result 0
+call 84 UpdatePlayerHead
+  a player 9
+  o result 0
+call 84 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 85 UpdatePlayerHead
+  a player 0
+  o result 1
+call 85 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 85 UpdatePlayerHead
+  a player 1
+  o result 1
+call 85 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 85 UpdatePlayerHead
+  a player 2
+  o result 0
+call 85 UpdatePlayerHead
+  a player 3
+  o result 0
+call 85 UpdatePlayerHead
+  a player 4
+  o result 0
+call 85 UpdatePlayerHead
+  a player 5
+  o result 0
+call 85 UpdatePlayerHead
+  a player 6
+  o result 0
+call 85 UpdatePlayerHead
+  a player 7
+  o result 0
+call 85 UpdatePlayerHead
+  a player 8
+  o result 0
+call 85 UpdatePlayerHead
+  a player 9
+  o result 0
+call 85 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 86 UpdatePlayerHead
+  a player 0
+  o result 1
+call 86 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 86 UpdatePlayerHead
+  a player 1
+  o result 1
+call 86 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 86 UpdatePlayerHead
+  a player 2
+  o result 0
+call 86 UpdatePlayerHead
+  a player 3
+  o result 0
+call 86 UpdatePlayerHead
+  a player 4
+  o result 0
+call 86 UpdatePlayerHead
+  a player 5
+  o result 0
+call 86 UpdatePlayerHead
+  a player 6
+  o result 0
+call 86 UpdatePlayerHead
+  a player 7
+  o result 0
+call 86 UpdatePlayerHead
+  a player 8
+  o result 0
+call 86 UpdatePlayerHead
+  a player 9
+  o result 0
+call 86 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 87 UpdatePlayerHead
+  a player 0
+  o result 1
+call 87 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 87 UpdatePlayerHead
+  a player 1
+  o result 1
+call 87 UpdatePlayerBody
+  r rng.seed 0x07564e35
+  a player 1
+  a stream main
+  o result 0
+call 87 UpdatePlayerHead
+  a player 2
+  o result 0
+call 87 UpdatePlayerHead
+  a player 3
+  o result 0
+call 87 UpdatePlayerHead
+  a player 4
+  o result 0
+call 87 UpdatePlayerHead
+  a player 5
+  o result 0
+call 87 UpdatePlayerHead
+  a player 6
+  o result 0
+call 87 UpdatePlayerHead
+  a player 7
+  o result 0
+call 87 UpdatePlayerHead
+  a player 8
+  o result 0
+call 87 UpdatePlayerHead
+  a player 9
+  o result 0
+call 87 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 88 UpdatePlayerHead
+  a player 0
+  o result 1
+call 88 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 88 UpdatePlayerHead
+  a player 1
+  o result 1
+call 88 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 88 UpdatePlayerHead
+  a player 2
+  o result 0
+call 88 UpdatePlayerHead
+  a player 3
+  o result 0
+call 88 UpdatePlayerHead
+  a player 4
+  o result 0
+call 88 UpdatePlayerHead
+  a player 5
+  o result 0
+call 88 UpdatePlayerHead
+  a player 6
+  o result 0
+call 88 UpdatePlayerHead
+  a player 7
+  o result 0
+call 88 UpdatePlayerHead
+  a player 8
+  o result 0
+call 88 UpdatePlayerHead
+  a player 9
+  o result 0
+call 88 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 89 UpdatePlayerHead
+  a player 0
+  o result 1
+call 89 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 89 UpdatePlayerHead
+  a player 1
+  o result 1
+call 89 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 89 UpdatePlayerHead
+  a player 2
+  o result 0
+call 89 UpdatePlayerHead
+  a player 3
+  o result 0
+call 89 UpdatePlayerHead
+  a player 4
+  o result 0
+call 89 UpdatePlayerHead
+  a player 5
+  o result 0
+call 89 UpdatePlayerHead
+  a player 6
+  o result 0
+call 89 UpdatePlayerHead
+  a player 7
+  o result 0
+call 89 UpdatePlayerHead
+  a player 8
+  o result 0
+call 89 UpdatePlayerHead
+  a player 9
+  o result 0
+call 89 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 90 Apply
+  a event.kind 203
+  a event.unit null
+  a event.player 1
+  a size 12
+  w Game.playerIndex 1
+  w Game.localPlayer 1
+  o result 1
+call 90 UpdatePlayerHead
+  a player 0
+  o result 1
+call 90 UpdatePlayerBody
+  r rng.seed 0x33287d56
+  a player 0
+  a stream main
+  w region 4:78
+  o result 2
+call 90 UpdatePlayerTail
+  a player 0
+call 90 UpdatePlayerHead
+  a player 1
+  o result 1
+call 90 UpdatePlayerBody
+  r rng.seed 0x5594bff1
+  a player 1
+  a stream main
+  i mission.GetGameType = 2
+  i mission.GetGameType = 2
+  i mission.GetGameType = 2
+  w region 8:78
+  o result 2
+call 90 UpdatePlayerTail
+  a player 1
+  i mission.GetGameType = 2
+call 90 UpdatePlayerHead
+  a player 2
+  o result 0
+call 90 UpdatePlayerHead
+  a player 3
+  o result 0
+call 90 UpdatePlayerHead
+  a player 4
+  o result 0
+call 90 UpdatePlayerHead
+  a player 5
+  o result 0
+call 90 UpdatePlayerHead
+  a player 6
+  o result 0
+call 90 UpdatePlayerHead
+  a player 7
+  o result 0
+call 90 UpdatePlayerHead
+  a player 8
+  o result 0
+call 90 UpdatePlayerHead
+  a player 9
+  o result 0
+call 90 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 91 UpdatePlayerHead
+  a player 0
+  o result 1
+call 91 UpdatePlayerBody
+  r Unit#1.flags 0x90e00021
+  r Unit#251.flags 0x90e40325
+  a player 0
+  a stream main
+  o result 0
+call 91 UpdatePlayerHead
+  a player 1
+  o result 1
+call 91 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 91 UpdatePlayerHead
+  a player 2
+  o result 0
+call 91 UpdatePlayerHead
+  a player 3
+  o result 0
+call 91 UpdatePlayerHead
+  a player 4
+  o result 0
+call 91 UpdatePlayerHead
+  a player 5
+  o result 0
+call 91 UpdatePlayerHead
+  a player 6
+  o result 0
+call 91 UpdatePlayerHead
+  a player 7
+  o result 0
+call 91 UpdatePlayerHead
+  a player 8
+  o result 0
+call 91 UpdatePlayerHead
+  a player 9
+  o result 0
+call 91 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 92 UpdatePlayerHead
+  a player 0
+  o result 1
+call 92 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 92 UpdatePlayerHead
+  a player 1
+  o result 1
+call 92 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 92 UpdatePlayerHead
+  a player 2
+  o result 0
+call 92 UpdatePlayerHead
+  a player 3
+  o result 0
+call 92 UpdatePlayerHead
+  a player 4
+  o result 0
+call 92 UpdatePlayerHead
+  a player 5
+  o result 0
+call 92 UpdatePlayerHead
+  a player 6
+  o result 0
+call 92 UpdatePlayerHead
+  a player 7
+  o result 0
+call 92 UpdatePlayerHead
+  a player 8
+  o result 0
+call 92 UpdatePlayerHead
+  a player 9
+  o result 0
+call 92 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 93 UpdatePlayerHead
+  a player 0
+  o result 1
+call 93 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 93 UpdatePlayerHead
+  a player 1
+  o result 1
+call 93 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 93 UpdatePlayerHead
+  a player 2
+  o result 0
+call 93 UpdatePlayerHead
+  a player 3
+  o result 0
+call 93 UpdatePlayerHead
+  a player 4
+  o result 0
+call 93 UpdatePlayerHead
+  a player 5
+  o result 0
+call 93 UpdatePlayerHead
+  a player 6
+  o result 0
+call 93 UpdatePlayerHead
+  a player 7
+  o result 0
+call 93 UpdatePlayerHead
+  a player 8
+  o result 0
+call 93 UpdatePlayerHead
+  a player 9
+  o result 0
+call 93 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 94 UpdatePlayerHead
+  a player 0
+  o result 1
+call 94 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 94 UpdatePlayerHead
+  a player 1
+  o result 1
+call 94 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 94 UpdatePlayerHead
+  a player 2
+  o result 0
+call 94 UpdatePlayerHead
+  a player 3
+  o result 0
+call 94 UpdatePlayerHead
+  a player 4
+  o result 0
+call 94 UpdatePlayerHead
+  a player 5
+  o result 0
+call 94 UpdatePlayerHead
+  a player 6
+  o result 0
+call 94 UpdatePlayerHead
+  a player 7
+  o result 0
+call 94 UpdatePlayerHead
+  a player 8
+  o result 0
+call 94 UpdatePlayerHead
+  a player 9
+  o result 0
+call 94 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 95 UpdatePlayerHead
+  a player 0
+  o result 1
+call 95 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 95 UpdatePlayerHead
+  a player 1
+  o result 1
+call 95 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 95 UpdatePlayerHead
+  a player 2
+  o result 0
+call 95 UpdatePlayerHead
+  a player 3
+  o result 0
+call 95 UpdatePlayerHead
+  a player 4
+  o result 0
+call 95 UpdatePlayerHead
+  a player 5
+  o result 0
+call 95 UpdatePlayerHead
+  a player 6
+  o result 0
+call 95 UpdatePlayerHead
+  a player 7
+  o result 0
+call 95 UpdatePlayerHead
+  a player 8
+  o result 0
+call 95 UpdatePlayerHead
+  a player 9
+  o result 0
+call 95 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 96 UpdatePlayerHead
+  a player 0
+  o result 1
+call 96 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 96 UpdatePlayerHead
+  a player 1
+  o result 1
+call 96 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 96 UpdatePlayerHead
+  a player 2
+  o result 0
+call 96 UpdatePlayerHead
+  a player 3
+  o result 0
+call 96 UpdatePlayerHead
+  a player 4
+  o result 0
+call 96 UpdatePlayerHead
+  a player 5
+  o result 0
+call 96 UpdatePlayerHead
+  a player 6
+  o result 0
+call 96 UpdatePlayerHead
+  a player 7
+  o result 0
+call 96 UpdatePlayerHead
+  a player 8
+  o result 0
+call 96 UpdatePlayerHead
+  a player 9
+  o result 0
+call 96 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 97 UpdatePlayerHead
+  a player 0
+  o result 1
+call 97 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 97 UpdatePlayerHead
+  a player 1
+  o result 1
+call 97 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 97 UpdatePlayerHead
+  a player 2
+  o result 0
+call 97 UpdatePlayerHead
+  a player 3
+  o result 0
+call 97 UpdatePlayerHead
+  a player 4
+  o result 0
+call 97 UpdatePlayerHead
+  a player 5
+  o result 0
+call 97 UpdatePlayerHead
+  a player 6
+  o result 0
+call 97 UpdatePlayerHead
+  a player 7
+  o result 0
+call 97 UpdatePlayerHead
+  a player 8
+  o result 0
+call 97 UpdatePlayerHead
+  a player 9
+  o result 0
+call 97 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 98 UpdatePlayerHead
+  a player 0
+  o result 1
+call 98 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 98 UpdatePlayerHead
+  a player 1
+  o result 1
+call 98 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 98 UpdatePlayerHead
+  a player 2
+  o result 0
+call 98 UpdatePlayerHead
+  a player 3
+  o result 0
+call 98 UpdatePlayerHead
+  a player 4
+  o result 0
+call 98 UpdatePlayerHead
+  a player 5
+  o result 0
+call 98 UpdatePlayerHead
+  a player 6
+  o result 0
+call 98 UpdatePlayerHead
+  a player 7
+  o result 0
+call 98 UpdatePlayerHead
+  a player 8
+  o result 0
+call 98 UpdatePlayerHead
+  a player 9
+  o result 0
+call 98 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 99 UpdatePlayerHead
+  a player 0
+  o result 1
+call 99 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 99 UpdatePlayerHead
+  a player 1
+  o result 1
+call 99 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 99 UpdatePlayerHead
+  a player 2
+  o result 0
+call 99 UpdatePlayerHead
+  a player 3
+  o result 0
+call 99 UpdatePlayerHead
+  a player 4
+  o result 0
+call 99 UpdatePlayerHead
+  a player 5
+  o result 0
+call 99 UpdatePlayerHead
+  a player 6
+  o result 0
+call 99 UpdatePlayerHead
+  a player 7
+  o result 0
+call 99 UpdatePlayerHead
+  a player 8
+  o result 0
+call 99 UpdatePlayerHead
+  a player 9
+  o result 0
+call 99 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 100 Apply
+  r Player#0.energy f32:0x446d8000
+  r Player#0.metal f32:0x40000000
+  r Player#1.energy f32:0x430b8000
+  a event.kind 196
+  a event.unit null
+  a event.from 1
+  a event.to 0
+  a event.resource 1
+  a event.amount f32:0x42c80000
+  a event.announce 1
+  a size 28
+  i services.ScheduleEconomySpend = 1
+  i services.SchedPublish 4 24
+  i network.SendShareEnergy 1 0 f32:0x42c80000
+  o result 1
+call 100 UpdatePlayerHead
+  a player 0
+  o result 1
+call 100 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 100 UpdatePlayerHead
+  a player 1
+  o result 1
+call 100 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 100 UpdatePlayerHead
+  a player 2
+  o result 0
+call 100 UpdatePlayerHead
+  a player 3
+  o result 0
+call 100 UpdatePlayerHead
+  a player 4
+  o result 0
+call 100 UpdatePlayerHead
+  a player 5
+  o result 0
+call 100 UpdatePlayerHead
+  a player 6
+  o result 0
+call 100 UpdatePlayerHead
+  a player 7
+  o result 0
+call 100 UpdatePlayerHead
+  a player 8
+  o result 0
+call 100 UpdatePlayerHead
+  a player 9
+  o result 0
+call 100 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 101 UpdatePlayerHead
+  a player 0
+  o result 1
+call 101 UpdatePlayerBody
+  r rng.seed 0x18c5931c
+  a player 0
+  a stream main
+  o result 0
+call 101 UpdatePlayerHead
+  a player 1
+  o result 1
+call 101 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 101 UpdatePlayerHead
+  a player 2
+  o result 0
+call 101 UpdatePlayerHead
+  a player 3
+  o result 0
+call 101 UpdatePlayerHead
+  a player 4
+  o result 0
+call 101 UpdatePlayerHead
+  a player 5
+  o result 0
+call 101 UpdatePlayerHead
+  a player 6
+  o result 0
+call 101 UpdatePlayerHead
+  a player 7
+  o result 0
+call 101 UpdatePlayerHead
+  a player 8
+  o result 0
+call 101 UpdatePlayerHead
+  a player 9
+  o result 0
+call 101 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 102 UpdatePlayerHead
+  a player 0
+  o result 1
+call 102 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 102 UpdatePlayerHead
+  a player 1
+  o result 1
+call 102 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 102 UpdatePlayerHead
+  a player 2
+  o result 0
+call 102 UpdatePlayerHead
+  a player 3
+  o result 0
+call 102 UpdatePlayerHead
+  a player 4
+  o result 0
+call 102 UpdatePlayerHead
+  a player 5
+  o result 0
+call 102 UpdatePlayerHead
+  a player 6
+  o result 0
+call 102 UpdatePlayerHead
+  a player 7
+  o result 0
+call 102 UpdatePlayerHead
+  a player 8
+  o result 0
+call 102 UpdatePlayerHead
+  a player 9
+  o result 0
+call 102 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 103 UpdatePlayerHead
+  a player 0
+  o result 1
+call 103 UpdatePlayerBody
+  r Unit#251.cell (210,86)
+  a player 0
+  a stream main
+  o result 0
+call 103 UpdatePlayerHead
+  a player 1
+  o result 1
+call 103 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 103 UpdatePlayerHead
+  a player 2
+  o result 0
+call 103 UpdatePlayerHead
+  a player 3
+  o result 0
+call 103 UpdatePlayerHead
+  a player 4
+  o result 0
+call 103 UpdatePlayerHead
+  a player 5
+  o result 0
+call 103 UpdatePlayerHead
+  a player 6
+  o result 0
+call 103 UpdatePlayerHead
+  a player 7
+  o result 0
+call 103 UpdatePlayerHead
+  a player 8
+  o result 0
+call 103 UpdatePlayerHead
+  a player 9
+  o result 0
+call 103 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 104 UpdatePlayerHead
+  a player 0
+  o result 1
+call 104 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 104 UpdatePlayerHead
+  a player 1
+  o result 1
+call 104 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 104 UpdatePlayerHead
+  a player 2
+  o result 0
+call 104 UpdatePlayerHead
+  a player 3
+  o result 0
+call 104 UpdatePlayerHead
+  a player 4
+  o result 0
+call 104 UpdatePlayerHead
+  a player 5
+  o result 0
+call 104 UpdatePlayerHead
+  a player 6
+  o result 0
+call 104 UpdatePlayerHead
+  a player 7
+  o result 0
+call 104 UpdatePlayerHead
+  a player 8
+  o result 0
+call 104 UpdatePlayerHead
+  a player 9
+  o result 0
+call 104 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 105 UpdatePlayerHead
+  a player 0
+  o result 1
+call 105 UpdatePlayerBody
+  r Unit#251.cell (209,86)
+  a player 0
+  a stream main
+  o result 0
+call 105 UpdatePlayerHead
+  a player 1
+  o result 1
+call 105 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 105 UpdatePlayerHead
+  a player 2
+  o result 0
+call 105 UpdatePlayerHead
+  a player 3
+  o result 0
+call 105 UpdatePlayerHead
+  a player 4
+  o result 0
+call 105 UpdatePlayerHead
+  a player 5
+  o result 0
+call 105 UpdatePlayerHead
+  a player 6
+  o result 0
+call 105 UpdatePlayerHead
+  a player 7
+  o result 0
+call 105 UpdatePlayerHead
+  a player 8
+  o result 0
+call 105 UpdatePlayerHead
+  a player 9
+  o result 0
+call 105 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 106 UpdatePlayerHead
+  a player 0
+  o result 1
+call 106 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 106 UpdatePlayerHead
+  a player 1
+  o result 1
+call 106 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 106 UpdatePlayerHead
+  a player 2
+  o result 0
+call 106 UpdatePlayerHead
+  a player 3
+  o result 0
+call 106 UpdatePlayerHead
+  a player 4
+  o result 0
+call 106 UpdatePlayerHead
+  a player 5
+  o result 0
+call 106 UpdatePlayerHead
+  a player 6
+  o result 0
+call 106 UpdatePlayerHead
+  a player 7
+  o result 0
+call 106 UpdatePlayerHead
+  a player 8
+  o result 0
+call 106 UpdatePlayerHead
+  a player 9
+  o result 0
+call 106 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 107 UpdatePlayerHead
+  a player 0
+  o result 1
+call 107 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 107 UpdatePlayerHead
+  a player 1
+  o result 1
+call 107 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 107 UpdatePlayerHead
+  a player 2
+  o result 0
+call 107 UpdatePlayerHead
+  a player 3
+  o result 0
+call 107 UpdatePlayerHead
+  a player 4
+  o result 0
+call 107 UpdatePlayerHead
+  a player 5
+  o result 0
+call 107 UpdatePlayerHead
+  a player 6
+  o result 0
+call 107 UpdatePlayerHead
+  a player 7
+  o result 0
+call 107 UpdatePlayerHead
+  a player 8
+  o result 0
+call 107 UpdatePlayerHead
+  a player 9
+  o result 0
+call 107 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 108 UpdatePlayerHead
+  a player 0
+  o result 1
+call 108 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 108 UpdatePlayerHead
+  a player 1
+  o result 1
+call 108 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 108 UpdatePlayerHead
+  a player 2
+  o result 0
+call 108 UpdatePlayerHead
+  a player 3
+  o result 0
+call 108 UpdatePlayerHead
+  a player 4
+  o result 0
+call 108 UpdatePlayerHead
+  a player 5
+  o result 0
+call 108 UpdatePlayerHead
+  a player 6
+  o result 0
+call 108 UpdatePlayerHead
+  a player 7
+  o result 0
+call 108 UpdatePlayerHead
+  a player 8
+  o result 0
+call 108 UpdatePlayerHead
+  a player 9
+  o result 0
+call 108 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 109 UpdatePlayerHead
+  a player 0
+  o result 1
+call 109 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 109 UpdatePlayerHead
+  a player 1
+  o result 1
+call 109 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 109 UpdatePlayerHead
+  a player 2
+  o result 0
+call 109 UpdatePlayerHead
+  a player 3
+  o result 0
+call 109 UpdatePlayerHead
+  a player 4
+  o result 0
+call 109 UpdatePlayerHead
+  a player 5
+  o result 0
+call 109 UpdatePlayerHead
+  a player 6
+  o result 0
+call 109 UpdatePlayerHead
+  a player 7
+  o result 0
+call 109 UpdatePlayerHead
+  a player 8
+  o result 0
+call 109 UpdatePlayerHead
+  a player 9
+  o result 0
+call 109 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 110 Apply
+  r Player#1.metal f32:0x44610000
+  a event.kind 204
+  a event.unit null
+  a event.player 0
+  a size 12
+  w Game.playerIndex 0
+  o result 1
+call 110 UpdatePlayerHead
+  a player 0
+  o result 1
+call 110 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 110 UpdatePlayerHead
+  a player 1
+  o result 1
+call 110 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 110 UpdatePlayerHead
+  a player 2
+  o result 0
+call 110 UpdatePlayerHead
+  a player 3
+  o result 0
+call 110 UpdatePlayerHead
+  a player 4
+  o result 0
+call 110 UpdatePlayerHead
+  a player 5
+  o result 0
+call 110 UpdatePlayerHead
+  a player 6
+  o result 0
+call 110 UpdatePlayerHead
+  a player 7
+  o result 0
+call 110 UpdatePlayerHead
+  a player 8
+  o result 0
+call 110 UpdatePlayerHead
+  a player 9
+  o result 0
+call 110 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 111 UpdatePlayerHead
+  a player 0
+  o result 1
+call 111 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 111 UpdatePlayerHead
+  a player 1
+  o result 1
+call 111 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 111 UpdatePlayerHead
+  a player 2
+  o result 0
+call 111 UpdatePlayerHead
+  a player 3
+  o result 0
+call 111 UpdatePlayerHead
+  a player 4
+  o result 0
+call 111 UpdatePlayerHead
+  a player 5
+  o result 0
+call 111 UpdatePlayerHead
+  a player 6
+  o result 0
+call 111 UpdatePlayerHead
+  a player 7
+  o result 0
+call 111 UpdatePlayerHead
+  a player 8
+  o result 0
+call 111 UpdatePlayerHead
+  a player 9
+  o result 0
+call 111 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 112 UpdatePlayerHead
+  a player 0
+  o result 1
+call 112 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 112 UpdatePlayerHead
+  a player 1
+  o result 1
+call 112 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 112 UpdatePlayerHead
+  a player 2
+  o result 0
+call 112 UpdatePlayerHead
+  a player 3
+  o result 0
+call 112 UpdatePlayerHead
+  a player 4
+  o result 0
+call 112 UpdatePlayerHead
+  a player 5
+  o result 0
+call 112 UpdatePlayerHead
+  a player 6
+  o result 0
+call 112 UpdatePlayerHead
+  a player 7
+  o result 0
+call 112 UpdatePlayerHead
+  a player 8
+  o result 0
+call 112 UpdatePlayerHead
+  a player 9
+  o result 0
+call 112 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 113 UpdatePlayerHead
+  a player 0
+  o result 1
+call 113 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 113 UpdatePlayerHead
+  a player 1
+  o result 1
+call 113 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 113 UpdatePlayerHead
+  a player 2
+  o result 0
+call 113 UpdatePlayerHead
+  a player 3
+  o result 0
+call 113 UpdatePlayerHead
+  a player 4
+  o result 0
+call 113 UpdatePlayerHead
+  a player 5
+  o result 0
+call 113 UpdatePlayerHead
+  a player 6
+  o result 0
+call 113 UpdatePlayerHead
+  a player 7
+  o result 0
+call 113 UpdatePlayerHead
+  a player 8
+  o result 0
+call 113 UpdatePlayerHead
+  a player 9
+  o result 0
+call 113 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 114 UpdatePlayerHead
+  a player 0
+  o result 1
+call 114 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 114 UpdatePlayerHead
+  a player 1
+  o result 1
+call 114 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 114 UpdatePlayerHead
+  a player 2
+  o result 0
+call 114 UpdatePlayerHead
+  a player 3
+  o result 0
+call 114 UpdatePlayerHead
+  a player 4
+  o result 0
+call 114 UpdatePlayerHead
+  a player 5
+  o result 0
+call 114 UpdatePlayerHead
+  a player 6
+  o result 0
+call 114 UpdatePlayerHead
+  a player 7
+  o result 0
+call 114 UpdatePlayerHead
+  a player 8
+  o result 0
+call 114 UpdatePlayerHead
+  a player 9
+  o result 0
+call 114 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 115 UpdatePlayerHead
+  a player 0
+  o result 1
+call 115 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 115 UpdatePlayerHead
+  a player 1
+  o result 1
+call 115 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 115 UpdatePlayerHead
+  a player 2
+  o result 0
+call 115 UpdatePlayerHead
+  a player 3
+  o result 0
+call 115 UpdatePlayerHead
+  a player 4
+  o result 0
+call 115 UpdatePlayerHead
+  a player 5
+  o result 0
+call 115 UpdatePlayerHead
+  a player 6
+  o result 0
+call 115 UpdatePlayerHead
+  a player 7
+  o result 0
+call 115 UpdatePlayerHead
+  a player 8
+  o result 0
+call 115 UpdatePlayerHead
+  a player 9
+  o result 0
+call 115 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 116 UpdatePlayerHead
+  a player 0
+  o result 1
+call 116 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 116 UpdatePlayerHead
+  a player 1
+  o result 1
+call 116 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 116 UpdatePlayerHead
+  a player 2
+  o result 0
+call 116 UpdatePlayerHead
+  a player 3
+  o result 0
+call 116 UpdatePlayerHead
+  a player 4
+  o result 0
+call 116 UpdatePlayerHead
+  a player 5
+  o result 0
+call 116 UpdatePlayerHead
+  a player 6
+  o result 0
+call 116 UpdatePlayerHead
+  a player 7
+  o result 0
+call 116 UpdatePlayerHead
+  a player 8
+  o result 0
+call 116 UpdatePlayerHead
+  a player 9
+  o result 0
+call 116 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 117 UpdatePlayerHead
+  a player 0
+  o result 1
+call 117 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 117 UpdatePlayerHead
+  a player 1
+  o result 1
+call 117 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 117 UpdatePlayerHead
+  a player 2
+  o result 0
+call 117 UpdatePlayerHead
+  a player 3
+  o result 0
+call 117 UpdatePlayerHead
+  a player 4
+  o result 0
+call 117 UpdatePlayerHead
+  a player 5
+  o result 0
+call 117 UpdatePlayerHead
+  a player 6
+  o result 0
+call 117 UpdatePlayerHead
+  a player 7
+  o result 0
+call 117 UpdatePlayerHead
+  a player 8
+  o result 0
+call 117 UpdatePlayerHead
+  a player 9
+  o result 0
+call 117 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 118 UpdatePlayerHead
+  a player 0
+  o result 1
+call 118 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 118 UpdatePlayerHead
+  a player 1
+  o result 1
+call 118 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 118 UpdatePlayerHead
+  a player 2
+  o result 0
+call 118 UpdatePlayerHead
+  a player 3
+  o result 0
+call 118 UpdatePlayerHead
+  a player 4
+  o result 0
+call 118 UpdatePlayerHead
+  a player 5
+  o result 0
+call 118 UpdatePlayerHead
+  a player 6
+  o result 0
+call 118 UpdatePlayerHead
+  a player 7
+  o result 0
+call 118 UpdatePlayerHead
+  a player 8
+  o result 0
+call 118 UpdatePlayerHead
+  a player 9
+  o result 0
+call 118 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 119 UpdatePlayerHead
+  a player 0
+  o result 1
+call 119 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 119 UpdatePlayerHead
+  a player 1
+  o result 1
+call 119 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 119 UpdatePlayerHead
+  a player 2
+  o result 0
+call 119 UpdatePlayerHead
+  a player 3
+  o result 0
+call 119 UpdatePlayerHead
+  a player 4
+  o result 0
+call 119 UpdatePlayerHead
+  a player 5
+  o result 0
+call 119 UpdatePlayerHead
+  a player 6
+  o result 0
+call 119 UpdatePlayerHead
+  a player 7
+  o result 0
+call 119 UpdatePlayerHead
+  a player 8
+  o result 0
+call 119 UpdatePlayerHead
+  a player 9
+  o result 0
+call 119 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 120 Apply
+  a event.kind 203
+  a event.unit null
+  a event.player 0
+  a size 12
+  w Game.localPlayer 0
+  o result 1
+call 120 UpdatePlayerHead
+  a player 0
+  o result 1
+call 120 UpdatePlayerBody
+  r rng.seed 0x533d1ff8
+  a player 0
+  a stream main
+  i mission.GetGameType = 2
+  i mission.GetGameType = 2
+  i mission.GetGameType = 2
+  w region 4:96
+  o result 2
+call 120 UpdatePlayerTail
+  a player 0
+  i mission.GetGameType = 2
+call 120 UpdatePlayerHead
+  a player 1
+  o result 1
+call 120 UpdatePlayerBody
+  r rng.seed 0x51fdfd79
+  r Unit#1.flags 0x90e00321
+  r Unit#251.flags 0x90e40025
+  a player 1
+  a stream main
+  w region 8:96
+  o result 2
+call 120 UpdatePlayerTail
+  a player 1
+call 120 UpdatePlayerHead
+  a player 2
+  o result 0
+call 120 UpdatePlayerHead
+  a player 3
+  o result 0
+call 120 UpdatePlayerHead
+  a player 4
+  o result 0
+call 120 UpdatePlayerHead
+  a player 5
+  o result 0
+call 120 UpdatePlayerHead
+  a player 6
+  o result 0
+call 120 UpdatePlayerHead
+  a player 7
+  o result 0
+call 120 UpdatePlayerHead
+  a player 8
+  o result 0
+call 120 UpdatePlayerHead
+  a player 9
+  o result 0
+call 120 UpdatePlayersFinish
+  i mission.GetGameType = 2
+call 121 UpdatePlayerHead
+  a player 0
+  o result 1
+call 121 UpdatePlayerBody
+  a player 0
+  a stream main
+  o result 0
+call 121 UpdatePlayerHead
+  a player 1
+  o result 1
+call 121 UpdatePlayerBody
+  a player 1
+  a stream main
+  o result 0
+call 121 UpdatePlayerHead
+  a player 2
+  o result 0
+call 121 UpdatePlayerHead
+  a player 3
+  o result 0
+call 121 UpdatePlayerHead
+  a player 4
+  o result 0
+call 121 UpdatePlayerHead
+  a player 5
+  o result 0
+call 121 UpdatePlayerHead
+  a player 6
+  o result 0
+call 121 UpdatePlayerHead
+  a player 7
+  o result 0
+call 121 UpdatePlayerHead
+  a player 8
+  o result 0
+call 121 UpdatePlayerHead
+  a player 9
+  o result 0
+call 121 UpdatePlayersFinish
   i mission.GetGameType = 2

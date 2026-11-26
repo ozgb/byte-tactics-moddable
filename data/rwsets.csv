@@ -30708,6 +30708,7 @@ address,function,file,kind,target
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,call,GetTicks
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,call,IsKeyDown
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,call,PlaySoundByName
+0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,call,PlayersPublishCompactRanks
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,call,Translate
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,call,operator->
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,call,sprintf
@@ -30742,7 +30743,6 @@ address,function,file,kind,target
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,field_read,Rect::left
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,field_read,Rect::right
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,field_read,Rect::top
-0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,field_write,Player::rank
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,field_write,Point::x
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,field_write,Point::y
 0x4948e0,DrawScorePanel,src/ingame/game_dialogs.cpp,field_write,Rect::bottom
@@ -45067,6 +45067,13 @@ address,function,file,kind,target
 ,CommandNameLess::operator(),src/util/commands.cpp,function,
 ,CommandNameNotEqual::operator(),src/util/commands.cpp,call,operator==
 ,CommandNameNotEqual::operator(),src/util/commands.cpp,function,
+,CompactPlayerRanks,src/game/players_events.cpp,call,CountsForRank
+,CompactPlayerRanks,src/game/players_events.cpp,field_escape,Game::players
+,CompactPlayerRanks,src/game/players_events.cpp,field_read,Game::numPlayers
+,CompactPlayerRanks,src/game/players_events.cpp,field_read,Player::rank
+,CompactPlayerRanks,src/game/players_events.cpp,field_write,Player::rank
+,CompactPlayerRanks,src/game/players_events.cpp,function,
+,CompactPlayerRanks,src/game/players_events.cpp,global_read,g_game
 ,CompareEntryNames,src/host/win32/files.cpp,call,strcmp
 ,CompareEntryNames,src/host/win32/files.cpp,deref_read,*unsigned char
 ,CompareEntryNames,src/host/win32/files.cpp,field_escape,host_dir_entry::name
@@ -45260,6 +45267,15 @@ address,function,file,kind,target
 ,CountUse,src/state/block.cpp,field_write,BlockHeader::highWater
 ,CountUse,src/state/block.cpp,field_write,BlockHeader::inUse
 ,CountUse,src/state/block.cpp,function,
+,CountsForRank,src/game/players_events.cpp,call,operator->
+,CountsForRank,src/game/players_events.cpp,field_read,Player::active
+,CountsForRank,src/game/players_events.cpp,field_read,Player::index
+,CountsForRank,src/game/players_events.cpp,field_read,Player::info
+,CountsForRank,src/game/players_events.cpp,field_read,Player::type
+,CountsForRank,src/game/players_events.cpp,field_read,Player::unitCount
+,CountsForRank,src/game/players_events.cpp,field_read,Player::unitsCreated
+,CountsForRank,src/game/players_events.cpp,field_read,PlayerInfo::flags_9b
+,CountsForRank,src/game/players_events.cpp,function,
 ,CreateFactoryIndex,src/units/factory_index.cpp,call,BlockVector::Clear
 ,CreateFactoryIndex,src/units/factory_index.cpp,call,EnsureFactoryIndex
 ,CreateFactoryIndex,src/units/factory_index.cpp,field_maybe_written,FactoryIndexEntry::factories
@@ -55713,6 +55729,7 @@ address,function,file,kind,target
 ,Player_Get,src/map/radar_capture.cpp,field_escape,Game::players_1b63_14b
 ,Player_Get,src/map/radar_capture.cpp,function,
 ,Player_Get,src/map/radar_capture.cpp,global_read,g_game
+,PlayersApply,src/game/players_events.cpp,call,CompactPlayerRanks
 ,PlayersApply,src/game/players_events.cpp,call,GiveUnitToPlayer
 ,PlayersApply,src/game/players_events.cpp,call,KillPlayerUnits
 ,PlayersApply,src/game/players_events.cpp,call,MissionConditions::Deactivate
@@ -55751,6 +55768,7 @@ address,function,file,kind,target
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersTransfer::from
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersTransfer::resource
 ,PlayersApply,src/game/players_events.cpp,field_read,PlayersTransfer::to
+,PlayersApply,src/game/players_events.cpp,field_read,Quirks::rankCompactionPerTick
 ,PlayersApply,src/game/players_events.cpp,field_write,<anon>::flag2
 ,PlayersApply,src/game/players_events.cpp,field_write,<anon>::flag5
 ,PlayersApply,src/game/players_events.cpp,field_write,<anon>::flag6
@@ -55761,6 +55779,7 @@ address,function,file,kind,target
 ,PlayersApply,src/game/players_events.cpp,field_write,Ref<Unit>::offset
 ,PlayersApply,src/game/players_events.cpp,function,
 ,PlayersApply,src/game/players_events.cpp,global_read,g_game
+,PlayersApply,src/game/players_events.cpp,global_read,g_quirks
 ,PlayersApply,src/game/players_events.cpp,mask_member,Game::bits 0x64
 ,PlayersApply,src/game/players_events.cpp,member_write,Game::bits
 ,PlayersEventSize,src/game/players_event_size.h,function,
@@ -55790,6 +55809,10 @@ address,function,file,kind,target
 ,PlayersOnEconomyShare,src/seams/players_world.cpp,field_write,PlayersTransfer::resource
 ,PlayersOnEconomyShare,src/seams/players_world.cpp,field_write,PlayersTransfer::to
 ,PlayersOnEconomyShare,src/seams/players_world.cpp,function,
+,PlayersPublishCompactRanks,src/game/players_events.h,call,SchedPublish
+,PlayersPublishCompactRanks,src/game/players_events.h,call,memset
+,PlayersPublishCompactRanks,src/game/players_events.h,field_write,PlayersEventHeader::kind
+,PlayersPublishCompactRanks,src/game/players_events.h,function,
 ,PlayersPublishDeactivateConditions,src/game/players_events.h,call,SchedPublish
 ,PlayersPublishDeactivateConditions,src/game/players_events.h,call,memset
 ,PlayersPublishDeactivateConditions,src/game/players_events.h,field_write,PlayersEventHeader::kind
@@ -65934,11 +65957,13 @@ address,function,file,kind,target
 ,UpdatePlayerTail,src/game/players.cpp,indirect_call,indirect via void (*)(Player *) __attribute__((stdcall)) [NetworkSeam::BroadcastPlayerEconomy]
 ,UpdatePlayers,src/seams/native.cpp,call,SchedPlayersPhase
 ,UpdatePlayers,src/seams/native.cpp,function,
+,UpdatePlayersFinish,src/game/players.cpp,call,CompactPlayerRanks
 ,UpdatePlayersFinish,src/game/players.cpp,call,CountCombatPlayers
 ,UpdatePlayersFinish,src/game/players.cpp,field_read,Game::commanderDeath
 ,UpdatePlayersFinish,src/game/players.cpp,field_read,Game::endGameFlags
 ,UpdatePlayersFinish,src/game/players.cpp,field_read,MissionSeam::GetGameType
 ,UpdatePlayersFinish,src/game/players.cpp,field_read,PlayersRegion::endGameCountdown
+,UpdatePlayersFinish,src/game/players.cpp,field_read,Quirks::rankCompactionPerTick
 ,UpdatePlayersFinish,src/game/players.cpp,field_read,Seams::mission
 ,UpdatePlayersFinish,src/game/players.cpp,field_write,<anon>::flag6
 ,UpdatePlayersFinish,src/game/players.cpp,field_write,Game::endGameFlags
@@ -65946,6 +65971,7 @@ address,function,file,kind,target
 ,UpdatePlayersFinish,src/game/players.cpp,field_write,PlayersRegion::endGameCountdown
 ,UpdatePlayersFinish,src/game/players.cpp,function,
 ,UpdatePlayersFinish,src/game/players.cpp,global_read,g_game
+,UpdatePlayersFinish,src/game/players.cpp,global_read,g_quirks
 ,UpdatePlayersFinish,src/game/players.cpp,global_read,g_seams
 ,UpdatePlayersFinish,src/game/players.cpp,global_read,s_region@src/game/players.cpp
 ,UpdatePlayersFinish,src/game/players.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]

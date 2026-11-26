@@ -63,6 +63,13 @@ inline void UnitsPublishKillAll(int outbox)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+template <class U>
+inline void UnitsPublishForgetAttacker(int outbox, U* unit)
+{
+    UnitsEventHeader event = UnitsHeaderOf(UNITS_FORGET_ATTACKER, unit);
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 inline void UnitsPublishReloadType(int outbox, int type)
 {
     UnitsReloadType event;

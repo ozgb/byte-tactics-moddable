@@ -1,6 +1,6 @@
 # The los_radar interface
 
-Los_radar sits behind `interfaces/los_radar.h` (version 5.0; 5.0 writes the units of `GetVisibleEnemiesInRadius` to a caller buffer, in place of a vector and its list twin, and `HasReadyUnitInRange` returns int instead of bool and takes a const position), the fourth module on the scheduler after economy
+Los_radar sits behind `interfaces/los_radar.h` (version 5.1; 5.1 adds the console's kind SET_MODE; 5.0 writes the units of `GetVisibleEnemiesInRadius` to a caller buffer, in place of a vector and its list twin, and `HasReadyUnitInRange` returns int instead of bool and takes a const position), the fourth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`) and targeting (`docs/targeting-interface.md`)
 (#965). It is line of sight, radar and sonar: what each player sees and has explored, the eyeballs (temporary views),
 the terrain height range of the cells, the radar picture's snapshots, and (since 3.1) each player's index of the enemy units it sees. 3.1c's code is its default implementation.
@@ -18,12 +18,12 @@ last run, outboxes routed through the table of `src/game/routes.cpp` in 3.1c's o
 run and drained at each phase boundary, synchronous slots that deliver the module's inbox first, events published
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
-to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 138 (effects would take 144 to 159; it has none).
+to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 139 (effects would take 144 to 159; it has none).
 
 Los_radar's place in it:
 - **Events into los_radar:** UPDATE_UNIT, REMOVE_UNIT, REVEAL_UNIT, ADD_EYEBALL, CELL_HEIGHTS, RECALCULATE,
   SHARE_MAPPING, SHARE_RADAR and SHARE_MAP, published by units, orders, map, players, economy and the engine; and,
-  since 3.2, SIGHT_RESET and SIGHT_LOAD, which units publishes (`LosRadarPublishSightReset`, `LosRadarPublishSightLoad`) as it sets a unit up and loads a saved game.
+  since 3.2, SIGHT_RESET and SIGHT_LOAD, which units publishes (`LosRadarPublishSightReset`, `LosRadarPublishSightLoad`) as it sets a unit up and loads a saved game; and, since 5.1, SET_MODE, which the engine's console publishes (`los`, `lostype`, `mapping`, `nowisee`) in place of its writes to the line of sight bits of the game record, each before its RECALCULATE.
   Los_radar's handler (`LosRadarInbox`, `src/seams/los_radar_world.cpp`) passes each to `Apply`.
 - **Routes:** of the fourteen routes, every one that can be published inside the tick is synchronous except map's
   CELL_HEIGHTS: three because the gate diverged with them queued, two by #952's rule, and three because no scenario
@@ -58,6 +58,7 @@ Los_radar's place in it:
 | units: a unit is created (`CreateUnit`, `CreateUnitFromPacket`) | `RevealNewUnit` | REVEAL_UNIT from units |
 | map: a unit added to or taken off the map (`AddUnitToMap`, `RemoveUnitFromMap`) | `UpdateCellHeightRange` | CELL_HEIGHTS from map |
 | players: the defeated local player's commander placed again, or the defeated local player made a watcher (`UpdatePlayerBody`) | `RecalculateLineOfSight(1)` | RECALCULATE from players |
+| the console (`CmdLOS`, `CmdLOSType`, `CmdMapping`, `CmdNowISee`) | writes to the line of sight bits of the game record | SET_MODE from the engine, before the RECALCULATE |
 | the console (`CmdLOS`, `CmdLOSType`, `CmdMapping`, `CmdNowISee`), the load of a match (`LoadMatch`) | `RecalculateLineOfSight` | RECALCULATE from the engine |
 | the console (`ShareMapping`, `ShareRadar`) | `CmdShareMapping`, `CmdShareRadar` (slots) | SHARE_MAPPING, SHARE_RADAR from the engine |
 | the console (`ShareAll`, economy's code) | `CmdShareMapping`, `CmdShareRadar` | SHARE_MAPPING, SHARE_RADAR from economy |
@@ -125,6 +126,7 @@ none of these, so no trace moves; a module publishing from WASM can.
 | `LoadMappingData`, `SaveMappingData` | read and write the visibility mask, the allocation `LoadTntMap` tags "MAPPED MEMORY", as the "Mapping" account of a saved game; `LoadSavedGameState` and `SaveGameFile` call them |
 | SIGHT_RESET (137) | event: sets a unit's cache back to zero, as units' set-up did to the bytes; outcome 1, 0 for a null unit |
 | SIGHT_LOAD (138) | event: sets a unit's cache to the `cell` and `frameIdx` of the payload (`LosRadarSightLoad`), as a saved game restores it; outcome 1, 0 for a null unit |
+| SET_MODE (139) | event: `mapFlags` = (`mapFlags` & ~`clear`) \| `set` (`LosRadarSetMode`), the settings bits 0 to 2; outcome 1, 0 when `clear` or `set` has a bit outside 0x7 |
 
 ## 3. Effects out of los_radar
 
@@ -139,12 +141,12 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
   player's update, so every reader sees the bits as 3.1c left them. The bits stay in the hashed `Unit` record. An
   effect to units would have to be synchronous for the same reason, and would only move the write.
 - **`bits_14281`, the line of sight settings of the game record.** Bits 0 to 2 (mapping, line of sight and its type)
-  are written only outside the tick, by the console, the options and the load of a match, and read by los_radar and
+  are written only outside the tick, by the console (through SET_MODE since 5.1), the options and the load of a match, and read by los_radar and
   units as settings. Bit 3 is a redraw request for the fog of war, set by `RecalculateLineOfSight` and
   `RevealAroundUnit` and cleared by the fog's drawing; the trace masks it out (0xfff7). The field stays in the game
   record as view state: the settings' writers are the engine's, and los_radar writes only bit 3.
 
-**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 5.0; the payloads are unchanged since 4.1) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload and one that names a unit with a null unit.
+**Payloads.** Every event starts with `LosRadarEventHeader`, which holds `kind` alone. Each kind has the payload of `interfaces/los_radar.h` (version 5.1; the payloads are unchanged since 4.1 besides the new kind) that starts with it. `Apply(event, size)` refuses, with outcome 0 and no change, an event smaller than its kind's payload, one that names a unit with a null unit, and a SET_MODE with a bit outside 0x7 in `clear` or `set`.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -155,6 +157,7 @@ los_radar alone writes, in its own passes, at 3.1c's statement:
 | SHARE_MAPPING 134, SHARE_RADAR 135 | `LosRadarSharePlayer` | `player`: the player whose sharing toggles |
 | SHARE_MAP 136 | `LosRadarShareMap` | `from` (the player whose sight is shown), `to` (the player it is shown to) |
 | SIGHT_LOAD 138 | `LosRadarSightLoad` | `unit`, `cell` (as `LosSightCache::cell`), `frameIdx` (as `LosSightCache::frameIdx`, 0 to 255) |
+| SET_MODE 139 | `LosRadarSetMode` | `clear`, `set`: the `mapFlags` bits to clear (first) and to set, within 0x7 |
 
 ## 4. Views
 
@@ -205,7 +208,7 @@ los_radar's state as 3.1c did.
 | units ADD_EYEBALL | synchronous | #952's rule. A unit's death adds an eyeball of the viewing player at its place, in the units phase among others, and later in the phase orders, unit scripts and map read the viewing player's sight through the same queries as above. |
 | map CELL_HEIGHTS | queued | It writes `high` and `low` from the cells' `height`, which nothing writes in the tick (`data/rwsets.csv` has no write of `Cell::height`; `LoadTntMap` fills it at load, and `UpdateAllCellHeightRanges` then sets every cell's range). So the recompute writes the values the cells already hold, and no read in the phase can see a difference while it is pending. |
 | players RECALCULATE | synchronous | Untested: no scenario publishes it (section 8). The argument against queueing it stands too, by #952's rule: the body of a player's update publishes it when the defeated local player's commander is placed again (the commander death option 2) or the defeated local player becomes a watcher, and the next players' updates in the same phase read sight through `IsUnitVisibleToPlayer` (ai's visible list) before any delivery of los_radar's inbox. |
-| engine RECALCULATE, SHARE_MAPPING, SHARE_RADAR, SHARE_MAP; economy SHARE_MAPPING, SHARE_RADAR | queued, delivered at once | Published outside the tick (the console, the load of a match, the share dialog), so #970's rule delivers each at once, in 3.1c's order. |
+| engine RECALCULATE, SET_MODE, SHARE_MAPPING, SHARE_RADAR, SHARE_MAP; economy SHARE_MAPPING, SHARE_RADAR | queued, delivered at once | Published outside the tick (the console, the load of a match, the share dialog), so #970's rule delivers each at once, in 3.1c's order. |
 | engine SHARE_MAP | synchronous | Untested. The share-map packet is handled in the net phase, inside the tick, and no scenario receives one, so the route takes 3.1c's order. |
 
 The engine's SHARE_MAP row is both: the table holds one row, synchronous, which matters only inside the tick; the

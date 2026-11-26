@@ -673,7 +673,13 @@ class Walker:
                 else:
                     self.path(base, mode)
                 if not path and not record_name(base["type"]).startswith("(lambda at "):
-                    self.access("field", "%s::%s" % (record_name(base["type"]), node.get("name") or "<anon>"), mode)
+                    owner = record_name(base["type"])
+                    self.access("field", "%s::%s" % (owner, node.get("name") or "<anon>"), mode)
+                    member = strip(base)
+                    if owner == "<anon>" and member["kind"] == "MemberExpr" and member.get("name") and member.get("inner"):
+                        enclosing = record_name(member["inner"][0]["type"])
+                        if enclosing != "<anon>":
+                            self.access("member", "%s::%s" % (enclosing, member["name"]), mode)
         elif kind == "ArraySubscriptExpr":
             base, index = inner[0], inner[1]
             self.visit(index, "R")

@@ -72,6 +72,7 @@ TARGET_NAMES = ["", "heap", "unit", "player", "unitdef", "weapondef", "projectil
                 "node", "moveclass", "order", "orderfx", "link"]
 GAME_MASK_REASONS: dict[str, str] = {
     "mapFlags": "bit 3 is cleared by the camera, which is presentation",
+    "endGameFlags": "bits 0 and 1, the debug display and debug mode, are view state: presentation sets them and reads them",
     "uiOptionFlags": "only bits 3 and 7 to 10, the treedeath and cheat toggles the simulation reads, are kept",
 }
 
@@ -315,6 +316,7 @@ HEAP_TYPES: list[tuple[str, str]] = [
 
 MASKS: dict[tuple[str, int], tuple[int, str]] = {
     ("ExplodedPiece", 0x28): (0x3F, "bits 6 to 31 are never written; the explosion of a piece copies them from an uninitialised stack header"),
+    ("Unit", 0x110): (0xFFFFFFEF, "bit 0x10 is the selection, view state: presentation sets it and reads it, and the tick only clears it"),
     ("Order", 0x42): (0xFFDFFFFF, "bit 0x200000 is set by the drawing of the weapon coverage of a selected unit and read only there"),
     ("UnitMotion", 0x2E): (0x07, "bits 3 to 7 are never written; the constructor sets mode and flag"),
     ("AiSearchGoal", 0x64): (0x0B, "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after the unit state sent over the network writes it"),
@@ -944,7 +946,7 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
     ("spotField_1421f", 0x1421F, 4, "HEAP", 0),
     ("scanIndex", 0x14257, 4, None, 0),
     ("mapFlags", 0x14281, 2, None, 0xFFF7),
-    ("endGameFlags", 0x3923B, 2, None, 0),
+    ("endGameFlags", 0x3923B, 2, None, 0xFFFC),
     ("uiOptionFlags", 0x37F2F, 2, None, 0x788),
 ]
 
@@ -1018,7 +1020,7 @@ EVENT_MODULES = [
                  "LOS_RADAR_CELL_HEIGHTS": "LosRadarCellHeights", "LOS_RADAR_RECALCULATE": "LosRadarRecalculate",
                  "LOS_RADAR_SHARE_MAPPING": "LosRadarSharePlayer", "LOS_RADAR_SHARE_RADAR": "LosRadarSharePlayer",
                  "LOS_RADAR_SHARE_MAP": "LosRadarShareMap", "LOS_RADAR_SIGHT_RESET": "LosRadarUnit",
-                 "LOS_RADAR_SIGHT_LOAD": "LosRadarSightLoad"}, size_header="los_radar_event_size.h"),
+                 "LOS_RADAR_SIGHT_LOAD": "LosRadarSightLoad", "LOS_RADAR_SET_MODE": "LosRadarSetMode"}, size_header="los_radar_event_size.h"),
     EventModule("map", 40, "Map", "map.h", "MapEventHeader", ["MapEventKind", "MapEffectKind"],
                 {"MAP_ADD_UNIT": None, "MAP_REMOVE_UNIT": None, "MAP_CLEAR_UNIT": None, "MAP_RECLAIM_FOOTPRINT": None,
                  "MAP_SET_YARD": "MapSetYard", "MAP_BUCKET_UNLINK": None, "MAP_BUCKET_PREPEND": None,
@@ -1030,7 +1032,8 @@ EVENT_MODULES = [
                 {"PLAYERS_GIVE_UNIT": "PlayersGiveUnit", "PLAYERS_KILL_UNITS": "PlayersKillUnits",
                  "PLAYERS_UNIT_CREATED": None, "PLAYERS_UNIT_DIED": None, "PLAYERS_TRANSFER": "PlayersTransfer", "PLAYERS_SET_STORE": "PlayersSetStore",
                  "PLAYERS_SET_TYPE": "PlayersSetType", "PLAYERS_END_GAME": "PlayersEndGame",
-                 "PLAYERS_DEACTIVATE_CONDITIONS": None,
+                 "PLAYERS_DEACTIVATE_CONDITIONS": None, "PLAYERS_SET_CHEATS": "PlayersSetCheats",
+                 "PLAYERS_LEAVE_GAME": None,
                  "PLAYERS_EFFECT_KILL_UNIT": "PlayersKillUnit", "PLAYERS_EFFECT_SEND_UNIT": "PlayersSendUnit",
                  "PLAYERS_EFFECT_CAPTURE_UNIT": "PlayersCaptureUnit"}, size_header="players_event_size.h"),
     EventModule("aiEvents", 42, "Ai", "ai.h", "AiEventHeader", ["AiEventKind", "AiEffectKind"],
@@ -1099,7 +1102,8 @@ EVENT_MODULES = [
                  "UNITS_NOTIFY_REFS": "UnitsNotifyRefs", "UNITS_ATTACKED_SPEECH": None, "UNITS_MARK_DAMAGED": None,
                  "UNITS_DAMAGE_RECORD": "UnitsDamageRecord", "UNITS_SET_HEALTH": "UnitsSetHealth",
                  "UNITS_KILL": "UnitsKill", "UNITS_SEND": "UnitsSend", "UNITS_CAPTURE": "UnitsCapture",
-                 "UNITS_CREATE": "UnitsCreate", "UNITS_KILL_ALL": None, "UNITS_RELOAD_TYPE": "UnitsReloadType"},
+                 "UNITS_CREATE": "UnitsCreate", "UNITS_KILL_ALL": None, "UNITS_RELOAD_TYPE": "UnitsReloadType",
+                 "UNITS_FORGET_ATTACKER": None},
                 size_header="units_event_size.h"),
     EventModule("scriptsEvents", 51, "Scripts", "scripts.h", "ScriptsEventHeader",
                 ["ScriptsEventKind"],

@@ -26,6 +26,7 @@
 #include "../seams/units_world.h"
 #include "../seams/scripts_world.h"
 #include "../../interfaces/units.h"
+#include "../state/block.h"
 #include "../../interfaces/scripts.h"
 #include "players.h"
 #include "scheduler.h"
@@ -36,6 +37,17 @@ static void PathfindingOnMapCellsChanged(const void* event, unsigned int size)
         return;
     const MapCellsChanged* e = static_cast<const MapCellsChanged*>(event);
     g_seams.pathfinding->CellsChanged(e->rect[0], e->rect[1], e->rect[2], e->rect[3], e->classes, e->cause);
+}
+
+static void PathfindingOnSetSearch(const void* event, unsigned int size)
+{
+    if (size < sizeof(PathfindingSetSearch))
+        return;
+    const PathfindingSetSearch* e = static_cast<const PathfindingSetSearch*>(event);
+    if (e->steps != 0)
+        SimSetSearchSteps(e->steps);
+    if (e->hasScale && g_seams.pathfinding->SetSearchScale != nullptr)
+        g_seams.pathfinding->SetSearchScale(e->scale);
 }
 
 static const SchedRoute s_routes[] = {
@@ -62,6 +74,8 @@ static const SchedRoute s_routes[] = {
     {SCHED_ENGINE, PLAYERS_SET_TYPE, SCHED_PLAYERS, PlayersInbox, 1},
     {SCHED_ENGINE, PLAYERS_END_GAME, SCHED_PLAYERS, PlayersInbox, 1},
     {SCHED_ENGINE, PLAYERS_DEACTIVATE_CONDITIONS, SCHED_PLAYERS, PlayersInbox, 1},
+    {SCHED_ENGINE, PLAYERS_SET_CHEATS, SCHED_PLAYERS, PlayersInbox, 1},
+    {SCHED_ENGINE, PLAYERS_LEAVE_GAME, SCHED_PLAYERS, PlayersInbox, 1},
     {SCHED_PLAYERS, PLAYERS_EFFECT_KILL_UNIT, SCHED_UNITS, UnitsOnPlayersKillUnit, 1},
     {SCHED_PLAYERS, PLAYERS_EFFECT_SEND_UNIT, SCHED_UNITS, UnitsOnPlayersSendUnit, 1},
     {SCHED_PLAYERS, PLAYERS_EFFECT_CAPTURE_UNIT, SCHED_UNITS, UnitsOnPlayersCaptureUnit, 1},
@@ -135,6 +149,7 @@ static const SchedRoute s_routes[] = {
     {SCHED_MAP, LOS_RADAR_CELL_HEIGHTS, SCHED_LOS_RADAR, LosRadarInbox, 0},
     {SCHED_PLAYERS, LOS_RADAR_RECALCULATE, SCHED_LOS_RADAR, LosRadarInbox, 1},
     {SCHED_ENGINE, LOS_RADAR_RECALCULATE, SCHED_LOS_RADAR, LosRadarInbox, 0},
+    {SCHED_ENGINE, LOS_RADAR_SET_MODE, SCHED_LOS_RADAR, LosRadarInbox, 0},
     {SCHED_ENGINE, LOS_RADAR_SHARE_MAPPING, SCHED_LOS_RADAR, LosRadarInbox, 0},
     {SCHED_ENGINE, LOS_RADAR_SHARE_RADAR, SCHED_LOS_RADAR, LosRadarInbox, 0},
     {SCHED_ECONOMY, LOS_RADAR_SHARE_MAPPING, SCHED_LOS_RADAR, LosRadarInbox, 0},
@@ -154,6 +169,7 @@ static const SchedRoute s_routes[] = {
     {SCHED_UNITS, MAP_BUCKET_UNLINK, SCHED_MAP, MapInbox, 1},
     {SCHED_UNITS, MAP_BUCKET_PREPEND, SCHED_MAP, MapInbox, 1},
     {SCHED_MAP, MAP_EFFECT_CELLS_CHANGED, SCHED_PATHFINDING, PathfindingOnMapCellsChanged, 1},
+    {SCHED_ENGINE, PATHFINDING_SET_SEARCH, SCHED_PATHFINDING, PathfindingOnSetSearch, 0},
     {SCHED_UNITS, ORDERS_ADD, SCHED_ORDERS, OrdersInbox, 1},
     {SCHED_ENGINE, ORDERS_COMMAND, SCHED_ORDERS, OrdersOnCommand, 0},
     {SCHED_ENGINE, ORDERS_GROUP_COMMAND, SCHED_ORDERS, OrdersOnGroupCommand, 0},
@@ -206,6 +222,7 @@ static const SchedRoute s_routes[] = {
     {SCHED_ENGINE, UNITS_SET_FLAGS, SCHED_UNITS, UnitsInbox, 0},
     {SCHED_ENGINE, UNITS_CREATE, SCHED_UNITS, UnitsInbox, 0},
     {SCHED_ENGINE, UNITS_KILL_ALL, SCHED_UNITS, UnitsInbox, 0},
+    {SCHED_ENGINE, UNITS_FORGET_ATTACKER, SCHED_UNITS, UnitsInbox, 0},
     {SCHED_ENGINE, UNITS_RELOAD_TYPE, SCHED_UNITS, UnitsInbox, 0},
     {SCHED_SCRIPTS, UNITS_SCRIPT_VALUE, SCHED_UNITS, UnitsInbox, 1},
     {SCHED_SCRIPTS, UNITS_ATTACH_TO_PIECE, SCHED_UNITS, UnitsInbox, 1},

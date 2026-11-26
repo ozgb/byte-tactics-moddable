@@ -367,6 +367,9 @@ row hashes:
 
 The excluded fields have no `units[i].<field>` line; the dump holds them under the record's prefix.
 
+`flags` (+0x110) is hashed with the mask 0xffffffef: bit 0x10, the selection, is view state (`docs/state.md`, "The
+selection"), so two runs that differ only in what is selected have equal rows. The dump prints the masked value.
+
 ### 7.2 projectiles (section 2)
 
 ```
@@ -491,7 +494,8 @@ for each field F of game_scalars, in order:   hash F at game+F.offset
 for each entry G of globals.game, in order:   hash G
 END
 ```
-Dump: `game.<name>`. Masked fields are dumped as masked.
+Dump: `game.<name>`. Masked fields are dumped as masked. `endGameFlags` is masked with 0xfffc: bits 0 and 1, the debug
+display and debug mode, are view state (`docs/state.md`, "The debug bits of endGameFlags").
 
 ### 8.2 map cells (section 11)
 

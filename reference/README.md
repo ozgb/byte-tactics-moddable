@@ -278,17 +278,17 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | conditions-shore-to-shore | judged | - |
 | console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
 | console-edge | judged | - |
-| console-features | left out | console commands that are not events: `treedeath` |
+| console-features | judged | - |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
-| console-sight | left out | console commands that are not events: `los`, `lostype`, `mapping`, `radar`, `nowisee`, `view`, `reloadaiprofiles` |
-| console-units | left out | console commands that are not events: `shootall`, `doubleshot`, `halfshot`, `search` |
+| console-sight | left out | console commands that are not events: `view`, `reloadaiprofiles` |
+| console-units | judged | - |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |
 | duel-pass-dark | judged | - |
 | duel-shore-to-shore | judged | - |
 | edges-economy-targeting | judged | - |
-| edges-targeting-lead | left out | console commands that are not events: `shootall` |
+| edges-targeting-lead | judged | - |
 | eight-full-moon | judged | - |
 | eight-greenhaven | judged | - |
 | eight-pincushion-teams | judged | - |

@@ -648,5 +648,94 @@ class DataTest(unittest.TestCase):
         self.assertIn("(%d rows)" % len(self.rows), doc)
 
 
+class PresentationWritesTest(unittest.TestCase):
+    CLASSES = [{"kind": "game-region", "name": "difficulty", "address": "0x10", "class": "sim"},
+               {"kind": "game-region", "name": "bit0|bit1", "address": "0x20", "class": "view"},
+               {"kind": "game-region", "name": "flags", "address": "0x30", "class": "sim"},
+               {"kind": "game-region", "name": "mixedField", "address": "0x40", "class": "mixed"},
+               {"kind": "global", "name": "g_count", "address": "0x500000", "class": "sim"},
+               {"kind": "global", "name": "g_view", "address": "0x500004", "class": "view"}]
+    GLOBALS = [{"name": "g_count", "address": "0x500000", "type": "int"},
+               {"name": "g_view", "address": "0x500004", "type": "int"}]
+    SUBSYSTEMS = {("Click", "src/gui/a.cpp"): "presentation", ("Tick", "src/gui/a.cpp"): "units",
+                  ("Setup", "src/game/b.cpp"): "presentation"}
+
+    def found(self, *rows, sim_targets=None, console=None):
+        return sc.presentation_sim_writes([["", f, file, kind, target] for f, file, kind, target in rows],
+                                          self.SUBSYSTEMS, self.CLASSES, self.GLOBALS, sim_targets, console)
+
+    def test_a_presentation_function_writing_a_sim_game_field_or_global_is_found(self):
+        got = self.found(("Click", "src/gui/a.cpp", "field_write", "Game::difficulty"),
+                         ("Click", "src/gui/a.cpp", "global_write", "g_count"))
+        self.assertEqual(got, [("Click", "Game::difficulty"), ("Click", "g_count")])
+
+    def test_view_and_mixed_targets_and_reads_are_not_found(self):
+        self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "Game::bit1"),
+                                    ("Click", "src/gui/a.cpp", "field_write", "Game::mixedField"),
+                                    ("Click", "src/gui/a.cpp", "global_write", "g_view"),
+                                    ("Click", "src/gui/a.cpp", "field_read", "Game::difficulty"),
+                                    ("Click", "src/gui/a.cpp", "global_maybe_written", "g_count")), [])
+
+    def test_only_functions_of_the_presentation_subsystem_in_a_presentation_folder_count(self):
+        self.assertEqual(self.found(("Tick", "src/gui/a.cpp", "field_write", "Game::difficulty"),
+                                    ("Setup", "src/game/b.cpp", "field_write", "Game::difficulty")), [])
+
+    def test_a_bit_of_an_unnamed_struct_is_found_as_the_member_that_holds_it(self):
+        self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "<anon>::flag2"),
+                                    ("Click", "src/gui/a.cpp", "member_write", "Game::flags")),
+                         [("Click", "Game::flags")])
+        self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "<anon>::flag2")), [])
+
+    def test_a_field_of_another_record_is_found_when_a_sim_function_touches_it(self):
+        row = ("Click", "src/gui/a.cpp", "field_write", "Unit::attacker")
+        self.assertEqual(self.found(row, sim_targets={"Unit::attacker"}), [("Click", "Unit::attacker")])
+        self.assertEqual(self.found(row, sim_targets={"Unit::hp"}), [])
+        shared = ("Click", "src/gui/a.cpp", "field_write", "Vec3::x")
+        self.assertEqual(self.found(shared, sim_targets={"Vec3::x"}), [])
+
+    def test_a_console_command_counts_as_presentation(self):
+        row = ("CmdDoubleShot", "src/game/console_commands.cpp", "field_write", "Game::difficulty")
+        self.assertEqual(self.found(row, console={"CmdDoubleShot"}), [("CmdDoubleShot", "Game::difficulty")])
+        self.assertEqual(self.found(row), [])
+        self.assertEqual(self.found(("CmdDoubleShot", "src/game/other.cpp", "field_write", "Game::difficulty"),
+                                    console={"CmdDoubleShot"}), [])
+
+    def test_the_console_table_names_its_handlers(self):
+        handlers = sc.console_command_functions()
+        self.assertIn("CmdLOS", handlers)
+        self.assertIn("ConsoleShareRadar", handlers)
+
+    def test_each_converted_write_is_found_when_it_comes_back(self):
+        classes = [{"kind": "game-region", "name": "bits", "address": "0x3923b", "class": "sim"}]
+        subsystems = {("ContinueWatchingCallback", "src/frontend/a.cpp"): "presentation",
+                      ("HandleDebugHotkey", "src/gui/a.cpp"): "presentation"}
+        rows = [["", "ContinueWatchingCallback", "src/frontend/a.cpp", "field_write", "<anon>::flag2"],
+                ["", "ContinueWatchingCallback", "src/frontend/a.cpp", "member_write", "Game::bits"],
+                ["", "HandleDebugHotkey", "src/gui/a.cpp", "field_write", "Unit::attacker"],
+                ["", "HandleDebugHotkey", "src/gui/a.cpp", "field_write", "Unit::lastAttackerSlot"]]
+        got = sc.presentation_sim_writes(rows, subsystems, classes, [], {"Unit::attacker", "Unit::lastAttackerSlot"})
+        self.assertEqual(got, [("ContinueWatchingCallback", "Game::bits"), ("HandleDebugHotkey", "Unit::attacker"),
+                               ("HandleDebugHotkey", "Unit::lastAttackerSlot")])
+
+    def test_a_target_that_joins_no_row_is_not_found(self):
+        self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "Game::unknownField"),
+                                    ("Click", "src/gui/a.cpp", "field_write", "Unit::hp")), [])
+
+    def test_a_write_in_the_table_passes_and_one_outside_it_fails(self):
+        allowed = [("Click", "Game::difficulty", "match setup")]
+        self.assertEqual(sc.presentation_write_errors([("Click", "Game::difficulty")], allowed), [])
+        self.assertEqual(sc.presentation_write_errors([("Click", "g_count")], allowed),
+                         ["presentation writes sim state: Click writes g_count",
+                          "stale PRESENTATION_SIM_WRITES entry: Click writes Game::difficulty"])
+
+    def test_an_entry_that_matches_no_write_is_stale(self):
+        errors = sc.presentation_write_errors([], [("Click", "Game::difficulty", "match setup")])
+        self.assertEqual(errors, ["stale PRESENTATION_SIM_WRITES entry: Click writes Game::difficulty"])
+
+    def test_every_entry_of_the_table_has_a_reason(self):
+        for function, target, reason in sc.PRESENTATION_SIM_WRITES:
+            self.assertTrue(reason, "%s %s" % (function, target))
+
+
 if __name__ == "__main__":
     unittest.main()

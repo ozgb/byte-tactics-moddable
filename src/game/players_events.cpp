@@ -155,6 +155,16 @@ int __stdcall PlayersApply(const PlayersEventHeader* event, unsigned int size)
         g_game->bits.flag2 = 1;
         return 1;
     }
+    case PLAYERS_SET_CHEATS: {
+        const PlayersSetCheats* e = reinterpret_cast<const PlayersSetCheats*>(event);
+        if ((e->clear | e->set) & ~0x788u)
+            return 0;
+        g_game->uiOptionFlags = (unsigned short)((g_game->uiOptionFlags & ~e->clear) | e->set);
+        return 1;
+    }
+    case PLAYERS_LEAVE_GAME:
+        g_game->bits.flag2 = 1;
+        return 1;
     case PLAYERS_DEACTIVATE_CONDITIONS:
         g_game->list_391ed->Deactivate();
         return 1;

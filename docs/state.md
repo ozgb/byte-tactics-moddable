@@ -57,13 +57,13 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2551 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
+As of the last read of `data/state_classes.csv` (2550 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
-| static | 6 | 28 | 630 | 0 | 66 | 730 |
-| game-region | 118 | 490 | 130 | 44 | 0 | 782 |
+| static | 6 | 28 | 629 | 0 | 66 | 729 |
+| game-region | 117 | 491 | 130 | 44 | 0 | 782 |
 | heap | 154 | 48 | 89 | 0 | 0 | 291 |
 
 ## Mixed cases and how to split them
@@ -83,22 +83,48 @@ The ten game-region rows with class `mixed`:
 
 ## Presentation writes sim state (#22 crossings)
 
-Found during review, and re-checked against the code for #783. Functions are cited by name, never by line. Each crossing needs an order, a message to the driver, or a split of the field.
+Found during review, and re-checked against the code for #783 and #1049. Functions are cited by name, never by line.
+During play, presentation changes the simulation only through the events of `docs/commands.md` (sections 4 and 8);
+`tools/stateclasses.py --check` fails when a presentation function (a function of the presentation subsystem in a
+presentation folder, or a console command handler of src/game/console_commands.cpp's command table) writes a field
+classed `sim` of the game or a global, a bit field of the game through the member that holds it, or a field of `Unit`,
+`Player`, `Order`, `Feature` or `Projectile` that a phase or a load function touches, unless `PRESENTATION_SIM_WRITES`
+in that tool names the write with its reason. It does not see a write to a field classed `mixed` (`uiOptionFlags`,
+`mapFlags`, `localPlayer`, `playerIndex`, `otherFlags`), because the classes are per field, not per bit; a direct write
+of the cheat bits or of bits 0 to 2 of `mapFlags` would pass it.
 
-- `HandleBuildPanelClick` (control_panel.cpp) calls `QueueBuildOrderWithSound` (control_panel.cpp), which calls `QueueBuildOrder`, and that calls `AdjustBuildCount` (order_list.cpp). A click edits a unit's order list directly.
-- `DrawWeaponCoverage` (markers.cpp) sets `order->flags_42 |= 0x200000` and `order->cached` while drawing.
-- Console commands and the debug hotkey:
-  - `CmdATM`, `CmdNoMetal` and `CmdNoEnergy` write `Player.metal` and `Player.energy`.
-  - `CmdSeaLevel` writes `seaLevel` and `CmdEdge` writes `mapWidth` and `mapHeight` (console_commands.cpp).
-  - `CmdControl` and `CmdView` write `localPlayer` and `playerIndex` (console_commands.cpp), which the tick reads.
-  - The cheat toggles write `uiOptionFlags` bits.
-  - `CmdILose` and `CmdIWin` write `endGameFlags` and `endGameVictory`.
-  - `CmdMeteor` publishes the Enable, Disable and Start events of wind_meteors, whose `Apply` writes the meteor globals when the scheduler delivers them.
-  - `HandleDebugHotkey` (game_dialogs.cpp) writes `Player.metal` and `Player.energy`.
-- `HandleSurrenderChoice` (options.cpp) writes `endGameFlags`.
-- The options and keys pause bit is `otherFlags`.
-- The camera (camera.cpp) clears a `mapFlags` bit that line of sight uses.
-- The lobby writes the packet manager and players before play. That is fine: nothing ticks yet.
+Crossings left during play, each waiting on another decision:
+- `CmdControl` and `CmdView` (console_commands.cpp) write `localPlayer` and `playerIndex`, which the tick reads. They
+  become events once the fields are split into the simulation's perspective, fixed by the match setup, and the view's
+  player.
+- `CmdReloadAIProfiles` (console_commands.cpp) resets the AI players and runs the AI script's console lines inside the
+  game. Where AI profile loading belongs is a question for the human on #1049.
+- The share commands (`CmdShareMetal` and the others of share_commands.cpp) write a player's sharing switches and
+  levels, in a network game only (no test-mode run has one).
+- `WriteScreenshot` (keys.cpp), the poster key, turns mapping and line of sight off, calls `RecalculateLineOfSight`,
+  draws the whole map and turns them back on with a second `RecalculateLineOfSight`. A presentation that draws from the
+  view (#1052) needs neither.
+- `DispatchOrdersPanelPageFlags` and `StepBuildMenuPageBack` (control_panel.cpp) write the build-menu page bits of
+  `Unit.flags`: bit 0x400000, the build menu rather than the orders, and the page number. Only presentation reads
+  them, but the trace still hashes them, since the mask covers only the selection bit 0x10. #1115 finds and masks
+  the presentation writes that remain hashed.
+- `DrawScorePanel` (game_dialogs.cpp) decrements `Player.rank` of each counted player above a rank no player holds,
+  while it draws the score panel; the kill credit of `units.cpp` (the rank update when a unit dies) reads and writes the
+  same ranks. It becomes the simulation's own compaction, or an event, in a later issue.
+- The selection (`Unit.flags` bit 0x10 and the other selection fields) is written by the selection functions of
+  selection.cpp; #1050 takes it out of the judged state.
+
+Not crossings:
+- `DrawWeaponCoverage` (markers.cpp) writes `Order.cached` and bit 0x200000 of `Order.flags_42`, its own cache of the
+  last place it saw a target: nothing in the tick reads them, and the trace leaves both out (tools/traceschema.py).
+- The pause request, bit 0 of `otherFlags`, written by the options screens and the keys: it is the driver's, which
+  reads it to decide whether to run a tick; the only phase that reads it is the network's timeout check, on the wall
+  clock.
+- The bit of `mapFlags` that the camera (camera.cpp, control_panel.cpp) clears, bit 3: it says the drawn fog of war is
+  current, the tick only clears it and drawing reads and sets it, and the trace leaves it out (mask 0xfff7). The word's
+  bits 0 to 2 are the simulation's, set by LOS_RADAR_SET_MODE.
+- The lobby writes the packet manager and players before play. That is fine: nothing ticks yet. So do the frontend's
+  menus (the difficulty, the number of players, the commander death rule) before a match loads.
 - Not a crossing: `g_explodedPieces`. `DrawExplosions` and `DrawExplodedPieces` (explosions.cpp) only clear a slot when `DrawExplodedPiece` returns 0, which it never does.
 - Not a crossing: `g_debrisMemCache`. The older note said the end-game screen frees it, but the only calls outside the explosion code are `InitMemoryCache` and `FreeMemoryCache` (endgame.cpp), which run at startup and through `atexit`. No commit removed a crossing there: the attribution was wrong when the note was written (6b9479b31).
 
@@ -156,6 +182,40 @@ tick's. A module restores its own state at load, through its own load slot or th
 LOAD, map's LOAD_PATH_LOCK_STAMP, wind_meteors' LIMITS and RESET); section 5 of each interface document lists what it
 restores. `tools/seamlink.py --private-state` reads `data/rwsets.csv`, which has every function and no windows, so it
 covers the save and load code as it covers the tick's.
+
+## The selection
+
+The selection is view state (#1047, decided by the human on 2026-11-24), though it is a bit of the simulation's unit
+record: `selected`, bit 0x10 of `Unit.flags` (+0x110). It stays there in this repository, as 3.1c lays it out; moving
+it is work for the re-implementation. The trace masks it out of the `Unit` table (`tools/traceschema.py`, mask
+0xffffffef), so no row hashes it (the phase rows, `world` and the end-of-tick `tick` row), and two runs that differ
+only in what is selected have equal traces. The save keeps the bit as 3.1c writes it. What a presentation is judged on
+is the UI log's `select` record (`docs/ui-log.md`), and the group command a click sends carries its units
+(`OrdersGroupCommand`), so the simulation never needs the selection to carry out an order.
+
+Who touches the bit:
+- Presentation sets and clears it (the functions of selection.cpp) and reads it: the panels (control_panel.cpp,
+  info_panel.cpp), and `SendGroupCommand` (selection.cpp), which turns the selection into the units of a group command.
+  `ExpandGroupCommand`'s default reads the units from the command alone.
+- Game logic reads it once: `UpdateUnitBody` (unit_position.cpp) clears it when the unit can no longer be selected (not
+  selectable, still being built, in its hold-off after a transfer, or carried by a unit whose cargo is not selectable).
+  The read changes nothing but the bit. It is 3.1c's deselection rule, a rule of the view that runs in the tick.
+- Game logic writes it twice more, and reads it nowhere else: `InitUnitFromType` (units.cpp) clears it for a new unit, and
+  `LoadUnit` (unit_save.cpp) restores it from the save.
+- The harness reads it for the UI log's `select` record.
+
+## The debug bits of endGameFlags
+
+Bits 0 and 1 of `endGameFlags` (+0x3923b) are view state too: bit 0 is the debug display (`INFO ON`) and bit 1 debug
+mode. The trace masks them out of the game scalars (mask 0xfffc). The word's other bits are the simulation's (bit 2,
+the game is over, and bit 3, set when a saved game is chosen to load), so the rows of `data/state_classes.csv` for the whole word keep class `sim`. The row `bits_3923b_1`, the member
+that names only bit 0, is `view`, so `tools/stateclasses.py --check` passes `HandleDebugHotkey`'s write.
+
+- Presentation sets them: `HandleGameKey` (keys.cpp) flips bit 1 and clears bit 0 with it, and `HandleDebugHotkey`
+  (game_dialogs.cpp) flips bit 0. It reads them in the panels (info_panel.cpp) and the keys (keys.cpp).
+- Game logic reads bit 1 once: `CmdDebugBreak` (console_commands.cpp), a console command, which with the cheats on
+  runs the out-of-memory tests. Nothing in the tick reads either bit.
+- Game logic writes them once: `InitGame` (game_state.cpp) clears both.
 
 ## Determinism findings
 

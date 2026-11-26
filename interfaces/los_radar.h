@@ -13,7 +13,7 @@ class HapiBank;
 // Major version of the los_radar interface, changed when a slot is removed or its signature changes.
 #define LOS_RADAR_VERSION_MAJOR 5
 // Minor version of the los_radar interface, changed when a slot is added.
-#define LOS_RADAR_VERSION_MINOR 0
+#define LOS_RADAR_VERSION_MINOR 1
 
 // The field every los_radar event starts with.
 struct LosRadarEventHeader {
@@ -21,7 +21,7 @@ struct LosRadarEventHeader {
     int kind;
 };
 
-// The kinds of event other modules and the engine publish to los_radar's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event smaller than its payload, or one that names a unit with a null unit, changes nothing; outcome 0.
+// The kinds of event other modules and the engine publish to los_radar's inbox; each is an intent, validated when Apply consumes it, and applied in the order it was published. An event smaller than its payload, one that names a unit with a null unit, or a SET_MODE that names a bit above bit 2, changes nothing; outcome 0.
 enum LosRadarEventKind {
     // Moves the line of sight of a unit to where it now is (LosRadarUnit); outcome 1.
     LOS_RADAR_UPDATE_UNIT = 128,
@@ -44,7 +44,9 @@ enum LosRadarEventKind {
     // Sets the sight cache of a unit back to what units' set-up wrote, no cell and no frame (LosRadarUnit); outcome 1.
     LOS_RADAR_SIGHT_RESET = 137,
     // Sets the sight cache of a unit to the one a saved game holds (LosRadarSightLoad); outcome 1.
-    LOS_RADAR_SIGHT_LOAD = 138
+    LOS_RADAR_SIGHT_LOAD = 138,
+    // Clears and sets bits of the map flags that switch line of sight, its type and mapping (LosRadarSetMode), the bits that are in clear first; outcome 1, or 0 when a bit is above bit 2.
+    LOS_RADAR_SET_MODE = 139
 };
 
 // What los_radar remembers of the line of sight it gave a unit, in the order a saved game stores it.
@@ -99,6 +101,16 @@ struct LosRadarRecalculate {
     LosRadarEventHeader h;
     // 1 to first reset what each cell shows: to nothing for every player when mapping is on, to everything when it is off.
     int reset;
+};
+
+// The payload of SET_MODE.
+struct LosRadarSetMode {
+    // The kind.
+    LosRadarEventHeader h;
+    // The map flag bits to clear, within 7.
+    unsigned int clear;
+    // The map flag bits to set, within 7.
+    unsigned int set;
 };
 
 // The payload of SHARE_MAPPING and SHARE_RADAR: the player whose sharing toggles.

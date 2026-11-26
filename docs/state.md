@@ -57,14 +57,14 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2550 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
+As of the last read of `data/state_classes.csv` (2549 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
 | static | 6 | 28 | 629 | 0 | 66 | 729 |
 | game-region | 117 | 491 | 130 | 44 | 0 | 782 |
-| heap | 154 | 48 | 89 | 0 | 0 | 291 |
+| heap | 154 | 48 | 88 | 0 | 0 | 290 |
 
 ## Mixed cases and how to split them
 
@@ -97,8 +97,6 @@ Crossings left during play, each waiting on another decision:
 - `CmdControl` and `CmdView` (console_commands.cpp) write `localPlayer` and `playerIndex`, which the tick reads. They
   become events once the fields are split into the simulation's perspective, fixed by the match setup, and the view's
   player.
-- `CmdReloadAIProfiles` (console_commands.cpp) resets the AI players and runs the AI script's console lines inside the
-  game. Where AI profile loading belongs is a question for the human on #1049.
 - The share commands (`CmdShareMetal` and the others of share_commands.cpp) write a player's sharing switches and
   levels, in a network game only (no test-mode run has one).
 - `WriteScreenshot` (keys.cpp), the poster key, turns mapping and line of sight off, calls `RecalculateLineOfSight`,

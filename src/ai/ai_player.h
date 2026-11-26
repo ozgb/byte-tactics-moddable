@@ -29,6 +29,7 @@ int __stdcall IsUnderLimit(int player, unsigned short index, int value);
 void __stdcall ParseDownloadableAiWeightScripts(int player);
 void __stdcall ReparseAiWeightScriptsIfLimitNotSticky(int player);
 void __stdcall ResetAIPlayers();
+void __stdcall LoadAIProfiles();
 void __stdcall ProbeUnitDefEnergyRate(int unused1, int unused2, int);
 void __stdcall UpdatePlayerAI(int player);
 void __stdcall CreatePlayerAI(int player);

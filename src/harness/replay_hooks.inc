@@ -476,6 +476,8 @@ unsigned short __stdcall RecFeaturesFindFeatureAtPos(Vec3* a0, Point16* a1, Poin
 
 int __stdcall RecAiApply(const AiEventHeader* a0, unsigned int a1)
 {
+    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == AI_RELOAD_PROFILES))
+        return s_inner_ai->Apply(a0, a1);
     ReplayRoots roots;
     EventRoots(roots, RET_AI, a0, a1);
     SlotScope scope(RSL_AI_APPLY, SUB_AI, roots);
@@ -499,17 +501,6 @@ void __stdcall RecAiDumpPlayerAI(int a0, void* a1)
         ArgHandle(s_call, "file", OBJ_FILE, a1);
     }
     s_inner_ai->DumpPlayerAI(a0, a1);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecAiResetAIPlayers()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_RESETAIPLAYERS, SUB_AI, roots);
-    if (scope.Open()) {
-    }
-    s_inner_ai->ResetAIPlayers();
     if (scope.Open()) {
     }
 }
@@ -558,30 +549,6 @@ void __stdcall RecAiRebuildFeatureCells(int a0)
         ArgValue(s_call, "player", a0);
     }
     s_inner_ai->RebuildFeatureCells(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecAiParseDownloadableAiWeightScripts(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_PARSEDOWNLOADABLEAIWEIGHTSCRIPTS, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-    }
-    s_inner_ai->ParseDownloadableAiWeightScripts(a0);
-    if (scope.Open()) {
-    }
-}
-
-void __stdcall RecAiReparseAiWeightScriptsIfLimitNotSticky(int a0)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_AI_REPARSEAIWEIGHTSCRIPTSIFLIMITNOTSTICKY, SUB_AI, roots);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-    }
-    s_inner_ai->ReparseAiWeightScriptsIfLimitNotSticky(a0);
     if (scope.Open()) {
     }
 }
@@ -4728,24 +4695,6 @@ void __stdcall RecUnitsUnitRefSetValue(UnitRef* a0, OrderBase* a1)
     }
 }
 
-void __stdcall RecPlayersLoadDefaultAIScript()
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_PLAYERS_LOADDEFAULTAISCRIPT, SUB_PLAYERS, roots, false);
-    if (scope.Open()) {
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i players.LoadDefaultAIScript");
-    }
-    s_inner_players->LoadDefaultAIScript();
-    if (scope.Import()) {
-        FinishImport(line);
-    }
-    if (scope.Open()) {
-    }
-}
-
 int __stdcall RecMapUnitsInRange(const Vec3* a0, int a1, int a2, unsigned short* a3, int a4)
 {
     ReplayRoots roots;
@@ -5630,8 +5579,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_WEAPONS_FINDTARGETABLEPROJECTILE)
             return true;
-        if (slot == RSL_PLAYERS_LOADDEFAULTAISCRIPT)
-            return true;
         if (slot == RSL_ECONOMY_GETENERGYUSE)
             return true;
         return false;
@@ -5985,8 +5932,6 @@ void HookSeams(const bool* on)
     if (on[SUB_AI])
         s_rec_ai.DumpPlayerAI = RecAiDumpPlayerAI;
     if (on[SUB_AI])
-        s_rec_ai.ResetAIPlayers = RecAiResetAIPlayers;
-    if (on[SUB_AI])
         s_rec_ai.CreatePlayerAI = RecAiCreatePlayerAI;
     if (on[SUB_AI])
         s_rec_ai.DestroyPlayerAI = RecAiDestroyPlayerAI;
@@ -5994,10 +5939,6 @@ void HookSeams(const bool* on)
         s_rec_ai.UpdatePlayerAI = RecAiUpdatePlayerAI;
     if (on[SUB_AI])
         s_rec_ai.RebuildFeatureCells = RecAiRebuildFeatureCells;
-    if (on[SUB_AI])
-        s_rec_ai.ParseDownloadableAiWeightScripts = RecAiParseDownloadableAiWeightScripts;
-    if (on[SUB_AI])
-        s_rec_ai.ReparseAiWeightScriptsIfLimitNotSticky = RecAiReparseAiWeightScriptsIfLimitNotSticky;
     if (on[SUB_AI])
         s_rec_ai.CreateSquads = RecAiCreateSquads;
     if (on[SUB_AI])
@@ -6458,8 +6399,6 @@ void HookSeams(const bool* on)
         s_rec_units.UnitRefGet = RecUnitsUnitRefGet;
     if (on[SUB_ORDERS])
         s_rec_units.UnitRefSetValue = RecUnitsUnitRefSetValue;
-    if (on[SUB_AI])
-        s_rec_players.LoadDefaultAIScript = RecPlayersLoadDefaultAIScript;
     if (on[SUB_LOS_RADAR] || on[SUB_PLAYERS])
         s_rec_map.UnitsInRange = RecMapUnitsInRange;
     g_seams.wind_meteors = &s_rec_wind_meteors;

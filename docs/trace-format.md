@@ -1509,13 +1509,15 @@ for k in 0 .. n-1, in order, by the kind of the record:
 | 227 | AI_PLAN | `unit` (unit), `difficulties`, `outcome` |
 | 228 | AI_WEIGHT | `unit` (unit), `scale`, `fix`, `types` (64 bytes), `outcome` |
 | 229 | AI_LIMIT | `unit` (unit), `limit`, `fix`, `types` (64 bytes), `outcome` |
+| 230 | AI_RELOAD_PROFILES | `unit` (unit), `outcome` |
 | 240 | AI_EFFECT_ADD_ORDER | `unit` (unit), `type`, `queue`, `target` (unit), `hasPos`, `pos` (12 bytes), `params` (8 bytes), `outcome` |
 | 241 | AI_EFFECT_QUEUE_BUILD | `unit` (unit), `type`, `count`, `outcome` |
 | 243 | AI_EFFECT_STOP | `unit` (unit), `all`, `outcome` |
 | 245 | AI_EFFECT_ACTIVATE | `unit` (unit), `bits`, `on`, `outcome` |
 | 246 | AI_EFFECT_SET_STATES | `unit` (unit), `movement`, `firing`, `outcome` |
 
-- `kind` is an event into ai's inbox: 224 REACT_TO_ATTACK, 226 SET_SQUAD, 227 PLAN, 228 WEIGHT, 229 LIMIT; or an
+- `kind` is an event into ai's inbox: 224 REACT_TO_ATTACK, 226 SET_SQUAD, 227 PLAN, 228 WEIGHT, 229 LIMIT,
+  230 RELOAD_PROFILES; or an
   effect ai publishes: 240 EFFECT_ADD_ORDER, 241 EFFECT_QUEUE_BUILD, 243 EFFECT_STOP, 245 EFFECT_ACTIVATE,
   246 EFFECT_SET_STATES. In ai 5.0 the kinds 225 (DAMAGE_SPLIT), 242 (ATTACK), 244 (NOTIFY_REFS) and 247 (HIT) are
   gone and not reused.

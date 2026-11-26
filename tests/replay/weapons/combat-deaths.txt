@@ -17590,9 +17590,9 @@ call 857 Apply
   r DebrisFace#0+1800.color 200*1800
   r DebrisFace#0+1800.flags 1*1800
   r DebrisFace#0+1800.texKind 0*1800
-  r DebrisFace#0+1800.texPad0 0*1800
-  r DebrisFace#0+1800.texPad1 0*1800
-  r DebrisFace#0+1800.texPad2 0*1800
+  r DebrisFace#0+1800.texKindHigh0 0*1800
+  r DebrisFace#0+1800.texKindHigh1 0*1800
+  r DebrisFace#0+1800.texKindHigh2 0*1800
   a event.kind 256
   a event.unit Unit#2
   a event.source Unit#2
@@ -17659,6 +17659,9 @@ call 857 Apply
   w PieceRec#1.posX 42342683
   w PieceRec#1.posY 336891
   w PieceRec#1.posZ 18268539
+  d cache 100000 218
+  d block 0 218 ExplodedSlot#0
+  d block 218 99782 null
   o result 1
 call 857 Apply
   a event.kind 264
@@ -17711,6 +17714,9 @@ call 857 Apply
   w PieceRec#2.posX 42631068
   w PieceRec#2.posY 348541
   w PieceRec#2.posZ 16210680
+  d cache 100000 436
+  d block 218 218 ExplodedSlot#1
+  d block 436 99564 null
   o result 1
 call 857 Apply
   a event.kind 264
@@ -17763,6 +17769,9 @@ call 857 Apply
   w PieceRec#3.posX 41452152
   w PieceRec#3.posY 335879
   w PieceRec#3.posZ 17099247
+  d cache 100000 654
+  d block 436 218 ExplodedSlot#2
+  d block 654 99346 null
   o result 1
 call 857 Apply
   a event.kind 264
@@ -17815,6 +17824,9 @@ call 857 Apply
   w PieceRec#4.posX 43528323
   w PieceRec#4.posY 340216
   w PieceRec#4.posZ 17373525
+  d cache 100000 872
+  d block 654 218 ExplodedSlot#3
+  d block 872 99128 null
   o result 1
 call 857 Apply
   a event.kind 264
@@ -18708,188 +18720,188 @@ call 857 Apply
   w DebrisFace#0.flags 1900568
   w DebrisFace#0.texPic GafFrame#1
   w DebrisFace#0.texKind 29
-  w DebrisFace#0.texPad1 28
+  w DebrisFace#0.texKindHigh1 28
   w DebrisFace#1.color 1023410802
   w DebrisFace#1.flags 1900568
   w DebrisFace#1.texPic GafFrame#1
   w DebrisFace#1.texKind 29
-  w DebrisFace#1.texPad1 28
+  w DebrisFace#1.texKindHigh1 28
   w DebrisFace#2.color 1023410802
   w DebrisFace#2.flags 1900568
   w DebrisFace#2.texPic GafFrame#1
   w DebrisFace#2.texKind 29
-  w DebrisFace#2.texPad1 28
+  w DebrisFace#2.texKindHigh1 28
   w DebrisFace#3.color 1023410802
   w DebrisFace#3.flags 1900568
   w DebrisFace#3.texPic GafFrame#1
   w DebrisFace#3.texKind 29
-  w DebrisFace#3.texPad1 28
+  w DebrisFace#3.texKindHigh1 28
   w DebrisFace#4.color 1023410802
   w DebrisFace#4.flags 1900568
   w DebrisFace#4.texPic GafFrame#1
   w DebrisFace#4.texKind 29
-  w DebrisFace#4.texPad1 28
+  w DebrisFace#4.texKindHigh1 28
   w DebrisFace#5.color 1023410802
   w DebrisFace#5.flags 1900568
   w DebrisFace#5.texPic GafFrame#1
   w DebrisFace#5.texKind 29
-  w DebrisFace#5.texPad1 28
+  w DebrisFace#5.texKindHigh1 28
   w DebrisFace#6.color 0
   w DebrisFace#6.flags 2162720
   w DebrisFace#6.texPic GafFrame#1
   w DebrisFace#6.texKind 33
-  w DebrisFace#6.texPad1 32
+  w DebrisFace#6.texKindHigh1 32
   w DebrisFace#7.color 0
   w DebrisFace#7.flags 2162720
   w DebrisFace#7.texPic GafFrame#1
   w DebrisFace#7.texKind 33
-  w DebrisFace#7.texPad1 32
+  w DebrisFace#7.texKindHigh1 32
   w DebrisFace#8.color 0
   w DebrisFace#8.flags 2162720
   w DebrisFace#8.texPic GafFrame#1
   w DebrisFace#8.texKind 33
-  w DebrisFace#8.texPad1 32
+  w DebrisFace#8.texKindHigh1 32
   w DebrisFace#9.color 0
   w DebrisFace#9.flags 2162720
   w DebrisFace#9.texPic GafFrame#1
   w DebrisFace#9.texKind 33
-  w DebrisFace#9.texPad1 32
+  w DebrisFace#9.texKindHigh1 32
   w DebrisFace#10.color 0
   w DebrisFace#10.flags 2162720
   w DebrisFace#10.texPic GafFrame#1
   w DebrisFace#10.texKind 33
-  w DebrisFace#10.texPad1 32
+  w DebrisFace#10.texKindHigh1 32
   w DebrisFace#11.color 0
   w DebrisFace#11.flags 2162720
   w DebrisFace#11.texPic GafFrame#1
   w DebrisFace#11.texKind 33
-  w DebrisFace#11.texPad1 32
+  w DebrisFace#11.texKindHigh1 32
   w DebrisFace#12.color 0
   w DebrisFace#12.flags 2687016
   w DebrisFace#12.texPic GafFrame#1
   w DebrisFace#12.texKind 41
-  w DebrisFace#12.texPad1 40
+  w DebrisFace#12.texKindHigh1 40
   w DebrisFace#13.color 0
   w DebrisFace#13.flags 2687016
   w DebrisFace#13.texPic GafFrame#1
   w DebrisFace#13.texKind 41
-  w DebrisFace#13.texPad1 40
+  w DebrisFace#13.texKindHigh1 40
   w DebrisFace#14.color 0
   w DebrisFace#14.flags 2687016
   w DebrisFace#14.texPic GafFrame#1
   w DebrisFace#14.texKind 41
-  w DebrisFace#14.texPad1 40
+  w DebrisFace#14.texKindHigh1 40
   w DebrisFace#15.color 0
   w DebrisFace#15.flags 2687016
   w DebrisFace#15.texPic GafFrame#1
   w DebrisFace#15.texKind 41
-  w DebrisFace#15.texPad1 40
+  w DebrisFace#15.texKindHigh1 40
   w DebrisFace#16.color 0
   w DebrisFace#16.flags 2687016
   w DebrisFace#16.texPic GafFrame#1
   w DebrisFace#16.texKind 41
-  w DebrisFace#16.texPad1 40
+  w DebrisFace#16.texKindHigh1 40
   w DebrisFace#17.color 0
   w DebrisFace#17.flags 2687016
   w DebrisFace#17.texPic GafFrame#1
   w DebrisFace#17.texKind 41
-  w DebrisFace#17.texPad1 40
+  w DebrisFace#17.texKindHigh1 40
   w DebrisFace#18.color 262144
   w DebrisFace#18.flags 1376272
   w DebrisFace#18.texPic GafFrame#1
   w DebrisFace#18.texKind 45
-  w DebrisFace#18.texPad1 44
+  w DebrisFace#18.texKindHigh1 44
   w DebrisFace#19.color 262144
   w DebrisFace#19.flags 1376272
   w DebrisFace#19.texPic GafFrame#1
   w DebrisFace#19.texKind 45
-  w DebrisFace#19.texPad1 44
+  w DebrisFace#19.texKindHigh1 44
   w DebrisFace#20.color 262144
   w DebrisFace#20.flags 1376272
   w DebrisFace#20.texPic GafFrame#1
   w DebrisFace#20.texKind 45
-  w DebrisFace#20.texPad1 44
+  w DebrisFace#20.texKindHigh1 44
   w DebrisFace#21.color 262144
   w DebrisFace#21.flags 1376272
   w DebrisFace#21.texPic GafFrame#1
   w DebrisFace#21.texKind 45
-  w DebrisFace#21.texPad1 44
+  w DebrisFace#21.texKindHigh1 44
   w DebrisFace#22.color 262144
   w DebrisFace#22.flags 1376272
   w DebrisFace#22.texPic GafFrame#1
   w DebrisFace#22.texKind 45
-  w DebrisFace#22.texPad1 44
+  w DebrisFace#22.texKindHigh1 44
   w DebrisFace#23.color 262144
   w DebrisFace#23.flags 1376272
   w DebrisFace#23.texPic GafFrame#1
   w DebrisFace#23.texKind 45
-  w DebrisFace#23.texPad1 44
+  w DebrisFace#23.texKindHigh1 44
   w DebrisFace#24.color 975030
   w DebrisFace#24.flags 2424864
   w DebrisFace#24.texPic GafFrame#1
   w DebrisFace#24.texKind 37
-  w DebrisFace#24.texPad1 36
+  w DebrisFace#24.texKindHigh1 36
   w DebrisFace#25.color 975030
   w DebrisFace#25.flags 2424864
   w DebrisFace#25.texPic GafFrame#1
   w DebrisFace#25.texKind 37
-  w DebrisFace#25.texPad1 36
+  w DebrisFace#25.texKindHigh1 36
   w DebrisFace#26.color 975030
   w DebrisFace#26.flags 2424864
   w DebrisFace#26.texPic GafFrame#1
   w DebrisFace#26.texKind 37
-  w DebrisFace#26.texPad1 36
+  w DebrisFace#26.texKindHigh1 36
   w DebrisFace#27.color 975030
   w DebrisFace#27.flags 2424864
   w DebrisFace#27.texPic GafFrame#1
   w DebrisFace#27.texKind 37
-  w DebrisFace#27.texPad1 36
+  w DebrisFace#27.texKindHigh1 36
   w DebrisFace#28.color 975030
   w DebrisFace#28.flags 2424864
   w DebrisFace#28.texPic GafFrame#1
   w DebrisFace#28.texKind 37
-  w DebrisFace#28.texPad1 36
+  w DebrisFace#28.texKindHigh1 36
   w DebrisFace#29.color 975030
   w DebrisFace#29.flags 2424864
   w DebrisFace#29.texPic GafFrame#1
   w DebrisFace#29.texKind 37
-  w DebrisFace#29.texPad1 36
+  w DebrisFace#29.texKindHigh1 36
   w DebrisFace#30.color 0
   w DebrisFace#30.flags 3473512
   w DebrisFace#30.texPic GafFrame#2
-  w DebrisFace#30.texPad0 99
-  w DebrisFace#30.texPad1 111
-  w DebrisFace#30.texPad2 108
+  w DebrisFace#30.texKindHigh0 99
+  w DebrisFace#30.texKindHigh1 111
+  w DebrisFace#30.texKindHigh2 108
   w DebrisFace#31.color 0
   w DebrisFace#31.flags 3473512
   w DebrisFace#31.texPic GafFrame#2
-  w DebrisFace#31.texPad0 99
-  w DebrisFace#31.texPad1 111
-  w DebrisFace#31.texPad2 108
+  w DebrisFace#31.texKindHigh0 99
+  w DebrisFace#31.texKindHigh1 111
+  w DebrisFace#31.texKindHigh2 108
   w DebrisFace#32.color 0
   w DebrisFace#32.flags 3473512
   w DebrisFace#32.texPic GafFrame#2
-  w DebrisFace#32.texPad0 99
-  w DebrisFace#32.texPad1 111
-  w DebrisFace#32.texPad2 108
+  w DebrisFace#32.texKindHigh0 99
+  w DebrisFace#32.texKindHigh1 111
+  w DebrisFace#32.texKindHigh2 108
   w DebrisFace#33.color 0
   w DebrisFace#33.flags 3473512
   w DebrisFace#33.texPic GafFrame#2
-  w DebrisFace#33.texPad0 99
-  w DebrisFace#33.texPad1 111
-  w DebrisFace#33.texPad2 108
+  w DebrisFace#33.texKindHigh0 99
+  w DebrisFace#33.texKindHigh1 111
+  w DebrisFace#33.texKindHigh2 108
   w DebrisFace#34.color 0
   w DebrisFace#34.flags 3473512
   w DebrisFace#34.texPic GafFrame#2
-  w DebrisFace#34.texPad0 99
-  w DebrisFace#34.texPad1 111
-  w DebrisFace#34.texPad2 108
+  w DebrisFace#34.texKindHigh0 99
+  w DebrisFace#34.texKindHigh1 111
+  w DebrisFace#34.texKindHigh2 108
   w DebrisFace#35.color 0
   w DebrisFace#35.flags 3473512
   w DebrisFace#35.texPic GafFrame#2
-  w DebrisFace#35.texPad0 99
-  w DebrisFace#35.texPad1 111
-  w DebrisFace#35.texPad2 108
+  w DebrisFace#35.texKindHigh0 99
+  w DebrisFace#35.texKindHigh1 111
+  w DebrisFace#35.texKindHigh2 108
   w DebrisFace#36.color 0
   w DebrisFace#36.flags 64
   w DebrisFace#36.texPic GafFrame#2
@@ -18942,188 +18954,218 @@ call 857 Apply
   w DebrisFace#48.flags 6501224
   w DebrisFace#48.texPic GafFrame#2
   w DebrisFace#48.texKind 108
-  w DebrisFace#48.texPad0 51
-  w DebrisFace#48.texPad1 98
+  w DebrisFace#48.texKindHigh0 51
+  w DebrisFace#48.texKindHigh1 98
   w DebrisFace#49.color 0
   w DebrisFace#49.flags 6501224
   w DebrisFace#49.texPic GafFrame#2
   w DebrisFace#49.texKind 108
-  w DebrisFace#49.texPad0 51
-  w DebrisFace#49.texPad1 98
+  w DebrisFace#49.texKindHigh0 51
+  w DebrisFace#49.texKindHigh1 98
   w DebrisFace#50.color 0
   w DebrisFace#50.flags 6501224
   w DebrisFace#50.texPic GafFrame#2
   w DebrisFace#50.texKind 108
-  w DebrisFace#50.texPad0 51
-  w DebrisFace#50.texPad1 98
+  w DebrisFace#50.texKindHigh0 51
+  w DebrisFace#50.texKindHigh1 98
   w DebrisFace#51.color 0
   w DebrisFace#51.flags 6501224
   w DebrisFace#51.texPic GafFrame#2
   w DebrisFace#51.texKind 108
-  w DebrisFace#51.texPad0 51
-  w DebrisFace#51.texPad1 98
+  w DebrisFace#51.texKindHigh0 51
+  w DebrisFace#51.texKindHigh1 98
   w DebrisFace#52.color 0
   w DebrisFace#52.flags 6501224
   w DebrisFace#52.texPic GafFrame#2
   w DebrisFace#52.texKind 108
-  w DebrisFace#52.texPad0 51
-  w DebrisFace#52.texPad1 98
+  w DebrisFace#52.texKindHigh0 51
+  w DebrisFace#52.texKindHigh1 98
   w DebrisFace#53.color 0
   w DebrisFace#53.flags 6501224
   w DebrisFace#53.texPic GafFrame#2
   w DebrisFace#53.texKind 108
-  w DebrisFace#53.texPad0 51
-  w DebrisFace#53.texPad1 98
+  w DebrisFace#53.texKindHigh0 51
+  w DebrisFace#53.texKindHigh1 98
   w DebrisFace#54.color 4
   w DebrisFace#54.flags 1638428
   w DebrisFace#54.texPic GafFrame#10
   w DebrisFace#54.texKind 1
-  w DebrisFace#54.texPad1 24
+  w DebrisFace#54.texKindHigh1 24
+  w DebrisFace#54.texTeamSrc FrameTable#12
   w DebrisFace#55.color 4
   w DebrisFace#55.flags 1638428
   w DebrisFace#55.texPic GafFrame#10
   w DebrisFace#55.texKind 1
-  w DebrisFace#55.texPad1 24
+  w DebrisFace#55.texKindHigh1 24
+  w DebrisFace#55.texTeamSrc FrameTable#12
   w DebrisFace#56.color 4
   w DebrisFace#56.flags 1638428
   w DebrisFace#56.texPic GafFrame#10
   w DebrisFace#56.texKind 1
-  w DebrisFace#56.texPad1 24
+  w DebrisFace#56.texKindHigh1 24
+  w DebrisFace#56.texTeamSrc FrameTable#12
   w DebrisFace#57.color 4
   w DebrisFace#57.flags 1638428
   w DebrisFace#57.texPic GafFrame#10
   w DebrisFace#57.texKind 1
-  w DebrisFace#57.texPad1 24
+  w DebrisFace#57.texKindHigh1 24
+  w DebrisFace#57.texTeamSrc FrameTable#12
   w DebrisFace#58.color 4
   w DebrisFace#58.flags 1638428
   w DebrisFace#58.texPic GafFrame#10
   w DebrisFace#58.texKind 1
-  w DebrisFace#58.texPad1 24
+  w DebrisFace#58.texKindHigh1 24
+  w DebrisFace#58.texTeamSrc FrameTable#12
   w DebrisFace#59.color 4
   w DebrisFace#59.flags 1638428
   w DebrisFace#59.texPic GafFrame#10
   w DebrisFace#59.texKind 1
-  w DebrisFace#59.texPad1 24
+  w DebrisFace#59.texKindHigh1 24
+  w DebrisFace#59.texTeamSrc FrameTable#12
   w DebrisFace#60.color 347930629
   w DebrisFace#60.flags 1900572
   w DebrisFace#60.texPic GafFrame#10
   w DebrisFace#60.texKind 1
-  w DebrisFace#60.texPad1 28
+  w DebrisFace#60.texKindHigh1 28
+  w DebrisFace#60.texTeamSrc FrameTable#12
   w DebrisFace#61.color 347930629
   w DebrisFace#61.flags 1900572
   w DebrisFace#61.texPic GafFrame#10
   w DebrisFace#61.texKind 1
-  w DebrisFace#61.texPad1 28
+  w DebrisFace#61.texKindHigh1 28
+  w DebrisFace#61.texTeamSrc FrameTable#12
   w DebrisFace#62.color 347930629
   w DebrisFace#62.flags 1900572
   w DebrisFace#62.texPic GafFrame#10
   w DebrisFace#62.texKind 1
-  w DebrisFace#62.texPad1 28
+  w DebrisFace#62.texKindHigh1 28
+  w DebrisFace#62.texTeamSrc FrameTable#12
   w DebrisFace#63.color 347930629
   w DebrisFace#63.flags 1900572
   w DebrisFace#63.texPic GafFrame#10
   w DebrisFace#63.texKind 1
-  w DebrisFace#63.texPad1 28
+  w DebrisFace#63.texKindHigh1 28
+  w DebrisFace#63.texTeamSrc FrameTable#12
   w DebrisFace#64.color 347930629
   w DebrisFace#64.flags 1900572
   w DebrisFace#64.texPic GafFrame#10
   w DebrisFace#64.texKind 1
-  w DebrisFace#64.texPad1 28
+  w DebrisFace#64.texKindHigh1 28
+  w DebrisFace#64.texTeamSrc FrameTable#12
   w DebrisFace#65.color 347930629
   w DebrisFace#65.flags 1900572
   w DebrisFace#65.texPic GafFrame#10
   w DebrisFace#65.texKind 1
-  w DebrisFace#65.texPad1 28
+  w DebrisFace#65.texKindHigh1 28
+  w DebrisFace#65.texTeamSrc FrameTable#12
   w DebrisFace#66.color 0
   w DebrisFace#66.flags 3473412
   w DebrisFace#66.texPic GafFrame#10
   w DebrisFace#66.texKind 1
-  w DebrisFace#66.texPad1 5
+  w DebrisFace#66.texKindHigh1 5
+  w DebrisFace#66.texTeamSrc FrameTable#12
   w DebrisFace#67.color 0
   w DebrisFace#67.flags 3473412
   w DebrisFace#67.texPic GafFrame#10
   w DebrisFace#67.texKind 1
-  w DebrisFace#67.texPad1 5
+  w DebrisFace#67.texKindHigh1 5
+  w DebrisFace#67.texTeamSrc FrameTable#12
   w DebrisFace#68.color 0
   w DebrisFace#68.flags 3473412
   w DebrisFace#68.texPic GafFrame#10
   w DebrisFace#68.texKind 1
-  w DebrisFace#68.texPad1 5
+  w DebrisFace#68.texKindHigh1 5
+  w DebrisFace#68.texTeamSrc FrameTable#12
   w DebrisFace#69.color 0
   w DebrisFace#69.flags 3473412
   w DebrisFace#69.texPic GafFrame#10
   w DebrisFace#69.texKind 1
-  w DebrisFace#69.texPad1 5
+  w DebrisFace#69.texKindHigh1 5
+  w DebrisFace#69.texTeamSrc FrameTable#12
   w DebrisFace#70.color 0
   w DebrisFace#70.flags 3473412
   w DebrisFace#70.texPic GafFrame#10
   w DebrisFace#70.texKind 1
-  w DebrisFace#70.texPad1 5
+  w DebrisFace#70.texKindHigh1 5
+  w DebrisFace#70.texTeamSrc FrameTable#12
   w DebrisFace#71.color 0
   w DebrisFace#71.flags 3473412
   w DebrisFace#71.texPic GafFrame#10
   w DebrisFace#71.texKind 1
-  w DebrisFace#71.texPad1 5
+  w DebrisFace#71.texKindHigh1 5
+  w DebrisFace#71.texTeamSrc FrameTable#12
   w DebrisFace#72.color 0
   w DebrisFace#72.flags 655364
   w DebrisFace#72.texPic GafFrame#10
   w DebrisFace#72.texKind 1
-  w DebrisFace#72.texPad1 8
+  w DebrisFace#72.texKindHigh1 8
+  w DebrisFace#72.texTeamSrc FrameTable#12
   w DebrisFace#73.color 0
   w DebrisFace#73.flags 655364
   w DebrisFace#73.texPic GafFrame#10
   w DebrisFace#73.texKind 1
-  w DebrisFace#73.texPad1 8
+  w DebrisFace#73.texKindHigh1 8
+  w DebrisFace#73.texTeamSrc FrameTable#12
   w DebrisFace#74.color 0
   w DebrisFace#74.flags 655364
   w DebrisFace#74.texPic GafFrame#10
   w DebrisFace#74.texKind 1
-  w DebrisFace#74.texPad1 8
+  w DebrisFace#74.texKindHigh1 8
+  w DebrisFace#74.texTeamSrc FrameTable#12
   w DebrisFace#75.color 0
   w DebrisFace#75.flags 655364
   w DebrisFace#75.texPic GafFrame#10
   w DebrisFace#75.texKind 1
-  w DebrisFace#75.texPad1 8
+  w DebrisFace#75.texKindHigh1 8
+  w DebrisFace#75.texTeamSrc FrameTable#12
   w DebrisFace#76.color 0
   w DebrisFace#76.flags 655364
   w DebrisFace#76.texPic GafFrame#10
   w DebrisFace#76.texKind 1
-  w DebrisFace#76.texPad1 8
+  w DebrisFace#76.texKindHigh1 8
+  w DebrisFace#76.texTeamSrc FrameTable#12
   w DebrisFace#77.color 0
   w DebrisFace#77.flags 655364
   w DebrisFace#77.texPic GafFrame#10
   w DebrisFace#77.texKind 1
-  w DebrisFace#77.texPad1 8
+  w DebrisFace#77.texKindHigh1 8
+  w DebrisFace#77.texTeamSrc FrameTable#12
   w DebrisFace#78.color 0
   w DebrisFace#78.flags 3211268
   w DebrisFace#78.texPic GafFrame#10
   w DebrisFace#78.texKind 1
-  w DebrisFace#78.texPad1 32
+  w DebrisFace#78.texKindHigh1 32
+  w DebrisFace#78.texTeamSrc FrameTable#12
   w DebrisFace#79.color 0
   w DebrisFace#79.flags 3211268
   w DebrisFace#79.texPic GafFrame#10
   w DebrisFace#79.texKind 1
-  w DebrisFace#79.texPad1 32
+  w DebrisFace#79.texKindHigh1 32
+  w DebrisFace#79.texTeamSrc FrameTable#12
   w DebrisFace#80.color 0
   w DebrisFace#80.flags 3211268
   w DebrisFace#80.texPic GafFrame#10
   w DebrisFace#80.texKind 1
-  w DebrisFace#80.texPad1 32
+  w DebrisFace#80.texKindHigh1 32
+  w DebrisFace#80.texTeamSrc FrameTable#12
   w DebrisFace#81.color 0
   w DebrisFace#81.flags 3211268
   w DebrisFace#81.texPic GafFrame#10
   w DebrisFace#81.texKind 1
-  w DebrisFace#81.texPad1 32
+  w DebrisFace#81.texKindHigh1 32
+  w DebrisFace#81.texTeamSrc FrameTable#12
   w DebrisFace#82.color 0
   w DebrisFace#82.flags 3211268
   w DebrisFace#82.texPic GafFrame#10
   w DebrisFace#82.texKind 1
-  w DebrisFace#82.texPad1 32
+  w DebrisFace#82.texKindHigh1 32
+  w DebrisFace#82.texTeamSrc FrameTable#12
   w DebrisFace#83.color 0
   w DebrisFace#83.flags 3211268
   w DebrisFace#83.texPic GafFrame#10
   w DebrisFace#83.texKind 1
-  w DebrisFace#83.texPad1 32
+  w DebrisFace#83.texKindHigh1 32
+  w DebrisFace#83.texTeamSrc FrameTable#12
   o result 1
 call 857 Apply
   a event.kind 259
@@ -40537,6 +40579,9 @@ call 964 Apply
   w PieceRec#5.posX 46075254
   w PieceRec#5.posY 2736128
   w PieceRec#5.posZ 18974703
+  d cache 100000 1090
+  d block 872 218 ExplodedSlot#0
+  d block 1090 98910 null
   o result 1
 call 964 Apply
   a event.kind 264
@@ -40614,6 +40659,9 @@ call 964 Apply
   w PieceRec#6.posX 46046542
   w PieceRec#6.posY 2739896
   w PieceRec#6.posZ 18518655
+  d cache 100000 1284
+  d block 1090 194 ExplodedSlot#2
+  d block 1284 98716 null
   o result 1
 call 964 Apply
   a event.kind 264
@@ -41404,549 +41452,549 @@ call 964 Apply
   w DebrisFace#12.flags 0
   w DebrisFace#12.texPic GafFrame#49
   w DebrisFace#12.texKind 0
-  w DebrisFace#12.texPad1 240
-  w DebrisFace#12.texPad2 255
+  w DebrisFace#12.texKindHigh1 240
+  w DebrisFace#12.texKindHigh2 255
   w DebrisFace#13.flags 0
   w DebrisFace#13.texPic GafFrame#49
   w DebrisFace#13.texKind 0
-  w DebrisFace#13.texPad1 240
-  w DebrisFace#13.texPad2 255
+  w DebrisFace#13.texKindHigh1 240
+  w DebrisFace#13.texKindHigh2 255
   w DebrisFace#14.flags 0
   w DebrisFace#14.texPic GafFrame#49
   w DebrisFace#14.texKind 0
-  w DebrisFace#14.texPad1 240
-  w DebrisFace#14.texPad2 255
+  w DebrisFace#14.texKindHigh1 240
+  w DebrisFace#14.texKindHigh2 255
   w DebrisFace#15.flags 0
   w DebrisFace#15.texPic GafFrame#49
   w DebrisFace#15.texKind 0
-  w DebrisFace#15.texPad1 240
-  w DebrisFace#15.texPad2 255
+  w DebrisFace#15.texKindHigh1 240
+  w DebrisFace#15.texKindHigh2 255
   w DebrisFace#16.flags 0
   w DebrisFace#16.texPic GafFrame#49
   w DebrisFace#16.texKind 0
-  w DebrisFace#16.texPad1 240
-  w DebrisFace#16.texPad2 255
+  w DebrisFace#16.texKindHigh1 240
+  w DebrisFace#16.texKindHigh2 255
   w DebrisFace#17.flags 0
   w DebrisFace#17.texPic GafFrame#49
   w DebrisFace#17.texKind 0
-  w DebrisFace#17.texPad1 240
-  w DebrisFace#17.texPad2 255
+  w DebrisFace#17.texKindHigh1 240
+  w DebrisFace#17.texKindHigh2 255
   w DebrisFace#42.flags 991232
   w DebrisFace#42.texPic GafFrame#50
   w DebrisFace#42.texKind 0
-  w DebrisFace#42.texPad0 64
-  w DebrisFace#42.texPad1 6
+  w DebrisFace#42.texKindHigh0 64
+  w DebrisFace#42.texKindHigh1 6
   w DebrisFace#43.flags 991232
   w DebrisFace#43.texPic GafFrame#50
   w DebrisFace#43.texKind 0
-  w DebrisFace#43.texPad0 64
-  w DebrisFace#43.texPad1 6
+  w DebrisFace#43.texKindHigh0 64
+  w DebrisFace#43.texKindHigh1 6
   w DebrisFace#44.flags 991232
   w DebrisFace#44.texPic GafFrame#50
   w DebrisFace#44.texKind 0
-  w DebrisFace#44.texPad0 64
-  w DebrisFace#44.texPad1 6
+  w DebrisFace#44.texKindHigh0 64
+  w DebrisFace#44.texKindHigh1 6
   w DebrisFace#45.flags 991232
   w DebrisFace#45.texPic GafFrame#50
   w DebrisFace#45.texKind 0
-  w DebrisFace#45.texPad0 64
-  w DebrisFace#45.texPad1 6
+  w DebrisFace#45.texKindHigh0 64
+  w DebrisFace#45.texKindHigh1 6
   w DebrisFace#46.flags 991232
   w DebrisFace#46.texPic GafFrame#50
   w DebrisFace#46.texKind 0
-  w DebrisFace#46.texPad0 64
-  w DebrisFace#46.texPad1 6
+  w DebrisFace#46.texKindHigh0 64
+  w DebrisFace#46.texKindHigh1 6
   w DebrisFace#47.flags 991232
   w DebrisFace#47.texPic GafFrame#50
   w DebrisFace#47.texKind 0
-  w DebrisFace#47.texPad0 64
-  w DebrisFace#47.texPad1 6
+  w DebrisFace#47.texKindHigh0 64
+  w DebrisFace#47.texKindHigh1 6
   w DebrisFace#54.color 0
   w DebrisFace#54.flags 8192
   w DebrisFace#54.texPic GafFrame#5
   w DebrisFace#54.texKind 149
-  w DebrisFace#54.texPad0 197
-  w DebrisFace#54.texPad1 8
+  w DebrisFace#54.texKindHigh0 197
+  w DebrisFace#54.texKindHigh1 8
   w DebrisFace#55.color 0
   w DebrisFace#55.flags 8192
   w DebrisFace#55.texPic GafFrame#5
   w DebrisFace#55.texKind 149
-  w DebrisFace#55.texPad0 197
-  w DebrisFace#55.texPad1 8
+  w DebrisFace#55.texKindHigh0 197
+  w DebrisFace#55.texKindHigh1 8
   w DebrisFace#56.color 0
   w DebrisFace#56.flags 8192
   w DebrisFace#56.texPic GafFrame#5
   w DebrisFace#56.texKind 149
-  w DebrisFace#56.texPad0 197
-  w DebrisFace#56.texPad1 8
+  w DebrisFace#56.texKindHigh0 197
+  w DebrisFace#56.texKindHigh1 8
   w DebrisFace#57.color 0
   w DebrisFace#57.flags 8192
   w DebrisFace#57.texPic GafFrame#5
   w DebrisFace#57.texKind 149
-  w DebrisFace#57.texPad0 197
-  w DebrisFace#57.texPad1 8
+  w DebrisFace#57.texKindHigh0 197
+  w DebrisFace#57.texKindHigh1 8
   w DebrisFace#58.color 0
   w DebrisFace#58.flags 8192
   w DebrisFace#58.texPic GafFrame#5
   w DebrisFace#58.texKind 149
-  w DebrisFace#58.texPad0 197
-  w DebrisFace#58.texPad1 8
+  w DebrisFace#58.texKindHigh0 197
+  w DebrisFace#58.texKindHigh1 8
   w DebrisFace#59.color 0
   w DebrisFace#59.flags 8192
   w DebrisFace#59.texPic GafFrame#5
   w DebrisFace#59.texKind 149
-  w DebrisFace#59.texPad0 197
-  w DebrisFace#59.texPad1 8
+  w DebrisFace#59.texKindHigh0 197
+  w DebrisFace#59.texKindHigh1 8
   w DebrisFace#60.color 0
   w DebrisFace#60.flags 4294770696
   w DebrisFace#60.texPic GafFrame#4
   w DebrisFace#60.texKind 0
-  w DebrisFace#60.texPad0 32
-  w DebrisFace#60.texPad1 0
+  w DebrisFace#60.texKindHigh0 32
+  w DebrisFace#60.texKindHigh1 0
   w DebrisFace#61.color 0
   w DebrisFace#61.flags 4294770696
   w DebrisFace#61.texPic GafFrame#4
   w DebrisFace#61.texKind 0
-  w DebrisFace#61.texPad0 32
-  w DebrisFace#61.texPad1 0
+  w DebrisFace#61.texKindHigh0 32
+  w DebrisFace#61.texKindHigh1 0
   w DebrisFace#62.color 0
   w DebrisFace#62.flags 4294770696
   w DebrisFace#62.texPic GafFrame#4
   w DebrisFace#62.texKind 0
-  w DebrisFace#62.texPad0 32
-  w DebrisFace#62.texPad1 0
+  w DebrisFace#62.texKindHigh0 32
+  w DebrisFace#62.texKindHigh1 0
   w DebrisFace#63.color 0
   w DebrisFace#63.flags 4294770696
   w DebrisFace#63.texPic GafFrame#4
   w DebrisFace#63.texKind 0
-  w DebrisFace#63.texPad0 32
-  w DebrisFace#63.texPad1 0
+  w DebrisFace#63.texKindHigh0 32
+  w DebrisFace#63.texKindHigh1 0
   w DebrisFace#64.color 0
   w DebrisFace#64.flags 4294770696
   w DebrisFace#64.texPic GafFrame#4
   w DebrisFace#64.texKind 0
-  w DebrisFace#64.texPad0 32
-  w DebrisFace#64.texPad1 0
+  w DebrisFace#64.texKindHigh0 32
+  w DebrisFace#64.texKindHigh1 0
   w DebrisFace#65.color 0
   w DebrisFace#65.flags 4294770696
   w DebrisFace#65.texPic GafFrame#4
   w DebrisFace#65.texKind 0
-  w DebrisFace#65.texPad0 32
-  w DebrisFace#65.texPad1 0
+  w DebrisFace#65.texKindHigh0 32
+  w DebrisFace#65.texKindHigh1 0
   w DebrisFace#78.flags 213000
   w DebrisFace#78.texPic GafFrame#50
   w DebrisFace#78.texKind 0
-  w DebrisFace#78.texPad0 32
-  w DebrisFace#78.texPad1 0
+  w DebrisFace#78.texKindHigh0 32
+  w DebrisFace#78.texKindHigh1 0
   w DebrisFace#79.flags 213000
   w DebrisFace#79.texPic GafFrame#50
   w DebrisFace#79.texKind 0
-  w DebrisFace#79.texPad0 32
-  w DebrisFace#79.texPad1 0
+  w DebrisFace#79.texKindHigh0 32
+  w DebrisFace#79.texKindHigh1 0
   w DebrisFace#80.flags 213000
   w DebrisFace#80.texPic GafFrame#50
   w DebrisFace#80.texKind 0
-  w DebrisFace#80.texPad0 32
-  w DebrisFace#80.texPad1 0
+  w DebrisFace#80.texKindHigh0 32
+  w DebrisFace#80.texKindHigh1 0
   w DebrisFace#81.flags 213000
   w DebrisFace#81.texPic GafFrame#50
   w DebrisFace#81.texKind 0
-  w DebrisFace#81.texPad0 32
-  w DebrisFace#81.texPad1 0
+  w DebrisFace#81.texKindHigh0 32
+  w DebrisFace#81.texKindHigh1 0
   w DebrisFace#82.flags 213000
   w DebrisFace#82.texPic GafFrame#50
   w DebrisFace#82.texKind 0
-  w DebrisFace#82.texPad0 32
-  w DebrisFace#82.texPad1 0
+  w DebrisFace#82.texKindHigh0 32
+  w DebrisFace#82.texKindHigh1 0
   w DebrisFace#83.flags 213000
   w DebrisFace#83.texPic GafFrame#50
   w DebrisFace#83.texKind 0
-  w DebrisFace#83.texPad0 32
-  w DebrisFace#83.texPad1 0
+  w DebrisFace#83.texKindHigh0 32
+  w DebrisFace#83.texKindHigh1 0
   w DebrisFace#84.color 0
   w DebrisFace#84.flags 4294392424
   w DebrisFace#84.texPic GafFrame#50
   w DebrisFace#84.texKind 13
-  w DebrisFace#84.texPad1 253
-  w DebrisFace#84.texPad2 255
+  w DebrisFace#84.texKindHigh1 253
+  w DebrisFace#84.texKindHigh2 255
   w DebrisFace#85.color 0
   w DebrisFace#85.flags 4294392424
   w DebrisFace#85.texPic GafFrame#50
   w DebrisFace#85.texKind 13
-  w DebrisFace#85.texPad1 253
-  w DebrisFace#85.texPad2 255
+  w DebrisFace#85.texKindHigh1 253
+  w DebrisFace#85.texKindHigh2 255
   w DebrisFace#86.color 0
   w DebrisFace#86.flags 4294392424
   w DebrisFace#86.texPic GafFrame#50
   w DebrisFace#86.texKind 13
-  w DebrisFace#86.texPad1 253
-  w DebrisFace#86.texPad2 255
+  w DebrisFace#86.texKindHigh1 253
+  w DebrisFace#86.texKindHigh2 255
   w DebrisFace#87.color 0
   w DebrisFace#87.flags 4294392424
   w DebrisFace#87.texPic GafFrame#50
   w DebrisFace#87.texKind 13
-  w DebrisFace#87.texPad1 253
-  w DebrisFace#87.texPad2 255
+  w DebrisFace#87.texKindHigh1 253
+  w DebrisFace#87.texKindHigh2 255
   w DebrisFace#88.color 0
   w DebrisFace#88.flags 4294392424
   w DebrisFace#88.texPic GafFrame#50
   w DebrisFace#88.texKind 13
-  w DebrisFace#88.texPad1 253
-  w DebrisFace#88.texPad2 255
+  w DebrisFace#88.texKindHigh1 253
+  w DebrisFace#88.texKindHigh2 255
   w DebrisFace#89.color 0
   w DebrisFace#89.flags 4294392424
   w DebrisFace#89.texPic GafFrame#50
   w DebrisFace#89.texKind 13
-  w DebrisFace#89.texPad1 253
-  w DebrisFace#89.texPad2 255
+  w DebrisFace#89.texKindHigh1 253
+  w DebrisFace#89.texKindHigh2 255
   w DebrisFace#90.color 0
   w DebrisFace#90.flags 4294770696
   w DebrisFace#90.texPic GafFrame#50
-  w DebrisFace#90.texPad0 32
+  w DebrisFace#90.texKindHigh0 32
   w DebrisFace#91.color 0
   w DebrisFace#91.flags 4294770696
   w DebrisFace#91.texPic GafFrame#50
-  w DebrisFace#91.texPad0 32
+  w DebrisFace#91.texKindHigh0 32
   w DebrisFace#92.color 0
   w DebrisFace#92.flags 4294770696
   w DebrisFace#92.texPic GafFrame#50
-  w DebrisFace#92.texPad0 32
+  w DebrisFace#92.texKindHigh0 32
   w DebrisFace#93.color 0
   w DebrisFace#93.flags 4294770696
   w DebrisFace#93.texPic GafFrame#50
-  w DebrisFace#93.texPad0 32
+  w DebrisFace#93.texKindHigh0 32
   w DebrisFace#94.color 0
   w DebrisFace#94.flags 4294770696
   w DebrisFace#94.texPic GafFrame#50
-  w DebrisFace#94.texPad0 32
+  w DebrisFace#94.texKindHigh0 32
   w DebrisFace#95.color 0
   w DebrisFace#95.flags 4294770696
   w DebrisFace#95.texPic GafFrame#50
-  w DebrisFace#95.texPad0 32
+  w DebrisFace#95.texKindHigh0 32
   w DebrisFace#96.color 0
   w DebrisFace#96.flags 573440
   w DebrisFace#96.texPic GafFrame#51
-  w DebrisFace#96.texPad0 64
-  w DebrisFace#96.texPad1 247
-  w DebrisFace#96.texPad2 255
+  w DebrisFace#96.texKindHigh0 64
+  w DebrisFace#96.texKindHigh1 247
+  w DebrisFace#96.texKindHigh2 255
   w DebrisFace#97.color 0
   w DebrisFace#97.flags 573440
   w DebrisFace#97.texPic GafFrame#51
-  w DebrisFace#97.texPad0 64
-  w DebrisFace#97.texPad1 247
-  w DebrisFace#97.texPad2 255
+  w DebrisFace#97.texKindHigh0 64
+  w DebrisFace#97.texKindHigh1 247
+  w DebrisFace#97.texKindHigh2 255
   w DebrisFace#98.color 0
   w DebrisFace#98.flags 573440
   w DebrisFace#98.texPic GafFrame#51
-  w DebrisFace#98.texPad0 64
-  w DebrisFace#98.texPad1 247
-  w DebrisFace#98.texPad2 255
+  w DebrisFace#98.texKindHigh0 64
+  w DebrisFace#98.texKindHigh1 247
+  w DebrisFace#98.texKindHigh2 255
   w DebrisFace#99.color 0
   w DebrisFace#99.flags 573440
   w DebrisFace#99.texPic GafFrame#51
-  w DebrisFace#99.texPad0 64
-  w DebrisFace#99.texPad1 247
-  w DebrisFace#99.texPad2 255
+  w DebrisFace#99.texKindHigh0 64
+  w DebrisFace#99.texKindHigh1 247
+  w DebrisFace#99.texKindHigh2 255
   w DebrisFace#100.color 0
   w DebrisFace#100.flags 573440
   w DebrisFace#100.texPic GafFrame#51
-  w DebrisFace#100.texPad0 64
-  w DebrisFace#100.texPad1 247
-  w DebrisFace#100.texPad2 255
+  w DebrisFace#100.texKindHigh0 64
+  w DebrisFace#100.texKindHigh1 247
+  w DebrisFace#100.texKindHigh2 255
   w DebrisFace#101.color 0
   w DebrisFace#101.flags 573440
   w DebrisFace#101.texPic GafFrame#51
-  w DebrisFace#101.texPad0 64
-  w DebrisFace#101.texPad1 247
-  w DebrisFace#101.texPad2 255
+  w DebrisFace#101.texKindHigh0 64
+  w DebrisFace#101.texKindHigh1 247
+  w DebrisFace#101.texKindHigh2 255
   w DebrisFace#102.color 0
   w DebrisFace#102.flags 991232
   w DebrisFace#102.texPic GafFrame#49
-  w DebrisFace#102.texPad0 128
-  w DebrisFace#102.texPad1 253
-  w DebrisFace#102.texPad2 255
+  w DebrisFace#102.texKindHigh0 128
+  w DebrisFace#102.texKindHigh1 253
+  w DebrisFace#102.texKindHigh2 255
   w DebrisFace#103.color 0
   w DebrisFace#103.flags 991232
   w DebrisFace#103.texPic GafFrame#49
-  w DebrisFace#103.texPad0 128
-  w DebrisFace#103.texPad1 253
-  w DebrisFace#103.texPad2 255
+  w DebrisFace#103.texKindHigh0 128
+  w DebrisFace#103.texKindHigh1 253
+  w DebrisFace#103.texKindHigh2 255
   w DebrisFace#104.color 0
   w DebrisFace#104.flags 991232
   w DebrisFace#104.texPic GafFrame#49
-  w DebrisFace#104.texPad0 128
-  w DebrisFace#104.texPad1 253
-  w DebrisFace#104.texPad2 255
+  w DebrisFace#104.texKindHigh0 128
+  w DebrisFace#104.texKindHigh1 253
+  w DebrisFace#104.texKindHigh2 255
   w DebrisFace#105.color 0
   w DebrisFace#105.flags 991232
   w DebrisFace#105.texPic GafFrame#49
-  w DebrisFace#105.texPad0 128
-  w DebrisFace#105.texPad1 253
-  w DebrisFace#105.texPad2 255
+  w DebrisFace#105.texKindHigh0 128
+  w DebrisFace#105.texKindHigh1 253
+  w DebrisFace#105.texKindHigh2 255
   w DebrisFace#106.color 0
   w DebrisFace#106.flags 991232
   w DebrisFace#106.texPic GafFrame#49
-  w DebrisFace#106.texPad0 128
-  w DebrisFace#106.texPad1 253
-  w DebrisFace#106.texPad2 255
+  w DebrisFace#106.texKindHigh0 128
+  w DebrisFace#106.texKindHigh1 253
+  w DebrisFace#106.texKindHigh2 255
   w DebrisFace#107.color 0
   w DebrisFace#107.flags 991232
   w DebrisFace#107.texPic GafFrame#49
-  w DebrisFace#107.texPad0 128
-  w DebrisFace#107.texPad1 253
-  w DebrisFace#107.texPad2 255
+  w DebrisFace#107.texKindHigh0 128
+  w DebrisFace#107.texKindHigh1 253
+  w DebrisFace#107.texKindHigh2 255
   w DebrisFace#108.color 0
   w DebrisFace#108.flags 411024
   w DebrisFace#108.texPic GafFrame#3
   w DebrisFace#108.texKind 12
-  w DebrisFace#108.texPad0 64
-  w DebrisFace#108.texPad1 3
+  w DebrisFace#108.texKindHigh0 64
+  w DebrisFace#108.texKindHigh1 3
   w DebrisFace#109.color 0
   w DebrisFace#109.flags 411024
   w DebrisFace#109.texPic GafFrame#3
   w DebrisFace#109.texKind 12
-  w DebrisFace#109.texPad0 64
-  w DebrisFace#109.texPad1 3
+  w DebrisFace#109.texKindHigh0 64
+  w DebrisFace#109.texKindHigh1 3
   w DebrisFace#110.color 0
   w DebrisFace#110.flags 411024
   w DebrisFace#110.texPic GafFrame#3
   w DebrisFace#110.texKind 12
-  w DebrisFace#110.texPad0 64
-  w DebrisFace#110.texPad1 3
+  w DebrisFace#110.texKindHigh0 64
+  w DebrisFace#110.texKindHigh1 3
   w DebrisFace#111.color 0
   w DebrisFace#111.flags 411024
   w DebrisFace#111.texPic GafFrame#3
   w DebrisFace#111.texKind 12
-  w DebrisFace#111.texPad0 64
-  w DebrisFace#111.texPad1 3
+  w DebrisFace#111.texKindHigh0 64
+  w DebrisFace#111.texKindHigh1 3
   w DebrisFace#112.color 0
   w DebrisFace#112.flags 411024
   w DebrisFace#112.texPic GafFrame#3
   w DebrisFace#112.texKind 12
-  w DebrisFace#112.texPad0 64
-  w DebrisFace#112.texPad1 3
+  w DebrisFace#112.texKindHigh0 64
+  w DebrisFace#112.texKindHigh1 3
   w DebrisFace#113.color 0
   w DebrisFace#113.flags 411024
   w DebrisFace#113.texPic GafFrame#3
   w DebrisFace#113.texKind 12
-  w DebrisFace#113.texPad0 64
-  w DebrisFace#113.texPad1 3
+  w DebrisFace#113.texKindHigh0 64
+  w DebrisFace#113.texKindHigh1 3
   w DebrisFace#114.color 0
   w DebrisFace#114.flags 1064960
   w DebrisFace#114.texPic GafFrame#4
-  w DebrisFace#114.texPad0 32
+  w DebrisFace#114.texKindHigh0 32
   w DebrisFace#115.color 0
   w DebrisFace#115.flags 1064960
   w DebrisFace#115.texPic GafFrame#4
-  w DebrisFace#115.texPad0 32
+  w DebrisFace#115.texKindHigh0 32
   w DebrisFace#116.color 0
   w DebrisFace#116.flags 1064960
   w DebrisFace#116.texPic GafFrame#4
-  w DebrisFace#116.texPad0 32
+  w DebrisFace#116.texKindHigh0 32
   w DebrisFace#117.color 0
   w DebrisFace#117.flags 1064960
   w DebrisFace#117.texPic GafFrame#4
-  w DebrisFace#117.texPad0 32
+  w DebrisFace#117.texKindHigh0 32
   w DebrisFace#118.color 0
   w DebrisFace#118.flags 1064960
   w DebrisFace#118.texPic GafFrame#4
-  w DebrisFace#118.texPad0 32
+  w DebrisFace#118.texKindHigh0 32
   w DebrisFace#119.color 0
   w DebrisFace#119.flags 1064960
   w DebrisFace#119.texPic GafFrame#4
-  w DebrisFace#119.texPad0 32
+  w DebrisFace#119.texKindHigh0 32
   w DebrisFace#120.color 0
   w DebrisFace#120.flags 4294557696
   w DebrisFace#120.texPic GafFrame#52
-  w DebrisFace#120.texPad0 32
+  w DebrisFace#120.texKindHigh0 32
   w DebrisFace#121.color 0
   w DebrisFace#121.flags 4294557696
   w DebrisFace#121.texPic GafFrame#52
-  w DebrisFace#121.texPad0 32
+  w DebrisFace#121.texKindHigh0 32
   w DebrisFace#122.color 0
   w DebrisFace#122.flags 4294557696
   w DebrisFace#122.texPic GafFrame#52
-  w DebrisFace#122.texPad0 32
+  w DebrisFace#122.texKindHigh0 32
   w DebrisFace#123.color 0
   w DebrisFace#123.flags 4294557696
   w DebrisFace#123.texPic GafFrame#52
-  w DebrisFace#123.texPad0 32
+  w DebrisFace#123.texKindHigh0 32
   w DebrisFace#124.color 0
   w DebrisFace#124.flags 4294557696
   w DebrisFace#124.texPic GafFrame#52
-  w DebrisFace#124.texPad0 32
+  w DebrisFace#124.texKindHigh0 32
   w DebrisFace#125.color 0
   w DebrisFace#125.flags 4294557696
   w DebrisFace#125.texPic GafFrame#52
-  w DebrisFace#125.texPad0 32
+  w DebrisFace#125.texKindHigh0 32
   w DebrisFace#126.color 0
   w DebrisFace#126.flags 8192
   w DebrisFace#126.texPic GafFrame#53
-  w DebrisFace#126.texPad0 128
-  w DebrisFace#126.texPad1 253
-  w DebrisFace#126.texPad2 255
+  w DebrisFace#126.texKindHigh0 128
+  w DebrisFace#126.texKindHigh1 253
+  w DebrisFace#126.texKindHigh2 255
   w DebrisFace#127.color 0
   w DebrisFace#127.flags 8192
   w DebrisFace#127.texPic GafFrame#53
-  w DebrisFace#127.texPad0 128
-  w DebrisFace#127.texPad1 253
-  w DebrisFace#127.texPad2 255
+  w DebrisFace#127.texKindHigh0 128
+  w DebrisFace#127.texKindHigh1 253
+  w DebrisFace#127.texKindHigh2 255
   w DebrisFace#128.color 0
   w DebrisFace#128.flags 8192
   w DebrisFace#128.texPic GafFrame#53
-  w DebrisFace#128.texPad0 128
-  w DebrisFace#128.texPad1 253
-  w DebrisFace#128.texPad2 255
+  w DebrisFace#128.texKindHigh0 128
+  w DebrisFace#128.texKindHigh1 253
+  w DebrisFace#128.texKindHigh2 255
   w DebrisFace#129.color 0
   w DebrisFace#129.flags 8192
   w DebrisFace#129.texPic GafFrame#53
-  w DebrisFace#129.texPad0 128
-  w DebrisFace#129.texPad1 253
-  w DebrisFace#129.texPad2 255
+  w DebrisFace#129.texKindHigh0 128
+  w DebrisFace#129.texKindHigh1 253
+  w DebrisFace#129.texKindHigh2 255
   w DebrisFace#130.color 0
   w DebrisFace#130.flags 8192
   w DebrisFace#130.texPic GafFrame#53
-  w DebrisFace#130.texPad0 128
-  w DebrisFace#130.texPad1 253
-  w DebrisFace#130.texPad2 255
+  w DebrisFace#130.texKindHigh0 128
+  w DebrisFace#130.texKindHigh1 253
+  w DebrisFace#130.texKindHigh2 255
   w DebrisFace#131.color 0
   w DebrisFace#131.flags 8192
   w DebrisFace#131.texPic GafFrame#53
-  w DebrisFace#131.texPad0 128
-  w DebrisFace#131.texPad1 253
-  w DebrisFace#131.texPad2 255
+  w DebrisFace#131.texKindHigh0 128
+  w DebrisFace#131.texKindHigh1 253
+  w DebrisFace#131.texKindHigh2 255
   w DebrisFace#132.color 0
   w DebrisFace#132.flags 991232
   w DebrisFace#132.texPic GafFrame#7
   w DebrisFace#132.texKind 107
-  w DebrisFace#132.texPad0 186
-  w DebrisFace#132.texPad1 249
-  w DebrisFace#132.texPad2 255
+  w DebrisFace#132.texKindHigh0 186
+  w DebrisFace#132.texKindHigh1 249
+  w DebrisFace#132.texKindHigh2 255
   w DebrisFace#133.color 0
   w DebrisFace#133.flags 991232
   w DebrisFace#133.texPic GafFrame#7
   w DebrisFace#133.texKind 107
-  w DebrisFace#133.texPad0 186
-  w DebrisFace#133.texPad1 249
-  w DebrisFace#133.texPad2 255
+  w DebrisFace#133.texKindHigh0 186
+  w DebrisFace#133.texKindHigh1 249
+  w DebrisFace#133.texKindHigh2 255
   w DebrisFace#134.color 0
   w DebrisFace#134.flags 991232
   w DebrisFace#134.texPic GafFrame#7
   w DebrisFace#134.texKind 107
-  w DebrisFace#134.texPad0 186
-  w DebrisFace#134.texPad1 249
-  w DebrisFace#134.texPad2 255
+  w DebrisFace#134.texKindHigh0 186
+  w DebrisFace#134.texKindHigh1 249
+  w DebrisFace#134.texKindHigh2 255
   w DebrisFace#135.color 0
   w DebrisFace#135.flags 991232
   w DebrisFace#135.texPic GafFrame#7
   w DebrisFace#135.texKind 107
-  w DebrisFace#135.texPad0 186
-  w DebrisFace#135.texPad1 249
-  w DebrisFace#135.texPad2 255
+  w DebrisFace#135.texKindHigh0 186
+  w DebrisFace#135.texKindHigh1 249
+  w DebrisFace#135.texKindHigh2 255
   w DebrisFace#136.color 0
   w DebrisFace#136.flags 991232
   w DebrisFace#136.texPic GafFrame#7
   w DebrisFace#136.texKind 107
-  w DebrisFace#136.texPad0 186
-  w DebrisFace#136.texPad1 249
-  w DebrisFace#136.texPad2 255
+  w DebrisFace#136.texKindHigh0 186
+  w DebrisFace#136.texKindHigh1 249
+  w DebrisFace#136.texKindHigh2 255
   w DebrisFace#137.color 0
   w DebrisFace#137.flags 991232
   w DebrisFace#137.texPic GafFrame#7
   w DebrisFace#137.texKind 107
-  w DebrisFace#137.texPad0 186
-  w DebrisFace#137.texPad1 249
-  w DebrisFace#137.texPad2 255
+  w DebrisFace#137.texKindHigh0 186
+  w DebrisFace#137.texKindHigh1 249
+  w DebrisFace#137.texKindHigh2 255
   w DebrisFace#138.color 0
   w DebrisFace#138.flags 4294803456
   w DebrisFace#138.texPic GafFrame#4
-  w DebrisFace#138.texPad0 32
-  w DebrisFace#138.texPad1 15
+  w DebrisFace#138.texKindHigh0 32
+  w DebrisFace#138.texKindHigh1 15
   w DebrisFace#139.color 0
   w DebrisFace#139.flags 4294803456
   w DebrisFace#139.texPic GafFrame#4
-  w DebrisFace#139.texPad0 32
-  w DebrisFace#139.texPad1 15
+  w DebrisFace#139.texKindHigh0 32
+  w DebrisFace#139.texKindHigh1 15
   w DebrisFace#140.color 0
   w DebrisFace#140.flags 4294803456
   w DebrisFace#140.texPic GafFrame#4
-  w DebrisFace#140.texPad0 32
-  w DebrisFace#140.texPad1 15
+  w DebrisFace#140.texKindHigh0 32
+  w DebrisFace#140.texKindHigh1 15
   w DebrisFace#141.color 0
   w DebrisFace#141.flags 4294803456
   w DebrisFace#141.texPic GafFrame#4
-  w DebrisFace#141.texPad0 32
-  w DebrisFace#141.texPad1 15
+  w DebrisFace#141.texKindHigh0 32
+  w DebrisFace#141.texKindHigh1 15
   w DebrisFace#142.color 0
   w DebrisFace#142.flags 4294803456
   w DebrisFace#142.texPic GafFrame#4
-  w DebrisFace#142.texPad0 32
-  w DebrisFace#142.texPad1 15
+  w DebrisFace#142.texKindHigh0 32
+  w DebrisFace#142.texKindHigh1 15
   w DebrisFace#143.color 0
   w DebrisFace#143.flags 4294803456
   w DebrisFace#143.texPic GafFrame#4
-  w DebrisFace#143.texPad0 32
-  w DebrisFace#143.texPad1 15
+  w DebrisFace#143.texKindHigh0 32
+  w DebrisFace#143.texKindHigh1 15
   w DebrisFace#144.color 0
   w DebrisFace#144.flags 327680
   w DebrisFace#144.texPic GafFrame#7
-  w DebrisFace#144.texPad1 251
-  w DebrisFace#144.texPad2 255
+  w DebrisFace#144.texKindHigh1 251
+  w DebrisFace#144.texKindHigh2 255
   w DebrisFace#145.color 0
   w DebrisFace#145.flags 327680
   w DebrisFace#145.texPic GafFrame#7
-  w DebrisFace#145.texPad1 251
-  w DebrisFace#145.texPad2 255
+  w DebrisFace#145.texKindHigh1 251
+  w DebrisFace#145.texKindHigh2 255
   w DebrisFace#146.color 0
   w DebrisFace#146.flags 327680
   w DebrisFace#146.texPic GafFrame#7
-  w DebrisFace#146.texPad1 251
-  w DebrisFace#146.texPad2 255
+  w DebrisFace#146.texKindHigh1 251
+  w DebrisFace#146.texKindHigh2 255
   w DebrisFace#147.color 0
   w DebrisFace#147.flags 327680
   w DebrisFace#147.texPic GafFrame#7
-  w DebrisFace#147.texPad1 251
-  w DebrisFace#147.texPad2 255
+  w DebrisFace#147.texKindHigh1 251
+  w DebrisFace#147.texKindHigh2 255
   w DebrisFace#148.color 0
   w DebrisFace#148.flags 327680
   w DebrisFace#148.texPic GafFrame#7
-  w DebrisFace#148.texPad1 251
-  w DebrisFace#148.texPad2 255
+  w DebrisFace#148.texKindHigh1 251
+  w DebrisFace#148.texKindHigh2 255
   w DebrisFace#149.color 0
   w DebrisFace#149.flags 327680
   w DebrisFace#149.texPic GafFrame#7
-  w DebrisFace#149.texPad1 251
-  w DebrisFace#149.texPad2 255
+  w DebrisFace#149.texKindHigh1 251
+  w DebrisFace#149.texKindHigh2 255
   w DebrisFace#150.color 0
   w DebrisFace#150.flags 1646592
   w DebrisFace#150.texPic GafFrame#4
-  w DebrisFace#150.texPad0 128
-  w DebrisFace#150.texPad1 2
+  w DebrisFace#150.texKindHigh0 128
+  w DebrisFace#150.texKindHigh1 2
   w DebrisFace#151.color 0
   w DebrisFace#151.flags 1646592
   w DebrisFace#151.texPic GafFrame#4
-  w DebrisFace#151.texPad0 128
-  w DebrisFace#151.texPad1 2
+  w DebrisFace#151.texKindHigh0 128
+  w DebrisFace#151.texKindHigh1 2
   w DebrisFace#152.color 0
   w DebrisFace#152.flags 1646592
   w DebrisFace#152.texPic GafFrame#4
-  w DebrisFace#152.texPad0 128
-  w DebrisFace#152.texPad1 2
+  w DebrisFace#152.texKindHigh0 128
+  w DebrisFace#152.texKindHigh1 2
   w DebrisFace#153.color 0
   w DebrisFace#153.flags 1646592
   w DebrisFace#153.texPic GafFrame#4
-  w DebrisFace#153.texPad0 128
-  w DebrisFace#153.texPad1 2
+  w DebrisFace#153.texKindHigh0 128
+  w DebrisFace#153.texKindHigh1 2
   w DebrisFace#154.color 0
   w DebrisFace#154.flags 1646592
   w DebrisFace#154.texPic GafFrame#4
-  w DebrisFace#154.texPad0 128
-  w DebrisFace#154.texPad1 2
+  w DebrisFace#154.texKindHigh0 128
+  w DebrisFace#154.texKindHigh1 2
   w DebrisFace#155.color 0
   w DebrisFace#155.flags 1646592
   w DebrisFace#155.texPic GafFrame#4
-  w DebrisFace#155.texPad0 128
-  w DebrisFace#155.texPad1 2
+  w DebrisFace#155.texKindHigh0 128
+  w DebrisFace#155.texKindHigh1 2
   o result 1
 call 964 Apply
   a event.kind 264
@@ -41999,6 +42047,9 @@ call 964 Apply
   w PieceRec#7.posX 46137344
   w PieceRec#7.posY 1712128
   w PieceRec#7.posZ 19922944
+  d cache 100000 1886
+  d block 1284 602 ExplodedSlot#3
+  d block 1886 98114 null
   o result 1
 call 964 Apply
   a event.kind 259

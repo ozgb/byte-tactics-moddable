@@ -23348,11 +23348,17 @@ call 261 Apply
   r DebrisFace#154.texPic GafFrame#13
   r DebrisFace#155.texPic GafFrame#13
   r DebrisFace#156.texPic GafFrame#14
+  r DebrisFace#156.texTeamSrc FrameTable#14
   r DebrisFace#157.texPic GafFrame#14
+  r DebrisFace#157.texTeamSrc FrameTable#14
   r DebrisFace#158.texPic GafFrame#14
+  r DebrisFace#158.texTeamSrc FrameTable#14
   r DebrisFace#159.texPic GafFrame#14
+  r DebrisFace#159.texTeamSrc FrameTable#14
   r DebrisFace#160.texPic GafFrame#14
+  r DebrisFace#160.texTeamSrc FrameTable#14
   r DebrisFace#161.texPic GafFrame#14
+  r DebrisFace#161.texTeamSrc FrameTable#14
   r DebrisFace#162.texPic GafFrame#15
   r DebrisFace#163.texPic GafFrame#15
   r DebrisFace#164.texPic GafFrame#15
@@ -23432,11 +23438,17 @@ call 261 Apply
   r DebrisFace#238.texPic GafFrame#13
   r DebrisFace#239.texPic GafFrame#13
   r DebrisFace#240.texPic GafFrame#14
+  r DebrisFace#240.texTeamSrc FrameTable#14
   r DebrisFace#241.texPic GafFrame#14
+  r DebrisFace#241.texTeamSrc FrameTable#14
   r DebrisFace#242.texPic GafFrame#14
+  r DebrisFace#242.texTeamSrc FrameTable#14
   r DebrisFace#243.texPic GafFrame#14
+  r DebrisFace#243.texTeamSrc FrameTable#14
   r DebrisFace#244.texPic GafFrame#14
+  r DebrisFace#244.texTeamSrc FrameTable#14
   r DebrisFace#245.texPic GafFrame#14
+  r DebrisFace#245.texTeamSrc FrameTable#14
   r DebrisFace#246.texPic GafFrame#15
   r DebrisFace#247.texPic GafFrame#15
   r DebrisFace#248.texPic GafFrame#15
@@ -23516,11 +23528,17 @@ call 261 Apply
   r DebrisFace#322.texPic GafFrame#13
   r DebrisFace#323.texPic GafFrame#13
   r DebrisFace#324.texPic GafFrame#14
+  r DebrisFace#324.texTeamSrc FrameTable#14
   r DebrisFace#325.texPic GafFrame#14
+  r DebrisFace#325.texTeamSrc FrameTable#14
   r DebrisFace#326.texPic GafFrame#14
+  r DebrisFace#326.texTeamSrc FrameTable#14
   r DebrisFace#327.texPic GafFrame#14
+  r DebrisFace#327.texTeamSrc FrameTable#14
   r DebrisFace#328.texPic GafFrame#14
+  r DebrisFace#328.texTeamSrc FrameTable#14
   r DebrisFace#329.texPic GafFrame#14
+  r DebrisFace#329.texTeamSrc FrameTable#14
   r DebrisFace#330.texPic GafFrame#15
   r DebrisFace#331.texPic GafFrame#15
   r DebrisFace#332.texPic GafFrame#15
@@ -23600,11 +23618,17 @@ call 261 Apply
   r DebrisFace#406.texPic GafFrame#13
   r DebrisFace#407.texPic GafFrame#13
   r DebrisFace#408.texPic GafFrame#14
+  r DebrisFace#408.texTeamSrc FrameTable#14
   r DebrisFace#409.texPic GafFrame#14
+  r DebrisFace#409.texTeamSrc FrameTable#14
   r DebrisFace#410.texPic GafFrame#14
+  r DebrisFace#410.texTeamSrc FrameTable#14
   r DebrisFace#411.texPic GafFrame#14
+  r DebrisFace#411.texTeamSrc FrameTable#14
   r DebrisFace#412.texPic GafFrame#14
+  r DebrisFace#412.texTeamSrc FrameTable#14
   r DebrisFace#413.texPic GafFrame#14
+  r DebrisFace#413.texTeamSrc FrameTable#14
   r DebrisFace#414.texPic GafFrame#22
   r DebrisFace#415.texPic GafFrame#22
   r DebrisFace#416.texPic GafFrame#22
@@ -23738,29 +23762,53 @@ call 261 Apply
   r DebrisFace#544.texPic GafFrame#30
   r DebrisFace#545.texPic GafFrame#30
   r DebrisFace#546.texPic GafFrame#31
+  r DebrisFace#546.texTeamSrc FrameTable#15
   r DebrisFace#547.texPic GafFrame#31
+  r DebrisFace#547.texTeamSrc FrameTable#15
   r DebrisFace#548.texPic GafFrame#31
+  r DebrisFace#548.texTeamSrc FrameTable#15
   r DebrisFace#549.texPic GafFrame#31
+  r DebrisFace#549.texTeamSrc FrameTable#15
   r DebrisFace#550.texPic GafFrame#31
+  r DebrisFace#550.texTeamSrc FrameTable#15
   r DebrisFace#551.texPic GafFrame#31
+  r DebrisFace#551.texTeamSrc FrameTable#15
   r DebrisFace#552.texPic GafFrame#32
+  r DebrisFace#552.texTeamSrc FrameTable#16
   r DebrisFace#553.texPic GafFrame#32
+  r DebrisFace#553.texTeamSrc FrameTable#16
   r DebrisFace#554.texPic GafFrame#32
+  r DebrisFace#554.texTeamSrc FrameTable#16
   r DebrisFace#555.texPic GafFrame#32
+  r DebrisFace#555.texTeamSrc FrameTable#16
   r DebrisFace#556.texPic GafFrame#32
+  r DebrisFace#556.texTeamSrc FrameTable#16
   r DebrisFace#557.texPic GafFrame#32
+  r DebrisFace#557.texTeamSrc FrameTable#16
   r DebrisFace#558.texPic GafFrame#33
+  r DebrisFace#558.texTeamSrc FrameTable#17
   r DebrisFace#559.texPic GafFrame#33
+  r DebrisFace#559.texTeamSrc FrameTable#17
   r DebrisFace#560.texPic GafFrame#33
+  r DebrisFace#560.texTeamSrc FrameTable#17
   r DebrisFace#561.texPic GafFrame#33
+  r DebrisFace#561.texTeamSrc FrameTable#17
   r DebrisFace#562.texPic GafFrame#33
+  r DebrisFace#562.texTeamSrc FrameTable#17
   r DebrisFace#563.texPic GafFrame#33
+  r DebrisFace#563.texTeamSrc FrameTable#17
   r DebrisFace#564.texPic GafFrame#33
+  r DebrisFace#564.texTeamSrc FrameTable#17
   r DebrisFace#565.texPic GafFrame#33
+  r DebrisFace#565.texTeamSrc FrameTable#17
   r DebrisFace#566.texPic GafFrame#33
+  r DebrisFace#566.texTeamSrc FrameTable#17
   r DebrisFace#567.texPic GafFrame#33
+  r DebrisFace#567.texTeamSrc FrameTable#17
   r DebrisFace#568.texPic GafFrame#33
+  r DebrisFace#568.texTeamSrc FrameTable#17
   r DebrisFace#569.texPic GafFrame#33
+  r DebrisFace#569.texTeamSrc FrameTable#17
   r DebrisFace#570.texPic GafFrame#34
   r DebrisFace#571.texPic GafFrame#34
   r DebrisFace#572.texPic GafFrame#34
@@ -23894,11 +23942,17 @@ call 261 Apply
   r DebrisFace#700.texPic GafFrame#37
   r DebrisFace#701.texPic GafFrame#37
   r DebrisFace#702.texPic GafFrame#38
+  r DebrisFace#702.texTeamSrc FrameTable#18
   r DebrisFace#703.texPic GafFrame#38
+  r DebrisFace#703.texTeamSrc FrameTable#18
   r DebrisFace#704.texPic GafFrame#38
+  r DebrisFace#704.texTeamSrc FrameTable#18
   r DebrisFace#705.texPic GafFrame#38
+  r DebrisFace#705.texTeamSrc FrameTable#18
   r DebrisFace#706.texPic GafFrame#38
+  r DebrisFace#706.texTeamSrc FrameTable#18
   r DebrisFace#707.texPic GafFrame#38
+  r DebrisFace#707.texTeamSrc FrameTable#18
   r DebrisFace#708.texPic GafFrame#39
   r DebrisFace#709.texPic GafFrame#39
   r DebrisFace#710.texPic GafFrame#39
@@ -23966,41 +24020,77 @@ call 261 Apply
   r DebrisFace#772.texPic GafFrame#40
   r DebrisFace#773.texPic GafFrame#40
   r DebrisFace#774.texPic GafFrame#42
+  r DebrisFace#774.texTeamSrc FrameTable#19
   r DebrisFace#775.texPic GafFrame#42
+  r DebrisFace#775.texTeamSrc FrameTable#19
   r DebrisFace#776.texPic GafFrame#42
+  r DebrisFace#776.texTeamSrc FrameTable#19
   r DebrisFace#777.texPic GafFrame#42
+  r DebrisFace#777.texTeamSrc FrameTable#19
   r DebrisFace#778.texPic GafFrame#42
+  r DebrisFace#778.texTeamSrc FrameTable#19
   r DebrisFace#779.texPic GafFrame#42
+  r DebrisFace#779.texTeamSrc FrameTable#19
   r DebrisFace#780.texPic GafFrame#42
+  r DebrisFace#780.texTeamSrc FrameTable#19
   r DebrisFace#781.texPic GafFrame#42
+  r DebrisFace#781.texTeamSrc FrameTable#19
   r DebrisFace#782.texPic GafFrame#42
+  r DebrisFace#782.texTeamSrc FrameTable#19
   r DebrisFace#783.texPic GafFrame#42
+  r DebrisFace#783.texTeamSrc FrameTable#19
   r DebrisFace#784.texPic GafFrame#42
+  r DebrisFace#784.texTeamSrc FrameTable#19
   r DebrisFace#785.texPic GafFrame#42
+  r DebrisFace#785.texTeamSrc FrameTable#19
   r DebrisFace#786.texPic GafFrame#42
+  r DebrisFace#786.texTeamSrc FrameTable#19
   r DebrisFace#787.texPic GafFrame#42
+  r DebrisFace#787.texTeamSrc FrameTable#19
   r DebrisFace#788.texPic GafFrame#42
+  r DebrisFace#788.texTeamSrc FrameTable#19
   r DebrisFace#789.texPic GafFrame#42
+  r DebrisFace#789.texTeamSrc FrameTable#19
   r DebrisFace#790.texPic GafFrame#42
+  r DebrisFace#790.texTeamSrc FrameTable#19
   r DebrisFace#791.texPic GafFrame#42
+  r DebrisFace#791.texTeamSrc FrameTable#19
   r DebrisFace#792.texPic GafFrame#42
+  r DebrisFace#792.texTeamSrc FrameTable#19
   r DebrisFace#793.texPic GafFrame#42
+  r DebrisFace#793.texTeamSrc FrameTable#19
   r DebrisFace#794.texPic GafFrame#42
+  r DebrisFace#794.texTeamSrc FrameTable#19
   r DebrisFace#795.texPic GafFrame#42
+  r DebrisFace#795.texTeamSrc FrameTable#19
   r DebrisFace#796.texPic GafFrame#42
+  r DebrisFace#796.texTeamSrc FrameTable#19
   r DebrisFace#797.texPic GafFrame#42
+  r DebrisFace#797.texTeamSrc FrameTable#19
   r DebrisFace#798.texPic GafFrame#42
+  r DebrisFace#798.texTeamSrc FrameTable#19
   r DebrisFace#799.texPic GafFrame#42
+  r DebrisFace#799.texTeamSrc FrameTable#19
   r DebrisFace#800.texPic GafFrame#42
+  r DebrisFace#800.texTeamSrc FrameTable#19
   r DebrisFace#801.texPic GafFrame#42
+  r DebrisFace#801.texTeamSrc FrameTable#19
   r DebrisFace#802.texPic GafFrame#42
+  r DebrisFace#802.texTeamSrc FrameTable#19
   r DebrisFace#803.texPic GafFrame#42
+  r DebrisFace#803.texTeamSrc FrameTable#19
   r DebrisFace#804.texPic GafFrame#42
+  r DebrisFace#804.texTeamSrc FrameTable#19
   r DebrisFace#805.texPic GafFrame#42
+  r DebrisFace#805.texTeamSrc FrameTable#19
   r DebrisFace#806.texPic GafFrame#42
+  r DebrisFace#806.texTeamSrc FrameTable#19
   r DebrisFace#807.texPic GafFrame#42
+  r DebrisFace#807.texTeamSrc FrameTable#19
   r DebrisFace#808.texPic GafFrame#42
+  r DebrisFace#808.texTeamSrc FrameTable#19
   r DebrisFace#809.texPic GafFrame#42
+  r DebrisFace#809.texTeamSrc FrameTable#19
   r DebrisFace#810.texPic GafFrame#43
   r DebrisFace#811.texPic GafFrame#43
   r DebrisFace#812.texPic GafFrame#43
@@ -24377,9 +24467,9 @@ call 261 Apply
   r DebrisFace#0+649.flags 0*6 4293984256*6 491520*6 425984*6 1228800*6 327680*6 671736*6 4294475776*6 819200*6 16384*6 163840*6 425984*6 409600*6 262136*6 1835040*6 4128832*6 4718656*6 1179656*6 1638424*6 3670072*6 1638424*6 1179656*6 1835040*6 2359328*6 262144*6 3211304*6 2359332*6 393216*6 2424864*6 3670064*6 655368*6 56*6 393216*6 3211304*6 2883624*6 29544*6 65536*6 3670064*6 262144*6 3211304*6 2359332*6 393216*6 2424864*6 3670064*6 655368*6 56*6 393216*6 3211304*6 2883624*6 29544*6 65536*6 3670064*6 262144*6 3211304*6 2359332*6 393216*6 2424864*6 3670064*6 655368*6 56*6 393216*6 3211304*6 2883624*6 29544*6 65536*6 3670064*6 262144*6 3211304*6 2359332*6 6357080*6 3342384*6 6583648*6 0*6 1225520*6 288352*6 668464*6 4294338144*6 1225520*18 0*6 4294678936*6 4294698592*6 720896*6 4294534760*6 308016*6 4293741768*6 288352*6 4294121880*6 4294698592*6 0*6 1225524*6 4294698596*6 4*6 4294678940*6 917512*6 1900560*6 2424864*6 1376288*6 3473456*6 3604536*6 2752552*6 1572888*6 3604536*6 917512*6 3473456*6 2424864*6 2752552*6 3604536
   r DebrisFace#649+1151.flags 3604536*5 2949160*6 1703960*6 32*6 2424864*6 3211304*6 2949160*6 1703960*6 0*6 4*6 0*6 2231510872*6 8421504*6 4668280*6 3631880*6 725760*6 4678488*6 3363664*6 9145224*6 14900024*6 3083008*6 4026532868*6 4*6 722708*6 461580*6 2828*6 986892*6 6245160*6 2035464*6 9923368*6 1772288*6 8338272*6 1245184*6 1799976*6 3840*6 2097176*6 1245208*6 1769488*6 393216*6 131072*6 49144*6 49152*6 1245208*6 1769488*6 393216*6 2687016*6 2097176*6 0*6 4293984256*6 491520*6 425984*6 1228800*6 327680*6 671736*6 4294475776*6 819200*6 16384*6 163840*6 425984*6 409600*6 262136*6 0*6 4293984256*6 491520*6 425984*6 1228800*6 327680*6 671736*6 4294475776*6 819200*6 16384*6 163840*6 425984*6 409600*6 262136*6 0*6 4293984256*6 491520*6 425984*6 1228800*6 327680*6 671736*6 4294475776*6 819200*6 16384*6 163840*6 425984*6 409600*6 262136*6 1*618
   r DebrisFace#0+1800.texKind 0*12 255*6 0*66 30*6 65*6 70*6 1*6 25*6 52*6 25*6 1*6 30*6 37*6 4*6 52*6 1*6 12*6 35*6 57*6 7*6 9*6 12*6 52*6 44*6 5*6 27*6 57*6 4*6 52*6 1*6 12*6 35*6 57*6 7*6 9*6 12*6 52*6 44*6 5*6 27*6 57*6 4*6 52*6 1*6 12*6 35*6 57*6 7*6 9*6 12*6 52*6 44*6 5*6 27*6 57*6 4*6 52*6 1*6 95*6 46*6 76*6 1*6 204*6 0*6 154*12 206*6 51*6 0*6 51*6 0*6 102*6 204*6 51*6 154*6 51*12 102*6 51*6 152*6 1*24 12*6 50*6 47*6 31*6 10*6 41*6 18*6 23*6 41*6 12*6 10*6 47*6 18*6 9*6 43*6 25*6 31*6 40*6 52*6 43*6 25*6 0*6 1*6 0*12 128*6 155*6 19*6 0*6 107*6 119*6 171*6 103*6 7*6 1*36 83*6 19*6 83*6 0*6 143*6 19*6 67*6 15*6 31*6 23*6 21*6 10*6 2*6 42*6 1*6 23*6 21*6 10*6 2*6 31*6 0*12 255*6 0*78 255*6 0*78 255*6 0*684
-  r DebrisFace#0+1800.texPad0 0*12 255*6 192*6 128*6 64*6 128*6 64*6 128*12 64*6 128*12 0*348 111*6 64*6 204*6 0*6 153*12 204*6 179*6 0*6 179*6 0*6 230*6 76*6 179*6 153*6 179*12 102*6 179*6 25*6 230*6 25*6 230*6 25*6 0*156 91*6 139*6 39*6 135*6 119*6 171*6 127*6 23*6 50*6 0*6 15*6 31*6 19*6 43*6 119*6 27*6 143*6 27*6 99*6 0*6 151*6 39*6 0*30 204*6 64*6 0*42 255*6 192*6 128*6 64*6 128*6 64*6 128*12 64*6 128*12 0*18 255*6 192*6 128*6 64*6 128*6 64*6 128*12 64*6 128*12 0*18 255*6 192*6 128*6 64*6 128*6 64*6 128*12 64*6 128*12 0*624
-  r DebrisFace#0+1800.texPad1 232*6 5*6 3*6 18*6 2*6 0*6 253*6 0*6 7*6 248*6 0*6 12*6 7*6 241*6 29*6 62*6 74*6 2*6 24*6 53*6 24*6 2*6 29*6 39*6 6*6 53*6 30*6 14*6 36*6 13*6 17*6 16*6 14*6 53*6 42*6 9*6 29*6 13*6 6*6 53*6 30*6 14*6 36*6 13*6 17*6 16*6 14*6 53*6 42*6 9*6 29*6 13*6 6*6 53*6 30*6 14*6 36*6 13*6 17*6 16*6 14*6 53*6 42*6 9*6 29*6 13*6 6*6 53*6 30*6 92*6 45*6 103*6 238*6 5*6 0*6 251*12 250*6 4*6 0*6 4*6 0*6 9*6 25*6 18*6 251*6 18*12 4*6 18*6 9*6 251*6 246*6 251*6 34*6 8*12 49*6 33*6 54*6 38*6 14*6 20*6 38*6 8*6 54*6 49*6 14*6 10*6 47*6 24*6 0*6 41*6 48*6 47*6 24*6 0*24 128*6 99*6 79*6 23*6 103*6 87*6 171*6 255*6 99*6 0*12 23*6 19*6 0*6 43*6 139*6 47*6 179*6 55*6 159*6 43*12 0*6 35*6 17*6 27*6 9*6 1*6 255*12 17*6 27*6 9*6 1*6 35*6 232*6 5*6 3*6 18*6 2*6 0*6 253*6 0*6 7*6 248*6 0*6 12*6 7*6 241*6 232*6 5*6 3*6 18*6 2*6 0*6 253*6 0*6 7*6 248*6 0*6 12*6 7*6 241*6 232*6 5*6 3*6 18*6 2*6 0*6 253*6 0*6 7*6 248*6 0*6 12*6 7*6 241*6 0*618
-  r DebrisFace#0+1800.texPad2 255*6 0*30 255*6 0*12 255*6 0*18 255*6 0*342 111*6 255*6 0*12 255*18 0*42 255*6 0*30 255*18 0*150 56*6 0*168 255*12 0*30 255*6 0*30 255*6 0*12 255*6 0*18 255*12 0*30 255*6 0*12 255*6 0*18 255*12 0*30 255*6 0*12 255*6 0*18 255*6 0*618
+  r DebrisFace#0+1800.texKindHigh0 0*12 255*6 192*6 128*6 64*6 128*6 64*6 128*12 64*6 128*12 0*348 111*6 64*6 204*6 0*6 153*12 204*6 179*6 0*6 179*6 0*6 230*6 76*6 179*6 153*6 179*12 102*6 179*6 25*6 230*6 25*6 230*6 25*6 0*156 91*6 139*6 39*6 135*6 119*6 171*6 127*6 23*6 50*6 0*6 15*6 31*6 19*6 43*6 119*6 27*6 143*6 27*6 99*6 0*6 151*6 39*6 0*30 204*6 64*6 0*42 255*6 192*6 128*6 64*6 128*6 64*6 128*12 64*6 128*12 0*18 255*6 192*6 128*6 64*6 128*6 64*6 128*12 64*6 128*12 0*18 255*6 192*6 128*6 64*6 128*6 64*6 128*12 64*6 128*12 0*624
+  r DebrisFace#0+1800.texKindHigh1 232*6 5*6 3*6 18*6 2*6 0*6 253*6 0*6 7*6 248*6 0*6 12*6 7*6 241*6 29*6 62*6 74*6 2*6 24*6 53*6 24*6 2*6 29*6 39*6 6*6 53*6 30*6 14*6 36*6 13*6 17*6 16*6 14*6 53*6 42*6 9*6 29*6 13*6 6*6 53*6 30*6 14*6 36*6 13*6 17*6 16*6 14*6 53*6 42*6 9*6 29*6 13*6 6*6 53*6 30*6 14*6 36*6 13*6 17*6 16*6 14*6 53*6 42*6 9*6 29*6 13*6 6*6 53*6 30*6 92*6 45*6 103*6 238*6 5*6 0*6 251*12 250*6 4*6 0*6 4*6 0*6 9*6 25*6 18*6 251*6 18*12 4*6 18*6 9*6 251*6 246*6 251*6 34*6 8*12 49*6 33*6 54*6 38*6 14*6 20*6 38*6 8*6 54*6 49*6 14*6 10*6 47*6 24*6 0*6 41*6 48*6 47*6 24*6 0*24 128*6 99*6 79*6 23*6 103*6 87*6 171*6 255*6 99*6 0*12 23*6 19*6 0*6 43*6 139*6 47*6 179*6 55*6 159*6 43*12 0*6 35*6 17*6 27*6 9*6 1*6 255*12 17*6 27*6 9*6 1*6 35*6 232*6 5*6 3*6 18*6 2*6 0*6 253*6 0*6 7*6 248*6 0*6 12*6 7*6 241*6 232*6 5*6 3*6 18*6 2*6 0*6 253*6 0*6 7*6 248*6 0*6 12*6 7*6 241*6 232*6 5*6 3*6 18*6 2*6 0*6 253*6 0*6 7*6 248*6 0*6 12*6 7*6 241*6 0*618
+  r DebrisFace#0+1800.texKindHigh2 255*6 0*30 255*6 0*12 255*6 0*18 255*6 0*342 111*6 255*6 0*12 255*18 0*42 255*6 0*30 255*18 0*150 56*6 0*168 255*12 0*30 255*6 0*30 255*6 0*12 255*6 0*18 255*12 0*30 255*6 0*12 255*6 0*18 255*12 0*30 255*6 0*12 255*6 0*18 255*6 0*618
   a event.kind 265
   a event.unit null
   a event.weapon 245

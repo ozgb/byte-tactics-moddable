@@ -18714,9 +18714,9 @@ call 1640 Apply
   r DebrisFace#0+1800.color 200*1800
   r DebrisFace#0+1800.flags 1*1800
   r DebrisFace#0+1800.texKind 0*1800
-  r DebrisFace#0+1800.texPad0 0*1800
-  r DebrisFace#0+1800.texPad1 0*1800
-  r DebrisFace#0+1800.texPad2 0*1800
+  r DebrisFace#0+1800.texKindHigh0 0*1800
+  r DebrisFace#0+1800.texKindHigh1 0*1800
+  r DebrisFace#0+1800.texKindHigh2 0*1800
   a event.kind 263
   a event.unit null
   a event.callback Unit#3.weapons[0].aimCob

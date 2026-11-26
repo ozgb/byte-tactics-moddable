@@ -18,6 +18,7 @@ struct ReplayArg {
 
 struct ReplayImport;
 void ReplayImportEnd(ReplayImport& call);
+void ReplayImportBegin(ReplayImport& call);
 void ReplayFail(const char* message);
 
 typedef bool (*ReplayAnswerFn)(ReplayImport& call);
@@ -30,6 +31,7 @@ struct ReplayGate {
     bool busy;
     ReplayAnswerFn answer;
     ReplayEndFn end;
+    ReplayEndFn begin;
 };
 
 ReplayGate& ReplayGateRef();
@@ -64,6 +66,11 @@ inline ReplayEndFn& ReplayEndHook()
     return ReplayGateRef().end;
 }
 
+inline ReplayEndFn& ReplayBeginHook()
+{
+    return ReplayGateRef().begin;
+}
+
 inline bool ReplayOwned()
 {
     return ReplayCalls() != 0 && ReplayOwner() == host_thread_id();
@@ -73,6 +80,8 @@ struct ReplayImport {
     explicit ReplayImport(int id) : id(id), active(ReplayOwned()), answering(ReplayAnswerHook() != nullptr && !ReplayAnswerBusy()), nested(false), count(0)
     {
         result.kind = -1;
+        if (active && ReplayBeginHook() != nullptr)
+            ReplayBeginHook()(*this);
         if (active)
             ReplayCalls() = 0;
     }

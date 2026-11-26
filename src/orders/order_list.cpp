@@ -316,10 +316,14 @@ static inline MissionType MissionTypeOf(unsigned char k)
     return m;
 }
 
+#ifndef BT_REPLAY_INJECT_CREATED_SHIFT
+#define BT_REPLAY_INJECT_CREATED_SHIFT 0
+#endif
+
 // FUNCTION: 0x43a0c0
 Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
     : kind(MissionTypeOf(k)), start(Point16FromShorts(0, 0)), cached(Point16FromShorts(0, 0)),
-      id(a), count(b), progress(c), created((unsigned int)g_game->ticks)
+      id(a), count(b), progress(c), created((unsigned int)g_game->ticks + BT_REPLAY_INJECT_CREATED_SHIFT)
 {
     g_seams.units->UnitRefInit((UnitRef*)&link, o, nullptr);
     g_seams.units->UnitRefSetValue((UnitRef*)&link, this);
@@ -773,6 +777,10 @@ static void ClearAllWeaponTargets(Unit* unit)
         TargetingPublishClear(SCHED_ORDERS, unit, i);
 }
 
+#ifndef BT_REPLAY_INJECT_STATE_STEP
+#define BT_REPLAY_INJECT_STATE_STEP 1
+#endif
+
 // FUNCTION: 0x43b7c0
 void __stdcall RunOrders(Unit* unit)
 {
@@ -798,7 +806,7 @@ void __stdcall RunOrders(Unit* unit)
             DelayOrderWake(node, 0xf);
             break;
         case 1:
-            node->state++;
+            node->state += BT_REPLAY_INJECT_STATE_STEP;
             break;
         case 0:
             node->state = 0;

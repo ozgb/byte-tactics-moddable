@@ -229,21 +229,6 @@ ConstructedElement::~ConstructedElement()
 {
 }
 
-int __stdcall StopOrder(Unit*, Order*, int)
-{
-    return 1;
-}
-
-int __stdcall MakeSelectableOrder(Unit*, Order*, int)
-{
-    return 2;
-}
-
-int __stdcall WaitOrder(Unit*, Order*, int)
-{
-    return 3;
-}
-
 int __stdcall FixtureOtherNotify(Unit*, Order*, int)
 {
     return 4;
@@ -333,6 +318,7 @@ char* g_lines[MAX_LINES];
 int g_lineCount;
 char g_subsystem[48];
 bool g_importChanges;
+bool g_forgetAllocations;
 const char* g_file = "";
 
 int g_callIndex;
@@ -345,6 +331,9 @@ char g_firstKey[96];
 ReplayText g_detail;
 const char* g_outNames[MAX_OUTS];
 const char* g_outValues[MAX_OUTS];
+const char* g_beforeNames[MAX_OUTS];
+const char* g_beforeValues[MAX_OUTS];
+int g_beforeCount;
 int g_outCount;
 unsigned g_hash;
 int g_importsTotal;
@@ -746,6 +735,7 @@ const char* Enter(const ReplayText& actual)
     int index = g_importIndex++;
     g_importsTotal++;
     g_outCount = 0;
+    g_beforeCount = 0;
     g_cbCount = 0;
     g_cbImportIndex = index;
     char key[96];
@@ -767,7 +757,19 @@ const char* Enter(const ReplayText& actual)
         g_cbLines[g_cbCount++] = g_lines[g_cursor] + 6;
         g_cursor++;
     }
-    while (g_cursor < g_callEnd && strncmp(g_lines[g_cursor], "  o ", 4) == 0 && !ClosingLine(g_lines[g_cursor])) {
+    while (g_cursor < g_callEnd && ((strncmp(g_lines[g_cursor], "  o ", 4) == 0 && !ClosingLine(g_lines[g_cursor])) || strncmp(g_lines[g_cursor], "  b ", 4) == 0)) {
+        if (g_lines[g_cursor][2] == 'b') {
+            char* name = g_lines[g_cursor] + 4;
+            char* sp = strchr(name, ' ');
+            if (sp != nullptr && g_beforeCount < MAX_OUTS) {
+                *sp = '\0';
+                g_beforeNames[g_beforeCount] = name;
+                g_beforeValues[g_beforeCount] = sp + 1;
+                g_beforeCount++;
+            }
+            g_cursor++;
+            continue;
+        }
         if (g_outCount < MAX_OUTS) {
             char* name = g_lines[g_cursor] + 4;
             char* sp = strchr(name, ' ');
@@ -1450,6 +1452,8 @@ void* AllocAnswer(const char* result, unsigned size)
     if (strcmp(result, "null") == 0)
         return nullptr;
     void* p = SimAlloc(size);
+    if (g_forgetAllocations)
+        g_objects.Forget(p);
     const char* hash = strchr(result, '#');
     int kind = hash == nullptr ? -1 : ReplayFindObjectKind(result, (unsigned)(hash - result));
     if (kind >= 0 && hash[1] != '?')
@@ -2738,11 +2742,37 @@ const char* ImportObjectProblem(const char* name, const ReplaySlotSets& sets)
     LineKey k;
     if (!ParseLineKey(name, k) || k.field == nullptr)
         return "an object line after an import that names no object field";
-    if (!InObjectSet(sets.objReads, sets.objReadCount, k.field))
-        return "an object line after an import whose field the slot does not read";
-    if (InObjectSet(sets.objWrites, sets.objWriteCount, k.field))
-        return "an object line after an import whose field the slot writes, which its w lines compare";
+    if (!InObjectSet(sets.objReads, sets.objReadCount, k.field) && !InObjectSet(sets.objWrites, sets.objWriteCount, k.field))
+        return "an object line after an import whose field the slot neither reads nor writes";
     return nullptr;
+}
+
+const char* BeforeValue(const char* name)
+{
+    for (int i = 0; i < g_beforeCount; i++) {
+        if (strcmp(g_beforeNames[i], name) == 0)
+            return g_beforeValues[i];
+    }
+    return g_known.Get(name);
+}
+
+void CompareBeforeImport(const char* name)
+{
+    LineKey k;
+    if (!ParseLineKey(name, k) || k.vectorElement || k.refsElement || k.field == nullptr || !InObjectSet(g_sets->objWrites, g_sets->objWriteCount, k.field))
+        return;
+    const ReplayObjectField& f = *k.field;
+    if (f.kind == RK_ARRAY || f.kind == RK_BLOB || f.kind == RK_VECTOR || f.kind == RK_REFS || f.kind == RK_CSTRINGS)
+        return;
+    const char* expected = BeforeValue(name);
+    void* p = ReplayResolveObject(k.object, nullptr, g_objects, AllocObject);
+    if (expected == nullptr || p == nullptr || !ReplayFieldLive(f, p))
+        return;
+    ReplayText value;
+    ReplayFormatObjectField(f, p, g_objects, false, value);
+    if (strcmp(expected, value.Data()) != 0)
+        Diff(name, expected, value.Data());
+    value.Free();
 }
 
 void RestoreImportObject(const char* name, const char* value)
@@ -2752,6 +2782,7 @@ void RestoreImportObject(const char* name, const char* value)
     const char* problem = ImportObjectProblem(name, *g_sets);
     if (problem != nullptr)
         Fatal(g_file, g_callIndex, problem, name);
+    CompareBeforeImport(name);
     RestoreObjectLine(name, value, g_file, g_sets, name);
 }
 
@@ -3232,6 +3263,7 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
     if (known == nullptr)
         Fatal(file, 0, "not a simulation subsystem", g_subsystem);
     g_importChanges = known->recordsImportChanges != 0;
+    g_forgetAllocations = known->forgetsAllocations != 0;
     if (tail[0] != '\0' || !known->complete)
         Fatal(file, 0, "the annotations of this subsystem are not complete, so its recordings cannot be replayed", g_subsystem);
     char want[32];
@@ -6036,6 +6068,8 @@ void PolymorphicSelfTest()
     Order* second = (Order*)SimAlloc(sizeof(Order));
     memset((void*)first, 0, sizeof(Order));
     memset((void*)second, 0, sizeof(Order));
+    SetVtable(first, ReplayVtable(ROK_ORDER));
+    SetVtable(second, ReplayVtable(ROK_ORDER));
     SetVtable(&first->link, ReplayVtable(ROK_PATHORDERATTACH));
     SetVtable(&second->link, ReplayVtable(ROK_PATHORDERATTACH));
     ApproachRadius* area = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));
@@ -6343,10 +6377,32 @@ void GoalSelfTest()
     Check(unparsed != nullptr && strstr(unparsed, "names no object field") != nullptr, "a line that names no field of the kind is fatal");
     ReplaySlotSets ticksOnly = { "ticks", 0, nullptr, 0, nullptr, 0, goalReads, 1, nullptr, 0 };
     const char* unread = ImportObjectProblem("FixtureGoalA#1.heading", ticksOnly);
-    Check(unread != nullptr && strstr(unread, "does not read") != nullptr, "so is a line for a field the slot does not read");
-    const char* written = ImportObjectProblem("FixtureGoalA#1.heading", goalSets);
-    Check(written != nullptr && strstr(written, "the slot writes") != nullptr, "and a line for a field the slot writes, so the slot's own result is always compared");
+    Check(unread != nullptr && strstr(unread, "neither reads nor writes") != nullptr, "so is a line for a field the slot neither reads nor writes");
+    Check(ImportObjectProblem("FixtureGoalA#1.heading", goalSets) == nullptr, "a line for a field the slot writes is one it can place too: the import changed it, and the w lines compare what the slot writes after");
     Check(changed != nullptr && changed->heading == 0, "none of which changes the object");
+
+    printf("a written field that an import changes\n");
+    g_known.Set("FixtureGoalA#1.heading", "5");
+    changed->heading = 5;
+    LoadCall("  i fixture.MakeGoal = FixtureGoalA#1\n  o FixtureGoalA#1.heading 7\n");
+    BeginImport();
+    Imp_fixture_MakeGoal();
+    Check(g_diffs == 0 && changed->heading == 7, "the module's value before the import is the last known one, and the line sets the import's");
+    changed->heading = 4;
+    LoadCall("  i fixture.MakeGoal = FixtureGoalA#1\n  o FixtureGoalA#1.heading 9\n");
+    BeginImport();
+    Imp_fixture_MakeGoal();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureGoalA#1.heading") == 0 && changed->heading == 9, "a wrong write that the import overwrites is a difference");
+    changed->heading = 6;
+    LoadCall("  i fixture.MakeGoal = FixtureGoalA#1\n  b FixtureGoalA#1.heading 6\n  o FixtureGoalA#1.heading 8\n");
+    BeginImport();
+    Imp_fixture_MakeGoal();
+    Check(g_diffs == 0 && changed->heading == 8, "a b line gives the value the slot wrote in the call before the import");
+    changed->heading = 3;
+    LoadCall("  i fixture.MakeGoal = FixtureGoalA#1\n  b FixtureGoalA#1.heading 6\n  o FixtureGoalA#1.heading 8\n");
+    BeginImport();
+    Imp_fixture_MakeGoal();
+    Check(g_diffs == 1 && strcmp(g_firstKey, "FixtureGoalA#1.heading") == 0, "and a module that wrote another value differs from it");
     g_importChanges = outerImportChanges;
     g_sets = outerSets;
 }

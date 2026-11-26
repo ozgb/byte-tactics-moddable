@@ -310,6 +310,13 @@ unsigned s_beforeUsed;
 bool s_beforeTaken;
 ReplayReach s_beforeReach;
 ReplayKnown s_beforeKnown;
+struct CallBlock {
+    const unsigned char* first;
+    unsigned bytes;
+};
+CallBlock* s_callBlocks;
+unsigned s_callBlockCount;
+unsigned s_callBlockCapacity;
 
 unsigned BeforeHash(const void* object, unsigned field)
 {
@@ -321,7 +328,7 @@ bool WrittenFieldSaved(const ReplayObjectField& f)
     return f.kind != RK_EMBED && f.kind != RK_EMBEDS && f.kind != RK_UNITID && f.kind != RK_SELF;
 }
 
-void ImportBefore()
+void ImportBefore(const ReplayRoots* extra)
 {
     s_beforeTaken = false;
     if (!s_recording || !kReplaySubsystems[s_sub].recordsImportChanges)
@@ -332,6 +339,8 @@ void ImportBefore()
         return;
     ReplayRoots roots;
     AddLiveRoots(roots, s_roots);
+    if (extra != nullptr)
+        AddLiveRoots(roots, *extra);
     ReplayWalk(s_beforeReach, r.table, false, sets, roots.kind, roots.object, roots.count);
     memset(s_beforeSlots, 0xff, sizeof s_beforeSlots);
     s_beforeCount = 0;
@@ -361,15 +370,74 @@ void ImportBefore()
     s_beforeTaken = true;
 }
 
-bool ChangedSinceBefore(const unsigned char* object, unsigned field)
+void CallAllocated(const void* p, unsigned bytes)
 {
-    const ReplayObjectField& f = kReplayObjectFields[field];
+    if (s_callBlocks == nullptr || s_callBlockCount == s_callBlockCapacity) {
+        unsigned wanted = s_callBlockCapacity == 0 ? 64 : s_callBlockCapacity * 2;
+        CallBlock* grown = (CallBlock*)realloc(s_callBlocks, wanted * sizeof(CallBlock));
+        if (grown == nullptr) {
+            abort();
+            return;
+        }
+        s_callBlocks = grown;
+        s_callBlockCapacity = wanted;
+    }
+    s_callBlocks[s_callBlockCount].first = (const unsigned char*)p;
+    s_callBlocks[s_callBlockCount].bytes = bytes;
+    s_callBlockCount++;
+}
+
+void CallFreed(const void* p)
+{
+    for (unsigned i = 0; i < s_callBlockCount; i++) {
+        if (s_callBlocks[i].first == p) {
+            s_callBlocks[i] = s_callBlocks[--s_callBlockCount];
+            return;
+        }
+    }
+}
+
+bool InCallBlock(const unsigned char* object)
+{
+    for (unsigned i = 0; i < s_callBlockCount; i++) {
+        if (object >= s_callBlocks[i].first && object < s_callBlocks[i].first + s_callBlocks[i].bytes)
+            return true;
+    }
+    return false;
+}
+
+const BeforeEntry* SavedBefore(const unsigned char* object, unsigned field)
+{
     for (unsigned slot = BeforeHash(object, field); s_beforeSlots[slot] >= 0; slot = (slot + 1) % BEFORE_HASH) {
         const BeforeEntry& e = s_before[s_beforeSlots[slot]];
         if (e.object == object && e.field == field)
-            return memcmp(s_beforeBytes + e.at, object + f.offset, f.size) != 0;
+            return &e;
     }
-    return true;
+    return nullptr;
+}
+
+bool KnownByPlainKey(const ReplayObjectField& f)
+{
+    return f.kind != RK_ARRAY && f.kind != RK_BLOB && f.kind != RK_VECTOR && f.kind != RK_REFS && f.kind != RK_CSTRINGS;
+}
+
+void AddBeforeLine(ReplayText& lines, Recording& r, const char* key, const ReplayObjectField& f, const unsigned char* bytes, ReplayText& value)
+{
+    static unsigned char image[0x10000];
+    if (f.offset + f.size > sizeof image) {
+        ReplayFail("a field the slot writes lies past the room the recorder keeps for its value before an import");
+        return;
+    }
+    memcpy(image + f.offset, bytes, f.size);
+    ReplayFormatObjectField(f, image, r.table, true, value);
+    const char* known = r.known.Get(key);
+    if (known == nullptr || strcmp(known, value.Data()) == 0)
+        return;
+    lines.Add("  b ");
+    lines.Add(key);
+    lines.AddChar(' ');
+    lines.Add(value.Data());
+    lines.AddChar('\n');
 }
 
 void KnowObjectLines(ReplayKnown& known, const ReplayText& lines)
@@ -380,9 +448,9 @@ void KnowObjectLines(ReplayKnown& known, const ReplayText& lines)
         size_t length = end == nullptr ? strlen(at) : (size_t)(end - at);
         line.assign(at, at + length);
         line.push_back('\0');
-        char* name = &line[0] + 4;
-        char* space = strchr(name, ' ');
-        if (length > 4 && space != nullptr) {
+        char* space = length > 4 && line[2] == 'o' ? strchr(&line[0] + 4, ' ') : nullptr;
+        if (space != nullptr) {
+            char* name = &line[0] + 4;
             *space = '\0';
             known.Set(name, space + 1);
         }
@@ -403,9 +471,16 @@ void ImportWrittenObjects(ReplayText& t, Recording& r, const ReplaySlotSets& set
             const ReplayObjectField& f = kReplayObjectFields[sets.objWrites[j]];
             if (f.object != kind || !WrittenFieldSaved(f) || !ReplayInReach(s_importReach, at, sets.objWrites[j]) || !ReplayFieldLive(f, object))
                 continue;
-            if (!ChangedSinceBefore(object, sets.objWrites[j]))
-                continue;
+            const BeforeEntry* before = SavedBefore(object, sets.objWrites[j]);
+            bool changed = before != nullptr && memcmp(s_beforeBytes + before->at, object + f.offset, f.size) != 0;
             ReplayObjectFieldKey(key, r.table, true, kind, object, f);
+            if (changed && KnownByPlainKey(f))
+                AddBeforeLine(lines, r, key.Data(), f, s_beforeBytes + before->at, value);
+            if (!changed) {
+                bool stated = KnownByPlainKey(f) ? r.known.Get(key.Data()) != nullptr : before != nullptr;
+                if (stated || InCallBlock(object))
+                    continue;
+            }
             ReplayEmitField(lines, s_beforeKnown, r.table, 'o', key.Data(), f, object, value);
         }
     }
@@ -450,10 +525,13 @@ void ImportServiceObjects(ReplayText& t, const ReplayImport& c)
         return;
     if (c.id == RI_SIM_FREE) {
         MarkFreed(c.args[0].v.p);
+        CallFreed(c.args[0].v.p);
         return;
     }
-    if ((c.id == RI_SIM_ALLOC || c.id == RI_SIM_ALLOC_TAGGED || c.id == RI_SIM_CAPTURE_ALLOC) && c.result.kind == 1)
+    if ((c.id == RI_SIM_ALLOC || c.id == RI_SIM_ALLOC_TAGGED || c.id == RI_SIM_CAPTURE_ALLOC) && c.result.kind == 1) {
         MarkAllocated(c.result.v.p);
+        CallAllocated(c.result.v.p, (unsigned)c.args[c.id == RI_SIM_ALLOC_TAGGED ? 1 : 0].v.i);
+    }
     ImportObjects(t, nullptr);
 }
 
@@ -474,6 +552,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)
     s_tail.Clear();
     s_roots = roots;
     s_freedCount = 0;
+    s_callBlockCount = 0;
     if (s_tick >= 0) {
         s_field.Clear();
         s_field.AddInt(s_tick);
@@ -528,7 +607,7 @@ public:
             ReplayFail("a call of a recorded subsystem made inside a call of another recorded subsystem is not recorded: record each in its own run");
         } else if (s_recording && ReplayOwned() && IsImportOf(s_sub, slot)) {
             role = 2;
-            ImportBefore();
+            ImportBefore(&roots);
             ReplayCalls() = 0;
         } else if (s_recording && ReplayNestedDepth() != 0 && !s_nestedSlot && ReplayOwner() == host_thread_id() && IsNestedSlot(slot)) {
             role = 3;
@@ -1235,7 +1314,7 @@ void AddResult(ReplayText& t, const ReplayArg& r)
 
 void ReplayImportBegin(ReplayImport&)
 {
-    ImportBefore();
+    ImportBefore(nullptr);
 }
 
 int ReplayConfigure(const char* value, char* error, int size)

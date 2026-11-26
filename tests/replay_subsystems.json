@@ -126,11 +126,19 @@
     }
   },
   "orders": {
-    "inject": {
-      "define": "BT_REPLAY_INJECT_STATE_STEP=2",
-      "recording": "orders-guard-attacked.txt",
-      "expect": 22,
-      "field": "Order#3.state"
-    }
+    "inject": [
+      {
+        "define": "BT_REPLAY_INJECT_STATE_STEP=2",
+        "recording": "ui-right-click.txt",
+        "expect": 19,
+        "field": "Order#4.state"
+      },
+      {
+        "define": "BT_REPLAY_INJECT_CREATED_SHIFT=1",
+        "recording": "orders-guard-attacked.txt",
+        "expect": 10,
+        "field": "Order#3.created"
+      }
+    ]
   }
 }

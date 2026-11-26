@@ -3512,7 +3512,6 @@ class LinkSources(unittest.TestCase):
             rows = list(csv.DictReader(f))
         linked = rs.replay_link_sources()
         other = next(r for r in rows if r["subsystem"] not in listed and r["file"] not in linked)
-        self.assertNotIn(other["file"], linked)
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "replay_subsystems.json"
             path.write_text(json.dumps({other["subsystem"]: {}}))

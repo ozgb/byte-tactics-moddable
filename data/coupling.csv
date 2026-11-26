@@ -4624,6 +4624,7 @@ presentation,harness,call,DisplayLogText,1
 presentation,harness,call,DisplayLogWants,31
 presentation,harness,call,HarnessEventLogOpen,1
 presentation,harness,call,HarnessEventText,1
+presentation,harness,call,HarnessFrameClockElapsedMs,1
 presentation,harness,call,HarnessFrameDrawn,1
 presentation,harness,call,HarnessSimEventOtherThread,1
 presentation,harness,call,HarnessSimEventPhase,1
@@ -4862,6 +4863,7 @@ presentation,platform,call,GetSlotDpid,2
 presentation,platform,call,GetTickRate,2
 presentation,platform,call,GetTicks,23
 presentation,platform,call,HandleHostEvent,1
+presentation,platform,call,HarnessTestMode,1
 presentation,platform,call,LoadBitmapByName,4
 presentation,platform,call,LoadRadarPic,1
 presentation,platform,call,LoadSoundByName,1

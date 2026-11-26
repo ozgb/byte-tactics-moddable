@@ -365,7 +365,7 @@ class OwnerOnlyStateTest(unittest.TestCase):
         self.model = json.loads(ts.JSON_OUT.read_text())
 
     def test_the_format_is_9(self):
-        self.assertEqual(ts.TRACE_FORMAT, 9)
+        self.assertEqual(ts.TRACE_FORMAT, 10)
 
     def test_unit_leaves_the_weapon_slots_and_its_own_state_to_the_records(self):
         unit = self.model["tables"]["Unit"]

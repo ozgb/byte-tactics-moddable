@@ -8,9 +8,9 @@ serves the local renderer, a network client that never holds the whole state, an
 
 This page states each fact of the block: its source in the judged state (`docs/trace-format.md`, by the dump path of
 the field, such as `units[i].health`) or in the sim events (`docs/sim-events.md`), and its rule of visibility. The rules
-are 3.1c's, quirks included; a quirk is a fact of the view until a quirk flag (#1) gives a profile the choice. Nothing
-fills the block yet: recording it every tick, as a hash and as the whole block on the ticks with stored frames, is
-#1063.
+are 3.1c's, quirks included; a quirk is a fact of the view until a quirk flag (#1) gives a profile the choice. A test-mode
+run fills the block at the end of every tick and records it: as the `view` row of the trace on every tick, and as a whole
+file on the ticks with a stored frame ("The recorded view").
 
 The facts are what presentation reads: the last section, "The reads", lists every field of the simulation that a
 function of presentation reads during play or in its menus, and says where each one is in the view, or why it is not.
@@ -83,6 +83,58 @@ sets a bit of `PlayerView.truncated`, so that a dropped entry is never silent:
 | `orders` | 65536 | the same for orders, with `orderCount`; `VIEW_TRUNCATED_ORDERS` |
 | `features` | 65536 | the features after the first 65536, in the order of their anchor cells (row by row), are dropped; `VIEW_TRUNCATED_FEATURES` |
 | `sight` | 1048576 cells (a grid of 1024 by 1024, a map of 32768 pixels a side) | `gridWidth` and `gridHeight` stay the grid's; the cells past the first 1048576, row by row, are dropped, and a draw reads them as `VIEW_SIGHT_HIDDEN`; `VIEW_TRUNCATED_SIGHT` |
+
+## The recorded view
+
+A test-mode run (`docs/scenario-format.md`) fills a `PlayerView` at the end of each tick, after every step of the tick and
+before the tick's save and round trip, for the viewer and controller the judged state names (section "The two players"),
+and records it twice: as the `view` row of `trace.txt` on every tick, and as a file on some ticks. Both are made from one byte
+string, the serialisation S. This section defines S, the row and the file exactly enough to compute them from a filled block.
+
+**The layout.** The structs are those of `interfaces/view.h` with the layout of a 32-bit Visual C++ build for x86: every member
+at an offset that is a multiple of its size (a `double` at a multiple of 8), a struct as aligned as its most aligned member
+and its size rounded up to that alignment, little-endian, `float` and `double` as IEEE 754 binary32 and binary64. The padding bytes
+between members and at the end of a struct are zero. The sizes in bytes: `ViewPlayer` 104, `ViewUnit` 80, `ViewPiece` 20,
+`ViewOrder` 24, `ViewBlip` 16, `ViewFeature` 32, `ViewProjectile` 48, `ViewDebris` 36, `ViewExplodedPiece` 28, `ViewMessage` 28.
+The fields of `PlayerView` before `players`, its header, take 88 bytes (`versionMajor` at 0, `tick` at 4, `mapWidth` at 20,
+`unitCount` at 52, `messageCount` at 84). `tools/viewblock.py` reads the layout from the header file and decodes any block.
+
+**S.** The serialisation of a filled block is the concatenation of
+
+1. the header: the bytes of `PlayerView` from offset 0 up to the `players` member;
+2. `players[0]` to `players[9]`, all ten, in use or not;
+3. the used rows of each table, in this order: `units[0..unitCount)`, `pieces[0..pieceCount)`, `orders[0..orderCount)`,
+   `blips[0..blipCount)`, `features[0..featureCount)`, `projectiles[0..projectileCount)`, `debris[0..debrisCount)`,
+   `explodedPieces[0..explodedPieceCount)`, `messages[0..messageCount)`;
+4. `sight[0..n)` with `n` the smaller of `gridWidth * gridHeight` and `VIEW_MAX_GRID_CELLS` (a grid cut at its capacity is
+   written cut, "Capacities").
+
+A count is never above its table's capacity ("Capacities"). The tables are written whole, each element as its struct: a field
+that is `reserved` is zero and is part of S. S is 1128 bytes (88 and ten players) when no table has a row and the grid is empty, and under 8 million at the capacities.
+
+**The `view` row.** `<tick> view <16 hex>` follows the `tick` row of the same tick, and is the trace hash
+(`docs/trace-format.md`, section 3) from the offset basis of S taken as one run: 8-byte little-endian words with the word step
+while at least 8 bytes remain, then the byte step for the rest. It has no preamble: no tick number, no random state and no section
+number or `END`; `tick` inside the header is the tick of the row. `tools/viewblock.py` has the function (`view_hash`).
+
+**The file.** On the dump tick (`-testdump <tick>`) and on every tick of the scenario's `frames` line the run also writes
+`views/<tick>.bin`, beside `trace.txt` (and the frame `frames/<tick>.bin` of `docs/frame-dump.md`, whose tick it shares). All numbers
+are little-endian.
+
+| Offset | Size | Content |
+| --- | --- | --- |
+| 0 | 4 | The bytes `BTVW` |
+| 4 | 2 | Version, 1 |
+| 6 | 2 | Reserved, 0 |
+| 8 | the length of S | S |
+
+The hash of the `view` row of that tick is the hash of the bytes from offset 8 to the end of the file. The reference stores the
+views of the frame ticks in `reference/views/<scenario>/<tick>.bin`, which `tools/reference.py --check` compares byte for byte
+with a run's, naming the first differing field in serialisation order (`tools/viewblock.py diff A B`).
+
+**What it is for.** A presentation reads only the view, so a presentation is judged on one tick by the view file of that tick in, and the
+display list (`docs/display-log.md`) and the frame (`docs/frame-dump.md`) of that tick out. A core that fills the block is judged
+on the `view` rows: equal where 3.1c's are.
 
 ## Sight
 

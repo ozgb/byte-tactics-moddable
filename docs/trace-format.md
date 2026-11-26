@@ -5,7 +5,7 @@ digest files. It is enough to compute every row of `trace.txt` from the game sta
 recompute the same rows from a `dump.txt`. It is written in terms of the state block layout and
 `data/trace_schema.json`, so an engine in any language can follow it without the reference's source.
 
-The format is `bt-trace 9`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
+The format is `bt-trace 10`. The scenarios that make a trace, and the switches of a test-mode run, are in `docs/scenario-format.md`.
 
 Contents:
 
@@ -56,7 +56,7 @@ Contents:
 Plain text, LF line endings. The header is seven lines, in this order:
 
 ```
-bt-trace 9
+bt-trace 10
 commit <40 lowercase hex digits, or "unknown">
 scenario <the path as given to the run>
 game_seed <decimal>
@@ -91,8 +91,9 @@ the hash `0x0123456789abcdef` is written `0123456789abcdef`.
 | `meteors` | After the meteors are updated. |
 | `world` | Immediately after `meteors`; the hash state is reset for it. |
 | `tick` | At the end of the tick, after every step that follows the last phase (`docs/schedule.md`, "After the phases"), and before the tick's save and round trip. The last tick of a run writes it too, before the run exits. |
+| `view` | Immediately after `tick`, in the same state: the player view of the end of the tick (section 6, `docs/view.md`, "The recorded view"). |
 
-A test-mode tick therefore has 9 rows. The rows are flushed at the end of each tick.
+A test-mode tick therefore has 10 rows. The rows are flushed at the end of each tick.
 
 ## 3. The hash
 
@@ -100,7 +101,7 @@ The hash is a 64-bit FNV-1a variant, over a stream of bytes the walk produces (s
 state is one 64-bit value `h`, mod 2^64.
 
 - Offset basis: `h = 0xcbf29ce484222325`. It is set at the start of every row, and again before
-  the `world` row and the `tick` row. (The two halves are 0xcbf29ce4 high and 0x84222325 low.)
+  the `world` row, the `tick` row and the `view` row. (The two halves are 0xcbf29ce4 high and 0x84222325 low.)
 - Prime: `P = 0x100000001b3`.
 - To hash a run of `n` bytes `b[0..n)`:
   - while at least 8 bytes remain: `h = (h xor w) * P`, where `w` is the next 8 bytes read as a
@@ -322,6 +323,13 @@ Its hash is not the world row's hash continued, nor a hash of the other rows: th
 at the end of the tick, which the steps after the last phase may have changed (an eyeball that expires clears
 visibility, a resource share moves metal or energy between players). An engine that reaches the same end-of-tick
 state by another order of work inside the tick has the same `tick` row and may have other phase rows.
+
+**The `view` row** (format 10) is the player view of the end of the tick: the block of `interfaces/view.h` that the run fills for the
+viewer and the controller, read right after the `tick` row from the same state. It is one hash from the offset basis, with the word
+step of section 3, over one run: the serialisation S of the filled block, defined in `docs/view.md`, "The recorded view" (the header of the
+block, the ten players, the used rows of each table in declaration order and the sight grid; no section number, no `END`, no
+preamble). It judges what a presentation is given, and is not part of the `tick` row: a core with the same state and another view
+has the same `tick` row and another `view` row.
 
 The rows hash state, and events are only dumped. Sections 16 and 17 (the pathfinder's own report of its
 state, section 8.7), economy's own report (record 34, section 8.22), the path results (section 32,
@@ -1919,7 +1927,7 @@ and a pointer is `null` or `heap`; a field with no name is `+0x<offset>`.
 ## 9. The per-tick digest
 
 `reference/traces/<scenario>.txt` holds one digest per tick instead of the rows. For a tick, take its
-rows in file order (`net` if present, the seven phases, then `world` and `tick`). Build a byte string from them:
+rows in file order (`net` if present, the seven phases, then `world`, `tick` and `view`). Build a byte string from them:
 for each row, the 8 bytes of the 64-bit row hash, **little-endian** (the least significant byte
 first; note this is the reverse of the order of the digits in the file). The digest is the standard
 64-bit FNV-1a over that byte string, one byte at a time:
@@ -1928,26 +1936,28 @@ first; note this is the reverse of the order of the digits in the file). The dig
 h = 0xcbf29ce484222325
 for each byte x:  h = (h xor x) * 0x100000001b3   (mod 2^64)
 ```
-It is written as 16 lowercase hex digits. A test-mode tick has 9 rows, so the string is 72 bytes.
+It is written as 16 lowercase hex digits. A test-mode tick has 10 rows, so the string is 80 bytes.
 
 The **state** of a tick is its `tick` row (section 6), as the trace writes it: 16 lowercase hex digits. The
 digest judges every row, so it enforces the order of the phases inside the tick; the state judges only the end
-of the tick. `tools/reference.py --check` compares the digests, and `--check --end-of-tick` the states.
+of the tick. The **view** of a tick is its `view` row (section 6), the same way: 16 lowercase hex digits. The digest covers it, and so a
+difference of the view alone shows in the digest. `tools/reference.py --check` compares the digests, and `--check --end-of-tick` the
+states, reporting the digests and the views beside them.
 
 The digest file is:
 
 ```
-bt-digest 9
-trace_format bt-trace 9
+bt-digest 10
+trace_format bt-trace 10
 commit <40 hex digits, or unknown>
 scenario <path>
 game_seed <n>
 crt_seed <n>
 view_seed <n>
 fpu_control_word 0x<hex>
-<tick> <digest> <state>
+<tick> <digest> <state> <view>
 ```
-with one `<tick> <digest> <state>` line per tick, in tick order. The `quirks` line of a trace is not copied.
+with one `<tick> <digest> <state> <view>` line per tick, in tick order. The `quirks` line of a trace is not copied.
 
 ## 10. dump.txt
 
@@ -1989,6 +1999,10 @@ row of their own.
 parts in the same order as a phase block (the phase-row lines, the world lines, then the lines that are not hash
 input, without section 35), read at the end of the tick. Its phase-row lines and world lines, in order and with
 no reset between them, are the hash input of the `tick` row.
+
+**The view has no block.** The `view` row is not in the dump: its input is a file. A run with `-testdump <tick>` also writes
+`views/<tick>.bin` beside `dump.txt` (`docs/view.md`, "The recorded view"), and the row of that tick is the hash of the file's bytes from
+offset 8 (`tools/tracerehash.py` recomputes it, with `tools/viewblock.py`). A reader of the dump has nothing new to skip.
 
 **What has no line.** Section numbers, the index words (`H32(i)`), presence bytes, `END` and the
 `H8(which + 1)` and `H8(0)` markers of the order chains are hashed but not dumped. They follow from
@@ -2071,7 +2085,7 @@ To recompute a hash from the dump:
 
 ## 12. Format numbers
 
-`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 9.
+`bt-trace N`, `bt-dump N` and `bt-digest N` carry the same number `N`, the format number, now 10.
 Format 4 took sections 16 and 17 out of the world row (they are only dumped) and added section 32.
 Format 5 took section 32 out of the world row and added section 33 (the economy events, section 8.22)
 after it, both only dumped, and took the resource account of a unit (bytes 0xbc to 0xeb of a `Unit`) out
@@ -2115,6 +2129,11 @@ Format 9 added the `tick` row (section 6), the ninth row of a test-mode tick, af
 after every step that follows the last phase (#1037). A dump has a `tick` block after the `meteors` block (section 10), and a digest
 file line is `<tick> <digest> <state>` (section 9), the digest folding nine rows. No other row changes, but every digest does, and so
 does the tag.
+
+Format 10 added the `view` row (section 6), the tenth row of a test-mode tick, after `tick`: the hash of the player view of the end of the
+tick (#1063, `docs/view.md`, "The recorded view"). A run writes `views/<tick>.bin` on the dump tick and on the ticks of a `frames` line
+(section 10), and a digest file line is `<tick> <digest> <state> <view>` (section 9), the digest folding ten rows. No other row changes, but
+every digest does, and so does the tag.
 
 **A change needs a new format number** when a reader of this page would have to read it again, that is
 when it changes any of:

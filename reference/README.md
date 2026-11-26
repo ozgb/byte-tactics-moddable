@@ -18,6 +18,8 @@ on `moddable` does the second step in a worktree of `origin/reference`
 `--traces` also copies the frames the branch wrote (`reference/frames/<scenario>/<tick>.bin`, for the scenarios with a `frames` line) into this tree's `reference/frames/`, replacing the old set.
 `--check` compares each such scenario's run frames byte for byte with them (docs/frame-dump.md); a missing stored frame fails.
 
+`--traces` copies the views of those frames the same way (`reference/views/<scenario>/<tick>.bin`, docs/view.md "The recorded view"), and `--check` compares each run's `views/<tick>.bin` with them, naming the first field that differs in serialisation order (tools/viewblock.py); a missing stored view fails. The report line is `views: K of M scenarios equal, ...`.
+
 `--traces` plays `moddable`'s scenarios: it copies this tree's
 `reference/scenarios/` into the branch worktree, replacing the branch's set, so
 a new scenario needs no cherry-pick to `reference`. It refuses to replace
@@ -378,9 +380,10 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 `reference/traces/<scenario>.txt` holds one digest per tick, not the phase
 hashes: the digest of a tick is computed from the tick's rows as
 [docs/trace-format.md](../docs/trace-format.md), "The per-tick digest", says. In
-test mode there are 9 rows per tick (the 7 phases `units` to `meteors`, since `net`
-does not run, then `world` and `tick`). Each line also carries the tick's `tick` row,
-the end-of-tick state, which `tools/reference.py --check --end-of-tick` compares alone.
+test mode (`bt-trace 10`) there are 10 rows per tick (the 7 phases `units` to `meteors`, since `net`
+does not run, then `world`, `tick` and `view`). Each line also carries the tick's `tick` row,
+the end-of-tick state, which `tools/reference.py --check --end-of-tick` compares alone, and its `view` row, the hash of the player view of the end
+of the tick (docs/view.md, "The recorded view"), which `--end-of-tick` reports beside the digest without failing on it.
 
 `tools/tracedigest.py trace.txt` converts a `trace.txt` to this form.
 
@@ -424,7 +427,7 @@ A second `--check` with the same cache key waits for the first on a key lock (`b
 rather than playing the same exe twice. `--no-lock` takes no slot and no key lock, for a run that is not a gate.
 A passing `--check` is cached: its output, date and commit go to `~/.cache/bt-gate/<key>.txt` (shared by every worktree on the machine),
 where the key is a SHA-256 of the exe, `wasmtime_host.dll`, the `.wasm` modules and `modules.json` beside it, `reference/scenarios`, `traces`,
-`sounds`, `ui`, `frames` and `saves`, `tools/playtest/`, `tools/reference.py`, `playtest.py`, `tracediff.py`, `tracedigest.py`, `savefile.py` and `blockpointers.py` with every `tools/` module they import (found from the source), `data/block_pointers.csv`, `docs/sim-events.md` (the order classes the event digest reads), the `TotalA.map` beside the exe (or its absence), and the options that change what is played
+`sounds`, `ui`, `frames`, `views` and `saves`, `tools/playtest/`, `tools/reference.py`, `playtest.py`, `tracediff.py`, `tracedigest.py`, `savefile.py` and `blockpointers.py` with every `tools/` module they import (found from the source), `data/block_pointers.csv`, `docs/sim-events.md` (the order classes the event digest reads), the `TotalA.map` beside the exe (or its absence), and the options that change what is played
 (tier, mode, `--steps-per-frame`, `--quirks`, `--roundtrip`, `--poison`); the `commit.txt` beside the exe is not part of it. A failing run writes nothing.
 The key is looked up before the key lock and again after it, so a run that waited behind a gate of the same inputs reports that gate's pass. On a hit
 `--check` prints `cached pass from <date> at <commit>` and the stored lines and exits 0; this counts as a gate run, and the pull request body says "cached".
@@ -505,7 +508,7 @@ works with `--tier`, `--steps-per-frame` and `--parallel`, and not with `--poiso
 
 The gate of a pull request is the tier (`--tier`), for every change the gate applies to, the state block
 layout, the host interface and platform code included. The full `--check` stays the gate only of a pull
-request that regenerates the stored reference data: `reference/` traces, sounds, UI logs, frames,
+request that regenerates the stored reference data: `reference/` traces, sounds, UI logs, frames, views,
 saves or display logs, or the trace format (`data/trace_schema.json`, `tools/traceschema.py`), since that data is
 produced for every scenario anyway. The body says which tier it ran.
 

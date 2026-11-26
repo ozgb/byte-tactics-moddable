@@ -599,6 +599,7 @@ static int s_altHeld = 0;
 static unsigned s_frameTick = 0;
 static unsigned s_framesAtTick = 0;
 static int s_debugKeys = 0;
+static FILE* s_replay = nullptr;
 enum { STOPPED_FRAME_LIMIT = 300 };
 
 static unsigned ParseKeyName(int lineNo, const char* text)
@@ -784,6 +785,8 @@ static void DeliverScriptedInput(const ScriptedInput* in)
 
 static void CheckFrameInputsBeforeTick(unsigned tick)
 {
+    if (s_replay != nullptr)
+        return;
     for (int i = 0; i < s_inputCount; i++) {
         const ScriptedInput* in = &s_inputs[i];
         if (in->frame == 0 || in->delivered || in->tick >= tick)
@@ -796,6 +799,8 @@ static void CheckFrameInputsBeforeTick(unsigned tick)
 
 static void CheckFrameInputsDelivered()
 {
+    if (s_replay != nullptr)
+        return;
     for (int i = 0; i < s_inputCount; i++) {
         const ScriptedInput* in = &s_inputs[i];
         if (in->frame != 0 && !in->delivered)
@@ -805,7 +810,7 @@ static void CheckFrameInputsDelivered()
 
 static void HarnessFrameEnd(unsigned tick)
 {
-    if (tick == 0 || tick > s_ticks)
+    if (tick == 0 || tick > s_ticks || s_replay != nullptr)
         return;
     if (tick != s_frameTick) {
         s_frameTick = tick;
@@ -1576,7 +1581,6 @@ static void ParseTestDisplay(char* cmdLine)
 }
 
 enum { REPLAY_LINE_BYTES = 1 << 22 };
-static FILE* s_replay = nullptr;
 static char s_replayLine[REPLAY_LINE_BYTES];
 static int s_replayLineNo = 0;
 static bool s_replayPending = false;

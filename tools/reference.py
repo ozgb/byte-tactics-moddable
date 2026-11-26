@@ -186,11 +186,15 @@ REPLAY_LEFT_OUT = {
     "ui-build-menu": SELECT_STATE,
     "ui-build-place": SELECT_STATE,
     "ui-click-select": SELECT_STATE,
+    "ui-dialogs": SELECT_STATE + "; and the exit menu's Yes ends the run after tick 61, but its PLAYERS_LEAVE_GAME, stamped "
+                  "tick 62, makes the run from the file play tick 62 too (#1136)",
     "ui-drag-select": SELECT_STATE,
     "ui-groups": SELECT_STATE,
     "ui-keys": SELECT_STATE,
     "ui-left-click-orders": SELECT_STATE,
     "ui-right-click": SELECT_STATE,
+    "ui-scroll-groups": SELECT_STATE,
+    "ui-share-chat": SELECT_STATE,
 }
 EVENT_LOGS: dict[str, str | None] = {}
 DISPLAY_LOGS: dict[str, str | None] = {}

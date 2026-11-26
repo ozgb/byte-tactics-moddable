@@ -121,12 +121,11 @@ Crossings left during play, each waiting on another decision:
   `Unit.flags`: bit 0x400000, the build menu rather than the orders, and the page number. Only presentation reads
   them, but the trace still hashes them, since the mask covers only the selection bit 0x10. `InitUnitFromType`
   (units.cpp) sets them too, for every builder with more than one menu page, so a mask would change nearly every
-  trace. No run played from its command log (`docs/commands.md`, section 2.2) differs on them: no scenario turns a
-  page.
+  trace. No run played from its command log (`docs/commands.md`, section 2.2) differs on them.
 - The selection functions of selection.cpp (`MarkLocalVisibleUnits`, `FindNextUnmarkedLocalUnit`,
   `FocusNextLocalUnit`, `FocusCommander`) write bits 6 and 7 of `Unit.flags` (`selectState`), the mark of the units
   that focusing the next unit has visited, and only they read it. It is still hashed, and it is the one difference
-  of every `ui-` scenario played from its command log: #1132 masks it.
+  of every `ui-` scenario played from its command log but the last tick of `ui-dialogs` (#1136): #1132 masks it.
 - `DrawScorePanel` (game_dialogs.cpp) decrements `Player.rank` of each counted player above a rank no player holds,
   while it draws the score panel; the kill credit of `units.cpp` (the rank update when a unit dies) reads and writes the
   same ranks. It becomes the simulation's own compaction, or an event, in a later issue.

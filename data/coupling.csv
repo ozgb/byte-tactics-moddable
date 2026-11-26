@@ -1081,6 +1081,7 @@ los_radar,game,shared_write,Game::minimapGadgetY,1
 los_radar,game,shared_write,Unit::flags,3
 los_radar,game,shared_write,Vec3::x,2
 los_radar,game,shared_write,Vec3::z,2
+los_radar,harness,call,DlNote,1
 los_radar,harness,call,HarnessEventBuffer,2
 los_radar,harness,call,HarnessEventRadar,2
 los_radar,harness,call,HarnessEventWords,5
@@ -1088,9 +1089,10 @@ los_radar,harness,shared_write,GafFrame::compressed,1
 los_radar,harness,shared_write,GafFrame::height,4
 los_radar,harness,shared_write,GafFrame::layers,2
 los_radar,harness,shared_write,GafFrame::pixelsOrLayers,4
+los_radar,harness,shared_write,GafFrame::transparency,1
 los_radar,harness,shared_write,GafFrame::width,4
-los_radar,harness,shared_write,GafFrame::xOffset,1
-los_radar,harness,shared_write,GafFrame::yOffset,1
+los_radar,harness,shared_write,GafFrame::xOffset,3
+los_radar,harness,shared_write,GafFrame::yOffset,3
 los_radar,harness,shared_write,Game::visibilityMask,1
 los_radar,harness,shared_write,Point::x,4
 los_radar,harness,shared_write,Point::y,4
@@ -2618,9 +2620,10 @@ presentation,harness,shared_write,GafFrame::compressed,1
 presentation,harness,shared_write,GafFrame::height,4
 presentation,harness,shared_write,GafFrame::layers,2
 presentation,harness,shared_write,GafFrame::pixelsOrLayers,4
+presentation,harness,shared_write,GafFrame::transparency,1
 presentation,harness,shared_write,GafFrame::width,4
-presentation,harness,shared_write,GafFrame::xOffset,1
-presentation,harness,shared_write,GafFrame::yOffset,1
+presentation,harness,shared_write,GafFrame::xOffset,3
+presentation,harness,shared_write,GafFrame::yOffset,3
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::mapFlags,1
 presentation,harness,shared_write,MissionType::index,1
@@ -2631,7 +2634,7 @@ presentation,harness,shared_write,Surface::pitch,2
 presentation,harness,shared_write,Surface::pixels,2
 presentation,harness,shared_write,Surface::width,2
 presentation,harness,shared_write,g_explodedPieces,1
-presentation,harness,shared_write,g_game,24
+presentation,harness,shared_write,g_game,25
 presentation,harness,shared_write,tagPOINT::x,1
 presentation,harness,shared_write,tagPOINT::y,1
 presentation,los_radar,call,BuildFogTiles,1
@@ -3647,8 +3650,9 @@ weapons,game,shared_write,Vec3::z,2
 weapons,harness,call,HarnessEventWords,1
 weapons,harness,call,HarnessPoseObject,1
 weapons,harness,call,HarnessTestMode,1
-weapons,harness,shared_write,GafFrame::xOffset,1
-weapons,harness,shared_write,GafFrame::yOffset,1
+weapons,harness,shared_write,GafFrame::transparency,1
+weapons,harness,shared_write,GafFrame::xOffset,3
+weapons,harness,shared_write,GafFrame::yOffset,3
 weapons,harness,shared_write,g_explodedPieces,1
 weapons,los_radar,call,GetMapCell,2
 weapons,los_radar,call,GetMapCellAtPosition,3

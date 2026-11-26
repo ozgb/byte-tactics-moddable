@@ -1,0 +1,5 @@
+bt-interface 1
+48 PLAYERS_TRANSFER unit - from 0 to 1 resource 1 amount 1150484480 announce 1
+48 PLAYERS_TRANSFER unit - from 0 to 1 resource 0 amount 1150484480 announce 1
+48 PLAYERS_GIVE_UNIT unit 2 player 1 record.present 0 record.hitPoints 0 record.buildPercent 0 record.angles 000000000000000000000000 record.stockpiles 000000000000000000000000
+48 LOS_RADAR_SHARE_MAP from 0 to 1

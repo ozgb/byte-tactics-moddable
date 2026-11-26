@@ -1,0 +1,6 @@
+bt-sound 1
+0 stop_all - - - - -
+37 play OPTIONS -585 - - -
+42 play OPTIONS -585 - - -
+47 play OPTIONS -585 - - -
+51 play SMALLBUTTON -585 - - -

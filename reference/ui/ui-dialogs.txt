@@ -1,0 +1,68 @@
+bt-ui 2
+1 scroll 304 32
+1 view 1
+1 select -
+5 input mouse move 384 240
+6 input mouse left down 384 240
+7 input mouse left up 384 240
+8 select 1
+9 view 2
+10 input key down 19
+11 input key up 19
+11 input key down 19
+12 input key up 19
+20 input key down 113
+21 input key up 113
+21 input mouse move 61 248
+21 input mouse left down 61 248
+21 input mouse left up 61 248
+21 input mouse move 61 249
+21 input mouse left down 61 249
+21 input mouse left up 61 249
+21 input mouse move 201 356
+21 input mouse left down 201 356
+21 input mouse left up 201 356
+21 input mouse move 230 277
+21 input mouse left down 230 277
+21 input mouse left up 230 277
+21 input mouse move 61 392
+21 input mouse left down 61 392
+21 input mouse left up 61 392
+21 input mouse move 62 434
+21 input mouse left down 62 434
+21 input mouse left up 62 434
+30 input mouse move 464 330
+31 input mouse right down 464 330
+32 input mouse right up 464 330
+33 view 3
+40 input key down 122
+41 input key up 122
+45 input char 61
+50 input mouse move 294 290
+51 input char 93
+60 input key down 113
+61 input key up 113
+61 input mouse move 61 374
+61 input mouse left down 61 374
+61 input mouse left up 61 374
+61 input mouse move 384 295
+61 input mouse left down 384 295
+61 input mouse left up 384 295
+61 input mouse move 61 374
+61 input mouse left down 61 374
+61 input mouse left up 61 374
+61 input mouse move 385 222
+61 input mouse left down 385 222
+61 input mouse left up 385 222
+61 input mouse move 457 255
+61 input mouse left down 457 255
+61 input mouse left up 457 255
+61 input mouse move 61 374
+61 input mouse left down 61 374
+61 input mouse left up 61 374
+61 input mouse move 385 222
+61 input mouse left down 385 222
+61 input mouse left up 385 222
+61 input mouse move 312 255
+61 input mouse left down 312 255
+61 input mouse left up 312 255

@@ -125,8 +125,8 @@ The sim state that presentation reads between ticks (data/presentation_reads.csv
 |---|---|---|---|---|
 | after-event | 2 | 4 | 5 | 11 |
 | every-frame | 43 | 10 | 85 | 138 |
-| ui-action | 81 | 38 | 76 | 195 |
-| unknown | 56 | 19 | 50 | 125 |
+| ui-action | 80 | 38 | 76 | 194 |
+| unknown | 57 | 19 | 50 | 126 |
 | all | 182 | 71 | 216 | 469 |
 
 ## Presentation feeds

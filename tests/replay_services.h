@@ -395,6 +395,16 @@ int __stdcall ComputeChecksum(unsigned char* data, int len)
     Space(t);
     t.AddInt((int)len);
     const char* result = Enter(t);
+    if (g_loading) {
+        unsigned char a = 0, b = 0, c = 0, d = 0;
+        for (int i = 0; i < len; i++) {
+            a += data[i];
+            b ^= data[i];
+            c += i ^ data[i];
+            d ^= i + data[i];
+        }
+        return (d << 24) | (c << 16) | (b << 8) | a;
+    }
     return atoi(result);
 }
 

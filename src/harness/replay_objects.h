@@ -33,6 +33,24 @@ struct ReplayLoadBind {
     unsigned offset;
     unsigned flags;
     char src[40];
+    unsigned type;
+    char tex[40];
+    unsigned word14;
+};
+
+struct ReplayCacheBlock {
+    unsigned offset;
+    unsigned size;
+    int owner;
+    bool live;
+};
+
+struct ReplayCacheStart {
+    ReplayCacheStart() : taken(false), cap(0), cur(0) {}
+    bool taken;
+    unsigned cap;
+    unsigned cur;
+    std::vector<ReplayCacheBlock> blocks;
 };
 
 struct ReplayLoadUse {
@@ -210,6 +228,8 @@ PieceFrame* ReplayFaceAt(const void* base, unsigned size, unsigned offset);
 bool ReplayAddLoadName(ReplayText& t, ReplayObjectTable& table, unsigned load, const void* p, bool assign = true);
 const void* ReplayParseLoad(unsigned load, const char* text, bool* found);
 void ReplayAddLoadLines(const ReplayObjectTable& table, ReplayText& out);
+void ReplayCaptureDebrisCache(ReplayCacheStart& start);
+void ReplayAddCacheLines(const ReplayCacheStart& start, ReplayText& out);
 bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, ReplayObjectTable& table, bool assign, ReplayText& out);
 bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const char* value, ReplayObjectTable& table, ReplayAllocFn alloc);
 const ReplayObjectField* ReplayFindObjectField(unsigned kind, const char* name);

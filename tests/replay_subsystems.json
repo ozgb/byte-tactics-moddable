@@ -110,6 +110,7 @@
     }
   },
   "scripts": {
+    "self_test": "orders-air.txt",
     "inject": {
       "define": "BT_REPLAY_INJECT_TURN_SCALE=2",
       "recording": "orders-air.txt",

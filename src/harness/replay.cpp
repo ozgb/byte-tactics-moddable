@@ -39,6 +39,7 @@ struct Recording {
     ReplayText out;
     ReplayKnown known;
     ReplayObjectTable table;
+    ReplayCacheStart cache;
 };
 
 struct ReplayRoots {
@@ -250,6 +251,8 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)
     s_recording = !r.windowed || RecordsAlways(slot) || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
     if (!s_recording)
         return;
+    if (!r.cache.taken && strcmp(kReplaySubsystems[sub].name, "weapons") == 0)
+        ReplayCaptureDebrisCache(r.cache);
     ReplayHandles().Reset();
     s_snapshots.Reset();
     s_nested.Clear();
@@ -1101,6 +1104,7 @@ int ReplayWrite(char* error, int size)
                 (int)kReplaySubsystems[i].minor, kReplaySubsystems[i].complete ? "" : " incomplete");
         ReplayText loads;
         ReplayAddLoadLines(s_rec[i]->table, loads);
+        ReplayAddCacheLines(s_rec[i]->cache, loads);
         bool written = fputs(head, file) >= 0 && fwrite(loads.Data(), 1, loads.Size(), file) == loads.Size()
             && fwrite(s_rec[i]->out.Data(), 1, s_rec[i]->out.Size(), file) == s_rec[i]->out.Size();
         loads.Free();

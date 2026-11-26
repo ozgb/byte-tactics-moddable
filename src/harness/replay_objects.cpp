@@ -19,6 +19,7 @@
 #include "replay_objects.h"
 #include "../graphics/object3do.h"
 #include "../graphics/piece_frame.h"
+#include "../graphics/memory_cache.h"
 
 void* __cdecl operator new(unsigned int size);
 
@@ -3307,11 +3308,14 @@ void CaptureFace(PieceFrame* face, unsigned offset, void* context)
 {
     BindCapture* c = (BindCapture*)context;
     unsigned flags = *(unsigned*)&face->flags;
-    if ((flags & 7) == 0)
+    if ((flags & 7) == 0 && face->ptr_10 == 0)
         return;
     ReplayLoadBind bind;
+    memset(&bind, 0, sizeof bind);
     bind.offset = offset;
     bind.flags = flags;
+    bind.type = (unsigned)face->unknown_0;
+    bind.word14 = (unsigned)face->unknown_14;
     const void* src = face->color;
     if ((flags & 2) != 0 && src != nullptr && !InImage(src, (unsigned)(size_t)c->base, c->size, 1)) {
         ReplayText name;
@@ -3321,6 +3325,18 @@ void CaptureFace(PieceFrame* face, unsigned offset, void* context)
     } else {
         strcpy(bind.src, "null");
     }
+    if ((flags & 2) != 0) {
+        _snprintf(bind.tex, sizeof bind.tex, "=%u", (unsigned)face->ptr_10);
+    } else if (face->ptr_10 == 0) {
+        strcpy(bind.tex, "null");
+    } else if (InImage((const void*)(size_t)face->ptr_10, (unsigned)(size_t)c->base, c->size, 1)) {
+        _snprintf(bind.tex, sizeof bind.tex, "+%u", (unsigned)((const char*)(size_t)face->ptr_10 - (const char*)c->base));
+    } else {
+        ReplayText name;
+        ReplayAddObjectName(name, *c->table, ROK_GAFFRAME, (const void*)(size_t)face->ptr_10, true);
+        _snprintf(bind.tex, sizeof bind.tex, "%s", name.Data());
+    }
+    bind.tex[sizeof bind.tex - 1] = '\0';
     c->use->binds.push_back(bind);
 }
 
@@ -3493,15 +3509,81 @@ void ReplayAddLoadLines(const ReplayObjectTable& table, ReplayText& out)
             out.AddChar('\n');
         }
         for (size_t b = 0; b < use.binds.size(); b++) {
+            const ReplayLoadBind& bind = use.binds[b];
+            char hex[96];
             out.Add("  bind ");
-            out.AddUnsigned(use.binds[b].offset);
-            out.Add(" 0x");
-            char hex[16];
-            _snprintf(hex, sizeof hex, "%x", use.binds[b].flags);
+            out.AddUnsigned(bind.offset);
+            _snprintf(hex, sizeof hex, " %u %s %u %s %u\n", bind.flags, bind.src, bind.type, bind.tex, bind.word14);
             out.Add(hex);
-            out.AddChar(' ');
-            out.Add(use.binds[b].src);
-            out.AddChar('\n');
         }
+    }
+}
+
+void ReplayCaptureDebrisCache(ReplayCacheStart& start)
+{
+    start.blocks.clear();
+    DebrisCache& cache = g_debrisMemCache;
+    const unsigned char* base = (const unsigned char*)cache.base.get();
+    if (base == nullptr)
+        return;
+    start.taken = true;
+    start.cap = (unsigned)cache.cap;
+    start.cur = (unsigned)((const unsigned char*)cache.cur.get() - base);
+    const unsigned char* slots = (const unsigned char*)&g_explodedPieces[0];
+    bool curAtBlock = false;
+    for (unsigned at = 0; at < start.cap;) {
+        const DebrisCacheChunk* chunk = (const DebrisCacheChunk*)(base + at);
+        ReplayCacheBlock block;
+        block.offset = at;
+        block.size = (unsigned)chunk->size;
+        block.owner = -1;
+        block.live = false;
+        if (chunk->size < 8 || block.size > start.cap - at) {
+            ReplayFail("the blocks of the debris cache do not tile its arena");
+            return;
+        }
+        const unsigned char* owner = (const unsigned char*)chunk->owner.get();
+        if (owner != nullptr) {
+            unsigned index = (unsigned)(owner - slots) / (unsigned)sizeof(g_explodedPieces[0]);
+            if (owner < slots || (owner - slots) % sizeof(g_explodedPieces[0]) != 0 || index >= sizeof(g_explodedPieces) / sizeof(g_explodedPieces[0])) {
+                ReplayFail("a block of the debris cache is owned by something other than a slot of g_explodedPieces");
+                return;
+            }
+            block.owner = (int)index;
+            block.live = (const unsigned char*)g_explodedPieces[index].get() == base + at + 8;
+        }
+        curAtBlock = curAtBlock || at == start.cur;
+        start.blocks.push_back(block);
+        at += block.size;
+    }
+    if (!curAtBlock)
+        ReplayFail("the cursor of the debris cache is not at the start of a block");
+}
+
+void ReplayAddCacheLines(const ReplayCacheStart& start, ReplayText& out)
+{
+    if (start.blocks.empty())
+        return;
+    out.Add("cache debris ");
+    out.AddUnsigned(start.cap);
+    out.AddChar(' ');
+    out.AddUnsigned(start.cur);
+    out.AddChar('\n');
+    for (size_t i = 0; i < start.blocks.size(); i++) {
+        const ReplayCacheBlock& b = start.blocks[i];
+        out.Add("  block ");
+        out.AddUnsigned(b.offset);
+        out.AddChar(' ');
+        out.AddUnsigned(b.size);
+        out.AddChar(' ');
+        if (b.owner < 0) {
+            out.Add("null");
+        } else {
+            out.Add("ExplodedSlot#");
+            out.AddUnsigned((unsigned)b.owner);
+            if (b.live)
+                out.Add(" live");
+        }
+        out.AddChar('\n');
     }
 }

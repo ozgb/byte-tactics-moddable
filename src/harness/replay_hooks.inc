@@ -2307,10 +2307,10 @@ void __stdcall RecScriptsNewUnitScript(Unit* a0)
 void __stdcall RecScriptsSetCob(CobScript* a0, ScriptTable* a1)
 {
     ReplayRoots roots;
-    roots.Add(ROK_COBSCRIPTBASE, a0);
+    roots.Add(ROK_COBSCRIPT, a0);
     SlotScope scope(RSL_SCRIPTS_SETCOB, SUB_SCRIPTS, roots);
     if (scope.Open()) {
-        ArgObject(s_call, "script", ROK_COBSCRIPTBASE, a0);
+        ArgObject(s_call, "script", ROK_COBSCRIPT, a0);
         ArgLoad(s_call, "data", RL_COB, a1);
     }
     s_inner_scripts->SetCob(a0, a1);

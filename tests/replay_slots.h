@@ -2939,7 +2939,7 @@ void Run_scripts_NewUnitScript()
 
 void Run_scripts_SetCob()
 {
-    CobScript* p0 = (CobScript*)ArgObject("script", ROK_COBSCRIPTBASE);
+    CobScript* p0 = (CobScript*)ArgObject("script", ROK_COBSCRIPT);
     ScriptTable* p1 = (ScriptTable*)ArgLoad("data", RL_COB);
     SetClosing(nullptr);
     g_seams.scripts->SetCob(p0, p1);

@@ -97,7 +97,7 @@ void CobScript::SetCob(ScriptTable* data)
 {
     table = data;
     if (data != 0) {
-        unknown_c = GetCobChecksum(data);
+        checksum = GetCobChecksum(data);
         pieces = (Piece*)SimRealloc(pieces, data->pieceCount * 0x4c);
         statics = (int*)SimRealloc(statics, data->staticCount * 4);
         memset(pieces, 0, data->pieceCount * 0x4c);
@@ -901,7 +901,7 @@ void CobScript::SaveScriptState(HapiBank* file)
     file->SeekBox(0);
 
     SavedScript big;
-    big.checksum = unknown_c;
+    big.checksum = checksum;
     for (int n = 0; n < 8; n++) {
         big.channels[n] = channels[n];
         big.channels[n].callback = 0;
@@ -957,7 +957,7 @@ int CobScript::LoadScriptState(HapiBank* file)
     if (file->ReadBox(&big, 0x528) != 0x528) {
         return 0;
     }
-    if (unknown_c != big.checksum) {
+    if (checksum != big.checksum) {
         return 0;
     }
     for (int n = 0; n < 8; n++) {

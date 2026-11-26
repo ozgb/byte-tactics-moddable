@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <math.h>
+#include <setjmp.h>
 #include <vector>
 #include <algorithm>
 
@@ -278,8 +279,16 @@ void Check(bool ok, const char* what)
     }
 }
 
+jmp_buf* g_fatalTrap;
+char g_fatalWhat[200];
+
 void Fatal(const char* file, int call, const char* what, const char* text)
 {
+    if (g_fatalTrap != nullptr) {
+        _snprintf(g_fatalWhat, sizeof g_fatalWhat, "%s: %s", what, text);
+        g_fatalWhat[sizeof g_fatalWhat - 1] = '\0';
+        longjmp(*g_fatalTrap, 1);
+    }
     printf("FAIL: %s: call %d: %s: %s\n", file, call, what, text);
     exit(2);
 }
@@ -2719,6 +2728,18 @@ void ClearFaceBits(PieceFrame* face, unsigned, void*)
     *(unsigned*)&face->flags &= ~7u;
 }
 
+bool DecimalWord(const char* text, unsigned* value)
+{
+    if (text[0] == '\0' || strlen(text) > 10)
+        return false;
+    for (const char* p = text; *p != '\0'; p++) {
+        if (*p < '0' || *p > '9')
+            return false;
+    }
+    *value = (unsigned)strtoul(text, nullptr, 10);
+    return true;
+}
+
 void BindModelFaces(const char* file, void* base, unsigned size, const std::vector<ReplayLoadBind>& binds)
 {
     ReplayEachFace(base, size, ClearFaceBits, nullptr);
@@ -2727,6 +2748,9 @@ void BindModelFaces(const char* file, void* base, unsigned size, const std::vect
         if (face == nullptr)
             Fatal(file, 0, "a bind line names no face of its model", "bind");
         *(unsigned*)&face->flags = binds[i].flags;
+        face->unknown_0 = (int)binds[i].type;
+        face->unknown_14 = (int)binds[i].word14;
+        face->ptr_10 = 0;
         if (strcmp(binds[i].src, "null") != 0) {
             unsigned kind = 0;
             void* target = ReplayResolveObject(binds[i].src, &kind, g_objects, AllocObject);
@@ -2734,17 +2758,106 @@ void BindModelFaces(const char* file, void* base, unsigned size, const std::vect
                 Fatal(file, 0, "a bind line names an object it cannot make", binds[i].src);
             face->color = (unsigned short*)target;
         }
+        if (binds[i].tex[0] == '=') {
+            unsigned word = 0;
+            if (!DecimalWord(binds[i].tex + 1, &word))
+                Fatal(file, 0, "a bind line's word is decimal", binds[i].tex);
+            face->ptr_10 = (int)word;
+        } else if (binds[i].tex[0] == '+') {
+            unsigned at = 0;
+            if (!DecimalWord(binds[i].tex + 1, &at) || at >= size)
+                Fatal(file, 0, "a bind line names a place outside its model", binds[i].tex);
+            face->ptr_10 = (int)(size_t)((char*)base + at);
+        } else if (strcmp(binds[i].tex, "null") != 0) {
+            unsigned kind = 0;
+            void* target = ReplayResolveObject(binds[i].tex, &kind, g_objects, AllocObject);
+            if (target == nullptr || kind != ROK_GAFFRAME)
+                Fatal(file, 0, "a bind line names a picture it cannot make", binds[i].tex);
+            face->ptr_10 = (int)(size_t)target;
+        }
     }
+}
+
+bool HexBytes(const char* text, unsigned char* out, unsigned long* count)
+{
+    unsigned long length = (unsigned long)strlen(text);
+    if (length % 2 != 0)
+        return false;
+    for (unsigned long i = 0; i < length; i++) {
+        char c = text[i];
+        if (!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f'))
+            return false;
+        if (out != nullptr && i % 2 == 0)
+            out[i / 2] = (unsigned char)ParseHexByte(text + i);
+    }
+    *count = length / 2;
+    return true;
+}
+
+ReplayCacheStart g_cacheStart;
+bool g_cacheNamed;
+
+int ReadCacheLines(const char* file, int at, int end)
+{
+    const char* line = g_lines[at];
+    char name[24];
+    unsigned cap = 0;
+    unsigned cur = 0;
+    char extra;
+    if (g_cacheNamed || sscanf(line, "cache %23s %u %u%c", name, &cap, &cur, &extra) != 3 || strcmp(name, "debris") != 0)
+        Fatal(file, 0, "a cache line is `cache debris <size> <cursor>`, once", line);
+    g_cacheNamed = true;
+    g_cacheStart.taken = true;
+    g_cacheStart.cap = cap;
+    g_cacheStart.cur = cur;
+    unsigned next = 0;
+    bool curAtBlock = false;
+    for (at++; at < end && strncmp(g_lines[at], "  block ", 8) == 0; at++) {
+        ReplayCacheBlock b;
+        unsigned offset;
+        unsigned size;
+        char owner[40];
+        char tail[16] = "";
+        int fields = sscanf(g_lines[at], "  block %u %u %39s %15s%c", &offset, &size, owner, tail, &extra);
+        bool slot = strncmp(owner, "ExplodedSlot#", 13) == 0;
+        bool live = strcmp(tail, "live") == 0;
+        if (fields < 3 || fields > 4 || offset != next || size < 8 || size > cap - offset || (!slot && strcmp(owner, "null") != 0) || (fields == 4 && !(live && slot)))
+            Fatal(file, 0, "a block line is `  block <offset> <size> <ExplodedSlot#N|null>[ live]`, tiling the cache", g_lines[at]);
+        b.offset = offset;
+        b.size = size;
+        b.owner = -1;
+        b.live = live;
+        if (slot) {
+            char* digits;
+            unsigned long index = strtoul(owner + 13, &digits, 10);
+            if (*digits != '\0' || digits == owner + 13 || index >= 100)
+                Fatal(file, 0, "a block owned by a slot that g_explodedPieces does not have", g_lines[at]);
+            b.owner = (int)index;
+        }
+        curAtBlock = curAtBlock || offset == cur;
+        g_cacheStart.blocks.push_back(b);
+        next = offset + size;
+    }
+    if (next != cap || !curAtBlock)
+        Fatal(file, 0, "the blocks of a cache line do not tile its size, or its cursor is in none", line);
+    return at;
 }
 
 void LoadInputs(const char* file, int end)
 {
     BindLoadFiles();
+    g_cacheStart = ReplayCacheStart();
+    g_cacheNamed = false;
+    std::vector<unsigned> held;
     int at = 2;
     while (at < end) {
         const char* line = g_lines[at];
         if (line[0] == '\0') {
             at++;
+            continue;
+        }
+        if (strncmp(line, "cache ", 6) == 0) {
+            at = ReadCacheLines(file, at, end);
             continue;
         }
         char loadName[48];
@@ -2760,6 +2873,12 @@ void LoadInputs(const char* file, int end)
         int kind = ReplayFindObjectKind(kindName, (unsigned)strlen(kindName));
         if (load == kReplayLoadCount || kind < 0)
             Fatal(file, 0, "a load line of an unknown load kind or holder kind", line);
+        unsigned key = (load << 24) ^ ((unsigned)kind << 16) ^ index;
+        for (size_t i = 0; i < held.size(); i++) {
+            if (held[i] == key)
+                Fatal(file, 0, "a second load line for one holder", line);
+        }
+        held.push_back(key);
         LoadFileBytes* f = new LoadFileBytes;
         ParseQuoted(quote, f->name, sizeof f->name);
         unsigned size = (unsigned)strtoul(open + 1, nullptr, 10);
@@ -2769,21 +2888,30 @@ void LoadInputs(const char* file, int end)
             unsigned long first = strtoul(g_lines[at] + 4, &colon, 10);
             if (*colon != ':')
                 Fatal(file, 0, "a load byte line is `  x <offset>:<hex>`", g_lines[at]);
-            unsigned long n = (unsigned long)strlen(colon + 1) / 2;
+            unsigned long n = 0;
+            if (!HexBytes(colon + 1, nullptr, &n))
+                Fatal(file, 0, "a load byte line holds bytes as an even number of lower case hex digits", g_lines[at]);
             if (first + n > size)
                 Fatal(file, 0, "a load byte line past the size of its file", g_lines[at]);
-            for (unsigned long i = 0; i < n; i++)
-                f->bytes[first + i] = (unsigned char)ParseHexByte(colon + 1 + i * 2);
+            HexBytes(colon + 1, n == 0 ? nullptr : &f->bytes[first], &n);
         }
         std::vector<ReplayLoadBind> binds;
         for (; at < end && strncmp(g_lines[at], "  bind ", 7) == 0; at++) {
+            if (load != RL_MODEL)
+                Fatal(file, 0, "a bind line on a load that is not a model", g_lines[at]);
             ReplayLoadBind b;
+            memset(&b, 0, sizeof b);
             char flagsText[24];
+            char typeText[24];
+            char wordText[24];
             char src[40];
-            if (sscanf(g_lines[at], "  bind %u %23s %39s", &b.offset, flagsText, src) != 3)
-                Fatal(file, 0, "a bind line is `  bind <offset> <flags> <FrameTable#N|null>`", g_lines[at]);
-            b.flags = (unsigned)strtoul(flagsText, nullptr, 0);
+            char tex[40];
+            char extra;
+            if (sscanf(g_lines[at], "  bind %u %23s %39s %23s %39s %23s%c", &b.offset, flagsText, src, typeText, tex, wordText, &extra) != 6
+                || !DecimalWord(flagsText, &b.flags) || !DecimalWord(typeText, &b.type) || !DecimalWord(wordText, &b.word14))
+                Fatal(file, 0, "a bind line is `  bind <offset> <flags> <FrameTable#N|null> <type> <GafFrame#N|null|=index> <word14>`", g_lines[at]);
             strcpy(b.src, src);
+            strcpy(b.tex, tex);
             binds.push_back(b);
         }
         g_loadFiles.push_back(f);
@@ -2930,6 +3058,18 @@ bool ParseLineKey(const char* name, LineKey& out)
     return true;
 }
 
+void AdoptCachedPiece(const ReplayObjectField& f, void* slot, const char* value)
+{
+    unsigned held = *(unsigned*)((unsigned char*)slot + f.offset);
+    if (held == 0 || strncmp(value, "ExplodedPiece#", 14) != 0)
+        return;
+    char* end;
+    unsigned long ordinal = strtoul(value + 14, &end, 10);
+    void* piece = ReplayRefPtr(held);
+    if (*end == '\0' && end != value + 14 && ordinal != 0 && g_objects.Find(ROK_EXPLODEDPIECE, piece) == 0 && g_objects.Pointer(ROK_EXPLODEDPIECE, (unsigned)ordinal) == nullptr)
+        g_objects.Bind(ROK_EXPLODEDPIECE, (unsigned)ordinal, piece);
+}
+
 bool RestoreObjectLine(const char* name, const char* value, const char* file, const ReplaySlotSets* sets, const char* line)
 {
     LineKey k;
@@ -2974,6 +3114,8 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
         g_known.Set(name, value);
         return true;
     }
+    if (f->object == ROK_EXPLODEDSLOT && f->kind == RK_REF)
+        AdoptCachedPiece(*f, p, value);
     if (!ReplayRestoreObjectField(*f, p, value, g_objects, AllocObject))
         Fatal(file, g_callIndex, "a value that cannot be restored", value);
     g_known.Set(name, value);
@@ -3436,23 +3578,23 @@ bool Mutate(int mutation)
     return false;
 }
 
-void InitDebrisForReplay()
+void InitDebrisForReplay(const char* file)
 {
-    for (int i = 0; i < 300; ++i) {
-        g_game->slots[i].state = -1;
-        g_game->slots[i].vertexCount = 8;
-        g_game->slots[i].faceCount = 6;
-        g_game->slots[i].firstFace = -1;
-        g_game->slots[i].verts = g_game->vertices_1e88f[i];
-        g_game->slots[i].faces = (*(Face (*)[300][6])&g_game->frames)[i];
-        for (int j = 0; j < 6; ++j) {
-            (*(Face (*)[300][6])&g_game->frames)[i][j].flags.raw |= 1;
-            (*(Face (*)[300][6])&g_game->frames)[i][j].color = 200;
-            (*(Face (*)[300][6])&g_game->frames)[i][j].nverts = 4;
-            (*(Face (*)[300][6])&g_game->frames)[i][j].vindex = g_faceVertexIndices[j];
-        }
+    InitDebrisPieces();
+    if (!g_cacheStart.taken)
+        return;
+    if (g_cacheStart.cap != (unsigned)g_debrisMemCache.cap)
+        Fatal(file, 0, "the recorded debris cache has another size than the game's", "cache");
+    unsigned char* base = (unsigned char*)g_debrisMemCache.base.get();
+    for (size_t i = 0; i < g_cacheStart.blocks.size(); i++) {
+        const ReplayCacheBlock& b = g_cacheStart.blocks[i];
+        DebrisCacheChunk* chunk = (DebrisCacheChunk*)(base + b.offset);
+        chunk->size = (int)b.size;
+        chunk->owner = b.owner < 0 ? nullptr : (Ref<char>*)&g_explodedPieces[b.owner];
+        if (b.live)
+            g_explodedPieces[b.owner] = (ExplodedPiece*)(base + b.offset + 8);
     }
-    g_debrisMemCache.InitSimCache(100000);
+    g_debrisMemCache.cur = (DebrisCacheChunk*)(base + g_cacheStart.cur);
 }
 
 void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
@@ -3500,7 +3642,7 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
     g_callIndex = 0;
     LoadInputs(file, at);
     if (strcmp(g_subsystem, "weapons") == 0)
-        InitDebrisForReplay();
+        InitDebrisForReplay(file);
     while (at < g_lineCount && (g_core || !out.diverged)) {
         if (g_lines[at][0] == '\0') {
             at++;
@@ -8139,7 +8281,11 @@ void LoadBindSelfTest()
     unsigned short sequence[8] = { 4, 0, 0, 0, 0, 0, 0, 0 };
     *(unsigned*)&model->faces[1].flags = 0x1e;
     model->faces[1].color = sequence;
+    model->faces[1].ptr_10 = 0x50003;
+    model->faces[1].unknown_14 = 7;
     *(unsigned*)&model->faces[2].flags = 0x1;
+    model->faces[2].unknown_0 = 0xd1;
+    model->faces[2].ptr_10 = (int)(size_t)((char*)model + 200);
     UnitDef* defs = (UnitDef*)Fresh(2 * (unsigned)sizeof(UnitDef));
     g_game->defs = defs;
     g_game->unitDefCount = 2;
@@ -8152,7 +8298,7 @@ void LoadBindSelfTest()
     ReplayText lines;
     ReplayAddLoadLines(*table, lines);
     printf("%s", lines.Data());
-    Check(strstr(lines.Data(), "  bind 96 0x1e FrameTable#1\n  bind 128 0x1 null\n") != nullptr && strstr(lines.Data(), "  bind 64 ") == nullptr, "a face a bind set is a bind line with its offset, its flags and the object its sequence is; an unbound face has none");
+    Check(strstr(lines.Data(), "  bind 96 30 FrameTable#1 0 =327683 7\n  bind 128 1 null 209 +200 0\n") != nullptr && strstr(lines.Data(), "  bind 64 ") == nullptr, "a face a bind set is a bind line with its offset, flags, sequence, type, picture word and the word after it; an unbound face has none");
     name.Free();
     lines.Free();
     delete table;
@@ -8164,14 +8310,15 @@ void LoadBindSelfTest()
     MirrorObject(again);
     *(unsigned*)&again->faces[0].flags = 0x7;
     std::vector<ReplayLoadBind> binds;
-    ReplayLoadBind one = { 96, 0x1e, "FrameTable#1" };
-    ReplayLoadBind two = { 128, 0x1, "null" };
+    ReplayLoadBind one = { 96, 0x1e, "FrameTable#1", 0, "=327683", 7 };
+    ReplayLoadBind two = { 128, 0x1, "null", 0xd1, "+200", 0 };
     binds.push_back(one);
     binds.push_back(two);
     BindModelFaces("bind", again, sizeof file, binds);
     void* made = g_objects.Pointer(ROK_FRAMETABLE, 1);
     Check((*(unsigned*)&again->faces[0].flags & 7) == 0 && *(unsigned*)&again->faces[1].flags == 0x1e && *(unsigned*)&again->faces[2].flags == 0x1, "the replayer clears the bits of every face and sets those of the lines");
     Check(made != nullptr && (void*)again->faces[1].color == made && again->faces[2].color == nullptr, "and names the object of a sequence as the services' answers do, FrameTable#1, so a later line resolves to it");
+    Check(again->faces[1].ptr_10 == 0x50003 && again->faces[1].unknown_14 == 7 && again->faces[2].unknown_0 == 0xd1 && again->faces[2].ptr_10 == (int)(size_t)((char*)again + 200), "and the type, the picture word, a name inside the model and the word after the picture");
     Check(ReplayFaceAt(again, sizeof file, 77) == nullptr && ReplayFaceAt(again, sizeof file, 96) == again->faces + 1, "a face is found by its offset in the file");
 }
 
@@ -8325,6 +8472,204 @@ void LoadFormSelfTest()
     free(loads);
 }
 
+
+void HexOf(const unsigned char* bytes, unsigned count, char* out)
+{
+    for (unsigned i = 0; i < count; i++)
+        sprintf(out + i * 2, "%02x", (unsigned)bytes[i]);
+}
+
+bool LoadsRefused(const char* loads, const char* want)
+{
+    jmp_buf jump;
+    g_fatalWhat[0] = '\0';
+    ForgetLoads();
+    BindLoadFiles();
+    if (setjmp(jump) == 0) {
+        g_fatalTrap = &jump;
+        PrepareLoads(loads, "  a x 1\n");
+        g_fatalTrap = nullptr;
+        return false;
+    }
+    g_fatalTrap = nullptr;
+    printf("refused: %s\n", g_fatalWhat);
+    return strstr(g_fatalWhat, want) != nullptr;
+}
+
+void LoadRefusalSelfTest()
+{
+    printf("load refusals\n");
+    unsigned char cob[72];
+    MakeCobFile(cob);
+    char hex[200];
+    HexOf(cob, 72, hex);
+    char text[1024];
+    sprintf(text, "load cob UnitDef#1 \"scripts\\\\A.COB\" [72]\n  x 0:%s\n", hex);
+    Check(!LoadsRefused(text, "never"), "a well formed load line is read");
+    sprintf(text, "load cob UnitDef#1 \"scripts\\\\A.COB\" [72]\n  x 0:%.8sZZ\n", hex);
+    Check(LoadsRefused(text, "even number of lower case hex digits"), "a byte line with bad hex is refused");
+    sprintf(text, "load cob UnitDef#1 \"scripts\\\\A.COB\" [72]\n  x 0:%.9s\n", hex);
+    Check(LoadsRefused(text, "even number of lower case hex digits"), "and one of odd length");
+    sprintf(text, "load cob UnitDef#1 \"scripts\\\\A.COB\" [72]\n  x 0:0B000000\n");
+    Check(LoadsRefused(text, "even number of lower case hex digits"), "and upper case");
+    sprintf(text, "load cob UnitDef#1 \"scripts\\\\A.COB\" [72]\n  x 0:%s\n  bind 8 1 null 0 null 0\n", hex);
+    Check(LoadsRefused(text, "a bind line on a load that is not a model"), "a bind line on a cob load is refused");
+    sprintf(text, "load cob UnitDef#1 \"scripts\\\\A.COB\" [72]\n  x 0:%s\nload cob UnitDef#1 \"scripts\\\\A.COB\" [72]\n  x 0:%s\n", hex, hex);
+    Check(LoadsRefused(text, "a second load line for one holder"), "a second load line for one holder is refused");
+    sprintf(text, "load cob UnitDef#1 \"scripts\\\\A.COB\" [72]\n  x 64:%s\n", hex);
+    Check(LoadsRefused(text, "past the size of its file"), "and a byte line past the size of its file");
+    ForgetLoads();
+}
+
+void LoadChunkSelfTest()
+{
+    printf("load chunks\n");
+    ResetBlock();
+    ReplayClearFailure();
+    BindLoadFiles();
+    unsigned char big[1100];
+    memset(big, 0, sizeof big);
+    MakeCobFile(big);
+    big[1030] = 7;
+    big[1099] = 9;
+    AddLoadFile("scripts\\TAIL.COB", big, sizeof big);
+    ReplayLoadsReset();
+    ReplayLoadHook() = NoteLoadHook;
+    int* cob = (int*)LoadCobScript((char*)"scripts\\TAIL.COB");
+    ReplayLoadHook() = nullptr;
+    UnitDef* defs = (UnitDef*)Fresh(2 * (unsigned)sizeof(UnitDef));
+    g_game->defs = defs;
+    g_game->unitDefCount = 2;
+    defs[1].data = cob;
+    ReplayObjectTable* table = new ReplayObjectTable;
+    ReplayText name;
+    ReplayAddLoadName(name, *table, RL_COB, cob);
+    ReplayText lines;
+    ReplayAddLoadLines(*table, lines);
+    char* loads = strdup(lines.Data());
+    Check(strstr(loads, "  x 512:") == nullptr && strstr(loads, "  x 1024:") != nullptr, "a chunk of zeros in the middle is left out, and the short last chunk is written");
+    PrepareLoads(loads, "  a x 1\n");
+    const LoadFileBytes* back = g_loadFiles.back();
+    Check(back->bytes.size() == sizeof big && memcmp(&back->bytes[0], big, sizeof big) == 0, "the file reads back whole, with the zero chunk restored and the short last chunk in place");
+    free(loads);
+    name.Free();
+    lines.Free();
+    delete table;
+}
+
+void DebrisCacheSelfTest()
+{
+    printf("debris cache\n");
+    ResetBlock();
+    ReplayClearFailure();
+    InitDebrisPieces();
+    Check(g_debrisMemCache.AllocHandle(&g_explodedPieces[3], 200) == 1 && g_debrisMemCache.AllocHandle(&g_explodedPieces[5], 300) == 1, "two blocks are allocated");
+    g_explodedPieces[5] = nullptr;
+    ReplayCacheStart start;
+    ReplayCaptureDebrisCache(start);
+    ReplayText text;
+    ReplayAddCacheLines(start, text);
+    printf("%s", text.Data());
+    Check(ReplayFailure() == nullptr && start.blocks.size() == 3 && start.blocks[0].owner == 3 && start.blocks[0].live && start.blocks[1].owner == 5 && !start.blocks[1].live && start.blocks[2].owner == -1, "the blocks of the cache are captured with their owners, and whether the owner still holds them");
+    Check(start.cur == start.blocks[2].offset, "and the cursor");
+    char* recorded = strdup(text.Data());
+    text.Free();
+
+    ResetBlock();
+    BindLoadFiles();
+    PrepareLoads(recorded, "  a x 1\n");
+    InitDebrisForReplay("self-test");
+    unsigned char* base = (unsigned char*)g_debrisMemCache.base.get();
+    Check((unsigned char*)g_debrisMemCache.cur.get() == base + start.cur, "the replayer starts from the recorded cursor");
+    Check((unsigned char*)g_explodedPieces[3].get() == base + 8 && g_explodedPieces[5].get() == nullptr, "a live slot points at its block and the others at none");
+    DebrisCacheChunk* second = (DebrisCacheChunk*)(base + start.blocks[1].offset);
+    Check((char*)second->owner.get() == (char*)&g_explodedPieces[5] && (unsigned)second->size == start.blocks[1].size, "the headers are the recorded ones, owner and size");
+    g_game->ticks = 1;
+    AdoptCachedPiece(kReplayObjectFields[FieldIndex(ROK_EXPLODEDSLOT, "piece")], &g_explodedPieces[3], "ExplodedPiece#4");
+    Check(g_objects.Pointer(ROK_EXPLODEDPIECE, 4) == base + 8, "the object a line names for a live slot is its block");
+
+    char bad[256];
+    sprintf(bad, "cache debris 100000 0\n  block 0 50000 null\n");
+    Check(LoadsRefused(bad, "do not tile"), "blocks that do not tile the cache are refused");
+    sprintf(bad, "cache debris 100000 5\n  block 0 100000 null\n");
+    Check(LoadsRefused(bad, "do not tile its size, or its cursor"), "and a cursor inside a block");
+    free(recorded);
+}
+
+char* ReadWholeFile(const char* file, unsigned* size)
+{
+    FILE* f = fopen(file, "rb");
+    if (f == nullptr)
+        Fatal(file, 0, "cannot read", file);
+    fseek(f, 0, SEEK_END);
+    long length = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    char* text = (char*)malloc((unsigned)length + 1);
+    *size = (unsigned)fread(text, 1, (unsigned)length, f);
+    fclose(f);
+    text[*size] = '\0';
+    return text;
+}
+
+void ReplayChangedText(const char* text, unsigned size, Outcome& out)
+{
+    const char* changed = "replay_changed.tmp";
+    FILE* f = fopen(changed, "wb");
+    fwrite(text, 1, size, f);
+    fclose(f);
+    ReplayFile(changed, out);
+    remove(changed);
+    printf("changed: call %d, %s\n", out.call, out.key);
+}
+
+void LoadByteFlipSelfTest(const char* file)
+{
+    printf("a flipped load byte\n");
+    unsigned size = 0;
+    char* text = ReadWholeFile(file, &size);
+    char* setCob = strstr(text, " SetCob\n");
+    char* data = setCob == nullptr ? nullptr : strstr(setCob, "\n  a data ");
+    char holder[64] = "";
+    if (data != nullptr)
+        sscanf(data + 10, "%40s", holder);
+    char want[80];
+    sprintf(want, "\nload cob %s ", holder);
+    char* load = holder[0] == '\0' ? nullptr : strstr(text, want);
+    char* chunk = load == nullptr ? nullptr : strstr(load, "\n  x ");
+    char* end = chunk == nullptr ? nullptr : strchr(chunk + 1, '\n');
+    if (end == nullptr)
+        Fatal(file, 0, "a scripts recording with a SetCob call and the load of its script", "load cob");
+    Outcome same;
+    ReplayFile(file, same);
+    Check(!same.diverged, "the recording replays equal");
+    end[-1] = end[-1] == '0' ? '1' : '0';
+    Outcome changed;
+    ReplayChangedText(text, size, changed);
+    Check(changed.diverged && strstr(changed.key, "checksum") != nullptr, "a changed byte of a loaded file is reported at the field the script's load computes from it");
+    free(text);
+}
+
+void SetCobWriteSelfTest(const char* file)
+{
+    printf("a wrong write of SetCob\n");
+    unsigned size = 0;
+    char* text = ReadWholeFile(file, &size);
+    char* setCob = strstr(text, " SetCob\n");
+    char* next = setCob == nullptr ? nullptr : strstr(setCob + 1, "\ncall ");
+    char* pieces = setCob == nullptr ? nullptr : strstr(setCob, ".pieces [");
+    char* bytes = pieces == nullptr ? nullptr : strstr(pieces, "] 0:");
+    if (bytes == nullptr || (next != nullptr && bytes > next))
+        Fatal(file, 0, "a scripts recording whose SetCob call writes the pieces", "SetCob");
+    int call = -1;
+    for (char* at = strstr(text, "\ncall "); at != nullptr && at < setCob; at = strstr(at + 1, "\ncall "))
+        call++;
+    bytes[4] = bytes[4] == '0' ? '1' : '0';
+    Outcome out;
+    ReplayChangedText(text, size, out);
+    Check(out.diverged && out.call == call && strstr(out.key, ".pieces") != nullptr, "a write of SetCob's script that the call does not make is reported at the call and the field");
+    free(text);
+}
+
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
@@ -8377,6 +8722,9 @@ int SelfTest(const char* file)
     LoadInputsSelfTest();
     LoadBindSelfTest();
     LoadFormSelfTest();
+    LoadRefusalSelfTest();
+    LoadChunkSelfTest();
+    DebrisCacheSelfTest();
     EmptyTargetSelfTest();
     RebindSelfTest();
     RebindToFreshAddressesSelfTest();
@@ -8386,6 +8734,11 @@ int SelfTest(const char* file)
     RegionSelfTest();
     if (file == nullptr)
         return 0;
+    if (strstr(file, "scripts") != nullptr) {
+        LoadByteFlipSelfTest(file);
+        SetCobWriteSelfTest(file);
+        return 0;
+    }
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {
         Outcome out;
         ReplayFile(file, out, mutation);

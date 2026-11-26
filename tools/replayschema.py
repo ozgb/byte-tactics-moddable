@@ -412,7 +412,7 @@ def factor_asserts(length: list[dict], owner: str, where: str) -> list[str]:
         out.append('static_assert(sizeof(((%s*)nullptr)->%s) == 1 || sizeof(((%s*)nullptr)->%s) == 2 || sizeof(((%s*)nullptr)->%s) == 4, "%s: %s is a byte, a short or an int");'
                    % (o, m, o, m, o, m, where, m))
         if "via" in f:
-            out.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s: %s is a pointer");' % (owner, f["member"], where, f["member"]))
+            out.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s: %s is a pointer");' % (owner, f["member"], where, f["member"]))
     return out
 
 
@@ -1301,6 +1301,12 @@ def functions_of(slot: dict, subsystem: str, assignment: dict[str, list[str]], n
     return []
 
 
+def object_types(ann: dict) -> set[str]:
+    """The types a pointer argument or result names an object of: a state kind's, but not a delta table's whose type is also a value kind (DebrisVertex is a table of Vec3, which arguments pass by value)."""
+    values = {s["type"] for s in ann["objects"].values() if s["scope"] == "value"}
+    return {s["type"] for s in ann["objects"].values() if s["scope"] == "state" and not (s.get("delta") and s["type"] in values)}
+
+
 def classify_arg(param: dict, note: dict | None, ann: dict) -> dict:
     """How one parameter is recorded: mode and its details, or mode 'pending'."""
     ctype = normalise(param["type"])
@@ -1314,7 +1320,7 @@ def classify_arg(param: dict, note: dict | None, ann: dict) -> dict:
         out["mode"] = "text"
     elif ctype == "HapiBank*":
         out.update({"mode": "handle", "kind": "bank"})
-    elif ctype.endswith("*") and ctype[:-1] in {s["type"] for s in ann["objects"].values() if s["scope"] == "state"}:
+    elif ctype.endswith("*") and ctype[:-1] in object_types(ann):
         kind = [k for k, s in ann["objects"].items() if s["type"] == ctype[:-1]][0]
         out.update({"mode": "object", "kind": kind})
         if "kinds" in ann["objects"][kind]:
@@ -1339,7 +1345,7 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
         return out
     if ctype in SCALARS:
         out["mode"] = "scalar"
-    elif ctype.endswith("*") and ctype[:-1] in {s["type"] for s in ann["objects"].values() if s["scope"] == "state"}:
+    elif ctype.endswith("*") and ctype[:-1] in object_types(ann):
         kind = [k for k, s in ann["objects"].items() if s["type"] == ctype[:-1]][0]
         out.update({"mode": "object", "kind": kind})
         if "kinds" in ann["objects"][kind]:
@@ -2330,7 +2336,7 @@ def render_loads(ann: dict, model: dict) -> list[str]:
     for l in loads:
         for h in l["holders"]:
             if h["how"] == "member":
-                L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s holds the pointer of a %s load");' % (h["type"], h["member"], h["type"], h["member"], l["name"]))
+                L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s holds the pointer of a %s load");' % (h["type"], h["member"], h["type"], h["member"], l["name"]))
     if any(h["how"] == "member" for l in loads for h in l["holders"]):
         L.append("")
     return L
@@ -2591,7 +2597,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L.append('static_assert(sizeof(%s) == 16, "%s::%s is a block vector");' % (access, t, f["name"]))
             L.append('static_assert(__is_same(%s::value_type, %s), "%s::%s holds %s");' % (access, v["ctype"], t, f["name"], v["ctype"]))
         elif f["kind"] == "code":
-            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
+            L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
         elif f["kind"] in ("ptr", "load"):
             L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s is a raw pointer");' % (t, member, t, f["name"]))
         elif f["kind"] == "cstring":

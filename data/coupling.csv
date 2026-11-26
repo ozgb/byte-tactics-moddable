@@ -372,6 +372,7 @@ game,harness,call,HarnessTestMode,1
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::localPlayer,5
 game,harness,shared_write,Game::playerIndex,1
+game,harness,shared_write,Game::uiOptionFlags,1
 game,los_radar,call,ClampWorldPosToTerrain,2
 game,los_radar,call,ExpireEyeballs,1
 game,los_radar,call,FreeMapResources,1
@@ -974,6 +975,7 @@ harness,economy,shared_write,Player::type,8
 harness,features,call,GetCellFeature,1
 harness,features,shared_write,Game::difficulty,2
 harness,features,shared_write,Game::playerIndex,1
+harness,features,shared_write,Game::uiOptionFlags,1
 harness,features,shared_write,Player::type,2
 harness,game,call,ApplySlotsToGamePlayers,1
 harness,game,call,ExecuteCommandLine,1
@@ -984,6 +986,7 @@ harness,game,call,SaveGameFile,1
 harness,game,shared_write,Game::difficulty,4
 harness,game,shared_write,Game::localPlayer,13
 harness,game,shared_write,Game::playerIndex,5
+harness,game,shared_write,Game::uiOptionFlags,4
 harness,game,shared_write,Player::type,10
 harness,los_radar,call,GetMapCell,2
 harness,los_radar,shared_write,Game::localPlayer,5
@@ -999,6 +1002,7 @@ harness,map,shared_write,Game::difficulty,1
 harness,map,shared_write,Game::playerIndex,1
 harness,map,shared_write,Player::type,2
 harness,network,shared_write,Game::localPlayer,19
+harness,network,shared_write,Game::uiOptionFlags,1
 harness,network,shared_write,Player::progress,2
 harness,network,shared_write,Player::type,65
 harness,orders,call,DeleteOrder,1
@@ -1035,6 +1039,7 @@ harness,presentation,indirect,ParticleSystem::~ParticleSystem,1
 harness,presentation,shared_write,Game::difficulty,9
 harness,presentation,shared_write,Game::localPlayer,67
 harness,presentation,shared_write,Game::playerIndex,32
+harness,presentation,shared_write,Game::uiOptionFlags,4
 harness,presentation,shared_write,Player::type,46
 harness,presentation,shared_write,tagPOINT::x,9
 harness,presentation,shared_write,tagPOINT::y,9
@@ -2234,6 +2239,7 @@ players,game,shared_write,Vec3::x,2
 players,game,shared_write,Vec3::z,2
 players,game,shared_write,_MEMORYSTATUS::dwLength,1
 players,harness,call,HarnessEventWords,11
+players,harness,call,HarnessUiLeaveGame,1
 players,harness,shared_write,Game::localPlayer,5
 players,harness,shared_write,Game::mapFlags,1
 players,harness,shared_write,Game::playerIndex,1
@@ -2611,10 +2617,16 @@ presentation,harness,call,HarnessSetCursorPos,1
 presentation,harness,call,HarnessSoundEvent,6
 presentation,harness,call,HarnessUiCancel,1
 presentation,harness,call,HarnessUiCommand,2
+presentation,harness,call,HarnessUiForgetAttacker,1
+presentation,harness,call,HarnessUiGiveUnit,1
 presentation,harness,call,HarnessUiGroup,2
+presentation,harness,call,HarnessUiLeaveGame,1
 presentation,harness,call,HarnessUiOrder,2
 presentation,harness,call,HarnessUiQueue,1
+presentation,harness,call,HarnessUiSetStore,1
+presentation,harness,call,HarnessUiShareMap,1
 presentation,harness,call,HarnessUiSquads,1
+presentation,harness,call,HarnessUiTransfer,1
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,shared_write,GafFrame::compressed,1
 presentation,harness,shared_write,GafFrame::height,4
@@ -2626,6 +2638,7 @@ presentation,harness,shared_write,GafFrame::xOffset,3
 presentation,harness,shared_write,GafFrame::yOffset,3
 presentation,harness,shared_write,Game::difficulty,2
 presentation,harness,shared_write,Game::mapFlags,1
+presentation,harness,shared_write,Game::uiOptionFlags,1
 presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,Point::x,4
 presentation,harness,shared_write,Point::y,4

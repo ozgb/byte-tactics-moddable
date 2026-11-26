@@ -138,9 +138,9 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
             st->unit = unit;
             unit->angles = spot->rot;
             unit->pos = spot->pos;
-            DlNote(DL_FEATURE_TYPE, f->name);
+            DlNote(DL_FEATURE_TYPE, f->name, cell->spot);
             DrawUnit(dest, unit);
-            DlNote(DL_FEATURE_TYPE, 0);
+            DlNote(DL_FEATURE_TYPE, 0, -1);
         }
     } else {
         if (f->over) {

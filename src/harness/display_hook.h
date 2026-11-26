@@ -41,6 +41,7 @@
 #define DL_FEATURE_TYPE 106
 #define DL_FRAME_END 107
 #define DL_FREE 108
+#define DL_WRITTEN 109
 
 struct DlScope {
     DlScope(int kind, ...);

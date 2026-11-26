@@ -449,7 +449,7 @@ and so on), and this page is updated to name it. The current tag is
   still version 1 of the file (`BTVW`). The trace format is still `bt-trace 10`. Every `view` row and so every digest
   changes, and no `tick` row does; the commit line names a30a983b5, the reference tip with the view 2.0 fill (#1148).
   The event digests, sound logs, UI logs, interface commands, display logs, frames and saves are those of v48.
-- With the next free reference-traces tag after the merge of #1145: `frontend-skirmish`'s UI log,
+- `reference-traces-v50` (#1145): `frontend-skirmish`'s UI log,
   `reference/ui/frontend-skirmish.txt`, the one the reference writes at a30a983b5 (and at 86c792ca9). The headless
   host answers the CD audio as GOG's no-CD music does (17 tracks, the first not audio), so the battle music the menus
   leave on draws from the view stream at tick 2 as on the reference. The traces and every other stored log are those
@@ -460,6 +460,6 @@ traces and the sound logs, and `tools/reference.py --check` compares each scenar
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v49 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v50 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

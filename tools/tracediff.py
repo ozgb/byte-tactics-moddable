@@ -19,8 +19,12 @@ The row `world` is the tables hashed once per tick (game scalars, map, line of s
 after the last phase's row. A dump holds them after every phase, so the fields of a `world` divergence
 are read from the last phase's lines.
 
+The row `view` (format 10) hashes the player view of the end of the tick (docs/view.md, "The recorded view"). Its
+divergence is not a dump block: both builds play again with `--testdump <tick>`, which also writes views/<tick>.bin
+beside the trace, and the first field in which the two files differ is named (tools/viewblock.py), with both values.
+
 `--traces` compares existing trace files without running, and reports the first
-divergence only. `--dumps` diffs the phase of two existing dump files.
+divergence only (for a `view` row, the first differing field too when a `views/<tick>.bin` lies beside each trace.txt). `--dumps` diffs the phase of two existing dump files.
 
 `--poison-b` runs B with `playtest.py --poison` (new allocations filled with 0xCD), A as usual.
 
@@ -41,10 +45,13 @@ import sys
 import tempfile
 from pathlib import Path
 
+import viewblock
 from traceschema import TRACE_FORMAT
 
 ROOT = Path(__file__).resolve().parent.parent
-PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world", "tick")
+PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world", "tick", "view")
+DUMP_PHASES = tuple(p for p in PHASES if p != "view")
+VIEWS_DIR = "views"
 PHASE_FUNCTIONS = {
     "net": ("HandleNetPackets", 0x453D40),
     "units": ("UpdateAllUnits", 0x48AD30),
@@ -127,6 +134,8 @@ def describe_phase(phase: str) -> str:
     """The function a phase's hash follows, from RunGameSteps (src/ingame/dialogs_493340.cpp)."""
     if phase == "tick":
         return "none (the end of the tick, hashed after the whole step)"
+    if phase == "view":
+        return "none (the player view of the end of the tick, docs/view.md)"
     if phase not in PHASE_FUNCTIONS:
         return "none (the once-per-tick tables, hashed after UpdateMeteors)"
     name, address = PHASE_FUNCTIONS[phase]
@@ -200,11 +209,11 @@ def need(run: Path, name: str) -> Path:
 
 
 def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
-                 poison: bool = False) -> Path:
+                 poison: bool = False, **extra) -> Path:
     """`play`, but a scenario with a `load` line first plays the scenario it names, from the same directory, and gets its save."""
     saver = scenario_load(scenario)
     if saver is None:
-        return play(exe, scenario, game_dir, dump, timeout, poison)
+        return play(exe, scenario, game_dir, dump, timeout, poison, **extra)
     saver_path = scenario.parent / f"{saver}.txt"
     if not saver_path.is_file():
         raise Error(f"{scenario.stem}: load {saver}: there is no scenario {saver_path}")
@@ -221,7 +230,27 @@ def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | No
                 shutil.copyfile(run / path, Path(scratch) / Path(path).name)
         finally:
             shutil.rmtree(run.parent, ignore_errors=True)
-        return play(exe, scenario, game_dir, dump, timeout, poison, put={path: Path(scratch) / Path(path).name for path in SAVE_FILES})
+        return play(exe, scenario, game_dir, dump, timeout, poison, put={path: Path(scratch) / Path(path).name for path in SAVE_FILES},
+                    **extra)
+
+
+def view_file(directory: Path, tick: int) -> Path:
+    return directory / VIEWS_DIR / f"{tick}.bin"
+
+
+def view_difference(a: Path, b: Path) -> str | None:
+    """`<path>: a=<value> b=<value>` for the first field in which the two view files differ, None when they are equal."""
+    for path in (a, b):
+        if not path.is_file():
+            raise Error(f"{path} is missing: does the exe write views/<tick>.bin on the dump tick?")
+    return viewblock.describe_difference(a, b)
+
+
+def print_view_diff(diff: str | None) -> None:
+    if diff is None:
+        print("  the view files are equal")
+    else:
+        print(f"  first differing field: {diff}")
 
 
 def compare(args: argparse.Namespace) -> int:
@@ -238,7 +267,11 @@ def compare(args: argparse.Namespace) -> int:
         return 0
     tick, phase = div
     print_divergence(tick, phase)
-    runs = [play_loading(e, s, args.game_dir, tick, None, p) for e, s, p in zip(exes, scenarios, poison)]
+    extra = {"collect": (f"{VIEWS_DIR}/{tick}.bin",)} if phase == "view" else {}
+    runs = [play_loading(e, s, args.game_dir, tick, None, p, **extra) for e, s, p in zip(exes, scenarios, poison)]
+    if phase == "view":
+        print_view_diff(view_difference(view_file(runs[0], tick), view_file(runs[1], tick)))
+        return 1
     print_diff(diff_dumps(need(runs[0], "dump.txt"), need(runs[1], "dump.txt"), tick, phase))
     return 1
 
@@ -267,8 +300,8 @@ def main() -> int:
     for s in args.scenario or []:
         if args.exe and not Path(s).is_file():
             ap.error(f"{s} is not a file")
-    if args.dumps and (not args.at or not args.at[0].isdigit() or args.at[1] not in PHASES):
-        ap.error(f"--dumps needs --at TICK PHASE, phase one of {' '.join(PHASES)}")
+    if args.dumps and (not args.at or not args.at[0].isdigit() or args.at[1] not in DUMP_PHASES):
+        ap.error(f"--dumps needs --at TICK PHASE, phase one of {' '.join(DUMP_PHASES)}")
     try:
         if args.traces:
             (ha, ra), (hb, rb) = (parse_trace(Path(t)) for t in args.traces)
@@ -278,6 +311,10 @@ def main() -> int:
                 print(f"traces identical ({len(ra)} lines)")
                 return 0
             print_divergence(*div)
+            if div[1] == "view":
+                dirs = [Path(t).parent for t in args.traces]
+                if all(view_file(d, div[0]).is_file() for d in dirs):
+                    print_view_diff(view_difference(*(view_file(d, div[0]) for d in dirs)))
             return 1
         if args.dumps:
             diffs = diff_dumps(Path(args.dumps[0]), Path(args.dumps[1]), int(args.at[0]), args.at[1])

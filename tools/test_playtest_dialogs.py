@@ -303,6 +303,18 @@ def test_x_joins_the_namespace_only_on_a_read_only_socket_dir() -> None:
             sock.chmod(0o755)
 
 
+def test_every_x_client_goes_through_xwrap() -> None:
+    lines = Path(playtest.__file__).read_text().splitlines()
+    clients = [l for l in lines if any(f'["{c}"' in l for c in ("xdotool", "xdpyinfo", "import"))]
+    assert len(clients) >= 5
+    for line in clients:
+        assert "self.xwrap([" in line, line
+    servers = [l for l in lines if "self.xserver = subprocess.Popen(" in l]
+    assert len(servers) == 1
+    start = lines.index(servers[0])
+    assert lines[start + 1].strip().startswith("self.xwrap(cmd)")
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

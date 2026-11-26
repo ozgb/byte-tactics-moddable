@@ -554,6 +554,9 @@ class Instance:
         if self.run.window and not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
             raise RuntimeError("Xephyr needs a desktop to open its window on (DISPLAY is not set)")
         self.x_in_netns = self.x_needs_netns()
+        if self.run.window and self.x_in_netns:
+            raise RuntimeError("--window can't show a multiplayer run on WSL, where /tmp/.X11-unix is read-only: "
+                               "one instance's Xephyr could take :0 and the other's would open inside it")
         r, w = os.pipe()
         title = f"TA play test: {self.run.name}{self.suffix}" if self.run.window else None
         cmd = x_command(title, w)
@@ -787,10 +790,8 @@ class Instance:
         if not self.display:
             return
         path = self.run.out / (name + (".jpg" if jpeg else ".png"))
-        args = ["import", "-window", "root"]
-        if jpeg:
-            args += ["-quality", "80"]
-        subprocess.run(self.xwrap([*args, str(path)]), env={**os.environ, "DISPLAY": self.display},
+        quality = ["-quality", "80"] if jpeg else []
+        subprocess.run(self.xwrap(["import", "-window", "root", *quality, str(path)]), env={**os.environ, "DISPLAY": self.display},
                        capture_output=True, timeout=30)
 
 

@@ -259,6 +259,7 @@ HEAP_TYPES: list[tuple[str, str]] = [
 
 MASKS: dict[tuple[str, int], tuple[int, str]] = {
     ("ExplodedPiece", 0x28): (0x3F, "bits 6 to 31 are never written; StartExplodePiece copies them from an uninitialised stack header"),
+    ("Unit", 0x110): (0xFFFFFFEF, "bit 0x10 is the selection, view state: presentation sets it and reads it, and the tick only clears it"),
     ("Order", 0x42): (0xFFDFFFFF, "bit 0x200000 is set by DrawWeaponCoverage (markers.cpp:564) and read only there (markers.cpp:556)"),
     ("UnitMotion", 0x2E): (0x07, "bits 3 to 7 are never written; the constructor sets mode and flag (order_list.cpp:2096)"),
     ("AiSearchGoal", 0x64): (0x0B, "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after SerializeNetUnitState writes it"),
@@ -888,7 +889,7 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
     ("spotField_1421f", 0x1421F, 4, "HEAP", 0),
     ("scanIndex", 0x14257, 4, None, 0),
     ("mapFlags", 0x14281, 2, None, 0xFFF7),
-    ("endGameFlags", 0x3923B, 2, None, 0),
+    ("endGameFlags", 0x3923B, 2, None, 0xFFFC),
     ("uiOptionFlags", 0x37F2F, 2, None, 0x788),
 ]
 

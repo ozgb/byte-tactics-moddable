@@ -1,4 +1,4 @@
-bt-ui 1
+bt-ui 2
 1 scroll 304 32
 1 view 1
 1 select -
@@ -9,14 +9,10 @@ bt-ui 1
 14 view 2
 20 input mouse move 464 300
 21 input mouse right down 464 300
-21 command order mode 1 kind - units 1 target - pos 640 1 300 param 0 amount 0 remove 0
-21 order Move_Ground unit 1 target - pos 640 1 300 type - param 0 amount 0 remove 0
 22 input mouse right up 464 300
 23 view 3
 60 input mouse move 524 300
 61 input mouse right down 524 300
-61 command order mode 1 kind - units 1 target 252 pos 700 1 300 param 0 amount 0 remove 0
-61 order Attack_Chase unit 1 target 252 pos 700 1 300 type - param 0 amount 0 remove 0
 62 input mouse right up 524 300
 63 view 4
 79 view 5

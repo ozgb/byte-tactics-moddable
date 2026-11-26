@@ -17,6 +17,7 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | `reference/sounds/` | the stored sound logs | `docs/sound-log.md` |
 | `reference/frames/` | the stored frames | `docs/frame-dump.md` |
 | `reference/ui/` | the stored UI logs | `docs/ui-log.md` |
+| `reference/commands/` | the stored interface commands | `docs/commands.md` |
 | `reference/events/` | the stored sim event digests: for each scenario, the tick, phase, record count and hash of each run of sim events, and for each tick its count, the hash of the records whose order counts and the hash of their set | `docs/events-log.md` |
 | `docs/events-log.md`, `tools/eventdigest.py` | the sim event log format, the digest format and the tool that makes a digest from a log and compares it with a stored one (standard library only, with `tools/tracerehash.py`; it reads the order classes from `docs/sim-events.md`) | `docs/events-log.md` |
 | `reference/display/` | the stored display digests: for each scenario, each frame's number, tick, item count, the hash of its display list in order and the hash of its items with their layers | `docs/display-log.md` |

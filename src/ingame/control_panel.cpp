@@ -640,7 +640,6 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                 int count = IsKeyDown(0xf9) ? 5 : 1;
                 if (GetClickMode(menu) != 1)
                     count = -count;
-                HarnessUiQueue(text, unit, count);
                 QueueBuildOrderWithSound(text, unit, count);
                 if (unit->immobile
                     || (unit->weapons[0].weapon.get()->flags.value & 0x10000000))

@@ -102,10 +102,19 @@ the run stops before the last tick.
 
 `--check` compares each run's `ui.txt` line by line with `reference/ui/<scenario>.txt` and reports the first line
 that differs (format and meaning in [docs/ui-log.md](../docs/ui-log.md)). It fails when a stored log has no
-scenario, when a `ui-*` scenario has no stored log, and when a `ui-*` scenario's log has no order, queued build,
-cancel or group line and selects no unit (a click that gives nothing is a broken scenario). A scenario with no
+scenario, when a `ui-*` scenario has no stored log, and when a `ui-*` scenario's run makes no control group, selects
+no unit and sends no command of the interface (input that does nothing is a broken scenario). A scenario with no
 stored log is only counted. `--traces` copies the logs the reference branch wrote into `reference/ui/`. A scenario
 with `input` lines runs at one step per frame even under `--steps-per-frame`.
+
+## Interface commands
+
+`--check` decodes the interface's records of each run's `commands.txt` (`tools/interfacelog.py`) and compares them
+line by line with `reference/commands/<scenario>.txt`, naming the first record that differs (format in
+[docs/commands.md](../docs/commands.md), section 2.1). Every scenario with `input` lines has a stored file; one
+without them must have none, and its run must send no command of the interface. A stored file with no scenario
+fails. The reference branch writes `interface.txt` in the decoded form, and `--traces` copies the files it stored
+into `reference/commands/`.
 
 ## Event logs
 

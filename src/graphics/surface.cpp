@@ -842,10 +842,6 @@ void __stdcall DrawQuadRow(int row, int* rect, Surface* surf, GafFrame* info)
     }
 }
 
-struct FrameQuad {
-    Point p[4];
-};
-
 struct FrameQuadScanline {
     int left;
     int right;

@@ -48,9 +48,6 @@ void __stdcall FillPolygon(Surface* surface, Point* points, int n, unsigned char
 void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth);
 Font* __stdcall LoadFontByName(const char* name);
 
-struct FrameQuad {
-    Point p[4];
-};
 void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp, FrameQuad* dst, FrameQuad* src);
 
 static const int kMaxTargets = 64;

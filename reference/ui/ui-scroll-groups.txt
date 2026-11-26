@@ -1,0 +1,723 @@
+bt-ui 2
+1 scroll 304 32
+1 view 1
+1 select -
+10 input mouse move 424 300
+11 input mouse left down 424 300
+12 input mouse left up 424 300
+13 select 2
+14 view 2
+15 input key down 17
+16 input key down 49
+17 input key up 49
+17 group 1 2
+18 input key up 17
+20 input mouse move 96 187
+21 input mouse left down 96 187
+22 input mouse left up 96 187
+24 view 3
+30 input mouse move 384 240
+31 input mouse left down 384 240
+32 input mouse left up 384 240
+33 select 1
+34 view 4
+40 input key down 16
+41 input mouse move 300 360
+42 input mouse right down 300 360
+43 input mouse right up 300 360
+44 input mouse move 250 400
+45 input mouse right down 250 400
+46 input mouse right up 250 400
+47 input key up 16
+60 input mouse move 639 300
+80 input mouse move 400 300
+87 view 34
+88 view 95
+89 view 155
+90 input key down 40
+90 view 215
+91 view 275
+92 view 335
+93 view 395
+94 view 455
+95 view 515
+96 view 575
+97 view 635
+98 view 695
+99 view 755
+100 view 815
+101 view 875
+102 view 935
+103 view 995
+104 view 1055
+105 view 1115
+106 view 1175
+107 view 1235
+108 view 1295
+109 view 1355
+110 input key up 40
+110 view 1415
+111 view 1475
+112 view 1535
+113 view 1595
+114 view 1655
+115 view 1715
+116 view 1775
+117 view 1835
+118 view 1895
+119 view 1955
+120 input key down 37
+120 view 2015
+121 view 2075
+122 view 2135
+123 view 2195
+124 view 2255
+125 view 2315
+126 view 2375
+127 view 2435
+128 view 2495
+129 view 2555
+130 view 2615
+131 view 2675
+132 view 2735
+133 view 2795
+134 view 2855
+135 input key up 37
+135 view 2915
+136 view 2975
+137 view 3035
+138 view 3095
+139 view 3155
+140 view 3215
+141 view 3275
+142 view 3335
+143 view 3395
+144 view 3455
+145 view 3515
+146 view 3575
+147 view 3635
+148 view 3695
+149 view 3755
+150 input mouse move 40 40
+150 view 3815
+151 input mouse left down 40 40
+151 view 3875
+152 input mouse move 60 50
+152 view 3935
+153 input mouse move 80 70
+153 scroll 1435 189
+153 view 3995
+154 input mouse move 100 90
+154 scroll 1999 756
+154 view 4055
+155 input mouse left up 100 90
+155 scroll 2563 1088
+155 view 4115
+156 view 4175
+157 view 4235
+158 view 4295
+159 view 4355
+160 view 4415
+161 view 4475
+162 view 4535
+163 view 4595
+164 view 4655
+165 view 4715
+166 view 4775
+167 view 4835
+168 view 4895
+169 view 4955
+170 input key down 17
+170 view 5015
+171 input key down 116
+171 view 5075
+172 input key up 116
+172 view 5135
+173 input key up 17
+173 view 5195
+174 view 5255
+175 view 5315
+176 view 5375
+177 view 5435
+178 view 5495
+179 view 5555
+180 input key down 39
+180 view 5615
+181 view 5675
+182 view 5735
+183 view 5795
+184 view 5855
+185 view 5915
+186 view 5975
+187 view 6035
+188 view 6095
+189 view 6155
+190 view 6215
+191 view 6275
+192 view 6335
+193 view 6395
+194 view 6455
+195 input key up 39
+195 view 6515
+196 view 6575
+197 view 6635
+198 view 6695
+199 view 6756
+200 input key down 116
+200 view 6816
+201 input key up 116
+201 view 6876
+202 view 6936
+203 view 6996
+204 view 7056
+205 view 7116
+206 view 7176
+207 view 7236
+208 view 7296
+209 view 7356
+210 input char 110
+210 view 7416
+211 view 7476
+212 scroll 2243 768
+212 view 7536
+213 scroll 1923 448
+213 view 7596
+214 scroll 1603 128
+214 view 7656
+215 scroll 1283 110
+215 view 7716
+216 scroll 963 101
+216 view 7776
+217 scroll 643 96
+217 view 7836
+218 scroll 498 94
+218 view 7896
+219 scroll 425 93
+219 view 7956
+220 input char 116
+220 scroll 389 92
+220 view 8016
+221 scroll 371 92
+221 view 8076
+222 scroll 290 134
+222 view 8136
+223 scroll 249 155
+223 view 8196
+224 scroll 228 166
+224 view 8256
+225 scroll 217 172
+225 view 8316
+226 scroll 211 176
+226 view 8376
+227 scroll 207 178
+227 view 8436
+228 scroll 205 179
+228 view 8496
+229 scroll 203 180
+229 view 8556
+230 scroll 202 181
+230 view 8616
+231 scroll 201 182
+231 view 8676
+232 scroll 200 183
+232 view 8736
+233 scroll 199 184
+233 view 8796
+234 scroll 198 185
+234 view 8856
+235 scroll 197 186
+235 view 8916
+236 scroll 196 187
+236 view 8976
+237 scroll 195 188
+237 view 9036
+238 scroll 194 188
+238 view 9096
+239 scroll 193 189
+239 view 9156
+240 input char 116
+240 scroll 192 189
+240 view 9216
+241 scroll 191 189
+241 view 9276
+242 scroll 190 189
+242 view 9336
+243 scroll 189 190
+243 view 9396
+244 scroll 188 190
+244 view 9456
+245 scroll 187 190
+245 view 9516
+246 scroll 186 190
+246 view 9576
+247 scroll 184 190
+247 view 9636
+248 scroll 183 190
+248 view 9696
+249 scroll 182 190
+249 view 9756
+250 view 9816
+251 view 9876
+252 view 9936
+253 view 9996
+254 view 10056
+255 view 10116
+256 view 10176
+257 view 10236
+258 view 10296
+259 view 10356
+260 input char 116
+260 view 10416
+261 view 10476
+262 view 10536
+263 view 10596
+264 view 10656
+265 view 10716
+266 view 10776
+267 view 10836
+268 view 10896
+269 view 10956
+270 view 11016
+271 view 11076
+272 view 11136
+273 view 11196
+274 view 11256
+275 view 11316
+276 view 11376
+277 view 11436
+278 view 11496
+279 view 11556
+280 input key down 17
+280 view 11616
+281 input key down 67
+281 view 11676
+282 input key up 67
+282 view 11736
+283 input key up 17
+283 view 11796
+284 view 11856
+285 view 11916
+286 view 11976
+287 view 12036
+288 view 12096
+289 view 12156
+290 input key down 17
+290 view 12216
+291 input key down 90
+291 view 12276
+292 input key up 90
+292 view 12336
+293 input key up 17
+293 view 12396
+294 view 12456
+295 view 12516
+296 view 12576
+297 view 12636
+298 view 12696
+299 view 12756
+300 input key down 17
+300 view 12816
+301 input key down 65
+301 view 12876
+302 input key up 65
+302 view 12936
+303 input key up 17
+303 view 12996
+303 select 1,2
+304 view 13056
+305 view 13116
+306 view 13176
+307 view 13236
+308 view 13296
+309 view 13356
+310 input key down 17
+310 view 13416
+311 input key down 83
+311 view 13476
+312 input key up 83
+312 view 13536
+313 input key up 17
+313 view 13596
+314 view 13656
+315 view 13716
+316 view 13776
+317 view 13836
+318 view 13896
+319 view 13956
+320 input key down 17
+320 view 14016
+321 input key down 86
+321 view 14076
+322 input key up 86
+322 view 14136
+323 input key up 17
+323 view 14196
+323 select -
+324 view 14256
+325 view 14316
+326 view 14376
+327 view 14436
+328 view 14496
+329 view 14556
+330 view 14616
+331 view 14676
+332 view 14736
+333 view 14796
+334 view 14856
+335 view 14916
+336 view 14976
+337 view 15036
+338 view 15096
+339 view 15156
+340 view 15216
+341 view 15276
+342 view 15336
+343 view 15396
+344 view 15456
+345 view 15516
+346 view 15576
+347 view 15636
+348 view 15696
+349 view 15756
+350 view 15816
+351 view 15876
+352 view 15936
+353 view 15996
+354 view 16056
+355 view 16116
+356 view 16176
+357 view 16236
+358 view 16296
+359 view 16356
+360 view 16416
+361 view 16476
+362 view 16536
+363 view 16596
+364 view 16656
+365 view 16716
+366 view 16776
+367 view 16836
+368 view 16896
+369 view 16956
+370 view 17016
+371 view 17076
+372 view 17136
+373 view 17196
+374 view 17256
+375 view 17316
+376 view 17376
+377 view 17436
+378 view 17496
+379 view 17556
+380 view 17616
+381 view 17676
+382 view 17736
+383 view 17796
+384 view 17856
+385 view 17916
+386 view 17976
+387 view 18036
+388 view 18096
+389 view 18156
+390 view 18216
+391 view 18276
+392 view 18336
+393 view 18396
+394 view 18456
+395 view 18516
+396 view 18576
+397 view 18636
+398 view 18696
+399 view 18756
+400 view 18816
+401 view 18876
+402 view 18936
+403 view 18996
+404 view 19056
+405 view 19116
+406 view 19176
+407 view 19236
+408 view 19296
+409 view 19356
+410 view 19416
+411 view 19476
+412 view 19536
+413 view 19596
+414 view 19656
+415 view 19716
+416 view 19776
+417 view 19836
+418 view 19896
+419 view 19956
+420 view 20016
+421 view 20076
+422 view 20136
+423 view 20196
+424 view 20256
+425 view 20316
+426 view 20376
+427 view 20436
+428 view 20496
+429 view 20556
+430 view 20616
+431 view 20676
+432 view 20736
+433 view 20796
+434 view 20856
+435 view 20916
+436 view 20976
+437 view 21036
+438 view 21096
+439 view 21156
+440 view 21216
+441 view 21276
+442 view 21336
+443 view 21396
+444 view 21456
+445 view 21516
+446 view 21576
+447 view 21636
+448 view 21696
+449 view 21756
+450 view 21816
+451 view 21876
+452 view 21936
+453 view 21996
+454 view 22056
+455 view 22116
+456 view 22176
+457 view 22236
+458 view 22296
+459 view 22356
+460 view 22416
+461 view 22476
+462 view 22536
+463 view 22596
+464 view 22656
+465 view 22716
+466 view 22776
+467 view 22836
+468 view 22896
+469 view 22956
+470 view 23016
+471 view 23076
+472 view 23136
+473 view 23196
+474 view 23256
+475 view 23316
+476 view 23376
+477 view 23436
+478 view 23496
+479 view 23556
+480 view 23616
+481 view 23676
+482 view 23736
+483 view 23796
+484 view 23856
+485 view 23916
+486 view 23976
+487 view 24036
+488 view 24096
+489 view 24156
+490 view 24216
+491 view 24276
+492 view 24336
+493 view 24396
+494 view 24486
+495 view 24606
+496 view 24726
+497 view 24846
+498 view 24966
+499 view 25086
+500 view 25206
+501 view 25326
+502 view 25446
+503 view 25566
+504 view 25686
+505 view 25806
+506 view 25926
+507 view 26046
+508 view 26166
+509 view 26286
+510 view 26406
+511 view 26526
+512 view 26646
+513 view 26766
+514 view 26886
+515 view 27006
+516 view 27126
+517 view 27246
+518 view 27366
+519 view 27486
+520 view 27606
+521 view 27726
+522 view 27846
+523 view 27966
+524 view 28086
+525 view 28206
+526 view 28326
+527 view 28446
+528 view 28566
+529 view 28686
+530 view 28806
+531 view 28926
+532 view 29046
+533 view 29166
+534 view 29286
+535 view 29406
+536 view 29526
+537 view 29646
+538 view 29766
+539 view 29886
+540 view 30006
+541 view 30126
+542 view 30246
+543 view 30366
+544 view 30486
+545 view 30606
+546 view 30726
+547 view 30846
+548 view 30966
+549 view 31086
+550 view 31206
+551 view 31326
+552 view 31446
+553 view 31566
+554 view 31686
+555 view 31806
+556 view 31926
+557 view 32046
+558 view 32166
+559 view 32286
+560 view 32406
+561 view 32526
+562 view 32646
+563 view 32766
+564 view 32886
+565 view 33006
+566 view 33126
+567 view 33246
+568 view 33366
+569 view 33486
+570 view 33606
+571 view 33697
+572 view 33758
+573 view 33818
+574 view 33878
+575 view 33938
+576 view 33998
+577 view 34058
+578 view 34118
+579 view 34178
+580 view 34238
+581 view 34298
+582 view 34358
+583 view 34418
+584 view 34478
+585 view 34538
+586 view 34598
+587 view 34658
+588 view 34718
+589 view 34778
+590 view 34838
+591 view 34898
+592 view 34958
+593 view 35018
+594 view 35078
+595 view 35138
+596 view 35198
+597 view 35258
+598 view 35318
+599 view 35378
+600 view 35438
+601 view 35498
+602 view 35558
+603 view 35618
+604 view 35678
+605 view 35738
+606 view 35798
+607 view 35858
+608 view 35918
+609 view 35978
+610 view 36038
+611 view 36098
+612 view 36158
+613 view 36218
+614 view 36278
+615 view 36338
+616 view 36398
+617 view 36458
+618 view 36518
+619 view 36578
+620 view 36638
+621 view 36698
+622 view 36758
+623 view 36818
+624 view 36878
+625 view 36938
+626 view 36998
+627 view 37058
+628 view 37118
+629 view 37178
+630 view 37238
+631 view 37298
+632 view 37358
+633 view 37418
+634 view 37478
+635 view 37538
+636 view 37598
+637 view 37658
+638 view 37718
+639 view 37778
+640 view 37838
+641 view 37898
+642 view 37958
+643 view 38018
+644 view 38078
+645 view 38138
+646 view 38198
+647 view 38258
+648 view 38318
+649 view 38378
+650 input key down 18
+650 view 38438
+651 input key down 49
+651 view 38498
+652 input key up 49
+652 view 38558
+652 groupsel 1 2,3
+653 input key up 18
+653 view 38618
+653 select 3
+654 view 38678
+655 view 38738
+656 view 38798
+657 view 38858
+658 view 38918
+659 view 38978
+660 input mouse move 300 300
+660 view 39038
+661 input mouse right down 300 300
+661 view 39098
+662 input mouse right up 300 300
+662 view 39158
+663 view 39219
+664 view 39279
+665 view 39339
+666 view 39399
+667 view 39459
+668 view 39519
+669 view 39579
+670 view 39639
+671 view 39699
+672 view 39759
+673 view 39819
+674 view 39879
+675 view 39939
+676 view 39999
+677 view 40059
+678 view 40119
+679 view 40179
+680 view 40239
+681 view 40299
+682 view 40329

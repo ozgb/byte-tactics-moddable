@@ -1,0 +1,1242 @@
+bt-display 1
+frame 25 22 1 28d82e7e3b99a38e
+sprite ARMLAB1.GUI 64 27 128 91 anims/armlab1.gaf:ARMPW:1 65 27
+blit RADAR%20FINAL 0 0 126 53 RADAR%20MAPPED 0 0
+sprite RADAR%20FINAL 18 7 22 11 anims/fx.gaf:radlogo:0 19 8
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+sprite RADAR%20FINAL 19 8 25 14 anims/fx.gaf:radlogohigh:0 21 10
+terrain screen 128 32 640 448 The%20Pass 304 32
+sprite screen 129 0 640 32 anims/armint.gaf:PANELTOP:0 130 0
+quad screen 132 5 153 26 textures/logos.gaf:32xlogos:0 132,5 152,5 152,25 132,25 0,0,32,0,32,32,0,32
+fill screen 471 12 591 15 208
+text screen 529 18 547 29 console 255 254 254 529 18 944
+text screen 468 1 474 12 console 255 254 254 468 1 0
+text screen 571 1 595 12 console 255 254 254 571 1 1000
+text screen 609 5 621 16 console 233 254 254 609 5 25
+text screen 609 17 615 28 console 211 254 254 609 17 0
+fill screen 218 12 338 15 224
+text screen 278 18 296 29 console 255 254 254 278 18 944
+text screen 215 1 221 12 console 255 254 254 215 1 0
+text screen 317 1 341 12 console 255 254 254 317 1 1000
+text screen 358 5 373 16 console 233 254 254 358 5 1.0
+text screen 358 17 373 28 console 211 254 254 358 17 0.0
+blit screen 0 36 126 89 RADAR%20FINAL 0 36
+outline screen 10 37 28 51 10 37 27 50 194
+sprite screen 349 298 408 364 anims/rocks.gaf:rockmetal3:0 376 328
+sprite_blend screen 553 43 598 90 anims/trees.gaf:treeshad2:0 568 88
+sprite screen 549 32 586 89 anims/trees.gaf:tree2:0 568 88
+sprite_blend screen 627 42 640 89 anims/trees.gaf:leafshad:0 632 88
+sprite screen 607 32 640 89 anims/trees.gaf:leaf2:0 632 88
+sprite_blend screen 627 122 640 169 anims/trees.gaf:leafshad:0 632 168
+sprite screen 610 104 640 171 anims/trees.gaf:leaf3:0 632 168
+sprite_blend screen 515 186 565 233 anims/trees.gaf:leafshad:0 520 232
+sprite screen 492 162 544 233 anims/trees.gaf:leaf1:0 520 232
+model screen 128 32 640 448 armcom armcom 384 240 36700160 65536 15728640 0 0 0 0 00000000 0 bf4ccccd,3f800000,3e800000 ground,3,0,0,0,0,0,0 pelvis,3,0,0,0,0,1507327,0 lthigh,3,0,0,0,-327680,1310719,0 lleg,3,0,0,0,-327680,720896,0 rthigh,3,0,0,0,327680,1310719,0 rleg,3,0,0,0,327680,720896,0 torso,3,0,0,0,0,1703934,0 ruparm,3,0,0,0,622591,1998846,0 biggun,3,0,0,0,753662,1605631,0 rbigflash,2,0,0,0,786430,1048575,0 luparm,3,0,0,0,-622591,1998846,0 nanolath,3,0,0,0,-753662,1638400,0 lfirept,2,0,0,0,-779387,1099531,241335 nanospray,2,0,0,0,-786432,1015808,0 head,3,0,0,0,0,2228224,0
+sprite_blend screen 128 218 133 265 anims/trees.gaf:leafshad:0 88 264
+sprite_blend screen 579 250 629 297 anims/trees.gaf:leafshad:0 584 296
+sprite screen 562 232 609 299 anims/trees.gaf:leaf3:0 584 296
+line screen 384 251 467 263 466 251 384 262 233
+line screen 384 262 399 358 384 262 398 357 233
+line screen 398 346 480 358 398 357 479 346 233
+line screen 466 251 480 347 479 346 466 251 233
+model screen 128 32 640 448 armlab armlab 432 304 39845888 65536 19922944 0 -31295 0 0 00000000 0 bf4ccccd,3f800000,3e800000 base,3,0,0,0,0,0,0 stand1,3,0,0,0,-1784298,-442,-253671 nano1,3,0,0,0,-2805755,261925,-398890 beam1,2,0,0,0,-2163365,-603911,-241368 stand2,3,0,0,0,1865403,-442,265201 nano2,3,0,0,0,2886860,261925,410420 beam2,2,0,0,0,2226020,-603911,382664 door1,3,0,0,0,-627339,0,-2571500 door1A,3,0,0,0,-267547,0,-1610168 door2,3,0,0,0,1400273,0,-2283237 door2A,3,0,0,0,705706,0,-1471802 door3,3,0,0,0,-1319169,0,2294768 door3A,3,0,0,0,-717237,0,1552906 door4,3,0,0,0,708443,0,2583030 door4A,3,0,0,0,256017,0,1691272 pad,3,0,0,0,157,26214,231704
+sprite_blend screen 579 330 629 377 anims/trees.gaf:leafshad:0 584 376
+sprite screen 559 308 606 377 anims/trees.gaf:leaf2:0 584 376
+fill screen 128 32 160 48 0
+sprite_gray screen 160 32 192 48 anims/fog.gaf:Gray1:6 160 16
+sprite screen 160 32 192 48 anims/fog.gaf:Black1:6 160 16
+sprite_gray screen 192 32 210 34 anims/fog.gaf:Gray2:0 192 16
+sprite_gray screen 556 32 576 37 anims/fog.gaf:Gray1:1 544 16
+sprite_gray screen 576 32 608 48 anims/fog.gaf:Gray2:10 576 16
+sprite screen 576 32 608 48 anims/fog.gaf:Black2:10 576 16
+fill screen 608 32 640 48 0
+fill screen 128 48 160 80 0
+sprite_gray screen 160 48 180 80 anims/fog.gaf:Gray2:4 160 48
+sprite screen 160 48 176 80 anims/fog.gaf:Black2:4 160 48
+sprite_gray screen 585 48 608 80 anims/fog.gaf:Gray3:9 576 48
+sprite screen 592 48 608 80 anims/fog.gaf:Black3:9 576 48
+fill screen 608 48 640 80 0
+sprite_gray screen 128 80 160 112 anims/fog.gaf:Gray2:6 128 80
+sprite screen 128 80 160 112 anims/fog.gaf:Black2:6 128 80
+sprite_gray screen 160 80 178 98 anims/fog.gaf:Gray3:0 160 80
+sprite screen 160 80 176 96 anims/fog.gaf:Black3:0 160 80
+sprite_gray screen 588 80 608 101 anims/fog.gaf:Gray4:1 576 80
+sprite screen 592 80 608 96 anims/fog.gaf:Black4:1 576 80
+sprite_gray screen 608 80 640 112 anims/fog.gaf:Gray1:10 608 80
+sprite screen 608 80 640 112 anims/fog.gaf:Black1:10 608 80
+sprite_gray screen 128 112 146 130 anims/fog.gaf:Gray3:0 128 112
+sprite screen 128 112 144 128 anims/fog.gaf:Black3:0 128 112
+sprite_gray screen 620 112 640 133 anims/fog.gaf:Gray2:1 608 112
+sprite screen 624 112 640 128 anims/fog.gaf:Black2:1 608 112
+sprite_gray screen 128 285 147 304 anims/fog.gaf:Gray4:3 128 272
+sprite screen 128 287 144 304 anims/fog.gaf:Black4:3 128 272
+sprite_gray screen 128 304 160 336 anims/fog.gaf:Gray1:12 128 304
+sprite screen 128 304 160 336 anims/fog.gaf:Black1:12 128 304
+sprite_gray screen 160 317 179 336 anims/fog.gaf:Gray2:3 160 304
+sprite screen 160 320 177 336 anims/fog.gaf:Black2:3 160 304
+fill screen 128 336 160 368 0
+sprite_gray screen 160 336 182 368 anims/fog.gaf:Gray3:4 160 336
+sprite screen 160 336 176 368 anims/fog.gaf:Black3:4 160 336
+fill screen 128 368 160 400 0
+sprite_gray screen 160 368 192 400 anims/fog.gaf:Gray4:12 160 368
+sprite screen 160 368 192 400 anims/fog.gaf:Black4:12 160 368
+sprite_gray screen 192 381 211 400 anims/fog.gaf:Gray1:3 192 368
+sprite screen 192 384 208 400 anims/fog.gaf:Black1:3 192 368
+sprite_gray screen 621 381 640 401 anims/fog.gaf:Gray2:7 608 368
+sprite screen 624 383 640 400 anims/fog.gaf:Black2:7 608 368
+fill screen 128 400 160 432 0
+fill screen 160 400 192 432 0
+sprite_gray screen 192 400 224 432 anims/fog.gaf:Gray2:12 192 400
+sprite screen 192 400 224 432 anims/fog.gaf:Black2:12 192 400
+sprite_gray screen 224 413 257 432 anims/fog.gaf:Gray3:11 224 400
+sprite screen 224 416 256 432 anims/fog.gaf:Black3:11 224 400
+sprite_gray screen 256 413 275 432 anims/fog.gaf:Gray4:3 256 400
+sprite screen 256 415 272 432 anims/fog.gaf:Black4:3 256 400
+sprite_gray screen 617 400 640 432 anims/fog.gaf:Gray3:9 608 400
+sprite screen 624 400 640 432 anims/fog.gaf:Black3:9 608 400
+fill screen 128 432 160 448 0
+fill screen 160 432 192 448 0
+fill screen 192 432 224 448 0
+fill screen 224 432 256 448 0
+sprite_gray screen 256 432 288 448 anims/fog.gaf:Gray1:12 256 432
+sprite screen 256 432 288 448 anims/fog.gaf:Black1:12 256 432
+sprite_gray screen 288 445 307 448 anims/fog.gaf:Gray2:3 288 432
+sprite_gray screen 589 443 608 448 anims/fog.gaf:Gray3:7 576 432
+sprite_gray screen 608 432 640 448 anims/fog.gaf:Gray4:13 608 432
+sprite screen 608 432 640 448 anims/fog.gaf:Black4:13 608 432
+blit screen 0 128 128 480 ARMLAB1.GUI 0 128
+cursor anims/cursors.gaf:cursornormal 96 187
+frame 73 70 1 28d82e7e3b99a38e
+blit RADAR%20FINAL 0 0 126 53 RADAR%20MAPPED 0 0
+sprite RADAR%20FINAL 18 7 22 11 anims/fx.gaf:radlogo:0 19 8
+circle RADAR%20FINAL 5 0 34 23 19 8 14 233
+circle RADAR%20FINAL 5 0 34 23 19 8 14 233
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+terrain screen 128 32 640 448 The%20Pass 304 32
+sprite screen 129 0 640 32 anims/armint.gaf:PANELTOP:0 130 0
+quad screen 132 5 153 26 textures/logos.gaf:32xlogos:0 132,5 152,5 152,25 132,25 0,0,32,0,32,32,0,32
+fill screen 471 12 592 15 208
+text screen 529 18 553 29 console 255 254 254 529 18 1042
+text screen 468 1 474 12 console 255 254 254 468 1 0
+text screen 571 1 595 12 console 255 254 254 571 1 1100
+text screen 609 5 621 16 console 233 254 254 609 5 25
+text screen 609 17 615 28 console 211 254 254 609 17 0
+fill screen 218 12 334 15 224
+text screen 278 18 302 29 console 255 254 254 278 18 1002
+text screen 215 1 221 12 console 255 254 254 215 1 0
+text screen 317 1 341 12 console 255 254 254 317 1 1100
+text screen 358 5 373 16 console 233 254 254 358 5 1.0
+text screen 358 17 373 28 console 211 254 254 358 17 0.0
+blit screen 0 36 126 89 RADAR%20FINAL 0 36
+outline screen 10 37 28 51 10 37 27 50 194
+sprite screen 349 298 408 364 anims/rocks.gaf:rockmetal3:0 376 328
+sprite_blend screen 553 43 598 90 anims/trees.gaf:treeshad2:0 568 88
+sprite screen 549 32 586 89 anims/trees.gaf:tree2:0 568 88
+sprite_blend screen 627 42 640 89 anims/trees.gaf:leafshad:0 632 88
+sprite screen 607 32 640 89 anims/trees.gaf:leaf2:0 632 88
+sprite_blend screen 627 122 640 169 anims/trees.gaf:leafshad:0 632 168
+sprite screen 610 104 640 171 anims/trees.gaf:leaf3:0 632 168
+sprite_blend screen 515 186 565 233 anims/trees.gaf:leafshad:0 520 232
+sprite screen 492 162 544 233 anims/trees.gaf:leaf1:0 520 232
+line screen 359 217 384 240 383 239 359 217 233
+line screen 338 217 360 242 359 217 338 241 233
+line screen 338 241 363 264 338 241 362 263 233
+line screen 362 239 384 264 362 263 383 239 233
+model screen 128 32 640 448 armcom armcom 360 240 35181047 65536 15758769 0 25205 0 0 00000000 0 bf4ccccd,3f800000,3e800000 ground,3,0,0,0,0,0,0 pelvis,3,0,-32768,0,0,1474559,0 lthigh,3,0,0,0,255638,1278576,-205594 lleg,3,0,0,0,90562,743845,-391885 rthigh,3,0,0,0,-234858,1278576,229044 rleg,3,0,0,0,-135197,708217,341513 torso,3,0,0,0,-10390,1670541,-11725 ruparm,3,0,0,0,-504352,1962993,369150 biggun,3,0,0,0,-613572,1569725,441318 rbigflash,2,0,0,0,-960585,1331444,75002 luparm,3,0,0,0,452402,1966037,-427776 nanolath,3,0,0,0,607065,1615663,-448229 lfirept,2,0,0,0,327288,1257140,-825680 nanospray,2,0,0,0,443271,1068490,-698165 head,3,0,-1,0,-38097,2193163,-42992
+sprite_blend screen 128 218 133 265 anims/trees.gaf:leafshad:0 88 264
+sprite_blend screen 579 250 629 297 anims/trees.gaf:leafshad:0 584 296
+sprite screen 562 232 609 299 anims/trees.gaf:leaf3:0 584 296
+model screen 128 32 640 448 armlab armlab 432 304 39845888 65536 19922944 0 -31295 0 0 00000000 0 bf4ccccd,3f800000,3e800000 base,3,0,0,0,0,0,0 stand1,1,0,0,0,-1784298,-442,-253671 nano1,1,0,0,0,-2470700,807412,-351256 beam1,0,0,0,0,-1430522,1051033,-137181 stand2,1,0,0,0,1865403,-442,265201 nano2,1,0,0,0,2545496,812837,361889 beam2,0,0,0,0,1490767,1072992,278134 door1,1,690778,0,0,-1311240,0,-2668729 door1A,1,0,0,1622016,-723145,0,-3313265 door2,1,-690778,0,0,2084174,0,-2186008 door2A,1,0,0,1638400,1620217,0,-2996662 door3,1,690778,0,0,-2003070,0,2197539 door3A,1,0,0,-1556480,-1620217,0,2996662 door4,1,-690778,0,0,1392344,0,2680260 door4A,1,0,0,-1572864,718532,0,3345707 pad,1,0,0,0,157,26214,231704
+sprite_blend screen 579 330 629 377 anims/trees.gaf:leafshad:0 584 376
+sprite screen 559 308 606 377 anims/trees.gaf:leaf2:0 584 376
+sprite_gray screen 128 32 160 48 anims/fog.gaf:Gray4:6 128 16
+sprite screen 128 32 160 48 anims/fog.gaf:Black4:6 128 16
+sprite_gray screen 160 32 179 35 anims/fog.gaf:Gray1:0 160 16
+sprite_gray screen 524 32 544 37 anims/fog.gaf:Gray4:1 512 16
+sprite_gray screen 544 32 576 48 anims/fog.gaf:Gray1:10 544 16
+gray screen 576 32 608 48
+sprite screen 576 32 608 48 anims/fog.gaf:Black2:10 576 16
+fill screen 608 32 640 48 0
+sprite_gray screen 128 48 149 80 anims/fog.gaf:Gray1:4 128 48
+sprite screen 128 48 144 80 anims/fog.gaf:Black1:4 128 48
+sprite_gray screen 556 48 576 80 anims/fog.gaf:Gray2:9 544 48
+gray screen 576 48 608 80
+sprite screen 592 48 608 80 anims/fog.gaf:Black3:9 576 48
+fill screen 608 48 640 80 0
+sprite_gray screen 128 80 146 98 anims/fog.gaf:Gray2:0 128 80
+sprite screen 128 80 144 96 anims/fog.gaf:Black2:0 128 80
+sprite_gray screen 554 80 576 101 anims/fog.gaf:Gray3:1 544 80
+sprite_gray screen 576 80 608 112 anims/fog.gaf:Gray4:10 576 80
+sprite screen 592 80 608 96 anims/fog.gaf:Black4:1 576 80
+gray screen 608 80 640 112
+sprite screen 608 80 640 112 anims/fog.gaf:Black1:10 608 80
+sprite_gray screen 588 112 608 133 anims/fog.gaf:Gray1:1 576 112
+sprite_gray screen 608 112 640 144 anims/fog.gaf:Gray2:10 608 112
+sprite screen 624 112 640 128 anims/fog.gaf:Black2:1 608 112
+sprite_gray screen 617 144 640 176 anims/fog.gaf:Gray3:9 608 144
+sprite_gray screen 620 176 640 208 anims/fog.gaf:Gray4:9 608 176
+sprite_gray screen 620 208 640 229 anims/fog.gaf:Gray1:1 608 208
+sprite_gray screen 128 317 147 336 anims/fog.gaf:Gray1:3 128 304
+sprite screen 128 320 144 336 anims/fog.gaf:Black1:3 128 304
+sprite_gray screen 128 336 148 368 anims/fog.gaf:Gray2:4 128 336
+sprite screen 128 336 144 368 anims/fog.gaf:Black2:4 128 336
+sprite_gray screen 128 368 160 400 anims/fog.gaf:Gray3:12 128 368
+sprite screen 128 368 160 400 anims/fog.gaf:Black3:12 128 368
+sprite_gray screen 160 381 179 400 anims/fog.gaf:Gray4:3 160 368
+sprite screen 160 383 176 400 anims/fog.gaf:Black4:3 160 368
+sprite_gray screen 621 381 640 401 anims/fog.gaf:Gray2:7 608 368
+sprite screen 624 383 640 400 anims/fog.gaf:Black2:7 608 368
+fill screen 128 400 160 432 0
+sprite_gray screen 160 400 192 432 anims/fog.gaf:Gray1:12 160 400
+sprite screen 160 400 192 432 anims/fog.gaf:Black1:12 160 400
+sprite_gray screen 192 413 225 432 anims/fog.gaf:Gray2:11 192 400
+sprite screen 192 414 224 432 anims/fog.gaf:Black2:11 192 400
+sprite_gray screen 224 411 243 432 anims/fog.gaf:Gray3:3 224 400
+sprite screen 224 416 240 432 anims/fog.gaf:Black3:3 224 400
+sprite_gray screen 617 400 640 432 anims/fog.gaf:Gray3:9 608 400
+sprite screen 624 400 640 432 anims/fog.gaf:Black3:9 608 400
+fill screen 128 432 160 448 0
+fill screen 160 432 192 448 0
+fill screen 192 432 224 448 0
+sprite_gray screen 224 432 256 448 anims/fog.gaf:Gray4:12 224 432
+sprite screen 224 432 256 448 anims/fog.gaf:Black4:12 224 432
+sprite_gray screen 256 445 275 448 anims/fog.gaf:Gray1:3 256 432
+sprite_gray screen 589 443 608 448 anims/fog.gaf:Gray3:7 576 432
+sprite_gray screen 608 432 640 448 anims/fog.gaf:Gray4:13 608 432
+sprite screen 608 432 640 448 anims/fog.gaf:Black4:13 608 432
+cursor anims/cursors.gaf:cursornormal 639 300
+frame 103 100 1 28d82e7e3b99a38e
+blit RADAR%20FINAL 0 0 126 53 RADAR%20MAPPED 0 0
+sprite RADAR%20FINAL 17 8 21 12 anims/fx.gaf:radlogo:0 18 9
+circle RADAR%20FINAL 4 0 33 24 18 9 14 233
+circle RADAR%20FINAL 4 0 33 24 18 9 14 233
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+sprite RADAR%20FINAL 19 8 25 14 anims/fx.gaf:radlogohigh:0 21 10
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+terrain screen 128 32 640 448 The%20Pass 304 32
+sprite screen 129 0 640 32 anims/armint.gaf:PANELTOP:0 130 0
+quad screen 132 5 153 26 textures/logos.gaf:32xlogos:0 132,5 152,5 152,25 132,25 0,0,32,0,32,32,0,32
+fill screen 471 12 594 15 208
+text screen 529 18 553 29 console 255 254 254 529 18 1063
+text screen 468 1 474 12 console 255 254 254 468 1 0
+text screen 571 1 595 12 console 255 254 254 571 1 1100
+text screen 609 5 621 16 console 233 254 254 609 5 25
+text screen 609 17 615 28 console 211 254 254 609 17 5
+fill screen 218 12 334 15 224
+text screen 278 18 302 29 console 255 254 254 278 18 1002
+text screen 215 1 221 12 console 255 254 254 215 1 0
+text screen 317 1 341 12 console 255 254 254 317 1 1100
+text screen 358 5 373 16 console 233 254 254 358 5 1.0
+text screen 358 17 373 28 console 211 254 254 358 17 0.4
+sprite screen 129 448 640 480 anims/armint.gaf:PANELBOT:0 129 415
+text screen 220 452 270 463 console 83 254 254 220 452 Kbot%20Lab
+fill screen 200 463 291 466 233
+quad screen 132 455 153 476 textures/logos.gaf:32xlogos:0 132,455 152,455 152,475 132,475 0,0,32,0,32,32,0,32
+text screen 350 458 371 469 console 233 254 254 350 458 +0.0
+text screen 400 458 412 469 console 233 254 254 400 458 +0
+text screen 350 468 371 479 console 211 254 254 350 468 -0.4
+text screen 400 468 412 479 console 211 254 254 400 468 -6
+text screen 353 449 417 460 console 83 254 254 353 449 Nanolathing
+text screen 536 452 574 463 console 83 254 254 536 452 Peewee
+fill screen 510 463 513 466 233
+fill screen 513 463 601 466 213
+blit screen 0 36 126 89 RADAR%20FINAL 0 36
+outline screen 10 37 28 51 10 37 27 50 194
+sprite screen 349 298 408 364 anims/rocks.gaf:rockmetal3:0 376 328
+sprite_blend screen 553 43 598 90 anims/trees.gaf:treeshad2:0 568 88
+sprite screen 549 32 586 89 anims/trees.gaf:tree2:0 568 88
+sprite_blend screen 627 42 640 89 anims/trees.gaf:leafshad:0 632 88
+sprite screen 607 32 640 89 anims/trees.gaf:leaf2:0 632 88
+sprite_blend screen 627 122 640 169 anims/trees.gaf:leafshad:0 632 168
+sprite screen 610 104 640 171 anims/trees.gaf:leaf3:0 632 168
+sprite_blend screen 515 186 565 233 anims/trees.gaf:leafshad:0 520 232
+sprite screen 492 162 544 233 anims/trees.gaf:leaf1:0 520 232
+line screen 335 244 360 267 359 266 335 244 233
+line screen 313 244 336 269 335 244 313 268 233
+line screen 313 268 338 290 313 268 337 289 233
+line screen 337 266 360 290 337 289 359 266 233
+model screen 128 32 640 448 armcom armcom 336 267 33589665 65536 17500379 0 25030 0 0 00000000 0 bf4ccccd,3f800000,3e800000 ground,3,0,0,0,0,0,0 pelvis,3,0,0,0,0,1507327,0 lthigh,3,0,0,0,249611,1311089,-212635 lleg,3,0,0,0,157480,737227,-313060 rthigh,3,0,0,0,-233311,1311089,230403 rleg,3,0,0,0,-182112,726148,286211 torso,3,0,0,0,-8150,1703564,-8884 ruparm,3,0,0,0,-479151,1997921,398676 biggun,3,0,0,0,-574104,1604713,489060 rbigflash,2,0,0,0,-931449,1345139,148017 luparm,3,0,0,0,438400,1997921,-443095 nanolath,3,0,0,0,566295,1640463,-497572 lfirept,2,0,0,0,244633,1332648,-886246 nanospray,2,0,0,0,352334,1127081,-779270 head,3,0,-1,0,-29884,2226866,-32575
+sprite_blend screen 128 218 133 265 anims/trees.gaf:leafshad:0 88 264
+sprite_blend screen 579 250 629 297 anims/trees.gaf:leafshad:0 584 296
+sprite screen 562 232 609 299 anims/trees.gaf:leaf3:0 584 296
+model screen 128 32 640 448 armlab armlab 432 304 39845888 65536 19922944 0 -31295 0 0 00000000 0 bf4ccccd,3f800000,3e800000 base,3,0,0,0,0,0,0 stand1,1,0,0,0,-1784298,-442,-253671 nano1,1,0,0,0,-2470700,807412,-351256 beam1,0,0,0,0,-1430522,1051033,-137181 stand2,1,0,0,0,1865403,-442,265201 nano2,1,0,0,0,2545496,812837,361889 beam2,0,0,0,0,1490767,1072992,278134 door1,1,1228800,0,0,-1843906,0,-2744457 door1A,1,0,0,1622016,-1255810,0,-3388994 door2,1,-1228800,0,0,2616840,0,-2110280 door2A,1,0,0,1638400,2152883,0,-2920934 door3,1,1228800,0,0,-2535735,0,2121810 door3A,1,0,0,-1556480,-2152883,0,2920934 door4,1,-1228800,0,0,1925010,0,2755988 door4A,1,0,0,-1572864,1251198,0,3421435 pad,1,0,0,0,157,26214,231704
+cargo screen 128 32 640 448 armpw armpw 432 300 39846045 91750 19691240 0 -28929 0 0 3f789850 0 bf4ccccd,3f800000,3e800000 ground,3,0,0,0,0,0,0 pelvis,3,0,0,0,-106578,937997,276371 rthigh,3,0,0,0,-99057,796263,-38199 rleg,3,0,0,0,-247643,610469,-95499 rfoot,3,0,0,0,-247643,212338,-95499 lthigh,3,0,0,0,99057,796263,38199 lleg,3,0,0,0,247643,610469,95499 lfoot,3,0,0,0,247643,212338,95499 torso,3,0,0,0,0,902431,0 luparm,3,0,0,0,253309,1300562,154577 lloarm,3,0,0,0,479967,1073480,304498 lfire,2,0,0,0,562752,95519,69335 ruparm,3,0,0,0,-291508,1300562,-55522 rloarm,3,0,0,0,-560139,1073480,-96601 rfire,2,0,0,0,-476742,95519,-331528
+sprite_blend screen 579 330 629 377 anims/trees.gaf:leafshad:0 584 376
+sprite screen 559 308 606 377 anims/trees.gaf:leaf2:0 584 376
+fill screen 433 290 435 292 162
+fill screen 424 294 426 296 162
+fill screen 426 291 428 293 165
+fill screen 434 291 436 293 167
+fill screen 432 291 434 293 161
+fill screen 431 295 433 297 162
+fill screen 434 294 436 296 163
+fill screen 434 293 436 295 167
+fill screen 434 291 436 293 161
+fill screen 432 290 434 292 162
+fill screen 432 292 434 294 163
+fill screen 435 291 437 293 164
+fill screen 427 295 429 297 165
+fill screen 426 294 428 296 166
+fill screen 427 293 429 295 167
+fill screen 424 293 426 295 161
+fill screen 426 296 428 298 162
+fill screen 433 293 435 295 166
+fill screen 430 294 432 296 167
+fill screen 433 292 435 294 161
+fill screen 432 290 434 292 162
+fill screen 432 295 434 297 163
+fill screen 442 292 444 294 164
+fill screen 440 294 442 296 165
+fill screen 442 291 444 293 166
+fill screen 442 293 444 295 167
+fill screen 440 292 442 294 161
+fill screen 427 294 429 296 165
+fill screen 428 297 430 299 166
+fill screen 426 295 428 297 167
+fill screen 425 294 427 296 161
+fill screen 425 292 427 294 162
+fill screen 418 297 420 299 163
+fill screen 418 294 420 296 164
+fill screen 418 297 420 299 165
+fill screen 418 296 420 298 166
+fill screen 418 295 420 297 167
+fill screen 442 291 444 293 164
+fill screen 441 291 443 293 165
+fill screen 441 293 443 295 166
+fill screen 442 295 444 297 167
+fill screen 442 291 444 293 161
+fill screen 450 292 452 294 162
+fill screen 450 292 452 294 163
+fill screen 450 292 452 294 164
+fill screen 450 291 452 293 165
+fill screen 450 292 452 294 166
+fill screen 418 297 420 299 163
+fill screen 419 296 421 298 164
+fill screen 418 297 420 299 165
+fill screen 419 295 421 297 166
+fill screen 419 296 421 298 167
+fill screen 410 298 412 300 161
+fill screen 410 298 412 300 162
+fill screen 410 298 412 300 163
+fill screen 410 298 412 300 164
+fill screen 410 298 412 300 165
+fill screen 450 291 452 293 162
+fill screen 450 292 452 294 163
+fill screen 450 291 452 293 164
+fill screen 450 291 452 293 165
+fill screen 450 292 452 294 166
+gray screen 128 32 160 48
+sprite screen 128 32 160 48 anims/fog.gaf:Black4:6 128 16
+sprite_gray screen 160 32 192 48 anims/fog.gaf:Gray1:6 160 16
+sprite_gray screen 192 32 224 35 anims/fog.gaf:Gray2:2 192 16
+sprite_gray screen 224 32 242 34 anims/fog.gaf:Gray3:0 224 16
+sprite_gray screen 524 32 544 37 anims/fog.gaf:Gray4:1 512 16
+sprite_gray screen 544 32 576 48 anims/fog.gaf:Gray1:10 544 16
+gray screen 576 32 608 48
+sprite screen 576 32 608 48 anims/fog.gaf:Black2:10 576 16
+fill screen 608 32 640 48 0
+sprite_gray screen 128 48 160 80 anims/fog.gaf:Gray1:6 128 48
+sprite screen 128 48 144 80 anims/fog.gaf:Black1:4 128 48
+sprite_gray screen 160 48 178 66 anims/fog.gaf:Gray2:0 160 48
+sprite_gray screen 556 48 576 69 anims/fog.gaf:Gray2:1 544 48
+sprite_gray screen 576 48 608 69 anims/fog.gaf:Gray3:2 576 48
+sprite screen 592 48 608 64 anims/fog.gaf:Black3:1 576 48
+sprite_gray screen 608 48 640 80 anims/fog.gaf:Gray4:10 608 48
+sprite screen 608 48 640 80 anims/fog.gaf:Black4:10 608 48
+sprite_gray screen 128 80 148 112 anims/fog.gaf:Gray2:4 128 80
+sprite screen 128 80 144 96 anims/fog.gaf:Black2:0 128 80
+sprite_gray screen 620 80 640 101 anims/fog.gaf:Gray1:1 608 80
+sprite screen 624 80 640 96 anims/fog.gaf:Black1:1 608 80
+sprite_gray screen 128 112 146 130 anims/fog.gaf:Gray3:0 128 112
+sprite_gray screen 128 349 147 368 anims/fog.gaf:Gray2:3 128 336
+sprite screen 128 352 145 368 anims/fog.gaf:Black2:3 128 336
+sprite_gray screen 128 368 150 400 anims/fog.gaf:Gray3:4 128 368
+sprite screen 128 368 144 400 anims/fog.gaf:Black3:4 128 368
+sprite_gray screen 128 400 160 432 anims/fog.gaf:Gray4:12 128 400
+sprite screen 128 400 160 432 anims/fog.gaf:Black4:12 128 400
+sprite_gray screen 160 413 179 432 anims/fog.gaf:Gray1:3 160 400
+sprite screen 160 416 176 432 anims/fog.gaf:Black1:3 160 400
+fill screen 128 432 160 448 0
+sprite_gray screen 160 432 192 448 anims/fog.gaf:Gray2:12 160 432
+sprite screen 160 432 192 448 anims/fog.gaf:Black2:12 160 432
+sprite_gray screen 192 445 225 448 anims/fog.gaf:Gray3:11 192 432
+sprite_gray screen 224 445 243 448 anims/fog.gaf:Gray4:3 224 432
+sprite screen 224 447 240 448 anims/fog.gaf:Black4:3 224 432
+sprite_gray screen 621 445 640 448 anims/fog.gaf:Gray4:7 608 432
+sprite screen 623 446 640 448 anims/fog.gaf:Black4:7 608 432
+cursor anims/cursors.gaf:cursorselect 400 300
+frame 157 154 1 28d82e7e3b99a38e
+blit RADAR%20FINAL 0 0 126 53 RADAR%20MAPPED 0 0
+sprite RADAR%20FINAL 15 10 19 14 anims/fx.gaf:radlogo:0 16 11
+circle RADAR%20FINAL 2 0 31 26 16 11 14 233
+circle RADAR%20FINAL 2 0 31 26 16 11 14 233
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+terrain screen 128 32 640 448 The%20Pass 1999 756
+sprite screen 129 0 640 32 anims/armint.gaf:PANELTOP:0 130 0
+quad screen 132 5 153 26 textures/logos.gaf:32xlogos:0 132,5 152,5 152,25 132,25 0,0,32,0,32,32,0,32
+fill screen 471 12 592 15 208
+text screen 529 18 553 29 console 255 254 254 529 18 1044
+text screen 468 1 474 12 console 255 254 254 468 1 0
+text screen 571 1 595 12 console 255 254 254 571 1 1100
+text screen 609 5 621 16 console 233 254 254 609 5 25
+text screen 609 17 621 28 console 211 254 254 609 17 43
+fill screen 218 12 334 15 224
+text screen 278 18 296 29 console 255 254 254 278 18 997
+text screen 215 1 221 12 console 255 254 254 215 1 0
+text screen 317 1 341 12 console 255 254 254 317 1 1100
+text screen 358 5 373 16 console 233 254 254 358 5 1.0
+text screen 358 17 373 28 console 211 254 254 358 17 3.3
+blit screen 0 36 126 89 RADAR%20FINAL 0 36
+outline screen 70 62 88 76 70 62 87 75 194
+sprite_blend screen 433 32 480 44 anims/trees.gaf:treeshad3:0 441 41
+sprite screen 425 32 457 43 anims/trees.gaf:tree3:0 441 41
+sprite_blend screen 128 32 140 50 anims/trees.gaf:treeshad:0 89 44
+sprite_blend screen 497 32 544 51 anims/trees.gaf:treeshad3:0 505 48
+sprite screen 489 32 521 50 anims/trees.gaf:tree3:0 505 48
+sprite_blend screen 566 32 620 33 anims/trees.gaf:treeshad:0 569 27
+sprite_blend screen 625 32 640 51 anims/trees.gaf:treeshad3:0 633 48
+sprite screen 617 32 640 50 anims/trees.gaf:tree3:0 633 48
+sprite_blend screen 170 39 215 86 anims/trees.gaf:treeshad2:0 185 84
+sprite screen 166 32 203 85 anims/trees.gaf:tree2:0 185 84
+sprite_blend screen 614 48 640 82 anims/trees.gaf:treeshad:0 617 76
+sprite screen 604 32 632 77 anims/trees.gaf:tree1:0 617 76
+sprite_blend screen 150 79 204 113 anims/trees.gaf:treeshad:0 153 107
+sprite screen 140 44 168 108 anims/trees.gaf:tree1:0 153 107
+sprite_blend screen 417 89 464 119 anims/trees.gaf:treeshad3:0 425 116
+sprite screen 409 59 441 118 anims/trees.gaf:tree3:0 425 116
+sprite_blend screen 128 68 151 115 anims/trees.gaf:treeshad2:0 121 113
+sprite screen 128 54 139 114 anims/trees.gaf:tree2:0 121 113
+sprite_blend screen 538 50 583 97 anims/trees.gaf:treeshad2:0 553 95
+sprite screen 534 36 571 96 anims/trees.gaf:tree2:0 553 95
+sprite_blend screen 502 73 556 107 anims/trees.gaf:treeshad:0 505 101
+sprite screen 492 38 520 102 anims/trees.gaf:tree1:0 505 101
+sprite_blend screen 614 117 640 151 anims/trees.gaf:treeshad:0 617 145
+sprite screen 604 82 632 146 anims/trees.gaf:tree1:0 617 145
+sprite screen 636 92 640 156 anims/trees.gaf:tree1:0 649 155
+sprite_blend screen 128 154 140 188 anims/trees.gaf:treeshad:0 89 182
+sprite_blend screen 170 181 215 228 anims/trees.gaf:treeshad2:0 185 226
+sprite screen 166 167 203 227 anims/trees.gaf:tree2:0 185 226
+sprite_blend screen 580 127 630 174 anims/trees.gaf:leafshad:0 585 173
+sprite screen 557 103 609 174 anims/trees.gaf:leaf1:0 585 173
+sprite_blend screen 470 131 524 165 anims/trees.gaf:treeshad:0 473 159
+sprite screen 460 96 488 160 anims/trees.gaf:tree1:0 473 159
+sprite_blend screen 522 129 567 176 anims/trees.gaf:treeshad2:0 537 174
+sprite screen 518 115 555 175 anims/trees.gaf:tree2:0 537 174
+sprite_blend screen 634 166 640 213 anims/trees.gaf:treeshad2:0 649 211
+sprite screen 630 152 640 212 anims/trees.gaf:tree2:0 649 211
+sprite_blend screen 582 201 636 235 anims/trees.gaf:treeshad:0 585 229
+sprite screen 572 166 600 230 anims/trees.gaf:tree1:0 585 229
+sprite_blend screen 602 234 640 281 anims/trees.gaf:treeshad2:0 617 279
+sprite screen 598 220 635 280 anims/trees.gaf:tree2:0 617 279
+sprite_blend screen 436 194 486 241 anims/trees.gaf:leafshad:0 441 240
+sprite screen 419 176 466 243 anims/trees.gaf:leaf3:0 441 240
+sprite_blend screen 532 199 582 246 anims/trees.gaf:leafshad:0 537 245
+sprite screen 512 177 559 246 anims/trees.gaf:leaf2:0 537 245
+sprite_blend screen 634 293 640 340 anims/trees.gaf:treeshad2:0 649 338
+sprite screen 630 279 640 339 anims/trees.gaf:tree2:0 649 338
+sprite_blend screen 474 207 519 254 anims/trees.gaf:treeshad2:0 489 252
+sprite screen 470 193 507 253 anims/trees.gaf:tree2:0 489 252
+sprite_blend screen 545 253 592 283 anims/trees.gaf:treeshad3:0 553 280
+sprite screen 537 223 569 282 anims/trees.gaf:tree3:0 553 280
+sprite_blend screen 417 244 464 274 anims/trees.gaf:treeshad3:0 425 271
+sprite screen 409 214 441 273 anims/trees.gaf:tree3:0 425 271
+sprite_blend screen 426 244 471 291 anims/trees.gaf:treeshad2:0 441 289
+sprite screen 422 230 459 290 anims/trees.gaf:tree2:0 441 289
+sprite_blend screen 513 302 560 332 anims/trees.gaf:treeshad3:0 521 329
+sprite screen 505 272 537 331 anims/trees.gaf:tree3:0 521 329
+sprite_blend screen 522 293 567 340 anims/trees.gaf:treeshad2:0 537 338
+sprite screen 518 279 555 339 anims/trees.gaf:tree2:0 537 338
+sprite_blend screen 545 324 592 354 anims/trees.gaf:treeshad3:0 553 351
+sprite screen 537 294 569 353 anims/trees.gaf:tree3:0 553 351
+sprite_blend screen 561 345 608 375 anims/trees.gaf:treeshad3:0 569 372
+sprite screen 553 315 585 374 anims/trees.gaf:tree3:0 569 372
+sprite_blend screen 609 377 640 407 anims/trees.gaf:treeshad3:0 617 404
+sprite screen 601 347 633 406 anims/trees.gaf:tree3:0 617 404
+sprite_blend screen 385 297 432 327 anims/trees.gaf:treeshad3:0 393 324
+sprite screen 377 267 409 326 anims/trees.gaf:tree3:0 393 324
+sprite_blend screen 417 305 464 335 anims/trees.gaf:treeshad3:0 425 332
+sprite screen 409 275 441 334 anims/trees.gaf:tree3:0 425 332
+sprite_blend screen 465 326 512 356 anims/trees.gaf:treeshad3:0 473 353
+sprite screen 457 296 489 355 anims/trees.gaf:tree3:0 473 353
+sprite_blend screen 497 332 544 362 anims/trees.gaf:treeshad3:0 505 359
+sprite screen 489 302 521 361 anims/trees.gaf:tree3:0 505 359
+sprite_blend screen 385 341 432 371 anims/trees.gaf:treeshad3:0 393 368
+sprite screen 377 311 409 370 anims/trees.gaf:tree3:0 393 368
+sprite_blend screen 420 344 470 391 anims/trees.gaf:leafshad:0 425 390
+sprite screen 397 320 449 391 anims/trees.gaf:leaf1:0 425 390
+sprite_blend screen 326 400 380 434 anims/trees.gaf:treeshad:0 329 428
+sprite screen 316 365 344 429 anims/trees.gaf:tree1:0 329 428
+sprite_blend screen 353 391 400 421 anims/trees.gaf:treeshad3:0 361 418
+sprite screen 345 361 377 420 anims/trees.gaf:tree3:0 361 418
+sprite_blend screen 362 414 407 448 anims/trees.gaf:treeshad2:0 377 459
+sprite screen 358 400 395 448 anims/trees.gaf:tree2:0 377 459
+sprite_blend screen 401 411 448 441 anims/trees.gaf:treeshad3:0 409 438
+sprite screen 393 381 425 440 anims/trees.gaf:tree3:0 409 438
+sprite_blend screen 449 411 496 441 anims/trees.gaf:treeshad3:0 457 438
+sprite screen 441 381 473 440 anims/trees.gaf:tree3:0 457 438
+sprite_blend screen 481 416 528 446 anims/trees.gaf:treeshad3:0 489 443
+sprite screen 473 386 505 445 anims/trees.gaf:tree3:0 489 443
+sprite screen 412 432 440 448 anims/trees.gaf:tree1:0 425 495
+sprite_blend screen 465 440 512 448 anims/trees.gaf:treeshad3:0 473 467
+sprite screen 457 410 489 448 anims/trees.gaf:tree3:0 473 467
+sprite screen 476 415 504 448 anims/trees.gaf:tree1:0 489 478
+sprite screen 128 430 136 448 anims/trees.gaf:tree1:0 121 493
+fill screen 128 32 129 60 0
+fill screen 129 32 161 60 0
+fill screen 161 32 193 60 0
+fill screen 193 32 225 60 0
+fill screen 225 32 257 60 0
+fill screen 257 32 289 60 0
+fill screen 289 32 321 60 0
+fill screen 321 32 353 60 0
+fill screen 353 32 385 60 0
+fill screen 385 32 417 60 0
+fill screen 417 32 449 60 0
+fill screen 449 32 481 60 0
+fill screen 481 32 513 60 0
+fill screen 513 32 545 60 0
+fill screen 545 32 577 60 0
+fill screen 577 32 609 60 0
+fill screen 609 32 640 60 0
+fill screen 128 60 129 92 0
+fill screen 129 60 161 92 0
+fill screen 161 60 193 92 0
+fill screen 193 60 225 92 0
+fill screen 225 60 257 92 0
+fill screen 257 60 289 92 0
+fill screen 289 60 321 92 0
+fill screen 321 60 353 92 0
+fill screen 353 60 385 92 0
+fill screen 385 60 417 92 0
+fill screen 417 60 449 92 0
+fill screen 449 60 481 92 0
+fill screen 481 60 513 92 0
+fill screen 513 60 545 92 0
+fill screen 545 60 577 92 0
+fill screen 577 60 609 92 0
+fill screen 609 60 640 92 0
+fill screen 128 92 129 124 0
+fill screen 129 92 161 124 0
+fill screen 161 92 193 124 0
+fill screen 193 92 225 124 0
+fill screen 225 92 257 124 0
+fill screen 257 92 289 124 0
+fill screen 289 92 321 124 0
+fill screen 321 92 353 124 0
+fill screen 353 92 385 124 0
+fill screen 385 92 417 124 0
+fill screen 417 92 449 124 0
+fill screen 449 92 481 124 0
+fill screen 481 92 513 124 0
+fill screen 513 92 545 124 0
+fill screen 545 92 577 124 0
+fill screen 577 92 609 124 0
+fill screen 609 92 640 124 0
+fill screen 128 124 129 156 0
+fill screen 129 124 161 156 0
+fill screen 161 124 193 156 0
+fill screen 193 124 225 156 0
+fill screen 225 124 257 156 0
+fill screen 257 124 289 156 0
+fill screen 289 124 321 156 0
+fill screen 321 124 353 156 0
+fill screen 353 124 385 156 0
+fill screen 385 124 417 156 0
+fill screen 417 124 449 156 0
+fill screen 449 124 481 156 0
+fill screen 481 124 513 156 0
+fill screen 513 124 545 156 0
+fill screen 545 124 577 156 0
+fill screen 577 124 609 156 0
+fill screen 609 124 640 156 0
+fill screen 128 156 129 188 0
+fill screen 129 156 161 188 0
+fill screen 161 156 193 188 0
+fill screen 193 156 225 188 0
+fill screen 225 156 257 188 0
+fill screen 257 156 289 188 0
+fill screen 289 156 321 188 0
+fill screen 321 156 353 188 0
+fill screen 353 156 385 188 0
+fill screen 385 156 417 188 0
+fill screen 417 156 449 188 0
+fill screen 449 156 481 188 0
+fill screen 481 156 513 188 0
+fill screen 513 156 545 188 0
+fill screen 545 156 577 188 0
+fill screen 577 156 609 188 0
+fill screen 609 156 640 188 0
+fill screen 128 188 129 220 0
+fill screen 129 188 161 220 0
+fill screen 161 188 193 220 0
+fill screen 193 188 225 220 0
+fill screen 225 188 257 220 0
+fill screen 257 188 289 220 0
+fill screen 289 188 321 220 0
+fill screen 321 188 353 220 0
+fill screen 353 188 385 220 0
+fill screen 385 188 417 220 0
+fill screen 417 188 449 220 0
+fill screen 449 188 481 220 0
+fill screen 481 188 513 220 0
+fill screen 513 188 545 220 0
+fill screen 545 188 577 220 0
+fill screen 577 188 609 220 0
+fill screen 609 188 640 220 0
+fill screen 128 220 129 252 0
+fill screen 129 220 161 252 0
+fill screen 161 220 193 252 0
+fill screen 193 220 225 252 0
+fill screen 225 220 257 252 0
+fill screen 257 220 289 252 0
+fill screen 289 220 321 252 0
+fill screen 321 220 353 252 0
+fill screen 353 220 385 252 0
+fill screen 385 220 417 252 0
+fill screen 417 220 449 252 0
+fill screen 449 220 481 252 0
+fill screen 481 220 513 252 0
+fill screen 513 220 545 252 0
+fill screen 545 220 577 252 0
+fill screen 577 220 609 252 0
+fill screen 609 220 640 252 0
+fill screen 128 252 129 284 0
+fill screen 129 252 161 284 0
+fill screen 161 252 193 284 0
+fill screen 193 252 225 284 0
+fill screen 225 252 257 284 0
+fill screen 257 252 289 284 0
+fill screen 289 252 321 284 0
+fill screen 321 252 353 284 0
+fill screen 353 252 385 284 0
+fill screen 385 252 417 284 0
+fill screen 417 252 449 284 0
+fill screen 449 252 481 284 0
+fill screen 481 252 513 284 0
+fill screen 513 252 545 284 0
+fill screen 545 252 577 284 0
+fill screen 577 252 609 284 0
+fill screen 609 252 640 284 0
+fill screen 128 284 129 316 0
+fill screen 129 284 161 316 0
+fill screen 161 284 193 316 0
+fill screen 193 284 225 316 0
+fill screen 225 284 257 316 0
+fill screen 257 284 289 316 0
+fill screen 289 284 321 316 0
+fill screen 321 284 353 316 0
+fill screen 353 284 385 316 0
+fill screen 385 284 417 316 0
+fill screen 417 284 449 316 0
+fill screen 449 284 481 316 0
+fill screen 481 284 513 316 0
+fill screen 513 284 545 316 0
+fill screen 545 284 577 316 0
+fill screen 577 284 609 316 0
+fill screen 609 284 640 316 0
+fill screen 128 316 129 348 0
+fill screen 129 316 161 348 0
+fill screen 161 316 193 348 0
+fill screen 193 316 225 348 0
+fill screen 225 316 257 348 0
+fill screen 257 316 289 348 0
+fill screen 289 316 321 348 0
+fill screen 321 316 353 348 0
+fill screen 353 316 385 348 0
+fill screen 385 316 417 348 0
+fill screen 417 316 449 348 0
+fill screen 449 316 481 348 0
+fill screen 481 316 513 348 0
+fill screen 513 316 545 348 0
+fill screen 545 316 577 348 0
+fill screen 577 316 609 348 0
+fill screen 609 316 640 348 0
+fill screen 128 348 129 380 0
+fill screen 129 348 161 380 0
+fill screen 161 348 193 380 0
+fill screen 193 348 225 380 0
+fill screen 225 348 257 380 0
+fill screen 257 348 289 380 0
+fill screen 289 348 321 380 0
+fill screen 321 348 353 380 0
+fill screen 353 348 385 380 0
+fill screen 385 348 417 380 0
+fill screen 417 348 449 380 0
+fill screen 449 348 481 380 0
+fill screen 481 348 513 380 0
+fill screen 513 348 545 380 0
+fill screen 545 348 577 380 0
+fill screen 577 348 609 380 0
+fill screen 609 348 640 380 0
+fill screen 128 380 129 412 0
+fill screen 129 380 161 412 0
+fill screen 161 380 193 412 0
+fill screen 193 380 225 412 0
+fill screen 225 380 257 412 0
+fill screen 257 380 289 412 0
+fill screen 289 380 321 412 0
+fill screen 321 380 353 412 0
+fill screen 353 380 385 412 0
+fill screen 385 380 417 412 0
+fill screen 417 380 449 412 0
+fill screen 449 380 481 412 0
+fill screen 481 380 513 412 0
+fill screen 513 380 545 412 0
+fill screen 545 380 577 412 0
+fill screen 577 380 609 412 0
+fill screen 609 380 640 412 0
+fill screen 128 412 129 444 0
+fill screen 129 412 161 444 0
+fill screen 161 412 193 444 0
+fill screen 193 412 225 444 0
+fill screen 225 412 257 444 0
+fill screen 257 412 289 444 0
+fill screen 289 412 321 444 0
+fill screen 321 412 353 444 0
+fill screen 353 412 385 444 0
+fill screen 385 412 417 444 0
+fill screen 417 412 449 444 0
+fill screen 449 412 481 444 0
+fill screen 481 412 513 444 0
+fill screen 513 412 545 444 0
+fill screen 545 412 577 444 0
+fill screen 577 412 609 444 0
+fill screen 609 412 640 444 0
+fill screen 128 444 129 448 0
+fill screen 129 444 161 448 0
+fill screen 161 444 193 448 0
+fill screen 193 444 225 448 0
+fill screen 225 444 257 448 0
+fill screen 257 444 289 448 0
+fill screen 289 444 321 448 0
+fill screen 321 444 353 448 0
+fill screen 353 444 385 448 0
+fill screen 385 444 417 448 0
+fill screen 417 444 449 448 0
+fill screen 449 444 481 448 0
+fill screen 481 444 513 448 0
+fill screen 513 444 545 448 0
+fill screen 545 444 577 448 0
+fill screen 577 444 609 448 0
+fill screen 609 444 640 448 0
+cursor anims/cursors.gaf:cursornormal 100 90
+frame 208 205 1 28d82e7e3b99a38e
+blit RADAR%20FINAL 0 0 126 53 RADAR%20MAPPED 0 0
+sprite RADAR%20FINAL 15 12 19 16 anims/fx.gaf:radlogo:0 16 13
+circle RADAR%20FINAL 2 0 31 28 16 13 14 233
+circle RADAR%20FINAL 2 0 31 28 16 13 14 233
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+terrain screen 128 32 640 448 The%20Pass 2563 1088
+blit screen 0 36 126 89 RADAR%20FINAL 0 36
+outline screen 90 74 108 88 90 74 107 87 194
+sprite screen 522 186 581 252 anims/rocks.gaf:rockmetal3:0 549 216
+sprite_blend screen 416 106 466 153 anims/trees.gaf:leafshad:0 421 152
+sprite screen 393 82 445 153 anims/trees.gaf:leaf1:0 421 152
+sprite_blend screen 189 156 236 186 anims/trees.gaf:treeshad3:0 197 183
+sprite screen 181 126 213 185 anims/trees.gaf:tree3:0 197 183
+sprite_blend screen 210 203 264 237 anims/trees.gaf:treeshad:0 213 231
+sprite screen 200 168 228 232 anims/trees.gaf:tree1:0 213 231
+sprite_blend screen 182 215 227 262 anims/trees.gaf:treeshad2:0 197 260
+sprite screen 178 201 215 261 anims/trees.gaf:tree2:0 197 260
+sprite_blend screen 274 252 328 286 anims/trees.gaf:treeshad:0 277 280
+sprite screen 264 217 292 281 anims/trees.gaf:tree1:0 277 280
+sprite_blend screen 128 207 168 241 anims/trees.gaf:treeshad:0 117 235
+sprite screen 128 172 132 236 anims/trees.gaf:tree1:0 117 235
+sprite_blend screen 224 249 274 296 anims/trees.gaf:leafshad:0 229 295
+sprite screen 207 231 254 298 anims/trees.gaf:leaf3:0 229 295
+sprite_blend screen 294 251 339 298 anims/trees.gaf:treeshad2:0 309 296
+sprite screen 290 237 327 297 anims/trees.gaf:tree2:0 309 296
+sprite_blend screen 269 333 316 363 anims/trees.gaf:treeshad3:0 277 360
+sprite screen 261 303 293 362 anims/trees.gaf:tree3:0 277 360
+sprite_blend screen 162 269 216 303 anims/trees.gaf:treeshad:0 165 297
+sprite screen 152 234 180 298 anims/trees.gaf:tree1:0 165 297
+sprite_blend screen 226 330 280 364 anims/trees.gaf:treeshad:0 229 358
+sprite screen 216 295 244 359 anims/trees.gaf:tree1:0 229 358
+sprite_blend screen 317 381 364 411 anims/trees.gaf:treeshad3:0 325 408
+sprite screen 309 351 341 410 anims/trees.gaf:tree3:0 325 408
+sprite_blend screen 182 333 227 380 anims/trees.gaf:treeshad2:0 197 378
+sprite screen 178 319 215 379 anims/trees.gaf:tree2:0 197 378
+sprite_blend screen 226 389 280 423 anims/trees.gaf:treeshad:0 229 417
+sprite screen 216 354 244 418 anims/trees.gaf:tree1:0 229 417
+sprite_blend screen 272 394 322 441 anims/trees.gaf:leafshad:0 277 440
+sprite screen 252 372 299 441 anims/trees.gaf:leaf2:0 277 440
+sprite_blend screen 128 339 147 386 anims/trees.gaf:treeshad2:0 117 384
+sprite screen 128 325 135 385 anims/trees.gaf:tree2:0 117 384
+sprite_blend screen 157 370 204 400 anims/trees.gaf:treeshad3:0 165 397
+sprite screen 149 340 181 399 anims/trees.gaf:tree3:0 165 397
+sprite_blend screen 128 405 168 439 anims/trees.gaf:treeshad:0 117 433
+sprite screen 128 370 132 434 anims/trees.gaf:tree1:0 117 433
+sprite_blend screen 162 407 216 441 anims/trees.gaf:treeshad:0 165 435
+sprite screen 152 372 180 436 anims/trees.gaf:tree1:0 165 435
+sprite_blend screen 128 404 147 448 anims/trees.gaf:treeshad2:0 117 449
+sprite screen 128 390 135 448 anims/trees.gaf:tree2:0 117 449
+fill screen 128 32 141 48 0
+fill screen 141 32 173 48 0
+fill screen 173 32 205 48 0
+fill screen 205 32 237 48 0
+fill screen 237 32 269 48 0
+fill screen 269 32 301 48 0
+fill screen 301 32 333 48 0
+fill screen 333 32 365 48 0
+fill screen 365 32 397 48 0
+fill screen 397 32 429 48 0
+fill screen 429 32 461 48 0
+fill screen 461 32 493 48 0
+fill screen 493 32 525 48 0
+fill screen 525 32 557 48 0
+fill screen 557 32 589 48 0
+fill screen 589 32 621 48 0
+fill screen 621 32 640 48 0
+fill screen 128 48 141 80 0
+fill screen 141 48 173 80 0
+fill screen 173 48 205 80 0
+fill screen 205 48 237 80 0
+fill screen 237 48 269 80 0
+fill screen 269 48 301 80 0
+fill screen 301 48 333 80 0
+fill screen 333 48 365 80 0
+fill screen 365 48 397 80 0
+fill screen 397 48 429 80 0
+fill screen 429 48 461 80 0
+fill screen 461 48 493 80 0
+fill screen 493 48 525 80 0
+fill screen 525 48 557 80 0
+fill screen 557 48 589 80 0
+fill screen 589 48 621 80 0
+fill screen 621 48 640 80 0
+fill screen 128 80 141 112 0
+fill screen 141 80 173 112 0
+fill screen 173 80 205 112 0
+fill screen 205 80 237 112 0
+fill screen 237 80 269 112 0
+fill screen 269 80 301 112 0
+fill screen 301 80 333 112 0
+fill screen 333 80 365 112 0
+fill screen 365 80 397 112 0
+fill screen 397 80 429 112 0
+fill screen 429 80 461 112 0
+fill screen 461 80 493 112 0
+fill screen 493 80 525 112 0
+fill screen 525 80 557 112 0
+fill screen 557 80 589 112 0
+fill screen 589 80 621 112 0
+fill screen 621 80 640 112 0
+fill screen 128 112 141 144 0
+fill screen 141 112 173 144 0
+fill screen 173 112 205 144 0
+fill screen 205 112 237 144 0
+fill screen 237 112 269 144 0
+fill screen 269 112 301 144 0
+fill screen 301 112 333 144 0
+fill screen 333 112 365 144 0
+fill screen 365 112 397 144 0
+fill screen 397 112 429 144 0
+fill screen 429 112 461 144 0
+fill screen 461 112 493 144 0
+fill screen 493 112 525 144 0
+fill screen 525 112 557 144 0
+fill screen 557 112 589 144 0
+fill screen 589 112 621 144 0
+fill screen 621 112 640 144 0
+fill screen 128 144 141 176 0
+fill screen 141 144 173 176 0
+fill screen 173 144 205 176 0
+fill screen 205 144 237 176 0
+fill screen 237 144 269 176 0
+fill screen 269 144 301 176 0
+fill screen 301 144 333 176 0
+fill screen 333 144 365 176 0
+fill screen 365 144 397 176 0
+fill screen 397 144 429 176 0
+fill screen 429 144 461 176 0
+fill screen 461 144 493 176 0
+fill screen 493 144 525 176 0
+fill screen 525 144 557 176 0
+fill screen 557 144 589 176 0
+fill screen 589 144 621 176 0
+fill screen 621 144 640 176 0
+fill screen 128 176 141 208 0
+fill screen 141 176 173 208 0
+fill screen 173 176 205 208 0
+fill screen 205 176 237 208 0
+fill screen 237 176 269 208 0
+fill screen 269 176 301 208 0
+fill screen 301 176 333 208 0
+fill screen 333 176 365 208 0
+fill screen 365 176 397 208 0
+fill screen 397 176 429 208 0
+fill screen 429 176 461 208 0
+fill screen 461 176 493 208 0
+fill screen 493 176 525 208 0
+fill screen 525 176 557 208 0
+fill screen 557 176 589 208 0
+fill screen 589 176 621 208 0
+fill screen 621 176 640 208 0
+fill screen 128 208 141 240 0
+fill screen 141 208 173 240 0
+fill screen 173 208 205 240 0
+fill screen 205 208 237 240 0
+fill screen 237 208 269 240 0
+fill screen 269 208 301 240 0
+fill screen 301 208 333 240 0
+fill screen 333 208 365 240 0
+fill screen 365 208 397 240 0
+fill screen 397 208 429 240 0
+fill screen 429 208 461 240 0
+fill screen 461 208 493 240 0
+fill screen 493 208 525 240 0
+fill screen 525 208 557 240 0
+fill screen 557 208 589 240 0
+fill screen 589 208 621 240 0
+fill screen 621 208 640 240 0
+fill screen 128 240 141 272 0
+fill screen 141 240 173 272 0
+fill screen 173 240 205 272 0
+fill screen 205 240 237 272 0
+fill screen 237 240 269 272 0
+fill screen 269 240 301 272 0
+fill screen 301 240 333 272 0
+fill screen 333 240 365 272 0
+fill screen 365 240 397 272 0
+fill screen 397 240 429 272 0
+fill screen 429 240 461 272 0
+fill screen 461 240 493 272 0
+fill screen 493 240 525 272 0
+fill screen 525 240 557 272 0
+fill screen 557 240 589 272 0
+fill screen 589 240 621 272 0
+fill screen 621 240 640 272 0
+fill screen 128 272 141 304 0
+fill screen 141 272 173 304 0
+fill screen 173 272 205 304 0
+fill screen 205 272 237 304 0
+fill screen 237 272 269 304 0
+fill screen 269 272 301 304 0
+fill screen 301 272 333 304 0
+fill screen 333 272 365 304 0
+fill screen 365 272 397 304 0
+fill screen 397 272 429 304 0
+fill screen 429 272 461 304 0
+fill screen 461 272 493 304 0
+fill screen 493 272 525 304 0
+fill screen 525 272 557 304 0
+fill screen 557 272 589 304 0
+fill screen 589 272 621 304 0
+fill screen 621 272 640 304 0
+fill screen 128 304 141 336 0
+fill screen 141 304 173 336 0
+fill screen 173 304 205 336 0
+fill screen 205 304 237 336 0
+fill screen 237 304 269 336 0
+fill screen 269 304 301 336 0
+fill screen 301 304 333 336 0
+fill screen 333 304 365 336 0
+fill screen 365 304 397 336 0
+fill screen 397 304 429 336 0
+fill screen 429 304 461 336 0
+fill screen 461 304 493 336 0
+fill screen 493 304 525 336 0
+fill screen 525 304 557 336 0
+fill screen 557 304 589 336 0
+fill screen 589 304 621 336 0
+fill screen 621 304 640 336 0
+fill screen 128 336 141 368 0
+fill screen 141 336 173 368 0
+fill screen 173 336 205 368 0
+fill screen 205 336 237 368 0
+fill screen 237 336 269 368 0
+fill screen 269 336 301 368 0
+fill screen 301 336 333 368 0
+fill screen 333 336 365 368 0
+fill screen 365 336 397 368 0
+fill screen 397 336 429 368 0
+fill screen 429 336 461 368 0
+fill screen 461 336 493 368 0
+fill screen 493 336 525 368 0
+fill screen 525 336 557 368 0
+fill screen 557 336 589 368 0
+fill screen 589 336 621 368 0
+fill screen 621 336 640 368 0
+fill screen 128 368 141 400 0
+fill screen 141 368 173 400 0
+fill screen 173 368 205 400 0
+fill screen 205 368 237 400 0
+fill screen 237 368 269 400 0
+fill screen 269 368 301 400 0
+fill screen 301 368 333 400 0
+fill screen 333 368 365 400 0
+fill screen 365 368 397 400 0
+fill screen 397 368 429 400 0
+fill screen 429 368 461 400 0
+fill screen 461 368 493 400 0
+fill screen 493 368 525 400 0
+fill screen 525 368 557 400 0
+fill screen 557 368 589 400 0
+fill screen 589 368 621 400 0
+fill screen 621 368 640 400 0
+fill screen 128 400 141 432 0
+fill screen 141 400 173 432 0
+fill screen 173 400 205 432 0
+fill screen 205 400 237 432 0
+fill screen 237 400 269 432 0
+fill screen 269 400 301 432 0
+fill screen 301 400 333 432 0
+fill screen 333 400 365 432 0
+fill screen 365 400 397 432 0
+fill screen 397 400 429 432 0
+fill screen 429 400 461 432 0
+fill screen 461 400 493 432 0
+fill screen 493 400 525 432 0
+fill screen 525 400 557 432 0
+fill screen 557 400 589 432 0
+fill screen 589 400 621 432 0
+fill screen 621 400 640 432 0
+fill screen 128 432 141 448 0
+fill screen 141 432 173 448 0
+fill screen 173 432 205 448 0
+fill screen 205 432 237 448 0
+fill screen 237 432 269 448 0
+fill screen 269 432 301 448 0
+fill screen 301 432 333 448 0
+fill screen 333 432 365 448 0
+fill screen 365 432 397 448 0
+fill screen 397 432 429 448 0
+fill screen 429 432 461 448 0
+fill screen 461 432 493 448 0
+fill screen 493 432 525 448 0
+fill screen 525 432 557 448 0
+fill screen 557 432 589 448 0
+fill screen 589 432 621 448 0
+fill screen 621 432 640 448 0
+cursor anims/cursors.gaf:cursornormal 100 90
+frame 288 285 1 28d82e7e3b99a38e
+blit RADAR%20FINAL 0 0 126 53 RADAR%20MAPPED 0 0
+sprite RADAR%20FINAL 14 13 18 17 anims/fx.gaf:radlogo:0 15 14
+circle RADAR%20FINAL 1 0 30 29 15 14 14 233
+circle RADAR%20FINAL 1 0 30 29 15 14 14 233
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+terrain screen 128 32 640 448 The%20Pass 182 190
+sprite screen 129 0 640 32 anims/armint.gaf:PANELTOP:0 130 0
+quad screen 132 5 153 26 textures/logos.gaf:32xlogos:0 132,5 152,5 152,25 132,25 0,0,32,0,32,32,0,32
+fill screen 471 12 582 15 208
+text screen 529 18 547 29 console 255 254 254 529 18 960
+text screen 468 1 474 12 console 255 254 254 468 1 0
+text screen 571 1 595 12 console 255 254 254 571 1 1100
+text screen 609 5 621 16 console 233 254 254 609 5 25
+text screen 609 17 621 28 console 211 254 254 609 17 43
+fill screen 218 12 333 15 224
+text screen 278 18 296 29 console 255 254 254 278 18 988
+text screen 215 1 221 12 console 255 254 254 215 1 0
+text screen 317 1 341 12 console 255 254 254 317 1 1100
+text screen 358 5 373 16 console 233 254 254 358 5 1.0
+text screen 358 17 373 28 console 211 254 254 358 17 3.3
+blit screen 0 36 126 89 RADAR%20FINAL 0 36
+outline screen 6 42 24 56 6 42 23 55 194
+sprite screen 471 140 530 206 anims/rocks.gaf:rockmetal3:0 498 170
+sprite_blend screen 637 32 640 75 anims/trees.gaf:leafshad:0 642 74
+sprite screen 614 32 640 75 anims/trees.gaf:leaf1:0 642 74
+sprite_blend screen 205 60 255 107 anims/trees.gaf:leafshad:0 210 106
+sprite screen 188 42 235 109 anims/trees.gaf:leaf3:0 210 106
+model screen 128 32 640 448 armlab armlab 554 146 39845888 65536 19922944 0 -31295 0 0 00000000 0 bf4ccccd,3f800000,3e800000 base,3,0,0,0,0,0,0 stand1,1,0,0,0,-1784298,-442,-253671 nano1,1,0,0,0,-2470700,807412,-351256 beam1,0,0,0,0,-1430522,1051033,-137181 stand2,1,0,0,0,1865403,-442,265201 nano2,1,0,0,0,2545496,812837,361889 beam2,0,0,0,0,1490767,1072992,278134 door1,1,1228800,0,0,-1843906,0,-2744457 door1A,1,0,0,1622016,-1255810,0,-3388994 door2,1,-1228800,0,0,2616840,0,-2110280 door2A,1,0,0,1638400,2152883,0,-2920934 door3,1,1228800,0,0,-2535735,0,2121810 door3A,1,0,0,-1556480,-2152883,0,2920934 door4,1,-1228800,0,0,1925010,0,2755988 door4A,1,0,0,-1572864,1251198,0,3421435 pad,1,0,0,0,157,26214,231704
+cargo screen 128 32 640 448 armpw armpw 554 142 39846045 91750 19691240 0 4741 0 0 3f16be28 0 bf4ccccd,3f800000,3e800000 ground,3,0,0,0,0,0,0 pelvis,3,0,0,0,130050,937997,-266133 rthigh,3,0,0,0,95387,796263,46612 rleg,3,0,0,0,238469,610469,116531 rfoot,3,0,0,0,238469,212338,116531 lthigh,3,0,0,0,-95387,796263,-46612 lleg,3,0,0,0,-238469,610469,-116531 lfoot,3,0,0,0,-238469,212338,-116531 torso,3,0,0,0,0,902431,0 luparm,3,0,0,0,-239011,1300562,-175878 lloarm,3,0,0,0,-451873,1073480,-344815 lfire,2,0,0,0,-554661,95519,-117681 ruparm,3,0,0,0,285623,1300562,80492 rloarm,3,0,0,0,549702,1073480,144619 rfire,2,0,0,0,446326,95519,371465
+line screen 398 225 400 258 399 257 398 225 233
+line screen 366 225 399 227 398 225 366 226 233
+line screen 366 226 368 259 366 226 367 258 233
+line screen 367 257 400 259 367 258 399 257 233
+model screen 128 32 640 448 armcom armcom 383 241 28646313 65536 26198834 0 16832 0 0 00000000 0 bf4ccccd,3f800000,3e800000 ground,3,0,0,0,0,0,0 pelvis,3,0,0,0,0,1507327,0 lthigh,3,0,0,0,32123,1311551,-326602 lleg,3,0,0,0,86283,724225,-324274 rthigh,3,0,0,0,3983,1311551,328154 rleg,3,0,0,0,58143,724225,330481 torso,3,0,0,0,-18053,1703102,-776 ruparm,3,0,0,0,-106013,1993607,617660 biggun,3,0,0,0,-142648,1600474,743760 rbigflash,2,0,0,0,-652576,1374590,725432 luparm,3,0,0,0,15746,1999924,-621539 nanolath,3,0,0,0,124360,1653190,-744339 lfirept,2,0,0,0,-326357,1277763,-816387 nanospray,2,0,0,0,-147417,1095581,-806813 head,3,0,-1,0,-66196,2225172,-2845
+fill screen 550 134 552 136 162
+fill screen 559 138 561 140 162
+fill screen 560 131 562 133 163
+fill screen 551 134 553 136 166
+fill screen 554 137 556 139 167
+fill screen 554 139 556 141 161
+fill screen 552 137 554 139 162
+fill screen 554 138 556 140 163
+fill screen 550 137 552 139 167
+fill screen 550 137 552 139 161
+fill screen 551 134 553 136 162
+fill screen 552 137 554 139 163
+fill screen 553 141 555 143 164
+fill screen 559 135 561 137 165
+fill screen 559 135 561 137 166
+fill screen 558 135 560 137 167
+fill screen 560 137 562 139 161
+fill screen 558 134 560 136 162
+fill screen 551 136 553 138 166
+fill screen 553 133 555 135 167
+fill screen 555 139 557 141 161
+fill screen 554 132 556 134 162
+fill screen 552 137 554 139 163
+fill screen 544 138 546 140 164
+fill screen 544 138 546 140 165
+fill screen 544 136 546 138 166
+fill screen 544 138 546 140 167
+fill screen 543 134 545 136 161
+fill screen 558 133 560 135 165
+fill screen 559 134 561 136 166
+fill screen 559 135 561 137 167
+fill screen 559 135 561 137 161
+fill screen 559 132 561 134 162
+fill screen 567 134 569 136 163
+fill screen 567 136 569 138 164
+fill screen 567 135 569 137 165
+fill screen 568 133 570 135 166
+fill screen 568 135 570 137 167
+fill screen 544 139 546 141 164
+fill screen 544 137 546 139 165
+fill screen 544 140 546 142 166
+fill screen 546 138 548 140 167
+fill screen 545 137 547 139 161
+fill screen 536 139 538 141 162
+fill screen 536 138 538 140 163
+fill screen 536 138 538 140 164
+fill screen 536 139 538 141 165
+fill screen 536 139 538 141 166
+fill screen 568 133 570 135 163
+fill screen 568 136 570 138 164
+fill screen 566 134 568 136 165
+fill screen 568 134 570 136 166
+fill screen 567 133 569 135 167
+fill screen 576 133 578 135 161
+fill screen 576 133 578 135 162
+fill screen 576 133 578 135 163
+fill screen 576 133 578 135 164
+fill screen 576 133 578 135 165
+fill screen 536 140 538 142 162
+fill screen 535 138 537 140 163
+fill screen 535 138 537 140 164
+fill screen 536 139 538 141 165
+fill screen 536 139 538 141 166
+gray screen 128 32 154 50
+sprite screen 128 32 154 50 anims/fog.gaf:Black1:6 122 18
+sprite_gray screen 154 32 186 50 anims/fog.gaf:Gray2:6 154 18
+sprite screen 154 32 170 34 anims/fog.gaf:Black2:0 154 18
+sprite_gray screen 186 32 204 36 anims/fog.gaf:Gray3:0 186 18
+gray screen 128 50 154 82
+sprite screen 128 50 138 82 anims/fog.gaf:Black2:4 122 50
+sprite_gray screen 154 50 176 82 anims/fog.gaf:Gray3:4 154 50
+sprite_gray screen 128 82 154 114 anims/fog.gaf:Gray3:6 122 82
+sprite screen 128 82 138 114 anims/fog.gaf:Black3:4 122 82
+sprite_gray screen 154 82 172 100 anims/fog.gaf:Gray4:0 154 82
+sprite_gray screen 128 114 140 132 anims/fog.gaf:Gray4:0 122 114
+sprite screen 128 114 140 130 anims/fog.gaf:Black4:0 122 114
+sprite_gray screen 128 287 141 306 anims/fog.gaf:Gray1:3 122 274
+sprite screen 128 290 138 306 anims/fog.gaf:Black1:3 122 274
+sprite_gray screen 128 306 154 338 anims/fog.gaf:Gray2:12 122 306
+sprite screen 128 306 154 338 anims/fog.gaf:Black2:12 122 306
+sprite_gray screen 154 317 173 338 anims/fog.gaf:Gray3:3 154 306
+sprite screen 154 322 170 338 anims/fog.gaf:Black3:3 154 306
+fill screen 128 338 154 370 0
+sprite_gray screen 154 338 174 370 anims/fog.gaf:Gray4:4 154 338
+sprite screen 154 338 172 370 anims/fog.gaf:Black4:4 154 338
+fill screen 128 370 154 402 0
+sprite_gray screen 154 370 186 402 anims/fog.gaf:Gray1:12 154 370
+sprite screen 154 370 186 402 anims/fog.gaf:Black1:12 154 370
+sprite_gray screen 186 383 205 402 anims/fog.gaf:Gray2:3 186 370
+sprite screen 186 386 203 402 anims/fog.gaf:Black2:3 186 370
+sprite_gray screen 549 383 570 403 anims/fog.gaf:Gray1:7 538 370
+sprite_gray screen 570 383 603 402 anims/fog.gaf:Gray2:11 570 370
+sprite screen 586 385 602 402 anims/fog.gaf:Black2:7 570 370
+sprite_gray screen 602 383 635 402 anims/fog.gaf:Gray3:11 602 370
+sprite screen 602 386 634 402 anims/fog.gaf:Black3:11 602 370
+sprite_gray screen 634 370 640 402 anims/fog.gaf:Gray4:13 634 370
+sprite screen 634 370 640 402 anims/fog.gaf:Black4:13 634 370
+fill screen 128 402 154 434 0
+fill screen 154 402 186 434 0
+sprite_gray screen 186 402 218 434 anims/fog.gaf:Gray3:12 186 402
+sprite screen 186 402 218 434 anims/fog.gaf:Black3:12 186 402
+sprite_gray screen 218 415 251 434 anims/fog.gaf:Gray4:11 218 402
+sprite screen 218 418 250 434 anims/fog.gaf:Black4:11 218 402
+sprite_gray screen 250 415 269 434 anims/fog.gaf:Gray1:3 250 402
+sprite screen 250 418 266 434 anims/fog.gaf:Black1:3 250 402
+sprite_gray screen 487 415 506 435 anims/fog.gaf:Gray4:7 474 402
+sprite_gray screen 506 415 539 434 anims/fog.gaf:Gray1:11 506 402
+sprite screen 522 418 538 434 anims/fog.gaf:Black1:7 506 402
+sprite_gray screen 538 402 570 434 anims/fog.gaf:Gray2:13 538 402
+sprite screen 538 416 570 434 anims/fog.gaf:Black2:11 538 402
+gray screen 570 402 602 434
+sprite screen 570 402 602 434 anims/fog.gaf:Black3:13 570 402
+fill screen 602 402 634 434 0
+fill screen 634 402 640 434 0
+fill screen 128 434 154 448 0
+fill screen 154 434 186 448 0
+fill screen 186 434 218 448 0
+fill screen 218 434 250 448 0
+sprite_gray screen 250 434 282 448 anims/fog.gaf:Gray2:12 250 434
+sprite screen 250 434 282 448 anims/fog.gaf:Black2:12 250 434
+sprite_gray screen 282 445 301 448 anims/fog.gaf:Gray3:3 282 434
+sprite_gray screen 455 447 474 448 anims/fog.gaf:Gray4:7 442 434
+sprite_gray screen 474 434 506 448 anims/fog.gaf:Gray1:13 474 434
+gray screen 506 434 538 448
+sprite screen 506 434 538 448 anims/fog.gaf:Black2:13 506 434
+fill screen 538 434 570 448 0
+fill screen 570 434 602 448 0
+fill screen 602 434 634 448 0
+fill screen 634 434 640 448 0
+cursor anims/cursors.gaf:cursornormal 100 90
+frame 658 655 1 28d82e7e3b99a38e
+blit RADAR%20FINAL 0 0 126 53 RADAR%20MAPPED 0 0
+sprite RADAR%20FINAL 14 13 18 17 anims/fx.gaf:radlogo:0 15 14
+sprite RADAR%20FINAL 20 9 24 13 anims/fx.gaf:radlogo:0 21 10
+sprite RADAR%20FINAL 20 13 24 17 anims/fx.gaf:radlogo:0 21 14
+terrain screen 128 32 640 448 The%20Pass 182 190
+blit screen 0 36 126 89 RADAR%20FINAL 0 36
+outline screen 6 42 24 56 6 42 23 55 194
+sprite screen 471 140 530 206 anims/rocks.gaf:rockmetal3:0 498 170
+sprite_blend screen 637 32 640 75 anims/trees.gaf:leafshad:0 642 74
+sprite screen 614 32 640 75 anims/trees.gaf:leaf1:0 642 74
+sprite_blend screen 205 60 255 107 anims/trees.gaf:leafshad:0 210 106
+sprite screen 188 42 235 109 anims/trees.gaf:leaf3:0 210 106
+model screen 128 32 640 448 armlab armlab 554 146 39845888 65536 19922944 0 -31295 0 0 00000000 0 bf4ccccd,3f800000,3e800000 base,3,0,0,0,0,0,0 stand1,1,0,0,0,-1784298,-442,-253671 nano1,1,0,0,0,-2470700,807412,-351256 beam1,0,0,0,0,-1430522,1051033,-137181 stand2,1,0,0,0,1865403,-442,265201 nano2,1,0,0,0,2545496,812837,361889 beam2,0,0,0,0,1490767,1072992,278134 door1,1,1228800,0,0,-1843906,0,-2744457 door1A,1,0,0,1622016,-1255810,0,-3388994 door2,1,-1228800,0,0,2616840,0,-2110280 door2A,1,0,0,1638400,2152883,0,-2920934 door3,1,1228800,0,0,-2535735,0,2121810 door3A,1,0,0,-1556480,-2152883,0,2920934 door4,1,-1228800,0,0,1925010,0,2755988 door4A,1,0,0,-1572864,1251198,0,3421435 pad,1,0,0,0,157,26214,231704
+model screen 128 32 640 448 armcom armcom 383 241 28646313 65536 26198834 0 16832 0 0 00000000 0 bf4ccccd,3f800000,3e800000 ground,3,0,0,0,0,0,0 pelvis,3,0,0,0,0,1507327,0 lthigh,3,0,0,0,32123,1311551,-326602 lleg,3,0,0,0,86283,724225,-324274 rthigh,3,0,0,0,3983,1311551,328154 rleg,3,0,0,0,58143,724225,330481 torso,3,0,0,0,-18053,1703102,-776 ruparm,3,0,0,0,-106013,1993607,617660 biggun,3,0,0,0,-142648,1600474,743760 rbigflash,2,0,0,0,-652576,1374590,725432 luparm,3,0,0,0,15746,1999924,-621539 nanolath,3,0,0,0,124360,1653190,-744339 lfirept,2,0,0,0,-326357,1277763,-816387 nanospray,2,0,0,0,-147417,1095581,-806813 head,3,0,-1,0,-66196,2225172,-2845
+line screen 539 224 572 228 571 227 539 224 233
+line screen 536 224 540 257 539 224 536 256 233
+line screen 536 256 569 260 536 256 568 259 233
+line screen 568 227 572 260 568 259 571 227 233
+model screen 128 32 640 448 armpw armpw 554 242 39847011 65536 26219887 0 31845 0 0 00000000 0 bf4ccccd,3f800000,3e800000 ground,3,0,0,0,0,0,0 pelvis,3,0,-38231,0,26149,899766,295052 rthigh,3,0,0,0,-105752,758032,9372 rleg,3,0,0,0,-264383,572238,23431 rfoot,3,0,0,0,-264383,174107,23431 lthigh,3,0,0,0,105752,758032,-9372 lleg,3,0,0,0,255272,603540,-126235 lfoot,3,0,0,0,248253,213428,-205430 torso,3,0,0,0,0,864200,0 luparm,3,0,0,0,295508,1262331,27101 lloarm,3,0,0,0,565041,1035249,61769 lfire,2,0,0,0,524287,99686,-314561 ruparm,3,0,0,0,-286136,1262331,78650 rloarm,3,0,0,0,-545370,1035249,160181 rfire,2,0,0,0,-585472,99686,-216206
+gray screen 128 32 154 50
+sprite screen 128 32 154 50 anims/fog.gaf:Black1:6 122 18
+sprite_gray screen 154 32 186 50 anims/fog.gaf:Gray2:6 154 18
+sprite screen 154 32 170 34 anims/fog.gaf:Black2:0 154 18
+sprite_gray screen 186 32 204 36 anims/fog.gaf:Gray3:0 186 18
+gray screen 128 50 154 82
+sprite screen 128 50 138 82 anims/fog.gaf:Black2:4 122 50
+sprite_gray screen 154 50 176 82 anims/fog.gaf:Gray3:4 154 50
+sprite_gray screen 128 82 154 114 anims/fog.gaf:Gray3:6 122 82
+sprite screen 128 82 138 114 anims/fog.gaf:Black3:4 122 82
+sprite_gray screen 154 82 172 100 anims/fog.gaf:Gray4:0 154 82
+sprite_gray screen 128 114 140 132 anims/fog.gaf:Gray4:0 122 114
+sprite screen 128 114 140 130 anims/fog.gaf:Black4:0 122 114
+sprite_gray screen 128 287 141 306 anims/fog.gaf:Gray1:3 122 274
+sprite screen 128 290 138 306 anims/fog.gaf:Black1:3 122 274
+sprite_gray screen 128 306 154 338 anims/fog.gaf:Gray2:12 122 306
+sprite screen 128 306 154 338 anims/fog.gaf:Black2:12 122 306
+sprite_gray screen 154 317 173 338 anims/fog.gaf:Gray3:3 154 306
+sprite screen 154 322 170 338 anims/fog.gaf:Black3:3 154 306
+fill screen 128 338 154 370 0
+sprite_gray screen 154 338 174 370 anims/fog.gaf:Gray4:4 154 338
+sprite screen 154 338 172 370 anims/fog.gaf:Black4:4 154 338
+fill screen 128 370 154 402 0
+sprite_gray screen 154 370 186 402 anims/fog.gaf:Gray1:12 154 370
+sprite screen 154 370 186 402 anims/fog.gaf:Black1:12 154 370
+sprite_gray screen 186 383 205 402 anims/fog.gaf:Gray2:3 186 370
+sprite screen 186 386 203 402 anims/fog.gaf:Black2:3 186 370
+fill screen 128 402 154 434 0
+fill screen 154 402 186 434 0
+sprite_gray screen 186 402 218 434 anims/fog.gaf:Gray3:12 186 402
+sprite screen 186 402 218 434 anims/fog.gaf:Black3:12 186 402
+sprite_gray screen 218 415 251 434 anims/fog.gaf:Gray4:11 218 402
+sprite screen 218 418 250 434 anims/fog.gaf:Black4:11 218 402
+sprite_gray screen 250 415 269 434 anims/fog.gaf:Gray1:3 250 402
+sprite screen 250 418 266 434 anims/fog.gaf:Black1:3 250 402
+fill screen 128 434 154 448 0
+fill screen 154 434 186 448 0
+fill screen 186 434 218 448 0
+fill screen 218 434 250 448 0
+sprite_gray screen 250 434 282 448 anims/fog.gaf:Gray2:12 250 434
+sprite screen 250 434 282 448 anims/fog.gaf:Black2:12 250 434
+sprite_gray screen 282 445 301 448 anims/fog.gaf:Gray3:3 282 434
+cursor anims/cursors.gaf:cursornormal 100 90

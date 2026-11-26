@@ -1,0 +1,386 @@
+item,reader,function,container,every,after
+Feature::animTable,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
+Feature::flags16,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
+Feature::flagsHigh,presentation,DrawBattleFrame,LoadFeatureType: realloc Feature,1,
+Feature::footprint,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
+Feature::footprintZ,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
+Feature::height,presentation,DrawBattleFrame,LoadFeatureType: realloc Feature,1,
+Feature::shadowTable,presentation,BlitFeatureGaf,LoadFeatureType: realloc Feature,1,
+InitPlayerSlot: operator new unsigned char,los_radar,BuildFogTiles,InitPlayerSlot: operator new unsigned char,0,
+LoadBattleAssets: GameAllocIgnoreTag Economy region,economy,EconomyUnitAccount,LoadBattleAssets: GameAllocIgnoreTag Economy region,0,
+LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,BuildFogTiles,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,
+LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,ShareMapInfo,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,0,-
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+Mission::type,mission,Mission::GetGameType,SetMissionType: new Mission,1,
+MissionConditions::RegisterConditions: new DefeatAllUnitsKilled #2,players,MissionConditions::NotifyUnitCaptured,MissionConditions::RegisterConditions: new DefeatAllUnitsKilled #2,0,-
+MissionConditions::RegisterConditions: new VictoryDestroyAllUnits #2,players,MissionConditions::NotifyUnitCaptured,MissionConditions::RegisterConditions: new VictoryDestroyAllUnits #2,0,-
+ModelState::animDirty,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::animDirty,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::animDirty,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::animDirty,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::animDirty,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::animDirty,scripts,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::bitmap,presentation,CMemoryCache::AddModelBounds,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,presentation,CMemoryCache::AllocTwoPlaneBitmap,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::bitmap,presentation,CMemoryCache::DrawObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,presentation,CMemoryCache::DrawObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::bitmap,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::bitmap,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::bitmap,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::bitmap,unknown,CacheCore::AllocHandle,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::cacheDrawCount,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::cacheDrawCount,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::cacheDrawCount,presentation,CMemoryCache::DrawObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::cacheDrawCount,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::cacheDrawCount,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::cacheDrawCount,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::cacheDrawCount,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::cacheDrawCount,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::cacheDrawCount,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::count,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::count,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::count,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::count,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::count,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::count,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::count,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::count,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::owner,harness,DisplayLogModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::owner,presentation,CMemoryCache::DrawObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,presentation,CMemoryCache::DrawObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,presentation,CMemoryCache::ShadeByIntensity,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::owner,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::owner,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::owner,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::owner,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pieces,harness,ModelItem,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pieces,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pieces,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pieces,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pieces,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pieces,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pieces,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pieces,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pieces,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pos,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pos,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pos,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pos,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pos,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::pos,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pos,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pos,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::pos,scripts,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::root,harness,ModelItem,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::root,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::root,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::root,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::root,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::root,presentation,UnitTable::DrawPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::root,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::root,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::root,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::root,scripts,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::shadow,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::shadow,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::shadow,scripts,PoseModel,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::shadow,scripts,RestorePieceVertices,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+ModelState::shadow,scripts,TransformPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
+Unit::activateFlags,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::activateFlags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::activateFlags,weapons,DamageUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::b3a,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::b56,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::bank,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::bank,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::bank,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::bank,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::cargo,harness,DisplayLogModel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::cargo,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::cargo,presentation,CMemoryCache::MergeIntoComposite,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::cargo,presentation,DrawUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::cargo,presentation,GiveSelectedUnitsToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::carrier,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::carrier,presentation,DrawUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::carrier,presentation,GiveSelectedUnitsToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::carrier,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::def,ai,AiApply,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::def,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::def,orders,GetOrderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::def,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::def,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::def,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::def,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::def,presentation,PickUnitUnderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::def,presentation,RefreshOrderButtons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::def,presentation,SpeechQueue::PlaySpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::def,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::f2c,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::f48,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::f_1f,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::field_1e,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,players,GiveUnitToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::flags,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::flags,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,CollectSelectedUnits,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::flags,presentation,DrainSimEvents,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::flags,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,GiveSelectedUnitsToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,QueueUnitSpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::flags,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::flags,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::flags,units,UnitsApply,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,units,UnitsApplyAttackedSpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,units,UnitsApplySend,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,weapons,ApplyUnitDamage,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::group,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::head,units,NotifyUnitRefs,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::heading,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::heading,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::heading,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::health,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::health,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::health,weapons,ApplyUnitDamage,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::id,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::id,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::id,presentation,IsUnitVisible,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::id,presentation,OpenGeneratorDialog,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::id,presentation,PickUnitUnderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::id,units,UnitsApplyAttackedSpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::id,weapons,DamageUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::killCount,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::killCount,weapons,DamageUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::lastAttackerSlot,units,UnitsApplyAttackedSpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::list,orders,GetOrderFlags,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::list,orders,GetOrderName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::list,orders,GetOrderTarget,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::list2,orders,GetBuildWeaponPercent,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::motion,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::pitch,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::pitch,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::pitch,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::player,los_radar,IsUnitVisibleToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::player,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::player,players,GiveUnitToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::player,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::player,weapons,ApplyUnitDamage,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::player,weapons,DamageUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::playerIndex,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::playerIndex,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::playerIndex,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::playerIndex,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::playerIndex,presentation,DrainSimEvents,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::playerIndex,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::playerIndex,presentation,QueueUnitSpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::playerIndex,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::playerIndex,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::playerIndex,units,UnitsApplyAttackedSpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::pos,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::pos,map,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::pos,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::pos,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::pos,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::postTransferHoldoff,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::postTransferHoldoff,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::script,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::speed,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::speed,network,NetSendOwnershipTransfer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::speed,presentation,CMemoryCache::ShadeByIntensity,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::speed,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::speed,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::speed,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::state,presentation,DrawUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::state,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::unitDefIndex,game,BattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::unitDefIndex,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::unitDefIndex,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::unitDefIndex,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::unitDefIndex,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::unitDefIndex,presentation,GiveSelectedUnitsToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::unitDefIndex,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::unitDefIndex,presentation,OpenGeneratorDialog,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::unitDefIndex,presentation,PickUnitUnderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::weapon,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::xWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::yFraction,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::yFraction,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::yFraction,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::yFraction,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::yWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::zBufferFlag,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::zBufferFlag,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::zFraction,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::zFraction,map,GetGroundHeight,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::zFraction,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::zFraction,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::zFraction,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::zWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::zWhole,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,1,
+UnitResources::energyMake,economy,EconomyApply,InitPlayerSlot: new UnitResources,0,-
+UnitResources::energyUse,economy,EconomySpend,InitPlayerSlot: new UnitResources,0,-
+UnitResources::metalMake,economy,EconomyApply,InitPlayerSlot: new UnitResources,0,-
+UnitResources::metalUse,economy,EconomySpend,InitPlayerSlot: new UnitResources,0,-
+UnitTypeSet::bits,presentation,GiveSelectedUnitsToPlayer,GetLoadCategoryMask: GameAllocIgnoreTag UnitTypeSet,0,-
+WeaponDef::reloadTime,presentation,DrawUnitInfoPanel,weapons,0,
+baseX,los_radar,ClampWorldPosToTerrain,baseX,1,
+baseY,los_radar,ClampWorldPosToTerrain,baseY,1,
+bits,game,BattleFrame,bits,0,
+bits,presentation,DrawBattleFrame,bits,1,
+bits,presentation,DrawUnitInfoPanel,bits,1,
+bits,presentation,HandleGameKey,bits,0,-
+bits_14281,los_radar,BuildFogTiles,bits_14281,0,
+bits_14281,presentation,DrawFogOfWar,bits_14281,1,
+bits_2a44,game,MainLoopTick,bits_2a44,1,
+bits_2a44,network,BroadcastPacket,bits_2a44,0,-
+bits_2a44,network,SendPacketToPlayer,bits_2a44,0,-
+bits_2a44,presentation,UpdateCdCategoryByActivity,bits_2a44,1,
+bits_37f2f,presentation,DrawBattleFrame,bits_37f2f,1,
+bits_38a51,game,MainLoopTick,bits_38a51,1,
+bits_38a51,presentation,DrawBattleFrame,bits_38a51,1,
+cells,los_radar,FreeLosTables,cells,1,
+cells,map,GetGroundHeight,cells,1,
+cells,presentation,DrawBattleFrame,cells,1,
+count_1491b,presentation,DrawExplosions,count_1491b,1,
+defs,units,FindUnitTypeId,defs,0,
+features,presentation,BlitFeatureGaf,features,1,
+features,presentation,DrawBattleFrame,features,1,
+field_1df2,network,SendShareEnergy,field_1df2,0,-
+field_1df2,network,SendShareMetal,field_1df2,0,-
+field_1df2,presentation,HandleShareDialogEvent,field_1df2,0,-
+field_1df2,presentation,OpenShareDialog,field_1df2,0,-
+field_1df2,seams,WorldPlayerInfo,field_1df2,0,-
+flags_38d75,presentation,UpdateCdCategoryByActivity,flags_38d75,1,
+g_emptyText,presentation,??0StringRef@@QAE@PBD@Z,g_emptyText,0,-
+g_explodedPieces,presentation,DrawExplosions,g_explodedPieces,1,
+g_missionOrderTableVec,orders,GetOrderName,g_missionOrderTableVec,0,
+height,los_radar,BuildFogTiles,height,0,
+height,los_radar,FreeLosTables,height,1,
+height,los_radar,ShareMapInfo,height,0,-
+height,map,GetGroundHeight,height,1,
+height,presentation,DrawBattleFrame,height,1,
+list_391ed,players,GiveUnitToPlayer,list_391ed,0,-
+list_391ed,players,PlayersApply,list_391ed,0,-
+localPlayer,presentation,BuildEntryGuiName,localPlayer,0,-
+localPlayer,presentation,ClickSelectHoverUnit,localPlayer,0,-
+localPlayer,presentation,CollectSelectedUnits,localPlayer,0,-
+localPlayer,presentation,DrawBattleFrame,localPlayer,1,
+localPlayer,presentation,HandleShareDialogEvent,localPlayer,0,-
+localPlayer,presentation,HandleTalkDialogEvent,localPlayer,0,-
+localPlayer,presentation,OpenGeneratorDialog,localPlayer,0,-
+localPlayer,presentation,OpenShareDialog,localPlayer,0,-
+localPlayer,presentation,OpenTalkDialog,localPlayer,0,-
+localPlayer,presentation,ResolveCursorModeForSelection,localPlayer,0,
+net,seams,GetGameTypeNative,net,1,
+numPlayers,presentation,OpenShareDialog,numPlayers,0,-
+p1b8a,harness,ModelItem,p1b8a,1,
+p1b8a,presentation,DrawBattleFrame,p1b8a,1,
+p1b8a,presentation,DrawUnitInfoPanel,p1b8a,0,
+p1b8a,presentation,OpenGeneratorDialog,p1b8a,0,-
+p1b8a,presentation,OpenShareDialog,p1b8a,0,-
+p1b8a,presentation,OpenTalkDialog,p1b8a,0,-
+p1b8a,presentation,UnitTable::DrawPieces,p1b8a,0,
+p1cd5,presentation,HandleShareDialogEvent,p1cd5,0,-
+p1cd5,presentation,OpenShareDialog,p1cd5,0,-
+p1cd5,seams,WorldPlayerInfo,p1cd5,0,-
+pad_14273,los_radar,BuildFogTiles,pad_14273,0,
+pad_14273,los_radar,ShareMapInfo,pad_14273,0,-
+pad_1df4,network,SendShareEnergy,pad_1df4,0,-
+pad_1df4,network,SendShareMetal,pad_1df4,0,-
+pad_1df4,presentation,HandleShareDialogEvent,pad_1df4,0,-
+pad_1df4,presentation,OpenShareDialog,pad_1df4,0,-
+pad_1df4,seams,WorldPlayerInfo,pad_1df4,0,-
+playerIndex,los_radar,BuildFogTiles,playerIndex,0,
+playerIndex,presentation,CollectVisibleUnitIds,playerIndex,1,
+playerIndex,presentation,DrainSimEvents,playerIndex,0,-
+playerIndex,presentation,DrawBattleFrame,playerIndex,1,
+playerIndex,presentation,DrawUnitInfoPanel,playerIndex,0,
+playerIndex,presentation,QueueUnitSpeech,playerIndex,0,-
+projectileCount,presentation,DrawProjectiles,projectileCount,1,
+seaLevel,los_radar,ClampWorldPosToTerrain,seaLevel,1,
+seaLevel,presentation,CMemoryCache::DrawObjectPicture,seaLevel,1,
+startPos,presentation,DrawBattleFrame,startPos,1,
+startPos,presentation,DrawUnitInfoPanel,startPos,0,
+ticks,game,RecordSimEvent,ticks,0,-
+ticks,game,RunGameSteps,ticks,1,
+ticks,harness,HarnessCommandEvent,ticks,0,-
+ticks,harness,HarnessDisplayFrame,ticks,1,
+ticks,harness,HarnessFrameDrawn,ticks,0,
+ticks,harness,HarnessSimEventSlot,ticks,0,-
+ticks,harness,HarnessSoundEvent,ticks,0,
+ticks,network,AddMessage,ticks,0,-
+ticks,network,ExpireOldestMessage,ticks,0,
+ticks,presentation,DrawProjectiles,ticks,1,
+ticks,presentation,PlayNextSpeech,ticks,0,-
+ticks,presentation,SpeechQueue::EnqueueSpeech,ticks,0,-
+types,presentation,DrawBattleFrame,types,0,
+types,presentation,HitTestUnitScreenHull,types,0,
+unitDefCount,units,FindUnitTypeId,unitDefCount,0,
+units,game,BattleFrame,units,0,
+units,presentation,ClickSelectHoverUnit,units,0,-
+units,presentation,CollectVisibleUnitIds,units,1,
+units,presentation,DrainSimEvents,units,0,-
+units,presentation,DrawBattleFrame,units,1,
+units,presentation,DrawUnitInfoPanel,units,0,
+units,presentation,PickUnitUnderCursor,units,0,
+units,presentation,ResolveCursorModeForSelection,units,0,
+units,seams,WorldUnitSlot,units,0,
+units,weapons,ApplyUnitDamage,units,0,-
+unitsEnd,presentation,ClickSelectHoverUnit,unitsEnd,0,-
+unitsEnd,presentation,CollectVisibleUnitIds,unitsEnd,1,
+unknown_1b8e,economy,EconomySpend,unknown_1b8e,0,-
+unknown_1b8e,los_radar,BuildFogTiles,unknown_1b8e,0,
+unknown_1b8e,network,BroadcastPacket,unknown_1b8e,0,-
+unknown_1b8e,network,NetSendOwnershipTransfer,unknown_1b8e,0,-
+unknown_1b8e,network,SendChatPacket,unknown_1b8e,0,-
+unknown_1b8e,network,SendShareEnergy,unknown_1b8e,0,-
+unknown_1b8e,network,SendShareMapInfo,unknown_1b8e,0,-
+unknown_1b8e,network,SendShareMetal,unknown_1b8e,0,-
+unknown_1b8e,platform,GetSlotDpid,unknown_1b8e,0,-
+unknown_1b8e,players,GiveUnitToPlayer,unknown_1b8e,0,-
+unknown_1b8e,players,TransferEnergy,unknown_1b8e,0,-
+unknown_1b8e,players,TransferMetal,unknown_1b8e,0,-
+unknown_1b8e,presentation,BuildEntryGuiName,unknown_1b8e,0,-
+unknown_1b8e,presentation,CollectSelectedUnits,unknown_1b8e,0,-
+unknown_1b8e,presentation,DrawBattleFrame,unknown_1b8e,1,
+unknown_1b8e,presentation,DrawUnitInfoPanel,unknown_1b8e,0,-
+unknown_1b8e,presentation,HandleShareDialogEvent,unknown_1b8e,0,-
+unknown_1b8e,presentation,OpenShareDialog,unknown_1b8e,0,-
+unknown_1b8e,presentation,ResolveCursorModeForSelection,unknown_1b8e,0,
+unknown_1b8e,seams,WorldPlayerInfo,unknown_1b8e,0,-
+unknown_1b8e,weapons,ApplyUnitDamage,unknown_1b8e,0,-
+unknown_1b8e,weapons,DamageUnit,unknown_1b8e,0,-
+unknown_1cd9,economy,EconomyApply,unknown_1cd9,0,-
+unknown_1cd9,network,NetSendOwnershipTransfer,unknown_1cd9,0,-
+unknown_1cd9,network,SendShareEnergy,unknown_1cd9,0,-
+unknown_1cd9,network,SendShareMapInfo,unknown_1cd9,0,-
+unknown_1cd9,network,SendShareMetal,unknown_1cd9,0,-
+unknown_1cd9,platform,GetSlotDpid,unknown_1cd9,0,-
+unknown_1cd9,players,GiveUnitToPlayer,unknown_1cd9,0,-
+unknown_1cd9,presentation,HandleShareDialogEvent,unknown_1cd9,0,-
+unknown_1cd9,presentation,OpenShareDialog,unknown_1cd9,0,-
+unknown_1cd9,seams,WorldPlayerInfo,unknown_1cd9,0,-
+width,los_radar,BuildFogTiles,width,0,
+width,los_radar,FreeLosTables,width,1,
+width,los_radar,ShareMapInfo,width,0,-
+width,map,GetGroundHeight,width,1,
+width,presentation,BlitFeatureGaf,width,1,
+width,presentation,DrawBattleFrame,width,1,
+width,presentation,DrawMapTiles,width,1,

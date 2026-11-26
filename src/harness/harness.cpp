@@ -588,6 +588,8 @@ enum { MAX_INPUTS = 1024 };
 struct ScriptedInput {
     int lineNo;
     unsigned tick;
+    unsigned frame;
+    int delivered;
     unsigned type;
     unsigned a;
     int x;
@@ -598,6 +600,10 @@ struct ScriptedInput {
 static ScriptedInput s_inputs[MAX_INPUTS];
 static int s_inputCount = 0;
 static int s_altHeld = 0;
+static unsigned s_frameTick = 0;
+static unsigned s_framesAtTick = 0;
+static int s_debugKeys = 0;
+enum { STOPPED_FRAME_LIMIT = 300 };
 
 static unsigned ParseKeyName(int lineNo, const char* text)
 {
@@ -649,6 +655,13 @@ static void ReadInput(int lineNo, char* value)
     ScriptedInput* in = &s_inputs[s_inputCount++];
     memset(in, 0, sizeof *in);
     in->lineNo = lineNo;
+    char* frameText = strchr(tickText, '.');
+    if (frameText != nullptr) {
+        *frameText++ = '\0';
+        in->frame = ParseNumber(lineNo, "input", frameText);
+        if (in->frame == 0)
+            FailLine(lineNo, "needs a frame of at least 1 after the dot", "input", "");
+    }
     in->tick = ParseNumber(lineNo, "input", tickText);
     if (in->tick == 0)
         FailLine(lineNo, "needs a tick of at least 1", "input", "");
@@ -716,9 +729,11 @@ static void CheckInputs()
         const ScriptedInput* in = &s_inputs[i];
         if (in->tick > s_ticks)
             FailLine(in->lineNo, "has a tick after the last tick", "input", "");
+        if (in->frame != 0 && in->tick == s_ticks)
+            FailLine(in->lineNo, "names a frame after the last tick", "input", ", the run ends when that tick has run");
         for (int k = 0; k < i; k++) {
-            if (s_inputs[k].tick == in->tick && s_inputs[k].mouse == in->mouse)
-                FailLine(in->lineNo, in->mouse ? "is a second mouse event on its tick" : "is a second key event on its tick",
+            if (s_inputs[k].tick == in->tick && s_inputs[k].frame == in->frame && s_inputs[k].mouse == in->mouse)
+                FailLine(in->lineNo, in->mouse ? "is a second mouse event on its frame" : "is a second key event on its frame",
                          "input", ", the game takes one of each per frame");
         }
     }
@@ -769,6 +784,55 @@ static void DeliverScriptedInput(const ScriptedInput* in)
     }
     host_inject_event(&ev);
     UiLogInput(in);
+}
+
+static void CheckFrameInputsBeforeTick(unsigned tick)
+{
+    for (int i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* in = &s_inputs[i];
+        if (in->frame == 0 || in->delivered || in->tick >= tick)
+            continue;
+        char detail[100];
+        sprintf(detail, ", the game ran tick %u first", tick);
+        FailLine(in->lineNo, "names a frame after a tick that the game did not reach", "input", detail);
+    }
+}
+
+static void CheckFrameInputsDelivered()
+{
+    for (int i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* in = &s_inputs[i];
+        if (in->frame != 0 && !in->delivered)
+            FailLine(in->lineNo, "names a frame that the game did not draw", "input", ", the run ended first");
+    }
+}
+
+static void HarnessFrameEnd(unsigned tick)
+{
+    if (tick == 0 || tick > s_ticks)
+        return;
+    if (tick != s_frameTick) {
+        s_frameTick = tick;
+        s_framesAtTick = 0;
+    }
+    s_framesAtTick++;
+    unsigned last = 0;
+    for (int i = 0; i < s_inputCount; i++) {
+        ScriptedInput* in = &s_inputs[i];
+        if (in->frame == 0 || in->tick != tick)
+            continue;
+        if (in->frame > last)
+            last = in->frame;
+        if (in->frame == s_framesAtTick) {
+            in->delivered = 1;
+            DeliverScriptedInput(in);
+        }
+    }
+    if (s_framesAtTick > last + STOPPED_FRAME_LIMIT) {
+        char msg[100];
+        sprintf(msg, "testmode: no tick ran for %u frames after tick %u\n", (unsigned)STOPPED_FRAME_LIMIT, tick);
+        Fail(msg);
+    }
 }
 
 static void CheckConsoles()
@@ -929,6 +993,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
             FailLine(lineNo, why, key, "");
     } else if (strcmp(key, "frames") == 0)
         ReadFrames(lineNo, value);
+    else if (strcmp(key, "debug_keys") == 0)
+        s_debugKeys = ParseRange(lineNo, key, value, 1);
     else if (strcmp(key, "ticks") == 0) {
         s_ticks = ParseNumber(lineNo, key, value);
         if (s_ticks == 0)
@@ -1634,6 +1700,13 @@ static void ResolveQuirks()
 
 void HarnessExit()
 {
+    if (HarnessTestMode())
+        CheckFrameInputsDelivered();
+    if (HarnessTestMode() && s_blockScan)
+        BlockScanWrite(strcmp(s_commit, "unknown") == 0 ? "-" : s_commit);
+#if BT_ACCESS_LOG
+    AccessLogFinish();
+#endif
     if (!s_recordSwitch)
         return;
     char error[300];
@@ -1865,6 +1938,7 @@ void HarnessAfterStep()
         s_interfaceOpen = true;
         return;
     }
+    CheckFrameInputsDelivered();
     char msg[64];
     if (s_trace != NULL)
         fclose(s_trace);
@@ -4168,6 +4242,9 @@ void HarnessBeforeStep()
     }
     if (tick == 1)
         ApplyShareSettings();
+    if (tick == 1 && s_debugKeys)
+        g_game->uiOptionFlags_37f2f.bit1 = 1;
+    CheckFrameInputsBeforeTick(tick);
     if (s_quirkTamper && tick == s_quirkTamperTick)
         QuirksFlipFirstSim(&g_quirks);
     if (s_quirkReach && tick == s_quirkReachTick)
@@ -4201,7 +4278,7 @@ void HarnessBeforeStep()
         CommandEnd(tick, "console", s_consoles[i].lineNo);
     }
     for (int i = 0; i < s_inputCount; i++) {
-        if (s_inputs[i].tick == tick)
+        if (s_inputs[i].tick == tick && s_inputs[i].frame == 0)
             DeliverScriptedInput(&s_inputs[i]);
     }
 }
@@ -4442,9 +4519,12 @@ const char* HarnessMapName()
 
 void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY)
 {
-    if (!HarnessTestMode() || DlIsOn() == 0)
+    if (!HarnessTestMode())
         return;
     unsigned tick = GameU32(GAME_TICK);
+    HarnessFrameEnd(tick);
+    if (DlIsOn() == 0)
+        return;
     int list = s_displayAll;
     for (unsigned i = 0; i < s_frameCount; i++) {
         if (s_frameTicks[i] == tick)

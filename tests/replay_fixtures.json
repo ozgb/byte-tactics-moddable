@@ -270,6 +270,16 @@
       "FixtureCell.metal"
      ],
      "depth": 1
+    },
+    {
+     "name": "script",
+     "kind": "load",
+     "load": "fixture_script"
+    },
+    {
+     "name": "shape",
+     "kind": "load",
+     "load": "fixture_shape"
     }
    ]
   },
@@ -908,6 +918,56 @@
      "poly": "FixtureGoalBase"
     }
    ]
+  },
+  "FixtureTrack": {
+   "type": "FixtureTrack",
+   "scope": "state",
+   "fields": [
+    {
+     "name": "count",
+     "kind": "i32"
+    },
+    {
+     "name": "table",
+     "kind": "load",
+     "load": "fixture_script"
+    },
+    {
+     "name": "marks",
+     "kind": "array",
+     "elem": "u8",
+     "ref": true,
+     "length": "table->lapCount*2"
+    },
+    {
+     "name": "laps",
+     "kind": "embeds",
+     "count": "count",
+     "capacity": 5,
+     "target": "FixtureLap",
+     "member": "laps[]"
+    }
+   ]
+  },
+  "FixtureLap": {
+   "type": "FixtureLap",
+   "scope": "state",
+   "inside": [
+    {
+     "kind": "FixtureTrack",
+     "member": "laps[]"
+    }
+   ],
+   "fields": [
+    {
+     "name": "time",
+     "kind": "u16"
+    },
+    {
+     "name": "mark",
+     "kind": "i16"
+    }
+   ]
   }
  },
  "fixtures": {
@@ -1143,6 +1203,46 @@
     ]
    }
   },
+  "Attach": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "void*",
+     "name": "script"
+    },
+    {
+     "type": "void*",
+     "name": "shape"
+    }
+   ],
+   "args": {
+    "script": {
+     "mode": "load",
+     "load": "fixture_script"
+    },
+    "shape": {
+     "mode": "load",
+     "load": "fixture_shape"
+    }
+   },
+   "result": {
+    "mode": "scalar"
+   }
+  },
+  "Lookup": {
+   "ret": "void*",
+   "params": [
+    {
+     "type": "int",
+     "name": "lane"
+    }
+   ],
+   "args": {},
+   "result": {
+    "mode": "load",
+    "load": "fixture_script"
+   }
+  },
   "MakeGoal": {
    "ret": "unsigned int",
    "params": [],
@@ -1254,5 +1354,31 @@
    }
   ]
  },
- "sim_fields": {}
+ "sim_fields": {},
+ "loads": {
+  "fixture_script": {
+   "type": "FixtureFile",
+   "loader": [
+    "LoadCobScript"
+   ],
+   "holders": [
+    {
+     "kind": "FixtureLane",
+     "member": "script"
+    }
+   ]
+  },
+  "fixture_shape": {
+   "type": "FixtureFile",
+   "loader": [
+    "Load3do"
+   ],
+   "holders": [
+    {
+     "kind": "FixtureLane",
+     "game": "types"
+    }
+   ]
+  }
+ }
 }

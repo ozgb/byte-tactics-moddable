@@ -39,7 +39,7 @@ class CobScript
   public:
     int scale;
     ScriptTable *table;
-    int unknown_c;
+    int checksum;
     Ref<int> statics;
     Ref<Piece> pieces;
     int changed;

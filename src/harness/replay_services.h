@@ -131,4 +131,10 @@ static const char* const kReplayImportNames[RI_COUNT] = {
     "services.ScheduleMapCanPlaceUnitFootprint",
 };
 
+enum ReplayLoadId {
+    RL_COB,
+    RL_MODEL,
+    RL_COUNT
+};
+
 #endif

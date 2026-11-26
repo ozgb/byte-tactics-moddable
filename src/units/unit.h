@@ -63,7 +63,7 @@ struct Unit {
     Ref<Order> list2;
     union {
         struct {
-            short field_64;
+            short bank;
             short heading;
             short pitch;
         };

@@ -51,6 +51,7 @@
 /alternatename:?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21PAH@Z=?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2HH@Z
 /alternatename:?FireVLaunchProjectile@@YGXPAUUnitWeaponSlot@@PAX1111@Z=?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2HH@Z
 /alternatename:?FireVLaunchWeapon@@YGHPAX000@Z=?FireVLaunchWeapon@@YGHPAUUnit@@PAUUnitWeaponSlot@@0PAUVec3@@@Z
+/alternatename:?FreeCobScript@@YGXPAX@Z=?FreeCobScript@@YGXH@Z
 /alternatename:?GetDesiredHeading@AirManeuverOrder@@YGXXZ=?GetDesiredHeading@AirManeuverOrder@@UAEHPAG@Z
 /alternatename:?GetDesiredHeading@PathOrder@@YGXXZ=?GetDesiredHeading@PathOrder@@UAEHPAG@Z
 /alternatename:?GetGroundHeight@@YGHPAUFixedWorldPos@@@Z=?GetGroundHeight@@YGHPAUVec3@@@Z
@@ -77,6 +78,7 @@
 /alternatename:?KeepAfterComplete@OrderFx@@YGXXZ=?KeepAfterComplete@OrderFx@@UAEHXZ
 /alternatename:?KeepAfterComplete@PathOrder@@YGXXZ=?KeepAfterComplete@PathOrder@@UAEHXZ
 /alternatename:?LowerBoundOrderTypes@@YGPAUOrderTableEntry@@PAU1@0ABQBDP6GHHPBD@ZPAH@Z=?LowerBoundOrderTypes@@YGPAUOrderTableEntry@@PAU1@0ABQBDP6GHABU1@PBD@ZPAH@Z
+/alternatename:?MirrorObject@@YGXPAX@Z=?MirrorObject@@YGXPAUObject3do@@@Z
 /alternatename:?OnAimCobReturn@@YGXXZ=?OnAimCobReturn@WeaponAimCobCb@@QAEXH@Z
 /alternatename:?OrderSquad@@YGXPAUPlayer@@HEHPAUUnit@@PAUVec3@@HH@Z=?OrderSquad@@YGXPAUPlayer@@HEHPAUUnit@@HHH@Z
 /alternatename:?PickRandomReclaimableResourcesInRadius@@YGHPAUVec3@@HPAPAU1@PAM12@Z=?PickRandomReclaimableResourcesInRadius@@YGHPAUVec3@@TFixed@@PAPAU1@PAM23@Z

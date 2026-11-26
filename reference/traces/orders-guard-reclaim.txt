@@ -1,6 +1,6 @@
 bt-digest 9
 trace_format bt-trace 9
-commit cc2b4f772c249d9434d81dbbe81e77d818f21598
+commit 0974c9c897b1849e5b45a7c8076a6fe0e4b5fc10
 scenario reference/scenarios/orders-guard-reclaim.txt
 game_seed 203
 crt_seed 1203

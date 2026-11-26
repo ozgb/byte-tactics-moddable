@@ -158,9 +158,12 @@ GATE_TIER = (
     "share-all",
     "ui-build-menu",
     "ui-build-place",
+    "ui-dialogs",
     "ui-groups",
     "ui-keys",
     "ui-left-click-orders",
+    "ui-scroll-groups",
+    "ui-share-chat",
     "units-transport-ship",
 )
 RUN_SECONDS_BASE = 120

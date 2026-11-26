@@ -116,6 +116,38 @@ without them must have none, and its run must send no command of the interface. 
 fails. The reference branch writes `interface.txt` in the decoded form, and `--traces` copies the files it stored
 into `reference/commands/`.
 
+## Interface paths
+
+Every way the interface sends a command, changes the selection or a control group, or scrolls the view, with the
+scenarios whose `input` lines drive it (the events are in [docs/commands.md](../docs/commands.md), section 8).
+
+| Path | Scenarios |
+| --- | --- |
+| Click selection, Shift-click to add, a click on the ground to clear | ui-click-select |
+| Box selection, Shift-box to add | ui-drag-select |
+| Right-click order on the ground or a unit (interface type 1) | ui-click-select, ui-right-click, ui-scroll-groups |
+| Left-click order in an order mode (interface type 0) | ui-left-click-orders |
+| Command characters `a`, `p`, `m`, `s`, `d`, and Escape | ui-keys, ui-left-click-orders |
+| An order with Shift held (queued) | ui-keys (a command character), ui-scroll-groups (right-click) |
+| Self-destruct toggle (Ctrl+D), set and cancelled | ui-keys |
+| Control groups: Ctrl+digit makes, Alt+digit recalls | ui-groups, ui-scroll-groups |
+| A factory in a control group: the unit it builds joins | ui-scroll-groups |
+| Build menu of a factory: +1, +5 with Shift, -1, -5 | ui-build-menu, ui-scroll-groups |
+| Build menu of a builder: sites placed, with Shift | ui-build-place |
+| Minimap: a click scrolls, a drag scrolls, a click in an order mode orders | ui-left-click-orders, ui-right-click, ui-scroll-groups |
+| Scrolling by the screen edge and by the arrow keys | ui-scroll-groups |
+| Camera save (Ctrl+F5) and restore (F5), follow (`n`, `t`) | ui-scroll-groups |
+| Ctrl selection keys: C (commander), Z (same types), A (idle), S (visible), V (a category) | ui-scroll-groups |
+| Pause and resume (the Pause key) | ui-dialogs |
+| The options menu (F2): the interface type (the option the tick reads) and the text lines, saved with OK | ui-dialogs |
+| The exit menu: Cancel, Exit Game with No and with Yes (PLAYERS_LEAVE_GAME) | ui-dialogs |
+| The debug hotkeys `=` and `]` (F11, with `debug_keys 1`) | none: debug mode draws the frame rate, which follows the wall clock (#1130) |
+| The share dialog of game type 3 (`h`): metal, energy, the selected units and the map | ui-share-chat |
+| The chat line (Enter): a message | ui-share-chat |
+| The chat line: a `+` console command | none: the console scenarios cover the commands as `console` lines, and the reference hook in `CmdATM` changes the code of other functions of its file |
+| The defeated player's dialog: stop watching (PLAYERS_LEAVE_GAME) | none: a scenario needs the local commander to die and the game to go on |
+| The menus before the battle | none: #1122 |
+
 ## Event logs
 
 `--check` makes the digest of each run's `events.txt` and compares it line by line with `reference/events/<scenario>.txt` when that file exists, and `--traces` writes the digests of the logs the reference branch wrote into `reference/events/` (the stored files are digests, as the traces are: a tick, a phase, a record count and a hash for each run of records, and after the last run of each tick a `<tick> tick <count> <ordered> <set>` line that leaves the phase out and keeps the order only for the kinds whose order counts (`bt-event-digest 2`); format in [docs/events-log.md](../docs/events-log.md)). When a digest differs, the check plays the reference build of the stored traces and the exe, and names the first differing record (`tools/tracediff.py --events`). With `--end-of-tick` the digests are compared on their `tick` lines alone, and the record named is the first one that differs under the same rule (`tools/tracediff.py --events --end-of-tick`).
@@ -266,11 +298,14 @@ seeds) and runs deterministically: two runs give identical traces.
 | ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
 | ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
 | ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
+| ui-dialogs | The Pass | 2 | 300 | Scripted pause and resume, the options menu (interface type, text lines) and the exit menu to Exit Game, which ends the run at tick 61; input while no tick runs (`input <tick>.<frame>`), the dialogs in frames |
 | ui-drag-select | The Pass | 2 | 200 | Scripted box selection with and without Shift |
 | ui-groups | The Pass | 2 | 300 | Scripted control groups |
 | ui-keys | The Pass | 2 | 300 | Scripted keyboard shortcuts: attack, patrol, special attack, stop, queueing, self-destruct |
 | ui-left-click-orders | The Pass | 2 | 260 | Scripted left-click orders and command characters (interface type 0) |
 | ui-right-click | The Pass | 2 | 260 | Scripted right-click move and attack, the minimap scroll |
+| ui-scroll-groups | The Pass | 2 | 700 | Scripted factory in a control group (the Peewee it builds joins), Shift right-click moves, edge, arrow-key and minimap-drag scrolling, camera save and restore, follow, the Ctrl selection keys |
+| ui-share-chat | The Pass | 3 | 120 | Scripted share dialog of game type 3 (metal, energy, a unit and the map to the remote ally) and a chat line, the dialogs in frames |
 
 ## The scenarios of the core's verdict
 
@@ -365,11 +400,14 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | ui-build-menu | left out | has `input` lines: it needs the presentation |
 | ui-build-place | left out | has `input` lines: it needs the presentation |
 | ui-click-select | left out | has `input` lines: it needs the presentation |
+| ui-dialogs | left out | has `input` lines: it needs the presentation |
 | ui-drag-select | left out | has `input` lines: it needs the presentation |
 | ui-groups | left out | has `input` lines: it needs the presentation |
 | ui-keys | left out | has `input` lines: it needs the presentation |
 | ui-left-click-orders | left out | has `input` lines: it needs the presentation |
 | ui-right-click | left out | has `input` lines: it needs the presentation |
+| ui-scroll-groups | left out | has `input` lines: it needs the presentation |
+| ui-share-chat | left out | has `input` lines: it needs the presentation |
 | units-transport | judged | - |
 | units-transport-ship | judged | - |
 
@@ -626,8 +664,8 @@ it compares the runs that differed.
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta
 ```
 
-`--tier` is the same `--check` restricted to the 40 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 38,200 ticks of the 375,750 that the suite's 93 scenarios play (10.2%), none longer than 9000.
+`--tier` is the same `--check` restricted to the 43 scenarios of the `GATE_TIER` constant of
+`tools/reference.py`, 39,081 ticks of the 376,631 that the suite's 96 scenarios play (10.4%), none longer than 9000.
 A scenario's ticks here are those its stored trace holds, as `tools/coverage.py` counts them, so a mission that a
 victory condition ends early counts the ticks it played, not its `ticks` line. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how
@@ -656,6 +694,11 @@ without it the tier would never enter the resource sharing of a network game.
 
 `save-targets` and `load-targets` (#1029) are in it by hand too: theirs is the only save of the suite in which a weapon
 holds a target (one a unit, one a ground point), so they are what catches a target saved or loaded wrongly.
+
+`ui-dialogs`, `ui-scroll-groups` and `ui-share-chat` (#1055) are in it by hand, 881 ticks together: each is the only
+scenario of a path of "Interface paths" (input while no tick runs and the dialogs; the factory in a
+control group and the scrolling; the share dialog), and so of the interface events of the share dialog and the exit
+menu.
 
 `uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
 nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the
@@ -706,9 +749,12 @@ upper bound. Replay parts pick their recordings from it.
 | share-all | 2 | 960 |
 | ui-build-menu | 2 | 200 |
 | ui-build-place | 2 | 200 |
+| ui-dialogs | 2 | 61 |
 | ui-groups | 2 | 300 |
 | ui-keys | 2 | 300 |
 | ui-left-click-orders | 2 | 260 |
+| ui-scroll-groups | 2 | 700 |
+| ui-share-chat | 3 | 120 |
 | units-transport-ship | 2 | 200 |
 
 `tools/tracediff.py --ignore-view-seed` accepts traces whose headers differ only

@@ -63,7 +63,7 @@ As of the last read of `data/state_classes.csv` (2550 rows). `tools/test_statecl
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
 | static | 6 | 28 | 629 | 0 | 66 | 729 |
-| game-region | 118 | 490 | 130 | 44 | 0 | 782 |
+| game-region | 117 | 491 | 130 | 44 | 0 | 782 |
 | heap | 154 | 48 | 89 | 0 | 0 | 291 |
 
 ## Mixed cases and how to split them
@@ -104,9 +104,6 @@ Crossings left during play, each waiting on another decision:
 - `WriteScreenshot` (keys.cpp), the poster key, turns mapping and line of sight off, calls `RecalculateLineOfSight`,
   draws the whole map and turns them back on with a second `RecalculateLineOfSight`. A presentation that draws from the
   view (#1052) needs neither.
-- `HandleGameKey` (keys.cpp) and `HandleDebugHotkey` (game_dialogs.cpp) flip bits 0 and 1 of `endGameFlags`, the debug
-  mode and the debug display. Only presentation reads them, but they share the word the trace hashes with the
-  simulation's end-of-game bits. #1050 takes them out of the judged state.
 - `DrawScorePanel` (game_dialogs.cpp) decrements `Player.rank` of each counted player above a rank no player holds,
   while it draws the score panel; the kill credit of `units.cpp` (the rank update when a unit dies) reads and writes the
   same ranks. It becomes the simulation's own compaction, or an event, in a later issue.
@@ -207,7 +204,8 @@ Who touches the bit:
 
 Bits 0 and 1 of `endGameFlags` (+0x3923b) are view state too: bit 0 is the debug display (`INFO ON`) and bit 1 debug
 mode. The trace masks them out of the game scalars (mask 0xfffc). The word's other bits are the simulation's (bit 2,
-the game is over, and bit 3, set when a saved game is chosen to load), so the rows of `data/state_classes.csv` keep class `sim`.
+the game is over, and bit 3, set when a saved game is chosen to load), so the rows of `data/state_classes.csv` for the whole word keep class `sim`. The row `bits_3923b_1`, the member
+that names only bit 0, is `view`, so `tools/stateclasses.py --check` passes `HandleDebugHotkey`'s write.
 
 - Presentation sets them: `HandleGameKey` (keys.cpp) flips bit 1 and clears bit 0 with it, and `HandleDebugHotkey`
   (game_dialogs.cpp) flips bit 0. It reads them in the panels (info_panel.cpp) and the keys (keys.cpp).

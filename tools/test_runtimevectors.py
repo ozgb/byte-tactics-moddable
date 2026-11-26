@@ -72,6 +72,15 @@ class Check(unittest.TestCase):
         problems = self.problems(readme="`alpha` `gamma`\n")
         self.assertEqual(problems, ["README.md does not name beta"])
 
+    def test_a_stale_readme_fails_and_readme_rewrites_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write(root)
+            self.assertEqual(runtimevectors.readme_problems(root),
+                             ["README.md is not readme(entries): run uv run tools/runtimevectors.py readme"])
+            self.assertEqual(runtimevectors.main(["readme", "--dir", str(root)]), 0)
+            self.assertEqual(runtimevectors.readme_problems(root), [])
+
     def test_an_unknown_type_fails(self):
         problems = self.problems(data=manifest(alpha={"file": "alpha.bin", "inputs": [["a", "float"]],
                                                       "outputs": [], "edge": 1, "random": 1, "random_total": 5,

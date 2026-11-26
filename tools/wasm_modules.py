@@ -74,7 +74,8 @@ a test interface calc (the module's slots, major 2) and calc_host (imports, majo
 built with wasm-tools: current, built against those majors, and old, built against calc 1 and calc_host 2, which
 the manifest's adapters bring to the current signatures with each form (reorder, drop, constant argument, constant
 result, no result). The program loads old, then current, and checks every slot and import of both, and then checks the
-loader's refusals: a changed slot or import without an adapter, and each adapter its kinds rule out.
+loader's refusals: a changed slot or import without an adapter, and each adapter its kinds rule out. Last it checks the
+manifest reader's numbers: every integer up to 2147483647 read, a larger one, a fraction and an exponent refused.
 
 Publishes. A module entry of wasm/modules.json may have "publishes", an object from each effect kind the module may publish
 through services.Emit (a decimal string, the value of an enumerator of the "interface" header's EffectKind enum) to the size in

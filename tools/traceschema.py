@@ -72,6 +72,7 @@ TARGET_NAMES = ["", "heap", "unit", "player", "unitdef", "weapondef", "projectil
                 "node", "moveclass", "order", "orderfx", "link"]
 GAME_MASK_REASONS: dict[str, str] = {
     "mapFlags": "bit 3 is cleared by the camera, which is presentation",
+    "endGameFlags": "bits 0 and 1, the debug display and debug mode, are view state: presentation sets them and reads them",
     "uiOptionFlags": "only bits 3 and 7 to 10, the treedeath and cheat toggles the simulation reads, are kept",
 }
 
@@ -315,6 +316,7 @@ HEAP_TYPES: list[tuple[str, str]] = [
 
 MASKS: dict[tuple[str, int], tuple[int, str]] = {
     ("ExplodedPiece", 0x28): (0x3F, "bits 6 to 31 are never written; the explosion of a piece copies them from an uninitialised stack header"),
+    ("Unit", 0x110): (0xFFFFFFEF, "bit 0x10 is the selection, view state: presentation sets it and reads it, and the tick only clears it"),
     ("Order", 0x42): (0xFFDFFFFF, "bit 0x200000 is set by the drawing of the weapon coverage of a selected unit and read only there"),
     ("UnitMotion", 0x2E): (0x07, "bits 3 to 7 are never written; the constructor sets mode and flag"),
     ("AiSearchGoal", 0x64): (0x0B, "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after the unit state sent over the network writes it"),
@@ -944,7 +946,7 @@ GAME_SCALARS: list[tuple[str, int, int, str | None, int]] = [
     ("spotField_1421f", 0x1421F, 4, "HEAP", 0),
     ("scanIndex", 0x14257, 4, None, 0),
     ("mapFlags", 0x14281, 2, None, 0xFFF7),
-    ("endGameFlags", 0x3923B, 2, None, 0),
+    ("endGameFlags", 0x3923B, 2, None, 0xFFFC),
     ("uiOptionFlags", 0x37F2F, 2, None, 0x788),
 ]
 

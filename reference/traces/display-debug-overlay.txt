@@ -1,7 +1,7 @@
 bt-digest 9
 trace_format bt-trace 9
 commit 80fc5d17ebee898c3a81a04fc9426f9f29fa82d3
-scenario reference/scenarios/ui-debug-overlay.txt
+scenario reference/scenarios/display-debug-overlay.txt
 game_seed 1054
 crt_seed 2054
 view_seed 3054

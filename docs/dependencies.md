@@ -156,7 +156,7 @@ Presentation must not feed the simulation except through the player view. The ro
 | presentation | map | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | players | conditions-dark-side@60 | The map cell grid (one 13-byte cell per map square; its allocation has no type, so the log keeps it as one item). Drawing the battlefield clears the draw-after-units bit (bit 2) of the flags byte of each visible cell every frame and sets it again under a tall feature, a read-modify-write of the byte (in allied-victory every write of drawing to the grid falls on that byte); map reads cells of the grid in phase players, so a read of any byte of the grid after a frame shows as a read of that write. Only drawing reads the draw-after-units bit, and the bits the simulation reads (the feature bit, the footprint bit and the owner) are written back unchanged, so no value flows to the simulation. The bit follows the view of one machine. |
 | presentation | map | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | projectiles | edges-economy-targeting@40 | The map cell grid (one 13-byte cell per map square; its allocation has no type, so the log keeps it as one item). Drawing the battlefield clears the draw-after-units bit (bit 2) of the flags byte of each visible cell every frame and sets it again under a tall feature, a read-modify-write of the byte (in allied-victory every write of drawing to the grid falls on that byte); map reads cells of the grid in phase projectiles, so a read of any byte of the grid after a frame shows as a read of that write. Only drawing reads the draw-after-units bit, and the bits the simulation reads (the feature bit, the footprint bit and the owner) are written back unchanged, so no value flows to the simulation. The bit follows the view of one machine. |
 | presentation | map | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | tail | mission-capture@2 | The map cell grid (one 13-byte cell per map square; its allocation has no type, so the log keeps it as one item). Drawing the battlefield clears the draw-after-units bit (bit 2) of the flags byte of each visible cell every frame and sets it again under a tall feature, a read-modify-write of the byte (in allied-victory every write of drawing to the grid falls on that byte); map reads cells of the grid in phase tail, so a read of any byte of the grid after a frame shows as a read of that write. Only drawing reads the draw-after-units bit, and the bits the simulation reads (the feature bit, the footprint bit and the owner) are written back unchanged, so no value flows to the simulation. The bit follows the view of one machine. |
-| presentation | map | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | units | mission-build-unit@2 | The map cell grid (one 13-byte cell per map square; its allocation has no type, so the log keeps it as one item). Drawing the battlefield clears the draw-after-units bit (bit 2) of the flags byte of each visible cell every frame and sets it again under a tall feature, a read-modify-write of the byte (in allied-victory every write of drawing to the grid falls on that byte); map reads cells of the grid in phase units, so a read of any byte of the grid after a frame shows as a read of that write. Only drawing reads the draw-after-units bit, and the bits the simulation reads (the feature bit, the footprint bit and the owner) are written back unchanged, so no value flows to the simulation. The bit follows the view of one machine. |
+| presentation | map | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | units | display-chat-dither@2 | The map cell grid (one 13-byte cell per map square; its allocation has no type, so the log keeps it as one item). Drawing the battlefield clears the draw-after-units bit (bit 2) of the flags byte of each visible cell every frame and sets it again under a tall feature, a read-modify-write of the byte (in allied-victory every write of drawing to the grid falls on that byte); map reads cells of the grid in phase units, so a read of any byte of the grid after a frame shows as a read of that write. Only drawing reads the draw-after-units bit, and the bits the simulation reads (the feature bit, the footprint bit and the owner) are written back unchanged, so no value flows to the simulation. The bit follows the view of one machine. |
 | presentation | movement | `Unit::flags` | units | ui-build-menu@13 | A selection click (click, box, group or category select, deselect) or a build-menu page step sets or clears the select bits and the build-menu page bits of Unit::flags; movement reads and writes other bits of the same word (the move rate in bits 2 and 3, which the move rate update keeps). The log item is the whole word, and no read of the select or page bits was found in them (saving and loading units copy those bits into saves). Selection is local to one machine: a sim read of it would be a multiplayer desync risk in 3.1c itself. |
 | presentation | players | `bits_142f1` | tail | ai-antinuke-intercept@8 | Camera moves and radar clicks set the camera-moved bit of the view dirty flags byte, and the radar picture sets the map-changed and blink bits; the blink update (players, in the tail) toggles the blink bit in the same byte. Blink state is local to one machine; the blink toggle is the only reader. |
 | presentation | players | `blinkTimer` | tail | ai-antinuke-intercept@1 | The radar picture resets the blink timer to 7 and the blink update (players, in the tail) counts it down and toggles the blink bit. Local to one machine; only the blink update reads it. |
@@ -1079,7 +1079,7 @@ The 15 groups with the most rows are shown.
 
 | direction | item | phase | runs | example |
 |---|---|---|---|---|
-| reads from units | `Unit::flags` | units | 61 | mission-build-unit@3 |
+| reads from units | `Unit::flags` | units | 61 | display-chat-dither@3 |
 | reads from economy | `unknown_1b8e` | players | 47 | mission-capture@30 |
 | writes to orders | `Unit::netDirtyFlags` | units | 27 | edges-economy-targeting@10 |
 | reads from units | `Unit::netDirtyFlags` | units | 27 | edges-economy-targeting@10 |
@@ -1154,7 +1154,7 @@ Cannot be cut from, with the edge of the most runs:
 | weapons | immediate | weapons -> targeting | `Unit::f_1f` | units | 26 | load-targets@1 |
 | los_radar | immediate | los_radar -> targeting | `Unit::flags` | players | 4 | mission-radius@1530 |
 | orders | immediate | targeting -> orders | `Unit::netDirtyFlags` | units | 27 | edges-economy-targeting@10 |
-| units | immediate | units -> targeting | `Unit::flags` | units | 61 | mission-build-unit@3 |
+| units | immediate | units -> targeting | `Unit::flags` | units | 61 | display-chat-dither@3 |
 | map | ordered | map -> targeting | `rng.parkMiller` | units | 2 | long-great-divide-2p@29979 |
 | scripts | ordered | scripts -> targeting | `rng.parkMiller` | units | 3 | long-greenhaven-8p@22416 |
 | movement | immediate | movement -> targeting | `Unit::motion` | units | 9 | mission-build-unit@75 |
@@ -1692,7 +1692,7 @@ The 15 groups with the most rows are shown.
 | writes to los_radar | `Unit::def` | units | 63 | mission-build-unit@1 |
 | writes to movement | `Unit::pitch` | units | 62 | mission-build-unit@1 |
 | writes to orders | `Unit::flags` | units | 62 | mission-kill-of-type@1 |
-| writes to targeting | `Unit::flags` | units | 61 | mission-build-unit@3 |
+| writes to targeting | `Unit::flags` | units | 61 | display-chat-dither@3 |
 | writes to map | `Unit::def` | units | 57 | mission-build-unit@1 |
 | writes to orders | `Unit::cobStateFlags` | units | 56 | conditions-shore-to-shore@6 |
 | writes to orders | `Unit::def` | units | 55 | mission-build-unit@1 |
@@ -1753,7 +1753,7 @@ Cannot be cut from, with the edge of the most runs:
 | features | immediate | features -> units | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | units | 10 | mission-build-unit@1 |
 | ai | immediate | units -> ai | `Unit::flags` | players | 78 | combat-deaths@29 |
 | weapons | immediate | units -> weapons | `Unit::def` | units | 64 | conditions-shore-to-shore@6 |
-| targeting | immediate | units -> targeting | `Unit::flags` | units | 61 | mission-build-unit@3 |
+| targeting | immediate | units -> targeting | `Unit::flags` | units | 61 | display-chat-dither@3 |
 | los_radar | immediate | units -> los_radar | `Unit::activateFlags` | players | 95 | ai-antinuke-intercept@30 |
 | orders | immediate | units -> orders | `Unit::netDirtyFlags` | units | 97 | mission-build-unit@1 |
 | players | immediate | units -> players | `Unit::def` | units | 7 | mission-build-unit@1 |

@@ -218,6 +218,9 @@ seeds) and runs deterministically: two runs give identical traces.
 | console-iwin | The Pass | 2 | 100 | Console: `iwin`, so the other side loses its units and the run ends at tick 30 |
 | console-sight | The Pass | 2 | 200 | Console: `los`, `lostype`, `mapping`, `radar`, `nowisee`, then `ai` and `reloadaiprofiles` |
 | console-units | The Pass | 2 | 300 | Console: unit names typed alone, `move`, `reload`, `kill`, the damage toggles, `search`, `edge`, `assign` and `selectable` |
+| display-chat-dither | The Pass | 2 | 120 | The chat line types and sends `+dither`, so the fog is dithered (`sprite_lit`, `sprite_erase`, `dither`) |
+| display-debug-overlay | The Pass | 2 | 60 | Debug mode (F11 after the cheat code) and its occupancy overlay (`polygon`) |
+| display-tab-menu | The Pass | 2 | 60 | Game type 3: Tab opens the in-game tab menu, whose current button has a lit box (`outline_lit`) |
 | duel-coast-to-coast | Coast To Coast | 2 | 5400 | Two Core players on Coast To Coast, three minutes, difficulty 2 |
 | duel-great-divide | Great Divide | 2 | 3600 | Two Arm players on Great Divide, random start positions, two minutes |
 | duel-pass-dark | The Pass | 2 | 2700 | Two players on The Pass with the map unmapped and line of sight off, ninety seconds |
@@ -269,15 +272,12 @@ seeds) and runs deterministically: two runs give identical traces.
 | ui-antinuke-range | The Pass | 2 | 3620 | A human Core anti-nuke builds one missile and is selected: the minimap draws its coverage as a dashed circle (`circle_dashed`) |
 | ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
 | ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
-| ui-chat-dither | The Pass | 2 | 120 | The chat line types and sends `+dither`, so the fog is dithered (`sprite_lit`, `sprite_erase`, `dither`) |
 | ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
-| ui-debug-overlay | The Pass | 2 | 60 | Debug mode (F11 after the cheat code) and its occupancy overlay (`polygon`) |
 | ui-drag-select | The Pass | 2 | 200 | Scripted box selection with and without Shift |
 | ui-groups | The Pass | 2 | 300 | Scripted control groups |
 | ui-keys | The Pass | 2 | 300 | Scripted keyboard shortcuts: attack, patrol, special attack, stop, queueing, self-destruct |
 | ui-left-click-orders | The Pass | 2 | 260 | Scripted left-click orders and command characters (interface type 0) |
 | ui-right-click | The Pass | 2 | 260 | Scripted right-click move and attack, the minimap scroll |
-| ui-tab-menu | The Pass | 2 | 60 | Game type 3: Tab opens the in-game tab menu, whose current button has a lit box (`outline_lit`) |
 
 ## The scenarios of the core's verdict
 
@@ -299,6 +299,9 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | console-iwin | judged | - |
 | console-sight | left out | console commands that are not events: `view` |
 | console-units | judged | - |
+| display-chat-dither | left out | has `input` lines: it needs the presentation |
+| display-debug-overlay | left out | has `input` lines: it needs the presentation |
+| display-tab-menu | left out | has `input` lines: it needs the presentation |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |
 | duel-pass-dark | judged | - |
@@ -372,15 +375,12 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | ui-antinuke-range | left out | has `input` lines: it needs the presentation |
 | ui-build-menu | left out | has `input` lines: it needs the presentation |
 | ui-build-place | left out | has `input` lines: it needs the presentation |
-| ui-chat-dither | left out | has `input` lines: it needs the presentation |
 | ui-click-select | left out | has `input` lines: it needs the presentation |
-| ui-debug-overlay | left out | has `input` lines: it needs the presentation |
 | ui-drag-select | left out | has `input` lines: it needs the presentation |
 | ui-groups | left out | has `input` lines: it needs the presentation |
 | ui-keys | left out | has `input` lines: it needs the presentation |
 | ui-left-click-orders | left out | has `input` lines: it needs the presentation |
 | ui-right-click | left out | has `input` lines: it needs the presentation |
-| ui-tab-menu | left out | has `input` lines: it needs the presentation |
 | units-transport | judged | - |
 | units-transport-ship | judged | - |
 

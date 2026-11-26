@@ -2520,7 +2520,7 @@ units.players,Unit::flags,orders,MoveGroundOrder,other-record,6,long-greenhaven-
 units.players,Unit::flags,orders,Order::AnnounceStatusIfFlagged,other-record,9,orders-air-fights@455
 units.players,Unit::flags,orders,ReclaimOrder,other-record,4,eight-pincushion-teams@11845
 units.players,Unit::flags,orders,RepairUnitOrder,other-record,3,long-greenhaven-8p@22423
-units.players,Unit::flags,targeting,FindBestTargetIfFireAtWill,other-record,53,ui-chat-dither@3
+units.players,Unit::flags,targeting,FindBestTargetIfFireAtWill,other-record,53,display-chat-dither@3
 units.players,Unit::flags,targeting,FindWeaponTarget,other-record,9,orders-air-fights@46
 units.players,Unit::flags,targeting,FindWeaponTarget,same-record,5,ui-right-click@42
 units.players,Unit::flags,units,AddBuildProgress,other-record,40,mission-passes-z@100

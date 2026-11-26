@@ -397,8 +397,19 @@ static GafFrame* Picture(const char* name)
         return known->frame;
     if (name[0] == '@' || name[0] == '?')
         ReplayFail("a picture with no picture line: ", name);
-    if (strncmp(name, "target:", 7) == 0)
-        return nullptr;
+    if (strncmp(name, "target:", 7) == 0) {
+        Target* from = FindTarget(name + 7);
+        if (from == nullptr)
+            return nullptr;
+        GafFrame* f = (GafFrame*)calloc(1, sizeof(GafFrame));
+        if (f == nullptr)
+            ReplayFail("no memory for a picture", nullptr);
+        f->width = (unsigned short)from->width;
+        f->height = (unsigned short)from->height;
+        f->pixelsOrLayers = from->pixels;
+        f->transparency = 0xff;
+        return KeepPicture(name, f);
+    }
     char text[400];
     strncpy(text, name, sizeof text - 1);
     text[sizeof text - 1] = '\0';
@@ -961,7 +972,11 @@ static void Draw(char** w, int n)
         }
         Surface src;
         SurfaceFor(from, &src, 0, 0, from->width, from->height);
-        DrawSurface(&s, &src, atoi(w[7]), atoi(w[8]));
+        Surface inside = s;
+        inside.pixels = s.pixels + (size_t)y0 * s.pitch + x0;
+        inside.width = x1 - x0;
+        inside.height = y1 - y0;
+        DrawSurface(&inside, &src, atoi(w[7]) - x0, atoi(w[8]) - y0);
     } else if (strcmp(kind, "copy") == 0 && n >= 13) {
         Target* from = FindTarget(w[6]);
         if (from == nullptr) {

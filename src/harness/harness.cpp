@@ -4793,7 +4793,7 @@ static void __stdcall ViewCaptureBegin(int, const char* name)
     s_viewCaptureSlot = slot;
 }
 
-static void __stdcall ViewCaptureInt(const char* field, int, int, unsigned int value)
+static void __stdcall ViewCaptureInt(const char* field, int index, int, unsigned int value)
 {
     if (s_viewCaptureKind == 1) {
         ViewReportProjectile* p = &s_viewReport.projectiles[s_viewCaptureSlot];
@@ -4830,20 +4830,34 @@ static void __stdcall ViewCaptureInt(const char* field, int, int, unsigned int v
         else if (strcmp(field, "angle_z") == 0) e->angleZ = (short)value;
     } else if (s_viewCaptureKind == 3) {
         ViewReportPiece* p = &s_viewReport.pieces[s_viewCaptureSlot];
+        ViewReportFace* f = index >= 0 && index < VIEW_REPORT_PIECE_FACES ? &p->faces[index] : nullptr;
         if (strcmp(field, "firstFace") == 0) p->firstFace = (int)value;
         else if (strcmp(field, "faceCount") == 0) p->faceCount = (int)value;
+        else if (strcmp(field, "vertexCount") == 0) p->vertexCount = (int)value;
+        else if (f != nullptr && strcmp(field, "faces[%u].color") == 0) f->color = (int)value;
+        else if (f != nullptr && strcmp(field, "faces[%u].nverts") == 0) f->count = (int)value;
+        else if (f != nullptr && strcmp(field, "faces[%u].flags") == 0) f->flags = value;
     }
 }
 
-static void __stdcall ViewCaptureBytes(const char*, int, const void*, int)
+static void __stdcall ViewCaptureBytes(const char* field, int, const void* data, int size)
 {
+    if (s_viewCaptureKind == 3 && strcmp(field, "vertices") == 0 && size == (int)sizeof s_viewReport.pieces[0].vertices)
+        memcpy(s_viewReport.pieces[s_viewCaptureSlot].vertices, data, (size_t)size);
 }
 
-static void __stdcall ViewCaptureHandle(const char* field, int, int, unsigned int value)
+static void __stdcall ViewCaptureHandle(const char* field, int index, int, unsigned int value)
 {
     if (s_viewCaptureKind == 2 && strcmp(field, "unit") == 0)
         s_viewReport.exploded[s_viewCaptureSlot].unit = value;
-    else if (s_viewCaptureKind == 4) {
+    else if (s_viewCaptureKind == 2 && strcmp(field, "rec.desc") == 0)
+        s_viewReport.exploded[s_viewCaptureSlot].desc = value;
+    else if (s_viewCaptureKind == 3 && index >= 0 && index < VIEW_REPORT_PIECE_FACES) {
+        ViewReportFace* f = &s_viewReport.pieces[s_viewCaptureSlot].faces[index];
+        if (strcmp(field, "faces[%u].vindex") == 0) f->indices = value;
+        else if (strcmp(field, "faces[%u].texFrame") == 0) f->pic = value;
+        else if (strcmp(field, "faces[%u].texSrc") == 0) f->src = value;
+    } else if (s_viewCaptureKind == 4) {
         ViewReportDebris* e = &s_viewReport.debris[s_viewCaptureSlot];
         if (strcmp(field, "obj") == 0) e->obj = value;
         else if (strcmp(field, "ref1.src") == 0) e->spriteSource = value;

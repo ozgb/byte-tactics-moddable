@@ -7,11 +7,13 @@
     uv run tools/displaylog.py compare a.txt b.txt --end-of-tick               # items compared as sorted `<layer> <item>` lines
     uv run tools/displaylog.py against-digests a/display.txt b/display.txt     # compare two digest files
 
-A display list (`bt-display 1`) holds frames: a frame line, one line for each item and a cursor line. The layer of an item
-is computed from the lines alone ("Which orders count"): 0 when it depends on no item before it, else one more than the
-highest layer of the items before it that it depends on. Two items depend on each other when they are on the same target
-with overlapping areas, or when one reads a target (`blit`, `copy`, a picture named `target:<name>`) and the other draws
-on that target with an area that is not empty.
+A display list (`bt-display 1`) holds frames: a frame line, one line for each item and a cursor line. An item whose area
+is empty changes no pixel and is left out when a list is read, as the game leaves it out of its log ("Draws that change no
+pixel"), so a list that holds such items has the digest of the same list without them. The layer of an item is computed
+from the lines alone ("Which orders count"): 0 when it depends on no item before it, else one more than the highest layer
+of the items before it that it depends on. Two items depend on each other when they are on the same target with
+overlapping areas, or when one reads a target (`blit`, `copy`, a picture named `target:<name>`) and the other draws on
+that target.
 
 The digest (`bt-display-digest 1`) has a line `<number> <tick> <count> <ordered> <set>` for each frame: `ordered` is the
 hash of the frame's lines in order, and `set` the hash of the frame line, the sorted `<layer> <item>` lines and the cursor
@@ -102,7 +104,7 @@ def parse_item(number: int, line: str) -> Item:
 
 
 def parse_list(text: str) -> list[Frame]:
-    """The frames of a display list (layers not yet computed); an Error for a list that is not well formed."""
+    """The frames of a display list (layers not yet computed), without the items whose area is empty; an Error for a list that is not well formed."""
     lines = text.split("\n")
     if lines and lines[-1] == "":
         lines.pop()
@@ -126,7 +128,9 @@ def parse_list(text: str) -> list[Frame]:
             frames.append(current)
             current = None
         else:
-            current.items.append(parse_item(number, line))
+            item = parse_item(number, line)
+            if nonempty(item.area):
+                current.items.append(item)
     if current is not None:
         raise Error(f"the frame at line {current.line_number} has no cursor line")
     return frames
@@ -205,15 +209,11 @@ def assign_layers(items: list[Item]) -> None:
 
     for item in items:
         mine = surface(item.target)
-        drawn = nonempty(item.area)
-        depends = -1
-        if drawn:
-            depends = max(mine.query(item.area), mine.max_read)
+        depends = max(mine.query(item.area), mine.max_read)
         if item.reads is not None:
             depends = max(depends, surface(item.reads).max_draw)
         item.layer = depends + 1
-        if drawn:
-            mine.add(item.area, item.layer)
+        mine.add(item.area, item.layer)
         if item.reads is not None:
             source = surface(item.reads)
             source.max_read = max(source.max_read, item.layer)

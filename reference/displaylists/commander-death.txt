@@ -5,12 +5,9 @@ terrain screen 128 32 640 448 The%20Pass 313 36
 blit screen 0 36 126 89 RADAR%20FINAL 0 36
 outline screen 11 37 29 51 11 37 28 50 194
 sprite screen 340 294 399 360 anims/rocks.gaf:rockmetal3:0 367 324
-sprite screen 0 0 0 0 anims/trees.gaf:Conifboom:3 623 20
 sprite screen 505 32 632 96 anims/trees.gaf:Conifboom:3 559 84
 sprite screen 571 32 640 82 anims/trees.gaf:treeboom:3 623 84
-sprite screen 0 0 0 0 anims/trees.gaf:treeboom:3 -33 100
 sprite screen 128 32 138 98 anims/trees.gaf:treeboom:3 63 100
-sprite screen 0 0 0 0 anims/trees.gaf:treeboom:3 15 132
 sprite screen 571 75 640 162 anims/trees.gaf:treeboom:3 623 164
 sprite screen 459 139 586 226 anims/trees.gaf:treeboom:3 511 228
 sprite screen 128 171 154 258 anims/trees.gaf:treeboom:3 79 260
@@ -23,16 +20,11 @@ sprite_blend screen 371 233 375 237 anims/fx.gaf:smoke%201:0 374 235
 fill screen 128 32 151 44 0
 sprite_gray screen 151 32 183 44 anims/fog.gaf:Gray1:6 151 12
 sprite screen 151 32 183 44 anims/fog.gaf:Black1:6 151 12
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:0 183 12
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:0 183 12
 sprite_gray screen 547 32 567 33 anims/fog.gaf:Gray1:1 535 12
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:1 535 12
 sprite_gray screen 567 32 599 44 anims/fog.gaf:Gray2:10 567 12
 sprite screen 567 32 599 44 anims/fog.gaf:Black2:10 567 12
 fill screen 599 32 631 44 0
 fill screen 631 32 640 44 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 663 12
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 663 12
 fill screen 128 44 151 76 0
 sprite_gray screen 151 44 171 76 anims/fog.gaf:Gray2:4 151 44
 sprite screen 151 44 167 76 anims/fog.gaf:Black2:4 151 44
@@ -40,8 +32,6 @@ sprite_gray screen 576 44 599 76 anims/fog.gaf:Gray3:9 567 44
 sprite screen 583 44 599 76 anims/fog.gaf:Black3:9 567 44
 fill screen 599 44 631 76 0
 fill screen 631 44 640 76 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 663 44
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 663 44
 sprite_gray screen 128 76 151 108 anims/fog.gaf:Gray2:6 119 76
 sprite screen 128 76 151 108 anims/fog.gaf:Black2:6 119 76
 sprite_gray screen 151 76 169 94 anims/fog.gaf:Gray3:0 151 76
@@ -51,40 +41,18 @@ sprite screen 583 76 599 92 anims/fog.gaf:Black4:1 567 76
 sprite_gray screen 599 76 631 108 anims/fog.gaf:Gray1:10 599 76
 sprite screen 599 76 631 108 anims/fog.gaf:Black1:10 599 76
 fill screen 631 76 640 108 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:4 663 76
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:4 663 76
 sprite_gray screen 128 108 137 126 anims/fog.gaf:Gray3:0 119 108
 sprite screen 128 108 135 124 anims/fog.gaf:Black3:0 119 108
 sprite_gray screen 611 108 631 129 anims/fog.gaf:Gray2:1 599 108
 sprite screen 615 108 631 124 anims/fog.gaf:Black2:1 599 108
 sprite_gray screen 631 108 640 140 anims/fog.gaf:Gray3:10 631 108
 sprite screen 631 108 640 140 anims/fog.gaf:Black3:10 631 108
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 663 108
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 663 108
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:9 631 140
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:9 631 140
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 663 140
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 663 140
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:9 631 172
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:9 631 172
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 663 172
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 663 172
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:9 631 204
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:9 631 204
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:4 663 204
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:4 663 204
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:9 631 236
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:9 631 236
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 663 236
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 663 236
 sprite_gray screen 128 281 138 300 anims/fog.gaf:Gray4:3 119 268
 sprite screen 128 283 135 300 anims/fog.gaf:Black4:3 119 268
 sprite_gray screen 612 279 631 301 anims/fog.gaf:Gray3:7 599 268
 sprite screen 615 284 631 300 anims/fog.gaf:Black3:7 599 268
 sprite_gray screen 631 268 640 300 anims/fog.gaf:Gray4:13 631 268
 sprite screen 631 268 640 300 anims/fog.gaf:Black4:13 631 268
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 663 268
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 663 268
 sprite_gray screen 128 300 151 332 anims/fog.gaf:Gray1:12 119 300
 sprite screen 128 300 151 332 anims/fog.gaf:Black1:12 119 300
 sprite_gray screen 151 313 170 332 anims/fog.gaf:Gray2:3 151 300
@@ -94,8 +62,6 @@ sprite screen 583 316 599 332 anims/fog.gaf:Black3:7 567 300
 sprite_gray screen 599 300 631 332 anims/fog.gaf:Gray4:13 599 300
 sprite screen 599 300 631 332 anims/fog.gaf:Black4:13 599 300
 fill screen 631 300 640 332 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 663 300
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 663 300
 fill screen 128 332 151 364 0
 sprite_gray screen 151 332 173 364 anims/fog.gaf:Gray3:4 151 332
 sprite screen 151 332 167 364 anims/fog.gaf:Black3:4 151 332
@@ -103,8 +69,6 @@ sprite_gray screen 579 332 599 364 anims/fog.gaf:Gray4:9 567 332
 sprite screen 578 332 599 364 anims/fog.gaf:Black4:9 567 332
 fill screen 599 332 631 364 0
 fill screen 631 332 640 364 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:4 663 332
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:4 663 332
 fill screen 128 364 151 396 0
 sprite_gray screen 151 364 183 396 anims/fog.gaf:Gray4:12 151 364
 sprite screen 151 364 183 396 anims/fog.gaf:Black4:12 151 364
@@ -116,8 +80,6 @@ sprite_gray screen 567 364 599 396 anims/fog.gaf:Gray1:13 567 364
 sprite screen 567 364 599 396 anims/fog.gaf:Black1:13 567 364
 fill screen 599 364 631 396 0
 fill screen 631 364 640 396 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 663 364
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 663 364
 fill screen 128 396 151 428 0
 fill screen 151 396 183 428 0
 sprite_gray screen 183 396 215 428 anims/fog.gaf:Gray2:12 183 396
@@ -135,8 +97,6 @@ sprite screen 535 396 567 428 anims/fog.gaf:Black1:13 535 396
 fill screen 567 396 599 428 0
 fill screen 599 396 631 428 0
 fill screen 631 396 640 428 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 663 396
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 663 396
 fill screen 128 428 151 448 0
 fill screen 151 428 183 448 0
 fill screen 183 428 215 448 0
@@ -154,36 +114,6 @@ fill screen 535 428 567 448 0
 fill screen 567 428 599 448 0
 fill screen 599 428 631 448 0
 fill screen 631 428 640 448 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 663 428
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 663 428
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 119 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 119 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:2 151 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:2 151 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:2 183 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:2 183 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 215 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 215 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 247 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 247 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:0 279 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:0 279 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:1 439 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:1 439 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 471 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 471 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 503 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 503 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:2 535 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:2 535 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:2 567 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:2 567 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 599 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 599 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 631 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 631 460
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:0 663 460
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:0 663 460
 sprite screen 138 53 146 65 anims/hattfont12.gaf:Haettenschweiler%20(120):67 138 52
 sprite screen 146 55 153 65 anims/hattfont12.gaf:Haettenschweiler%20(120):111 146 52
 sprite screen 153 55 163 65 anims/hattfont12.gaf:Haettenschweiler%20(120):109 153 52
@@ -306,16 +236,10 @@ terrain screen 128 32 640 448 The%20Pass 303 31
 blit screen 0 36 126 89 RADAR%20FINAL 0 36
 outline screen 10 37 28 51 10 37 27 50 194
 sprite screen 350 299 409 365 anims/rocks.gaf:rockmetal3:0 377 329
-sprite screen 0 0 0 0 anims/trees.gaf:Conifboom:13 633 25
 sprite screen 487 32 622 95 anims/trees.gaf:Conifboom:13 569 89
 sprite screen 560 32 640 100 anims/trees.gaf:treeboom:13 633 89
-sprite screen 0 0 0 0 anims/trees.gaf:treeboom:13 -23 105
-sprite screen 0 0 0 0 anims/trees.gaf:treeboom:13 73 105
-sprite screen 0 0 0 0 anims/trees.gaf:treeboom:13 25 137
 sprite screen 560 109 640 180 anims/trees.gaf:treeboom:13 633 169
 sprite screen 448 173 553 244 anims/trees.gaf:treeboom:13 521 233
-sprite screen 0 0 0 0 anims/trees.gaf:treeboom:13 89 265
-sprite screen 0 0 0 0 anims/trees.gaf:treeboom:13 -39 297
 sprite screen 512 237 617 308 anims/trees.gaf:treeboom:13 585 297
 sprite screen 512 317 617 388 anims/trees.gaf:treeboom:13 585 377
 sprite screen 271 152 515 344 anims/commboom.gaf:CommBoom:13 385 241
@@ -332,8 +256,6 @@ sprite screen 561 32 577 33 anims/fog.gaf:Black1:1 545 17
 sprite_gray screen 577 32 609 49 anims/fog.gaf:Gray2:10 577 17
 sprite screen 577 32 609 49 anims/fog.gaf:Black2:10 577 17
 fill screen 609 32 640 49 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 641 17
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 641 17
 fill screen 128 49 129 81 0
 fill screen 129 49 161 81 0
 sprite_gray screen 161 49 181 81 anims/fog.gaf:Gray2:4 161 49
@@ -341,8 +263,6 @@ sprite screen 161 49 177 81 anims/fog.gaf:Black2:4 161 49
 sprite_gray screen 586 49 609 81 anims/fog.gaf:Gray3:9 577 49
 sprite screen 593 49 609 81 anims/fog.gaf:Black3:9 577 49
 fill screen 609 49 640 81 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 641 49
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 641 49
 fill screen 128 81 129 113 0
 sprite_gray screen 129 81 161 113 anims/fog.gaf:Gray2:6 129 81
 sprite screen 129 81 161 113 anims/fog.gaf:Black2:6 129 81
@@ -352,32 +272,18 @@ sprite_gray screen 589 81 609 102 anims/fog.gaf:Gray4:1 577 81
 sprite screen 593 81 609 97 anims/fog.gaf:Black4:1 577 81
 sprite_gray screen 609 81 640 113 anims/fog.gaf:Gray1:10 609 81
 sprite screen 609 81 640 113 anims/fog.gaf:Black1:10 609 81
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 641 81
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 641 81
 sprite_gray screen 128 113 129 145 anims/fog.gaf:Gray2:6 97 113
 sprite screen 128 113 129 145 anims/fog.gaf:Black2:6 97 113
 sprite_gray screen 129 113 147 131 anims/fog.gaf:Gray3:0 129 113
 sprite screen 129 113 145 129 anims/fog.gaf:Black3:0 129 113
 sprite_gray screen 621 113 640 134 anims/fog.gaf:Gray2:1 609 113
 sprite screen 625 113 640 129 anims/fog.gaf:Black2:1 609 113
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:0 641 113
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:0 641 113
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:4 97 145
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:4 97 145
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 97 177
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 97 177
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 97 209
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 97 209
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 97 241
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 97 241
 sprite_gray screen 128 273 129 305 anims/fog.gaf:Gray3:12 97 273
 sprite screen 128 273 129 305 anims/fog.gaf:Black3:12 97 273
 sprite_gray screen 129 286 148 305 anims/fog.gaf:Gray4:3 129 273
 sprite screen 129 288 145 305 anims/fog.gaf:Black4:3 129 273
 sprite_gray screen 622 284 640 306 anims/fog.gaf:Gray3:7 609 273
 sprite screen 625 289 640 305 anims/fog.gaf:Black3:7 609 273
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:3 641 273
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:3 641 273
 fill screen 128 305 129 337 0
 sprite_gray screen 129 305 161 337 anims/fog.gaf:Gray1:12 129 305
 sprite screen 129 305 161 337 anims/fog.gaf:Black1:12 129 305
@@ -387,8 +293,6 @@ sprite_gray screen 590 316 609 338 anims/fog.gaf:Gray3:7 577 305
 sprite screen 593 321 609 337 anims/fog.gaf:Black3:7 577 305
 sprite_gray screen 609 305 640 337 anims/fog.gaf:Gray4:13 609 305
 sprite screen 609 305 640 337 anims/fog.gaf:Black4:13 609 305
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 641 305
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 641 305
 fill screen 128 337 129 369 0
 fill screen 129 337 161 369 0
 sprite_gray screen 161 337 183 369 anims/fog.gaf:Gray3:4 161 337
@@ -396,8 +300,6 @@ sprite screen 161 337 177 369 anims/fog.gaf:Black3:4 161 337
 sprite_gray screen 589 337 609 369 anims/fog.gaf:Gray4:9 577 337
 sprite screen 588 337 609 369 anims/fog.gaf:Black4:9 577 337
 fill screen 609 337 640 369 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 641 337
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 641 337
 fill screen 128 369 129 401 0
 fill screen 129 369 161 401 0
 sprite_gray screen 161 369 193 401 anims/fog.gaf:Gray4:12 161 369
@@ -409,8 +311,6 @@ sprite screen 560 383 577 401 anims/fog.gaf:Black4:7 545 369
 sprite_gray screen 577 369 609 401 anims/fog.gaf:Gray1:13 577 369
 sprite screen 577 369 609 401 anims/fog.gaf:Black1:13 577 369
 fill screen 609 369 640 401 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:4 641 369
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:4 641 369
 fill screen 128 401 129 433 0
 fill screen 129 401 161 433 0
 fill screen 161 401 193 433 0
@@ -428,8 +328,6 @@ sprite_gray screen 545 401 577 433 anims/fog.gaf:Gray1:13 545 401
 sprite screen 545 401 577 433 anims/fog.gaf:Black1:13 545 401
 fill screen 577 401 609 433 0
 fill screen 609 401 640 433 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 641 401
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 641 401
 fill screen 128 433 129 448 0
 fill screen 129 433 161 448 0
 fill screen 161 433 193 448 0
@@ -438,45 +336,13 @@ fill screen 225 433 257 448 0
 sprite_gray screen 257 433 289 448 anims/fog.gaf:Gray1:12 257 433
 sprite screen 257 433 289 448 anims/fog.gaf:Black1:12 257 433
 sprite_gray screen 289 446 308 448 anims/fog.gaf:Gray2:3 289 433
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:3 289 433
 sprite_gray screen 462 444 481 448 anims/fog.gaf:Gray3:7 449 433
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:7 449 433
 sprite_gray screen 481 433 513 448 anims/fog.gaf:Gray4:13 481 433
 sprite screen 481 433 513 448 anims/fog.gaf:Black4:13 481 433
 fill screen 513 433 545 448 0
 fill screen 545 433 577 448 0
 fill screen 577 433 609 448 0
 fill screen 609 433 640 448 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 641 433
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 641 433
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 97 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 97 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 129 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 129 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:2 161 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:2 161 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:2 193 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:2 193 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 225 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 225 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 257 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 257 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:0 289 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:0 289 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:1 449 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:1 449 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 481 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 481 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 513 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 513 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:2 545 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:2 545 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:2 577 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:2 577 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 609 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 609 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:0 641 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:0 641 465
 sprite screen 138 53 146 65 anims/hattfont12.gaf:Haettenschweiler%20(120):67 138 52
 sprite screen 146 55 153 65 anims/hattfont12.gaf:Haettenschweiler%20(120):111 146 52
 sprite screen 153 55 163 65 anims/hattfont12.gaf:Haettenschweiler%20(120):109 153 52
@@ -601,13 +467,8 @@ outline screen 10 37 28 51 10 37 27 50 194
 sprite_blend screen 621 32 640 35 anims/trees.gaf:smudge03:0 633 25
 sprite_blend screen 557 80 582 99 anims/trees.gaf:smudge03:0 569 89
 sprite_blend screen 624 82 640 98 anims/trees.gaf:smudge02:0 633 89
-sprite_blend screen 0 0 0 0 anims/trees.gaf:smudge02:0 -23 105
-sprite_blend screen 0 0 0 0 anims/trees.gaf:smudge02:0 73 105
-sprite_blend screen 0 0 0 0 anims/trees.gaf:smudge01:0 25 137
 sprite_blend screen 621 160 640 179 anims/trees.gaf:smudge03:0 633 169
 sprite_blend screen 509 223 533 242 anims/trees.gaf:smudge01:0 521 233
-sprite_blend screen 0 0 0 0 anims/trees.gaf:smudge03:0 89 265
-sprite_blend screen 0 0 0 0 anims/trees.gaf:smudge01:0 -39 297
 sprite_blend screen 573 288 598 307 anims/trees.gaf:smudge03:0 585 297
 sprite screen 350 299 409 365 anims/rocks.gaf:rockmetal3:0 377 329
 sprite_blend screen 576 370 596 386 anims/trees.gaf:smudge02:0 585 377
@@ -632,8 +493,6 @@ sprite screen 561 32 577 33 anims/fog.gaf:Black1:1 545 17
 gray screen 577 32 609 49
 sprite screen 577 32 609 49 anims/fog.gaf:Black2:10 577 17
 fill screen 609 32 640 49 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 641 17
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 641 17
 fill screen 128 49 129 81 0
 fill screen 129 49 161 81 0
 gray screen 161 49 193 81
@@ -653,8 +512,6 @@ gray screen 545 49 577 81
 gray screen 577 49 609 81
 sprite screen 593 49 609 81 anims/fog.gaf:Black3:9 577 49
 fill screen 609 49 640 81 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 641 49
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 641 49
 fill screen 128 81 129 113 0
 gray screen 129 81 161 113
 sprite screen 129 81 161 113 anims/fog.gaf:Black2:6 129 81
@@ -676,8 +533,6 @@ gray screen 577 81 609 113
 sprite screen 593 81 609 97 anims/fog.gaf:Black4:1 577 81
 gray screen 609 81 640 113
 sprite screen 609 81 640 113 anims/fog.gaf:Black1:10 609 81
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 641 81
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 641 81
 gray screen 128 113 129 145
 sprite screen 128 113 129 145 anims/fog.gaf:Black2:6 97 113
 gray screen 129 113 161 145
@@ -698,10 +553,7 @@ gray screen 545 113 577 145
 gray screen 577 113 609 145
 gray screen 609 113 640 145
 sprite screen 625 113 640 129 anims/fog.gaf:Black2:1 609 113
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:4 641 113
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:0 641 113
 gray screen 128 145 129 177
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:4 97 145
 gray screen 129 145 161 177
 gray screen 161 145 193 177
 gray screen 193 145 225 177
@@ -718,9 +570,7 @@ gray screen 513 145 545 177
 gray screen 545 145 577 177
 gray screen 577 145 609 177
 gray screen 609 145 640 177
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 641 145
 gray screen 128 177 129 209
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 97 177
 gray screen 129 177 161 209
 gray screen 161 177 193 209
 gray screen 193 177 225 209
@@ -737,9 +587,7 @@ gray screen 513 177 545 209
 gray screen 545 177 577 209
 gray screen 577 177 609 209
 gray screen 609 177 640 209
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 641 177
 gray screen 128 209 129 241
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 97 209
 gray screen 129 209 161 241
 gray screen 161 209 193 241
 gray screen 193 209 225 241
@@ -756,9 +604,7 @@ gray screen 513 209 545 241
 gray screen 545 209 577 241
 gray screen 577 209 609 241
 gray screen 609 209 640 241
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 641 209
 gray screen 128 241 129 273
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 97 241
 gray screen 129 241 161 273
 gray screen 161 241 193 273
 gray screen 193 241 225 273
@@ -775,7 +621,6 @@ gray screen 513 241 545 273
 gray screen 545 241 577 273
 gray screen 577 241 609 273
 gray screen 609 241 640 273
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:4 641 241
 gray screen 128 273 129 305
 sprite screen 128 273 129 305 anims/fog.gaf:Black3:12 97 273
 gray screen 129 273 161 305
@@ -796,8 +641,6 @@ gray screen 545 273 577 305
 gray screen 577 273 609 305
 gray screen 609 273 640 305
 sprite screen 625 289 640 305 anims/fog.gaf:Black3:7 609 273
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 641 273
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:3 641 273
 fill screen 128 305 129 337 0
 gray screen 129 305 161 337
 sprite screen 129 305 161 337 anims/fog.gaf:Black1:12 129 305
@@ -819,8 +662,6 @@ gray screen 577 305 609 337
 sprite screen 593 321 609 337 anims/fog.gaf:Black3:7 577 305
 gray screen 609 305 640 337
 sprite screen 609 305 640 337 anims/fog.gaf:Black4:13 609 305
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 641 305
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 641 305
 fill screen 128 337 129 369 0
 fill screen 129 337 161 369 0
 gray screen 161 337 193 369
@@ -840,8 +681,6 @@ gray screen 545 337 577 369
 gray screen 577 337 609 369
 sprite screen 588 337 609 369 anims/fog.gaf:Black4:9 577 337
 fill screen 609 337 640 369 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:4 641 337
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:4 641 337
 fill screen 128 369 129 401 0
 fill screen 129 369 161 401 0
 gray screen 161 369 193 401
@@ -863,8 +702,6 @@ sprite screen 560 383 577 401 anims/fog.gaf:Black4:7 545 369
 gray screen 577 369 609 401
 sprite screen 577 369 609 401 anims/fog.gaf:Black1:13 577 369
 fill screen 609 369 640 401 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:4 641 369
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:4 641 369
 fill screen 128 401 129 433 0
 fill screen 129 401 161 433 0
 fill screen 161 401 193 433 0
@@ -888,8 +725,6 @@ gray screen 545 401 577 433
 sprite screen 545 401 577 433 anims/fog.gaf:Black1:13 545 401
 fill screen 577 401 609 433 0
 fill screen 609 401 640 433 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:4 641 401
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:4 641 401
 fill screen 128 433 129 448 0
 fill screen 129 433 161 448 0
 fill screen 161 433 193 448 0
@@ -898,53 +733,17 @@ fill screen 225 433 257 448 0
 gray screen 257 433 289 448
 sprite screen 257 433 289 448 anims/fog.gaf:Black1:12 257 433
 gray screen 289 433 321 448
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:3 289 433
 gray screen 321 433 353 448
 gray screen 353 433 385 448
 gray screen 385 433 417 448
 gray screen 417 433 449 448
 gray screen 449 433 481 448
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:7 449 433
 gray screen 481 433 513 448
 sprite screen 481 433 513 448 anims/fog.gaf:Black4:13 481 433
 fill screen 513 433 545 448 0
 fill screen 545 433 577 448 0
 fill screen 577 433 609 448 0
 fill screen 609 433 640 448 0
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:4 641 433
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:4 641 433
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 97 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 97 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 129 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 129 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:2 161 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:2 161 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:2 193 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:2 193 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 225 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 225 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 257 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 257 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:2 289 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:0 289 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:2 321 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 353 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 385 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:2 417 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:2 449 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:1 449 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 481 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 481 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:2 513 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:2 513 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray3:2 545 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black3:2 545 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray4:2 577 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black4:2 577 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray1:2 609 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black1:2 609 465
-sprite_gray screen 0 0 0 0 anims/fog.gaf:Gray2:0 641 465
-sprite screen 0 0 0 0 anims/fog.gaf:Black2:0 641 465
 sprite screen 138 53 146 65 anims/hattfont12.gaf:Haettenschweiler%20(120):67 138 52
 sprite screen 146 55 153 65 anims/hattfont12.gaf:Haettenschweiler%20(120):111 146 52
 sprite screen 153 55 163 65 anims/hattfont12.gaf:Haettenschweiler%20(120):109 153 52

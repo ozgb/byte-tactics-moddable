@@ -30,6 +30,17 @@ static void TestWithinCapacity()
     Check(ViewSerializedSize(&s_view) == expect, "the serialisation holds the header, players, used rows and sight");
 }
 
+static void TestEmptyRuns()
+{
+    ViewBegin(&s_view);
+    ViewUnit* a = ViewAddUnit(&s_view);
+    ViewUnit* b = ViewAddUnit(&s_view);
+    Check(ViewAddPieces(&s_view, a, 4) == 4 && ViewAddOrders(&s_view, a, 2) == 2, "the first unit's runs fit");
+    Check(ViewAddPieces(&s_view, b, 0) == 0 && b->firstPiece == 0, "a unit with no pieces has first piece 0");
+    Check(ViewAddOrders(&s_view, b, 0) == 0 && b->firstOrder == 0, "a unit with no orders has first order 0");
+    Check(s_view.truncated == 0, "an empty run sets no bit");
+}
+
 static void TestPieces()
 {
     ViewBegin(&s_view);
@@ -106,6 +117,7 @@ static void TestFixedTables()
 int main()
 {
     TestWithinCapacity();
+    TestEmptyRuns();
     TestPieces();
     TestOrders();
     TestFeatures();

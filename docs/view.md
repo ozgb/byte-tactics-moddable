@@ -180,9 +180,9 @@ ally's unit not at all. Radar does not put a unit in `units`; it makes a blip.
 | `carrier` | the unit's carrier; a carried unit is drawn with it | every unit |
 | `recentlyDamaged` | `units[i].recentlyDamagedTimer` | every unit |
 | `group` | `units[i].group`, the control group, drawn as a digit under the unit | the viewer's own units; 0 for the rest |
-| `killCount`, `weaponBuild`, `orderKind`, `orderTarget`, `moveOrder`, `fireOrder`, `cloakOrder`, `metalMake`, `metalUse`, `energyMake`, `energyUse` | `units[i].killCount`; the stockpile progress of its weapon slots; its first order (section 8.9) and its target; its standing orders; its resources (section 8.16) | the viewer's own units; 0 for the rest |
-| `firstOrder`, `orderCount` | its orders (section 8.9) | the controller's units; 0 for the rest |
-| `firstPiece`, `pieceCount` | the posed pieces of its model, from the scripts' state (section 8.12) | every unit |
+| `killCount`, `weaponBuild`, `orderKind`, `orderTarget`, `moveOrder`, `fireOrder`, `cloakOrder`, `metalMake`, `metalUse`, `energyMake`, `energyUse` | `units[i].killCount`; the stockpile progress of its weapon slots, `progress * 100 / reload` of the first weapon-build order, clamped to 0 to 255, and 0 when no such order names a slot 0 to 2 with a weapon, a reload of 0 or a progress of 0 or less; its first order (section 8.9) and its target, the target only when bit 0x8 of the order's flags is set (as 3.1c's `GetOrderTargetIfFlagged`) and 0 otherwise; its standing orders; its resources (section 8.16) | the viewer's own units; 0 for the rest |
+| `firstOrder`, `orderCount` | its orders (section 8.9); `firstOrder` is 0 when the count is 0 | the controller's units; 0 for the rest |
+| `firstPiece`, `pieceCount` | the posed pieces of its model, from the scripts' state (section 8.12); `firstPiece` is 0 when the count is 0 | every unit |
 
 The unit panel shows a unit under the cursor that is not in `units`, a blip, as "Unidentified object", with the prefix
 "S: " when the blip's `VIEW_BLIP_SONAR` is set and "R: " when it is clear, and nothing else.
@@ -279,7 +279,7 @@ The sprite catalogue lists the explosion animations in this order:
   `explosionSeq` animation.
 
 `explodedPieces` has a row for each slot of the exploded-piece table that holds a block, in slot order, from
-`weaponsState.explodedPieces[slot]`: `unitDefIndex` and `owner` are those of the unit `unit` names, `pieceIndex` is
+`weaponsState.explodedPieces[slot]`: `unitDefIndex` and `owner` are the current values of the unit slot `unit` names (0 for a dead unit's definition, the new unit's for a reused slot; #1123 gives them a source that outlives the unit), `pieceIndex` is
 `index`, `x`, `y`, `z` are the piece record's `pos` and `rotX`, `rotY`, `rotZ` its angles `angle_10`, `angle_12` and
 `angle_14`. `trail` is 1 when bit 0x2 of `flags` is set, else 2 when bit 0x1 is set, else 0.
 
@@ -424,7 +424,7 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `ModelState::root` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
 | `ModelState::shadow` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
 | `Order::created` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
-| `Order::flags_42` | Left out: presentation's own cache of a target's last seen place, written and read only by the weapon coverage overlay; nothing in the tick reads it. |
+| `Order::flags_42` | `ViewUnit.orderTarget` through bit 0x8 and `ViewUnit.weaponBuild` through bit 0x80000 (Units); the weapon coverage overlay's cache of a target's last seen place in it is presentation's own. |
 | `Order::kind` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
 | `Order::next` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
 | `Order::pos` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |

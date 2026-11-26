@@ -131,7 +131,8 @@ enum {
     ORDER_CREATED = 0x46,
     ORDER_NEXT = 0x4a,
     ORDER_CHAIN_LIMIT = 4096,
-    ORDER_WEAPON_BUILD = 0x80000
+    ORDER_WEAPON_BUILD = 0x80000,
+    ORDER_TARGET_SHOWN = 0x8
 };
 
 enum {
@@ -559,7 +560,8 @@ static void FillUnit(PlayerView* v, ViewUnit* out, const unsigned char* unit)
         out->weaponBuild = (unsigned char)WeaponBuildPercent(unit);
         if (first != 0) {
             out->orderKind = first[ORDER_KIND];
-            out->orderTarget = (unsigned short)UnitIdPlusOne(UnitOf(RRef(first, ORDER_TARGET)));
+            if ((R32(first, ORDER_FLAGS) & ORDER_TARGET_SHOWN) != 0)
+                out->orderTarget = (unsigned short)UnitIdPlusOne(UnitOf(RRef(first, ORDER_TARGET)));
         }
         out->moveOrder = (unsigned char)((raw >> 18) & 3);
         out->fireOrder = (unsigned char)((raw >> 20) & 3);

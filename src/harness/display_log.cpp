@@ -799,7 +799,8 @@ static TargetSlot* SlotFor(const unsigned char* base, int width, int height, int
 {
     int i;
     for (i = 0; i < s_targetCount; i++) {
-        if (s_targets[i].base == base)
+        const TargetSlot* s = &s_targets[i];
+        if (s->base == base && s->name == name && s->width == width && s->height == height)
             return &s_targets[i];
     }
     if (s_targetCount >= kMaxTargets)

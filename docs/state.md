@@ -104,6 +104,10 @@ Crossings left during play, each waiting on another decision:
 - `WriteScreenshot` (keys.cpp), the poster key, turns mapping and line of sight off, calls `RecalculateLineOfSight`,
   draws the whole map and turns them back on with a second `RecalculateLineOfSight`. A presentation that draws from the
   view (#1052) needs neither.
+- `DispatchOrdersPanelPageFlags` and `StepBuildMenuPageBack` (control_panel.cpp) write the build-menu page bits of
+  `Unit.flags`: bit 0x400000, the build menu rather than the orders, and the page number. Only presentation reads
+  them, but the trace still hashes them, since the mask covers only the selection bit 0x10. #1115 finds and masks
+  the presentation writes that remain hashed.
 - `DrawScorePanel` (game_dialogs.cpp) decrements `Player.rank` of each counted player above a rank no player holds,
   while it draws the score panel; the kill credit of `units.cpp` (the rank update when a unit dies) reads and writes the
   same ranks. It becomes the simulation's own compaction, or an event, in a later issue.

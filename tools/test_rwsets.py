@@ -161,7 +161,8 @@ class RwsetsTest(unittest.TestCase):
             ("global_read", "g_game"), ("field_write", "Game::values")})
 
     def test_a_bit_of_an_unnamed_struct_is_also_an_access_of_the_member_that_holds_it(self):
-        self.assertEqual(self.by_function["SetBit"], {("field_write", "<anon>::a"), ("member_write", "Flagged::bits")})
+        self.assertEqual(self.by_function["SetBit"], {("field_write", "<anon>::a"), ("member_write", "Flagged::bits"),
+                                                      ("mask_member", "Flagged::bits 0x1")})
 
     def test_a_lambda_capture_is_not_a_field(self):
         source = ("struct Unit { int hp; };\ntemplate <class F> void Each(F f) { f(0); }\n"
@@ -241,6 +242,85 @@ class RwsetsTest(unittest.TestCase):
         self.assertEqual(addresses["ReadGlobal"], "0x401000")
         self.assertEqual(addresses["Increment"], "")
         self.assertEqual(self.rows, sorted(self.rows, key=lambda r: (r[0] == "", int(r[0] or "0", 16), *r[1:])))
+
+
+MASKS = """struct Pair { unsigned short lo : 4; unsigned short hi : 4; };
+struct Split { union { unsigned short raw; struct { unsigned short b0 : 1; unsigned short b1 : 3; }; }; };
+struct Mixed { unsigned short word; struct { unsigned short a : 1; unsigned short : 2; unsigned short b : 2; } bits;
+               Pair pair; Split split; struct { unsigned char c : 4; unsigned short d : 1; } sizes; };
+extern Mixed* g_mixed;
+extern unsigned short g_word;
+
+void ClearBit() { g_mixed->word &= 0xfff7; }
+void SetAndToggle() { g_mixed->word |= 0x3; g_mixed->word ^= (1 << 4); }
+void CastConstant() { g_word &= (unsigned char)~1; }
+void BoundedThenAssigned() { g_mixed->word |= 1; g_mixed->word = 2; }
+void VariableMask(int k) { g_mixed->word |= k; }
+void Incremented() { g_mixed->word++; }
+void SetBitField() { g_mixed->bits.b = 1; }
+void SetNamedBitField() { g_mixed->pair.hi = 2; }
+void SetBitThroughUnnamedMembers() { g_mixed->split.b1 = 1; }
+void SetBitAfterAnotherSize() { g_mixed->sizes.d = 1; }
+"""
+
+
+@unittest.skipUnless(shutil.which("clang-cl"), "clang-cl is not installed")
+class MaskTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rows, cls.by_function = rows_of(MASKS)
+
+    def masks(self, function):
+        return {(kind, target) for kind, target in self.by_function[function] if kind.startswith("mask_")}
+
+    def test_a_bitwise_assignment_with_a_constant_can_change_only_its_bits(self):
+        self.assertEqual(self.masks("ClearBit"), {("mask_field", "Mixed::word 0x8")})
+        self.assertEqual(self.masks("SetAndToggle"), {("mask_field", "Mixed::word 0x13")})
+
+    def test_a_cast_constant_is_cut_to_the_type_it_is_cast_to(self):
+        self.assertEqual(self.masks("CastConstant"), {("mask_global", "g_word 0xff01")})
+
+    def test_a_write_that_cannot_be_bounded_leaves_no_mask(self):
+        for function in ("BoundedThenAssigned", "VariableMask", "Incremented"):
+            self.assertIn(("field_write", "Mixed::word"), self.by_function[function], function)
+            self.assertEqual(self.masks(function), set(), function)
+
+    def test_a_bit_field_write_is_a_mask_of_the_member_that_holds_it(self):
+        self.assertEqual(self.masks("SetBitField"), {("mask_member", "Mixed::bits 0x18")})
+
+    def test_a_bit_field_of_a_named_record_is_an_access_of_the_member_that_holds_it(self):
+        self.assertIn(("member_write", "Mixed::pair"), self.by_function["SetNamedBitField"])
+        self.assertEqual(self.masks("SetNamedBitField"), {("mask_member", "Mixed::pair 0xf0")})
+
+    def test_unnamed_members_are_skipped_to_the_named_one(self):
+        self.assertIn(("member_write", "Mixed::split"), self.by_function["SetBitThroughUnnamedMembers"])
+        self.assertEqual(self.masks("SetBitThroughUnnamedMembers"), {("mask_member", "Mixed::split 0xe")})
+
+    def test_a_bit_field_after_a_unit_of_another_size_has_no_known_offset(self):
+        self.assertIn(("member_write", "Mixed::sizes"), self.by_function["SetBitAfterAnotherSize"])
+        self.assertEqual(self.masks("SetBitAfterAnotherSize"), set())
+
+
+class ConstantTest(unittest.TestCase):
+    @staticmethod
+    def literal(value):
+        return {"kind": "IntegerLiteral", "value": str(value), "type": {"qualType": "int"}}
+
+    def test_operators_on_literals_are_evaluated(self):
+        node = {"kind": "BinaryOperator", "opcode": "|", "inner": [
+            {"kind": "UnaryOperator", "opcode": "~", "inner": [self.literal(2)]},
+            {"kind": "ParenExpr", "inner": [self.literal(1)]}]}
+        self.assertEqual(rwsets.constant_value(node), ~2 | 1)
+
+    def test_a_name_is_no_constant(self):
+        self.assertIsNone(rwsets.constant_value({"kind": "DeclRefExpr", "referencedDecl": {"name": "k"}}))
+
+    def test_an_and_assignment_changes_the_bits_its_constant_clears(self):
+        node = {"kind": "CompoundAssignOperator", "opcode": "&=",
+                "inner": [{"kind": "MemberExpr", "type": {"qualType": "unsigned short"}}, self.literal(0xfffe)]}
+        self.assertEqual(rwsets.assigned_bits(node), 0x1)
+        self.assertIsNone(rwsets.assigned_bits(dict(node, opcode="+=")))
+
 
 
 SIM_COMMON = """struct Counter { int n; int Get() const { return n; } void Bump() { n++; } };

@@ -150,8 +150,8 @@ Unit::f_1f,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag U
 Unit::f_3b,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::f_57,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::f_57,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
-Unit::field_64,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::field_64,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::bank,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::bank,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,los_radar,IsUnitVisibleToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,orders,GetOrderType,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-

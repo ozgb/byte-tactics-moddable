@@ -332,7 +332,7 @@ reads of the unit record are of units' view. Each pair is served as follows:
 | orders to features | 1 | `Order::pos` | units | A view: the order's position, read by features as of orders' last write. |
 | orders to map | 1 | `Order::pos` | units | A view: the order's position, read by map as of orders' last write. |
 | orders to movement | 8 | `Order::flags_42`, `pos`, `subFlags`, `unit`, `Unit::flags`, `Unit::list` | units, players, projectiles | A view: the order a goal reads (`Order::unit`, `pos`, `flags_42`) and the unit's order list, as of orders' last write, in 3.1c's order within a unit's update (orders before movement). |
-| orders to scripts | 2 | `Unit::field_64`, `Unit::netDirtyFlags` | units | A view of the unit record, written by orders' effects (SET_FLAGS, CLEAR_NET_DIRTY) through units' handlers, as of the handler's run. |
+| orders to scripts | 2 | `Unit::bank`, `Unit::netDirtyFlags` | units | A view of the unit record, written by orders' effects (SET_FLAGS, CLEAR_NET_DIRTY) through units' handlers, as of the handler's run. |
 | orders to targeting | 2 | `Unit::netDirtyFlags` | projectiles, units | A view of the unit record, as of the handler's run of CLEAR_NET_DIRTY. |
 | orders to units | 6 | `Order::unknown_1a`, `Unit::flags`, `health`, `netDirtyFlags` | players, projectiles, units | A view of orders' order list, and units' own fields written by units' adapters of orders' effects (SET_FLAGS, SET_BUILD_STATE, CLEAR_NET_DIRTY), as of the handler's run. |
 | orders to weapons | 2 | `Unit::flags`, `health` | units | A view of the unit record, written by orders' effects in a unit's update; orders run after weapons in the unit's update, so weapons reads the previous tick's, as in 3.1c (`docs/weapons-interface.md`, section 4). |

@@ -2183,7 +2183,7 @@ The 15 groups with the most rows are shown.
 | writes to weapons | `Unit::script` | units | 54 | conditions-shore-to-shore@6 |
 | reads from units | `Unit::speed` | units | 53 | conditions-shore-to-shore@6 |
 | writes to orders | `Unit::script` | units | 51 | conditions-shore-to-shore@6 |
-| reads from units | `Unit::field_64` | units | 48 | mission-capture@1 |
+| reads from units | `Unit::bank` | units | 48 | mission-capture@1 |
 | reads from units | `Unit::pitch` | units | 48 | mission-capture@1 |
 | reads from units | `ModelState::bitmap` | units | 46 | mission-timer@51 |
 | reads from units | `Unit::health` | units | 46 | mission-kill-of-type@150 |
@@ -2279,7 +2279,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `UnitScript::EmitSfx` | 13 | 0 | `ModelState::owner` | 13 |
 | units | `UnitScript::GetUnitValue` | 13 | 6 | `ModelState::owner` | 62 |
 | units | `CobScript::AnimatePieces` | 12 | 4 | `Piece::active` | 65 |
-| units | `GetPieceAngles` | 12 | 3 | `Unit::field_64` | 25 |
+| units | `GetPieceAngles` | 12 | 3 | `Unit::bank` | 25 |
 | units | `UnitScript::SetPieceRotation` | 12 | 2 | `ModelState::bitmap` | 53 |
 | units.players | `GetSweetSpot` | 12 | 4 | `ModelState::root` | 20 |
 | units.players | `UnitScript::GetPieceRotation` | 12 | 2 | `ModelState::bitmap` | 45 |

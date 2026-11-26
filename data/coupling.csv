@@ -4596,6 +4596,7 @@ presentation,harness,shared_write,Unit::selected,2
 presentation,harness,shared_write,Vec3::x,3
 presentation,harness,shared_write,Vec3::y,1
 presentation,harness,shared_write,Vec3::z,3
+presentation,harness,shared_write,g_explodedPieces,1
 presentation,los_radar,call,BuildFogTiles,1
 presentation,los_radar,call,GetMapCell,1
 presentation,los_radar,call,GetMapCellAtPosition,1
@@ -6923,10 +6924,13 @@ weapons,game,shared_write,Ref<Unit>::offset,7
 weapons,game,shared_write,Vec3::x,4
 weapons,game,shared_write,Vec3::y,2
 weapons,game,shared_write,Vec3::z,4
+weapons,harness,shared_write,DebrisCache::cap,1
+weapons,harness,shared_write,DebrisCache::cur,1
 weapons,harness,shared_write,Ref<Unit>::offset,1
 weapons,harness,shared_write,Vec3::x,3
 weapons,harness,shared_write,Vec3::y,1
 weapons,harness,shared_write,Vec3::z,3
+weapons,harness,shared_write,g_explodedPieces,1
 weapons,los_radar,indirect,GetMapCell,1
 weapons,los_radar,indirect,GetMapCellAtPosition,3
 weapons,los_radar,shared_write,GafFrame::transparency,3

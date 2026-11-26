@@ -192,6 +192,8 @@ Unit::activateFlags,los_radar,ui-action,,per-player-filter,12
 Unit::activateFlags,network,unknown,,per-player-filter,1
 Unit::activateFlags,presentation,every-frame,,per-player-filter,92
 Unit::activateFlags,units,unknown,,per-player-filter,1
+Unit::bank,platform,ui-action,,per-player-filter,8
+Unit::bank,scripts,every-frame,,per-player-filter,92
 Unit::buildLeft,presentation,after-event,SIM_EVENT_DESELECT_IF_INELIGIBLE,per-player-filter,0
 Unit::cargo,presentation,every-frame,,per-player-filter,92
 Unit::cargoNext,presentation,every-frame,,per-player-filter,11
@@ -210,8 +212,6 @@ Unit::f_1f,weapons,unknown,,per-player-filter,6
 Unit::f_3b,weapons,unknown,,per-player-filter,6
 Unit::f_57,presentation,ui-action,,per-player-filter,5
 Unit::f_57,weapons,unknown,,per-player-filter,6
-Unit::field_64,platform,ui-action,,per-player-filter,8
-Unit::field_64,scripts,every-frame,,per-player-filter,92
 Unit::fireOrder,presentation,unknown,,per-player-filter,0
 Unit::flags,los_radar,ui-action,,per-player-filter,12
 Unit::flags,orders,unknown,,per-player-filter,7

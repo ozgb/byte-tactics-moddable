@@ -2162,15 +2162,9 @@ def copy_ui(directory: Path) -> None:
     UIS.mkdir(parents=True, exist_ok=True)
     for old in UIS.glob("*.txt"):
         old.unlink()
-    copied = 0
     for path in logs:
-        scenario = SCENARIOS / path.name
-        # TODO(#1145): store the UI log of a frontend scenario once the headless host's CD audio draws as the reference's does
-        if scenario.exists() and scenario_frontend(scenario):
-            continue
         shutil.copyfile(path, UIS / path.name)
-        copied += 1
-    print(f"{copied} UI logs copied to {UIS.relative_to(ROOT)}")
+    print(f"{len(logs)} UI logs copied to {UIS.relative_to(ROOT)}")
 
 
 def copy_commands(directory: Path) -> None:

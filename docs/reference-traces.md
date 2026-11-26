@@ -443,6 +443,10 @@ and so on), and this page is updated to name it. The current tag is
   unset, as the menus leave them); the commit line names 86c792ca9, the reference merge that adds the frontend mode.
   The saves of `save-midgame` and `save-targets` change with them. The other
   event digests, sound logs, UI logs, interface commands, display logs, frames and views are those of v47.
+- With the next free reference-traces tag after the merge of #1145: `frontend-skirmish`'s UI log,
+  `reference/ui/frontend-skirmish.txt`, from 86c792ca9. The headless host answers the CD audio as GOG's
+  no-CD music does (17 tracks, the first not audio), so the battle music the menus leave on draws from the view
+  stream at tick 2 as on the reference. The traces and every other stored log are those of v48.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

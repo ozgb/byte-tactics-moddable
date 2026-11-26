@@ -1,9 +1,11 @@
 """Recompute the rows of a trace.txt from a dump.txt, following docs/trace-format.md only.
 
-    uv run tools/tracerehash.py dump.txt [--schema data/trace_schema.json] [--trace trace.txt]
+    uv run tools/tracerehash.py dump.txt [--schema data/trace_schema.json] [--trace trace.txt] [--views DIR]
 
 Prints `<tick> <phase> <hash>` for every phase row and the world row of each dumped tick, and the `tick` row of a tick
-whose dump has a `tick` block: the phase rows' hash continued, without a reset, over the world tables. With
+whose dump has a `tick` block: the phase rows' hash continued, without a reset, over the world tables. The `view` row is not in a dump:
+it is rehashed from the view file of its tick (`<DIR>/<tick>.bin`, the file the run writes on the dump tick; DIR defaults to `views/` beside the
+dump), as the trace hash of the serialisation S (tools/viewblock.py, docs/view.md "The recorded view"), for each dumped tick that has one. With
 --trace, each row is followed by `ok` or `differs` against the same row of the trace, and the exit
 status is 1 if any row differs or the input cannot be parsed. A path ending in .xz is read compressed. Dumps of tick 1 also give the
 sections 29 to 31 in the world row. Sections 24 and 25 are the records los_radar and units write through the state writer (`losRadarIndex[i].*`, `unitsFactories[i].*`). The pathfinder's own report (sections 16 and 17) is read from the dump and checked for
@@ -18,11 +20,14 @@ import re
 import sys
 from pathlib import Path
 
+import viewblock
+
 OFFSET_BASIS = 0xCBF29CE484222325
 PRIME = 0x100000001B3
 MASK64 = (1 << 64) - 1
 END = 0xFFFFFFFF
 PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "tick")
+ROW_ORDER = (*PHASES[:-1], "world", "tick", "view")
 POS_Y_UNSET_KINDS = ("MobileBuild", "VTOL_MobileBuild", "Reclaim", "VTOL_Reclaim")
 DUMPED_ONLY = ("results.", "results[", "economy.", "economy[", "features.", "features[", "packets.", "packets[",
                "windMeteors.", "windMeteors[", "targeting.", "targeting[", "los_radar.", "los_radar[", "map.", "map[",
@@ -672,15 +677,33 @@ def rehash(schema: Schema, blocks: dict[tuple[int, str], list[tuple[str, str]]])
     return rows
 
 
+def view_rows(directory: Path, ticks: list[int]) -> list[tuple[int, str, int]]:
+    """The (tick, "view", hash) of each tick in `ticks` that has a view file in `directory`."""
+    rows = []
+    for tick in ticks:
+        path = directory / f"{tick}.bin"
+        if path.is_file():
+            try:
+                rows.append((tick, "view", viewblock.view_hash(viewblock.split(path.read_bytes()))))
+            except viewblock.Error as e:
+                raise Error(f"{path}: {e}") from None
+    return rows
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("dump", help="a dump.txt, or a dump.txt.xz")
     ap.add_argument("--schema", default="data/trace_schema.json")
     ap.add_argument("--trace", help="a trace.txt (or .xz) to compare the rows with")
+    ap.add_argument("--views", help="the directory of the view files <tick>.bin (default: views/ beside the dump)")
     args = ap.parse_args()
     try:
         schema = Schema(json.loads(Path(args.schema).read_text()))
-        rows = rehash(schema, parse_dump(read_text(args.dump), schema.data["trace_format"]))
+        blocks = parse_dump(read_text(args.dump), schema.data["trace_format"])
+        rows = rehash(schema, blocks)
+        views = Path(args.views) if args.views else Path(args.dump).resolve().parent / "views"
+        rows += view_rows(views, sorted({t for t, _ in blocks}))
+        rows.sort(key=lambda row: (row[0], ROW_ORDER.index(row[1])))
         expected = parse_trace_rows(read_text(args.trace)) if args.trace else None
     except (Error, OSError, ValueError, KeyError) as e:
         print(f"tracerehash: {e}", file=sys.stderr)

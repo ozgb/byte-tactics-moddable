@@ -29,7 +29,13 @@ lines.
 
 The row `tick` is hashed after the whole step (the tail after `meteors` included): the phase rows' state, then the
 tables of `world`, in one hash. Its dump block is the `tick` block. `--end-of-tick` (two exes, or `--traces`)
-compares only the `tick` rows and reports the first tick whose `tick` row differs, as phase `tick`.
+compares only the `tick` rows and reports the first tick whose `tick` row differs, as phase `tick`; when the `tick` rows are all
+equal it looks at the `view` rows and reports the first that differs, as phase `view`.
+
+The row `view` (format 10) hashes the player view of the end of the tick (docs/view.md, "The recorded view"). Its divergence is not
+a dump block: both builds play again with `--testdump <tick>`, which also writes views/<tick>.bin beside the trace, and the first
+field in which the two files differ is named (tools/viewblock.py), with both values. `--traces` does the same when a
+`views/<tick>.bin` lies beside each trace.txt.
 
 With `--events` or `--event-logs`, `--end-of-tick` compares the two sim event logs tick by tick under the rule of docs/events-log.md ("What the check compares"): it names the first tick whose `tick` line of the event digest differs and, in it, the first record that the logs hold a different number of times, or else the first pair of kinds whose projection differs and the first record of that projection that differs, with both records and their line numbers.
 
@@ -70,10 +76,13 @@ from typing import NamedTuple
 
 import displaylog
 import eventdigest
+import viewblock
 from traceschema import TRACE_FORMAT
 
 ROOT = Path(__file__).resolve().parent.parent
-PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world", "tick")
+PHASES = ("net", "units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world", "tick", "view")
+DUMP_PHASES = tuple(p for p in PHASES if p != "view")
+VIEWS_DIR = "views"
 PHASE_FUNCTIONS = {
     "net": ("HandleNetPackets", 0x453D40),
     "units": ("UpdateAllUnits", 0x48AD30),
@@ -163,9 +172,17 @@ def check_headers(a: dict[str, str], b: dict[str, str], ignore_view_seed: bool =
         raise Error("the traces are not of the same run, " + "; ".join(bad))
 
 
-def end_of_tick_rows(rows: list[tuple[int, str, str]]) -> list[tuple[int, str, str]]:
-    """The `tick` rows of a trace."""
-    return [row for row in rows if row[1] == "tick"]
+def end_of_tick_rows(rows: list[tuple[int, str, str]], phase: str = "tick") -> list[tuple[int, str, str]]:
+    """The `tick` rows of a trace (the rows of another `phase`, such as `view`, when named)."""
+    return [row for row in rows if row[1] == phase]
+
+
+def end_of_tick_divergence(a: list[tuple[int, str, str]], b: list[tuple[int, str, str]]) -> tuple[int, str] | None:
+    """The first tick whose `tick` row differs, else the first whose `view` row differs, else None.
+
+    The state is the verdict (docs/trace-format.md, section 6); the view is looked at only when the states are equal."""
+    return first_divergence(end_of_tick_rows(a), end_of_tick_rows(b)) or first_divergence(
+        end_of_tick_rows(a, "view"), end_of_tick_rows(b, "view"))
 
 
 def first_divergence(a: list[tuple[int, str, str]], b: list[tuple[int, str, str]]) -> tuple[int, str] | None:
@@ -367,6 +384,8 @@ def describe_phase(phase: str) -> str:
     """The function a phase's hash follows, from RunGameSteps (src/ingame/game_dialogs.cpp)."""
     if phase == "tick":
         return "none (the end of the tick, hashed after the whole step)"
+    if phase == "view":
+        return "none (the player view of the end of the tick, docs/view.md)"
     if phase not in PHASE_FUNCTIONS:
         return "none (the once-per-tick tables, hashed after UpdateMeteors)"
     name, address = PHASE_FUNCTIONS[phase]
@@ -383,6 +402,27 @@ def print_diff(diffs: list[tuple[str, str, str]]) -> None:
     print(f"  all {len(diffs)} differing fields:")
     for path, va, vb in diffs:
         print(f"    {path}: a={va} b={vb}")
+
+
+def view_file(directory: Path, tick: int) -> Path:
+    return directory / VIEWS_DIR / f"{tick}.bin"
+
+
+def view_difference(a: Path, b: Path) -> str | None:
+    """`<path>: a=<value> b=<value>` for the first field in which the two view files differ, None when they are equal.
+
+    A missing file is named, not read as empty."""
+    for path in (a, b):
+        if not path.is_file():
+            raise Error(f"{path} is missing: does the exe write views/<tick>.bin on the dump tick?")
+    return viewblock.describe_difference(a, b)
+
+
+def print_view_diff(diff: str | None) -> None:
+    if diff is None:
+        print("  the view files are equal")
+    else:
+        print(f"  first differing field: {diff}")
 
 
 def print_divergence(tick: int, phase: str) -> None:
@@ -673,15 +713,19 @@ def compare(args: argparse.Namespace) -> int:
     runs = [play_loading(e, s, args.game_dir, None, None, p, x) for e, s, p, x in zip(exes, scenarios, poison, xserver)]
     (ha, ra), (hb, rb) = (parse_trace(need(r, "trace.txt")) for r in runs)
     check_headers(ha, hb, args.ignore_view_seed)
+    div = end_of_tick_divergence(ra, rb) if args.end_of_tick else first_divergence(ra, rb)
     if args.end_of_tick:
-        ra, rb = end_of_tick_rows(ra), end_of_tick_rows(rb)
-    div = first_divergence(ra, rb)
+        ra = end_of_tick_rows(ra)
     if not div:
         print(f"traces identical ({len(ra)} lines)")
         return 0
     tick, phase = div
     print_divergence(tick, phase)
-    runs = [play_loading(e, s, args.game_dir, tick, None, p, x) for e, s, p, x in zip(exes, scenarios, poison, xserver)]
+    extra = {"collect": (f"{VIEWS_DIR}/{tick}.bin",)} if phase == "view" else {}
+    runs = [play_loading(e, s, args.game_dir, tick, None, p, x, **extra) for e, s, p, x in zip(exes, scenarios, poison, xserver)]
+    if phase == "view":
+        print_view_diff(view_difference(view_file(runs[0], tick), view_file(runs[1], tick)))
+        return 1
     maps = load_maps(args.reference_ref) if args.reference else None
     print_diff(diff_dumps(need(runs[0], "dump.txt"), need(runs[1], "dump.txt"), tick, phase, args.reference, maps))
     return 1
@@ -736,19 +780,23 @@ def main() -> int:
     for s in args.scenario or []:
         if args.exe and not Path(s).is_file():
             ap.error(f"{s} is not a file")
-    if args.dumps and (not args.at or not args.at[0].isdigit() or args.at[1] not in PHASES):
-        ap.error(f"--dumps needs --at TICK PHASE, phase one of {' '.join(PHASES)}")
+    if args.dumps and (not args.at or not args.at[0].isdigit() or args.at[1] not in DUMP_PHASES):
+        ap.error(f"--dumps needs --at TICK PHASE, phase one of {' '.join(DUMP_PHASES)}")
     try:
         if args.traces:
             (ha, ra), (hb, rb) = (parse_trace(Path(t)) for t in args.traces)
             check_headers(ha, hb, args.ignore_view_seed)
+            div = end_of_tick_divergence(ra, rb) if args.end_of_tick else first_divergence(ra, rb)
             if args.end_of_tick:
-                ra, rb = end_of_tick_rows(ra), end_of_tick_rows(rb)
-            div = first_divergence(ra, rb)
+                ra = end_of_tick_rows(ra)
             if not div:
                 print(f"traces identical ({len(ra)} lines)")
                 return 0
             print_divergence(*div)
+            if div[1] == "view":
+                dirs = [Path(t).parent for t in args.traces]
+                if all(view_file(d, div[0]).is_file() for d in dirs):
+                    print_view_diff(view_difference(*(view_file(d, div[0]) for d in dirs)))
             return 1
         if args.event_logs:
             return print_event_difference(*(Path(p).read_text() for p in args.event_logs), args.end_of_tick)

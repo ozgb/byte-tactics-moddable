@@ -8,6 +8,8 @@
 #define VIEW_REPORT_PIECES 300
 #define VIEW_REPORT_DEBRIS 300
 #define VIEW_REPORT_EVENT_ARGS 12
+#define VIEW_REPORT_PIECE_VERTICES 8
+#define VIEW_REPORT_PIECE_FACES 6
 
 struct ViewReportProjectile {
     int startX;
@@ -26,6 +28,7 @@ struct ViewReportProjectile {
 struct ViewReportExploded {
     unsigned used;
     unsigned unit;
+    unsigned desc;
     int index;
     unsigned flags;
     short angle10;
@@ -51,10 +54,22 @@ struct ViewReportDebris {
     short angleZ;
 };
 
+struct ViewReportFace {
+    int color;
+    int count;
+    unsigned indices;
+    unsigned pic;
+    unsigned src;
+    unsigned flags;
+};
+
 struct ViewReportPiece {
     unsigned used;
+    int vertexCount;
     int firstFace;
     int faceCount;
+    int vertices[VIEW_REPORT_PIECE_VERTICES * 3];
+    ViewReportFace faces[VIEW_REPORT_PIECE_FACES];
 };
 
 struct ViewWeaponsReport {
@@ -82,6 +97,9 @@ unsigned ViewHostTakeEvents(const ViewRawEvent** events);
 void ViewHostFail(const char* message);
 
 int ViewIsMessageKind(unsigned kind);
+
+int ViewFillDebrisGeometry(PlayerView* v, ViewDebris* out, const ViewReportPiece* piece);
+int ViewFillExplodedGeometry(PlayerView* v, ViewExplodedPiece* out, const unsigned char* desc, int teamColour);
 
 void ViewFill(PlayerView* v);
 

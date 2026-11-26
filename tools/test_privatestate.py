@@ -297,6 +297,10 @@ class WeaponsOwnerTest(unittest.TestCase):
                 "presentation": [("-", "presentation", "Projectile::start"), ("-", "presentation", "count_1491b")]}
         self.assertEqual(ps.violations(rows), [])
 
+    def test_the_display_log_reads_what_the_drawing_reads_for_the_owner(self):
+        rows = {"cross": [("weapons", "harness", "Debris::angle_x")], "presentation": [("-", "harness", "DebrisPiece::faces")]}
+        self.assertEqual(ps.violations(rows), [])
+
     def test_another_subsystem_touching_a_private_part_fails(self):
         rows = {"edges": [("-", "ai", "Projectile::speed"), ("units", "-", "Unit::unknown_30")], "reads": [("-", "map", "Debris::vel"), ("-", "los_radar", "g_explodedPieces")]}
         self.assertEqual(ps.violations(rows),

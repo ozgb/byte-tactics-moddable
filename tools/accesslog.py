@@ -790,6 +790,39 @@ def source_order(rows: list[tuple[dict, re.Match]]) -> list[tuple[dict, re.Match
     return [rows[i] for i in sorted(range(len(rows)), key=lambda i: (at[i], i))]
 
 
+CALLEE_PREFIXES = {"new": ("??2",), "new[]": ("??_U",), "operator new": ("??2",)}
+
+
+def callee_fits(allocator: str, names: set[str]) -> bool:
+    """Whether a call of the function the map names `names` (decorated) can make a heap row of `allocator`."""
+    prefixes = CALLEE_PREFIXES.get(allocator, ()) + tuple("?%s@" % s for s in SOURCE_SPELLINGS.get(allocator, (allocator,)))
+    return any(n.startswith(prefixes) for n in names)
+
+
+def allocator_callees(map_path: Path, sites: list[int]) -> dict[int, set[str]]:
+    """The map's names of the function each allocator call site calls."""
+    names: dict[int, set[str]] = {}
+    for line in map_path.read_text(errors="replace").splitlines():
+        m = blockpointers.MAP_LINE.match(line)
+        if m:
+            names.setdefault(int(m.group(2), 16), set()).add(m.group(1))
+    targets = blockpointers.call_targets(map_path.with_suffix(".exe"), sites)
+    return {site: names.get(target, set()) for site, target in targets.items()}
+
+
+def site_rows(sites: list[int], candidates: list[tuple[dict, re.Match]], callees: dict[int, set[str]]) -> list[tuple[int, tuple[dict, re.Match]]]:
+    """The heap row of each allocator call site of one function, sites in address order and rows in source order. When the
+    function has more sites than rows and the sites whose callee can make one of the rows are one per row, in order, those
+    sites take the rows and the others none: an inlined helper's allocation (a std::vector's) is no row of the function.
+    Otherwise the k-th site takes the k-th row, and the sites past the last row take the last."""
+    if len(candidates) > 1 and len(sites) > len(candidates):
+        fitting = [s for s in sites if any(callee_fits(m.group("allocator"), callees.get(s, set())) for _, m in candidates)]
+        if len(fitting) == len(candidates) and all(callee_fits(m.group("allocator"), callees.get(s, set()))
+                                                   for s, (_, m) in zip(fitting, candidates)):
+            return list(zip(fitting, candidates))
+    return [(s, candidates[min(k, len(candidates)) - 1]) for k, s in enumerate(sites, 1)]
+
+
 def build_items(info: MapInfo, map_path: Path, layouts: Layouts, rows: list[dict], globals_rows: list[dict]) -> tuple[Items, dict]:
     """The items table of a build and what it could not place."""
     items = Items(types=TypeTable(layouts))
@@ -829,15 +862,20 @@ def build_items(info: MapInfo, map_path: Path, layouts: Layouts, rows: list[dict
                 heap.setdefault(m.group("function"), []).append((row, m))
     heap = {function: source_order(found) for function, found in heap.items()}
     stats["heap_rows"] = sum(len(v) for v in heap.values())
+    by_function: dict[str, list[int]] = {}
     for ra in sorted(namer.ranks):
-        rank, count = namer.ranks[ra]
-        function = code_map.function(ra)
+        by_function.setdefault(code_map.function(ra), []).append(ra)
+    callees = allocator_callees(map_path, list(namer.ranks))
+    named = []
+    for function, sites in by_function.items():
         candidates = heap.get(function) or heap.get(sources.base_name(function)) or heap.get(blockpointers.demangle(function))
         if not candidates:
             continue
-        if len(candidates) != count and len(candidates) > 1:
-            stats["heap_ambiguous"] += 1
-        row, m = candidates[min(rank, len(candidates)) - 1]
+        found = site_rows(sites, candidates, callees)
+        if len(candidates) > 1 and len(found) != len(candidates):
+            stats["heap_ambiguous"] += len(found)
+        named.extend(found)
+    for ra, (row, m) in sorted(named, key=lambda n: n[0]):
         what = TAG_TYPES.get(m.group("what") or "", m.group("what") or "")
         tid, stride = items.types.refine(what if re.fullmatch(r"\w+", what) else None)
         items.sites.append((ra, items.string(row["name"]), tid, stride))

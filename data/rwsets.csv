@@ -50317,6 +50317,9 @@ address,function,file,kind,target
 ,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::bh
 ,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::bw
 ,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::first
+,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::height
+,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::name
+,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::width
 ,SlotFor,src/harness/display_log.cpp,field_write,Bucket::full
 ,SlotFor,src/harness/display_log.cpp,field_write,Bucket::head
 ,SlotFor,src/harness/display_log.cpp,field_write,TargetSlot::base
@@ -50337,7 +50340,6 @@ address,function,file,kind,target
 ,SlotFor,src/harness/display_log.cpp,global_read,kMaxTargets@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_read,s_bucketUsed@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_read,s_targetCount@src/harness/display_log.cpp
-,SlotFor,src/harness/display_log.cpp,global_read,s_targets@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_write,s_bucketUsed@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_write,s_buckets@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_write,s_targetCount@src/harness/display_log.cpp

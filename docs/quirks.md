@@ -15,10 +15,11 @@ The layout is published as `struct Quirks` in
 order of `quirks.def`. A new flag needs a member appended there too, and the
 build fails when the two disagree. A flag never moves or goes away, so a
 module built against an older version finds every flag where it was:
-`tools/abidiff.py` refuses any moved member. Appending a flag is a minor bump
-of the quirks interface. Retiring one is a major bump: the flag keeps its line
-in `quirks.def` and its slot in `Quirks`, renamed `retired<Name>`, and is
-always off.
+`tools/abidiff.py` refuses a moved member under a minor bump, and under a major
+one when a module in `wasm/modules.json` is built against the old major.
+Appending a flag is a minor bump of the quirks interface. Retiring one is a
+major bump: the flag keeps its line in `quirks.def` and its slot in `Quirks`,
+renamed `retired<Name>`, and is always off.
 
 ## Choosing flags
 

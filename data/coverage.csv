@@ -220,7 +220,7 @@ game,OffsetWorldPosFromView,src/game/game_load.cpp,0,0,0,0,0,0,?OffsetWorldPosFr
 game,OutOfBlock,src/state/block.cpp,1,0,0,0,0,0,?OutOfBlock@?A0x@@YGXXZ,0,error-path
 game,OutOfMemoryHandler,src/game/main.cpp,1,0,0,0,0,0,?OutOfMemoryHandler@@YGXXZ,0,error-path
 game,PlayerRecordAt,src/game/game_load.cpp,1,0,0,0,0,0,?PlayerRecordAt@@YGPADPAUGame@@H@Z,0,network
-game,PlayersPublishCompactRanks,src/game/players_events.h,1,0,0,0,0,0,?PlayersPublishCompactRanks@@YGXH@Z,0,game-over
+game,PlayersPublishCompactRanks,src/game/players_events.h,1,0,0,0,0,0,?PlayersPublishCompactRanks@@YGXH@Z,0,input
 game,PlayersPublishLeaveGame,src/game/players_events.h,1,0,0,0,0,0,?PlayersPublishLeaveGame@@YGXH@Z,0,menu
 game,PreBattleFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?PreBattleFrame@@YGXXZ,0,network
 game,QuirksFlipFirstSim,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksFlipFirstSim@@YG_NPAUQuirks@@@Z,0,test-only

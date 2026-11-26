@@ -494,6 +494,7 @@ void __stdcall CalcRadarViewportRect(int* param_1)
 }
 
 #include "../harness/harness_events.h"
+#include "../harness/display_hook.h"
 
 static void HarnessRadarMapped(void)
 {
@@ -556,6 +557,7 @@ void UpdateRadarMapped()
                 dst++;
             }
         }
+        DlNote(DL_WRITTEN, g_game->mappedSurface);
         g_game->timer.word.flags.pending = 1;
     }
 }

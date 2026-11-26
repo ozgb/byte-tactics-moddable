@@ -4913,7 +4913,7 @@ void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, 
     unsigned tick = GameU32(GAME_TICK);
     int list = s_displayAll;
     for (unsigned i = 0; i < s_frameCount; i++) {
-        if (s_frameTicks[i] == tick)
+        if (s_frameTicks[i] >= tick)
             list = 1;
     }
     if (s_displayTickLine != 0) {

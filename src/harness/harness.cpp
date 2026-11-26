@@ -45,6 +45,7 @@
 #include "../files/files_api.h"
 #include "../debug/debug_lib.h"
 #include "harness.h"
+#include "display_log.h"
 #include "replay.h"
 #include "../ai/pathfind_hpa.h"
 #include "../ai/ai_idle.h"
@@ -129,6 +130,7 @@ static const char* const s_recordPhaseNames[9] = { "net", "units", "projectiles"
                                                    "wind", "meteors", "sharing" };
 static int s_recordPhase = -1;
 static const char* s_eventPhases[SIM_EVENT_CAPACITY];
+static unsigned char s_eventOtherThread[SIM_EVENT_CAPACITY];
 static FILE* s_ui = nullptr;
 static char s_uiBuffer[4096];
 static int s_uiMute = 0;
@@ -138,6 +140,12 @@ static unsigned s_frameCount = 0;
 static unsigned s_frameNext = 0;
 static int s_frameLine = 0;
 static unsigned s_dumpTick = 0;
+static int s_displayAll = 0;
+static int s_displayTickLine = 0;
+static unsigned s_displayTick = 0;
+static int s_displayTickDone = 0;
+static unsigned s_displayFrames = 0;
+static unsigned s_displaySteps = 0;
 static char s_scenarioQuirks[512];
 static Quirks s_scenarioQuirkSet;
 static char s_switchQuirks[512];
@@ -1475,6 +1483,31 @@ static void ParseTestDump(char* cmdLine)
     }
 }
 
+static void ParseTestDisplay(char* cmdLine)
+{
+    for (char* p = cmdLine; *p != '\0'; p++) {
+        if ((p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "testdisplay", 11) == 0
+            && (p[12] == '\0' || isspace((unsigned char)p[12])) && (p == cmdLine || isspace((unsigned char)p[-1]))) {
+            char* q = p + 12;
+            while (*q == ' ' || *q == '\t')
+                q++;
+            char* end;
+            if (_strnicmp(q, "all", 3) == 0 && (q[3] == '\0' || isspace((unsigned char)q[3]))) {
+                s_displayAll = 1;
+                end = q + 3;
+            } else {
+                unsigned tick = strtoul(q, &end, 0);
+                if (end == q || (*end != '\0' && !isspace((unsigned char)*end)) || tick == 0)
+                    Fail("testmode: -testdisplay needs a tick number or all\n");
+                s_displayTickLine = 1;
+                s_displayTick = tick;
+            }
+            memset(p, ' ', end - p);
+            return;
+        }
+    }
+}
+
 static void ParseBlockScan(char* cmdLine)
 {
     for (char* p = cmdLine; *p != '\0'; p++) {
@@ -1637,6 +1670,7 @@ void HarnessInit(char* cmdLine)
         return;
     }
     ParseTestDump(cmdLine);
+    ParseTestDisplay(cmdLine);
 
     char* q = flag + 9;
     while (*q == ' ' || *q == '\t')
@@ -1783,6 +1817,7 @@ static void WriteTickRow();
 void HarnessAfterStep()
 {
     s_recordPhase = -1;
+    s_displaySteps++;
 #if BT_ACCESS_LOG
     AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PRESENTATION);
 #endif
@@ -1837,6 +1872,11 @@ void HarnessAfterStep()
     if (s_ui != nullptr)
         fclose(s_ui);
     s_ui = nullptr;
+    DlClose();
+    if (!gameOver && s_displayTickLine != 0 && !s_displayTickDone) {
+        sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_displayTick);
+        Fail(msg);
+    }
     if (!gameOver && s_frameNext < s_frameCount) {
         sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_frameTicks[s_frameNext]);
         Fail(msg);
@@ -4384,6 +4424,12 @@ void __stdcall HarnessSimEventSlot(unsigned slot)
         s_eventPhases[slot % SIM_EVENT_CAPACITY] = s_recordPhaseNames[s_recordPhase];
     else
         s_eventPhases[slot % SIM_EVENT_CAPACITY] = g_game->ticks == 0 ? "load" : "outside";
+    s_eventOtherThread[slot % SIM_EVENT_CAPACITY] = (unsigned char)DlOnOtherThread();
+}
+
+int HarnessSimEventOtherThread(unsigned slot)
+{
+    return s_eventOtherThread[slot % SIM_EVENT_CAPACITY];
 }
 
 const char* HarnessSimEventPhase(unsigned slot)
@@ -4478,6 +4524,37 @@ void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int wid
     }
 }
 
+const char* HarnessMapName()
+{
+    return s_map;
+}
+
+void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY)
+{
+    if (!HarnessTestMode() || DlIsOn() == 0)
+        return;
+    unsigned tick = GameU32(GAME_TICK);
+    int list = s_displayAll;
+    for (unsigned i = 0; i < s_frameCount; i++) {
+        if (s_frameTicks[i] == tick)
+            list = 1;
+    }
+    if (s_displayTickLine != 0) {
+        if (tick == s_displayTick) {
+            list = 1;
+            s_displayTickDone = 1;
+        } else if (tick > s_displayTick && !s_displayTickDone) {
+            char msg[100];
+            sprintf(msg, "testmode: tick %u is not the last tick of a frame\n", s_displayTick);
+            Fail(msg);
+            return;
+        }
+    }
+    s_displayFrames++;
+    DlFrameEnd(s_displayFrames, tick, s_displaySteps, palette, list, cursor, cursorX, cursorY);
+    s_displaySteps = 0;
+}
+
 void HarnessPhase(int phase)
 {
     if (!HarnessTestMode() || s_trace == NULL)
@@ -4524,6 +4601,7 @@ void HarnessPhase(int phase)
             fflush(s_events);
         if (s_ui != nullptr)
             fflush(s_ui);
+        DlFlush();
         if (s_dumpNow)
             fflush(s_dump);
     }
@@ -4606,6 +4684,7 @@ static void OpenTrace(unsigned controlWord)
         Fail("testmode: cannot write ui.txt\n");
     setvbuf(s_ui, s_uiBuffer, _IOFBF, sizeof s_uiBuffer);
     fprintf(s_ui, "bt-ui 1\n");
+    DlOpen(s_displayAll);
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",
             TRACE_FORMAT, commit, s_scenarioPath, s_gameSeed, s_crtSeed, s_viewSeed, controlWord);

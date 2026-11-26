@@ -23,6 +23,7 @@ void __stdcall HarnessSharePacket(const void* packet, int size);
 bool HarnessEventLogOpen();
 void __stdcall HarnessSimEventSlot(unsigned slot);
 const char* HarnessSimEventPhase(unsigned slot);
+int HarnessSimEventOtherThread(unsigned slot);
 void HarnessEventText(const char* text);
 void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
 void __stdcall HarnessUiOrder(unsigned char kind, int remove, const Unit* unit, const Unit* target, const int* pos, int typeId, int amount);
@@ -31,6 +32,10 @@ void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit);
 void __stdcall HarnessUiGroup(const char* what, int group);
 void __stdcall HarnessUiCommand(const OrdersGroupCommand* command);
 struct tagPALETTEENTRY;
+struct DlPicture;
 void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int width, int height, const tagPALETTEENTRY* entries);
+
+const char* HarnessMapName();
+void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY);
 
 #endif

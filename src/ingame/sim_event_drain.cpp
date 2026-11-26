@@ -17,6 +17,7 @@
 #include "radar.h"
 #include "../util/engine_services.h"
 #include "../harness/harness.h"
+#include "../harness/display_game.h"
 #include "../units/unit.h"
 #include "../util/vec3.h"
 
@@ -370,6 +371,7 @@ void DrainSimEvents()
             continue;
         if (logging)
             EventLogRecord(q, e, slot);
+        DisplayLogMute mute(HarnessSimEventOtherThread(slot));
         switch (e.kind) {
         case SIM_EVENT_UNIT_SPEECH:
             DrainUnitSpeech(e);

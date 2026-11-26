@@ -111,6 +111,18 @@ with `input` lines runs at one step per frame even under `--steps-per-frame`.
 
 `--check` makes the digest of each run's `events.txt` and compares it line by line with `reference/events/<scenario>.txt` when that file exists, and `--traces` writes the digests of the logs the reference branch wrote into `reference/events/` (the stored files are digests, as the traces are: a tick, a phase, a record count and a hash for each run of records, and after the last run of each tick a `<tick> tick <count> <ordered> <set>` line that leaves the phase out and keeps the order only for the kinds whose order counts (`bt-event-digest 2`); format in [docs/events-log.md](../docs/events-log.md)). When a digest differs, the check plays the reference build of the stored traces and the exe, and names the first differing record (`tools/tracediff.py --events`). With `--end-of-tick` the digests are compared on their `tick` lines alone, and the record named is the first one that differs under the same rule (`tools/tracediff.py --events --end-of-tick`).
 
+## Display logs
+
+`--check` compares each run's `display.txt`, the digest of every frame it drew, line by line with
+`reference/display/<scenario>.txt` and names the first frame that differs, and for a scenario with a `frames` line it
+compares the run's `displaylist.txt` with `reference/displaylists/<scenario>.txt` and names the first frame and item that
+differ (format and meaning in [docs/display-log.md](../docs/display-log.md)). `--tier` compares the tier's digests and
+the full `--check` all of them. When a digest differs at a frame no stored list holds, the check plays the reference
+build of the stored traces and the exe with `-testdisplay <tick>` and names the first differing item
+(`tools/tracediff.py --display`). A stored file with no scenario fails, and a scenario with no stored digest is only
+counted. `--traces` copies the files the reference branch wrote into `reference/display/` and
+`reference/displaylists/`.
+
 ## Traces
 
 In test mode the exe writes `trace.txt` in its working directory: a hash of the
@@ -484,8 +496,8 @@ works with `--tier`, `--steps-per-frame` and `--parallel`, and not with `--poiso
 
 The gate of a pull request is the tier (`--tier`), for every change the gate applies to, the state block
 layout, the host interface and platform code included. The full `--check` stays the gate only of a pull
-request that regenerates the stored reference data: `reference/` traces, sounds, UI logs, frames or
-saves, or the trace format (`data/trace_schema.json`, `tools/traceschema.py`), since that data is
+request that regenerates the stored reference data: `reference/` traces, sounds, UI logs, frames,
+saves or display logs, or the trace format (`data/trace_schema.json`, `tools/traceschema.py`), since that data is
 produced for every scenario anyway. The body says which tier it ran.
 
 The play-tests (`tools/playtest.py` smoke, full, mp and music) are not part of a pull request's gate.

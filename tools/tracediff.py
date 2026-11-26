@@ -5,6 +5,8 @@
     uv run tools/tracediff.py --dumps a/dump.txt b/dump.txt --at 900 units
     uv run tools/tracediff.py A/TotalA.exe B/TotalA.exe --scenario reference/scenarios/skirmish2.txt --events
     uv run tools/tracediff.py --event-logs a/events.txt b/events.txt
+    uv run tools/tracediff.py A/TotalA.exe B/TotalA.exe --scenario reference/scenarios/skirmish2.txt --display
+    uv run tools/tracediff.py --display-lists a/displaylist.txt b/displaylist.txt
 
 Runs both exes on the scenario under Wine (tools/playtest.py --testmode), compares
 the trace.txt each writes and reports the first tick and phase whose hashes differ.
@@ -30,6 +32,8 @@ tables of `world`, in one hash. Its dump block is the `tick` block. `--end-of-ti
 compares only the `tick` rows and reports the first tick whose `tick` row differs, as phase `tick`.
 
 With `--events` or `--event-logs`, `--end-of-tick` compares the two sim event logs tick by tick under the rule of docs/events-log.md ("What the check compares"): it names the first tick whose `tick` line of the event digest differs and, in it, the first record that the logs hold a different number of times, or else the first pair of kinds whose projection differs and the first record of that projection that differs, with both records and their line numbers.
+
+With `--display`, both exes play the scenario and their display digests (display.txt, docs/display-log.md) are compared; at the first frame that differs both play again with `-testdisplay <tick>` (`-testdisplay all` for a frame of tick 0, such as a loading frame; `--display-tick TICK` names the tick and skips the first pair of runs) and the first item of that frame's display lists that differs is printed, with both lines and their line numbers. `--display-lists` compares two displaylist.txt files without running. `--end-of-tick` compares frame numbers, ticks, counts and `set` of the digests, and the items of a frame as sorted `<layer> <item>` lines.
 
 `--traces` compares existing trace files without running, and reports the first
 divergence only. `--dumps` diffs the phase of two existing dump files.
@@ -64,6 +68,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import NamedTuple
 
+import displaylog
 import eventdigest
 from traceschema import TRACE_FORMAT
 
@@ -400,13 +405,14 @@ def scenario_load(scenario: Path) -> str | None:
 def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
          poison: bool = False, blockscan: int = 0, env: dict[str, str] | None = None,
          put: dict[str, Path] | None = None, collect: tuple[str, ...] = (), xserver: bool = False,
-         blockscan_verify: bool = False,
+         blockscan_verify: bool = False, testdisplay: str | None = None,
          started: Callable[[subprocess.Popen], None] | None = None) -> Path:
     """Run the exe on the scenario with playtest.py, in `env` (default: this process's); the run's directory.
 
     `put` maps a path in the run's game copy to a file placed there before the exe starts, and each path of
     `collect` that the game writes in its copy is kept at the same path in the run's directory. An `xserver`
     run gives the game a display: the reference build has no headless host and exits at once without one.
+    `testdisplay` (a tick, or `all`) adds that frame (every frame) to the run's displaylist.txt.
     `started` is called with the playtest.py process as soon as it starts, so that a caller can stop it.
     """
     cmd = [sys.executable, str(ROOT / "tools/playtest.py"), "--exe", str(exe), "--testmode", str(scenario)]
@@ -418,6 +424,8 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
         cmd += ["--game-dir", game_dir]
     if dump is not None:
         cmd += ["--testdump", str(dump)]
+    if testdisplay is not None:
+        cmd += ["--testdisplay", testdisplay]
     if timeout is not None:
         cmd += ["--testmode-timeout", f"{timeout:g}"]
     if poison:
@@ -462,10 +470,12 @@ def save_put(saved: Path, loader: str, saver: str) -> dict[str, Path]:
 
 
 def play_loading(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, timeout: float | None = None,
-                 poison: bool = False, xserver: bool = False, collect: tuple[str, ...] = ()) -> Path:
+                 poison: bool = False, xserver: bool = False, collect: tuple[str, ...] = (), testdisplay: str | None = None) -> Path:
     """`play`, but a scenario with a `load` line first plays the scenario it names, from the same directory, and gets its save."""
     saver = scenario_load(scenario)
-    extra = {"collect": collect} if collect else {}
+    extra: dict = {"collect": collect} if collect else {}
+    if testdisplay is not None:
+        extra["testdisplay"] = testdisplay
     if saver is None:
         return play(exe, scenario, game_dir, dump, timeout, poison, xserver=xserver, **extra)
     saver_path = scenario.parent / f"{saver}.txt"
@@ -607,6 +617,53 @@ def compare_events(args: argparse.Namespace) -> int:
     return print_event_difference(logs[0], logs[1], args.end_of_tick)
 
 
+def print_display_difference(a: str, b: str, end_of_tick: bool = False) -> int:
+    """Print the first frame and item where two display lists differ (or that they are equal); 1 when they differ."""
+    diff = displaylog.list_difference(a, b, end_of_tick)
+    print(diff or f"display lists {'equal up to the order that does not count' if end_of_tick else 'identical'} ({len(a.splitlines())} and {len(b.splitlines())} lines)")
+    return 1 if diff else 0
+
+
+def testdisplay_for(tick: int) -> str:
+    """The -testdisplay argument that lists the frames of `tick`: `all` for tick 0, which the harness takes as no tick."""
+    return "all" if tick == 0 else str(tick)
+
+
+def compare_display(args: argparse.Namespace) -> int:
+    """Play both exes on the scenario, find the first frame whose display digest differs, play both again with `-testdisplay` at its tick and print the first item that differs."""
+    exes = [Path(e).resolve() for e in args.exe]
+    scenarios = [Path(s).resolve() for s in args.scenario]
+    scenarios *= 2 if len(scenarios) == 1 else 1
+    poison = [False, args.poison_b]
+    xserver = [args.reference == "a", args.reference == "b"]
+    tick = args.display_tick
+    differing = False
+    if tick is None:
+        runs = [play_loading(e, s, args.game_dir, None, None, p, x) for e, s, p, x in zip(exes, scenarios, poison, xserver)]
+        digests = [(run / "display.txt").read_text() if (run / "display.txt").is_file() else None for run in runs]
+        for side, digest in zip("ab", digests):
+            if digest is None:
+                raise Error(f"the run of {side} wrote no display.txt")
+        diff = displaylog.digest_difference(digests[0], digests[1], args.end_of_tick)
+        frame = displaylog.digest_frame(digests[0], digests[1], args.end_of_tick)
+        if diff is None:
+            print(f"display digests identical ({len(digests[0].splitlines()) - 2} frames)")
+            return 0
+        print(diff)
+        differing = True
+        if frame is None:
+            return 1
+        tick = frame[1]
+    runs = [play_loading(e, s, args.game_dir, None, None, p, x, testdisplay=testdisplay_for(tick))
+            for e, s, p, x in zip(exes, scenarios, poison, xserver)]
+    lists = [(run / "displaylist.txt").read_text() if (run / "displaylist.txt").is_file() else None for run in runs]
+    for side, text in zip("ab", lists):
+        if text is None:
+            raise Error(f"the run of {side} wrote no displaylist.txt")
+    print(f"display lists at tick {tick}:")
+    return print_display_difference(lists[0], lists[1], args.end_of_tick) or int(differing)
+
+
 def compare(args: argparse.Namespace) -> int:
     exes = [Path(e).resolve() for e in args.exe]
     scenarios = [Path(s).resolve() for s in args.scenario]
@@ -649,17 +706,27 @@ def main() -> int:
     ap.add_argument("--events", action="store_true",
                     help="with two exes: compare their sim event logs (docs/events-log.md) and name the first differing record")
     ap.add_argument("--event-logs", nargs=2, metavar=("A", "B"), help="compare two events.txt files, without running")
+    ap.add_argument("--display", action="store_true",
+                    help="with two exes: compare their display digests and lists (docs/display-log.md) and name the first differing item")
+    ap.add_argument("--display-tick", type=int, metavar="TICK", help="--display: play with -testdisplay TICK at once, without the digest run")
+    ap.add_argument("--display-lists", nargs=2, metavar=("A", "B"), help="compare two displaylist.txt files, without running")
     ap.add_argument("--traces", nargs=2, metavar=("A", "B"), help="compare two trace.txt files, without running")
     ap.add_argument("--dumps", nargs=2, metavar=("A", "B"), help="diff two dump.txt files, with --at")
     ap.add_argument("--at", nargs=2, metavar=("TICK", "PHASE"), help="--dumps: the tick and phase to diff")
     args = ap.parse_args()
-    modes = [bool(args.traces), bool(args.dumps), bool(args.exe), bool(args.event_logs)]
+    modes = [bool(args.traces), bool(args.dumps), bool(args.exe), bool(args.event_logs), bool(args.display_lists)]
     if sum(modes) != 1:
-        ap.error("give two exes with --scenario, or --traces A B, or --dumps A B --at TICK PHASE, or --event-logs A B")
+        ap.error("give two exes with --scenario, or --traces A B, or --dumps A B --at TICK PHASE, or --event-logs A B, or --display-lists A B")
     if args.end_of_tick and args.dumps:
-        ap.error("--end-of-tick applies to two exes, to --traces and to --event-logs")
+        ap.error("--end-of-tick applies to two exes, to --traces, to --event-logs and to --display-lists")
     if args.events and not args.exe:
         ap.error("--events needs two exes and --scenario")
+    if args.display and not args.exe:
+        ap.error("--display needs two exes and --scenario")
+    if args.events and args.display:
+        ap.error("--events and --display are two comparisons: give one")
+    if args.display_tick is not None and not args.display:
+        ap.error("--display-tick needs --display")
     if args.exe and (len(args.exe) != 2 or not args.scenario):
         ap.error("two exes and --scenario are required")
     if args.exe and len(args.scenario) > 2:
@@ -685,6 +752,8 @@ def main() -> int:
             return 1
         if args.event_logs:
             return print_event_difference(*(Path(p).read_text() for p in args.event_logs), args.end_of_tick)
+        if args.display_lists:
+            return print_display_difference(*(Path(p).read_text() for p in args.display_lists), args.end_of_tick)
         if args.dumps:
             maps = load_maps(args.reference_ref) if args.reference else None
             diffs = diff_dumps(Path(args.dumps[0]), Path(args.dumps[1]), int(args.at[0]), args.at[1],
@@ -693,6 +762,8 @@ def main() -> int:
             print(f"  phase function: {describe_phase(args.at[1])}")
             print_diff(diffs)
             return 1 if diffs else 0
+        if args.display:
+            return compare_display(args)
         return compare_events(args) if args.events else compare(args)
     except (Error, OSError) as e:
         print(f"tracediff: {e}", file=sys.stderr)

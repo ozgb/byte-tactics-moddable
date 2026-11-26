@@ -41,7 +41,6 @@ int __stdcall FindGadgetIndexBySubstring(int value, char* name);
 #include "../gui/gui.h"
 void __stdcall SetCursorAnimation(void* a, void* b);
 void __stdcall SetCloseHandler(void* a, int b);
-int GetTicks();
 #include "../gui/keyboard.h"
 #include "../gui/keyboard.h"
 #include "build_placement.h"
@@ -204,8 +203,7 @@ void BattleFrame(void)
             int dz = g_game->boxStartZ - g_game->boxEndZ;
             dx = abs(dx);
             dz = abs(dz);
-            int now = GetTicks();
-            if (g_game->boxStartTick + 0x19 > now && dx < 0x20 && dz < 0x20) {
+            if (g_game->boxStartTick + 0x19 > mouse.scaledTick && dx < 0x20 && dz < 0x20) {
                 HandleLeftClick(&mouse);
             } else if (SelectUnitsInBox(&mouse) == 0) {
                 ClearSelection();
@@ -219,7 +217,7 @@ void BattleFrame(void)
     } else if (mouse.msg == 0x201) {
         if ((flags & 2) != 0) {
             g_game->inputFlags = flags | 8;
-            g_game->boxStartTick = GetTicks();
+            g_game->boxStartTick = mouse.scaledTick;
             g_game->boxStartX = g_game->xWhole;
             g_game->boxStartHeight = g_game->yWhole;
             g_game->boxStartZ = g_game->zWhole;

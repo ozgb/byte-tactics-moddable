@@ -521,7 +521,6 @@ void HandleGameKey(void)
             int r = FindOrderByType(*it, order);
             if (r != 0) {
                 found = 1;
-                HarnessUiCancel(order.index, (Unit*)*it);
                 OrdersPublishCancel(SCHED_ENGINE, (Unit*)*it, order.index);
             }
         }

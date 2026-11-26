@@ -165,6 +165,7 @@ CONTENTS = [
     ("dir", "reference/sounds", "the stored sound logs"),
     ("dir", "reference/frames", "the stored frames"),
     ("dir", "reference/ui", "the stored UI logs"),
+    ("dir", "reference/commands", "the stored interface commands"),
     ("dir", "reference/events", "the stored sim event digests"),
     ("dir", "reference/display", "the stored display digests"),
     ("dir", "reference/displaylists", "the stored display lists of the frames with stored pixels"),

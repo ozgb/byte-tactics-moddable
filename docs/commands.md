@@ -29,26 +29,78 @@ never repeats that.
 
 ## 2. The command log
 
-A test-mode run writes `commands.txt` beside `trace.txt`. It is a diagnostic and an input a core can be played from,
-not a verdict, and no stored copy of it exists. Its first line is
+A test-mode run writes `commands.txt` beside `trace.txt`. It is a diagnostic and an input a core can be played from;
+its scripted lines are not a verdict and have no stored copy, and its interface records are judged in their decoded
+form (section 2.1). Its first line is
 
-    bt-commands 1
+    bt-commands 2
 
-and every later line is one scripted `spawn`, `order` or `console` line, in the order the lines were delivered:
+and its second, written before the first command, is
+
+    units <offset> <stride>
+
+the offset of unit 0 of the unit table in the state block and the size of a unit record, both in decimal: what a
+reader needs to turn a unit ref of a payload into a unit index. Every later line is one command, in the order the
+commands were delivered: a scripted `spawn`, `order` or `console` line, or one event the interface published:
 
     <tick> <key> <line> <count>[ <KIND> <hex>]...
 
-- `tick` is the tick the command precedes (the line's tick).
-- `key` is `spawn`, `order` or `console`.
-- `line` is the line number of the scenario file.
+- `tick` is the tick the command precedes. For a scripted line it is the line's tick. The interface acts after a
+  tick's simulation has finished (`docs/ui-log.md`, "Delivery"), so its event of the UI log's tick `N` precedes, and
+  carries, tick `N + 1`, and comes before the scripted lines of tick `N + 1` in the file.
+- `key` is `spawn`, `order`, `console` or `interface`.
+- `line` is the line number of the scenario file, or `-` for the interface.
 - `count` is the number of events the command published to the engine's outbox. Only outermost publications count:
-  an event that a handler publishes while another event is being delivered is not counted and not listed.
+  an event that a handler publishes while another event is being delivered is not counted and not listed. An
+  interface line is one event, so its `count` is 1.
 - After `count`, one ` <KIND> <hex>` pair for each counted event, in publication order: `KIND` is the enum name of
   the event's kind in its interface header (`PLAYERS_TRANSFER`), and `hex` is the event's payload bytes, all of them
   from its `kind` field on, in lowercase hexadecimal with no separators, each integer in the machine's little-endian
   byte order. A kind of a module whose events have no section of the trace is written `KIND_<n>` instead, its number
   in decimal: PATHFINDING_SET_SEARCH is `KIND_448`.
-- `input` lines get no line. A command that publishes nothing is a line with `count` 0 and no pairs.
+- `input` lines get no line of their own: what the interface makes of them is its records. A command that publishes
+  nothing is a line with `count` 0 and no pairs.
+- The interface's records are every event published to the engine's outbox after a tick's simulation has finished
+  and before the next tick starts, outside the scripted lines: section 8 lists them. After the last tick nothing is
+  recorded.
+
+Format 1 had neither the `units` line nor the interface's records.
+
+### 2.1 The interface's records, decoded
+
+A payload holds a unit as a ref, its offset in the state block, which another build with another block layout does
+not share. What is judged is therefore each interface record decoded, and that is what `reference/commands/` stores
+for every scenario with `input` lines: `reference/commands/<scenario>.txt`, written by the reference build, which has
+no state block and writes the same form from its own records of the interface's clicks. Its first line is
+
+    bt-interface 1
+
+and every later line is one interface record of `commands.txt`, in the file's order:
+
+    <tick> <KIND>[ <field> <value>]...
+
+- `tick` and `KIND` are the record's.
+- The fields are those of the kind's entry in `data/trace_schema.json` (the `kinds` of the module's events section),
+  in the entry's order, each at the offset that the sizes of the fields before it add up to: every field but `kind`
+  that lies wholly inside the payload's bytes (an `outcome` field never does: the module writes it, the publisher
+  does not).
+- A `scalar` field is the little-endian signed integer of its size, in decimal. A `ref` field of target `unit` is
+  `-` when it is 0, the unit index `(ref - offset) / stride` when the ref is a unit of the table (by the `units`
+  line), and `heap` otherwise; a `ref` of any other target is `-` or `heap`. A `bytes` field is its bytes in
+  lowercase hexadecimal.
+- A kind with no entry in the schema is `<tick> KIND_<n> payload <hex>`.
+
+A group command, for example, reads
+
+    23 ORDERS_GROUP_COMMAND unit 1 mode 3 type 0 queue 0 target - hasPos 1 pos 000086020000010000003601 params 0000000000000000 units 0100...
+
+where `unit` is the local player's first unit, bit `i` of `units` is the unit `unit + i`, and `pos` is three 16.16
+fixed-point numbers (646, 1, 310).
+
+`tools/interfacelog.py` decodes a `commands.txt`. `tools/reference.py --check` decodes each run's file and compares
+it, line by line, with the stored one, naming the first record that differs. A scenario with `input` lines must have
+a stored file, a scenario without them must have none and its run must have no interface record, and a stored file
+with no scenario fails.
 
 ## 3. Reading a console line
 

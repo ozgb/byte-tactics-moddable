@@ -1622,6 +1622,8 @@ delivery to the same subscriber. No inbox holds an effect when the tick ends.
 | engine | `PLAYERS_DEACTIVATE_CONDITIONS` | players | synchronous |
 | engine | `PLAYERS_SET_CHEATS` | players | synchronous |
 | engine | `PLAYERS_LEAVE_GAME` | players | synchronous |
+| engine | `PLAYERS_SET_CONTROL` | players | synchronous |
+| engine | `PLAYERS_SET_VIEW` | players | synchronous |
 | players | `PLAYERS_EFFECT_KILL_UNIT` | units | synchronous |
 | players | `PLAYERS_EFFECT_SEND_UNIT` | units | synchronous |
 | players | `PLAYERS_EFFECT_CAPTURE_UNIT` | units | synchronous |

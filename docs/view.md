@@ -40,8 +40,9 @@ section 8.1). They are equal from the match's start. The console's `control` com
 | `viewer` | `game.playerIndex` | Whose sight decides what is drawn and heard; whose economy the resource bars show; whose units have health bars, group numbers and the unit panel's own-only lines. |
 | `controller` | `game.localPlayer` | Whose units the selection and the orders act on; whose unit count the status panel shows; whose row the score panel highlights; whose notices (`SIM_EVENT_WATCH_PROMPT`, `SIM_EVENT_WATCH_MODE_NOTICE`, `SIM_EVENT_CD_ACTIVITY`) reach the presentation. |
 
-The simulation also reads both fields (line of sight, unit flags, which messages a command raises). How these fields are
-written is #1117's to decide. While `view` has made them differ, 3.1c draws the viewer's units with the controller's
+The simulation also reads both fields (line of sight, unit flags, which messages a command raises), so both are game
+state: `control` and `view` publish PLAYERS_SET_CONTROL and PLAYERS_SET_VIEW, and players writes the fields when it
+applies them (`docs/players-interface.md`). While `view` has made them differ, 3.1c draws the viewer's units with the controller's
 input, so the viewer's own units cannot be selected: `VIEW_RELATION_CONTROLLED` is clear on them.
 
 ## The world

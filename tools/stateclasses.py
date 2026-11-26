@@ -246,7 +246,6 @@ MATCH_SETUP = "match setup before the first tick"
 SELECTION = "the selection bit, view state masked out of the trace"
 BUILD_MENU_PAGE = "a crossing left: the build-menu page bits of Unit::flags (0x400000 and the page), still hashed, #1115"
 BATTLE_ROOM = "battle room setup, outside a match"
-CONSOLE_PLAYER = "a crossing left: the console's control and view switch, until they are events (#1117)"
 POSTER = "a crossing left: the poster key turns these bits off and back on around drawing the whole map (docs/state.md)"
 PRESENTATION_SIM_WRITES = [
     ("HandleNewGameClick", "Game::difficulty", MATCH_SETUP),
@@ -293,9 +292,6 @@ PRESENTATION_SIM_WRITES = [
     ("CompactActivePlayerSlots", "Player::active", BATTLE_ROOM),
     ("SwapPlayerSlots", "Player::active", BATTLE_ROOM),
     ("SwapPlayerSlots", "Player::index", BATTLE_ROOM),
-    ("CmdControl", "Game::localPlayer", CONSOLE_PLAYER),
-    ("CmdControl", "Game::playerIndex", CONSOLE_PLAYER),
-    ("CmdView", "Game::playerIndex", CONSOLE_PLAYER),
     ("WriteScreenshot", "Game::mapFlags", POSTER),
     ("WriteScreenshot", "Game::uiOptionFlags", "clears and restores bit 6, the clock (a view bit), by assignment, "
                                                "which the mask cannot bound"),

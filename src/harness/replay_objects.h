@@ -74,6 +74,7 @@ public:
     unsigned Name(unsigned kind, const void* p);
     void* Pointer(unsigned kind, unsigned ordinal) const;
     void Bind(unsigned kind, unsigned ordinal, void* p);
+    void Forget(const void* p);
     unsigned Count(unsigned kind) const { return count[kind]; }
 
 private:

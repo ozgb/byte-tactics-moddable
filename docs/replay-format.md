@@ -71,6 +71,7 @@ call and has no line of its own. The lines of a call, indented by two spaces, in
 | `c <handle>#<n>.<Method> <arguments> [= <result>]` | indented by four spaces, right after an `i` line and before its `o` lines: one call the import made on a callback object it was given, in call order (see Callbacks) |
 | `c <handle>#<n>.<Method> <arguments> [= <result>]` | indented by two spaces, after the `i` lines and before the closing `o` lines: one call the module made during the slot on a callback object it holds or was given, in call order (see Callbacks, "A callback held in state") |
 | `o <name> <value>` | right after an `i` line: a value the import wrote through a pointer argument (`o dst "text"`, `o dst x:0102`) or reached through its result (`o weapondef#17.flags 0x00000001`, `o Cell#1.metal 12`) |
+| `b <name> <value>` | right after an `i` line, before that import's `o` line of the same name: the value a field of the slot's write set had before the import, when the slot wrote it earlier in the call and the import then changed it (see An object field that an import changes) |
 | `w <field> <value>` | a field of the slot's write set that differs from the last known value after the call |
 | `d cache <size> <cursor>`, then `d block <offset> <size> <owner>` | a call of `weapons` that changed the debris cache: its cursor after the call, and each block whose header the call wrote (see The start state of the debris cache) |
 | `o <name> <value>` | last in the call: a value the slot wrote through its own pointer argument, or `o result <value>` for its result |
@@ -1274,10 +1275,40 @@ last gave:
 ```
 
 The replayer's answer to the import stores the value in the field before the module goes on, as for the fields of a service (`A service that leaves a block field behind`).
-A field of the write set never has the line, so a field the slot computes is compared by its `w` line and never set from the recording. The replayer stops with an error on a
-line of this form that it cannot place (one that names no field of a known kind, or a field outside the slot's read set or inside its write set), so a recording that broke that
-rule fails rather than going uncompared. An object the import frees (`services.SimFree`) is not walked until `services.SimAlloc` hands its address out again; the list of freed
-addresses has no limit. The walk runs after every import, so a subsystem has the lines only when its annotation asks for them with a reason, `"import_objects": "<reason>"` (movement has it); `replayschema.py --check` fails for one with no reason. The other subsystems record as before: their slots read such fields again from the `r` lines of their next call, and a slot whose read set has none has no lines. The self-test replays the
+An import can change a field of the write set too: orders' `RunOrders` calls `movement.NewApproachRadius`, whose MOVEMENT_EFFECT_ORDER_FLAGS runs orders' own `Apply` on a
+synchronous route and sets the order's `subFlags` inside the import, and the unit that `units.CreateUnit` makes has its `flags` before orders writes them. Before each import the
+recorder saves the bytes of every field of the write set of every object reached from the same roots as the walk after it (the slot's roots and the objects the import's
+arguments name), and after the import it writes an `o` line for each such field whose bytes changed:
+
+```
+  i movement.NewApproachRadius Order#4 45878325 19689825 16 = ApproachRadius#1
+  o Order#4.subFlags 128
+```
+
+A field of the write set that the import left alone has no `o` line, so what the slot wrote stays for its `w` lines to compare. The one exception is a field the recording has
+never given, of an object that the walk reaches for the first time and that no `services.SimAlloc` of the call allocated (the unit `units.CreateUnit` makes, once the next
+import names it): the replayer has no value for it, so the recorder gives it once, as for a field of the read set. A block that the call's own `SimAlloc` allocated is the
+module's, and its fields are what the module writes, so they have `o` lines only when an import changes them.
+
+When the slot wrote a field of its write set earlier in the call and the import then changed it, its value before the import differs from what the recording last gave. The
+recorder writes that value on a `b <name> <value>` line before the import's `o` lines, and the replayer compares the module's value with it before it stores the `o` line's
+value. For a field with no `b` line the replayer compares the module's value with the last known one, so a wrong write that an import then overwrites still fails
+(movement's `UpdateMotion` sets `PathOrder#4.posY` between two `scripts.GetPiecePosition` calls, `orders-air`):
+
+```
+  i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
+  o PathOrder#4.posY 65536
+```
+
+The line is also what the recording knows of the field, so the slot's `w` lines compare what it writes after the import, and a field the slot computes is never set from the
+recording unless an import changed it. The replayer stops with an error on a line of this form that it cannot place (one that names no field of a known kind, or a field the
+slot neither reads nor writes), so a recording that broke that rule fails rather than going uncompared. An object the import frees (`services.SimFree`) is not walked until `services.SimAlloc` hands its address out again; the list of freed
+addresses has no limit. The walk runs after every import, so a subsystem has the lines only when its annotation asks for them with a reason, `"import_objects": "<reason>"` (movement and orders have it); `replayschema.py --check` fails for one with no reason.
+A subsystem that frees an object and allocates the next at the same address also gives `"fresh_allocations": "<reason>"` (orders has it): the recorder forgets the names other
+objects held at the block's first address before it names the block of `services.SimAlloc`, and the replayer forgets them before it binds the block, so a new order is
+`Order#5`, not the name of the order freed there. Only the first address is forgotten: a `PathOrderAttach` named on its own at an offset inside the freed block (as
+`units.UnitRefInit`'s argument) keeps its name, in the recorder and the replayer alike. `replayschema.py --check` fails for one with no reason or on a subsystem with no `import_objects`. The other subsystems record as before: their slots read such fields again from the `r` lines of their next call, and a slot whose read set has none has no lines. The self-test replays the
 form on a fixture (`an object field that an import changes`).
 
 ## The schema and its annotations
@@ -1328,7 +1359,9 @@ from the layout), and the export refuses a copy that names any other source name
   name of the file's holder and the offset into the file (see Load inputs, "A pointer to load-time data"). `unitid` is a 16-bit unit id (`weapon0TargetX` holds either an x position or
   a unit id; `weapon0TargetUnit` is the same bytes read as an id) that the walker follows to `Unit#<id>`, but only when its `when`
   field (`weapon0TargetZ`) equals the given value (-32768, the sentinel that says the slot holds a unit); it is never written
-  as a line, and the unit it leads to records only the fields of its `reach`. A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
+  as a line, and the unit it leads to records only the fields of its `reach`. Its `target` may be another kind with a table: an order's `type`, the
+  index of the unit type a build order makes, is `mobileBuildDef` (and three more, one for each build kind of the order's `when`), a `unitid` over `UnitDef`
+  with `"size": 4`, since the member is an `int` and the id is its low 16 bits, so a mobile build order of type 112 leads to `UnitDef#112`, recorded with the fields of the `reach` (`orders-build-patrol`). A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
   are recorded as `r weapondef#17.flags` lines. A field may name a `member` of its type that is not its own name
   (`weapons[1].aimTarget`, `pos.x`), so that an array element or a part of a `Vec3` is a field.
 - `reach`: a list of `Kind.field` names with an explicit `depth` (the number of objects from the root to the farthest, at most 2),
@@ -1374,7 +1407,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
 | `struct` (`dir` in, out or inout) | a pointer to a value kind, `nullable` when in or inout | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local); a `Vec3` out of an import is the `o <name> (x,y,z)` line a `vec3` out argument writes, only when `when` holds, and its stub writes it (`weapons` imports `targeting.GetWeaponTargetPos`) |
-| `event` (`events`, `size`, optional `unrecorded` and `refs`) | a pointer to a subsystem's event header and a `size` argument | the lines of the payload struct of the event's kind (see Event arguments) |
+| `event` (`events`, `size`, optional `unrecorded` and `refs`) | a pointer to a subsystem's event header, or to one of its payload structs (`OrdersGroupCommand*`), and a `size` argument | the lines of the payload struct of the event's kind (see Event arguments) |
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
@@ -1706,6 +1739,13 @@ scripts:
 - `CreateObjectState` is a recorded slot that no committed recording calls: it builds the model state of a unit type that has no script, and every unit type that the scenarios checked (`orders-factory`, `orders-air`, `mission-victory`, `console-units`) create has one.
 - A script that sets a unit value and reads it back in the same call (the factory's opcode pair on value 18, the yard): the scheduler runs the handler of the event before it returns, and the handler writes `Unit.cobStateFlags`, which the script then reads, so the replay would take the other branch. No form records a block field that a handler of an import wrote, so no recorded window holds such a call: the recordings avoid the tick at which `orders-factory` finishes a unit (793). An import line that names a block field its handler wrote is the form that would record it.
 - The paths of a script that no recorded window reaches: the sound-and-smoke effect (smoke and thrust, with the `los_radar.IsUnitVisibleToPlayer` import), the attach and drop of a transport, the angle, distance and ground height cases of a unit value read (`map.GetGroundHeight`), the explosion of a piece (weapons' EXPLODE_PIECE, which no scripts window reaches), and a start with a callback by its index.
+orders:
+
+- `Apply` of ADD with a queue, QUEUE_BUILD, STOP, BE_CARRIED, ATTACKED, PARALYZE, COMMAND and CANCEL: the recorded windows publish ADD once and STATUS_FLAGS, and the other kinds come from the user interface, ai, weapons and units outside them (an order added through the interface is `ExpandGroupCommand`, recorded).
+- `GetOrderFlags` and `MissionTypeFromName` at top level: ai and the interface call them outside the recorded windows (`GetOrderType` is called once, in `units-transport`).
+- The constructor that loads an order from a saved game, and the helpers that resolve its kind and unit type by name: it runs only when a saved game loads, which is load class. Its rows go under the same name as the other constructors of `Order`, so the schema's rules on the saved record say it, and the slots' function lists leave its helpers out.
+- A build order of the unit type with index 0: the `unitid` fields that lead the walk from an order's `type` to its `UnitDef` follow no id of 0, as for a unit id, so `UnitDef#0` would have no `r` lines, and the walk also skips an id at or past the
+count of the definition table. No recorded window builds either.
 
 ## Replaying
 
@@ -1926,6 +1966,25 @@ The recordings of movement 5.0, which the modern build runs as native code in ev
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 1 UnitMotion#2.velocityX tests/replay/movement/orders-build-patrol.txt
+```
+
+The recordings of orders 6.2, which the modern build runs as native code in every mode (it has no WASM module yet), are windows of 6 to 23 ticks, each of 90 to 150 KB:
+`orders-guard-attacked` (ticks 8 to 30: `RunOrders` and `RunSecondaryOrders` 130 each, `ExpandGroupCommand` 3, with `targeting.ChooseWeapon` and `weapons.WeaponCanReachUnit`),
+`orders-move-attack` (ticks 98 to 106: 18 each, `ExpandGroupCommand` and an `Apply` of ADD, with `weapons.GetWeaponRange`), `orders-build-patrol` (ticks 148 to 162: 45 each, a
+mobile build and the repair patrol after it, with `map.UnitsInRange`, `units.CanRepair`, `units.AddBuildProgress` and `scripts.GetNanoPiecePosition`), `orders-air-repair` (ticks 848
+to 853: 24 each, a self-repair with `units.AddRepairProgress` and the VTOL follow and guard orders), `units-transport` (ticks 4408 to 4416: 90 each, the ground unload and the carried units, with `movement.NewPointMarker` and the one `GetOrderType`),
+`orders-air` (ticks 4090 to 4102: 169 each, the air orders with `movement.NewPathOrderAt` and `NewPathOrderToUnit`), `ui-right-click` (ticks 19 to 26: 24 each, the order a right
+click gives, with `los_radar.GetMapCellAtPosition`) and `orders-factory` (ticks 15 to 22: 20 each, a factory that builds a unit, with `map.SnapWorldPosToFootprint` and
+`units.CreateUnit`). Every `Apply` of these windows but one is a STATUS_FLAGS (`a event.order Order#4`, the `refs` of the payload). A new order is the object result
+form of `services.SimAlloc` and the embedded attachment it links (`i units.UnitRefSetValue PathOrderAttach#1 Order#5`), and a field an import changes, read or written,
+is an `o` line (`An object field that an import changes`). `replay_inject_test.exe` is also built with two injections. The state-step injection of 2 (the step of 1 by which
+`RunOrders` moves an order's state on when its handler returns 1) is reported at call 19 of `ui-right-click` and at `Order#4.state` (recorded 1, replayed 2). The created-shift
+injection of 1 (a new order's `created` one tick past the tick it is made on) is reported at call 10 of `orders-guard-attacked` and at `Order#3.created` (recorded 10,
+replayed 11), on the `w` line of the call that makes the order. Each row uses a recording whose first divergence is its own injection:
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 19 Order#4.state tests/replay/orders/ui-right-click.txt
+wine build/modern/replay_inject_test.exe --expect 10 Order#3.created tests/replay/orders/orders-guard-attacked.txt
 ```
 
 ### Against the WASM module

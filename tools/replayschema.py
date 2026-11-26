@@ -1591,8 +1591,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
             size = a.get("size")
             if table is None:
                 errors.append("%s: %s needs `events` that names a table of EVENTS" % (where, label))
-            elif arg_type(a) != table["header"] + "*":
-                errors.append("%s: %s is %s, and the events of %s start with %s*" % (where, label, arg_type(a), a["events"], table["header"]))
+            elif arg_type(a) not in {s + "*" for s in [table["header"]] + [k for k in table["kinds"].values() if k]}:
+                errors.append("%s: %s is %s, and the events of %s start with %s* or are one of its payloads" % (where, label, arg_type(a), a["events"], table["header"]))
             if size not in names or size == a["name"] or args[names.index(size)]["type"] not in INTEGER_ARGS:
                 errors.append("%s: %s needs a `size` that names an integer argument" % (where, label))
             if table is not None:
@@ -2166,6 +2166,12 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             if not isinstance(spec["import_objects"], str) or not spec["import_objects"]:
                 errors.append("%s: import_objects needs a reason" % sub)
             subsystems[sub]["importObjects"] = spec["import_objects"]
+        if "fresh_allocations" in spec:
+            if not isinstance(spec["fresh_allocations"], str) or not spec["fresh_allocations"]:
+                errors.append("%s: fresh_allocations needs a reason" % sub)
+            elif "import_objects" not in spec:
+                errors.append("%s: fresh_allocations names the blocks of the import lines, and the subsystem has no import_objects" % sub)
+            subsystems[sub]["freshAllocations"] = spec["fresh_allocations"]
         if unrecorded:
             subsystems[sub]["unrecorded"] = unrecorded
         left = {k: v for k, v in done.items() if v}
@@ -2695,7 +2701,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     first = 0
     for sub, spec in subsystems.items():
         n = len(spec["slots"])
-        L.append('    { "%s", %d, %d, %d, %d, %d, %s, %d },' % (sub, spec["version"][0], spec["version"][1], int(spec["status"] == "complete"), first, n, "RET_" + upper(sub) if sub in events else "RET_COUNT", int("importObjects" in spec)))
+        L.append('    { "%s", %d, %d, %d, %d, %d, %s, %d, %d },' % (sub, spec["version"][0], spec["version"][1], int(spec["status"] == "complete"), first, n, "RET_" + upper(sub) if sub in events else "RET_COUNT", int("importObjects" in spec),
+                                                         int("freshAllocations" in spec)))
         first += n
     L += ["};", "static const unsigned kReplaySubsystemCount = SUB_COUNT;", "", "#endif", ""]
     return "\n".join(L)

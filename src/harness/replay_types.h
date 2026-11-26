@@ -210,6 +210,7 @@ struct ReplaySubsystem {
     unsigned slotCount;
     unsigned events;
     unsigned char recordsImportChanges;
+    unsigned char forgetsAllocations;
 };
 
 #endif

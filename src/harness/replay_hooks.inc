@@ -1303,7 +1303,7 @@ int __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a
     }
     int result = s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4, a5);
     if (scope.Import()) {
-        ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 41, 7);
+        ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 69, 7);
         FinishImport(line, roots);
     }
     if (scope.Open()) {
@@ -1567,9 +1567,10 @@ int __stdcall RecOrdersMissionTypeFromName(const char* a0)
 int __stdcall RecOrdersExpandGroupCommand(const OrdersGroupCommand* a0, unsigned int a1)
 {
     ReplayRoots roots;
+    EventRoots(roots, RET_ORDERS, a0, a1);
     SlotScope scope(RSL_ORDERS_EXPANDGROUPCOMMAND, SUB_ORDERS, roots);
     if (scope.Open()) {
-        ArgPending(s_call, "command");
+        ArgEvent(s_call, "command", RET_ORDERS, a0, a1);
         ArgValue(s_call, "size", a1);
     }
     int result = s_inner_orders->ExpandGroupCommand(a0, a1);
@@ -4336,23 +4337,20 @@ int __stdcall RecUnitsGetFactoriesInRadius(int a0, const Vec3* a1, int a2, Ref<U
     SlotScope scope(RSL_UNITS_GETFACTORIESINRADIUS, SUB_UNITS, roots, false);
     if (scope.Open()) {
         ArgValue(s_call, "player", a0);
-        ArgValueStruct(s_call, "a", "pos", ROK_VEC3, a1);
+        ArgVec3(s_call, "pos", a1);
         ArgValue(s_call, "radius", a2);
-        ArgPending(s_call, "out");
         ArgValue(s_call, "capacity", a4);
     }
     ReplayText line;
     if (scope.Import()) {
         line.Add("  i units.GetFactoriesInRadius");
         ImportValue(line, a0);
-        ImportValueStruct(line, ROK_VEC3, a1);
+        ImportVec3(line, "pos", a1);
         ImportValue(line, a2);
-        ImportPending(line);
-        ImportValue(line, a4);
     }
     int result = s_inner_units->GetFactoriesInRadius(a0, a1, a2, a3, a4);
     if (scope.Import()) {
-        ImportResult(line, result);
+        ImportOutUnitBuffer(line, "units.GetFactoriesInRadius", "out", a3, result, a4, kReplayReachFields + 0, 1);
         FinishImport(line, roots);
     }
     if (scope.Open()) {
@@ -5670,6 +5668,8 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_MAP_CANPLACEFOOTPRINTAT)
             return true;
+        if (slot == RSL_MAP_UNITSINRANGE)
+            return true;
         if (slot == RSL_NETWORK_SENDSCRIPTCALL)
             return true;
         if (slot == RSL_NETWORK_SENDSCRIPTCALLBYNAME)
@@ -6310,7 +6310,7 @@ void HookSeams(const bool* on)
         s_rec_units.UnitRefGet = RecUnitsUnitRefGet;
     if (on[SUB_ORDERS])
         s_rec_units.UnitRefSetValue = RecUnitsUnitRefSetValue;
-    if (on[SUB_LOS_RADAR] || on[SUB_PLAYERS])
+    if (on[SUB_LOS_RADAR] || on[SUB_ORDERS] || on[SUB_PLAYERS])
         s_rec_map.UnitsInRange = RecMapUnitsInRange;
     if (on[SUB_ORDERS])
         s_rec_scripts.GetNanoPiecePosition = RecScriptsGetNanoPiecePosition;

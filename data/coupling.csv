@@ -1699,7 +1699,7 @@ harness,game,call,QuirksFlipFirstSim,1
 harness,game,call,QuirksHash,2
 harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
-harness,game,call,ReplayGateRef,7
+harness,game,call,ReplayGateRef,8
 harness,game,call,SaveGameFile,1
 harness,game,call,SchedRoutes,1
 harness,game,call,SimBlockAttach,1
@@ -1875,7 +1875,7 @@ harness,orders,shared_write,Seams::movement,30
 harness,orders,shared_write,Seams::network,5
 harness,orders,shared_write,Seams::scripts,20
 harness,orders,shared_write,Seams::targeting,1
-harness,orders,shared_write,Seams::units,26
+harness,orders,shared_write,Seams::units,25
 harness,orders,shared_write,Seams::weapons,8
 harness,orders,shared_write,TargetingSeam::ChooseWeapon,1
 harness,orders,shared_write,UnitsSeam::AddBuildProgress,5
@@ -1884,7 +1884,7 @@ harness,orders,shared_write,UnitsSeam::CanLoad,2
 harness,orders,shared_write,UnitsSeam::CanReclaim,3
 harness,orders,shared_write,UnitsSeam::CanRepair,5
 harness,orders,shared_write,UnitsSeam::CreateUnit,4
-harness,orders,shared_write,UnitsSeam::FindUnitTypeId,4
+harness,orders,shared_write,UnitsSeam::FindUnitTypeId,3
 harness,orders,shared_write,UnitsSeam::GetFactoriesInRadius,1
 harness,orders,shared_write,UnitsSeam::UnitRefGet,3
 harness,orders,shared_write,UnitsSeam::UnitRefSetUnit,9
@@ -3382,8 +3382,8 @@ orders,features,shared_write,Ref<Unit>::offset,1
 orders,features,shared_write,Vec3::x,8
 orders,features,shared_write,Vec3::y,7
 orders,features,shared_write,Vec3::z,9
-orders,files,call,HapiBank::GetStringItem,3
-orders,files,call,HapiBank::HasItem,4
+orders,files,call,HapiBank::GetStringItem,2
+orders,files,call,HapiBank::HasItem,3
 orders,files,call,HapiBank::OpenNamedBox,2
 orders,files,call,HapiBank::ReadBox,1
 orders,files,call,HapiBank::SeekBox,2
@@ -3580,7 +3580,7 @@ orders,targeting,shared_write,Vec3::y,2
 orders,targeting,shared_write,Vec3::z,3
 orders,units,indirect,AddBuildProgress,5
 orders,units,indirect,AddRepairProgress,3
-orders,units,indirect,FindUnitTypeId,4
+orders,units,indirect,FindUnitTypeId,3
 orders,units,indirect,GetFactoriesInRadius,7
 orders,units,indirect,LoadUnit,2
 orders,units,indirect,UnitRefGet,3
@@ -5856,7 +5856,7 @@ seams,orders,shared_write,Seams::movement,30
 seams,orders,shared_write,Seams::network,5
 seams,orders,shared_write,Seams::scripts,20
 seams,orders,shared_write,Seams::targeting,1
-seams,orders,shared_write,Seams::units,26
+seams,orders,shared_write,Seams::units,25
 seams,orders,shared_write,Seams::weapons,8
 seams,orders,shared_write,TargetingSeam::ChooseWeapon,1
 seams,orders,shared_write,UnitsSeam::AddBuildProgress,5
@@ -5865,7 +5865,7 @@ seams,orders,shared_write,UnitsSeam::CanLoad,2
 seams,orders,shared_write,UnitsSeam::CanReclaim,3
 seams,orders,shared_write,UnitsSeam::CanRepair,5
 seams,orders,shared_write,UnitsSeam::CreateUnit,4
-seams,orders,shared_write,UnitsSeam::FindUnitTypeId,4
+seams,orders,shared_write,UnitsSeam::FindUnitTypeId,3
 seams,orders,shared_write,UnitsSeam::GetFactoriesInRadius,1
 seams,orders,shared_write,UnitsSeam::UnitRefGet,3
 seams,orders,shared_write,UnitsSeam::UnitRefSetUnit,9
@@ -6556,9 +6556,9 @@ units,orders,indirect,OrdersMissionTypeFromName,1
 units,orders,indirect,OrdersSaveOrders,1
 units,orders,shared_write,Angles16::heading,5
 units,orders,shared_write,Fixed::value,8
-units,orders,shared_write,Game::defs,9
+units,orders,shared_write,Game::defs,8
 units,orders,shared_write,Game::poolCount,1
-units,orders,shared_write,Game::unitDefCount,4
+units,orders,shared_write,Game::unitDefCount,3
 units,orders,shared_write,Game::units,4
 units,orders,shared_write,Game::unitsEnd,3
 units,orders,shared_write,PathOrderAttach::owner,3

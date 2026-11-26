@@ -434,6 +434,21 @@ void ReplayObjectTable::Bind(unsigned kind, unsigned ordinal, void* p)
         Rebuild(kind);
 }
 
+void ReplayObjectTable::Forget(const void* p)
+{
+    for (unsigned k = 0; k < KINDS; k++) {
+        bool forgot = false;
+        for (unsigned at = 0; at < count[k]; at++) {
+            if (objects[k][at] == p) {
+                objects[k][at] = nullptr;
+                forgot = true;
+            }
+        }
+        if (forgot)
+            Rebuild(k);
+    }
+}
+
 void ReplayObjectTable::Rebuild(unsigned kind)
 {
     memset(slots[kind], 0xff, sizeof slots[kind]);

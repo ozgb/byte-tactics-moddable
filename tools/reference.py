@@ -57,6 +57,9 @@ COMMANDS = ROOT / "reference/commands"
 INTERFACE_FILE = "interface.txt"
 EVENTS = ROOT / "reference/events"
 EVENTS_FILE = "events.txt"
+SETUPS = ROOT / "reference/setup"
+SETUP_FILE = "setup.txt"
+SETUP_LOGS: dict[str, str | None] = {}
 SOUND_LOGS: dict[str, str | None] = {}
 UI_LOGS: dict[str, str | None] = {}
 INTERFACE_LOGS: dict[str, str | None] = {}
@@ -262,6 +265,11 @@ def should_retry(message: str) -> bool:
     return True
 
 
+def scenario_frontend(scenario: Path) -> bool:
+    """Whether the scenario has a `frontend 1` line, so that the menus set up its match and its setup log is stored."""
+    return any(line.split() == ["frontend", "1"] for line in scenario.read_text().splitlines())
+
+
 def scenario_saves(scenario: Path) -> bool:
     """Whether the scenario has a `save` line, so that its run writes harness.sav."""
     return any(line.split()[:1] == ["save"] for line in scenario.read_text().splitlines())
@@ -290,7 +298,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
-            extra: dict = {"collect": (SOUND_FILE, UI_FILE, INTERFACE_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAY_LIST_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
+            extra: dict = {"collect": (SOUND_FILE, UI_FILE, INTERFACE_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAY_LIST_FILE, SETUP_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
                                 *(view_path(t) for t in scenario_frames(scenario)),
                                 *dict.fromkeys((*(tracediff.SAVE_FILES if save_to is not None else ()),
                                                 *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
@@ -318,6 +326,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         INTERFACE_LOGS[scenario.stem] = interface_log.read_text() if interface_log.is_file() else None
         events_log = run / EVENTS_FILE
         EVENT_LOGS[scenario.stem] = events_log.read_text() if events_log.is_file() else None
+        setup_log = run / SETUP_FILE
+        SETUP_LOGS[scenario.stem] = setup_log.read_text() if setup_log.is_file() else None
         display_log = run / DISPLAY_FILE
         DISPLAY_LOGS[scenario.stem] = display_log.read_text() if display_log.is_file() else None
         display_list = run / DISPLAY_LIST_FILE
@@ -460,6 +470,9 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
             if dump is None:
                 fail(f"{name}: the run wrote no {view_path(tick)}; the stored views are untouched")
     for name in results:
+        if scenario_frontend(scenarios[name]) and SETUP_LOGS.get(name) is None:
+            fail(f"{name}: the run wrote no {SETUP_FILE}; the stored setup logs are untouched")
+    for name in results:
         if scenario_saves(scenarios[name]) and SAVE_BYTES.get(name) is None:
             fail(f"{name}: the run wrote no {SAVE_FILE}; the stored saves are untouched")
     SOUNDS.mkdir(parents=True, exist_ok=True)
@@ -501,6 +514,12 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
             (DISPLAY_LISTS / f"{name}.txt").write_text(DISPLAY_LIST_LOGS[name])
             lists += 1
     print(f"{lists} display lists written to {DISPLAY_LISTS.relative_to(ROOT)}")
+    shutil.rmtree(SETUPS, ignore_errors=True)
+    setups = [name for name in results if scenario_frontend(scenarios[name])]
+    for name in setups:
+        SETUPS.mkdir(parents=True, exist_ok=True)
+        (SETUPS / f"{name}.txt").write_text(SETUP_LOGS[name])
+    print(f"{len(setups)} setup logs written to {SETUPS.relative_to(ROOT)}")
     shutil.rmtree(SAVES, ignore_errors=True)
     saved = 0
     for name in results:

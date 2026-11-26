@@ -52,14 +52,21 @@ uv run tools/notes.py PING          # prints PONG
 
 ## 3. Check that the gate runs
 
-The lead's subagents run this before every pull request, so it has to pass on your machine first. Wine runs the game as a 32-bit program, which needs i386 graphics libraries. On a WSL (Ubuntu) machine where every run ended at the `dialog-directx` error, these were missing (not yet confirmed to be all of it):
+The lead's subagents run this before every pull request, so it has to pass on your machine first. Wine runs the game as a 32-bit program, which needs these i386 libraries; without them every run ends at the `dialog-directx` error (confirmed on WSL Ubuntu 24.04):
 
 ```sh
 sudo dpkg --add-architecture i386 && sudo apt update
 sudo apt install libgl1:i386 libgl1-mesa-dri:i386 libxrandr2:i386 libxinerama1:i386 libxcursor1:i386 libxi6:i386
 ```
 
-On WSL, `/tmp/.X11-unix` is WSLg's read-only mount, and Xvfb has started there only with `-nolisten unix`.
+On WSL without sudo, `wsl -d <distro> -u root` from Windows gives a root shell for the install.
+
+On WSL, `/tmp/.X11-unix` is WSLg's read-only mount, so `tools/playtest.py` fails with `RuntimeError: Xvfb did not start`. Until it handles that, put an `Xvfb` wrapper earlier on `PATH` than `/usr/bin/Xvfb`, for example `~/.local/bin/Xvfb` (made executable):
+
+```sh
+#!/bin/sh
+exec /usr/bin/Xvfb -nolisten unix "$@"
+```
 
 ```sh
 export WINEARCH=win64

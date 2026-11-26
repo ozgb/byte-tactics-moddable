@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem los_radar 5.0
+subsystem los_radar 5.1
 call 0 GetMapCell
   r Game.width 224
   r Game.height 102
@@ -82325,8 +82325,14 @@ call 10 GetMapCell
   a y 16
   o result Cell#3624
 call 10 Apply
-  r Game.mapFlags 13
   r Game.flags_142f1 1
+  a event.kind 139
+  a event.clear 2
+  a event.set 0
+  a size 12
+  w Game.mapFlags 13
+  o result 1
+call 10 Apply
   a event.kind 133
   a event.reset 0
   a size 8
@@ -82826,8 +82832,14 @@ call 20 GetMapCell
   a y 16
   o result Cell#3624
 call 20 Apply
-  r Game.mapFlags 15
   r Game.flags_142f1 0
+  a event.kind 139
+  a event.clear 0
+  a event.set 2
+  a size 12
+  w Game.mapFlags 15
+  o result 1
+call 20 Apply
   a event.kind 133
   a event.reset 0
   a size 8
@@ -83352,8 +83364,14 @@ call 30 GetMapCell
   a y 16
   o result Cell#3624
 call 30 Apply
-  r Game.mapFlags 11
   r Game.flags_142f1 1
+  a event.kind 139
+  a event.clear 4
+  a event.set 0
+  a size 12
+  w Game.mapFlags 11
+  o result 1
+call 30 Apply
   a event.kind 133
   a event.reset 0
   a size 8
@@ -84051,8 +84069,14 @@ call 40 GetMapCell
   a y 16
   o result Cell#3624
 call 40 Apply
-  r Game.mapFlags 15
   r Game.flags_142f1 0
+  a event.kind 139
+  a event.clear 0
+  a event.set 4
+  a size 12
+  w Game.mapFlags 15
+  o result 1
+call 40 Apply
   a event.kind 133
   a event.reset 0
   a size 8
@@ -84550,8 +84574,14 @@ call 50 GetMapCell
   a y 16
   o result Cell#3624
 call 50 Apply
-  r Game.mapFlags 14
   r Game.flags_142f1 0
+  a event.kind 139
+  a event.clear 1
+  a event.set 0
+  a size 12
+  w Game.mapFlags 14
+  o result 1
+call 50 Apply
   a event.kind 133
   a event.reset 1
   a size 8
@@ -85076,8 +85106,14 @@ call 60 GetMapCell
   a y 16
   o result Cell#3624
 call 60 Apply
-  r Game.mapFlags 15
   r Game.flags_142f1 1
+  a event.kind 139
+  a event.clear 0
+  a event.set 1
+  a size 12
+  w Game.mapFlags 15
+  o result 1
+call 60 Apply
   a event.kind 133
   a event.reset 1
   a size 8
@@ -86526,8 +86562,14 @@ call 90 GetMapCell
   a y 16
   o result Cell#3624
 call 90 Apply
-  r Game.mapFlags 12
   r Game.flags_142f1 1
+  a event.kind 139
+  a event.clear 3
+  a event.set 0
+  a size 12
+  w Game.mapFlags 12
+  o result 1
+call 90 Apply
   a event.kind 133
   a event.reset 1
   a size 8

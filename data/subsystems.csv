@@ -4109,6 +4109,7 @@ LosRadarEventSize,src/game/los_radar_event_size.h,game,name:Radar,game
 LosRadarInbox,src/seams/los_radar_world.cpp,seams,folder:src/seams/,
 LosRadarInit,src/map/line_of_sight.cpp,los_radar,file:src/map/line_of_sight,
 LosRadarPublishRecalculate,src/game/los_radar_events.h,game,phase:UpdatePlayers,game
+LosRadarPublishSetMode,src/game/los_radar_events.h,game,name:Radar,game
 LosRadarPublishShareMap,src/game/los_radar_events.h,game,name:Radar,game
 LosRadarPublishShareMapping,src/game/los_radar_events.h,game,name:Radar,game
 LosRadarPublishShareRadar,src/game/los_radar_events.h,game,name:Radar,game
@@ -4455,7 +4456,9 @@ PathfindingDebugCell,src/ai/pathfind.cpp,pathfinding,file:src/ai/pathfind,
 PathfindingHpaSeam,src/ai/pathfind_hpa.cpp,pathfinding,file:src/ai/pathfind,
 PathfindingInit,src/ai/pathfind.cpp,pathfinding,file:src/ai/pathfind,
 PathfindingOnMapCellsChanged,src/game/routes.cpp,pathfinding,name:Pathfind,
+PathfindingOnSetSearch,src/game/routes.cpp,pathfinding,name:Pathfind,
 PathfindingPoll,src/ai/pathfind.cpp,pathfinding,file:src/ai/pathfind,
+PathfindingPublishSetSearch,src/game/pathfinding_events.h,game,name:Pathfind,game
 PathfindingRegionSize,src/ai/pathfind.cpp,pathfinding,file:src/ai/pathfind,
 PathfindingSetBaseScale,src/ai/pathfind.cpp,pathfinding,file:src/ai/pathfind,
 PathfindingShutdown,src/ai/pathfind.cpp,pathfinding,file:src/ai/pathfind,
@@ -4490,6 +4493,8 @@ PlayersOnEconomyShare,src/seams/players_world.cpp,seams,folder:src/seams/,
 PlayersPublishDeactivateConditions,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishEndGame,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishKillUnits,src/game/players_events.h,game,file:src/game/players,game
+PlayersPublishLeaveGame,src/game/players_events.h,game,file:src/game/players,game
+PlayersPublishSetCheats,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishSetStore,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishSetType,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishTransfer,src/game/players_events.h,game,file:src/game/players,game

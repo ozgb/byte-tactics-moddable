@@ -237,6 +237,7 @@ void __stdcall CmdBurnAll(int arg1)
 #include "ai_events.h"
 #include "map_events.h"
 #include "units_events.h"
+#include "pathfinding_events.h"
 #include "features_events.h"
 #include "../units/unit_type_set.h"
 
@@ -350,7 +351,10 @@ void __stdcall ConsoleShareRadar(int unused)
 // FUNCTION: 0x416690
 void __stdcall CmdLOSType(int unused)
 {
-    g_game->bits_14281.bit2_14281 = !g_game->bits_14281.bit2_14281;
+    if (g_game->bits_14281.bit2_14281)
+        LosRadarPublishSetMode(SCHED_ENGINE, 0x4, 0);
+    else
+        LosRadarPublishSetMode(SCHED_ENGINE, 0, 0x4);
     LosRadarPublishRecalculate(SCHED_ENGINE, 0);
 }
 
@@ -376,11 +380,10 @@ void __stdcall CmdEdge(CommandArgs* args)
 // FUNCTION: 0x416780
 void __stdcall CmdSearch(CommandArgs* args)
 {
-    if (args->GetIntArg(1, 0)) {
-        SimSetSearchSteps((unsigned int)args->GetIntArg(1, 0));
-    }
-    if (args->count == 3 && g_seams.pathfinding->SetSearchScale != nullptr) {
-        g_seams.pathfinding->SetSearchScale(bx_ftol(atof(args->GetArg(2, g_emptyText)) * 65536.0));
+    int hasScale = args->count == 3;
+    if (args->GetIntArg(1, 0) || hasScale) {
+        int scale = hasScale ? bx_ftol(atof(args->GetArg(2, g_emptyText)) * 65536.0) : 0;
+        PathfindingPublishSetSearch(SCHED_ENGINE, (unsigned int)args->GetIntArg(1, 0), hasScale, scale);
     }
 }
 
@@ -534,7 +537,10 @@ void __stdcall CmdIFace(void* args)
 // FUNCTION: 0x416d50
 void __stdcall CmdLOS(int unused)
 {
-    g_game->bits_14281.bit1_14281 = !g_game->bits_14281.bit1_14281;
+    if (g_game->bits_14281.bit1_14281)
+        LosRadarPublishSetMode(SCHED_ENGINE, 0x2, 0);
+    else
+        LosRadarPublishSetMode(SCHED_ENGINE, 0, 0x2);
     SaveSettings();
     LosRadarPublishRecalculate(SCHED_ENGINE, 0);
 }
@@ -542,7 +548,10 @@ void __stdcall CmdLOS(int unused)
 // FUNCTION: 0x416d80
 void __stdcall CmdMapping(int unused)
 {
-    g_game->bits_14281.bit0_14281 = !g_game->bits_14281.bit0_14281;
+    if (g_game->bits_14281.bit0_14281)
+        LosRadarPublishSetMode(SCHED_ENGINE, 0x1, 0);
+    else
+        LosRadarPublishSetMode(SCHED_ENGINE, 0, 0x1);
     SaveSettings();
     LosRadarPublishRecalculate(SCHED_ENGINE, 1);
 }
@@ -563,7 +572,10 @@ void __stdcall CmdSelBoxes(int unused)
 // FUNCTION: 0x416e30
 void __stdcall CmdTreeDeath(int unused)
 {
-    g_game->uiOptionBits.b3 = !g_game->uiOptionBits.b3;
+    if (g_game->uiOptionFlags & 0x8)
+        PlayersPublishSetCheats(SCHED_ENGINE, 0x8, 0);
+    else
+        PlayersPublishSetCheats(SCHED_ENGINE, 0, 0x8);
 }
 
 // FUNCTION: 0x416e60
@@ -587,26 +599,28 @@ void __stdcall CmdNow(CommandArgs* args)
 // FUNCTION: 0x417030
 void __stdcall CmdDoubleShot(int unused)
 {
-    unsigned short* ptr = &g_game->uiOptionFlags;
-    unsigned short ax = *ptr;
-    unsigned short edx = ax;
-    edx = (unsigned short)(~edx);
-    edx ^= ax;
-    edx &= 0x80;
-    edx ^= ax;
-    *ptr = edx;
+    if (g_game->uiOptionFlags & 0x80)
+        PlayersPublishSetCheats(SCHED_ENGINE, 0x80, 0);
+    else
+        PlayersPublishSetCheats(SCHED_ENGINE, 0, 0x80);
 }
 
 // FUNCTION: 0x417060
 void __stdcall CmdHalfShot(int unused)
 {
-    g_game->uiOptionBits.b8 = !g_game->uiOptionBits.b8;
+    if (g_game->uiOptionFlags & 0x100)
+        PlayersPublishSetCheats(SCHED_ENGINE, 0x100, 0);
+    else
+        PlayersPublishSetCheats(SCHED_ENGINE, 0, 0x100);
 }
 
 // FUNCTION: 0x417090
 void __stdcall CmdRadar(int unused)
 {
-    g_game->uiOptionBits.b9 = !g_game->uiOptionBits.b9;
+    if (g_game->uiOptionFlags & 0x200)
+        PlayersPublishSetCheats(SCHED_ENGINE, 0x200, 0);
+    else
+        PlayersPublishSetCheats(SCHED_ENGINE, 0, 0x200);
 }
 
 // FUNCTION: 0x4170c0
@@ -750,14 +764,7 @@ void __stdcall CmdProfile(void* args)
 // FUNCTION: 0x417540
 void __stdcall CmdNowISee(void*)
 {
-    void* p_game = g_game;
-    unsigned short* p = (unsigned short*)((char*)p_game + 0x14281);
-    *p = *p & 0xfffe;
-
-    p_game = g_game;
-    p = (unsigned short*)((char*)p_game + 0x14281);
-    *p = *p & 0xfffd;
-
+    LosRadarPublishSetMode(SCHED_ENGINE, 0x3, 0);
     LosRadarPublishRecalculate(SCHED_ENGINE, 1);
 }
 
@@ -1258,7 +1265,10 @@ void __stdcall CmdSenderror(CommandArgs* args)
 // FUNCTION: 0x418ca0
 void __stdcall CmdShootAll(int unused)
 {
-    g_game->uiOptionBits.flag10 = !g_game->uiOptionBits.flag10;
+    if (g_game->uiOptionFlags & 0x400)
+        PlayersPublishSetCheats(SCHED_ENGINE, 0x400, 0);
+    else
+        PlayersPublishSetCheats(SCHED_ENGINE, 0, 0x400);
 }
 
 // GLOBAL: 0x501d38

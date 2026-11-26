@@ -214,12 +214,12 @@ economy,players,shared_write,Player::totalMetalProduced,2
 economy,players,shared_write,Ref<Unit>::offset,1
 economy,presentation,shared_write,EconLedger::makePrev,1
 economy,presentation,shared_write,EconLedger::usePrev,1
-economy,presentation,shared_write,Player::energy,4
+economy,presentation,shared_write,Player::energy,3
 economy,presentation,shared_write,Player::energyCapacity,3
 economy,presentation,shared_write,Player::energyIncome,1
 economy,presentation,shared_write,Player::energyUsage,1
 economy,presentation,shared_write,Player::energyWasted,1
-economy,presentation,shared_write,Player::metal,4
+economy,presentation,shared_write,Player::metal,3
 economy,presentation,shared_write,Player::metalCapacity,3
 economy,presentation,shared_write,Player::metalIncome,1
 economy,presentation,shared_write,Player::metalUsage,1
@@ -696,16 +696,19 @@ game,los_radar,indirect,SoundHeardMask,2
 game,los_radar,indirect,UpdateSensorRadarAndCloak,1
 game,los_radar,indirect,UpdateUnitLineOfSight,1
 game,los_radar,shared_write,Game::localPlayer,1
-game,los_radar,shared_write,Game::mapFlags,5
+game,los_radar,shared_write,Game::mapFlags,6
 game,los_radar,shared_write,Game::numPlayers,1
 game,los_radar,shared_write,Game::playerIndex,14
 game,los_radar,shared_write,Game::ticks,6
+game,los_radar,shared_write,Game::uiOptionFlags,1
 game,los_radar,shared_write,Grid::cells,2
 game,los_radar,shared_write,Grid::height,3
 game,los_radar,shared_write,Grid::width,3
 game,los_radar,shared_write,LosRadarEventHeader::kind,1
 game,los_radar,shared_write,LosRadarMapInfo::unitSlots,1
 game,los_radar,shared_write,LosRadarRecalculate::reset,1
+game,los_radar,shared_write,LosRadarSetMode::clear,1
+game,los_radar,shared_write,LosRadarSetMode::set,1
 game,los_radar,shared_write,LosRadarShareMap::from,1
 game,los_radar,shared_write,LosRadarShareMap::to,1
 game,los_radar,shared_write,LosRadarSharePlayer::player,1
@@ -1010,6 +1013,7 @@ game,players,shared_write,Game::localPlayer,10
 game,players,shared_write,Game::mapFlags,1
 game,players,shared_write,Game::playerIndex,3
 game,players,shared_write,Game::ticks,4
+game,players,shared_write,Game::uiOptionFlags,1
 game,players,shared_write,Player::allied,7
 game,players,shared_write,Player::displayTimer,3
 game,players,shared_write,Player::energyStorageBonus,3
@@ -1023,6 +1027,8 @@ game,players,shared_write,PlayerInfo::side,5
 game,players,shared_write,PlayersEndGame::victory,1
 game,players,shared_write,PlayersEventHeader::kind,1
 game,players,shared_write,PlayersKillUnits::player,1
+game,players,shared_write,PlayersSetCheats::clear,1
+game,players,shared_write,PlayersSetCheats::set,1
 game,players,shared_write,PlayersSetStore::add,1
 game,players,shared_write,PlayersSetStore::amount,1
 game,players,shared_write,PlayersSetStore::player,1
@@ -1754,7 +1760,7 @@ harness,game,shared_write,Seams::mission,21
 harness,game,shared_write,Seams::movement,2
 harness,game,shared_write,Seams::network,1
 harness,game,shared_write,Seams::orders,4
-harness,game,shared_write,Seams::pathfinding,4
+harness,game,shared_write,Seams::pathfinding,3
 harness,game,shared_write,Seams::pathworld,1
 harness,game,shared_write,Seams::players,10
 harness,game,shared_write,Seams::scripts,1
@@ -1904,7 +1910,7 @@ harness,pathfinding,shared_write,PathWorldView::Tick,4
 harness,pathfinding,shared_write,PathWorldView::UnitState,2
 harness,pathfinding,shared_write,PathWorldView::UnitsPerPlayer,1
 harness,pathfinding,shared_write,PathfindingSeam::CellsChanged,1
-harness,pathfinding,shared_write,Seams::pathfinding,1
+harness,pathfinding,shared_write,Seams::pathfinding,2
 harness,pathfinding,shared_write,Seams::pathworld,8
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
@@ -2278,6 +2284,7 @@ harness,weapons,shared_write,g_quirks,1
 harness,wind_meteors,shared_write,Seams::weapons,1
 harness,wind_meteors,shared_write,WeaponsSeam::FindWeaponByName,1
 los_radar,ai,shared_write,Cell::feature,1
+los_radar,ai,shared_write,Game::mapFlags,1
 los_radar,ai,shared_write,Game::mapHeight,1
 los_radar,ai,shared_write,Game::mapWidth,1
 los_radar,ai,shared_write,Point16::x,8
@@ -2315,6 +2322,7 @@ los_radar,game,call,FeaturesPublishPlace,1
 los_radar,game,call,Game::Current,1
 los_radar,game,call,Game::SlotOf,1
 los_radar,game,call,LosRadarEventSize,1
+los_radar,game,call,PlayersPublishSetCheats,1
 los_radar,game,call,PublishWindMeteorsLimits,1
 los_radar,game,call,RecordMessage,3
 los_radar,game,call,RecordSimEvent,2
@@ -2322,6 +2330,7 @@ los_radar,game,call,SimAlloc,1
 los_radar,game,call,SimAllocTagged,1
 los_radar,game,call,SimBlockTrack,1
 los_radar,game,call,SimCaptureAlloc,2
+los_radar,game,shared_write,Game::mapFlags,1
 los_radar,game,shared_write,Game::mapHeight,3
 los_radar,game,shared_write,Game::mapWidth,4
 los_radar,game,shared_write,Point16::x,1
@@ -2345,6 +2354,7 @@ los_radar,map,shared_write,Cell::feature,7
 los_radar,map,shared_write,Cell::high,7
 los_radar,map,shared_write,Cell::low,7
 los_radar,map,shared_write,Game::cells,17
+los_radar,map,shared_write,Game::mapFlags,1
 los_radar,map,shared_write,Game::mapHeight,1
 los_radar,map,shared_write,Game::mapWidth,1
 los_radar,map,shared_write,Game::visibilityMask,3
@@ -2409,6 +2419,7 @@ los_radar,platform,shared_write,Point16::y,7
 los_radar,platform,shared_write,Vec3::x,22
 los_radar,platform,shared_write,Vec3::y,14
 los_radar,platform,shared_write,Vec3::z,22
+los_radar,players,shared_write,Game::mapFlags,1
 los_radar,players,shared_write,Point16::x,3
 los_radar,players,shared_write,Point16::y,3
 los_radar,players,shared_write,Ref<Unit>::offset,1
@@ -2421,6 +2432,7 @@ los_radar,presentation,call,GetGafFrame,8
 los_radar,presentation,call,StringRef::ReleaseRef,1
 los_radar,presentation,shared_write,Cell::feature,2
 los_radar,presentation,shared_write,Game::cells,2
+los_radar,presentation,shared_write,Game::mapFlags,19
 los_radar,presentation,shared_write,Game::mapHeight,9
 los_radar,presentation,shared_write,Game::mapWidth,9
 los_radar,presentation,shared_write,Game::visibilityMask,2
@@ -2478,6 +2490,7 @@ los_radar,targeting,shared_write,Vec3::x,3
 los_radar,targeting,shared_write,Vec3::y,2
 los_radar,targeting,shared_write,Vec3::z,3
 los_radar,units,shared_write,Game::cells,2
+los_radar,units,shared_write,Game::mapFlags,1
 los_radar,units,shared_write,LosSightCache::cell,1
 los_radar,units,shared_write,LosSightCache::frameIdx,1
 los_radar,units,shared_write,Point16::x,8
@@ -3605,6 +3618,7 @@ pathfinding,ai,shared_write,Point16::x,8
 pathfinding,ai,shared_write,Point16::y,8
 pathfinding,features,shared_write,Point16::x,12
 pathfinding,features,shared_write,Point16::y,12
+pathfinding,game,call,SimSetSearchSteps,1
 pathfinding,game,shared_write,Point16::x,1
 pathfinding,game,shared_write,Point16::y,1
 pathfinding,harness,shared_write,PathfindingEventHeader::kind,1
@@ -4097,6 +4111,7 @@ players,game,shared_write,Game::endGameVictory,6
 players,game,shared_write,Game::localPlayer,16
 players,game,shared_write,Game::mapFlags,1
 players,game,shared_write,Game::playerIndex,9
+players,game,shared_write,Game::uiOptionFlags,7
 players,game,shared_write,Player::active,11
 players,game,shared_write,Player::allied,2
 players,game,shared_write,Player::commanderKills,1
@@ -4134,6 +4149,7 @@ players,harness,shared_write,Game::endGameFlags,2
 players,harness,shared_write,Game::endGameVictory,2
 players,harness,shared_write,Game::localPlayer,3
 players,harness,shared_write,Game::playerIndex,1
+players,harness,shared_write,Game::uiOptionFlags,1
 players,harness,shared_write,Player::allied,1
 players,harness,shared_write,Player::alliedBy,1
 players,harness,shared_write,Player::energyCapacity,1
@@ -4156,8 +4172,9 @@ players,los_radar,indirect,CreateUnitIndex,1
 players,los_radar,indirect,FreeUnitIndex,1
 players,los_radar,indirect,RecordRadarUnits,1
 players,los_radar,shared_write,Game::localPlayer,1
-players,los_radar,shared_write,Game::mapFlags,5
+players,los_radar,shared_write,Game::mapFlags,6
 players,los_radar,shared_write,Game::playerIndex,14
+players,los_radar,shared_write,Game::uiOptionFlags,1
 players,los_radar,shared_write,Player::active,2
 players,los_radar,shared_write,Player::allied,2
 players,los_radar,shared_write,Player::explored,8
@@ -4208,6 +4225,7 @@ players,network,shared_write,Game::endGameVictory,1
 players,network,shared_write,Game::head,5
 players,network,shared_write,Game::localPlayer,19
 players,network,shared_write,Game::tail,5
+players,network,shared_write,Game::uiOptionFlags,1
 players,network,shared_write,Player::active,53
 players,network,shared_write,Player::alliance,6
 players,network,shared_write,Player::allied,4
@@ -4292,6 +4310,7 @@ players,presentation,shared_write,Game::localPlayer,70
 players,presentation,shared_write,Game::mapFlags,19
 players,presentation,shared_write,Game::playerIndex,23
 players,presentation,shared_write,Game::tail,2
+players,presentation,shared_write,Game::uiOptionFlags,2
 players,presentation,shared_write,Player::active,40
 players,presentation,shared_write,Player::alliance,13
 players,presentation,shared_write,Player::allied,6
@@ -4299,7 +4318,7 @@ players,presentation,shared_write,Player::alliedBy,4
 players,presentation,shared_write,Player::commanderKills,1
 players,presentation,shared_write,Player::commanderLosses,1
 players,presentation,shared_write,Player::displayTimer,1
-players,presentation,shared_write,Player::energy,4
+players,presentation,shared_write,Player::energy,3
 players,presentation,shared_write,Player::energyCapacity,3
 players,presentation,shared_write,Player::energyIncome,1
 players,presentation,shared_write,Player::energyUsage,1
@@ -4313,7 +4332,7 @@ players,presentation,shared_write,Player::index,23
 players,presentation,shared_write,Player::info,62
 players,presentation,shared_write,Player::kills,2
 players,presentation,shared_write,Player::losses,2
-players,presentation,shared_write,Player::metal,4
+players,presentation,shared_write,Player::metal,3
 players,presentation,shared_write,Player::metalCapacity,3
 players,presentation,shared_write,Player::metalIncome,1
 players,presentation,shared_write,Player::metalUsage,1
@@ -4433,9 +4452,7 @@ presentation,ai,shared_write,MissionType::index,3
 presentation,ai,shared_write,Order::flags_42,1
 presentation,ai,shared_write,Player::active,5
 presentation,ai,shared_write,Player::allied,3
-presentation,ai,shared_write,Player::energy,1
 presentation,ai,shared_write,Player::index,5
-presentation,ai,shared_write,Player::metal,1
 presentation,ai,shared_write,Point16::x,8
 presentation,ai,shared_write,Point16::y,8
 presentation,ai,shared_write,Unit::flags,7
@@ -4446,9 +4463,7 @@ presentation,ai,shared_write,Vec3::z,15
 presentation,economy,indirect,EconomyUnitAccount,1
 presentation,economy,shared_write,Game::netGameFlags,5
 presentation,economy,shared_write,Player::active,2
-presentation,economy,shared_write,Player::energy,4
 presentation,economy,shared_write,Player::index,3
-presentation,economy,shared_write,Player::metal,4
 presentation,features,shared_write,Cell::flags,10
 presentation,features,shared_write,Fixed::whole,2
 presentation,features,shared_write,GafFrame::height,1
@@ -4507,6 +4522,8 @@ presentation,game,call,LosRadarPublishShareMap,1
 presentation,game,call,MatchSetupToInfo,1
 presentation,game,call,OrdersPublishQueueBuild,1
 presentation,game,call,PlayerRecordAt,1
+presentation,game,call,PlayersPublishLeaveGame,2
+presentation,game,call,PlayersPublishSetStore,1
 presentation,game,call,PlayersPublishTransfer,1
 presentation,game,call,ReadGameRegistryValue,3
 presentation,game,call,SaveAllMissionsSetting,1
@@ -4549,7 +4566,7 @@ presentation,game,shared_write,Game::mapFlags,1
 presentation,game,shared_write,Game::netGameFlags,2
 presentation,game,shared_write,Game::numPlayers,6
 presentation,game,shared_write,Game::textLines,1
-presentation,game,shared_write,Game::uiOptionFlags,4
+presentation,game,shared_write,Game::uiOptionFlags,7
 presentation,game,shared_write,MissionType::index,2
 presentation,game,shared_write,OnlineReportPlayer::allies,1
 presentation,game,shared_write,OnlineReportScoreBoard::scores,1
@@ -4658,9 +4675,10 @@ presentation,los_radar,shared_write,GafFrame::transparency,3
 presentation,los_radar,shared_write,GafFrame::width,3
 presentation,los_radar,shared_write,GafFrame::xOffset,5
 presentation,los_radar,shared_write,GafFrame::yOffset,5
-presentation,los_radar,shared_write,Game::mapFlags,5
+presentation,los_radar,shared_write,Game::mapFlags,6
 presentation,los_radar,shared_write,Game::netGameFlags,3
 presentation,los_radar,shared_write,Game::numPlayers,1
+presentation,los_radar,shared_write,Game::uiOptionFlags,1
 presentation,los_radar,shared_write,MapViewFlags::raw,7
 presentation,los_radar,shared_write,Player::active,2
 presentation,los_radar,shared_write,Player::allied,2
@@ -4777,10 +4795,8 @@ presentation,network,shared_write,Player::active,53
 presentation,network,shared_write,Player::alliance,6
 presentation,network,shared_write,Player::allied,4
 presentation,network,shared_write,Player::alliedBy,2
-presentation,network,shared_write,Player::energy,1
 presentation,network,shared_write,Player::id,55
 presentation,network,shared_write,Player::index,17
-presentation,network,shared_write,Player::metal,1
 presentation,network,shared_write,Player::rejectReason,10
 presentation,network,shared_write,PlayerInfo::bit6,1
 presentation,network,shared_write,PlayerInfo::closed,1
@@ -4788,9 +4804,7 @@ presentation,network,shared_write,PlayerInfo::color,7
 presentation,network,shared_write,PlayerInfo::flags_9d_wide,1
 presentation,network,shared_write,PlayerInfo::started,2
 presentation,network,shared_write,Unit::angles,2
-presentation,network,shared_write,Unit::attacker,1
 presentation,network,shared_write,Unit::flags,3
-presentation,network,shared_write,Unit::lastAttackerSlot,1
 presentation,network,shared_write,Unit::pos,1
 presentation,orders,call,FindOrderByType,1
 presentation,orders,call,GetBuildWeaponPercent,1
@@ -4812,14 +4826,10 @@ presentation,orders,shared_write,OrdersEventHeader::kind,2
 presentation,orders,shared_write,OrdersEventHeader::unit,2
 presentation,orders,shared_write,Player::active,3
 presentation,orders,shared_write,Player::allied,10
-presentation,orders,shared_write,Player::energy,2
 presentation,orders,shared_write,Player::index,16
-presentation,orders,shared_write,Player::metal,1
 presentation,orders,shared_write,Point16::x,26
 presentation,orders,shared_write,Point16::y,22
-presentation,orders,shared_write,Unit::attacker,2
 presentation,orders,shared_write,Unit::flags,24
-presentation,orders,shared_write,Unit::lastAttackerSlot,2
 presentation,orders,shared_write,Unit::pos,48
 presentation,orders,shared_write,Vec3::x,57
 presentation,orders,shared_write,Vec3::y,37
@@ -5004,14 +5014,13 @@ presentation,players,shared_write,Game::commanderDeath,3
 presentation,players,shared_write,Game::endGameVictory,3
 presentation,players,shared_write,Game::head,1
 presentation,players,shared_write,Game::mapFlags,1
+presentation,players,shared_write,Game::uiOptionFlags,1
 presentation,players,shared_write,Player::active,10
 presentation,players,shared_write,Player::alliance,2
 presentation,players,shared_write,Player::allied,7
 presentation,players,shared_write,Player::alliedBy,3
-presentation,players,shared_write,Player::energy,6
 presentation,players,shared_write,Player::id,2
 presentation,players,shared_write,Player::index,8
-presentation,players,shared_write,Player::metal,6
 presentation,players,shared_write,Player::rank,1
 presentation,players,shared_write,Player::rejectReason,2
 presentation,players,shared_write,PlayerInfo::bit5,2
@@ -5112,9 +5121,7 @@ presentation,units,shared_write,Point16::x,8
 presentation,units,shared_write,Point16::y,8
 presentation,units,shared_write,StringRef::data,4
 presentation,units,shared_write,Unit::angles,5
-presentation,units,shared_write,Unit::attacker,6
 presentation,units,shared_write,Unit::flags,22
-presentation,units,shared_write,Unit::lastAttackerSlot,7
 presentation,units,shared_write,Unit::pos,10
 presentation,units,shared_write,Unit::selected,2
 presentation,units,shared_write,Unit::state,4
@@ -5138,8 +5145,6 @@ presentation,weapons,shared_write,Game::tracked,7
 presentation,weapons,shared_write,Game::value_142f3,1
 presentation,weapons,shared_write,Game::value_1434b,5
 presentation,weapons,shared_write,Player::active,4
-presentation,weapons,shared_write,Player::energy,1
-presentation,weapons,shared_write,Player::metal,1
 presentation,weapons,shared_write,PlayerInfo::color,1
 presentation,weapons,shared_write,Unit::flags,6
 presentation,weapons,shared_write,Unit::pos,6
@@ -5457,7 +5462,7 @@ seams,game,shared_write,OrdersStop::all,1
 seams,game,shared_write,OrdersStop::h,1
 seams,game,shared_write,PathfindingSeam::Poll,1
 seams,game,shared_write,PathfindingSeam::Step,1
-seams,game,shared_write,PlayersEventHeader::kind,6
+seams,game,shared_write,PlayersEventHeader::kind,8
 seams,game,shared_write,PlayersSeam::UpdateBlink,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerBody,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerHead,1
@@ -5483,7 +5488,7 @@ seams,game,shared_write,Seams::mission,21
 seams,game,shared_write,Seams::movement,2
 seams,game,shared_write,Seams::network,1
 seams,game,shared_write,Seams::orders,4
-seams,game,shared_write,Seams::pathfinding,4
+seams,game,shared_write,Seams::pathfinding,3
 seams,game,shared_write,Seams::pathworld,1
 seams,game,shared_write,Seams::players,10
 seams,game,shared_write,Seams::scripts,1
@@ -5886,7 +5891,7 @@ seams,pathfinding,shared_write,PathUnitState::moveClass,2
 seams,pathfinding,shared_write,PathfindingSeam::CellsChanged,1
 seams,pathfinding,shared_write,Point16::x,9
 seams,pathfinding,shared_write,Point16::y,9
-seams,pathfinding,shared_write,Seams::pathfinding,1
+seams,pathfinding,shared_write,Seams::pathfinding,2
 seams,pathfinding,shared_write,Seams::pathworld,8
 seams,platform,call,FatalError,1
 seams,platform,call,HarnessTestMode,1
@@ -6745,7 +6750,6 @@ units,presentation,shared_write,Point16::y,5
 units,presentation,shared_write,Ref<Unit>::offset,3
 units,presentation,shared_write,Unit::activateFlags,2
 units,presentation,shared_write,Unit::angles,3
-units,presentation,shared_write,Unit::attacker,1
 units,presentation,shared_write,Unit::buildLeft,15
 units,presentation,shared_write,Unit::cargo,1
 units,presentation,shared_write,Unit::cargoSelectable,1
@@ -6760,7 +6764,6 @@ units,presentation,shared_write,Unit::group,5
 units,presentation,shared_write,Unit::health,3
 units,presentation,shared_write,Unit::immobile,1
 units,presentation,shared_write,Unit::killCount,2
-units,presentation,shared_write,Unit::lastAttackerSlot,1
 units,presentation,shared_write,Unit::mode,1
 units,presentation,shared_write,Unit::moveOrder,1
 units,presentation,shared_write,Unit::player,8

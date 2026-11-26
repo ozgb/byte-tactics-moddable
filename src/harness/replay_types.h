@@ -104,7 +104,7 @@ struct ReplayEventKind {
 };
 
 struct ReplayEventTable {
-    unsigned char header;
+    unsigned short header;
     unsigned first;
     unsigned count;
 };

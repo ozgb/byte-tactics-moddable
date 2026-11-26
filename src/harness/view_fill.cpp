@@ -26,6 +26,9 @@ enum {
     GAME_DEF_COUNT = 0x1438f,
     GAME_DEFS = 0x1439b,
     GAME_SPRITE_SOURCES = 0x147eb,
+    GAME_LOGOS = 0x148d7,
+    GAME_TEXTURE_GAF_COUNT = 0x148df,
+    GAME_TEXTURE_GAFS = 0x148e3,
     GAME_DEBRIS_COUNT = 0x1491b,
     GAME_DEBRIS = 0x1491f,
     GAME_SHADOW_SOURCES = 0x1ab8f,
@@ -82,6 +85,7 @@ enum {
     UNIT_WEAPONS = 0x4,
     UNIT_WEAPON_STRIDE = 0x1c,
     UNIT_WEAPON_DEF = 0xc,
+    UNIT_STOCKPILE = 0x1e,
     UNIT_LIST = 0x5c,
     UNIT_LIST2 = 0x60,
     UNIT_HEADING = 0x66,
@@ -185,6 +189,30 @@ enum {
 };
 
 enum {
+    MODEL_VERTEX_COUNT = 0x4,
+    MODEL_FACE_COUNT = 0x8,
+    MODEL_FIRST_FACE = 0xc,
+    MODEL_VERTICES = 0x24,
+    MODEL_FACES = 0x28,
+    FACE_STRIDE = 0x20,
+    FACE_COLOR = 0x0,
+    FACE_COUNT = 0x4,
+    FACE_INDICES = 0xc,
+    FACE_PIC = 0x10,
+    FACE_SRC = 0x18,
+    FACE_FLAGS = 0x1c,
+    FACE_FLAT = 1,
+    FACE_SEQUENCE = 2,
+    FACE_TEAM_COLOUR = 4,
+    GAF_FILE_COUNT = 0x4,
+    GAF_FILE_ENTRIES = 0xc,
+    GAF_ENTRY_NAME = 0x8,
+    GAF_ENTRY_FRAMES = 0x28,
+    GAF_FRAME_STRIDE = 0x8,
+    TEXTURE_CACHE = 256
+};
+
+enum {
     MISSION_TYPE = 0x0,
     UNIT_FLAG_ALIVE = 0x10000000,
     UNIT_FLAG_IMMOBILE = 0x20000000,
@@ -216,6 +244,10 @@ static const unsigned char* s_units;
 static unsigned s_poolCount;
 static const unsigned char* s_defs;
 static unsigned s_defCount;
+static unsigned s_textureCacheKey[3];
+static unsigned s_texturePic[TEXTURE_CACHE];
+static const unsigned char* s_textureEntry[TEXTURE_CACHE];
+static unsigned s_textureFrame[TEXTURE_CACHE];
 
 static unsigned R32(const unsigned char* p, unsigned offset)
 {
@@ -265,6 +297,11 @@ static int AddInt(int a, int b)
 static int SubInt(int a, int b)
 {
     return (int)((unsigned)a - (unsigned)b);
+}
+
+static const unsigned char* Plain(unsigned stored)
+{
+    return (const unsigned char*)(unsigned long)stored;
 }
 
 static const unsigned char* PlayerAt(unsigned slot)
@@ -558,6 +595,7 @@ static void FillUnit(PlayerView* v, ViewUnit* out, const unsigned char* unit)
         out->group = (unsigned char)R32(unit, UNIT_GROUP);
         out->killCount = R16(unit, UNIT_KILLS);
         out->weaponBuild = (unsigned char)WeaponBuildPercent(unit);
+        out->stockpile = unit[UNIT_STOCKPILE];
         if (first != 0) {
             out->orderKind = first[ORDER_KIND];
             if ((R32(first, ORDER_FLAGS) & ORDER_TARGET_SHOWN) != 0)
@@ -735,6 +773,179 @@ static unsigned ShadowIndex(unsigned source)
     return SPRITE_NONE;
 }
 
+static int FrameIn(const unsigned char* entry, unsigned pic, unsigned* frame)
+{
+    unsigned count = R16(entry, 0);
+    unsigned f;
+    for (f = 0; f < count; f++) {
+        if (R32(entry, GAF_ENTRY_FRAMES + f * GAF_FRAME_STRIDE) == pic) {
+            *frame = f;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static const unsigned char* FrameInGaf(const unsigned char* gaf, unsigned pic, unsigned* frame)
+{
+    int count;
+    int e;
+    if (gaf == 0)
+        return 0;
+    count = RS16(gaf, GAF_FILE_COUNT);
+    for (e = 0; e < count; e++) {
+        const unsigned char* entry = Plain(R32(gaf, GAF_FILE_ENTRIES + e * 4));
+        if (entry != 0 && FrameIn(entry, pic, frame))
+            return entry;
+    }
+    return 0;
+}
+
+static const unsigned char* FrameEntry(unsigned pic, unsigned* frame)
+{
+    const unsigned char* game = ViewHostGame();
+    unsigned gafs = R32(game, GAME_TEXTURE_GAFS);
+    unsigned count = R32(game, GAME_TEXTURE_GAF_COUNT);
+    unsigned logos = R32(game, GAME_LOGOS);
+    unsigned slot = (pic >> 3) % TEXTURE_CACHE;
+    const unsigned char* entry = 0;
+    int g;
+    if (pic == 0)
+        return 0;
+    if (s_textureCacheKey[0] != gafs || s_textureCacheKey[1] != count || s_textureCacheKey[2] != logos) {
+        memset(s_texturePic, 0, sizeof s_texturePic);
+        s_textureCacheKey[0] = gafs;
+        s_textureCacheKey[1] = count;
+        s_textureCacheKey[2] = logos;
+    }
+    if (s_texturePic[slot] == pic) {
+        *frame = s_textureFrame[slot];
+        return s_textureEntry[slot];
+    }
+    for (g = 0; gafs != 0 && g < (int)count && entry == 0; g++)
+        entry = FrameInGaf(Plain(R32(Plain(gafs), g * 4)), pic, frame);
+    if (entry == 0)
+        entry = FrameInGaf(Plain(logos), pic, frame);
+    if (entry == 0)
+        return 0;
+    s_texturePic[slot] = pic;
+    s_textureEntry[slot] = entry;
+    s_textureFrame[slot] = *frame;
+    return entry;
+}
+
+static int FillFace(PlayerView* v, int colour, unsigned flags, unsigned pic, unsigned src, unsigned count,
+                    const unsigned char* indices, int teamColour)
+{
+    ViewDebrisFace* out = ViewGeometryFace(v);
+    unsigned short* rows;
+    const unsigned char* entry = 0;
+    unsigned frame = 0;
+    unsigned k;
+    if (out == 0)
+        return 0;
+    rows = ViewGeometryIndices(v, out, indices != 0 ? count : 0);
+    if (rows == 0)
+        return 0;
+    for (k = 0; k < out->indexCount; k++)
+        rows[k] = R16(indices, k * 2);
+    out->texture = VIEW_NO_TEXTURE;
+    if ((flags & FACE_FLAT) != 0) {
+        out->kind = VIEW_FACE_FILLED;
+        out->colour = (unsigned)colour;
+        return 1;
+    }
+    if (count != 4)
+        return 1;
+    out->kind = VIEW_FACE_TEXTURED;
+    if ((flags & FACE_SEQUENCE) != 0) {
+        entry = Plain(src);
+        frame = (flags & FACE_TEAM_COLOUR) != 0 && teamColour >= 0 ? (unsigned)teamColour : (pic & 0xffff);
+    } else {
+        entry = FrameEntry(pic, &frame);
+    }
+    if (entry == 0)
+        return 1;
+    out->texture = (unsigned short)ViewGeometryTexture(v, (const char*)entry + GAF_ENTRY_NAME);
+    out->frame = (unsigned short)frame;
+    return out->texture != VIEW_NO_TEXTURE;
+}
+
+int ViewFillDebrisGeometry(PlayerView* v, ViewDebris* out, const ViewReportPiece* piece)
+{
+    ViewGeometryMark mark;
+    ViewDebrisVertex* vertices;
+    unsigned vertexCount = piece->vertexCount < 0 ? 0 : (unsigned)piece->vertexCount;
+    unsigned faceCount = piece->faceCount < 0 ? 0 : (unsigned)piece->faceCount;
+    unsigned q;
+    if (!ViewGeometryBegin(v, &mark))
+        return 0;
+    if (vertexCount > VIEW_REPORT_PIECE_VERTICES)
+        vertexCount = VIEW_REPORT_PIECE_VERTICES;
+    if (faceCount > VIEW_REPORT_PIECE_FACES)
+        faceCount = VIEW_REPORT_PIECE_FACES;
+    vertices = ViewGeometryVertices(v, vertexCount);
+    if (vertices == 0)
+        goto fail;
+    for (q = 0; q < vertexCount; q++) {
+        vertices[q].x = piece->vertices[q * 3];
+        vertices[q].y = piece->vertices[q * 3 + 1];
+        vertices[q].z = piece->vertices[q * 3 + 2];
+    }
+    for (q = piece->firstFace != -1 ? 1 : 0; q < faceCount; q++) {
+        const ViewReportFace* f = &piece->faces[q];
+        if (!FillFace(v, f->color, f->flags, f->pic, f->src, f->count < 0 ? 0 : (unsigned)f->count, Plain(f->indices), -1))
+            goto fail;
+    }
+    ViewGeometryEnd(v, &mark, &out->firstVertex, &out->vertexCount, &out->firstFace, &out->faceCount);
+    return 1;
+fail:
+    ViewGeometryFail(v, &mark, &out->firstVertex, &out->vertexCount, &out->firstFace, &out->faceCount);
+    return 0;
+}
+
+int ViewFillExplodedGeometry(PlayerView* v, ViewExplodedPiece* out, const unsigned char* desc, int teamColour)
+{
+    ViewGeometryMark mark;
+    ViewDebrisVertex* vertices;
+    const unsigned char* from;
+    const unsigned char* faces;
+    int vertexCount;
+    int faceCount;
+    int q;
+    if (!ViewGeometryBegin(v, &mark))
+        return 0;
+    if (desc == 0)
+        return 1;
+    vertexCount = RI32(desc, MODEL_VERTEX_COUNT);
+    faceCount = RI32(desc, MODEL_FACE_COUNT);
+    from = Plain(R32(desc, MODEL_VERTICES));
+    faces = Plain(R32(desc, MODEL_FACES));
+    if (vertexCount < 0 || vertexCount > VIEW_MAX_DEBRIS_VERTICES || faceCount < 0 || faceCount > VIEW_MAX_DEBRIS_FACES
+        || (vertexCount != 0 && from == 0) || (faceCount != 0 && faces == 0))
+        goto fail;
+    vertices = ViewGeometryVertices(v, (unsigned)vertexCount);
+    if (vertices == 0)
+        goto fail;
+    for (q = 0; q < vertexCount; q++) {
+        vertices[q].x = RI32(from, q * 12);
+        vertices[q].y = RI32(from, q * 12 + 4);
+        vertices[q].z = RI32(from, q * 12 + 8);
+    }
+    for (q = RI32(desc, MODEL_FIRST_FACE) != -1 ? 1 : 0; q < faceCount; q++) {
+        const unsigned char* f = faces + q * FACE_STRIDE;
+        int count = RI32(f, FACE_COUNT);
+        if (!FillFace(v, RI32(f, FACE_COLOR), R32(f, FACE_FLAGS), R32(f, FACE_PIC), R32(f, FACE_SRC),
+                      count < 0 ? 0 : (unsigned)count, Plain(R32(f, FACE_INDICES)), teamColour))
+            goto fail;
+    }
+    ViewGeometryEnd(v, &mark, &out->firstVertex, &out->vertexCount, &out->firstFace, &out->faceCount);
+    return 1;
+fail:
+    ViewGeometryFail(v, &mark, &out->firstVertex, &out->vertexCount, &out->firstFace, &out->faceCount);
+    return 0;
+}
+
 static void FillProjectiles(PlayerView* v, const ViewWeaponsReport* report)
 {
     const unsigned char* base = RRef(s_game, GAME_PROJECTILES);
@@ -805,15 +1016,12 @@ static void FillDebris(PlayerView* v, const ViewWeaponsReport* report)
         out->frame = e->frame;
         out->shadowSprite = (unsigned short)ShadowIndex(e->shadowSource);
         out->shadowFrame = e->shadowFrame;
-        out->unitDefIndex = SPRITE_NONE;
         if (obj != 0 && obj >= s_game + GAME_PIECES) {
             unsigned offset = (unsigned)(obj - (s_game + GAME_PIECES));
             if (offset % PIECE_RECORD_STRIDE == 0 && offset / PIECE_RECORD_STRIDE < PIECE_RECORD_LIMIT) {
                 const ViewReportPiece* piece = &report->pieces[offset / PIECE_RECORD_STRIDE];
-                if (piece->used) {
-                    out->firstFace = (unsigned short)piece->firstFace;
-                    out->faceCount = (unsigned short)piece->faceCount;
-                }
+                if (piece->used)
+                    ViewFillDebrisGeometry(v, out, piece);
             }
         }
         out->x = e->x;
@@ -832,6 +1040,7 @@ static void FillExplodedPieces(PlayerView* v, const ViewWeaponsReport* report)
         const ViewReportExploded* e = &report->exploded[s];
         const unsigned char* unit;
         ViewExplodedPiece* out;
+        int teamColour = 0;
         if (!e->used)
             continue;
         out = ViewAddExplodedPiece(v);
@@ -841,10 +1050,14 @@ static void FillExplodedPieces(PlayerView* v, const ViewWeaponsReport* report)
         }
         unit = ViewHostRef(e->unit);
         if (unit != 0) {
-            out->unitDefIndex = R16(unit, UNIT_DEF_INDEX);
             out->owner = unit[UNIT_OWNER];
+            if (out->owner < VIEW_MAX_PLAYERS) {
+                const unsigned char* info = RRef(PlayerAt(out->owner), PLAYER_INFO);
+                if (info != 0)
+                    teamColour = info[INFO_COLOR];
+            }
         }
-        out->pieceIndex = (unsigned short)e->index;
+        ViewFillExplodedGeometry(v, out, Plain(e->desc), teamColour);
         if ((e->flags & 2) != 0)
             out->trail = 1;
         else if ((e->flags & 1) != 0)

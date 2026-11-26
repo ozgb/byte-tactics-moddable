@@ -58,8 +58,8 @@ class LayerTest(unittest.TestCase):
     def test_different_targets_are_independent(self):
         self.assertEqual(layers_of(A, fill("map", 0, 0, 10, 10)), [0, 0])
 
-    def test_empty_area_items_depend_on_nothing(self):
-        self.assertEqual(layers_of(A, "text screen 0 0 0 0 comix 1 2 3 4 5 hello", B), [0, 0, 1])
+    def test_an_empty_item_takes_no_layer(self):
+        self.assertEqual(layers_of(A, "text screen 0 0 0 0 comix 1 2 3 4 5 hello", B), [0, 1])
 
     def test_a_blit_reads_its_source_target(self):
         self.assertEqual(layers_of(fill("map", 0, 0, 10, 10), "blit screen 0 0 640 480 map 0 0"), [0, 1])
@@ -74,7 +74,10 @@ class LayerTest(unittest.TestCase):
         self.assertEqual(layers_of(fill("map", 0, 0, 10, 10), "sprite screen 50 50 60 60 target:map 50 50"), [0, 1])
 
     def test_a_draw_with_an_empty_area_does_not_order_a_read(self):
-        self.assertEqual(layers_of("fill map 0 0 0 0 1", "blit screen 0 0 640 480 map 0 0"), [0, 0])
+        self.assertEqual(layers_of("fill map 0 0 0 0 1", "blit screen 0 0 640 480 map 0 0"), [0])
+
+    def test_a_read_with_an_empty_area_does_not_order_a_draw(self):
+        self.assertEqual(layers_of("blit screen 0 0 0 0 map 0 0", fill("map", 0, 0, 10, 10)), [0])
 
     def test_a_picture_that_is_a_file_reads_no_target(self):
         self.assertEqual(layers_of(fill("map", 0, 0, 10, 10), "sprite screen 0 0 10 10 anims/logos.gaf:logo:0 0 0"), [0, 0])
@@ -142,10 +145,10 @@ class DigestTest(unittest.TestCase):
         draw, blit = fill("map", 300, 300, 310, 310), "blit screen 0 0 10 10 map 0 0"
         self.assertNotEqual(ordered_and_set(draw, blit)[1], ordered_and_set(blit, draw)[1])
 
-    def test_empty_area_items_commute(self):
-        empty_one, empty_two = "text screen 0 0 0 0 comix 1 2 3 4 5 a", "text screen 0 0 0 0 comix 1 2 3 4 5 b"
-        self.assertEqual(ordered_and_set(A, empty_one, empty_two)[1], ordered_and_set(A, empty_two, empty_one)[1])
-        self.assertNotEqual(ordered_and_set(A, empty_one, empty_two)[0], ordered_and_set(A, empty_two, empty_one)[0])
+    def test_a_list_with_empty_items_has_the_digest_of_the_list_without(self):
+        empty_one, empty_two = "text screen 0 0 0 0 comix 1 2 3 4 5 a", "sprite_blend screen 0 0 0 0 anims/fx.gaf:smoke:0 -40 -40"
+        self.assertEqual(digest_text(listing(frame(A, empty_one, B, empty_two))), digest_text(listing(frame(A, B))))
+        self.assertEqual(digest_text(listing(frame(A, empty_one, B, empty_two))).splitlines()[2].split(" ")[2], "2")
 
     def test_a_different_count_changes_both(self):
         one, two = ordered_and_set(A), ordered_and_set(A, C)
@@ -198,6 +201,9 @@ class DigestCompareTest(unittest.TestCase):
 class ListCompareTest(unittest.TestCase):
     def test_equal_lists(self):
         self.assertIsNone(list_difference(listing(frame(A, B)), listing(frame(A, B))))
+
+    def test_an_empty_item_only_one_list_has_is_no_difference(self):
+        self.assertIsNone(list_difference(listing(frame(A, "fill screen 0 0 0 0 1", B)), listing(frame(A, B))))
 
     def test_names_the_frame_and_the_item_with_both_lines(self):
         one = listing(frame(A, number=1), frame(B, C, number=2, tick=5))
@@ -255,6 +261,16 @@ class ParseTest(unittest.TestCase):
     def test_a_blit_needs_a_source(self):
         with self.assertRaises(Error):
             parse_layered(listing(frame("blit screen 0 0 10 10")))
+
+    def test_an_empty_item_is_left_out(self):
+        for empty in ("fill screen 0 0 0 0 1", "fill screen 5 0 5 10 1", "fill screen 0 5 10 5 1", "fill screen 10 10 5 5 1"):
+            items = parse_layered(listing(frame(A, empty, B)))[0].items
+            self.assertEqual([item.line for item in items], [A, B], empty)
+
+    def test_an_item_with_an_area_is_kept(self):
+        one_pixel = "pixel screen 3 4 4 5 3 4 7"
+        items = parse_layered(listing(frame(one_pixel, "text screen 0 0 0 0 comix 1 2 3 4 5 a", C)))[0].items
+        self.assertEqual([(item.line, item.number) for item in items], [(one_pixel, 3), (C, 5)])
 
     def test_the_fields_of_an_item(self):
         item = parse_layered(listing(frame("copy screen 1 2 3 4 map 0 0 5 5 8 9")))[0].items[0]

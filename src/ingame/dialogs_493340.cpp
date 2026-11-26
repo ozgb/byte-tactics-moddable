@@ -319,6 +319,12 @@ static inline int TestBit(unsigned int* set, unsigned short n)
 // The list is a real std::vector<Unit*> (0x48ca20 calls the vector's _Ucopy,
 // _Ufill and _Destroy).
 
+void __stdcall HarnessUiGiveUnit(const void* unit, int player);
+void __stdcall HarnessUiTransfer(int from, int to, int resource, float amount, int announce);
+void __stdcall HarnessUiShareMap(int from, int to);
+void __stdcall HarnessUiForgetAttacker(const void* unit);
+void __stdcall HarnessUiSetStore(int player, int resource, int add, float amount);
+
 // FUNCTION: 0x4933e0
 void __stdcall GiveSelectedUnitsToPlayer(unsigned char player)
 {
@@ -332,6 +338,7 @@ void __stdcall GiveSelectedUnitsToPlayer(unsigned char player)
         Unit* unit = *it;
         if ((unit->flags & 3) != 2 && unit->cargo == 0 && unit->carrier == 0
             && !TestBit(set, unit->unitDefIndex)) {
+            HarnessUiGiveUnit(unit, player);
             GiveUnitToPlayer(unit, p, 0);
         }
     }
@@ -382,13 +389,18 @@ void __stdcall HandleShareDialogEvent(Gui* obj)
         int pi = FindSlotByDpid(g_shareDialogPlayerNetIds[idx]);
         Player* p = &g_game->players[pi];
         if (IsPlaying_4934b0(p) && !(p->info->flags_9b & 0x40) && IsCounted_4934b0(p)) {
+            HarnessUiTransfer(g_game->localPlayer, pi, 1,
+                         (float)ReadSliderValue(FindGadgetChecked_D(data, "METAL")), 1);
             TransferEnergy(g_game->localPlayer, pi,
                          (float)ReadSliderValue(FindGadgetChecked_D(data, "METAL")), 1);
+            HarnessUiTransfer(g_game->localPlayer, pi, 0,
+                         (float)ReadSliderValue(FindGadgetChecked_D(data, "ENERGY")), 1);
             TransferMetal(g_game->localPlayer, pi,
                          (float)ReadSliderValue(FindGadgetChecked_D(data, "ENERGY")), 1);
             if (GetButtonStageByName(obj, "SHARUNIT"))
                 GiveSelectedUnitsToPlayer(pi);
             if (GetButtonStageByName(obj, "MAPINFO")) {
+                HarnessUiShareMap(g_game->localPlayer, pi);
                 ShareMapInfo(g_game->localPlayer, pi);
                 SendShareMapInfo(g_game->localPlayer, pi);
             }
@@ -1345,6 +1357,7 @@ void __stdcall HandleDebugHotkey(int eventType)
     case 0x5d: {
         Unit* u = &g_game->units[g_game->hoverUnitId];
         if (u->unitDefIndex != 0) {
+            HarnessUiForgetAttacker(u);
             u->lastAttackerSlot = 10;
             u->flag_110 = 1;
             u->attacker = 0;
@@ -1360,6 +1373,8 @@ void __stdcall HandleDebugHotkey(int eventType)
                     unsigned char kind = g_game->players[k].type;
                     if (kind == 1 || kind == 2 || kind == 3) {
                         if (g_game->players[k].index != 10) {
+                            HarnessUiSetStore(k, 0, 0, g_game->players[k].energyCapacity);
+                            HarnessUiSetStore(k, 1, 0, g_game->players[k].metalCapacity);
                             g_game->players[k].energy = g_game->players[k].energyCapacity;
                             g_game->players[k].metal = g_game->players[k].metalCapacity;
                         }

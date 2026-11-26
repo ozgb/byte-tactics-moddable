@@ -20,6 +20,7 @@
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/state_writer.h"
+#include "../../interfaces/view.h"
 #include "../quirks/quirks.h"
 #include "../wasm/modules.h"
 #include "../state/sim_events.h"
@@ -55,6 +56,7 @@
 #include "../game/units_events.h"
 #include "../game/orders_events.h"
 #include "share_packets.h"
+#include "view_block.h"
 #include "view_fill.h"
 #include "../orders/order.h"
 

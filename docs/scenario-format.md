@@ -203,8 +203,10 @@ two players, a map chosen from the list and an option changed. The multiplayer l
 ### 3.6 The setup log
 
 Every run that does not load a saved game writes `setup.txt` when the match loads. It is the match the battle
-starts with, as the match keys of a scenario (sections 3.1 to 3.3): read back as a scenario, with the seeds and
-`ticks` added, it sets up the same battle, and the first tick of its trace equals the first tick of the run's.
+starts with, as the match keys of a scenario (sections 3.1 to 3.3), without the slot keys only a test sets
+(`player<N>.remote`, the storage keys and the `share_*` keys). The setup log of a `frontend 1` run, read back as a
+scenario with the seeds and `ticks` added, sets up the same battle, and the first tick of its trace equals the
+first tick of the run's.
 
     # bt-setup 1
     map Coast To Coast

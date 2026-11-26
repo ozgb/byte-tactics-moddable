@@ -278,11 +278,48 @@ void MarkFreed(const void* p)
     s_freed[s_freedCount++] = p;
 }
 
+const void** s_importFreed;
+unsigned s_importFreedCount;
+unsigned s_importFreedCapacity;
+
+bool ImportFreedHas(const void* p)
+{
+    for (unsigned i = 0; i < s_importFreedCount; i++) {
+        if (s_importFreed[i] == p)
+            return true;
+    }
+    return false;
+}
+
+void ImportFreed(const void* p)
+{
+    ReplaySetWalkSkip(ImportFreedHas);
+    if (p == nullptr || ImportFreedHas(p))
+        return;
+    if (s_importFreedCount == s_importFreedCapacity) {
+        unsigned wanted = s_importFreedCapacity == 0 ? 64 : s_importFreedCapacity * 2;
+        const void** grown = (const void**)realloc((void*)s_importFreed, wanted * sizeof(const void*));
+        if (grown == nullptr) {
+            abort();
+            return;
+        }
+        s_importFreed = grown;
+        s_importFreedCapacity = wanted;
+    }
+    s_importFreed[s_importFreedCount++] = p;
+}
+
 void MarkAllocated(const void* p)
 {
     int at = FreedIndex(p);
     if (at >= 0)
         s_freed[at] = s_freed[--s_freedCount];
+    for (unsigned i = 0; i < s_importFreedCount; i++) {
+        if (s_importFreed[i] == p) {
+            s_importFreed[i] = s_importFreed[--s_importFreedCount];
+            break;
+        }
+    }
 }
 
 void AddLiveRoots(ReplayRoots& to, const ReplayRoots& from)
@@ -296,7 +333,7 @@ void AddLiveRoots(ReplayRoots& to, const ReplayRoots& from)
 unsigned short s_importChanged[kReplayObjectFieldCount];
 ReplayReach s_importReach;
 
-enum { BEFORE_MAX = 65536, BEFORE_HASH = 131072, BEFORE_BYTES = 1 << 20 };
+enum { BEFORE_MAX = 1 << 18, BEFORE_HASH = 1 << 19, BEFORE_BYTES = 1 << 20 };
 
 struct BeforeEntry {
     const unsigned char* object;
@@ -559,6 +596,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)
     s_tail.Clear();
     s_roots = roots;
     s_freedCount = 0;
+    s_importFreedCount = 0;
     s_callBlockCount = 0;
     if (s_tick >= 0) {
         s_field.Clear();
@@ -732,6 +770,12 @@ void EventRoots(ReplayRoots& roots, unsigned table, const void* p, unsigned size
             void* weapon = ReplayWeaponAt(*(int*)(copy + f.offset));
             if (weapon != nullptr)
                 roots.Add(ROK_WEAPONDEF, weapon);
+            continue;
+        }
+        if (f.object == object && f.kind == RK_I32 && f.target != 0) {
+            void* element = ReplayTableElement(f.target, *(unsigned*)(copy + f.offset));
+            if (element != nullptr)
+                roots.Add(f.target, element);
             continue;
         }
         if (f.object != object || f.kind != RK_REF)

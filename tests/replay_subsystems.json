@@ -87,12 +87,20 @@
     }
   },
   "units": {
-    "inject": {
-      "define": "BT_REPLAY_INJECT_PERCENT_SCALE=99",
-      "recording": "orders-guard-attacked.txt",
-      "expect": 25,
-      "field": "Unit#1.healthPercent"
-    }
+    "inject": [
+      {
+        "define": "BT_REPLAY_INJECT_PERCENT_SCALE=99",
+        "recording": "orders-guard-attacked.txt",
+        "expect": 62,
+        "field": "Unit#1.healthPercent"
+      },
+      {
+        "define": "BT_REPLAY_INJECT_LAST_ATTACKER_SLOT=9",
+        "recording": "orders-factory.txt",
+        "expect": 3,
+        "field": "Unit#2.lastAttackerSlot"
+      }
+    ]
   },
   "ai": {
     "inject": {

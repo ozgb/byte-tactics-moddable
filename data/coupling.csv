@@ -671,7 +671,7 @@ game,harness,shared_write,Fixed::whole,1
 game,harness,shared_write,Game::difficulty,2
 game,harness,shared_write,Game::endGameFlags,2
 game,harness,shared_write,Game::endGameVictory,2
-game,harness,shared_write,Game::localPlayer,3
+game,harness,shared_write,Game::localPlayer,4
 game,harness,shared_write,Game::mode_391f1,1
 game,harness,shared_write,Game::numPlayers,2
 game,harness,shared_write,Game::playerIndex,1
@@ -4152,7 +4152,7 @@ players,game,shared_write,Vec3::y,2
 players,game,shared_write,Vec3::z,4
 players,harness,shared_write,Game::endGameFlags,2
 players,harness,shared_write,Game::endGameVictory,2
-players,harness,shared_write,Game::localPlayer,3
+players,harness,shared_write,Game::localPlayer,4
 players,harness,shared_write,Game::playerIndex,1
 players,harness,shared_write,Game::uiOptionFlags,1
 players,harness,shared_write,Player::allied,1
@@ -5593,7 +5593,7 @@ seams,harness,shared_write,MapSeam::IsPadSlotFree,2
 seams,harness,shared_write,MapSeam::PassMapGet,2
 seams,harness,shared_write,MapSeam::PassMapInBounds,2
 seams,harness,shared_write,MapSeam::SnapWorldPosToFootprint,3
-seams,harness,shared_write,MissionSeam::GetGameType,2
+seams,harness,shared_write,MissionSeam::GetGameType,4
 seams,harness,shared_write,MissionSeam::GetMissionName,2
 seams,harness,shared_write,MissionSeam::GetMissionParams,2
 seams,harness,shared_write,MissionSeam::GetNameSlot,2
@@ -5673,7 +5673,7 @@ seams,harness,shared_write,Seams::features,2
 seams,harness,shared_write,Seams::files,2
 seams,harness,shared_write,Seams::los_radar,3
 seams,harness,shared_write,Seams::map,3
-seams,harness,shared_write,Seams::mission,4
+seams,harness,shared_write,Seams::mission,6
 seams,harness,shared_write,Seams::movement,2
 seams,harness,shared_write,Seams::network,1
 seams,harness,shared_write,Seams::orders,2

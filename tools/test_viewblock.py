@@ -10,15 +10,16 @@ from pathlib import Path
 
 import viewblock as vb
 
-HEAD = "<HHIBBBBHHHH" + "IIII" + "iiii" + "9I"
+HEAD = "<HHIBBBBHHHH" + "IIII" + "iiii" + "13I"
 PLAYER = "<8B4HIHH10f" + "II" + "4d"
-UNIT = "<HHBBBBI" + "8B" + "3i" + "hhhH" + "fHH" + "4I" + "4f"
+UNIT = "<HHBBBBI" + "8B" + "3i" + "hhhH" + "fHH" + "4I" + "4f" + "BBH"
+FACE = "<IHBBIHH"
 BLIP = "<HBB3i"
 MESSAGE = "<HH6I"
 
 
-def header(tick=1, grid=(0, 0), counts=(0,) * 9):
-    return struct.pack(HEAD, 1, 0, tick, 0, 0, 0, 0, 0, 0, 0, 0, 64, 64, grid[0], grid[1], 0, 0, 0, 0, *counts)
+def header(tick=1, grid=(0, 0), counts=(0,) * 13):
+    return struct.pack(HEAD, 2, 0, tick, 0, 0, 0, 0, 0, 0, 0, 0, 64, 64, grid[0], grid[1], 0, 0, 0, 0, *counts)
 
 
 def players(metal=1000.0):
@@ -29,7 +30,7 @@ def players(metal=1000.0):
 
 
 def unit(x):
-    return struct.pack(UNIT, 7, 3, 1, 1, 0, 0, 0x10, 0, 0, 0, 0, 0, 0, 0, 0, x, 5, 6, 0, 0, 100, 0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0)
+    return struct.pack(UNIT, 7, 3, 1, 1, 0, 0, 0x10, 0, 0, 0, 0, 0, 0, 0, 0, x, 5, 6, 0, 0, 100, 0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0)
 
 
 class LayoutTest(unittest.TestCase):
@@ -40,6 +41,8 @@ class LayoutTest(unittest.TestCase):
         self.assertEqual(lay["ViewUnit"].size, struct.calcsize(UNIT))
         self.assertEqual(lay["ViewBlip"].size, struct.calcsize(BLIP))
         self.assertEqual(lay["ViewMessage"].size, struct.calcsize(MESSAGE))
+        self.assertEqual(lay["ViewDebrisFace"].size, struct.calcsize(FACE))
+        self.assertEqual(lay["ViewTexture"].size, 32)
         self.assertEqual(vb.header_size(), struct.calcsize(HEAD))
 
     def test_constants_come_from_the_header(self):
@@ -50,7 +53,7 @@ class LayoutTest(unittest.TestCase):
 class DecodeTest(unittest.TestCase):
     def block(self, x=1024, sight=b""):
         grid = (len(sight), 1) if sight else (0, 0)
-        return header(grid=grid, counts=(1, 0, 0, 0, 0, 0, 0, 0, 0)) + players() + unit(x) + sight
+        return header(grid=grid, counts=(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)) + players() + unit(x) + sight
 
     def test_paths_and_values(self):
         got = dict(vb.decode(self.block()))
@@ -66,9 +69,20 @@ class DecodeTest(unittest.TestCase):
         self.assertLess(paths.index("players[9].metal"), paths.index("units[0].id"))
         self.assertEqual(paths[-2:], ["sight[0]", "sight[1]"])
 
+    def test_debris_geometry_tables(self):
+        counts = (0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0)
+        data = (header(counts=counts) + players() + struct.pack("<3i", 1, -2, 3)
+                + struct.pack(FACE, 0, 2, 2, 0, 0, 0, 5) + struct.pack("<2H", 0, 7) + b"logo".ljust(32, b"\0"))
+        got = dict(vb.decode(data))
+        self.assertEqual(got["debrisVertices[0].y"], -2)
+        self.assertEqual(got["debrisFaces[0].frame"], 5)
+        self.assertEqual(got["debrisIndices[1]"], 7)
+        self.assertEqual(got["textures[0].name[3]"], ord("o"))
+        self.assertEqual(vb.serialisation_size(data), len(data))
+
     def test_header_only_block(self):
         got = vb.decode(header())
-        self.assertEqual(got[0], ("versionMajor", 1))
+        self.assertEqual(got[0], ("versionMajor", 2))
         self.assertTrue(all(not p.startswith("players") for p, _ in got))
 
     def test_truncated_sight_grid(self):
@@ -78,7 +92,7 @@ class DecodeTest(unittest.TestCase):
         self.assertEqual(vb.serialisation_size(data) - len(data), 2)
 
     def test_the_counts_cap_at_the_capacity(self):
-        data = header(counts=(0, 0, 0, 99999, 0, 0, 0, 0, 0))
+        data = header(counts=(0, 0, 0, 99999, 0, 0, 0, 0, 0, 0, 0, 0, 0))
         self.assertEqual(vb.serialisation_size(data), vb.header_size() + 10 * struct.calcsize(PLAYER) + 5001 * struct.calcsize(BLIP))
 
     def test_the_sight_grid_caps_at_the_cell_limit(self):
@@ -92,10 +106,10 @@ class DiffTest(unittest.TestCase):
         self.assertIsNone(vb.first_difference(data, data))
 
     def test_names_the_first_field_in_serialisation_order(self):
-        a = header(counts=(2, 0, 0, 0, 0, 0, 0, 0, 0)) + players() + unit(1) + unit(2)
-        b = header(counts=(2, 0, 0, 0, 0, 0, 0, 0, 0)) + players(2000.0) + unit(9) + unit(9)
+        a = header(counts=(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)) + players() + unit(1) + unit(2)
+        b = header(counts=(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)) + players(2000.0) + unit(9) + unit(9)
         self.assertEqual(vb.first_difference(a, b), ("players[0].metal", "1000", "2000"))
-        c = header(counts=(2, 0, 0, 0, 0, 0, 0, 0, 0)) + players() + unit(1) + unit(9)
+        c = header(counts=(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)) + players() + unit(1) + unit(9)
         self.assertEqual(vb.first_difference(a, c), ("units[1].x", "2", "9"))
 
     def test_a_missing_part_is_dash(self):

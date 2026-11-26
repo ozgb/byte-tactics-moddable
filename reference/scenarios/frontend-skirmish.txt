@@ -1,0 +1,27 @@
+# The main menu to a skirmish through the menus: Single, Skirmish, Select Map (Coast To Coast from the list), Line of Sight to Circular, Start. Two players, the human and the computer the menu starts with.
+frontend 1
+game_seed 1122
+crt_seed 2122
+view_seed 3122
+ticks 300
+input 0.20 mouse move 188 402
+input 0.21 mouse left down 188 402
+input 0.22 mouse left up 188 402
+input 0.70 mouse move 506 187
+input 0.71 mouse left down 506 187
+input 0.72 mouse left up 506 187
+input 0.120 mouse move 322 388
+input 0.121 mouse left down 322 388
+input 0.122 mouse left up 322 388
+input 0.170 mouse move 190 167
+input 0.171 mouse left down 190 167
+input 0.172 mouse left up 190 167
+input 0.190 mouse move 485 346
+input 0.191 mouse left down 485 346
+input 0.192 mouse left up 485 346
+input 0.220 mouse move 500 276
+input 0.221 mouse left down 500 276
+input 0.222 mouse left up 500 276
+input 0.270 mouse move 550 445
+input 0.271 mouse left down 550 445
+input 0.272 mouse left up 550 445

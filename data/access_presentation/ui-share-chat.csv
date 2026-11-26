@@ -14,6 +14,8 @@ LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,features,GetCellFeature,LoadTntMap: G
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,map,GetGroundHeight,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
+LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,DrawBattleFrame,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
+LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,HitTestUnitScreenHull,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
 Mission::type,mission,Mission::GetGameType,SetMissionType: new Mission,1,
 MissionConditions::RegisterConditions: new DefeatAllUnitsKilled #2,players,MissionConditions::NotifyUnitCaptured,MissionConditions::RegisterConditions: new DefeatAllUnitsKilled #2,0,-
 MissionConditions::RegisterConditions: new VictoryDestroyAllUnits #2,players,MissionConditions::NotifyUnitCaptured,MissionConditions::RegisterConditions: new VictoryDestroyAllUnits #2,0,-
@@ -233,6 +235,26 @@ Unit::zFraction,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnore
 Unit::zFraction,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::zWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zWhole,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+UnitDef::buildMenuPageCount,presentation,RefreshOrderButtons,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::buildMenuPageCount,presentation,RefreshSelectionOrders,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags1,presentation,CMemoryCache::DrawObjectPicture,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::flags1,presentation,UnitTable::DrawPieces,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::flags2,ai,AiApply,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags2,orders,GetOrderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::flags2,presentation,DrawUnitInfoPanel,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags2,presentation,RefreshSelectionOrders,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::maxHealth,presentation,DrawUnitInfoPanel,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::modelMaxX,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMaxYHigh,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMaxZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMinX,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMinY,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMinZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelSizeX,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::modelSizeY,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::modelSizeZ,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::unitname,harness,ModelItem,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitMotion::speed,presentation,CMemoryCache::DrawObjectState,MovementApply: new UnitMotion,1,
 UnitResources::energyMake,economy,EconomyApply,InitPlayerSlot: new UnitResources,0,-
 UnitResources::energyUse,economy,EconomySpend,InitPlayerSlot: new UnitResources,0,-

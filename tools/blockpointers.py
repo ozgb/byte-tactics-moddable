@@ -307,18 +307,37 @@ def call_sites(code: bytes, address: int, callees: set[int]) -> set[int]:
     return sites
 
 
-def exe_call_sites(exe: Path, callees: set[int]) -> list[int]:
-    """The return addresses of the calls to `callees` in the code sections of a PE exe, in address order."""
-    data = exe.read_bytes()
+def code_sections(data: bytes) -> list[tuple[int, bytes]]:
+    """The code sections of a PE image, as (load address, bytes)."""
     pe = struct.unpack_from("<I", data, 0x3C)[0]
     count, optional_size = struct.unpack_from("<H", data, pe + 6)[0], struct.unpack_from("<H", data, pe + 20)[0]
     image_base = struct.unpack_from("<I", data, pe + 24 + 28)[0]
-    sites: set[int] = set()
+    out = []
     for i in range(count):
         _, size, rva, raw_size, raw, *_, flags = struct.unpack_from("<8sIIIIIIHHI", data, pe + 24 + optional_size + 40 * i)
         if flags & CODE_SECTION:
-            sites |= call_sites(data[raw:raw + min(size, raw_size)], image_base + rva, callees)
+            out.append((image_base + rva, data[raw:raw + min(size, raw_size)]))
+    return out
+
+
+def exe_call_sites(exe: Path, callees: set[int]) -> list[int]:
+    """The return addresses of the calls to `callees` in the code sections of a PE exe, in address order."""
+    sites: set[int] = set()
+    for address, code in code_sections(exe.read_bytes()):
+        sites |= call_sites(code, address, callees)
     return sorted(sites)
+
+
+def call_targets(exe: Path, sites: list[int]) -> dict[int, int]:
+    """The callee of each direct call (`call rel32`) whose return address is in `sites`."""
+    sections = code_sections(exe.read_bytes())
+    out = {}
+    for site in sites:
+        for address, code in sections:
+            at = site - 5 - address
+            if 0 <= at and at + 5 <= len(code) and code[at] == 0xE8:
+                out[site] = (site + struct.unpack_from("<i", code, at + 1)[0]) & 0xFFFFFFFF
+    return out
 
 
 def load_call_sites(map_path: Path) -> list[int]:

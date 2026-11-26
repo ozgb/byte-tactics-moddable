@@ -124,6 +124,7 @@ VIEW_NAMES = {
     "InitPlayerSlot: operator new unsigned char": "the player slot block",
     "LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY": "the mapped memory",
     "LoadTntMap: GameAllocIgnoreTag PLOT MEMORY": "the plot memory",
+    "LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS": "the unit model table",
     "g_missionOrderTableVec@src/orders/order_list.cpp": "g_missionOrderTableVec, second copy",
 }
 STORED_COLUMNS = ["item", "reader", "function", "container", "every", "after"]

@@ -350,6 +350,7 @@ static void EventLogRecord(const SimEventQueue& q, const SimEvent& e, unsigned i
             all[6 + i] = next.args[i];
     }
     unsigned int count = kind == nullptr ? 6 : kind->args;
+    HarnessViewEvent(e.kind, e.flags & 0x7fff, all, count);
     for (unsigned int i = 0; i < count; i++) {
         sprintf(buf, " %u", all[i]);
         EventLogPut(buf);

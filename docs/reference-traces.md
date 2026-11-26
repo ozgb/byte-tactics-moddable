@@ -1,26 +1,28 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v46` is the fixed target for anyone writing a new
+The git tag `reference-traces-v47` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v46`**.
+code as a base. This page names the current tag: **`reference-traces-v47`**.
 
 ## What the tag holds
 
 - The source: 3.1c's game logic, and the conformity harness that writes traces
   (compiled into the test-mode build).
-- The trace format: `bt-trace 9` (the digest files are `bt-digest 9`). The
+- The trace format: `bt-trace 10` (the digest files are `bt-digest 10`; the tags up to v46 are `bt-trace 9` or older, see the list below). The
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
 - The scenario list: `reference/scenarios/`, 96 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest and one 64-bit end-of-tick state per tick
-  for each scenario.
+  for each scenario, and with the next free reference-traces tag after the merge also the hash of that tick's `view` row.
+- The views: `reference/views/<scenario>/<tick>.bin`, with the next free reference-traces tag after the merge, the player view
+  of each tick of a scenario's `frames` line (`docs/view.md`, "The recorded view").
 
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v46
+git checkout reference-traces-v47
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -120,13 +122,14 @@ uv run tools/tracedigest.py trace.txt --commit <sha> --scenario reference/scenar
 diff mine.txt reference/traces/skirmish2.txt
 ```
 
-The digest file starts with a header (`bt-digest 9`, trace format, commit,
-scenario, seeds, `fpu_control_word`), then one `<tick> <digest> <state>` line per
+The digest file starts with a header (`bt-digest 10`, trace format, commit,
+scenario, seeds, `fpu_control_word`), then one `<tick> <digest> <state> <view>` line per
 tick. Your header must agree with the stored one except for `commit`. The
 first differing tick is where your engine first diverges.
 
 `digest` folds every row of the tick, so it also judges the order of the phases inside it. `state` is the `tick` row alone,
-the state at the end of the tick (`docs/trace-format.md`, section 6). An engine that keeps the end-of-tick state but
+the state at the end of the tick (`docs/trace-format.md`, section 6), and `view` is the `view` row alone, the hash of the
+player view of that tick (`docs/view.md`, "The recorded view"), which the digest also covers. An engine that keeps the end-of-tick state but
 does its work inside a tick in another order is equal on `state` and differs on `digest`; `tools/reference.py --check
 --end-of-tick` judges `state` only.
 
@@ -136,7 +139,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v46
+git checkout reference-traces-v47
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -167,7 +170,7 @@ made each run and never committed), and from the options table the saver writes 
 ends at 1800.
 
 It does not match the uninterrupted game (`save-midgame`, the same as `skirmish2`) from the saved tick on:
-every row from tick 901 differs, all 8100 of them (900 ticks, 9 rows each). Do not compare the two. Compare a
+every row from tick 901 differs, all 8100 of them (900 ticks, 9 rows each in format 9, 10 now). Do not compare the two. Compare a
 loaded game with the digests of `load-midgame`.
 
 - At tick 901, phase `units` (the first row), the first differing field is the Park-Miller state of the
@@ -208,9 +211,9 @@ What the code shows about the players fields (the player loader and saver):
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v47`
+the digests that should become a target gets a new tag (`reference-traces-v48`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v46`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v47`
+`reference-traces-v47`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v49`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
@@ -425,12 +428,17 @@ and so on), and this page is updated to name it. The current tag is
   exit menu's surfaces by a freed surface that had the same address, and 0974c9c89 names it as `moddable` does but in
   the display log 1.1. The sounds, UI logs, interface logs, events, display logs, frames and saves of the
   other scenarios are those of v45.
+- `reference-traces-v47` (#1063): the 96 scenarios of v46 in trace format `bt-trace 10`. Each tick has a
+  tenth row, `view`, after `tick`: the hash of the player view of the end of the tick (`docs/view.md`, "The recorded view"), and the digest
+  files' lines are `<tick> <digest> <state> <view>`. The scenarios with a `frames` line have the view of each frame tick in
+  `reference/views/<scenario>/<tick>.bin` (version 1 of the file, `BTVW`). Every digest changes, and the commit line names 9a72a58db, the reference merge that records the view; no other row changes, but the dumps say `bank` for #1106's `field_64`. The event digests,
+  sound logs, UI logs, interface commands, display logs, frames and saves are those of v46.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 is `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

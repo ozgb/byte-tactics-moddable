@@ -411,6 +411,17 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(purecall_test DEPENDS "${CMAKE_BINARY_DIR}/purecall_test.exe")
 
+add_library(view_block_test_objects OBJECT src/harness/view_block.cpp tests/view_block_test.cpp)
+target_include_directories(view_block_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
+target_compile_options(view_block_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
+add_custom_command(
+  OUTPUT "${CMAKE_BINARY_DIR}/view_block_test.exe"
+  COMMAND "${LLD_LINK}" /nologo /machine:x86 /subsystem:console /out:${CMAKE_BINARY_DIR}/view_block_test.exe /libpath:${CMAKE_BINARY_DIR}/lib /incremental:no /safeseh:no
+          $<TARGET_OBJECTS:view_block_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib" "${MSVC5_LIB}/LIBCMT.LIB" "${MSVC5_LIB}/OLDNAMES.LIB"
+  DEPENDS view_block_test_objects $<TARGET_OBJECTS:view_block_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
+  VERBATIM COMMAND_EXPAND_LISTS)
+add_custom_target(view_block_test DEPENDS "${CMAKE_BINARY_DIR}/view_block_test.exe")
+
 if(ZLIB_SOURCES)
   add_library(files_adapter_objects OBJECT src/files/hpi.cpp src/files/sqsh.cpp src/game/cd_check.cpp src/util/tdf.cpp
     src/graphics/gaf.cpp src/graphics/blit.cpp src/graphics/pcx.cpp src/util/int_map.cpp

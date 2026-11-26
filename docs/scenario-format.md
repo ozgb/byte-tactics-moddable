@@ -410,6 +410,7 @@ A test-mode run writes these files in its working directory. Two builds conform 
 | `events.txt` | every run: the sim events the presentation drains, with the tick and the drain that delivered each | `docs/events-log.md` | `reference/events/<scenario>.txt` (the digest of the log) |
 | `setup.txt` | every run that does not load a saved game, when the match loads: the match it starts | section 3.6 | `reference/setup/<scenario>.txt`, for the scenarios with `frontend 1` |
 | `frames/<tick>.bin` | a run whose scenario has a `frames` line: one file per listed tick | `docs/frame-dump.md` | `reference/frames/<scenario>/<tick>.bin` |
+| `views/<tick>.bin` | a run whose scenario has a `frames` line (one file per listed tick), and a run with `-testdump <tick>` (that tick): the player view of the end of the tick | `docs/view.md`, "The recorded view" | `reference/views/<scenario>/<tick>.bin` (the frame ticks only) |
 | `savegame\harness.sav`, `savegame\harness.opt` | a run whose scenario has a `save` line | section 5 | `reference/saves/<scenario>.sav` (the `.opt` file is not stored) |
 | `replay-<subsystem>.txt` | a run with `record` lines | `docs/replay-format.md` | `tests/replay/<subsystem>/<scenario>.txt` |
 

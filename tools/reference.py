@@ -10,6 +10,7 @@ and compares the digest of each tick (tools/tracedigest.py) with the stored one.
 each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), each run's ui.txt with reference/ui/<scenario>.txt the same way (docs/ui-log.md), the decoded interface records of each run's commands.txt with reference/commands/<scenario>.txt the same way (tools/interfacelog.py), and the digest of each run's events.txt with reference/events/<scenario>.txt the same way (docs/events-log.md), naming the first differing record by playing the reference build.
 Each run's display.txt is compared, line by line, with reference/display/<scenario>.txt, and for a scenario with a `frames` line its displaylist.txt with reference/displaylists/<scenario>.txt frame by frame (docs/display-log.md, tools/displaylog.py); when a digest differs at a frame with no stored list, the first differing item is named by playing the reference build (tools/tracediff.py `--display`).
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
+Its view files (views/<tick>.bin, the player view of each frame tick, docs/view.md "The recorded view") are compared the same way with reference/views/<scenario>/, naming the first field that differs (tools/viewblock.py); the report line is `views: K of M scenarios equal, ...`, and a missing stored view fails.
 It also compares the harness.sav of each scenario with a `save` line with
 reference/saves/<scenario>.sav, when that file exists, by decoded contents (tools/savefile.py leaves out the bytes taken from the clock or from uninitialised memory).
 A run that ends before the stored trace does is reported as `EARLY <scenario>: ended at tick T of N (<exit code, signal or timeout>)`, with
@@ -22,7 +23,9 @@ scenarios named in GATE_TIER, the pull request gate (tools/coverage.py --tier ch
 `--check --end-of-tick` judges each scenario on the `state` column of the digest files alone, the hash of the `tick` row (the whole
 judged state at the end of the tick), not on the digest of all the rows of the tick. It is the verdict for a re-implementation that keeps the
 end-of-tick contract with its own order inside the tick (#1037). Each scenario's line then ends with ` [digest differs from tick T]` when its
-digest column differs, which does not fail it, and `K of M scenarios equal on every row` follows the total.
+digest column differs, and with ` [view differs from tick T]` when its `view` column (the hash of the `view` row) differs; neither fails it, and
+`K of M scenarios equal on every row` follows the total. The view files of the frames are compared as in a full check and reported, but a
+difference does not fail an end-of-tick check: the state stays the verdict.
 The sim event digests (`bt-event-digest 2`) are then compared on their `tick` lines alone, and the first differing record is named under the same rule (tools/tracediff.py `--events --end-of-tick`).
 The display digests and lists are compared on frame numbers, ticks, counts and `set`, and on items as sorted `<layer> <item>` lines (tools/displaylog.py `--end-of-tick`).
 
@@ -37,7 +40,7 @@ exclusive lock made them queue. A run that waits for a slot prints once which ga
 A second `--check` with the same cache key waits for the first on a key lock (bt-gate-key-<key>.lock) and then reports its cached pass.
 `--no-lock` takes no slot and no key lock. A scenario with a `load` line starts as soon as the scenario it loads has finished.
 A passing `--check` stores its output under ~/.cache/bt-gate/<key>.txt, the key being a SHA-256 of the exe, the files beside it
-(wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,commands,events,display,displaylists,frames,saves}, the four tools that play and compare
+(wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,commands,events,display,displaylists,frames,views,saves}, the four tools that play and compare
 (commit.txt is left out) and the options; a later `--check` with the same key, looked up before the lock and again after it, prints
 `cached pass from <date> at <commit>` and the stored lines and exits 0. `--no-cache` plays anyway.
 
@@ -60,7 +63,7 @@ and the block pointers are scanned and checked as in any full `--check`.
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
 traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the UI logs it wrote into reference/ui/, the interface commands it wrote into reference/commands/, the sim event logs it wrote into reference/events/ (if it wrote any), the display digests and lists it wrote into reference/display/ and reference/displaylists/ (if it wrote any), the
-frames it wrote into reference/frames/ (if it wrote any) and the saves it wrote into reference/saves/ (if it wrote any).
+frames it wrote into reference/frames/ (if it wrote any), the views of those frames (views/<tick>.bin) into reference/views/ (if it wrote any) and the saves it wrote into reference/saves/ (if it wrote any).
 Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
 """
@@ -94,6 +97,7 @@ import playtest
 import savefile
 import tracediff
 import tracedigest
+import viewblock
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUTS = ("TotalA.exe", "SMACKW32.DLL", "commit.txt")
@@ -119,6 +123,8 @@ UI_EFFECTS = ("group", "groupsel")
 FRAMES = ROOT / "reference/frames"
 FRAME_HEADER_SIZE = 16
 FRAME_PALETTE_SIZE = 1024
+VIEWS = ROOT / "reference/views"
+VIEWS_DIR = tracediff.VIEWS_DIR
 SAVES = ROOT / "reference/saves"
 SAVE_FILE = tracediff.SAVE_FILES[0]
 MAX_PARALLEL = 6
@@ -184,6 +190,7 @@ SETUP_LOGS: dict[str, str | None] = {}
 DISPLAY_LOGS: dict[str, str | None] = {}
 DISPLAY_LISTS: dict[str, str | None] = {}
 FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
+VIEW_DUMPS: dict[str, dict[int, bytes]] = {}
 SAVE_BYTES: dict[str, bytes | None] = {}
 MODES = ("wasm", "native")
 SLOT_FILE = "bt-gate-slot-{}"
@@ -191,7 +198,7 @@ KEY_LOCK_FILE = "bt-gate-key-{}.lock"
 SLOTS_ENV = "BT_GATE_SLOTS"
 SLOT_POLL_SECONDS = 0.25
 CACHE_ENV = "BT_GATE_CACHE"
-KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/commands", "reference/events", "reference/display", "reference/displaylists", "reference/frames", "reference/saves", "reference/setup",
+KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/commands", "reference/events", "reference/display", "reference/displaylists", "reference/frames", "reference/views", "reference/saves", "reference/setup",
             "tools/playtest")
 KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py", "tools/savefile.py",
              "tools/blockpointers.py", "tools/eventdigest.py", "tools/displaylog.py", "tools/tracerehash.py", "tools/interfacelog.py")
@@ -310,10 +317,11 @@ def scenario_frames(scenario: Path) -> list[int]:
 
 DIGEST = 1
 STATE = 2
+VIEW = 3
 
 
-def difference(want: tuple[dict[str, str], list[tuple[int, str, str]]], header: dict[str, str],
-               digests: list[tuple[int, str, str]], column: int = DIGEST) -> str | None:
+def difference(want: tuple[dict[str, str], list[tuple[int, str, str, str]]], header: dict[str, str],
+               digests: list[tuple[int, str, str, str]], column: int = DIGEST) -> str | None:
     """Why a run differs from the stored (header, digests) in `column` (DIGEST or STATE), or None when it equals them."""
     want_header, want_digests = want
     diff = first_difference(want_digests, digests, column)
@@ -916,11 +924,11 @@ def scenario_saves(scenario: Path) -> bool:
 
 
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
-                  want: tuple[dict[str, str], list[tuple[int, str, str]]] | None = None, poison: bool = False,
+                  want: tuple[dict[str, str], list[tuple[int, str, str, str]]] | None = None, poison: bool = False,
                   keep_always: bool = False, scans: dict[str, str | None] | None = None,
                   scan_every: int = 1, retry_any: bool = False, save_to: Path | None = None,
                   load_from: Path | None = None, watch: "Watch | None" = None,
-                  mode: str | None = None, column: int = DIGEST) -> tuple[dict[str, str], list[tuple[int, str, str]], float, Path | None]:
+                  mode: str | None = None, column: int = DIGEST) -> tuple[dict[str, str], list[tuple[int, str, str, str]], float, Path | None]:
     """Run the scenario under Wine: the trace header, the digest of each tick, the seconds taken.
 
     With `want` (the stored header and digests), a run that differs is kept: the last element is the
@@ -956,7 +964,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     for attempt in range(RUN_ATTEMPTS):
         try:
             frame_files = tuple(f"frames/{tick}.bin" for tick in scenario_frames(scenario))
-            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, COMMANDS_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAYLIST_FILE, SETUP_FILE, *frame_files, *dict.fromkeys(
+            view_files = tuple(f"{VIEWS_DIR}/{tick}.bin" for tick in scenario_frames(scenario))
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, COMMANDS_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAYLIST_FILE, SETUP_FILE, *frame_files, *view_files, *dict.fromkeys(
                 (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if watch is not None:
                 extra["started"] = watch.started(key)
@@ -1002,6 +1011,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         DISPLAY_LISTS[key] = display_list.read_text() if display_list.is_file() else None
         FRAME_DUMPS[key] = {tick: (run / "frames" / f"{tick}.bin").read_bytes()
                             for tick in scenario_frames(scenario) if (run / "frames" / f"{tick}.bin").is_file()}
+        VIEW_DUMPS[key] = {tick: (run / VIEWS_DIR / f"{tick}.bin").read_bytes()
+                           for tick in scenario_frames(scenario) if (run / VIEWS_DIR / f"{tick}.bin").is_file()}
         if scenario_saves(scenario):
             saved = run / SAVE_FILE
             SAVE_BYTES[key] = saved.read_bytes() if saved.is_file() else None
@@ -1245,7 +1256,7 @@ def with_roundtrip(scenarios: dict[str, Path], spec: str, directory: Path) -> di
     return copies
 
 
-def first_difference(stored: list[tuple[int, str, str]], got: list[tuple[int, str, str]], column: int = DIGEST) -> str | None:
+def first_difference(stored: list[tuple[int, str, str, str]], got: list[tuple[int, str, str, str]], column: int = DIGEST) -> str | None:
     """A description of the first tick at which `column` (DIGEST or STATE) differs, or None."""
     for a, b in zip(stored, got):
         if (a[0], a[column]) != (b[0], b[column]):
@@ -1256,7 +1267,18 @@ def first_difference(stored: list[tuple[int, str, str]], got: list[tuple[int, st
     return None
 
 
-def digest_note(stored: list[tuple[int, str, str]], got: list[tuple[int, str, str]]) -> str:
+def view_note(stored: list[tuple[int, str, str, str]], got: list[tuple[int, str, str, str]]) -> str:
+    """` [view differs from tick T]` for the first tick at which the view column differs (or the traces' lengths), else the empty string."""
+    for a, b in zip(stored, got):
+        if (a[0], a[VIEW]) != (b[0], b[VIEW]):
+            return f" [view differs from tick {a[0]}]"
+    if len(stored) != len(got):
+        longer = stored if len(stored) > len(got) else got
+        return f" [view differs from tick {longer[min(len(stored), len(got))][0]}]"
+    return ""
+
+
+def digest_note(stored: list[tuple[int, str, str, str]], got: list[tuple[int, str, str, str]]) -> str:
     """` [digest differs from tick T]` for the first tick at which the digest column differs (or the traces' lengths), else the empty string."""
     for a, b in zip(stored, got):
         if (a[0], a[DIGEST]) != (b[0], b[DIGEST]):
@@ -1605,6 +1627,51 @@ def frame_report(scenarios: dict[str, Path], dumps: dict[str, dict[int, bytes]],
     return differing, lines
 
 
+def view_file_difference(stored: bytes, got: bytes) -> str | None:
+    """The first field in which two view files differ (`<path>: stored <value>, got <value>`), or None when they are equal."""
+    try:
+        want, have = viewblock.split(stored), viewblock.split(got)
+    except viewblock.Error as e:
+        return str(e)
+    found = viewblock.first_difference(want, have)
+    return f"{found[0]}: stored {found[1]}, got {found[2]}" if found else None
+
+
+def view_report(scenarios: dict[str, Path], dumps: dict[str, dict[int, bytes]], directory: Path) -> tuple[list[str], list[str]]:
+    """(the scenarios whose views differ from directory/<scenario>/<tick>.bin, the report lines).
+
+    Only a scenario with a `frames` line is judged, and there a missing stored view or a view the run did not write is a difference.
+    """
+    differing: list[str] = []
+    lines: list[str] = []
+    judged = equal = 0
+    for name, path in scenarios.items():
+        ticks = scenario_frames(path)
+        if not ticks:
+            continue
+        judged += 1
+        got = dumps.get(name, {})
+        found = ""
+        for tick in ticks:
+            stored = directory / name / f"{tick}.bin"
+            if not stored.is_file():
+                found = f"view {tick}: no stored view in {(directory / name).relative_to(ROOT)}"
+            elif tick not in got:
+                found = f"view {tick}: the run wrote no view"
+            else:
+                diff = view_file_difference(stored.read_bytes(), got[tick])
+                found = f"view {tick}: {diff}" if diff else ""
+            if found:
+                break
+        if found:
+            differing.append(name)
+            lines.append(f"DIFF {name} {found}")
+        else:
+            equal += 1
+    lines.append(f"views: {equal} of {judged} scenarios equal, {len(differing)} differ, {len(scenarios) - judged} with no frames line")
+    return differing, lines
+
+
 def save_difference(stored: bytes, got: bytes) -> str | None:
     """The first difference between two saves (tools/savefile.py compares their decoded contents), or None when they are equal."""
     found = savefile.differences(stored, got)
@@ -1784,8 +1851,8 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
             key = tag(name, mode)
             header, digests, elapsed, kept = results[key]
             diff = difference(expected[name], header, digests, column)
-            note = digest_note(expected[name][1], digests) if end_of_tick else ""
-            every_row += end_of_tick and not note
+            note = digest_note(expected[name][1], digests) + view_note(expected[name][1], digests) if end_of_tick else ""
+            every_row += end_of_tick and not digest_note(expected[name][1], digests)
             where = f" [kept: {kept.relative_to(ROOT)}]" if kept else ""
             logged = SOUND_LOGS.get(key)
             sounds = f", {max(len(logged.splitlines()) - 1, 0)} sound lines" if logged is not None else ""
@@ -1796,7 +1863,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     print(f"{total - len(bad)} of {total} scenarios equal, total {clock(wall)}")
     if end_of_tick:
         print(every_row_line(every_row, total))
-    sound_bad = ui_bad = events_bad = display_bad = frame_bad = save_bad = setup_bad = 0
+    sound_bad = ui_bad = events_bad = display_bad = frame_bad = view_bad = save_bad = setup_bad = 0
     pointers = 0
     first_events: tuple[str, str] | None = None
     first_display: tuple[str, str, int] | None = None
@@ -1817,6 +1884,8 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         print("\n".join(label + line for line in list_lines))
         frame_names, frame_lines = frame_report(scenarios, mode_view(FRAME_DUMPS, scenarios, mode), FRAMES)
         print("\n".join(label + line for line in frame_lines))
+        view_names, view_lines = view_report(scenarios, mode_view(VIEW_DUMPS, scenarios, mode), VIEWS)
+        print("\n".join(label + line for line in view_lines))
         save_names, save_lines = save_report(scenarios, mode_view(SAVE_BYTES, scenarios, mode), SAVES)
         print("\n".join(label + line for line in save_lines))
         setup_names, setup_lines = setup_report(scenarios, mode_view(SETUP_LOGS, scenarios, mode), SETUPS)
@@ -1836,6 +1905,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
                     first_display = (name, mode, tick)
                     break
         frame_bad += len(frame_names)
+        view_bad += 0 if end_of_tick else len(view_names)
         save_bad += len(save_names)
         if scans is not None:
             pointers += report_block_pointers(exe, mode_view(scans, scenarios, mode), save_blockptrs / mode if save_blockptrs and both_modes else save_blockptrs, label)
@@ -1849,7 +1919,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
             report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir, end_of_tick)
         if first_display is not None:
             report_display_items(*first_display, expected, exe, scenarios, poison, game_dir, end_of_tick)
-        if pointers or sound_bad or ui_bad or events_bad or display_bad or frame_bad or save_bad or setup_bad:
+        if pointers or sound_bad or ui_bad or events_bad or display_bad or frame_bad or view_bad or save_bad or setup_bad:
             sys.exit(1)
         if tier:
             print(tier_message(len(scenarios), head_commit()))
@@ -2056,6 +2126,19 @@ def copy_frames(source: Path) -> None:
     print(f"{len(produced)} frames copied to {FRAMES.relative_to(ROOT)}")
 
 
+def copy_views(source: Path) -> None:
+    """Replace reference/views/ with the <scenario>/<tick>.bin files of `source` (left alone when it holds none)."""
+    produced = sorted(source.glob("*/*.bin"))
+    if not produced:
+        print("the reference branch wrote no views; reference/views/ is untouched")
+        return
+    shutil.rmtree(VIEWS, ignore_errors=True)
+    for path in produced:
+        (VIEWS / path.parent.name).mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(path, VIEWS / path.parent.name / path.name)
+    print(f"{len(produced)} views copied to {VIEWS.relative_to(ROOT)}")
+
+
 def copy_saves(directory: Path) -> None:
     """Replace reference/saves/ by the saves the reference branch checkout `directory` wrote (none written leaves it as it is)."""
     saves = sorted((directory / "reference/saves").glob("*.sav"))
@@ -2163,6 +2246,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
         shutil.copyfile(path, TRACES / path.name)
     print(f"{len(produced)} traces copied to {TRACES.relative_to(ROOT)}")
     copy_frames(directory / "reference/frames")
+    copy_views(directory / "reference/views")
     copy_saves(directory)
     copy_ui(directory)
     copy_commands(directory)

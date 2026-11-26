@@ -20,6 +20,7 @@
 #include "condition_class.h"
 #include "../../interfaces/seams.h"
 #include "../../interfaces/state_writer.h"
+#include "../../interfaces/view.h"
 #include "../quirks/quirks.h"
 #include "../wasm/modules.h"
 #include "../state/sim_events.h"
@@ -55,6 +56,9 @@
 #include "../game/units_events.h"
 #include "../game/orders_events.h"
 #include "share_packets.h"
+#include "view_block.h"
+#include "view_fill.h"
+#include "../orders/order.h"
 
 enum { MAX_PLAYERS = 10 };
 
@@ -2019,6 +2023,7 @@ static void RoundTripBlock()
 
 static void VisitSharePackets();
 static void WriteTickRow();
+static void WriteViewRow();
 
 void HarnessAfterStep()
 {
@@ -2030,6 +2035,7 @@ void HarnessAfterStep()
     if (HarnessTestMode() && s_trace != nullptr) {
         VisitSharePackets();
         WriteTickRow();
+        WriteViewRow();
     }
     if (HarnessTestMode()) {
         for (int i = 0; i < s_roundTripCount; i++) {
@@ -4750,6 +4756,200 @@ static void WriteTickRow()
     fflush(s_trace);
     if (s_dumpNow)
         fflush(s_dump);
+}
+
+static_assert(offsetof(Unit, playerIndex) == 0xff && offsetof(Unit, killCount) == 0xb8 && offsetof(Unit, group) == 0xac, "view: Unit");
+static_assert(offsetof(Unit, carrier) == 0x86 && offsetof(Unit, script) == 0x9a && offsetof(Unit, list2) == 0x60, "view: Unit refs");
+static_assert(offsetof(Unit, recentlyDamagedTimer) == 0xfa && offsetof(Unit, postTransferHoldoff) == 0xfb, "view: Unit timers");
+static_assert(offsetof(Order, target) == 0x16 && offsetof(Order, pos) == 0x22 && offsetof(Order, id) == 0x36, "view: Order");
+static_assert(offsetof(Order, progress) == 0x3e && offsetof(Order, flags_42) == 0x42 && offsetof(Order, created) == 0x46, "view: Order tail");
+static_assert(offsetof(PlayerInfo, side) == 0x95 && offsetof(PlayerInfo, color) == 0x96 && offsetof(PlayerInfo, flags) == 0x9b, "view: PlayerInfo");
+
+static ViewWeaponsReport s_viewReport;
+static int s_viewCaptureKind;
+static unsigned s_viewCaptureSlot;
+static ViewRawEvent s_viewEvents[4096];
+static unsigned s_viewEventCount;
+static PlayerView s_view;
+static unsigned char s_viewBytes[sizeof(PlayerView)];
+
+static void __stdcall ViewCaptureBegin(int, const char* name)
+{
+    unsigned slot;
+    s_viewCaptureKind = 0;
+    if (sscanf(name, "weaponsState.projectiles[%u]", &slot) == 1 && slot < VIEW_REPORT_PROJECTILES) {
+        s_viewCaptureKind = 1;
+        s_viewReport.projectileUsed[slot] = 1;
+    } else if (sscanf(name, "weaponsState.explodedPieces[%u]", &slot) == 1 && slot < VIEW_REPORT_EXPLODED) {
+        s_viewCaptureKind = 2;
+        s_viewReport.exploded[slot].used = 1;
+    } else if (sscanf(name, "weaponsState.debris[%u]", &slot) == 1 && slot < VIEW_REPORT_DEBRIS) {
+        s_viewCaptureKind = 4;
+        s_viewReport.debris[slot].used = 1;
+    } else if (sscanf(name, "weaponsState.pieces[%u]", &slot) == 1 && slot < VIEW_REPORT_PIECES) {
+        s_viewCaptureKind = 3;
+        s_viewReport.pieces[slot].used = 1;
+    }
+    s_viewCaptureSlot = slot;
+}
+
+static void __stdcall ViewCaptureInt(const char* field, int, int, unsigned int value)
+{
+    if (s_viewCaptureKind == 1) {
+        ViewReportProjectile* p = &s_viewReport.projectiles[s_viewCaptureSlot];
+        if (strcmp(field, "start.x") == 0) p->startX = (int)value;
+        else if (strcmp(field, "start.y") == 0) p->startY = (int)value;
+        else if (strcmp(field, "start.z") == 0) p->startZ = (int)value;
+        else if (strcmp(field, "angles.bank") == 0) p->bank = (short)value;
+        else if (strcmp(field, "angles.heading") == 0) p->heading = (short)value;
+        else if (strcmp(field, "angles.pitch") == 0) p->pitch = (short)value;
+        else if (strcmp(field, "propellerSpin") == 0) p->propellerSpin = (short)value;
+        else if (strcmp(field, "radius") == 0) p->radius = (short)value;
+        else if (strcmp(field, "active") == 0) p->active = (short)value;
+        else if (strcmp(field, "spawnTick") == 0) p->spawnTick = value;
+        else if (strcmp(field, "time") == 0) p->time = value;
+    } else if (s_viewCaptureKind == 2) {
+        ViewReportExploded* e = &s_viewReport.exploded[s_viewCaptureSlot];
+        if (strcmp(field, "index") == 0) e->index = (int)value;
+        else if (strcmp(field, "flags") == 0) e->flags = value;
+        else if (strcmp(field, "rec.angle_10") == 0) e->angle10 = (short)value;
+        else if (strcmp(field, "rec.angle_12") == 0) e->angle12 = (short)value;
+        else if (strcmp(field, "rec.angle_14") == 0) e->angle14 = (short)value;
+        else if (strcmp(field, "rec.pos.x") == 0) e->x = (int)value;
+        else if (strcmp(field, "rec.pos.y") == 0) e->y = (int)value;
+        else if (strcmp(field, "rec.pos.z") == 0) e->z = (int)value;
+    } else if (s_viewCaptureKind == 4) {
+        ViewReportDebris* e = &s_viewReport.debris[s_viewCaptureSlot];
+        if (strcmp(field, "ref1.index") == 0) e->frame = (unsigned short)value;
+        else if (strcmp(field, "ref2.index") == 0) e->shadowFrame = (unsigned short)value;
+        else if (strcmp(field, "pos.x") == 0) e->x = (int)value;
+        else if (strcmp(field, "pos.y") == 0) e->y = (int)value;
+        else if (strcmp(field, "pos.z") == 0) e->z = (int)value;
+        else if (strcmp(field, "angle_x") == 0) e->angleX = (short)value;
+        else if (strcmp(field, "angle_y") == 0) e->angleY = (short)value;
+        else if (strcmp(field, "angle_z") == 0) e->angleZ = (short)value;
+    } else if (s_viewCaptureKind == 3) {
+        ViewReportPiece* p = &s_viewReport.pieces[s_viewCaptureSlot];
+        if (strcmp(field, "firstFace") == 0) p->firstFace = (int)value;
+        else if (strcmp(field, "faceCount") == 0) p->faceCount = (int)value;
+    }
+}
+
+static void __stdcall ViewCaptureBytes(const char*, int, const void*, int)
+{
+}
+
+static void __stdcall ViewCaptureHandle(const char* field, int, int, unsigned int value)
+{
+    if (s_viewCaptureKind == 2 && strcmp(field, "unit") == 0)
+        s_viewReport.exploded[s_viewCaptureSlot].unit = value;
+    else if (s_viewCaptureKind == 4) {
+        ViewReportDebris* e = &s_viewReport.debris[s_viewCaptureSlot];
+        if (strcmp(field, "obj") == 0) e->obj = value;
+        else if (strcmp(field, "ref1.src") == 0) e->spriteSource = value;
+        else if (strcmp(field, "ref2.src") == 0) e->shadowSource = value;
+    }
+}
+
+static void __stdcall ViewCaptureRun(int)
+{
+}
+
+static const StateWriter s_viewCapture = { ViewCaptureBegin, ViewCaptureInt, ViewCaptureBytes, ViewCaptureHandle, ViewCaptureRun };
+
+const unsigned char* ViewHostGame(void)
+{
+    return (const unsigned char*)g_game;
+}
+
+const unsigned char* ViewHostRef(unsigned stored)
+{
+    return (const unsigned char*)RefAbs(stored);
+}
+
+void ViewHostUnitAccount(const unsigned char* unit, float out[4])
+{
+    EconAccount account;
+    g_seams.economy->UnitAccount(Ref<Unit>((Unit*)unit).offset, &account);
+    out[0] = account.metal.makePrev;
+    out[1] = account.metal.usePrev;
+    out[2] = account.energy.makePrev;
+    out[3] = account.energy.usePrev;
+}
+
+int ViewHostOrderDrawMask(unsigned kind)
+{
+    return *(const int*)((const unsigned char*)g_missionOrderTableVec.Begin() + kind * ORDER_TABLE_STRIDE + 0xc);
+}
+
+int ViewHostOrderPosYUnset(const unsigned char* order)
+{
+    return OrderPosYUnset((unsigned)order);
+}
+
+const ViewWeaponsReport* ViewHostWeaponsReport(void)
+{
+    memset(&s_viewReport, 0, sizeof s_viewReport);
+    s_viewCaptureKind = 0;
+    g_seams.weapons->WriteState(&s_viewCapture);
+    return &s_viewReport;
+}
+
+unsigned ViewHostTakeEvents(const ViewRawEvent** events)
+{
+    unsigned n = s_viewEventCount;
+    s_viewEventCount = 0;
+    *events = s_viewEvents;
+    return n;
+}
+
+void ViewHostFail(const char* message)
+{
+    Fail(message);
+}
+
+void HarnessViewEvent(unsigned kind, unsigned flags, const unsigned* args, unsigned count)
+{
+    if (!HarnessTestMode() || s_trace == nullptr || !ViewIsMessageKind(kind))
+        return;
+    if (s_viewEventCount >= sizeof s_viewEvents / sizeof s_viewEvents[0]) {
+        Fail("testmode: more sim events than the view's event buffer holds\n");
+        return;
+    }
+    ViewRawEvent* e = &s_viewEvents[s_viewEventCount++];
+    memset(e, 0, sizeof *e);
+    e->kind = (unsigned short)kind;
+    e->flags = (unsigned short)flags;
+    e->count = count;
+    for (unsigned i = 0; i < count && i < VIEW_REPORT_EVENT_ARGS; i++)
+        e->args[i] = args[i];
+}
+
+static void WriteViewRow()
+{
+    ViewFill(&s_view);
+    unsigned size = ViewSerialize(&s_view, s_viewBytes);
+    s_hash = kHashOffset;
+    HashBuf(s_viewBytes, size);
+    unsigned tick = s_view.tick;
+    fprintf(s_trace, "%u view %08x%08x\n", tick, (unsigned)(s_hash >> 32), (unsigned)s_hash);
+    fflush(s_trace);
+    bool wanted = s_dumpEnabled && tick == s_dumpTick;
+    for (unsigned i = 0; i < s_frameCount; i++) {
+        if (s_frameTicks[i] == tick)
+            wanted = true;
+    }
+    if (!wanted)
+        return;
+    char directory[] = "views";
+    char path[32];
+    MakeDirectoryPath(directory);
+    sprintf(path, "views\\%u.bin", tick);
+    if (!ViewWriteFile(path, s_viewBytes, size)) {
+        char msg[100];
+        sprintf(msg, "testmode: cannot write %s\n", path);
+        Fail(msg);
+    }
 }
 
 static void OpenTrace(unsigned controlWord)

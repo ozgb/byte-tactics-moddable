@@ -8,9 +8,9 @@ serves the local renderer, a network client that never holds the whole state, an
 
 This page states each fact of the block: its source in the judged state (`docs/trace-format.md`, by the dump path of
 the field, such as `units[i].health`) or in the sim events (`docs/sim-events.md`), and its rule of visibility. The rules
-are 3.1c's, quirks included; a quirk is a fact of the view until a quirk flag (#1) gives a profile the choice. Nothing
-fills the block yet: recording it every tick, as a hash and as the whole block on the ticks with stored frames, is
-#1063.
+are 3.1c's, quirks included; a quirk is a fact of the view until a quirk flag (#1) gives a profile the choice. A test-mode
+run fills the block at the end of every tick and records it: as the `view` row of the trace on every tick, and as a whole
+file on the ticks with a stored frame ("The recorded view").
 
 The facts are what presentation reads: the last section, "The reads", lists every field of the simulation that a
 function of presentation reads during play or in its menus, and says where each one is in the view, or why it is not.
@@ -84,6 +84,58 @@ sets a bit of `PlayerView.truncated`, so that a dropped entry is never silent:
 | `features` | 65536 | the features after the first 65536, in the order of their anchor cells (row by row), are dropped; `VIEW_TRUNCATED_FEATURES` |
 | `sight` | 1048576 cells (a grid of 1024 by 1024, a map of 32768 pixels a side) | `gridWidth` and `gridHeight` stay the grid's; the cells past the first 1048576, row by row, are dropped, and a draw reads them as `VIEW_SIGHT_HIDDEN`; `VIEW_TRUNCATED_SIGHT` |
 
+## The recorded view
+
+A test-mode run (`docs/scenario-format.md`) fills a `PlayerView` at the end of each tick, after every step of the tick and
+before the tick's save and round trip, for the viewer and controller the judged state names (section "The two players"),
+and records it twice: as the `view` row of `trace.txt` on every tick, and as a file on some ticks. Both are made from one byte
+string, the serialisation S. This section defines S, the row and the file exactly enough to compute them from a filled block.
+
+**The layout.** The structs are those of `interfaces/view.h` with the layout of a 32-bit Visual C++ build for x86: every member
+at an offset that is a multiple of its size (a `double` at a multiple of 8), a struct as aligned as its most aligned member
+and its size rounded up to that alignment, little-endian, `float` and `double` as IEEE 754 binary32 and binary64. The padding bytes
+between members and at the end of a struct are zero. The sizes in bytes: `ViewPlayer` 104, `ViewUnit` 80, `ViewPiece` 20,
+`ViewOrder` 24, `ViewBlip` 16, `ViewFeature` 32, `ViewProjectile` 48, `ViewDebris` 36, `ViewExplodedPiece` 28, `ViewMessage` 28.
+The fields of `PlayerView` before `players`, its header, take 88 bytes (`versionMajor` at 0, `tick` at 4, `mapWidth` at 20,
+`unitCount` at 52, `messageCount` at 84). `tools/viewblock.py` reads the layout from the header file and decodes any block.
+
+**S.** The serialisation of a filled block is the concatenation of
+
+1. the header: the bytes of `PlayerView` from offset 0 up to the `players` member;
+2. `players[0]` to `players[9]`, all ten, in use or not;
+3. the used rows of each table, in this order: `units[0..unitCount)`, `pieces[0..pieceCount)`, `orders[0..orderCount)`,
+   `blips[0..blipCount)`, `features[0..featureCount)`, `projectiles[0..projectileCount)`, `debris[0..debrisCount)`,
+   `explodedPieces[0..explodedPieceCount)`, `messages[0..messageCount)`;
+4. `sight[0..n)` with `n` the smaller of `gridWidth * gridHeight` and `VIEW_MAX_GRID_CELLS` (a grid cut at its capacity is
+   written cut, "Capacities").
+
+A count is never above its table's capacity ("Capacities"). The tables are written whole, each element as its struct: a field
+that is `reserved` is zero and is part of S. S is 1128 bytes (88 and ten players) when no table has a row and the grid is empty, and under 8 million at the capacities.
+
+**The `view` row.** `<tick> view <16 hex>` follows the `tick` row of the same tick, and is the trace hash
+(`docs/trace-format.md`, section 3) from the offset basis of S taken as one run: 8-byte little-endian words with the word step
+while at least 8 bytes remain, then the byte step for the rest. It has no preamble: no tick number, no random state and no section
+number or `END`; `tick` inside the header is the tick of the row. `tools/viewblock.py` has the function (`view_hash`).
+
+**The file.** On the dump tick (`-testdump <tick>`) and on every tick of the scenario's `frames` line the run also writes
+`views/<tick>.bin`, beside `trace.txt` (and the frame `frames/<tick>.bin` of `docs/frame-dump.md`, whose tick it shares). All numbers
+are little-endian.
+
+| Offset | Size | Content |
+| --- | --- | --- |
+| 0 | 4 | The bytes `BTVW` |
+| 4 | 2 | Version, 1 |
+| 6 | 2 | Reserved, 0 |
+| 8 | the length of S | S |
+
+The hash of the `view` row of that tick is the hash of the bytes from offset 8 to the end of the file. The reference stores the
+views of the frame ticks in `reference/views/<scenario>/<tick>.bin`, which `tools/reference.py --check` compares byte for byte
+with a run's, naming the first differing field in serialisation order (`tools/viewblock.py diff A B`).
+
+**What it is for.** A presentation reads only the view, so a presentation is judged on one tick by the view file of that tick in, and the
+display list (`docs/display-log.md`) and the frame (`docs/frame-dump.md`) of that tick out. A core that fills the block is judged
+on the `view` rows: equal where 3.1c's are.
+
 ## Sight
 
 `sight` holds, for each cell of the half-resolution grid (32 by 32 pixels), what the viewer knows of it:
@@ -128,9 +180,9 @@ ally's unit not at all. Radar does not put a unit in `units`; it makes a blip.
 | `carrier` | the unit's carrier; a carried unit is drawn with it | every unit |
 | `recentlyDamaged` | `units[i].recentlyDamagedTimer` | every unit |
 | `group` | `units[i].group`, the control group, drawn as a digit under the unit | the viewer's own units; 0 for the rest |
-| `killCount`, `weaponBuild`, `orderKind`, `orderTarget`, `moveOrder`, `fireOrder`, `cloakOrder`, `metalMake`, `metalUse`, `energyMake`, `energyUse` | `units[i].killCount`; the stockpile progress of its weapon slots; its first order (section 8.9) and its target; its standing orders; its resources (section 8.16) | the viewer's own units; 0 for the rest |
-| `firstOrder`, `orderCount` | its orders (section 8.9) | the controller's units; 0 for the rest |
-| `firstPiece`, `pieceCount` | the posed pieces of its model, from the scripts' state (section 8.12) | every unit |
+| `killCount`, `weaponBuild`, `orderKind`, `orderTarget`, `moveOrder`, `fireOrder`, `cloakOrder`, `metalMake`, `metalUse`, `energyMake`, `energyUse` | `units[i].killCount`; the stockpile progress of its weapon slots, `progress * 100 / reload` of the first weapon-build order, clamped to 0 to 255, and 0 when no such order names a slot 0 to 2 with a weapon, a reload of 0 or a progress of 0 or less; its first order (section 8.9) and its target, the target only when bit 0x8 of the order's flags is set, as 3.1c's presentation reads it, and 0 otherwise; its standing orders; its resources (section 8.16) | the viewer's own units; 0 for the rest |
+| `firstOrder`, `orderCount` | its orders (section 8.9); `firstOrder` is 0 when the count is 0 | the controller's units; 0 for the rest |
+| `firstPiece`, `pieceCount` | the posed pieces of its model, from the scripts' state (section 8.12); `firstPiece` is 0 when the count is 0 | every unit |
 
 The unit panel shows a unit under the cursor that is not in `units`, a blip, as "Unidentified object", with the prefix
 "S: " when the blip's `VIEW_BLIP_SONAR` is set and "R: " when it is clear, and nothing else.
@@ -161,6 +213,8 @@ The simulation decides the radar bits; jamming clears them, and an ally's jammer
 `orders` holds the queued orders of the controller's units, each unit's in the order they run (section 8.9): the kind,
 the unit to build, the target and the place. The overlays of the selected units (build footprints, paths, range rings,
 weapon coverage) draw from them. A target not in `units` is drawn at its last seen place, which presentation keeps.
+An order's `y` is 0 when its kind is `MobileBuild`, `VTOL_MobileBuild`, `Reclaim` or `VTOL_Reclaim`: those orders never
+write their `pos.y`, which the trace leaves out for the same reason (`docs/trace-format.md`, section 8.9).
 
 ## Features
 
@@ -201,6 +255,33 @@ not exempt, in the battle view; on the radar picture it is (`SIM_EVENT_RADAR_UNI
 (record 48, section 8.31: `weaponsState.debris[d]`, `weaponsState.explodedPieces[slot]`, `weaponsState.pieces[i]`).
 3.1c tests no sight for them: each is drawn anywhere on screen, and only the fog over its cell hides it. The faces a
 piece is drawn from are those of the unit's model, loaded data.
+
+`debris` has a row for each entry `d` of the debris table, in the table's order, an explosion with no model included.
+The fields of a row come from `weaponsState.debris[d]`:
+
+- `frame` and `shadowFrame` are `ref1.index` and `ref2.index`.
+- `x`, `y`, `z` are `pos`, and `rotX`, `rotY`, `rotZ` are `angle_x`, `angle_y`, `angle_z`.
+- `sprite` is the index, in the sprite catalogue below, of the animation `ref1.src` names: the first entry equal to it,
+  and 0xffff when `ref1.src` is null or equals no entry.
+- `shadowSprite` is the index of the first of the three animation pointers that start 0x1ab8f bytes into the game record
+  equal to `ref2.src`, and 0xffff when `ref2.src` is null or equals none.
+- `firstFace` and `faceCount` are those of the piece record that `obj` names (`weaponsState.pieces[i]`), and 0 when `obj`
+  is null.
+- `unitDefIndex` is 0xffff and `pieceIndex` 0 in every row: a debris keeps no record of the unit or piece it broke from.
+  A debris with a model is made of faces copied from the broken piece, with their own vertices and textures, which the
+  view does not hold; carrying them, and naming the sprites by a table of their own, is #1123.
+
+The sprite catalogue lists the explosion animations in this order:
+
+- indexes 0 to 8: the nine animation pointers that start 0x147eb bytes into the game record, in their order (the sea
+  splash, the lava splash, the flame stream, then `src3`, `explode2`, `explode3`, `explode4`, `explode5` and `nuke1`);
+- then, for each weapon definition `w` in order, index 9 + 2w is its `splash` animation and index 10 + 2w its
+  `explosionSeq` animation.
+
+`explodedPieces` has a row for each slot of the exploded-piece table that holds a block, in slot order, from
+`weaponsState.explodedPieces[slot]`: `unitDefIndex` and `owner` are the current values of the unit slot `unit` names (0 for a dead unit's definition, the new unit's for a reused slot; #1123 gives them a source that outlives the unit), `pieceIndex` is
+`index`, `x`, `y`, `z` are the piece record's `pos` and `rotX`, `rotY`, `rotZ` its angles `angle_10`, `angle_12` and
+`angle_14`. `trail` is 1 when bit 0x2 of `flags` is set, else 2 when bit 0x1 is set, else 0.
 
 ## Players, economy and score
 
@@ -343,7 +424,7 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `ModelState::root` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
 | `ModelState::shadow` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
 | `Order::created` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
-| `Order::flags_42` | Left out: presentation's own cache of a target's last seen place, written and read only by the weapon coverage overlay; nothing in the tick reads it. |
+| `Order::flags_42` | `ViewUnit.orderTarget` through bit 0x8 and `ViewUnit.weaponBuild` through bit 0x80000 (Units); the weapon coverage overlay's cache of a target's last seen place in it is presentation's own. |
 | `Order::kind` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
 | `Order::next` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
 | `Order::pos` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |

@@ -1248,6 +1248,7 @@ SimGlobals.pad_be2c,0x2,LoadSoundCategories: Sound Categories #1,2,22,0x5668,not
 SimGlobals.pad_be2c,0x2 0x3,LoadTntMap: TILE MAP #1,2,9,0xba48-0x1c148,not-a-pointer,"pad_be2c: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.pad_be2c,0x1+0x1*k,LoadTntMap: TILE SET #3,28,573,0x3108-0x87ffe0,not-a-pointer,"pad_be2c: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.pad_be2c,0x2 0x3,NanoParticles::Emit,1,3,0x40-0x1e0,not-a-pointer,"pad_be2c: integers (ticks, counts, seed) that only look like addresses"
+SimGlobals.pad_be3c,*,*,0,0,-,not-a-pointer,"the 4-byte gap after g_randomSeed, whose unaligned words at +1 to +3 take the low bytes of g_losUnitIndex"
 VtolFollowOrder #1,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolFollowOrder #2,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"
 VtolFollowOrder #3,*,*,0,0,-,not-a-pointer,"Order words (ids, ticks, coordinates) that only look like addresses"

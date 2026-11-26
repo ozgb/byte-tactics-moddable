@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include "../../interfaces/ref.h"
+#include "../harness/display_game.h"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -1013,9 +1014,10 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
             res.metal = res.maxMetal;
         if (res.energy > res.maxEnergy)
             res.energy = res.maxEnergy;
-        static unsigned int s_incomesShownAt = ~0u;
-        if (pl->displayTimer != s_incomesShownAt) {
-            s_incomesShownAt = pl->displayTimer;
+        static unsigned int s_incomesShownAt[11] = {~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u, ~0u};
+        int shown = g_game->playerIndex;
+        if (pl->displayTimer != s_incomesShownAt[shown]) {
+            s_incomesShownAt[shown] = pl->displayTimer;
             res.metalIncome = pl->energyIncome;
             res.metalUse = pl->energyUsage;
             res.energyIncome = pl->metalIncome;
@@ -1405,7 +1407,9 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
             st->unit = unit;
             unit->angles = spot->rot;
             unit->pos = spot->pos;
+            DisplayLogFeatureType(f->name);
             DrawUnit(dest, (UnitDrawView*)unit);
+            DisplayLogFeatureType(nullptr);
         }
     } else {
         if (f->over) {
@@ -1873,12 +1877,18 @@ static void DrawProjectedFaces(void* surface, Vec3* offset, short* angles, Vec3*
 void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
                             ProjectedModel* obj, short* angles)
 {
+    if (DisplayLogWants())
+        DisplayLogProjectile(surface, offset, obj, angles);
+    DisplayLogScope displayScope;
     DrawProjectedFaces(surface, offset, angles, obj->verts, obj->count, obj->prims, obj->faceCount, obj->firstFace);
 }
 
 void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
                             DebrisPiece* piece, short* angles)
 {
+    if (DisplayLogWants())
+        DisplayLogShard(surface, offset, piece, angles);
+    DisplayLogScope displayScope;
     Vec3* verts = piece->verts.get();
     Face* faces = piece->faces.get();
     if (verts == nullptr || faces == nullptr)

@@ -10,6 +10,7 @@
 
 #include "../scripts/cob_script.h"
 #include "../util/vec3.h"
+#include "../harness/display_game.h"
 
 #include "../map/cell.h"
 #include "unit_motion.h"
@@ -247,6 +248,9 @@ int __stdcall GetHandleSize(int param_1)
 // FUNCTION: 0x458810
 void CMemoryCache::DrawObjectState(ModelState* list, void* result)
 {
+    if (DisplayLogWants())
+        DisplayLogModel(result, list);
+    DisplayLogScope displayScope;
     int rebuild = 0;
     int x = g_game->scrollX << 16;
     int z = g_game->scrollY << 16;

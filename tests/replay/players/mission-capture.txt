@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem players 5.2
+subsystem players 5.3
 call 0 RegionSize
   a info (2)
   o result 84
@@ -28045,6 +28045,7 @@ call 499 Apply
   i services.RecordSimEvent 2 0 [0,0] 2
   i services.SchedPublish 4 48
   o rng.seed 0x4d14befb
+  w Game.playerIndex 0
   w VictoryCaptureUnitType#1.satisfied 1
   w VictoryCaptureUnitType#1.celebrated 1
   o result 1

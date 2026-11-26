@@ -28,10 +28,10 @@ Work through these in order, from step 0. Reviews come first after your messages
 
 ### 0. Your messages
 
-Read the leads' messages to you on every pass, before anything else. They arrive on the Valkey stream `bt:to-maintainer`: a pull request ready for review, a question, an issue taken. There may be more than one lead (`docs/team.md`, "More than one lead"), and each message's `from` field names the lead that sent it. Your cursor, the id of the last message you read, is the key `bt:cursor:maintainer`:
+Read the leads' messages to you on every pass, before anything else. They arrive on the Redis stream `bt:to-maintainer`: a pull request ready for review, a question, an issue taken. There may be more than one lead (`docs/team.md`, "More than one lead"), and each message's `from` field names the lead that sent it. Your cursor, the id of the last message you read, is the key `bt:cursor:maintainer`:
 
 ```sh
-P="$(cat ~/.local/share/bt-valkey/password)"; V() { valkey-cli -p 6390 -a "$P" --no-auth-warning "$@"; }
+V() { uv run tools/notes.py "$@"; }              # exits 2 when Redis can't be reached
 C="$(V GET bt:cursor:maintainer)"
 V XRANGE bt:to-maintainer "($C" +                    # when C is set
 V XREVRANGE bt:to-maintainer + - COUNT 10            # when it is empty

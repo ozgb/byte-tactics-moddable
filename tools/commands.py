@@ -1,4 +1,4 @@
-"""Fail when a scenario uses a command that docs/commands.md does not list, the verdict tables disagree, or a stored log misses an interface event.
+"""Fail when a scenario uses a command that docs/commands.md does not list, a command's group is unknown, the verdict tables disagree, or a stored log misses an interface event.
 
     python3 tools/commands.py --check            # check the repository
     python3 tools/commands.py --check --root DIR # check another tree
@@ -25,6 +25,7 @@ INTERFACE_HEADER = "| Interface event | Paths | Scenarios |"
 INTERFACE_LOGS = "reference/commands"
 VERDICT_HEADING = "The scenarios of the core's verdict"
 NOT_EVENTS = "direct"
+GROUPS = ("events", "converted", "direct", "inert", "presentation")
 
 
 def table(lines: list[str], header: str, after: str = "") -> list[list[str]]:
@@ -72,6 +73,9 @@ def check(root: Path) -> list[str]:
     commands = {}
     for row in table(doc, CONSOLE_HEADER):
         if len(row) >= 2:
+            if row[1] not in GROUPS:
+                problems.append("%s: console command %s has the group %r, not one of %s"
+                                % (DOC, row[0], row[1], ", ".join(GROUPS)))
             for word in words(row[0]):
                 commands[word] = row[1]
     orders = {w for row in table(doc, ORDER_HEADER) for w in words(row[0])}

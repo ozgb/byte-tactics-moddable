@@ -61,13 +61,6 @@ sudo apt install libgl1:i386 libgl1-mesa-dri:i386 libxrandr2:i386 libxinerama1:i
 
 On WSL without sudo, `wsl -d <distro> -u root` from Windows gives a root shell for the install.
 
-On WSL, `/tmp/.X11-unix` is WSLg's read-only mount, so `tools/playtest.py` fails with `RuntimeError: Xvfb did not start`. Until it handles that, put an `Xvfb` wrapper earlier on `PATH` than `/usr/bin/Xvfb`, for example `~/.local/bin/Xvfb` (made executable):
-
-```sh
-#!/bin/sh
-exec /usr/bin/Xvfb -nolisten unix "$@"
-```
-
 ```sh
 export WINEARCH=win64
 cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake

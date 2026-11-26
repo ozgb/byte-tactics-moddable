@@ -1,9 +1,10 @@
-"""Tests of the error-dialog matching and the retry decision: `uv run tools/test_playtest_dialogs.py`.
+"""Tests of the error-dialog matching, the retry decision and the X server command: `uv run tools/test_playtest_dialogs.py`.
 
 Pure functions only; no game, display or Wine is run.
 """
 
 import argparse
+import os
 import tempfile
 from types import SimpleNamespace
 from pathlib import Path
@@ -240,6 +241,66 @@ def test_compare_dumps() -> None:
         notes = playtest.compare_dumps(runs)
         assert list(notes) == ["b"]
         assert notes["b"] == ["1 of 3 frame dumps identical to a; differ: game; missing: end"]
+
+
+XVFB = ["Xvfb", "-displayfd", "7", "-screen", "0", "640x480x24", "-ac", "-br", "-noreset", "-nolisten", "tcp"]
+XEPHYR = ["Xephyr", "-displayfd", "7", "-screen", "800x600x24", "-ac", "-br", "-noreset", "-title", "t"]
+
+
+def read_only(d: Path) -> bool:
+    d.chmod(0o555)
+    return not os.access(d, os.W_OK)
+
+
+def test_writable_socket_dir_is_unchanged() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        assert playtest.x_command(None, 7, Path(d)) == XVFB
+        assert playtest.x_command("t", 7, Path(d)) == XEPHYR
+
+
+def test_missing_socket_dir_is_unchanged() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        assert playtest.x_command(None, 7, Path(d) / "none") == XVFB
+
+
+def test_read_only_socket_dir_drops_the_unix_socket() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        sock = Path(d) / "x11"
+        sock.mkdir()
+        try:
+            if not read_only(sock):
+                print("skipped: running as root, a directory is never read-only")
+                return
+            assert playtest.x_command(None, 7, sock) == [*XVFB, "-nolisten", "unix"]
+            assert playtest.x_command("t", 7, sock) == [*XEPHYR, "-nolisten", "unix"]
+        finally:
+            sock.chmod(0o755)
+
+
+def test_x_joins_the_namespace_only_on_a_read_only_socket_dir() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        sock = tmp / "x11"
+        sock.mkdir()
+        two = playtest.Scenario("two", [], {}, instances=2)
+        run = playtest.Run(1, "two", two, [tmp / "TotalA.exe"], "modern", tmp, {}, "-all")
+        run.netns = playtest.NetNamespace()
+        run.netns.pid = 4242
+        one = playtest.Run(1, "one", playtest.Scenario("one", [], {}), [tmp / "TotalA.exe"], "modern", tmp, {}, "-all")
+        inst = run.instances[0]
+        assert not inst.x_needs_netns(sock)
+        assert inst.xwrap(["xdpyinfo"]) == ["xdpyinfo"]
+        try:
+            if not read_only(sock):
+                print("skipped: running as root, a directory is never read-only")
+                return
+            assert inst.x_needs_netns(sock)
+            assert not one.instances[0].x_needs_netns(sock)
+            inst.x_in_netns = True
+            assert inst.xwrap(["xdpyinfo"]) == inst.wrap(["xdpyinfo"])
+            assert inst.xwrap(["xdpyinfo"])[0] == "nsenter"
+        finally:
+            sock.chmod(0o755)
 
 
 if __name__ == "__main__":

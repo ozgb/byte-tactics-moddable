@@ -349,6 +349,29 @@ class NetNamespace:
                 f.close()
 
 
+X_SOCKET_DIR = Path("/tmp/.X11-unix")
+
+
+def x_socket_dir_read_only(socket_dir: Path = X_SOCKET_DIR) -> bool:
+    return socket_dir.exists() and not os.access(socket_dir, os.W_OK)
+
+
+def x_command(window: str | None, fd: int, socket_dir: Path = X_SOCKET_DIR) -> list[str]:
+    """The X server command: a Xephyr window titled `window`, or an invisible Xvfb when it is None.
+
+    A read-only socket directory (WSLg's) leaves the server on Linux's abstract socket only.
+    """
+    if window is None:
+        cmd = ["Xvfb", "-displayfd", str(fd), "-screen", "0", "640x480x24", "-ac", "-br", "-noreset",
+               "-nolisten", "tcp"]
+    else:
+        cmd = ["Xephyr", "-displayfd", str(fd), "-screen", "800x600x24", "-ac", "-br", "-noreset",
+               "-title", window]
+    if x_socket_dir_read_only(socket_dir):
+        cmd += ["-nolisten", "unix"]
+    return cmd
+
+
 def wine_env(prefix: Path, display: str = "") -> dict[str, str]:
     env = dict(os.environ)
     env.update(WINEPREFIX=str(prefix), WINEARCH=os.environ.get("WINEARCH", "win32"), WINEDLLOVERRIDES="mscoree,mshtml=", WINEDEBUG="-all")
@@ -452,6 +475,7 @@ class Instance:
         self.game = self.base / "game"
         self.display = ""
         self.xserver: subprocess.Popen | None = None
+        self.x_in_netns = False
         self.wine: subprocess.Popen | None = None
         self.parec: subprocess.Popen | None = None
         self.sink = ""
@@ -480,6 +504,13 @@ class Instance:
 
     def wrap(self, cmd: list[str]) -> list[str]:
         return self.run.netns.wrap(cmd) if self.run.netns else cmd
+
+    def x_needs_netns(self, socket_dir: Path = X_SOCKET_DIR) -> bool:
+        """Whether the X server and its clients must join the run's namespace: only its abstract socket is left."""
+        return self.run.netns is not None and x_socket_dir_read_only(socket_dir)
+
+    def xwrap(self, cmd: list[str]) -> list[str]:
+        return self.wrap(cmd) if self.x_in_netns else cmd
 
     def prepare(self, template: Path, game_src: Path, reg: list[str], files: dict[str, str]) -> None:
         self.base.mkdir(parents=True, exist_ok=True)
@@ -520,17 +551,14 @@ class Instance:
             subprocess.run(self.wrap(["wineserver", "-w"]), env=env)
 
     def start_x(self) -> None:
+        if self.run.window and not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
+            raise RuntimeError("Xephyr needs a desktop to open its window on (DISPLAY is not set)")
+        self.x_in_netns = self.x_needs_netns()
         r, w = os.pipe()
-        if self.run.window:
-            if not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
-                raise RuntimeError("Xephyr needs a desktop to open its window on (DISPLAY is not set)")
-            cmd = ["Xephyr", "-displayfd", str(w), "-screen", "800x600x24", "-ac", "-br", "-noreset",
-                   "-title", f"TA play test: {self.run.name}{self.suffix}"]
-        else:
-            cmd = ["Xvfb", "-displayfd", str(w), "-screen", "0", "640x480x24", "-ac", "-br", "-noreset",
-                   "-nolisten", "tcp"]
+        title = f"TA play test: {self.run.name}{self.suffix}" if self.run.window else None
+        cmd = x_command(title, w)
         self.xserver = subprocess.Popen(
-            cmd, pass_fds=(w,), stdout=(self.run.out / f"xserver{self.suffix}.log").open("w"),
+            self.xwrap(cmd), pass_fds=(w,), stdout=(self.run.out / f"xserver{self.suffix}.log").open("w"),
             stderr=subprocess.STDOUT, start_new_session=True)
         os.close(w)
         with os.fdopen(r) as f:
@@ -539,7 +567,7 @@ class Instance:
             raise RuntimeError(f"{cmd[0]} did not start (see xserver.log)")
         self.display = f":{num}"
         deadline = time.time() + 10
-        while subprocess.run(["xdpyinfo"], env={**os.environ, "DISPLAY": self.display},
+        while subprocess.run(self.xwrap(["xdpyinfo"]), env={**os.environ, "DISPLAY": self.display},
                              capture_output=True).returncode != 0:
             if time.time() > deadline:
                 raise RuntimeError(f"X server {self.display} does not answer")
@@ -711,11 +739,11 @@ class Instance:
 
 
     def xdo(self, *args: str) -> None:
-        subprocess.run(["xdotool", *args], env={**os.environ, "DISPLAY": self.display}, capture_output=True)
+        subprocess.run(self.xwrap(["xdotool", *args]), env={**os.environ, "DISPLAY": self.display}, capture_output=True)
 
     def grab(self) -> Gray | None:
         try:
-            r = subprocess.run(["import", "-window", "root", "-colorspace", "Gray", "-depth", "8", "pgm:-"],
+            r = subprocess.run(self.xwrap(["import", "-window", "root", "-colorspace", "Gray", "-depth", "8", "pgm:-"]),
                                env={**os.environ, "DISPLAY": self.display}, capture_output=True, timeout=15)
         except subprocess.TimeoutExpired:
             return None
@@ -727,7 +755,7 @@ class Instance:
 
         def xdo_out(*args: str) -> str:
             try:
-                return subprocess.run(["xdotool", *args], env=env, capture_output=True, text=True,
+                return subprocess.run(self.xwrap(["xdotool", *args]), env=env, capture_output=True, text=True,
                                       timeout=15).stdout
             except subprocess.TimeoutExpired:
                 return ""
@@ -762,7 +790,7 @@ class Instance:
         args = ["import", "-window", "root"]
         if jpeg:
             args += ["-quality", "80"]
-        subprocess.run([*args, str(path)], env={**os.environ, "DISPLAY": self.display},
+        subprocess.run(self.xwrap([*args, str(path)]), env={**os.environ, "DISPLAY": self.display},
                        capture_output=True, timeout=30)
 
 

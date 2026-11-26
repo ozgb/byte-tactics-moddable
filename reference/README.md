@@ -59,10 +59,24 @@ Defaults are the ones in `LoadSettings`, never the registry.
 | `player<N>.share_metal` | none | Slot that is not remote, and only with a remote slot in the scenario: turns metal sharing on at this level before the step of tick 1 |
 | `player<N>.share_energy` | none | The same for energy |
 | `player<N>.share_mapping` | none | 0 or 1: whether the slot shares its map with its allies |
+| `player_slots` | the highest named slot plus one | 2 to 10: the game's player count, the slots of the skirmish menu, named or open; above every named slot, not under game type 1; one line only |
+| `frontend` | 0 | 1: the run starts at the main menu and the `input` lines set up the match through the menus (see Starting at the main menu); one line only |
 
 `player<N>.*` keys take N from 0 to 9. A slot exists when any key names it,
 slots no key names are open, and at least 2 slots must exist. The game's player
-count is the highest named slot plus one.
+count is `player_slots`, or the highest named slot plus one; the slots at or above it are left unset, as the
+skirmish menu leaves them.
+
+## Starting at the main menu
+
+With `frontend 1` the harness builds no match: the game starts at the main menu, and `input 0.<frame>` lines
+(the `<frame>`-th frame of the run, before tick 1) drive the menus into a battle. The keys that set the match,
+and `load`, `save`, `spawn`, `order` and `console`, are errors there. The intro movie and the DirectX, sound
+driver and CD player dialogs are skipped.
+
+Every run that does not load a saved game writes `setup.txt` when the match loads: the match as a scenario's
+match keys, the keys at their default left out (docs/scenario-format.md on `moddable`, "The setup log").
+`--traces` stores it in `reference/setup/<scenario>.txt` for each scenario with `frontend 1`.
 
 ## Loading a saved game
 

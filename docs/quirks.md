@@ -155,6 +155,27 @@ machine and isn't deterministic.
 - **Added in:** [#76](https://github.com/ozgb/byte-tactics-moddable/issues/76)
   (PR [#282](https://github.com/ozgb/byte-tactics-moddable/pull/282)).
 
+## Behaviour that follows the drawn frames
+
+In this place, 3.1c's game state changes with what presentation draws. The fork's default (flag off) keeps 3.1c's
+behaviour, carried from presentation to the simulation by an event, so traces match the reference. Turning the flag
+**on** makes the state follow the ticks alone.
+
+### `players.rank-compaction-per-tick`
+
+- **Scope:** sim.
+- **Where:** `UpdatePlayersFinish` (`src/game/players.cpp`) runs `CompactPlayerRanks`
+  (`src/game/players_events.cpp`), and `PlayersApply` ignores `PLAYERS_COMPACT_RANKS`.
+- **3.1c:** the score panel (`DrawScorePanel`, 0x4948e0) closes the gaps that defeated players leave in the players'
+  ranks, one pass per frame on which it draws, and the kill credit reads those ranks. So the ranks, and when a kill
+  raises "took the lead", depend on whether the panel is shown (F4 or Space) and on how many frames are drawn.
+- **Off (default):** the panel runs the pass on its own copy and publishes `PLAYERS_COMPACT_RANKS`, which applies the
+  same pass to the ranks (`docs/players-interface.md`, section 2, "The ranks").
+- **On:** the players phase of every tick runs the pass once, after the last player, whether or not a frame is drawn,
+  and the event changes nothing. A defeat in the units phase is closed in the same tick, one after the players phase in
+  the next tick, at any number of steps per frame.
+- **Added in:** [#1113](https://github.com/ozgb/byte-tactics-moddable/issues/1113).
+
 ## Audits
 
 The compiler-warning audit

@@ -33,6 +33,7 @@ struct UnitDef;
 #include "../../link/globals.h"
 #include "players_events.h"
 #include "../network/net_game.h"
+#include "../state/sim_globals.h"
 
 // FUNCTION: 0x464b30
 int __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag)
@@ -168,8 +169,47 @@ int __stdcall PlayersApply(const PlayersEventHeader* event, unsigned int size)
     case PLAYERS_DEACTIVATE_CONDITIONS:
         g_game->list_391ed->Deactivate();
         return 1;
+    case PLAYERS_COMPACT_RANKS:
+        if (g_quirks.rankCompactionPerTick)
+            return 0;
+        CompactPlayerRanks();
+        return 1;
     }
     return 0;
+}
+
+static bool CountsForRank(const Player* p)
+{
+    if (p->active == 0)
+        return false;
+    if (p->type != 1 && p->type != 2 && p->type != 3)
+        return false;
+    if (p->index == 0xa)
+        return false;
+    if (p->unitCount == 0 && p->unitsCreated != 0)
+        return false;
+    return (p->info->flags_9b & 0x40) == 0;
+}
+
+void __stdcall CompactPlayerRanks()
+{
+    for (int i = 0; i < (int)g_game->numPlayers; i++) {
+        int held = 0;
+        for (int n = 0; n < 10; n++) {
+            const Player* p = &g_game->players[n];
+            if (CountsForRank(p) && p->rank == i) {
+                held = 1;
+                break;
+            }
+        }
+        if (held)
+            continue;
+        for (int n = 0; n < 10; n++) {
+            Player* p = &g_game->players[n];
+            if (CountsForRank(p) && p->rank > i)
+                p->rank--;
+        }
+    }
 }
 
 // FUNCTION: 0x486f10

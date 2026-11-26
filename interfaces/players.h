@@ -11,13 +11,13 @@ class TdfFile;
 // Major version of the players interface, changed when a slot is removed or its signature changes.
 #define PLAYERS_VERSION_MAJOR 5
 // Minor version of the players interface, changed when a slot is added.
-#define PLAYERS_VERSION_MINOR 2
+#define PLAYERS_VERSION_MINOR 3
 
 // The fields every players event and effect starts with.
 struct PlayersEventHeader {
     // A PlayersEventKind or a PlayersEffectKind.
     int kind;
-    // The unit, as its block offset (an offset from the block base, 0 for none: KILL_UNITS, TRANSFER, SET_STORE, SET_TYPE, END_GAME, DEACTIVATE_CONDITIONS, SET_CHEATS and LEAVE_GAME name none), as economy's events give a unit.
+    // The unit, as its block offset (an offset from the block base, 0 for none: KILL_UNITS, TRANSFER, SET_STORE, SET_TYPE, END_GAME, DEACTIVATE_CONDITIONS, SET_CHEATS, LEAVE_GAME and COMPACT_RANKS name none), as economy's events give a unit.
     unsigned int unit;
 };
 
@@ -44,7 +44,9 @@ enum PlayersEventKind {
     // Clears and sets bits of the cheat toggles of the game (PlayersSetCheats), the bits that are in clear first; outcome 1, or 0 when a bit is not one of the five toggles (0x788).
     PLAYERS_SET_CHEATS = 201,
     // Raises the end-of-game bit that a player leaving the match raises; the header alone; outcome 1.
-    PLAYERS_LEAVE_GAME = 202
+    PLAYERS_LEAVE_GAME = 202,
+    // Runs one pass of the score panel over the ranks, as 3.1c's panel does on each frame it draws: for each place from 0 below the number of players, when no counted player holds it, every counted player above it moves down one (a counted player is active, plays as a human or a computer, is not the record past the ten players, is not defeated, which is no units left after making one, and does not only watch); the header alone; outcome 1, or 0 when players.rank-compaction-per-tick is on and the tick compacts instead. A pass keeps the players in order and closes a lone gap, but a run of gaps or a place past the number of players can take more than one, so the event is not idempotent: each one is one drawn frame's pass, and one more pass, as from another machine, closes the same gaps sooner.
+    PLAYERS_COMPACT_RANKS = 203
 };
 
 // The kinds of effect players publishes to its outbox, for the modules that subscribe to them.
@@ -227,7 +229,7 @@ struct PlayersSeam {
     int (__stdcall* UpdatePlayerBody)(int player, RandStream stream);
     // Runs the rest of one player's tick, after the settlement of its economy and, for the viewing player, the engine's radar passes. Hooks: none.
     void (__stdcall* UpdatePlayerTail)(int player);
-    // Runs what is left of the players' tick after the last player: the end of a network game when no player is left to fight. Hooks: none.
+    // Runs what is left of the players' tick after the last player: with players.rank-compaction-per-tick on, first the pass of COMPACT_RANKS over the ranks, then the end of a network game when no player is left to fight. Hooks: none.
     void (__stdcall* UpdatePlayersFinish)(void);
     // The bytes of private state the implementation needs for a match; called before Init. Hooks: none.
     unsigned int (__stdcall* RegionSize)(const PlayersMapInfo* info);

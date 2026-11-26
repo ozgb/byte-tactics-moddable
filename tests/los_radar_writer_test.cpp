@@ -142,6 +142,7 @@ int __stdcall GiveUnitToPlayer(Unit*, Player*, const PlayersGiveUnit*)
     return 0;
 }
 void __stdcall KillPlayerUnits(unsigned char) {}
+void __stdcall CompactPlayerRanks() {}
 int __stdcall HarnessConditionClass(void*)
 {
     return 0;

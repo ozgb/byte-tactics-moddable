@@ -1,0 +1,20 @@
+bt-sound 1
+0 stop_all - - - - -
+21 play OPTIONS -585 - - -
+21 play PANEL -585 - - -
+21 play OPTIONS -585 - - -
+21 play OPTIONS -585 - - -
+21 play OPTIONS -585 - - -
+21 play OPTIONS -585 - - -
+32 play_file kcarmmov.WAV -585 - - -
+61 play OPTIONS -585 - - -
+61 play OPTIONS -585 - - -
+61 play OPTIONS -585 - - -
+61 play OPTIONS -585 - - -
+61 play EXIT -585 - - -
+61 play OPTIONS -585 - - -
+61 play OPTIONS -585 - - -
+61 play EXIT -585 - - -
+61 play MessageArrived -585 - - -
+61 play xplomed2 -585 - - -
+61 play MessageArrived -585 - - -

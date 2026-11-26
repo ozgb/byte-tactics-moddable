@@ -2,7 +2,7 @@
 
     uv run tools/fullgate.py                          # print the count and whether the full run is due
     uv run tools/fullgate.py due                      # the same, exit 1 when any merge needed the gate
-    uv run tools/fullgate.py run                      # play the full suite, the round trip and the coverage check, print the comment text
+    uv run tools/fullgate.py run                      # play the full suite, the round trip, the coverage check and the match setup test, print the comment text
     uv run tools/fullgate.py --no-fetch               # do not fetch origin/moddable first
     uv run tools/fullgate.py --comments-json FILE     # tracking issue comments from a file (gh's --json comments)
     uv run tools/test_fullgate.py                     # tests, on a temporary repository and fake comments
@@ -10,19 +10,22 @@
 The pull request gate plays the tier; the full `reference.py --check` runs on the tip of moddable nightly, when
 a merge since the last run needed a gate (issue #631). The maintainer runs it when `due` exits 1, then comments
 on tracking issue #632: `Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n>
-equal, coverage: <result>`. The newest comment of that form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
+equal, coverage: <result>, match setup: <n> of 15 ok`. The newest comment of that form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
 on origin/moddable after that sha whose diff against their first parent touches GATE_PATHS, the paths
 reference/README.md, "Gate", says need a gate (test_fullgate.py checks the two agree).
 
 `run` plays `reference.py --check --both-modes --no-cache` and then, straight after it, `--check --no-cache
 --roundtrip auto` (the same exe, a fresh Wine prefix for each), prints their output to stderr and the text of the
-comment to stdout (or to --out FILE), and exits with the first nonzero status of the three. Posting stays with the maintainer.
+comment to stdout (or to --out FILE), and exits with the first nonzero status of the four. Posting stays with the maintainer.
 The round trip run scans block pointers too; the comment names them only when they are not all covered.
 
 After them `run` builds the coverage exe (tools/coverage_runtime.sh, then the BT_COVERAGE=ON build in build/coverage, with its
 wasm_runtime target) and plays `tools/coverage.py --check` on it, so that the next time the coverage link breaks or
 data/coverage.csv goes stale a periodic run says so (issue #770). The comment's coverage field is `no subsystem fell`, or
 `build failed`, or `failed`, or `not finished`.
+
+Last, on a fresh prefix, `run` plays `tools/test_matchsetup.py` on the exe (issue #1158), whose checks need Wine and so
+run in no pull request's CI. The comment's match setup field is its `<n> of 15 ok` line, or `not finished`.
 
 The comments are read through `bwai-outside gh issue -R ozgb/byte-tactics-moddable view 632 --json comments`,
 or through the command in FULLGATE_GH (split like a shell line, the issue arguments appended) or from
@@ -65,6 +68,7 @@ MERGE_SUBJECT = re.compile(r"Merge pull request #(\d+)\b")
 EQUAL_LINE = re.compile(r"^(\d+) of (\d+) scenarios equal, total ", re.MULTILINE)
 POINTERS_OK = re.compile(r"^(?:\[(\w+)\] )?block pointers: all covered by ", re.MULTILINE)
 COVERAGE_OK = re.compile(r"^coverage: no subsystem fell$", re.MULTILINE)
+MATCH_SETUP_LINE = re.compile(r"^(\d+ of \d+) ok$", re.MULTILINE)
 POINTERS_BAD = re.compile(r"^(?:\[(\w+)\] )?(\d+) problems with the pointers out of the block", re.MULTILINE)
 CHECK_COMMAND = ["uv", "run", "tools/reference.py", "--check", "--no-cache"]
 COVERAGE_DIR = "build/coverage"
@@ -168,15 +172,23 @@ def coverage_result(code: int, output: str) -> str:
     return "failed" if output.strip() else "not finished"
 
 
-def comment_text(sha: str, check: tuple[int, str], roundtrip: tuple[int, str], coverage: tuple[int, str]) -> str:
-    """The comment for issue #632 from the exit status and output of the both-modes run, the round trip run and the coverage check."""
-    (code, output), (trip_code, trip_output), (cov_code, cov_output) = check, roundtrip, coverage
+def match_setup_result(output: str) -> str:
+    """The match setup field: `<n> of <n> ok` from a test_matchsetup.py run, or `not finished`."""
+    match = MATCH_SETUP_LINE.search(output)
+    return f"{match.group(1)} ok" if match else "not finished"
+
+
+def comment_text(sha: str, check: tuple[int, str], roundtrip: tuple[int, str], coverage: tuple[int, str],
+                 matchsetup: tuple[int, str]) -> str:
+    """The comment for issue #632 from the exit status and output of the both-modes run, the round trip run, the coverage check and the match setup test."""
+    (code, output), (trip_code, trip_output), (cov_code, cov_output), (setup_code, setup_output) = check, roundtrip, coverage, matchsetup
     text = (f"Full gate on {sha}: {equal_count(output)} equal (both modes), block pointers: {pointer_result(output)}, "
             f"round trip: {equal_count(trip_output)} equal, coverage: {coverage_result(cov_code, cov_output)}")
     trip_pointers = pointer_result(trip_output)
     if "problems" in trip_pointers:
         text += f" (block pointers: {trip_pointers})"
-    for name, status in (("both modes", code), ("round trip", trip_code), ("coverage", cov_code)):
+    text += f", match setup: {match_setup_result(setup_output)}"
+    for name, status in (("both modes", code), ("round trip", trip_code), ("coverage", cov_code), ("match setup", setup_code)):
         if status != 0:
             text += f", {name} exit {1 if status == BUILD_FAILED else status}"
     return text
@@ -214,8 +226,13 @@ def coverage_check(game_dir: str | None, log: Path | None) -> tuple[int, str]:
     return stream(command + (["--game-dir", game_dir] if game_dir else []), log, "coverage")
 
 
+def match_setup(exe: list[str], log: Path | None) -> tuple[int, str]:
+    """Play tools/test_matchsetup.py on the exe; (exit status, output)."""
+    return stream(["uv", "run", "tools/test_matchsetup.py", *exe], log, "match setup")
+
+
 def run(args: argparse.Namespace) -> int:
-    """Play the both-modes check, the round trip check and the coverage check, and print the comment for issue #632."""
+    """Play the both-modes check, the round trip check, the coverage check and the match setup test, and print the comment for issue #632."""
     sha = args.sha or git("rev-parse", "HEAD").strip()
     exe = ["--exe", args.exe] + (["--game-dir", args.game_dir] if args.game_dir else [])
     log = Path(args.log) if args.log else None
@@ -231,6 +248,11 @@ def run(args: argparse.Namespace) -> int:
     results.append(coverage_check(args.game_dir, log))
     seconds = int(time.time() - started)
     print(f"fullgate: coverage took {seconds // 60}:{seconds % 60:02d}", file=sys.stderr, flush=True)
+    shutil.rmtree(ROOT / "build/playtest/prefix", ignore_errors=True)
+    started = time.time()
+    results.append(match_setup(exe, log))
+    seconds = int(time.time() - started)
+    print(f"fullgate: match setup took {seconds // 60}:{seconds % 60:02d}", file=sys.stderr, flush=True)
     text = comment_text(sha, *results)
     if args.out:
         Path(args.out).write_text(text + "\n")
@@ -241,14 +263,14 @@ def run(args: argparse.Namespace) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("command", nargs="?", choices=["due", "run"],
-                        help="due: exit 1 when the full run is due; run: play the full suite and the round trip")
+                        help="due: exit 1 when the full run is due; run: play the full suite, the round trip, the coverage check and the match setup test")
     parser.add_argument("--no-fetch", action="store_true", help=f"do not fetch {BRANCH} first")
     parser.add_argument("--comments-json", metavar="FILE", help="issue comments as JSON, instead of gh")
     parser.add_argument("--exe", default="build/modern/TotalA.exe", help="run: the exe to play")
     parser.add_argument("--game-dir", default=os.path.expanduser("~/.ta"), help="run: the game directory")
     parser.add_argument("--sha", help="run: the commit the comment names, default HEAD")
     parser.add_argument("--out", metavar="FILE", help="run: also write the comment text to FILE")
-    parser.add_argument("--log", metavar="FILE", help="run: append both runs' output to FILE")
+    parser.add_argument("--log", metavar="FILE", help="run: append every run's output to FILE")
     args = parser.parse_args()
     if args.command == "run":
         return run(args)

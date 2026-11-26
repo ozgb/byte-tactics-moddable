@@ -266,8 +266,10 @@ void MarkFreed(const void* p)
     if (s_freed == nullptr || s_freedCount == s_freedCapacity) {
         unsigned wanted = s_freedCapacity == 0 ? 64 : s_freedCapacity * 2;
         const void** grown = (const void**)realloc((void*)s_freed, wanted * sizeof(const void*));
-        if (grown == nullptr)
+        if (grown == nullptr) {
             abort();
+            return;
+        }
         s_freed = grown;
         s_freedCapacity = wanted;
     }

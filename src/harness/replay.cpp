@@ -59,6 +59,7 @@ Recording* s_rec[SUB_COUNT];
 bool s_open;
 bool s_recording;
 unsigned s_slot;
+int s_kind = -1;
 unsigned s_sub;
 int s_tick;
 ReplayText s_call;
@@ -230,10 +231,20 @@ void CaptureObjectSet(const ReplaySlotSets& sets, bool entry)
         ReplayCaptureObjects(s_call, r.known, r.table, s_reach, sets.objWrites, sets.objWriteCount, 'w');
 }
 
-void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
+const ReplaySlotSets& SetsOfKind(unsigned slot, int kind)
+{
+    for (unsigned i = 0; i < kReplayKindSetCount; i++) {
+        if (kReplayKindSets[i].slot == slot && kReplayKindSets[i].kind == kind)
+            return *kReplayKindSets[i].sets;
+    }
+    return kReplaySlots[slot];
+}
+
+void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)
 {
     Recording& r = *s_rec[sub];
     s_slot = slot;
+    s_kind = kind;
     s_sub = sub;
     s_tick = g_game == nullptr ? -1 : g_game->ticks;
     s_recording = !r.windowed || RecordsAlways(slot) || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
@@ -250,7 +261,7 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots)
         s_field.AddInt(s_tick);
         r.known.Set("Game.ticks", s_field.Data());
     }
-    const ReplaySlotSets& sets = kReplaySlots[slot];
+    const ReplaySlotSets& sets = SetsOfKind(slot, kind);
     MarkRng();
     CaptureSet(sets.reads, sets.readCount, 'r');
     CaptureObjectSet(sets, true);
@@ -265,7 +276,7 @@ void SlotLeave()
         return;
     Recording& r = *s_rec[s_sub];
     ReplayCalls() = 0;
-    const ReplaySlotSets& sets = kReplaySlots[s_slot];
+    const ReplaySlotSets& sets = SetsOfKind(s_slot, s_kind);
     CaptureSet(sets.writes, sets.writeCount, 'w');
     CaptureObjectSet(sets, false);
     r.out.Add("call ");
@@ -287,14 +298,14 @@ bool IsNestedSlot(unsigned slot);
 
 class SlotScope {
 public:
-    SlotScope(unsigned slot, unsigned sub, const ReplayRoots& roots, bool recorded = true) : role(0)
+    SlotScope(unsigned slot, unsigned sub, const ReplayRoots& roots, bool recorded = true, int kind = -1) : role(0)
     {
         if (!s_open) {
             if (s_rec[sub] == nullptr || !recorded)
                 return;
             role = 1;
             s_open = true;
-            SlotEnter(slot, sub, roots);
+            SlotEnter(slot, sub, roots, kind);
         } else if (sub != s_sub && s_rec[sub] != nullptr && recorded) {
             ReplayFail("a call of a recorded subsystem made inside a call of another recorded subsystem is not recorded: record each in its own run");
         } else if (s_recording && ReplayOwned() && IsImportOf(s_sub, slot)) {
@@ -848,6 +859,21 @@ void ImportOutUnitBuffer(ReplayText& t, const char* slot, const char* name, cons
     ImportOutUnits(t, name, &list, limit, limitCount);
 }
 
+void ArgOutUnitBuffer(ReplayText& t, const char* slot, const char* name, const Ref<Unit>* units, int result, int capacity)
+{
+    (void)slot;
+    int held = result < capacity ? result : capacity;
+    t.Add("  o ");
+    t.Add(name);
+    t.Add(" [");
+    for (int i = 0; i < held; i++) {
+        if (i != 0)
+            t.AddChar(',');
+        ReplayAddObjectName(t, Table(), ROK_UNIT, units[i].get(), true);
+    }
+    t.Add("]\n");
+}
+
 void ImportResultObjectReach(ReplayText& t, unsigned kind, const void* p, unsigned count, ...)
 {
     t.Add(" = ");
@@ -867,7 +893,17 @@ void ImportResultObjectReach(ReplayText& t, unsigned kind, const void* p, unsign
         t.Add(name);
         t.AddChar(' ');
         ReplayFormatObjectField(*f, p, Table(), true, s_field);
-        t.Add(s_field.Data());
+        const char* close = f->kind == RK_BLOB && s_field.Data()[0] == '[' ? strchr(s_field.Data(), ']') : nullptr;
+        if (close == nullptr) {
+            t.Add(s_field.Data());
+            continue;
+        }
+        for (const char* c = s_field.Data(); c <= close; c++)
+            t.AddChar(*c);
+        if (close[1] != '\0') {
+            t.Add(" 0:");
+            t.Add(close + 1);
+        }
     }
     va_end(names);
 }

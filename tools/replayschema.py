@@ -1485,6 +1485,17 @@ def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict
             errors.append("%s: %s leaves %s unrecorded, which is no kind of the events of %s" % (where, label, name, a["events"]))
         elif not isinstance(reason, str) or not reason:
             errors.append("%s: %s leaves %s unrecorded with no reason" % (where, label, name))
+    kind_writes = a.get("kindWrites", {})
+    if not isinstance(kind_writes, dict):
+        errors.append("%s: `kindWrites` of %s maps the name of a kind to the object fields that kind alone writes" % (where, label))
+        kind_writes = {}
+    for name, fields in kind_writes.items():
+        if name not in table["names"]:
+            errors.append("%s: %s writes for %s, which is no kind of the events of %s" % (where, label, name, a["events"]))
+        elif name in unrecorded:
+            errors.append("%s: %s both leaves %s unrecorded and names its writes" % (where, label, name))
+        if not isinstance(fields, list) or not fields:
+            errors.append("%s: `kindWrites` of %s gives %s no list of object fields" % (where, label, name))
     refs = a.get("refs", {})
     if not isinstance(refs, dict):
         errors.append("%s: `refs` of %s maps a payload member to the kind it leads to" % (where, label))
@@ -2080,6 +2091,23 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 into.update(blobs[i] for i in list(into) if i in blobs)
             if "playsAs" in note:
                 errors += check_plays_as("%s.%s" % (sub, s["name"]), note["playsAs"], args, slots)
+            kind_writes = []
+            for a in [] if skipped else args:
+                if a["mode"] != "event" or not isinstance(a.get("kindWrites"), dict):
+                    continue
+                names_of = EVENTS.get(a["events"], {}).get("names", {})
+                for kname, written in a["kindWrites"].items():
+                    extra = set()
+                    for name in written if isinstance(written, list) else []:
+                        k, _, fname = name.partition(".")
+                        if (k, fname) not in object_index:
+                            errors.append("%s.%s(%s): %s writes %s, which is no object field" % (sub, s["name"], a["name"], kname, name))
+                        elif object_index[(k, fname)] not in obj_reads:
+                            errors.append("%s.%s(%s): %s writes %s, which is not among the slot's reads, so no call records its value before" % (sub, s["name"], a["name"], kname, name))
+                        else:
+                            extra.add(object_index[(k, fname)])
+                    if kname in names_of:
+                        kind_writes.append({"kind": kname, "value": names_of[kname], "objectWrites": sorted(obj_writes | extra)})
             entry = {
                 "conv": s["conv"], "ret": s["ret"], "functions": functions,
                 "reads": [f for f in order if f in reads], "writes": [f for f in order if f in writes],
@@ -2088,6 +2116,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             }
             if "playsAs" in note:
                 entry["playsAs"] = note["playsAs"]
+            if kind_writes:
+                entry["kindWrites"] = kind_writes
             if note.get("by_id") and not skipped:
                 by_id, by_id_errors = resolve_by_id("%s.%s" % (sub, s["name"]), note["by_id"], ann, object_fields, object_index, reach_table)
                 errors += by_id_errors
@@ -2602,6 +2632,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
                                               ("ObjWrites", s["objectWrites"], "unsigned short", s["objectWrites"])):
                 if names:
                     L.append("static const %s %s%s[] = { %s };" % (kindname, base, tag, ", ".join(str(i) for i in idx)))
+            for k in s.get("kindWrites", []):
+                L.append("static const unsigned short %sObjWrites%d[] = { %s };" % (base, k["value"], ", ".join(str(i) for i in k["objectWrites"])))
     L += ["", "static const ReplaySlotSets kReplaySlots[] = {"]
     for sub, slot, s in slot_table(subsystems):
         base = "kReplay%s%s" % (re.sub(r"[^A-Za-z0-9]", "", sub.title()), slot)
@@ -2613,7 +2645,27 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         every = ref("AllOf", s["allOf"])
         by_id = ", %s, %d" % ref("IdReach", s["byId"]) if s.get("byId") else ""
         L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %s, %d, %s, %d%s },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], wo[0], wo[1], every[0], every[1], by_id))
-    L += ["};", "static const unsigned kReplaySlotCount = RSL_COUNT;", "", "static const ReplaySubsystem kReplaySubsystems[] = {"]
+    L += ["};", "static const unsigned kReplaySlotCount = RSL_COUNT;", ""]
+    kinded = [(sub, slot, s, k) for sub, slot, s in slot_table(subsystems) for k in s.get("kindWrites", [])]
+    L.append("static const ReplaySlotSets kReplayKindSlots[] = {")
+    for sub, slot, s, k in kinded:
+        base = "kReplay%s%s" % (re.sub(r"[^A-Za-z0-9]", "", sub.title()), slot)
+
+        def ref(tag, items):
+            return ("%s%s" % (base, tag) if items else "nullptr", len(items))
+        r, w = ref("Reads", s["reads"]), ref("Writes", s["writes"])
+        ro = ref("ObjReads", s["objectReads"])
+        every = ref("AllOf", s["allOf"])
+        by_id = ", %s, %d" % ref("IdReach", s["byId"]) if s.get("byId") else ""
+        L.append('    { "%s", SUB_%s, %s, %d, %s, %d, %s, %d, %sObjWrites%d, %d, %s, %d%s },' % (slot, upper(sub), r[0], r[1], w[0], w[1], ro[0], ro[1], base, k["value"], len(k["objectWrites"]), every[0], every[1], by_id))
+    if not kinded:
+        L.append("    { nullptr },")
+    L += ["};", "", "static const ReplayKindSets kReplayKindSets[] = {"]
+    for n, (sub, slot, s, k) in enumerate(kinded):
+        L.append("    { RSL_%s_%s, %d, &kReplayKindSlots[%d] }," % (upper(sub), upper(slot), k["value"], n))
+    if not kinded:
+        L.append("    { RSL_COUNT, 0, nullptr },")
+    L += ["};", "static const unsigned kReplayKindSetCount = %d;" % len(kinded), "", "static const ReplaySubsystem kReplaySubsystems[] = {"]
     first = 0
     for sub, spec in subsystems.items():
         n = len(spec["slots"])
@@ -2796,7 +2848,12 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L += struct_roots(a, i, objects, object_fields)
         elif a["mode"] == "event":
             L.append("    EventRoots(roots, RET_%s, a%d, a%d);" % (upper(a["events"]), i, a["sizeIndex"]))
-    L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
+    kinded = next((i for i, a in enumerate(s["args"]) if a["mode"] == "event" and s.get("kindWrites")), None)
+    if kinded is not None and not unrecorded:
+        a = s["args"][kinded]
+        L.append("    SlotScope scope(%s, SUB_%s, roots, true, a%d != nullptr && a%d >= sizeof(*a%d) ? (int)a%d->kind : -1);" % (rid, upper(sub), kinded, a["sizeIndex"], kinded, kinded))
+    else:
+        L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
     for i, a in enumerate(s["args"]):
         if a["mode"] == "region":
             L.append("    RegionBind(SUB_%s, a%d, a%d);" % (upper(sub), i, i + 1))
@@ -2891,6 +2948,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L.append("        ArgCallbackExit(s_tail, held%d);" % i)
     for i, a in enumerate(s["args"]):
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
+        if a["mode"] == "units-buffer" and own is not None and not unrecorded:
+            L.append('        ArgOutUnitBuffer(s_tail, "%s.%s", "%s", a%d, result, a%d);' % (sub, slot, a["line"], i, own[1]))
     if res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon", "load"):
         L += ["        " + x for x in result_out(res, objects, "o")]
     L.append("    }")
@@ -3406,6 +3465,15 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             closing.append(line + " ")
             after.append('    CompareBytes("%s", %s, (int)g_result_%s_%s%s, %s_length);' % (line, g, sub, slot, " * %d" % SIZES[a["resultElem"]] if a.get("resultElem") else "", g))
             call.append("(%s)%s" % (t, g))
+        elif m == "units-buffer":
+            g = "g_units_%s_%s_%d" % (sub, slot, i)
+            capacity = s["args"][names.index(a["capacity"])]
+            head += ["Ref<Unit>* %s;" % g, "int %s_capacity;" % g]
+            L.append('    %s_capacity = ArgScalar<int>("%s");' % (g, capacity["line"]))
+            L.append("    free(%s);\n    %s = (Ref<Unit>*)calloc(%s_capacity > 0 ? %s_capacity : 1, sizeof(Ref<Unit>));" % (g, g, g, g))
+            closing.append(line + " ")
+            after.append('    CompareUnitBuffer("%s", %s, (int)g_result_%s_%s, %s_capacity);' % (line, g, sub, slot, g))
+            call.append(g)
         elif m == "scratch":
             capacity = s["args"][names.index(a["capacity"])]
             L.append("    ScratchHolder %s;\n    %s.Reserve(sizeof(%s) * (size_t)ArgScalar<int>(\"%s\"));" % (v, v, t[:-1], capacity["line"]))
@@ -3516,6 +3584,8 @@ def json_slot(s: dict, model: dict) -> dict:
         out["byId"] = groups
     out["objectReads"] = [names[i] for i in s["objectReads"]]
     out["objectWrites"] = [names[i] for i in s["objectWrites"]]
+    if "kindWrites" in s:
+        out["kindWrites"] = [dict(k, objectWrites=[names[i] for i in k["objectWrites"]]) for k in s["kindWrites"]]
     return out
 
 
@@ -3704,7 +3774,7 @@ def check_service_specs(services: list[dict], ann: dict) -> list[str]:
             if s.get("kind") not in kinds or kinds[s["kind"]]["scope"] == "value" or not s.get("ctype"):
                 errors.append("%s: an object result needs a `kind` of the schema and the `ctype` that the function returns" % where)
             for f in s.get("reach", []):
-                if not any(x["name"] == f for x in kinds.get(s.get("kind"), {"fields": []})["fields"]):
+                if not any(x["name"] == f or (x["name"] + "[]" == f and "blob" in x) for x in kinds.get(s.get("kind"), {"fields": []})["fields"]):
                     errors.append("%s: the reach names %s, which is no field of %s" % (where, f, s.get("kind")))
         if res == "alloc":
             if params.get(s.get("size"), {}).get("mode") != "int":
@@ -4214,7 +4284,7 @@ def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
     return out, errors
 
 
-RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback", "weapon", "load", "bytes-out", "scratch"}
+RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback", "weapon", "load", "bytes-out", "scratch", "units-buffer"}
 
 
 def runnable(s: dict) -> bool:

@@ -101,6 +101,7 @@ struct ReplayReach {
 };
 
 typedef void* (*ReplayAllocFn)(unsigned size);
+typedef bool (*ReplayWalkSkipFn)(const void* object);
 typedef void* (*ReplayBindCallbackFn)(unsigned callback, unsigned ordinal, ReplayAllocFn alloc);
 
 ReplayBindCallbackFn& ReplayBindCallbackHook();
@@ -241,6 +242,8 @@ void* ReplayResolveObject(const char* text, unsigned* kind, ReplayObjectTable& t
 void ReplayEnsureAllOfTables(const unsigned short* kinds, unsigned count, ReplayAllocFn alloc);
 void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned short* rootKinds, void* const* roots, unsigned rootCount,
                 const unsigned short* rootLimit = nullptr, unsigned rootLimitCount = 0);
+void ReplaySetWalkSkip(ReplayWalkSkipFn skip);
+void* ReplayTableElement(unsigned kind, unsigned index);
 bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex);
 unsigned ReplayDeltaCount(const ReplayReach& reach);
 bool ReplayDeltaTable(const ReplayReach& reach, unsigned index, unsigned* kind, unsigned char** base, unsigned* count, unsigned* stride);

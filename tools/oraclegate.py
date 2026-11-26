@@ -14,7 +14,9 @@ the block pointer check, which judges the harness's scan and not the module's be
 The verdict of a scenario is its end-of-tick `state` (the hash of the `tick` row, the whole judged state at the end of the tick),
 and so is the exit status. Each scenario also has a `digest` verdict, and the result a top-level `digest`: `equal` or `differs`
 (from a tick) for the digest of all the rows of the tick. A module equal on `state` but different on `digest` kept the end-of-tick
-contract with another order inside the tick; the digest is not a failure.
+contract with another order inside the tick; the digest is not a failure. The `view` verdicts are the same for the hash of the `view` row
+(the player view of the end of the tick, docs/view.md "The recorded view"): `equal`, `differs` (from a tick) or `not_judged`, per scenario and at the top
+level. A view that differs is not a failure either: the state stays the verdict.
 
 Exit status: 0 when every scenario and recording is equal, 1 when one differs or failed to run, 2 when the loader refused
 the module or the arguments were wrong.
@@ -34,7 +36,7 @@ import reference
 import replay
 
 ROOT = Path(__file__).resolve().parent.parent
-FORMAT = 2
+FORMAT = 3
 RUNTIME_FILES = ("TotalA.exe", "TotalA.map", "CMakeCache.txt", "wasmtime_host.dll", "modules.json")
 OBJECT_LIST = "objs/objects.rsp"
 PROBE = "game_seed 1\ncrt_seed 2\nview_seed 3\nmap The Pass\nstart_positions fixed\nticks 10\nplayer0.controller human\nplayer0.side Arm\nplayer1.controller ai\nplayer1.side Core\n"
@@ -43,7 +45,8 @@ VALUE_LIMIT = 200
 NAME = re.compile(r"[A-Za-z0-9_.#\[\]-]{1,200}$")
 SCENARIO_LINE = re.compile(r"(ok|DIFF)\s+(\S+) \(\d+ ticks, [^)]*\)(?: (.*))?$")
 TICK = re.compile(r"tick (\d+): ")
-DIGEST_DIFFERS = re.compile(r"\[digest differs from tick (\d+)\]$")
+DIGEST_DIFFERS = re.compile(r"\[digest differs from tick (\d+)\]")
+VIEW_DIFFERS = re.compile(r"\[view differs from tick (\d+)\]")
 DIVERGENCE_FOR = re.compile(r"tracediff for (\S+): a = ")
 DIVERGENCE_AT = re.compile(r"first divergence: tick (\d+), phase (\S+)$")
 DIVERGENCE_FIELD = re.compile(r"first differing field: (\S+): a=(.*?) b=(.*)$")
@@ -152,22 +155,27 @@ def parse_suite(output: str, exit_code: int, expected: list[str]) -> dict[str, d
     """The verdict of each scenario from the lines of tools/reference.py's --check --end-of-tick report.
 
     `ok` and `DIFF` lines give equal or differs with the tick (of the end-of-tick state), and a ` [digest differs from tick T]` suffix
-    gives the scenario's `digest` verdict (`equal` for an `ok` line without it, not_judged for a `DIFF` line without it, as the watch prints it, and for a scenario that is not_judged or failed); the tracediff block gives the phase, the field and the value of
+    gives the scenario's `digest` verdict and a ` [view differs from tick T]` suffix gives its `view` verdict, both the same way (`equal` for an `ok` line without it, not_judged for a `DIFF` line without it, as the watch prints it, and for a scenario that is not_judged or failed); the tracediff block gives the phase, the field and the value of
     b (the module's side) for the scenario it names; `<name>: failed to run` lines give failed. A scenario with no line is
     not_judged (the run stopped at the first divergence). Nothing is read from a stored or reference side."""
     verdicts: dict[str, dict] = {name: {"status": "not_judged"} for name in expected}
     blocks: dict[str, dict] = {}
     digests: dict[str, dict] = {}
+    views: dict[str, dict] = {}
     current = None
     for line in output.splitlines():
         if m := SCENARIO_LINE.match(line):
             name = m[2]
             if name in verdicts:
-                late = DIGEST_DIFFERS.search(line)
+                late, seen = DIGEST_DIFFERS.search(line), VIEW_DIFFERS.search(line)
                 if late:
                     digests[name] = {"status": "differs", "tick": int(late[1])}
                 elif m[1] == "ok":
                     digests[name] = {"status": "equal"}
+                if seen:
+                    views[name] = {"status": "differs", "tick": int(seen[1])}
+                elif m[1] == "ok":
+                    views[name] = {"status": "equal"}
             if name in verdicts and m[1] == "ok":
                 verdicts[name] = {"status": "equal"}
             elif name in verdicts:
@@ -192,6 +200,7 @@ def parse_suite(output: str, exit_code: int, expected: list[str]) -> dict[str, d
                 verdicts[name] = {"status": "failed"}
     for name, v in verdicts.items():
         v["digest"] = digests[name] if name in digests and v["status"] in ("equal", "differs") else {"status": "not_judged"}
+        v["view"] = views[name] if name in views and v["status"] in ("equal", "differs") else {"status": "not_judged"}
     if exit_code != 0 and all(v["status"] == "equal" for v in verdicts.values()):
         verdicts["other_checks"] = {"status": "failed"}
         if any(BLOCK_POINTER_SUMMARY.match(line) for line in output.splitlines()):
@@ -218,9 +227,9 @@ def verdict_of(suite: dict[str, dict], recordings: dict[str, dict]) -> str:
     return "equal" if statuses and set(statuses) == {"equal"} else "failed"
 
 
-def digest_of(suite: dict[str, dict]) -> str:
-    """The digest verdict of the suite: differs when a judged scenario's digest differs, equal when all the judged ones are equal, else not_judged."""
-    statuses = [v["digest"]["status"] for v in suite.values() if "digest" in v]
+def digest_of(suite: dict[str, dict], column: str = "digest") -> str:
+    """The digest (or `view`) verdict of the suite: differs when a judged scenario's differs, equal when all the judged ones are equal, else not_judged."""
+    statuses = [v[column]["status"] for v in suite.values() if column in v]
     if "differs" in statuses:
         return "differs"
     return "equal" if "equal" in statuses else "not_judged"
@@ -235,7 +244,7 @@ def build_result(subsystem: str, module: Path, full: bool, kit: dict, suite: dic
         result.update(verdict="refused", message=message)
         return result
     result.update(scenarios=suite or {}, recordings=recordings or {}, verdict=verdict_of(suite or {}, recordings or {}),
-                  digest=digest_of(suite or {}))
+                  digest=digest_of(suite or {}), view=digest_of(suite or {}, "view"))
     return result
 
 

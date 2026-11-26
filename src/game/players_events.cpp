@@ -165,6 +165,19 @@ int __stdcall PlayersApply(const PlayersEventHeader* event, unsigned int size)
     case PLAYERS_LEAVE_GAME:
         g_game->bits.flag2 = 1;
         return 1;
+    case PLAYERS_SET_CONTROL:
+    case PLAYERS_SET_VIEW: {
+        const PlayersSetPlayer* e = reinterpret_cast<const PlayersSetPlayer*>(event);
+        if ((unsigned)e->player > 9)
+            return 0;
+        Player* p = &g_game->players[e->player];
+        if (p->active == 0 || (p->type != 1 && p->type != 2 && p->type != 3) || p->index == 10)
+            return 0;
+        if (event->kind == PLAYERS_SET_CONTROL)
+            g_game->localPlayer = (unsigned char)e->player;
+        g_game->playerIndex = (unsigned char)e->player;
+        return 1;
+    }
     case PLAYERS_DEACTIVATE_CONDITIONS:
         g_game->list_391ed->Deactivate();
         return 1;

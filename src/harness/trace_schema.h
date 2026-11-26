@@ -2,7 +2,7 @@
 #ifndef TRACE_SCHEMA_H
 #define TRACE_SCHEMA_H
 
-#define TRACE_FORMAT 9
+#define TRACE_FORMAT 10
 
 #include <stddef.h>
 #include "../../interfaces/economy.h"
@@ -1864,6 +1864,20 @@ static const TraceField kEventPlayersLeaveGame[] = {
     { "unit", offsetof(PlayersEventHeader, unit), 4, TF_REF, TT_UNIT, 0 },
     { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
 };
+static_assert(sizeof(PlayersSetPlayer) == 12, "PlayersSetPlayer");
+static const TraceField kEventPlayersSetControl[] = {
+    { "kind", offsetof(PlayersSetPlayer, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersSetPlayer, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(PlayersSetPlayer, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
+static_assert(sizeof(PlayersSetPlayer) == 12, "PlayersSetPlayer");
+static const TraceField kEventPlayersSetView[] = {
+    { "kind", offsetof(PlayersSetPlayer, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
+    { "unit", offsetof(PlayersSetPlayer, h.unit), 4, TF_REF, TT_UNIT, 0 },
+    { "player", offsetof(PlayersSetPlayer, player), 4, TF_SCALAR, TT_NONE, 0 },
+    { "outcome", TRACE_EVENT_OUTCOME, 4, TF_SCALAR, TT_NONE, 0 },
+};
 static_assert(sizeof(PlayersKillUnit) == 12, "PlayersKillUnit");
 static const TraceField kEventPlayersEffectKillUnit[] = {
     { "kind", offsetof(PlayersKillUnit, h.kind), 4, TF_SCALAR, TT_NONE, 0 },
@@ -1902,11 +1916,13 @@ static const TraceEventKind kPlayersKinds[] = {
     { 200, "PLAYERS_DEACTIVATE_CONDITIONS", sizeof(PlayersEventHeader), kEventPlayersDeactivateConditions, 3 },
     { 201, "PLAYERS_SET_CHEATS", sizeof(PlayersSetCheats), kEventPlayersSetCheats, 5 },
     { 202, "PLAYERS_LEAVE_GAME", sizeof(PlayersEventHeader), kEventPlayersLeaveGame, 3 },
+    { 203, "PLAYERS_SET_CONTROL", sizeof(PlayersSetPlayer), kEventPlayersSetControl, 4 },
+    { 204, "PLAYERS_SET_VIEW", sizeof(PlayersSetPlayer), kEventPlayersSetView, 4 },
     { 208, "PLAYERS_EFFECT_KILL_UNIT", sizeof(PlayersKillUnit), kEventPlayersEffectKillUnit, 4 },
     { 209, "PLAYERS_EFFECT_SEND_UNIT", sizeof(PlayersSendUnit), kEventPlayersEffectSendUnit, 4 },
     { 210, "PLAYERS_EFFECT_CAPTURE_UNIT", sizeof(PlayersCaptureUnit), kEventPlayersEffectCaptureUnit, 9 },
 };
-static const TraceEventModule kPlayersEvents = { "playersEvents", 41, kPlayersKinds, 14 };
+static const TraceEventModule kPlayersEvents = { "playersEvents", 41, kPlayersKinds, 16 };
 
 static_assert(sizeof(AiReactToAttack) == 16, "AiReactToAttack");
 static const TraceField kEventAiReactToAttack[] = {

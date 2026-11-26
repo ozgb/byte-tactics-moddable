@@ -27,6 +27,8 @@ between two frames and T falls inside a pass, or when the run ends before T.
 Each frame is written to `frames/<tick>.bin` beside `trace.txt`, creating the directory.
 All numbers are little-endian.
 
+The run writes the player view of the same tick to `views/<tick>.bin` beside the frame (`docs/view.md`, "The recorded view"): the view is what a presentation is given, and the frame is what it draws from it.
+
 | Offset | Size | Content |
 | --- | --- | --- |
 | 0 | 4 | The bytes `BTFR` |

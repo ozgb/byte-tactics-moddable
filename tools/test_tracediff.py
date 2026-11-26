@@ -332,7 +332,8 @@ class TickRowTest(unittest.TestCase):
     def test_tick_rows_parse_and_follow_world(self):
         self.assertEqual(td.parse_row("3 tick 00000000000000aa"), (3, "tick", "00000000000000aa"))
         self.assertLess(td.PHASES.index("world"), td.PHASES.index("tick"))
-        self.assertEqual(td.PHASES[-1], "tick")
+        self.assertEqual(td.PHASES[-2:], ("tick", "view"))
+        self.assertEqual(td.parse_row("3 view 00000000000000bb"), (3, "view", "00000000000000bb"))
 
     def test_a_tick_row_has_its_own_dump_block_and_no_phase_function(self):
         self.assertNotIn("tick", td.DUMP_PHASE)
@@ -362,6 +363,74 @@ class TickRowTest(unittest.TestCase):
             code, out = self.run_main("--traces", a, b, "--end-of-tick")
         self.assertEqual(code, 0)
         self.assertIn("traces identical", out)
+
+
+class ViewRowTest(unittest.TestCase):
+    traces = TickRowTest.traces
+    run_main = TickRowTest.run_main
+
+
+    def view_dirs(self, d, metals):
+        import viewblock
+        import test_viewblock as tv
+        dirs = []
+        for name, metal in zip("ab", metals):
+            directory = Path(d) / name
+            (directory / "views").mkdir(parents=True)
+            (directory / "views" / "2.bin").write_bytes(viewblock.FILE_HEADER + tv.header() + tv.players(metal))
+            dirs.append(directory)
+        return dirs
+
+    def test_a_view_row_is_its_own_phase_with_no_dump_block(self):
+        self.assertNotIn("view", td.DUMP_PHASES)
+        self.assertIn("player view", td.describe_phase("view"))
+
+    def test_end_of_tick_looks_at_the_view_only_when_the_states_agree(self):
+        with tempfile.TemporaryDirectory() as d:
+            a, b = self.traces(d, ["1 tick 03\n", "1 view 04\n", "2 tick 05\n", "2 view 06\n"],
+                               ["1 tick 03\n", "1 view 04\n", "2 tick 05\n", "2 view 07\n"])
+            code, out = self.run_main("--traces", a, b, "--end-of-tick")
+            self.assertEqual((code, "tick 2, phase view" in out), (1, True))
+            a, b = self.traces(d, ["1 tick 03\n", "1 view 08\n", "2 tick 05\n", "2 view 06\n"],
+                               ["1 tick 09\n", "1 view 04\n", "2 tick 05\n", "2 view 06\n"])
+            code, out = self.run_main("--traces", a, b, "--end-of-tick")
+            self.assertIn("tick 1, phase tick", out)
+
+    def test_traces_name_the_first_differing_view_field_from_the_views_beside_them(self):
+        with tempfile.TemporaryDirectory() as d:
+            dirs = self.view_dirs(d, (1.0, 2.0))
+            for directory, value in zip(dirs, ("a", "b")):
+                (directory / "trace.txt").write_text(
+                    f"bt-trace {TRACE_FORMAT}\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 view 01\n2 view 0{ '5' if value == 'a' else '6'}\n")
+            code, out = self.run_main("--traces", str(dirs[0] / "trace.txt"), str(dirs[1] / "trace.txt"))
+        self.assertEqual(code, 1)
+        self.assertIn("tick 2, phase view", out)
+        self.assertIn("first differing field: players[0].metal: a=1 b=2", out)
+
+    def test_a_missing_view_file_is_named(self):
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(td.Error, "views/2.bin is missing"):
+                td.view_difference(Path(d) / "views" / "2.bin", Path(d) / "views" / "2.bin")
+
+    def test_compare_replays_with_the_dump_and_names_the_field(self):
+        with tempfile.TemporaryDirectory() as d:
+            dirs = self.view_dirs(d, (1.0, 2.0))
+            for i, directory in enumerate(dirs):
+                (directory / "trace.txt").write_text(
+                    f"bt-trace {TRACE_FORMAT}\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\n2 tick 01\n2 view 0{i + 5}\n")
+            calls = []
+
+            def play_loading(exe, scenario, game_dir, dump, timeout, poison, xserver, collect=()):
+                calls.append((dump, collect))
+                return dirs[0 if exe.name == "a.exe" else 1]
+
+            argv = ["tracediff.py", "a.exe", "b.exe", "--scenario", str(Path(d) / "s.txt")]
+            (Path(d) / "s.txt").write_text("ticks 2\n")
+            with mock.patch("sys.argv", argv), mock.patch.object(td, "play_loading", play_loading), \
+                    mock.patch.object(td, "need", lambda run, name: run / name), contextlib.redirect_stdout(io.StringIO()) as out:
+                self.assertEqual(td.main(), 1)
+        self.assertIn((2, ("views/2.bin",)), calls)
+        self.assertIn("players[0].metal: a=1 b=2", out.getvalue())
 
 
 class PlayLoadingTest(unittest.TestCase):

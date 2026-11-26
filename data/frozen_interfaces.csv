@@ -4,4 +4,4 @@ interfaces/rand_stream.h,1,#1042
 interfaces/services.h,4,#1042
 interfaces/sim_events.h,1,#1042
 interfaces/state_writer.h,1,#1042
-reference/core/hash.json,2,#1106
+reference/core/hash.json,3,#1063

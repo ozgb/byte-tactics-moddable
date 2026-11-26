@@ -37,7 +37,7 @@ from rwsets import load_sim_map
 from simglobals import REF_FIELDS
 
 ROOT = Path(__file__).resolve().parent.parent
-TRACE_FORMAT = 9
+TRACE_FORMAT = 10
 ROOTS = [ROOT / p for p in [
     "src/units/unit.h", "src/game/game.h", "src/network/player.h", "src/network/settings.h",
     "src/weapons/projectile.h", "src/weapons/debris.h", "src/util/rot16.h",
@@ -1033,7 +1033,7 @@ EVENT_MODULES = [
                  "PLAYERS_UNIT_CREATED": None, "PLAYERS_UNIT_DIED": None, "PLAYERS_TRANSFER": "PlayersTransfer", "PLAYERS_SET_STORE": "PlayersSetStore",
                  "PLAYERS_SET_TYPE": "PlayersSetType", "PLAYERS_END_GAME": "PlayersEndGame",
                  "PLAYERS_DEACTIVATE_CONDITIONS": None, "PLAYERS_SET_CHEATS": "PlayersSetCheats",
-                 "PLAYERS_LEAVE_GAME": None,
+                 "PLAYERS_LEAVE_GAME": None, "PLAYERS_SET_CONTROL": "PlayersSetPlayer", "PLAYERS_SET_VIEW": "PlayersSetPlayer",
                  "PLAYERS_EFFECT_KILL_UNIT": "PlayersKillUnit", "PLAYERS_EFFECT_SEND_UNIT": "PlayersSendUnit",
                  "PLAYERS_EFFECT_CAPTURE_UNIT": "PlayersCaptureUnit"}, size_header="players_event_size.h"),
     EventModule("aiEvents", 42, "Ai", "ai.h", "AiEventHeader", ["AiEventKind", "AiEffectKind"],

@@ -10,12 +10,14 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | Path | What it is | Specified by |
 | --- | --- | --- |
 | `docs/trace-format.md`, `data/trace_schema.json` | the trace format and its schema | `docs/trace-format.md` |
-| `tools/tracerehash.py` | recomputes every trace hash from a test-mode dump, standard library only | `docs/trace-format.md` |
+| `tools/tracerehash.py` | recomputes every trace hash from a test-mode dump, and the `view` row from a view file, standard library only (with `tools/viewblock.py`) | `docs/trace-format.md` |
+| `tools/viewblock.py` | decodes a view file into `<path> <value>` fields, names the first field in which two view files differ and hashes a view as the `view` row does; it reads the layout from `interfaces/view.h` (standard library only) | `docs/view.md`, "The recorded view" |
 | `reference/traces/` | the stored traces, one per scenario: for each tick, the digest of every row and the end-of-tick state (`docs/trace-format.md`, section 9) | `docs/reference-traces.md` |
 | `reference/scenarios/` | the scenarios the traces come from | `docs/scenario-format.md` |
 | `reference/saves/` | the saved games some scenarios load | `docs/reference-traces.md` |
 | `reference/sounds/` | the stored sound logs | `docs/sound-log.md` |
 | `reference/frames/` | the stored frames | `docs/frame-dump.md` |
+| `reference/views/` | the stored views of those frames: for each scenario with a `frames` line, `<scenario>/<tick>.bin`, the player view of each frame's tick | `docs/view.md`, "The recorded view" |
 | `reference/ui/` | the stored UI logs | `docs/ui-log.md` |
 | `reference/commands/` | the stored interface commands | `docs/commands.md` |
 | `reference/events/` | the stored sim event digests: for each scenario, the tick, phase, record count and hash of each run of sim events, and for each tick its count, the hash of the records whose order counts and the hash of their set | `docs/events-log.md` |
@@ -54,6 +56,17 @@ stored display lists, drawn from blank targets with the game's data and their `p
 (`docs/display-log.md`, "The replay"). Any other host (another rasteriser, size, colour depth or a browser) is judged
 on the display list alone: its display digests and lists must equal `reference/display/` and
 `reference/displaylists/`.
+
+A presentation is judged on a frame it draws from the view alone. For each tick of a scenario's `frames` line the kit holds three
+files that belong together: the view of that tick (`reference/views/<scenario>/<tick>.bin`, the input: the bytes of
+`docs/view.md`, "The recorded view", which `tools/viewblock.py show` prints field by field), the display list the reference drew
+from the state behind it (`reference/displaylists/<scenario>.txt.xz`, the frame of that tick, `docs/display-log.md`, the output as items)
+and the pixels of the frame (`reference/frames/<scenario>/<tick>.bin`, `docs/frame-dump.md`, the output as a picture). A build that
+fills a `PlayerView` from the view file alone, runs its presentation and writes its display list and its frame for that tick is equal when
+its list equals the stored one under the rule of `docs/display-log.md` and its pixels equal the stored frame. The view of every tick,
+not only the frame ticks, is hashed in the `view` row of the stored traces (`docs/trace-format.md`, sections 2 and 6), so a core that
+fills the block can be judged against the same rows. The view of a tick is the end of the tick's state, which is what the frame of
+that tick shows.
 
 ## The manifest and the fuel pass
 

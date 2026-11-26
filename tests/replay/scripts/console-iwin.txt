@@ -581,11 +581,11 @@ call 30 QueryScript
   a script CobScript#2
   a name "Killed"
   a arg0 (100)
-  a arg1 (2554780)
+  a arg1 (0)
   a arg2 null
   a arg3 null
   o arg0 (100)
-  o arg1 (2554780)
+  o arg1 (0)
   o result 0
 call 30 FreeObjectState
   a state ModelState#2

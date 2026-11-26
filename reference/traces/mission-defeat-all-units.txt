@@ -1,6 +1,6 @@
 bt-digest 10
 trace_format bt-trace 10
-commit 40afcfe3e5965de27261ad174d486578ec8b7e38
+commit 86c792ca9b7a42884ee781e03d3c6b93ac815374
 scenario reference/scenarios/mission-defeat-all-units.txt
 game_seed 467
 crt_seed 1467

@@ -213,7 +213,7 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v49`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v48`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v51`
+`reference-traces-v48`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v50`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
@@ -440,7 +440,7 @@ and so on), and this page is updated to name it. The current tag is
   host does not yet give (#1145). The trace format is still `bt-trace 10`. Every
   other trace changes from tick 1 in `game.netGameFlags` (bit 3, which the menus set on the way to a single-player game
   and the harness now sets too) and in the starting metal and energy of the slots at or above the player count (now
-  unset, as the menus leave them); the commit line names 40afcfe3e, the reference commit that adds the frontend mode.
+  unset, as the menus leave them); the commit line names 86c792ca9, the reference merge that adds the frontend mode.
   The saves of `save-midgame` and `save-targets` change with them. The other
   event digests, sound logs, UI logs, interface commands, display logs, frames and views are those of v47.
 

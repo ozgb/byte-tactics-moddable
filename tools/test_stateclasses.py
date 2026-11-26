@@ -555,6 +555,11 @@ class RegenerationTest(unittest.TestCase):
         self.assertEqual([(r["name"], r["class"], r["note"], r["proposed"]) for r in merged],
                          [("a", "view", "why", "sim"), ("c", "", "", "")])
 
+    def test_the_bit_masks_are_kept(self):
+        old = [self.row("a", **{"class": "mixed", "sim_bits": "0x7", "view_bits": "0x8"})]
+        merged = sc.merge_kept([self.row("a")], old)
+        self.assertEqual((merged[0]["sim_bits"], merged[0]["view_bits"]), ("0x7", "0x8"))
+
     def test_differences_ignore_class_and_note_only(self):
         a, b = self.row("a"), self.row("a", **{"class": "sim", "note": "n"})
         self.assertEqual(sc.differences([a], [b]), [])
@@ -626,6 +631,15 @@ class DataTest(unittest.TestCase):
         names = [(r["kind"], r["name"]) for r in self.rows]
         self.assertEqual(len(names), len(set(names)))
 
+    def test_bit_masks_are_on_mixed_rows_only_and_do_not_overlap(self):
+        for r in self.rows:
+            if not (r["sim_bits"] or r["view_bits"]):
+                continue
+            self.assertEqual(r["class"], "mixed", r["name"])
+            sim, view = int(r["sim_bits"], 16), int(r["view_bits"], 16)
+            if r["name"] not in ("localPlayer", "playerIndex"):
+                self.assertEqual(sim & view, 0, r["name"])
+
     def test_the_file_has_every_kind(self):
         self.assertEqual({r["kind"] for r in self.rows}, set(sc.KINDS))
 
@@ -685,6 +699,44 @@ class PresentationWritesTest(unittest.TestCase):
                                     ("Click", "src/gui/a.cpp", "member_write", "Game::flags")),
                          [("Click", "Game::flags")])
         self.assertEqual(self.found(("Click", "src/gui/a.cpp", "field_write", "<anon>::flag2")), [])
+
+    BITS = CLASSES + [{"kind": "game-region", "name": "word|wordView", "address": "0x50", "class": "mixed",
+                       "sim_bits": "0xfff7", "view_bits": "0x0008"},
+                      {"kind": "game-region", "name": "pause", "address": "0x60", "class": "mixed",
+                       "sim_bits": "0x0000", "view_bits": "0xfffe"}]
+
+    def found_bits(self, *rows):
+        return sc.presentation_sim_writes([["", f, file, kind, target] for f, file, kind, target in rows],
+                                          self.SUBSYSTEMS, self.BITS, self.GLOBALS)
+
+    def test_a_write_of_only_view_bits_of_a_mixed_field_passes(self):
+        self.assertEqual(self.found_bits(("Click", "src/gui/a.cpp", "field_write", "Game::word"),
+                                         ("Click", "src/gui/a.cpp", "mask_field", "Game::word 0x8")), [])
+
+    def test_a_write_of_a_sim_bit_of_a_mixed_field_fails(self):
+        self.assertEqual(self.found_bits(("Click", "src/gui/a.cpp", "field_write", "Game::word"),
+                                         ("Click", "src/gui/a.cpp", "mask_field", "Game::word 0x9")),
+                         [("Click", "Game::word")])
+
+    def test_an_unbounded_write_of_a_mixed_field_fails(self):
+        self.assertEqual(self.found_bits(("Click", "src/gui/a.cpp", "field_write", "Game::word")),
+                         [("Click", "Game::word")])
+
+    def test_a_bit_field_write_is_judged_by_the_mask_of_the_member_that_holds_it(self):
+        member = ("Click", "src/gui/a.cpp", "member_write", "Game::wordView")
+        self.assertEqual(self.found_bits(member, ("Click", "src/gui/a.cpp", "mask_member", "Game::wordView 0x8")), [])
+        self.assertEqual(self.found_bits(member, ("Click", "src/gui/a.cpp", "mask_member", "Game::wordView 0x4")),
+                         [("Click", "Game::wordView")])
+        self.assertEqual(self.found_bits(member, ("Click", "src/gui/a.cpp", "mask_field", "Game::wordView 0x8")),
+                         [("Click", "Game::wordView")])
+
+    def test_a_mask_of_another_function_does_not_bound_a_write(self):
+        self.assertEqual(self.found_bits(("Click", "src/gui/a.cpp", "field_write", "Game::word"),
+                                         ("Tick", "src/gui/a.cpp", "mask_field", "Game::word 0x8")),
+                         [("Click", "Game::word")])
+
+    def test_a_mixed_field_without_sim_bits_passes_any_write(self):
+        self.assertEqual(self.found_bits(("Click", "src/gui/a.cpp", "field_write", "Game::pause")), [])
 
     def test_a_field_of_another_record_is_found_when_a_sim_function_touches_it(self):
         row = ("Click", "src/gui/a.cpp", "field_write", "Unit::attacker")

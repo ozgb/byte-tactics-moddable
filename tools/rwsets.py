@@ -39,6 +39,15 @@ Kinds:
                                    element; Type is the type of the object the field is
                                    in, typedefs removed. Only the last field of a path is
                                    recorded (`g_game->players[i].hp` is Player::hp).
+  member_read, member_write, ...   `Type::member`, the named member that holds an accessed
+                                   bit-field, or a field of an unnamed struct, besides the
+                                   field row (`g_game->flags.b2` is `<anon>::b2` and
+                                   `Game::flags`); unnamed members between them are skipped
+  mask_field, mask_member,         `<target> 0x<bits>`: the bits of the target that the
+  mask_global                      function's writes of it can change, counted from its first
+                                   byte, when every write is bounded: `|=`, `&=` or `^=` with
+                                   a constant made of literals, or a write of a bit-field
+                                   (for the member that holds it). No row means any bit
   deref_read, deref_write          `*type`, an access through a pointer that is not a
                                    field (`*p` or `p[i]` with int *p is `*int`)
   *_maybe_written                  an lvalue passed to a call as a non-const pointer or
@@ -311,6 +320,68 @@ def compile_commands(build_dir: Path, only: list[str]) -> list[tuple[str, list[s
 
 INTERFACE_FILES = (os.path.join("interfaces", "services.h"), os.path.join("interfaces", "map.h"))
 BLOCK_VECTOR = re.compile(r"^BlockVector<")
+INTEGER_BITS = {"bool": 8, "char": 8, "signed char": 8, "unsigned char": 8, "short": 16, "unsigned short": 16,
+                "wchar_t": 16, "int": 32, "unsigned int": 32, "long": 32, "unsigned long": 32, "long long": 64,
+                "unsigned long long": 64}
+BITWISE_ASSIGNMENTS = ("|=", "&=", "^=")
+MASK_CATEGORIES = ("field", "member", "global")
+CONSTANT_CASTS = ("ImplicitCastExpr", "CStyleCastExpr", "CXXFunctionalCastExpr", "CXXStaticCastExpr")
+
+
+def integer_type(t: dict) -> tuple[int, bool] | None:
+    """The width in bits of an integer type and whether it is signed, or None for any other type."""
+    text = " ".join(QUALIFIERS.sub("", t.get("desugaredQualType") or t.get("qualType", "")).split())
+    bits = INTEGER_BITS.get(text)
+    return None if bits is None else (bits, not text.startswith(("unsigned", "bool")))
+
+
+def constant_value(node: dict) -> int | None:
+    """The value of an integer constant expression made of literals, or None."""
+    kind = node.get("kind")
+    inner = node.get("inner", [])
+    if kind in ("IntegerLiteral", "CharacterLiteral", "ConstantExpr") and "value" in node:
+        return int(node["value"]) if re.fullmatch(r"-?\d+", str(node.get("value", ""))) else None
+    if kind == "ParenExpr" and inner:
+        return constant_value(inner[0])
+    if kind in CONSTANT_CASTS and inner:
+        value = constant_value(inner[0])
+        cast = integer_type(node.get("type", {}))
+        if value is None or cast is None:
+            return None
+        bits, signed = cast
+        value &= (1 << bits) - 1
+        return value - (1 << bits) if signed and value >> (bits - 1) else value
+    if kind == "UnaryOperator" and inner and node.get("opcode") in ("~", "-", "+"):
+        value = constant_value(inner[0])
+        if value is None:
+            return None
+        return {"~": ~value, "-": -value, "+": value}[node["opcode"]]
+    if kind == "BinaryOperator" and len(inner) == 2 and node.get("opcode") in ("|", "&", "^", "<<", ">>"):
+        left, right = constant_value(inner[0]), constant_value(inner[1])
+        if left is None or right is None or (node["opcode"] in ("<<", ">>") and not 0 <= right < 64):
+            return None
+        return {"|": left | right, "&": left & right, "^": left ^ right, "<<": left << right,
+                ">>": left >> right}[node["opcode"]]
+    return None
+
+
+def assigned_bits(node: dict) -> int | None:
+    """The bits of its left side that `x |= K`, `x &= K` or `x ^= K` can change, K a constant; else None."""
+    if node.get("opcode") not in BITWISE_ASSIGNMENTS or len(node.get("inner", [])) != 2:
+        return None
+    value = constant_value(node["inner"][1])
+    target = integer_type(node["inner"][0].get("type", {}))
+    if value is None or target is None:
+        return None
+    full = (1 << target[0]) - 1
+    return ~value & full if node["opcode"] == "&=" else value & full
+
+
+def bit_field_width(node: dict) -> int | None:
+    """The width of a bit-field declaration, or None for any other field."""
+    if not node.get("isBitfield"):
+        return None
+    return constant_value(node["inner"][0]) if node.get("inner") else None
 
 
 def strip(node: dict) -> dict:
@@ -398,6 +469,40 @@ class Analyzer:
         self.functions: list[dict] = []
         self.root_cache: dict[str, str | None] = {}
         self.block_vector_names: set[str] = set()
+        self.bit_offsets: dict[str, int | None] = {}
+        self.bit_widths: dict[str, int] = {}
+
+    def lay_out_bits(self, node: dict) -> None:
+        """The bit offset of each field of a record, where only bit-fields of one type size come before it.
+
+        The rule is the Microsoft layout: a bit-field goes into the open unit of its type when it fits,
+        else into a new unit right after it; a zero-width bit-field closes the unit. Every field of a
+        union is at offset 0. A field after any other field, or after a unit of another size, is None.
+        """
+        union = node.get("tagUsed") == "union"
+        start, unit = 0, None
+        for child in node.get("inner", ()):
+            if child["kind"] != "FieldDecl":
+                continue
+            width = bit_field_width(child)
+            if width is not None:
+                self.bit_widths[child["id"]] = width
+            if union:
+                self.bit_offsets[child["id"]] = 0
+                continue
+            integer = integer_type(child.get("type", {})) if width is not None else None
+            if integer is None or start is None or (unit and unit[1] != integer[0]):
+                self.bit_offsets[child["id"]] = 0 if start == 0 and unit is None else None
+                start, unit = None, None
+                continue
+            size = integer[0]
+            if unit and width and unit[2] + width <= size:
+                self.bit_offsets[child["id"]] = unit[0] + unit[2]
+                unit = (unit[0], size, unit[2] + width)
+                continue
+            begin = unit[0] + unit[1] if unit else start
+            self.bit_offsets[child["id"]] = begin
+            start, unit = (begin, None) if width == 0 else (begin, (begin, size, width))
 
     def is_block_vector(self, t: dict) -> bool:
         """Whether a type is a BlockVector instantiation or a typedef of one, through a pointer or reference."""
@@ -438,6 +543,7 @@ class Analyzer:
             if owner and node.get("name"):
                 name = owner + "::" + name
             self.records[node["id"]] = name
+            self.lay_out_bits(node)
             data = node.get("definitionData")
             if node.get("completeDefinition") and data is not None and node.get("name"):
                 self.destructors[name] = {
@@ -489,7 +595,7 @@ class Analyzer:
         start = node["_line"]
         self.functions.append({
             "address": "", "function": name, "file": rel,
-            "start": start, "items": sorted(walker.items),
+            "start": start, "items": sorted(walker.items), "masks": walker.masks,
         })
 
 
@@ -501,6 +607,9 @@ class Walker:
         self.name = name
         self.locals: dict[str, str | None] = {}
         self.items: set[tuple[str, str]] = set()
+        self.masks: dict[tuple[str, str], int | None] = {}
+        self.bounded: dict[int, int] = {}
+        self.mask: int | None = None
 
     def prepare(self, node: dict) -> None:
         """Find the variables declared in the function, so the rest are globals."""
@@ -535,6 +644,38 @@ class Walker:
             return
         for suffix in MODE_KINDS[mode]:
             self.record("%s_%s" % (category, suffix), target)
+        if mode in ("W", "RW") and category in MASK_CATEGORIES:
+            key = (category, target)
+            known = self.masks.get(key, 0)
+            self.masks[key] = None if known is None or self.mask is None else known | self.mask
+
+    def masked_access(self, category: str, target: str, mode: str, mask: int | None) -> None:
+        """An access whose write can change only the bits of mask (None: any bit)."""
+        outer, self.mask = self.mask, mask
+        try:
+            self.access(category, target, mode)
+        finally:
+            self.mask = outer
+
+    def member_access(self, base: dict, mode: str, bits: int | None, offset: int | None) -> None:
+        """The access of the named member that holds a field of an unnamed struct or a bit-field.
+
+        The walk goes up through unnamed members to the first named one; bits, at offset in the field's
+        record, are moved by the offset of each unnamed member, and become None when one is not known.
+        """
+        member = strip(base)
+        shift = offset
+        while member["kind"] == "MemberExpr" and not member.get("name") and member.get("inner") \
+                and not member.get("isArrow"):
+            link = self.unit.bit_offsets.get(member.get("referencedMemberDecl", ""))
+            shift = None if shift is None or link is None else shift + link
+            member = strip(member["inner"][0])
+        if member["kind"] != "MemberExpr" or not member.get("name") or not member.get("inner"):
+            return
+        enclosing = record_name(member["inner"][0]["type"])
+        if enclosing != "<anon>":
+            mask = None if bits is None or shift is None else bits << shift
+            self.masked_access("member", "%s::%s" % (enclosing, member["name"]), mode, mask)
 
     def visit(self, node: dict, mode: str = "R") -> None:
         """Walk an expression or statement, mode being how the context uses its value."""
@@ -556,6 +697,9 @@ class Walker:
                 for child in inner:
                     self.visit(child, "R")
         elif kind == "CompoundAssignOperator":
+            bits = assigned_bits(node)
+            if bits is not None:
+                self.bounded[id(strip_parens(inner[0]))] = bits
             self.visit(inner[0], "RW")
             self.visit(inner[1], "R")
         elif kind == "UnaryOperator":
@@ -658,13 +802,14 @@ class Walker:
                 if ref["id"] in self.locals:
                     name = self.locals[ref["id"]]
                     if name:
-                        self.access("global", name, mode)
+                        self.masked_access("global", name, mode, self.bounded.get(id(node)))
                 else:
-                    self.access("global", self.unit.statics.get(ref["id"], ref["name"]), mode)
+                    self.masked_access("global", self.unit.statics.get(ref["id"], ref["name"]), mode,
+                                       self.bounded.get(id(node)))
             elif ref["kind"] == "FunctionDecl" and mode == "ESC":
                 self.record("fn_ref", ref["name"])
         elif kind == "MemberExpr" and sim_global(node):
-            self.access("global", sim_global(node), mode)
+            self.masked_access("global", sim_global(node), mode, self.bounded.get(id(node)))
         elif kind == "MemberExpr":
             base = inner[0] if inner else None
             if base is not None:
@@ -674,12 +819,14 @@ class Walker:
                     self.path(base, mode)
                 if not path and not record_name(base["type"]).startswith("(lambda at "):
                     owner = record_name(base["type"])
-                    self.access("field", "%s::%s" % (owner, node.get("name") or "<anon>"), mode)
-                    member = strip(base)
-                    if owner == "<anon>" and member["kind"] == "MemberExpr" and member.get("name") and member.get("inner"):
-                        enclosing = record_name(member["inner"][0]["type"])
-                        if enclosing != "<anon>":
-                            self.access("member", "%s::%s" % (enclosing, member["name"]), mode)
+                    field = node.get("referencedMemberDecl", "")
+                    width = self.unit.bit_widths.get(field)
+                    bounded = self.bounded.get(id(node))
+                    self.masked_access("field", "%s::%s" % (owner, node.get("name") or "<anon>"), mode,
+                                       None if width is not None else bounded)
+                    if owner == "<anon>" or width is not None:
+                        bits = ((1 << width) - 1) if width is not None else bounded
+                        self.member_access(base, mode, bits, self.unit.bit_offsets.get(field))
         elif kind == "ArraySubscriptExpr":
             base, index = inner[0], inner[1]
             self.visit(index, "R")
@@ -809,8 +956,26 @@ def callee_hint(callee: dict) -> str:
 def analyse(job: tuple[Path, list[str], str]) -> list[list]:
     """Run clang-cl on one file and return its rows: [address, function, file, kind, target]."""
     unit, _ = analyse_unit(job, Analyzer)
-    return [[fn["address"], fn["function"], fn["file"], kind, target]
+    rows = [[fn["address"], fn["function"], fn["file"], kind, target]
             for fn in unit.functions for kind, target in [("function", "")] + fn["items"]]
+    return rows + mask_rows(unit.functions)
+
+
+def mask_rows(functions: list[dict]) -> list[list]:
+    """The `mask_*` rows: per function name and file, the bits its writes of a target can change.
+
+    Overloads share a name and file, so their masks are joined, and a write any of them cannot bound
+    leaves no row."""
+    joined: dict[tuple, int | None] = {}
+    addresses: dict[tuple[str, str], str] = {}
+    for fn in functions:
+        addresses.setdefault((fn["function"], fn["file"]), fn["address"])
+        for (category, target), mask in fn.get("masks", {}).items():
+            key = (fn["function"], fn["file"], category, target)
+            known = joined.get(key, 0)
+            joined[key] = None if known is None or mask is None else known | mask
+    return [[addresses[(function, file)], function, file, "mask_" + category, "%s 0x%x" % (target, mask)]
+            for (function, file, category, target), mask in joined.items() if mask is not None]
 
 
 def analyse_unit(job: tuple[Path, list[str], str], analyzer: type,

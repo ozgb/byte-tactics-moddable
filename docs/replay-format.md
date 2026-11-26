@@ -484,7 +484,7 @@ An argument or result of a slot with the scalar form that carries the block offs
 and that its caller, movement, makes from the offset of a goal) takes an `import` key: `{"mode": "scalar", "import": {"mode": "object", "kind": "PathGoal", "poly": "PathGoal", "ref": true}}`.
 The slot side keeps the scalar, `a requester 5412896`, so that the module that owns the slot is recorded and replayed with the number it was given. The import side, the line a caller's call
 of the slot writes and the stub that answers it, uses the object form: `i pathfinding.Cancel AiSearchGoal#1`, and the stub compares the name of the object it is passed.
-The `import` is a `scalar`, `text` or `object` form of a state kind, on a scalar. `replayschema.py --check` fails for any other. The fixture `HandGoal` of `tests/replay_fixtures.json` is replayed by the self-test.
+The `import` is an `object` form of a state kind, a `value` form of a value kind, or a `scalar` or `text` form, on an argument or result whose slot side is a `scalar`, `struct` or `value`. `replayschema.py --check` fails for any other. The `value` form is pathfinding's `Submit`, whose slot side records the request as a struct and whose import side records it as the value kind `PathRequestRefs`, `{"mode": "struct", "kind": "PathRequest", "dir": "in", "import": {"mode": "value", "kind": "PathRequestRefs", "byPointer": true}}`. An object that an `object` form names is a root of the import side only, so the walk after the import ("An object field that an import changes") visits it with the slot's own roots. The fixture `HandGoal` of `tests/replay_fixtures.json` is replayed by the self-test.
 
 ### A pointer or a ref that a member of the block holds
 
@@ -1109,7 +1109,7 @@ players' `console-units` and `mission-capture` have one such line each.
 An import can change a field of an object that the slot reads but does not write: movement's `SchedPublish` of a TURN or a MOVE runs units' handler on a synchronous
 route, which sets the unit's heading and position before the import returns, and units' `UnitRefInit` and `UnitRefUnlink` link and unlink the reference that a `PathOrder`
 embeds (`PathOrder.ref`, `PathOrderAttach.owner`). After each import of a subsystem that asks for it (below), the recorder walks the slot's roots, the live objects of the call and, for an import of a seam, the
-objects the import's arguments name, and writes an `o` line for each field of the slot's read set and not of its write set whose value differs from what the recording
+objects the import's arguments name (an argument that the slot takes as a number and the import names as an object among them), and writes an `o` line for each field of the slot's read set and not of its write set whose value differs from what the recording
 last gave:
 
 ```
@@ -1122,8 +1122,10 @@ last gave:
 ```
 
 The replayer's answer to the import stores the value in the field before the module goes on, as for the fields of a service (`A service that leaves a block field behind`).
-A field of the write set never has the line, so a field the slot computes is compared by its `w` line and never set from the recording. An object the import frees
-(`services.SimFree`) is not walked. The walk runs after every import, so a subsystem has the lines only when its annotation asks for them with a reason, `"import_objects": "<reason>"` (movement has it); `replayschema.py --check` fails for one with no reason. The other subsystems record as before: their slots read such fields again from the `r` lines of their next call, and a slot whose read set has none has no lines. The self-test replays the
+A field of the write set never has the line, so a field the slot computes is compared by its `w` line and never set from the recording. The replayer stops with an error on a
+line of this form that it cannot place (one that names no field of a known kind, or a field outside the slot's read set or inside its write set), so a recording that broke that
+rule fails rather than going uncompared. An object the import frees (`services.SimFree`) is not walked until `services.SimAlloc` hands its address out again; the list of freed
+addresses has no limit. The walk runs after every import, so a subsystem has the lines only when its annotation asks for them with a reason, `"import_objects": "<reason>"` (movement has it); `replayschema.py --check` fails for one with no reason. The other subsystems record as before: their slots read such fields again from the `r` lines of their next call, and a slot whose read set has none has no lines. The self-test replays the
 form on a fixture (`an object field that an import changes`).
 
 ## The schema and its annotations

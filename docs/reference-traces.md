@@ -434,9 +434,10 @@ and so on), and this page is updated to name it. The current tag is
   `reference/views/<scenario>/<tick>.bin` (version 1 of the file, `BTVW`). Every digest changes, and the commit line names 9a72a58db, the reference merge that records the view; no other row changes, but the dumps say `bank` for #1106's `field_64`. The event digests,
   sound logs, UI logs, interface commands, display logs, frames and saves are those of v46.
 - `reference-traces-v48` (#1122): the 96 scenarios of v47 and `frontend-skirmish`, the first scenario that starts at the
-  main menu (`docs/scenario-format.md`, section 3.5), with its trace, sound, UI, interface command and event logs and its
+  main menu (`docs/scenario-format.md`, section 3.5), with its trace, sound, interface command and event logs and its
   setup log, `reference/setup/frontend-skirmish.txt` (section 3.6). It has no display log yet, since the reference tip
-  writes the display log 1.1 of #1053 that `moddable` does not yet store. The trace format is still `bt-trace 10`. Every
+  writes a display log version that `moddable` does not yet store (#1053), and no UI log, whose view draws the headless
+  host does not yet give (#1145). The trace format is still `bt-trace 10`. Every
   other trace changes from tick 1 in `game.netGameFlags` (bit 3, which the menus set on the way to a single-player game
   and the harness now sets too) and in the starting metal and energy of the slots at or above the player count (now
   unset, as the menus leave them); the commit line names 40afcfe3e, the reference commit that adds the frontend mode.

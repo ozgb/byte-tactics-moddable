@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../harness/display_hook.h"
 
 #include "../util/tdf.h"
 
@@ -2604,6 +2605,7 @@ void OpenOptionsPanel()
     g_optionsFlipSurface = AllocSurface("FLIPSURFACE", layer->entries->width, layer->entries->height);
     memcpy(g_optionsFlipSurface->pixels, layer->entries->surface->pixels,
            layer->entries->width * layer->entries->height);
+    DlNote(DL_WRITTEN, g_optionsFlipSurface);
     FrameFromSurface((GafFrame*)&g_optionsFlipFrame, g_optionsFlipSurface);
     g_optionsLightbarX = 0;
     g_optionsLightbarMaxX = layer->entries->width - 1;

@@ -1155,6 +1155,7 @@ SimGlobals.g_explodedPieces,0x162,AllocDepthFrame: CompositeBuffer,1,52,0x7ffe0-
 SimGlobals.g_explodedPieces,0x15 0x25 0x66,CMemoryCache::InitCache: CMemoryCache CCH,2,307,0x234f82-0x2a002b,not-a-pointer,Exploded piece table words at odd offsets: they straddle two pointers and only look like addresses
 SimGlobals.g_explodedPieces,0x2a 0x62,HAPI_LoadFile,2,236,0x2433-0x2ba93,not-a-pointer,Exploded piece table words at odd offsets: they straddle two pointers and only look like addresses
 SimGlobals.g_explodedPieces,0xd 0x8e 0x101,LoadTntMap: TILE SET #3,2,253,0xffe0-0x2a0028,not-a-pointer,words of SimGlobals.g_explodedPieces that only look like addresses
+SimGlobals.g_factoryIndex,*,*,0,0,-,not-a-pointer,"the unaligned word at +2 joins the high half of the g_factoryIndex block offset to the low half of g_losUnitIndex's"
 SimGlobals.g_lastPlaceHeight,*,*,0,0,-,not-a-pointer,"g_lastPlaceHeight: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_lastPlaceHeight,0x1,CMemoryCache::InitCache: CMemoryCache CCH,3,813,0x22ffe0,not-a-pointer,"g_lastPlaceHeight: integers (ticks, counts, seed) that only look like addresses"
 SimGlobals.g_losTables,*,*,0,0,-,not-a-pointer,words of SimGlobals.g_losTables that only look like addresses

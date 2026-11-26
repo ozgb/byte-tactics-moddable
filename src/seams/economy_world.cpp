@@ -181,7 +181,7 @@ int __stdcall ScheduleEconomyRequestGranted(unsigned int unit, unsigned int reso
 void __stdcall ScheduleMetalExtraction(unsigned int unit)
 {
     ReplayImport call(RI_SCHEDULE_METAL_EXTRACTION);
-    call.Int((int)unit);
+    call.Ptr(UnitOf(unit));
     SchedDeliver(SCHED_ECONOMY);
     g_seams.economy->UpdateMetalExtraction(unit);
 }

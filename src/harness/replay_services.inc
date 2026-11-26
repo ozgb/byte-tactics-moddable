@@ -347,7 +347,7 @@ void ReplayImportEnd(ReplayImport& c)
     case RI_SCHEDULE_METAL_EXTRACTION:
     {
         AddSpace(t);
-        t.AddInt(a[0].v.i);
+        ReplayAddObjectName(t, Table(), ROK_UNIT, a[0].v.p, true);
         break;
     }
     case RI_SCHEDULE_UNITS_DELIVER:

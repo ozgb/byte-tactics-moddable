@@ -285,6 +285,10 @@ void FreeUnitMemory(void)
 
 #include "../util/math.h"
 
+#ifndef BT_REPLAY_INJECT_LAST_ATTACKER_SLOT
+#define BT_REPLAY_INJECT_LAST_ATTACKER_SLOT 0xa
+#endif
+
 // FUNCTION: 0x485a40
 void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
 {
@@ -348,7 +352,7 @@ void __stdcall InitUnitFromType(Unit* unit, Vec3 pos, int param_5)
     unit->netDirtyFlags = 0;
     unit->killCount = 0;
     unit->attacker = 0;
-    unit->lastAttackerSlot = 0xa;
+    unit->lastAttackerSlot = BT_REPLAY_INJECT_LAST_ATTACKER_SLOT;
     unit->moveOrder = ((TypeFlags*)&unit->def->flags1)->bits.movOrder;
     unit->fireOrder = ((TypeFlags*)&unit->def->flags1)->bits.fireOrder;
     unit->cloakOn = ((TypeFlags*)&unit->def->flags1)->bits.initCloaked;
@@ -608,7 +612,7 @@ void __stdcall KillUnit(Unit* unit, int killType)
             unit->player->flags &= 0xfffe;
         }
         int amount;
-        int flag;
+        int flag = 0;
         if (killType == 7) {
             flag = 1;
             amount = 0;

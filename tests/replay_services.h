@@ -449,7 +449,7 @@ void __stdcall ScheduleMetalExtraction(unsigned int unit)
     ReplayText t;
     StartImport(t, RI_SCHEDULE_METAL_EXTRACTION);
     Space(t);
-    t.AddInt((int)(unsigned int)unit);
+    ReplayAddObjectName(t, g_objects, ROK_UNIT, ReplayRefPtr(unit), false);
     const char* r = Enter(t);
     (void)r;
 }

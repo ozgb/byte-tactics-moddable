@@ -1190,7 +1190,7 @@ from the layout), and the export refuses a copy that names any other source name
   field (`weapon0TargetZ`) equals the given value (-32768, the sentinel that says the slot holds a unit); it is never written
   as a line, and the unit it leads to records only the fields of its `reach`. Its `target` may be another kind with a table: an order's `type`, the
   index of the unit type a build order makes, is `mobileBuildDef` (and three more, one for each build kind of the order's `when`), a `unitid` over `UnitDef`
-  with `"size": 4`, since the member is an `int` and the id is its low 16 bits, so `Definitions()[order->type]` is `UnitDef#68` with the fields of the `reach`. A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
+  with `"size": 4`, since the member is an `int` and the id is its low 16 bits, so a mobile build order of type 112 leads to `UnitDef#112`, recorded with the fields of the `reach` (`orders-build-patrol`). A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
   are recorded as `r weapondef#17.flags` lines. A field may name a `member` of its type that is not its own name
   (`weapons[1].aimTarget`, `pos.x`), so that an array element or a part of a `Vec3` is a field.
 - `reach`: a list of `Kind.field` names with an explicit `depth` (the number of objects from the root to the farthest, at most 2),

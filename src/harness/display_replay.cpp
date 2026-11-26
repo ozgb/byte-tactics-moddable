@@ -1,4 +1,3 @@
-#include "win_types.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +9,7 @@
 #include "../game/game.h"
 #include "../graphics/display.h"
 #include "../graphics/gaf_frame.h"
+#include "../graphics/handle.h"
 #include "../graphics/surface.h"
 #include "../graphics/font.h"
 #include "../graphics/draw.h"
@@ -92,12 +92,13 @@ static int s_skippedCount;
 static unsigned char s_palette[1024];
 static char s_paletteHash[20];
 
-static void ReplayFail(const char* what, const char* detail)
+[[noreturn]] static void ReplayFail(const char* what, const char* detail)
 {
     char msg[600];
     sprintf(msg, "testreplay: %s%s\n", what, detail != nullptr ? detail : "");
     host_log(msg);
     host_exit(2);
+    __builtin_unreachable();
 }
 
 static int Hex(char c)
@@ -521,13 +522,6 @@ static int HasAttr(const char* attrs, char c)
     return strchr(attrs, c) != nullptr;
 }
 
-struct PieceOrder {
-    char unknown_0[8];
-    int count;
-    char unknown_c[0x20 - 0xc];
-    const char** names;
-};
-
 static void PieceName(const char* field, char* out, int size)
 {
     char escaped[100];
@@ -550,11 +544,11 @@ static ModelState* StateInOrder(Object3do* object, char** pieces, int count, Uni
         PieceName(pieces[i], names[i], sizeof names[i]);
         order[i] = names[i];
     }
-    PieceOrder list;
+    ModelBuildList list;
     memset(&list, 0, sizeof list);
     list.count = count;
     list.names = order;
-    return CreatePlayerObjectState(object, (ModelBuildList*)&list, (Unit*)unit);
+    return CreatePlayerObjectState(object, &list, (Unit*)unit);
 }
 
 static ModelSlot* SlotFor(const char* key, const char* model, char** pieces, int pieceCount)
@@ -584,7 +578,7 @@ static ModelSlot* SlotFor(const char* key, const char* model, char** pieces, int
         memset(motion, 0, 0x40);
         slot->unit->motion = motion;
         UnitDef* def = (UnitDef*)SimAllocTagged("Replay Def", sizeof(UnitDef));
-        memset(def, 0, sizeof(UnitDef));
+        memset(static_cast<void*>(def), 0, sizeof(UnitDef));
         slot->unit->def = def;
     }
     slot->state = StateInOrder(object, pieces, pieceCount, slot->unit);
@@ -648,23 +642,23 @@ static GafFrame* RestorePicture(const unsigned char* saved, int size, GafFrame**
 struct ModelFields {
     char* kind;
     char* model;
+    char* light;
+    char* key;
+    char* attrs;
+    char** pieces;
     int x;
     int y;
     int wx;
     int wy;
     int wz;
-    short ax;
-    short ay;
-    short az;
     int colour;
     float build;
     int cloak;
-    char* light;
-    char* key;
-    char cache;
-    char* attrs;
-    char** pieces;
     int pieceCount;
+    short ax;
+    short ay;
+    short az;
+    char cache;
 };
 
 static int ParseModel(char** w, int n, ModelFields* m)
@@ -753,7 +747,7 @@ static void SetUpModel(ModelSlot* slot, const ModelFields* m, int player)
 
 static void DrawPendingModel()
 {
-    if (s_pendingCount == 0)
+    if (s_pendingCount <= 0)
         return;
     int count = s_pendingCount;
     s_pendingCount = 0;
@@ -1093,7 +1087,7 @@ static void LoadPalette(const char* hash)
 {
     if (strcmp(hash, s_paletteHash) == 0)
         return;
-    unsigned char* pal = (unsigned char*)HAPI_LoadFile("palettes\\PALETTE.PAL", 0);
+    unsigned char* pal = (unsigned char*)HAPI_LoadFile("palettes\\PALETTE.PAL", nullptr);
     if (pal == nullptr)
         ReplayFail("cannot load palettes\\PALETTE.PAL", nullptr);
     for (int i = 0; i < 256; i++) {
@@ -1136,6 +1130,8 @@ static char* ReadAll(const char* path)
         ReplayFail("cannot read ", path);
     fseek(f, 0, SEEK_END);
     long size = ftell(f);
+    if (size < 0)
+        ReplayFail("cannot read ", path);
     fseek(f, 0, SEEK_SET);
     char* text = (char*)malloc((size_t)size + 1);
     if (text == nullptr || fread(text, 1, (size_t)size, f) != (size_t)size)
@@ -1145,18 +1141,10 @@ static char* ReadAll(const char* path)
     return text;
 }
 
-struct SequenceView {
-    unsigned short index;
-    unsigned short value;
-    unsigned char kind;
-    char unknown_5[3];
-    void* src;
-};
-
 static void RestartSequences()
 {
     for (int i = 0; i < g_game->count_148e7; i++) {
-        SequenceView* v = (SequenceView*)((void**)g_game->data_148eb)[i];
+        Handle* v = (Handle*)((void**)g_game->data_148eb)[i];
         if (v->src == nullptr)
             ReplayFail("a picture sequence that has already ended", nullptr);
         InitGafSequence(v, v->src, 0);
@@ -1224,5 +1212,6 @@ void DisplayReplayRun(const char* path, const unsigned* frameTicks, unsigned fra
         sprintf(msg, "testreplay: %d %s items not drawn\n", s_skipped[i].count, s_skipped[i].kind);
         host_log(msg);
     }
+    free(text);
     host_exit(0);
 }

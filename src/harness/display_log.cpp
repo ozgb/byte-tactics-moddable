@@ -158,12 +158,13 @@ static void HexHash(char* out, unsigned long long h)
     sprintf(out, "%08x%08x", (unsigned)(h >> 32), (unsigned)h);
 }
 
-static void Fail(const char* what, const char* limit)
+[[noreturn]] static void Fail(const char* what, const char* limit)
 {
     char msg[200];
     sprintf(msg, "testmode: the display log is out of %s (limit %s)\n", what, limit);
     host_log(msg);
     host_exit(2);
+    __builtin_unreachable();
 }
 
 static char s_nameBytes[kNameBytes];
@@ -956,6 +957,7 @@ static unsigned long long s_pictureSet[kPictureSetSize];
 static unsigned char s_pictureState[kPictureSetSize];
 static int s_picturePending[kPictureSetSize];
 static int s_picturePendingCount = 0;
+static int s_pictureEntries = 0;
 
 static void PictureText(const char* p, int n)
 {
@@ -992,9 +994,12 @@ static void AddPictureLine(const char* name, const unsigned char* pixels, int wi
         }
         slot = (slot + 1) & (kPictureSetSize - 1);
     }
-    if (s_picturePendingCount >= kPictureSetSize / 2)
-        Fail("pictures", "65536");
-    s_pictureSet[slot] = key;
+    if (s_pictureSet[slot] == 0) {
+        if (s_pictureEntries >= kPictureSetSize / 2)
+            Fail("pictures", "65536");
+        s_pictureEntries++;
+        s_pictureSet[slot] = key;
+    }
     s_pictureState[slot] = 1;
     s_picturePending[s_picturePendingCount++] = (int)slot;
     PictureText("picture ", 8);
@@ -1084,11 +1089,14 @@ static void CheckRegion(Region* r)
             if (right > x1)
                 x1 = right;
         }
-        if (y0 < 0)
+        if (y0 < 0 || y1 < y0 || x1 < x0)
             return;
         int width = x1 - x0 + 1;
         int height = y1 - y0 + 1;
-        unsigned char* copy = (unsigned char*)malloc((size_t)width * height);
+        size_t bytes = (size_t)width * height;
+        if (bytes == 0)
+            return;
+        unsigned char* copy = (unsigned char*)malloc(bytes);
         if (copy == nullptr)
             Fail("memory for pixels", "malloc");
         for (int y = 0; y < height; y++) {

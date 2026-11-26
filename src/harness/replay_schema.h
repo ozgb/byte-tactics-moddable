@@ -1076,6 +1076,7 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 202, ROK_PLAYERSEVENTHEADER },
     { 203, ROK_PLAYERSSETPLAYER },
     { 204, ROK_PLAYERSSETPLAYER },
+    { 205, ROK_PLAYERSEVENTHEADER },
     { 208, ROK_PLAYERSKILLUNIT },
     { 209, ROK_PLAYERSSENDUNIT },
     { 210, ROK_PLAYERSCAPTUREUNIT },
@@ -1101,8 +1102,8 @@ static const ReplayEventTable kReplayEventTables[] = {
     { ROK_UNITSEVENTHEADER, 121, 31 },
     { ROK_SCRIPTSEVENTHEADER, 152, 4 },
     { ROK_ECONOMYEVENTHEADER, 156, 8 },
-    { ROK_PLAYERSEVENTHEADER, 164, 16 },
-    { ROK_FEATURESEVENTHEADER, 180, 9 },
+    { ROK_PLAYERSEVENTHEADER, 164, 17 },
+    { ROK_FEATURESEVENTHEADER, 181, 9 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
@@ -6388,7 +6389,7 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "los_radar", 5, 1, 1, 64, 22, RET_LOS_RADAR, 0, 0 },
     { "orders", 6, 2, 1, 86, 7, RET_ORDERS, 1, 1 },
     { "units", 7, 2, 1, 93, 22, RET_UNITS, 1, 0 },
-    { "players", 5, 3, 1, 115, 9, RET_PLAYERS, 0, 0 },
+    { "players", 5, 4, 1, 115, 9, RET_PLAYERS, 0, 0 },
     { "map", 9, 2, 1, 124, 11, RET_MAP, 0, 0 },
     { "scripts", 3, 0, 1, 135, 13, RET_SCRIPTS, 0, 0 },
     { "movement", 5, 0, 1, 148, 13, RET_MOVEMENT, 1, 0 },

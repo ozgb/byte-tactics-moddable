@@ -852,7 +852,7 @@ static int FillFace(PlayerView* v, int colour, unsigned flags, unsigned pic, uns
     out->texture = VIEW_NO_TEXTURE;
     if ((flags & FACE_FLAT) != 0) {
         out->kind = VIEW_FACE_FILLED;
-        out->colour = (unsigned)colour;
+        out->colour = (unsigned)colour & 0xff;
         return 1;
     }
     if (count != 4)

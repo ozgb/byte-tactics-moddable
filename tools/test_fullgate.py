@@ -187,14 +187,18 @@ ai functions: 80.0% (80/100) fell from 90.0% (90/100)
 ROUND_TRIP = """73 of 73 scenarios equal, total 3:02
 block pointers: all covered by data/block_pointers.csv (73 scenarios)
 """
+MATCH_SETUP = """ok   block-large: a 128 MiB block plays the stored trace of console-units
+ok   net-setup: game_type 3 plays the block size and the limit from the host's PlayerInfo
+15 of 15 ok
+"""
 
 
 class CommentTextTest(unittest.TestCase):
     def test_all_equal(self):
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP))
         self.assertEqual(text, "Full gate on abc1234: 146 of 146 equal (both modes), block pointers: "
                                "all covered by data/block_pointers.csv in both modes, round trip: 73 of 73 equal, "
-                               "coverage: no subsystem fell")
+                               "coverage: no subsystem fell, match setup: 15 of 15 ok")
         self.assertEqual(fullgate.last_full_run([comment(text, "2026-11-04T10:00:00Z")]), "abc1234")
 
     def test_pointer_problems_name_the_mode(self):
@@ -203,29 +207,36 @@ class CommentTextTest(unittest.TestCase):
 
     def test_round_trip_divergence_and_exit_status(self):
         trip = "70 of 73 scenarios equal, total 3:02\n"
-        text = fullgate.comment_text("abc1234", (1, BOTH_MODES_BAD), (1, trip), (0, COVERAGE))
+        text = fullgate.comment_text("abc1234", (1, BOTH_MODES_BAD), (1, trip), (0, COVERAGE), (0, MATCH_SETUP))
         self.assertIn("145 of 146 equal (both modes)", text)
-        self.assertTrue(text.endswith("round trip: 70 of 73 equal, coverage: no subsystem fell, both modes exit 1, round trip exit 1"))
+        self.assertTrue(text.endswith("round trip: 70 of 73 equal, coverage: no subsystem fell, match setup: 15 of 15 ok, both modes exit 1, round trip exit 1"))
 
     def test_a_run_that_did_not_finish(self):
-        text = fullgate.comment_text("abc1234", (1, ""), (0, ROUND_TRIP), (0, COVERAGE))
+        text = fullgate.comment_text("abc1234", (1, ""), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP))
         self.assertIn("not finished equal (both modes), block pointers: not reported", text)
 
     def test_round_trip_pointer_problems_are_named(self):
         trip = "73 of 73 scenarios equal, total 3:02\n2 problems with the pointers out of the block; add them\n"
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (1, trip), (0, COVERAGE))
-        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: no subsystem fell (block pointers: 2 block pointer problems), round trip exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (1, trip), (0, COVERAGE), (0, MATCH_SETUP))
+        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: no subsystem fell (block pointers: 2 block pointer problems), match setup: 15 of 15 ok, round trip exit 1"))
 
     def test_coverage_fall_names_the_status(self):
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (1, COVERAGE_FELL))
-        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: failed, coverage exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (1, COVERAGE_FELL), (0, MATCH_SETUP))
+        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: failed, match setup: 15 of 15 ok, coverage exit 1"))
 
     def test_coverage_build_failure_and_no_output(self):
         self.assertEqual(fullgate.coverage_result(fullgate.BUILD_FAILED, "FAILED: link\n"), "build failed")
         self.assertEqual(fullgate.coverage_result(1, ""), "not finished")
         self.assertEqual(fullgate.coverage_result(0, COVERAGE), "no subsystem fell")
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (fullgate.BUILD_FAILED, "x"))
-        self.assertTrue(text.endswith("coverage: build failed, coverage exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (fullgate.BUILD_FAILED, "x"), (0, MATCH_SETUP))
+        self.assertTrue(text.endswith("coverage: build failed, match setup: 15 of 15 ok, coverage exit 1"))
+
+    def test_match_setup_failure_and_no_output(self):
+        failed = "ok   block-large: ...\nFAIL the two limits play differently (first differing tick None)\n14 of 15 ok\n"
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (1, failed))
+        self.assertTrue(text.endswith("coverage: no subsystem fell, match setup: 14 of 15 ok, match setup exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (1, "steps-low: the run failed\n"))
+        self.assertTrue(text.endswith("match setup: not finished, match setup exit 1"))
 
     def test_coverage_check_builds_then_plays(self):
         calls = []
@@ -236,7 +247,7 @@ class CommentTextTest(unittest.TestCase):
 
         with unittest.mock.patch.object(fullgate, "stream", fake_stream), unittest.mock.patch.object(
                 fullgate.shutil, "rmtree"):
-            self.assertEqual(fullgate.coverage_check("g", None), (0, COVERAGE))
+            self.assertEqual(fullgate.coverage_check("g", None), (0, COVERAGE), (0, MATCH_SETUP))
         self.assertEqual(calls[:-1], list(fullgate.COVERAGE_BUILD))
         self.assertEqual(calls[-1][-3:], ["--check", "--game-dir", "g"])
         calls.clear()
@@ -253,8 +264,9 @@ class CommentTextTest(unittest.TestCase):
         out = "73 of 73 scenarios equal, total 1:00\nblock pointers: all covered by data/block_pointers.csv (73 scenarios)\n"
         self.assertEqual(fullgate.pointer_result(out), "all covered by data/block_pointers.csv")
 
-    def test_run_plays_both_checks_and_prints_the_comment(self):
+    def test_run_plays_every_check_and_prints_the_comment(self):
         played = []
+        setup = []
 
         def fake_play(args, log, what):
             played.append((what, args))
@@ -266,6 +278,7 @@ class CommentTextTest(unittest.TestCase):
         try:
             with unittest.mock.patch.object(fullgate, "play", fake_play), unittest.mock.patch.object(
                     fullgate, "coverage_check", lambda game_dir, log: (0, COVERAGE)), unittest.mock.patch.object(
+                    fullgate, "match_setup", lambda exe, log: setup.append(exe) or (0, MATCH_SETUP)), unittest.mock.patch.object(
                     fullgate.shutil, "rmtree"), contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
                 code = fullgate.main()
         finally:
@@ -274,7 +287,14 @@ class CommentTextTest(unittest.TestCase):
         self.assertEqual([what for what, _ in played], ["both modes", "round trip"])
         self.assertEqual(played[0][1], ["--exe", "x.exe", "--both-modes"])
         self.assertEqual(played[1][1], ["--exe", "x.exe", "--roundtrip", "auto"])
-        self.assertIn("round trip: 73 of 73 equal, coverage: no subsystem fell", out.getvalue())
+        self.assertEqual(setup, [["--exe", "x.exe"]])
+        self.assertIn("round trip: 73 of 73 equal, coverage: no subsystem fell, match setup: 15 of 15 ok", out.getvalue())
+
+    def test_match_setup_plays_the_test_on_the_exe(self):
+        calls = []
+        with unittest.mock.patch.object(fullgate, "stream", lambda command, log, what: calls.append(command) or (0, MATCH_SETUP)):
+            self.assertEqual(fullgate.match_setup(["--exe", "x.exe", "--game-dir", "g"], None), (0, MATCH_SETUP))
+        self.assertEqual(calls, [["uv", "run", "tools/test_matchsetup.py", "--exe", "x.exe", "--game-dir", "g"]])
 
 
 class GatePathsTest(unittest.TestCase):

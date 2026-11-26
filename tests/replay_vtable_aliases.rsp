@@ -1,3 +1,5 @@
+/alternatename:??0Order@@QAE@EHHHHH@Z=??0Order@@QAE@EPAUUnit@@PAUVec3@@HHH@Z
+/alternatename:??0Order@@QAE@VMissionType@@PAUUnit@@PAXHHH@Z=??0Order@@QAE@EPAUUnit@@PAUVec3@@HHH@Z
 /alternatename:?AddExplosionEffect@@YGXPAUVec3@@PAXHH@Z=?AddExplosionEffect@@YGXPAUVec3@@PAUGafSequence@@HH@Z
 /alternatename:?AddExplosionEffect@@YGXPAX0HH@Z=?AddExplosionEffect@@YGXPAUVec3@@PAUGafSequence@@HH@Z
 /alternatename:?AimCobStub@@YGXXZ=?AimCobStub@@YGHHHHH@Z
@@ -49,6 +51,7 @@
 /alternatename:?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@21PAH@Z=?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2HH@Z
 /alternatename:?FireVLaunchProjectile@@YGXPAUUnitWeaponSlot@@PAX1111@Z=?FireVLaunchProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2HH@Z
 /alternatename:?FireVLaunchWeapon@@YGHPAX000@Z=?FireVLaunchWeapon@@YGHPAUUnit@@PAUUnitWeaponSlot@@0PAUVec3@@@Z
+/alternatename:?FreeCobScript@@YGXPAX@Z=?FreeCobScript@@YGXH@Z
 /alternatename:?GetDesiredHeading@AirManeuverOrder@@YGXXZ=?GetDesiredHeading@AirManeuverOrder@@UAEHPAG@Z
 /alternatename:?GetDesiredHeading@PathOrder@@YGXXZ=?GetDesiredHeading@PathOrder@@UAEHPAG@Z
 /alternatename:?GetGroundHeight@@YGHPAUFixedWorldPos@@@Z=?GetGroundHeight@@YGHPAUVec3@@@Z
@@ -60,6 +63,7 @@
 /alternatename:?GetType@PointMarker@@YGXXZ=?GetType@PointMarker@@UAEHXZ
 /alternatename:?GetType@RingApproach@@YGXXZ=?GetType@RingApproach@@UAEHXZ
 /alternatename:?GetWeaponPiecePosition@@YGXPAUUnit@@PAUVec3@@EH@Z=?GetWeaponPiecePosition@@YGXPAUObject@@PAUVec3@@EH@Z
+/alternatename:?GroundPickupOrder@@YGHPAUUnit@@PAUOrder@@H@Z=?GroundPickupOrder@@YGHPAUUnit@@PAUOrder@@E@Z
 /alternatename:?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@HHPAUUnit@@@Z=?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@2HPAUUnit@@@Z
 /alternatename:?InitProjectile@@YGXPAUProjectile@@PAX1HHPAUUnit@@@Z=?InitProjectile@@YGXPAUProjectile@@PAUWeaponDef@@PAUVec3@@2HPAUUnit@@@Z
 /alternatename:?InsertMapCacheEntry@MapCache@@QAEXPAVMapCacheEntry@@HABV2@@Z=?insert@?$vector@VMapCacheEntry@@V?$allocator@VMapCacheEntry@@@std@@@std@@QAEXPAVMapCacheEntry@@IABV3@@Z
@@ -73,9 +77,12 @@
 /alternatename:?KeepAfterComplete@AirManeuverOrder@@YGXXZ=?KeepAfterComplete@AirManeuverOrder@@UAEHXZ
 /alternatename:?KeepAfterComplete@OrderFx@@YGXXZ=?KeepAfterComplete@OrderFx@@UAEHXZ
 /alternatename:?KeepAfterComplete@PathOrder@@YGXXZ=?KeepAfterComplete@PathOrder@@UAEHXZ
+/alternatename:?LowerBoundOrderTypes@@YGPAUOrderTableEntry@@PAU1@0ABQBDP6GHHPBD@ZPAH@Z=?LowerBoundOrderTypes@@YGPAUOrderTableEntry@@PAU1@0ABQBDP6GHABU1@PBD@ZPAH@Z
+/alternatename:?MirrorObject@@YGXPAX@Z=?MirrorObject@@YGXPAUObject3do@@@Z
 /alternatename:?OnAimCobReturn@@YGXXZ=?OnAimCobReturn@WeaponAimCobCb@@QAEXH@Z
 /alternatename:?OrderSquad@@YGXPAUPlayer@@HEHPAUUnit@@PAUVec3@@HH@Z=?OrderSquad@@YGXPAUPlayer@@HEHPAUUnit@@HHH@Z
 /alternatename:?PickRandomReclaimableResourcesInRadius@@YGHPAUVec3@@HPAPAU1@PAM12@Z=?PickRandomReclaimableResourcesInRadius@@YGHPAUVec3@@TFixed@@PAPAU1@PAM23@Z
+/alternatename:?RegisterOrderTypes@@YGXPAXH@Z=?RegisterOrderTypes@@YGXPAUOrderTableEntry@@H@Z
 /alternatename:?ScaleUnitWeights@@YGXHPAVUnitTypeSet@@MH@Z=?ScaleUnitWeights@@YGXHPAIMH@Z
 /alternatename:?Serialize@ApproachRadius@@YGXXZ=?Serialize@ApproachRadius@@QAEHHPAVHapiBank@@PAD@Z
 /alternatename:?Serialize@PointMarker@@YGXXZ=?Serialize@PointMarker@@QAEHHPAVHapiBank@@PAD@Z
@@ -106,5 +113,6 @@
 /alternatename:?g_pathOrderVtable@@3PAPAXA=?g_pathOrderVtable@@3QBQ6GXXZB
 /alternatename:?g_patrolGoalVtable@@3PAPAXA=??_7PatrolGoal@@6B@
 /alternatename:?g_pointMarkerVtable@@3PAPAXA=?g_pointMarkerVtable@@3QBQ6GXXZB
+/alternatename:?g_readyOrder@@3PAUOrderTableEntry@@A=?g_readyOrder@@3QBUOrderTableEntry@@B
 /alternatename:?g_ringApproachVtable@@3PAPAXA=?g_ringApproachVtable@@3QBQ6GXXZB
 /alternatename:?g_weaponAimCobVtable@@3PAPAXA=?g_weaponAimCobVtable@@3QBQ6GXXZB

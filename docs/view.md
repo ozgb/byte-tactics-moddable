@@ -213,6 +213,8 @@ The simulation decides the radar bits; jamming clears them, and an ally's jammer
 `orders` holds the queued orders of the controller's units, each unit's in the order they run (section 8.9): the kind,
 the unit to build, the target and the place. The overlays of the selected units (build footprints, paths, range rings,
 weapon coverage) draw from them. A target not in `units` is drawn at its last seen place, which presentation keeps.
+An order's `y` is 0 when its kind is `MobileBuild`, `VTOL_MobileBuild`, `Reclaim` or `VTOL_Reclaim`: those orders never
+write their `pos.y`, which the trace leaves out for the same reason (`docs/trace-format.md`, section 8.9).
 
 ## Features
 

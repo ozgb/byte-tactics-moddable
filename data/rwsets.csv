@@ -47505,6 +47505,7 @@ address,function,file,kind,target
 ,FillOrders,src/harness/view_fill.cpp,call,UnitOf
 ,FillOrders,src/harness/view_fill.cpp,call,ViewAddOrders
 ,FillOrders,src/harness/view_fill.cpp,call,ViewHostOrderDrawMask
+,FillOrders,src/harness/view_fill.cpp,call,ViewHostOrderPosYUnset
 ,FillOrders,src/harness/view_fill.cpp,deref_read,*unsigned char
 ,FillOrders,src/harness/view_fill.cpp,field_escape,PlayerView::orders
 ,FillOrders,src/harness/view_fill.cpp,field_read,ViewUnit::firstOrder
@@ -66757,6 +66758,8 @@ address,function,file,kind,target
 ,ViewHostOrderDrawMask,src/harness/harness.cpp,deref_read,*int
 ,ViewHostOrderDrawMask,src/harness/harness.cpp,function,
 ,ViewHostOrderDrawMask,src/harness/harness.cpp,global_maybe_written,g_missionOrderTableVec
+,ViewHostOrderPosYUnset,src/harness/harness.cpp,call,OrderPosYUnset
+,ViewHostOrderPosYUnset,src/harness/harness.cpp,function,
 ,ViewHostRef,src/harness/harness.cpp,call,RefAbs
 ,ViewHostRef,src/harness/harness.cpp,function,
 ,ViewHostTakeEvents,src/harness/harness.cpp,deref_write,*ViewRawEvent

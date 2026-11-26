@@ -4670,6 +4670,11 @@ int ViewHostOrderDrawMask(unsigned kind)
     return *(const int*)((const unsigned char*)g_missionOrderTableVec.Begin() + kind * ORDER_TABLE_STRIDE + 0xc);
 }
 
+int ViewHostOrderPosYUnset(const unsigned char* order)
+{
+    return OrderPosYUnset((unsigned)order);
+}
+
 const ViewWeaponsReport* ViewHostWeaponsReport(void)
 {
     memset(&s_viewReport, 0, sizeof s_viewReport);

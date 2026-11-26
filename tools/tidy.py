@@ -54,7 +54,8 @@ from determinismlint import mask_c
 
 DEFAULT_BUILD_DIR = "build/modern"
 TIDY_DIRS = ("src/", "interfaces/")
-GENERATED = {"src/harness/trace_schema.h", "src/state/layout_asserts.cpp"}
+GENERATED = {"src/harness/trace_schema.h", "src/state/layout_asserts.cpp", "src/harness/replay_schema.h", "src/harness/replay_hooks.inc",
+             "tests/replay_schema_fixtures.h", "tests/replay_slots.h"}
 HEADER_SUFFIXES = {".h", ".hpp", ".inc"}
 SOURCE_SUFFIXES = {".c", ".cpp"}
 INCLUDE = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)

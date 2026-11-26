@@ -2,7 +2,7 @@
 #ifndef TRACE_SCHEMA_H
 #define TRACE_SCHEMA_H
 
-#define TRACE_FORMAT 9
+#define TRACE_FORMAT 10
 
 #include <stddef.h>
 #include "../../interfaces/economy.h"

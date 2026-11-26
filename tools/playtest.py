@@ -488,6 +488,7 @@ class Instance:
         for stale in ("trace.txt", "sound.txt", "display.txt", "displaylist.txt", "dump.txt", "blockptrs.txt", "commands.txt", *self.run.recordings()):
             (self.game / stale).unlink(missing_ok=True)
         shutil.rmtree(self.game / "frames", ignore_errors=True)
+        shutil.rmtree(self.game / "views", ignore_errors=True)
         for dest, _ in self.run.put:
             (self.game / dest).unlink(missing_ok=True)
         for path in self.run.collect:
@@ -823,6 +824,10 @@ class Instance:
             if (self.game / name).is_file():
                 shutil.copyfile(self.game / name, self.run.out / name)
                 self.run.notes.append(f"{name}: {self.run.out / name}")
+        views = self.game / "views"
+        if views.is_dir():
+            shutil.copytree(views, self.run.out / "views", dirs_exist_ok=True)
+            self.run.notes.append(f"views: {self.run.out / 'views'}")
         crash = self.game / CRASH_FILE
         if crash.is_file():
             self.run.notes.append(f"{CRASH_FILE}{self.suffix}: " + "; ".join(crash.read_text(errors="replace").split("\n")).strip("; "))

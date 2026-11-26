@@ -1,6 +1,6 @@
 bt-digest 9
 trace_format bt-trace 9
-commit 0da95c09550529f3da32ea9b58a5aac9c3d684e9
+commit 68f1378c1f9136fe5da9844906bd226db674d994
 scenario reference/scenarios/ten-ring-atoll.txt
 game_seed 233
 crt_seed 1233

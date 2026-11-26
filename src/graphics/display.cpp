@@ -30,6 +30,9 @@ union Flags_4b5980 {
     } bits;
 };
 
+int HarnessTestMode();
+unsigned int HarnessFrameClockElapsedMs();
+
 // The frame counter at +0x1da: milliseconds accumulated since the last sample,
 // the last tick, the frames since then and the rate of the last second.
 struct FrameCounter_4b66a0 {
@@ -40,7 +43,7 @@ struct FrameCounter_4b66a0 {
 
     void Tick()
     {
-        unsigned int now = GetTickCount();
+        unsigned int now = HarnessTestMode() ? lastTick + HarnessFrameClockElapsedMs() : GetTickCount();
         accum += now - lastTick;
         lastTick = now;
         frames++;

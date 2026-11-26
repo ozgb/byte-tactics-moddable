@@ -124,6 +124,9 @@ static int s_displayTickLine = 0;
 static unsigned s_displayTick = 0;
 static int s_displayTickDone = 0;
 static unsigned s_displayFrames = 0;
+static const unsigned kFrameClockStepMs = 33;
+static unsigned s_frameClockMs = 0;
+static unsigned s_frameClockRead = 0;
 static unsigned s_displaySteps = 0;
 static char s_loadName[64];
 static int s_loadLine = 0;
@@ -5189,10 +5192,18 @@ void HarnessCursorPosition(int* x, int* y)
     *y = pt.y;
 }
 
+unsigned int HarnessFrameClockElapsedMs()
+{
+    unsigned elapsed = s_frameClockMs - s_frameClockRead;
+    s_frameClockRead = s_frameClockMs;
+    return elapsed;
+}
+
 void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY)
 {
     if (!s_testMode)
         return;
+    s_frameClockMs += kFrameClockStepMs;
     unsigned tick = GameU32(GAME_TICK);
     HarnessFrameEnd(tick);
     if (DlIsOn() == 0)

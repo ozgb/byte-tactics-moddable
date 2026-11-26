@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v46`**.
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 93 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 97 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest and one 64-bit end-of-tick state per tick
   for each scenario.
@@ -415,14 +415,15 @@ and so on), and this page is updated to name it. The current tag is
   change, and no stored item has an empty area. The traces are those of v44 but for their commit line, which names
   cc2b4f772, the reference commit that holds the interface log and the rule. The sounds, UI logs, interface
   commands, events and frames are those of v44, and the saves decode equal to v44's.
-- `reference-traces-v46`: the 93 scenarios of v45, whose display lists hold every pixel they draw (#1053,
-  `docs/display-log.md` 1.1): `picture` lines for the pictures the game made, `pixels` items for what the game
-  writes into a target without a drawing item, the fields of a `model` that choose how it is drawn, and every frame
-  up to the last `frames` tick, stored xz compressed in `reference/displaylists/<scenario>.txt.xz`. Drawn from
-  blank targets, the lists give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display
-  digest changes; the traces are those of v45 but for their commit line, which names REFCOMMIT, the reference
-  commit that writes the 1.1 log. The sounds, UI logs, interface commands, events and frames are those of v45, and
-  the saves decode equal to v45's.
+- `reference-traces-v46`: the 93 scenarios of v45 and four new ones, `ui-antinuke-range`, `ui-chat-dither`,
+  `ui-debug-overlay` and `ui-tab-menu`, whose frames draw the display kinds no other scenario does. The display
+  lists hold every pixel they draw (#1053, `docs/display-log.md` 1.1): `picture` lines for the pictures the game
+  made, `pixels` items for what the game writes into a target without a drawing item, the fields of a `model` that
+  choose how it is drawn, and every frame up to the last `frames` tick, stored xz compressed in
+  `reference/displaylists/<scenario>.txt.xz` (ten lists). Drawn from blank targets, the lists give the stored frames
+  byte for byte (`tools/displayreplay.py --check`). Every display digest changes; the traces of the 93 are those of
+  v45 but for their commit line, which names c14a8f660, the reference commit that writes the 1.1 log. The sounds, UI
+  logs, interface commands, events and frames of the 93 are those of v45, and the saves decode equal to v45's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

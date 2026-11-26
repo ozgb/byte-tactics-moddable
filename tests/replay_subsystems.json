@@ -38,6 +38,7 @@
     }
   },
   "weapons": {
+    "self_test": "combat-deaths.txt",
     "inject": [
       {
         "define": "BT_REPLAY_INJECT_RELOAD_BASE=150",

@@ -33,9 +33,9 @@ struct ReplayLoadBind {
     unsigned offset;
     unsigned flags;
     char src[40];
-    unsigned type;
+    unsigned fillColor;
     char tex[40];
-    unsigned word14;
+    unsigned texKind;
 };
 
 struct ReplayCacheBlock {
@@ -228,7 +228,9 @@ PieceFrame* ReplayFaceAt(const void* base, unsigned size, unsigned offset);
 bool ReplayAddLoadName(ReplayText& t, ReplayObjectTable& table, unsigned load, const void* p, bool assign = true);
 const void* ReplayParseLoad(unsigned load, const char* text, bool* found);
 void ReplayAddLoadLines(const ReplayObjectTable& table, ReplayText& out);
+const char* ReplayReadDebrisCache(ReplayCacheStart& start);
 void ReplayCaptureDebrisCache(ReplayCacheStart& start);
+void ReplayAddCacheChanges(const ReplayCacheStart& before, const ReplayCacheStart& after, ReplayText& out);
 void ReplayAddCacheLines(const ReplayCacheStart& start, ReplayText& out);
 bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, ReplayObjectTable& table, bool assign, ReplayText& out);
 bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const char* value, ReplayObjectTable& table, ReplayAllocFn alloc);

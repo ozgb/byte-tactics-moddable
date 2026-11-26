@@ -41,6 +41,7 @@ struct Recording {
     ReplayKnown known;
     ReplayObjectTable table;
     ReplayCacheStart cache;
+    ReplayCacheStart callCache;
 };
 
 struct ReplayRoots {
@@ -342,8 +343,11 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)
     s_recording = !r.windowed || RecordsAlways(slot) || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
     if (!s_recording)
         return;
-    if (!r.cache.taken && strcmp(kReplaySubsystems[sub].name, "weapons") == 0)
-        ReplayCaptureDebrisCache(r.cache);
+    if (strcmp(kReplaySubsystems[sub].name, "weapons") == 0) {
+        ReplayCaptureDebrisCache(r.callCache);
+        if (!r.cache.taken)
+            r.cache = r.callCache;
+    }
     ReplayHandles().Reset();
     s_snapshots.Reset();
     s_nested.Clear();
@@ -374,6 +378,11 @@ void SlotLeave()
     const ReplaySlotSets& sets = SetsOfKind(s_slot, s_kind);
     CaptureSet(sets.writes, sets.writeCount, 'w');
     CaptureObjectSet(sets, false);
+    if (strcmp(kReplaySubsystems[s_sub].name, "weapons") == 0) {
+        ReplayCacheStart after;
+        ReplayCaptureDebrisCache(after);
+        ReplayAddCacheChanges(r.callCache, after, s_call);
+    }
     r.out.Add("call ");
     if (s_tick >= 0)
         r.out.AddInt(s_tick);

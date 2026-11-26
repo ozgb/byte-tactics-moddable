@@ -2842,8 +2842,8 @@ void BindModelFaces(const char* file, void* base, unsigned size, const std::vect
         if (face == nullptr)
             Fatal(file, 0, "a bind line names no face of its model", "bind");
         *(unsigned*)&face->flags = binds[i].flags;
-        face->fillColor = (int)binds[i].type;
-        face->texKind = (int)binds[i].word14;
+        face->fillColor = (int)binds[i].fillColor;
+        face->texKind = (int)binds[i].texKind;
         face->ptr_10 = 0;
         if (strcmp(binds[i].src, "null") != 0) {
             unsigned kind = 0;
@@ -2910,7 +2910,7 @@ int ReadCacheLines(const char* file, int at, int end)
         ReplayCacheBlock b;
         unsigned offset;
         unsigned size;
-        char owner[40];
+        char owner[40] = "";
         char tail[16] = "";
         int fields = sscanf(g_lines[at], "  block %u %u %39s %15s%c", &offset, &size, owner, tail, &extra);
         bool slot = strncmp(owner, "ExplodedSlot#", 13) == 0;
@@ -2996,14 +2996,14 @@ void LoadInputs(const char* file, int end)
             ReplayLoadBind b;
             memset(&b, 0, sizeof b);
             char flagsText[24];
-            char typeText[24];
-            char wordText[24];
+            char fillColorText[24];
+            char texKindText[24];
             char src[40];
             char tex[40];
             char extra;
-            if (sscanf(g_lines[at], "  bind %u %23s %39s %23s %39s %23s%c", &b.offset, flagsText, src, typeText, tex, wordText, &extra) != 6
-                || !DecimalWord(flagsText, &b.flags) || !DecimalWord(typeText, &b.type) || !DecimalWord(wordText, &b.word14))
-                Fatal(file, 0, "a bind line is `  bind <offset> <flags> <FrameTable#N|null> <type> <GafFrame#N|null|=index> <word14>`", g_lines[at]);
+            if (sscanf(g_lines[at], "  bind %u %23s %39s %23s %39s %23s%c", &b.offset, flagsText, src, fillColorText, tex, texKindText, &extra) != 6
+                || !DecimalWord(flagsText, &b.flags) || !DecimalWord(fillColorText, &b.fillColor) || !DecimalWord(texKindText, &b.texKind))
+                Fatal(file, 0, "a bind line is `  bind <offset> <flags> <FrameTable#N|null> <fillColor> <GafFrame#N|null|=index> <texKind>`", g_lines[at]);
             strcpy(b.src, src);
             strcpy(b.tex, tex);
             binds.push_back(b);
@@ -3523,6 +3523,56 @@ void CompareSnapshots()
     hex.Free();
 }
 
+bool CachedSubsystem()
+{
+    return !g_core && strcmp(g_subsystem, "weapons") == 0;
+}
+
+void CacheLinesText(const char* lines, ReplayText& out)
+{
+    if (*lines == '\0')
+        out.Add("no change");
+    for (const char* p = lines; *p != '\0';) {
+        const char* end = strchr(p, '\n');
+        if (p != lines)
+            out.Add("; ");
+        for (const char* c = p + 4; c < end; c++)
+            out.AddChar(*c);
+        p = end + 1;
+    }
+}
+
+void CompareCache(const ReplayCacheStart& before)
+{
+    ReplayCacheStart after;
+    const char* failure = ReplayReadDebrisCache(after);
+    if (failure != nullptr) {
+        Diff("cache debris", "blocks that tile the arena", failure);
+        return;
+    }
+    ReplayText replayed;
+    ReplayAddCacheChanges(before, after, replayed);
+    ReplayText recorded;
+    for (int k = g_callFirst + 1; k < g_callEnd; k++) {
+        if (strncmp(g_lines[k], "  d ", 4) == 0) {
+            recorded.Add(g_lines[k]);
+            recorded.AddChar('\n');
+        }
+    }
+    HashText(replayed.Data());
+    if (strcmp(recorded.Data(), replayed.Data()) != 0) {
+        ReplayText a;
+        ReplayText b;
+        CacheLinesText(recorded.Data(), a);
+        CacheLinesText(replayed.Data(), b);
+        Diff("cache debris", a.Data(), b.Data());
+        a.Free();
+        b.Free();
+    }
+    recorded.Free();
+    replayed.Free();
+}
+
 void ReplayCall(const char* file, Outcome& out)
 {
     char* header = g_lines[g_callFirst];
@@ -3584,6 +3634,9 @@ void ReplayCall(const char* file, Outcome& out)
     ReplayEnsureAllOfTables(sets->allOf, sets->allOfCount, AllocObject);
     if (g_game->unitsEnd.get() == nullptr && g_game->units.get() != nullptr && g_game->poolCount != 0)
         g_game->unitsEnd = (Unit*)((unsigned char*)g_game->units.get() + g_game->poolCount * sizeof(Unit) - sizeof(Unit));
+    ReplayCacheStart cacheBefore;
+    if (CachedSubsystem() && ReplayReadDebrisCache(cacheBefore) != nullptr)
+        Fatal(file, g_callIndex, "the debris cache does not tile its arena before the call", slotText);
     bool ran = RunSlot(g_subsystem, slotText);
     ReplayAnswerHook() = nullptr;
     if (!ran)
@@ -3599,6 +3652,8 @@ void ReplayCall(const char* file, Outcome& out)
         }
     }
     CompareWrites(file, sets);
+    if (CachedSubsystem())
+        CompareCache(cacheBefore);
     CompareSnapshots();
     RunAfter(g_subsystem, slotText);
     CompareHeld();
@@ -8513,7 +8568,7 @@ void LoadBindSelfTest()
     ReplayText lines;
     ReplayAddLoadLines(*table, lines);
     printf("%s", lines.Data());
-    Check(strstr(lines.Data(), "  bind 96 30 FrameTable#1 0 =327683 7\n  bind 128 1 null 209 +200 0\n") != nullptr && strstr(lines.Data(), "  bind 64 ") == nullptr, "a face a bind set is a bind line with its offset, flags, sequence, type, picture word and the word after it; an unbound face has none");
+    Check(strstr(lines.Data(), "  bind 96 30 FrameTable#1 0 =327683 7\n  bind 128 1 null 209 +200 0\n") != nullptr && strstr(lines.Data(), "  bind 64 ") == nullptr, "a face a bind set is a bind line with its offset, flags, sequence, fill colour, picture word and texture kind; an unbound face has none");
     name.Free();
     lines.Free();
     delete table;
@@ -8533,7 +8588,7 @@ void LoadBindSelfTest()
     void* made = g_objects.Pointer(ROK_FRAMETABLE, 1);
     Check((*(unsigned*)&again->faces[0].flags & 7) == 0 && *(unsigned*)&again->faces[1].flags == 0x1e && *(unsigned*)&again->faces[2].flags == 0x1, "the replayer clears the bits of every face and sets those of the lines");
     Check(made != nullptr && (void*)again->faces[1].color == made && again->faces[2].color == nullptr, "and names the object of a sequence as the services' answers do, FrameTable#1, so a later line resolves to it");
-    Check(again->faces[1].ptr_10 == 0x50003 && again->faces[1].texKind == 7 && again->faces[2].fillColor == 0xd1 && again->faces[2].ptr_10 == (int)(size_t)((char*)again + 200), "and the type, the picture word, a name inside the model and the word after the picture");
+    Check(again->faces[1].ptr_10 == 0x50003 && again->faces[1].texKind == 7 && again->faces[2].fillColor == 0xd1 && again->faces[2].ptr_10 == (int)(size_t)((char*)again + 200), "and the fill colour, the picture word, a name inside the model and the texture kind");
     Check(ReplayFaceAt(again, sizeof file, 77) == nullptr && ReplayFaceAt(again, sizeof file, 96) == again->faces + 1, "a face is found by its offset in the file");
 }
 
@@ -8811,6 +8866,47 @@ void DebrisCacheSelfTest()
     free(recorded);
 }
 
+void DebrisCacheChangeSelfTest()
+{
+    printf("debris cache changes\n");
+    ResetBlock();
+    ReplayClearFailure();
+    InitDebrisPieces();
+    ReplayCacheStart before;
+    ReplayCacheStart after;
+    ReplayText text;
+    Check(ReplayReadDebrisCache(before) == nullptr, "the installed cache is read");
+    ReplayAddCacheChanges(before, before, text);
+    Check(text.Size() == 0, "a call that leaves the cache alone has no d line");
+    Check(g_debrisMemCache.AllocHandle(&g_explodedPieces[3], 200) == 1, "a block is allocated");
+    Check(ReplayReadDebrisCache(after) == nullptr, "and the cache read again");
+    ReplayAddCacheChanges(before, after, text);
+    printf("%s", text.Data());
+    Check(strcmp(text.Data(), "  d cache 100000 208\n  d block 0 208 ExplodedSlot#3\n  d block 208 99792 null\n") == 0, "an allocation is the cursor, its block with the 8-byte header, and the rest split off");
+
+    unsigned char* base = (unsigned char*)g_debrisMemCache.base.get();
+    DebrisCacheChunk* first = (DebrisCacheChunk*)base;
+    first->owner = (Ref<char>*)&g_explodedPieces[5];
+    first->size = 99900;
+    DebrisCacheChunk* last = (DebrisCacheChunk*)(base + 99900);
+    last->owner = nullptr;
+    last->size = 100;
+    g_explodedPieces[3] = nullptr;
+    g_explodedPieces[5] = (ExplodedPiece*)(base + 8);
+    g_debrisMemCache.cur = last;
+    Check(ReplayReadDebrisCache(before) == nullptr, "a cache whose cursor is near the end of the arena is read");
+    Check(g_debrisMemCache.AllocHandle(&g_explodedPieces[3], 200) == 1 && ReplayReadDebrisCache(after) == nullptr, "a block is allocated past its end");
+    text.Clear();
+    ReplayAddCacheChanges(before, after, text);
+    printf("%s", text.Data());
+    Check(strcmp(text.Data(), "  d cache 100000 208\n  d block 0 208 ExplodedSlot#3\n  d block 208 99692 null\n") == 0, "the allocation wraps to the start of the arena, and the block at the end is unchanged");
+    Check(g_explodedPieces[5].get() == nullptr && (unsigned char*)g_explodedPieces[3].get() == base + 8, "and it evicts the piece whose block it takes");
+
+    first->size = 4;
+    Check(ReplayReadDebrisCache(after) != nullptr, "blocks that do not tile the arena are refused");
+    text.Free();
+}
+
 char* ReadWholeFile(const char* file, unsigned* size)
 {
     FILE* f = fopen(file, "rb");
@@ -8885,6 +8981,102 @@ void SetCobWriteSelfTest(const char* file)
     free(text);
 }
 
+char* Splice(const char* text, unsigned size, const char* at, unsigned removed, const char* insert, unsigned* spliced)
+{
+    unsigned head = (unsigned)(at - text);
+    unsigned added = (unsigned)strlen(insert);
+    *spliced = size - removed + added;
+    char* out = (char*)malloc(*spliced + 1);
+    memcpy(out, text, head);
+    memcpy(out + head, insert, added);
+    memcpy(out + head + added, at + removed, size - head - removed);
+    out[*spliced] = '\0';
+    return out;
+}
+
+int CallOfLine(const char* text, const char* at)
+{
+    int call = -1;
+    for (const char* p = strstr(text, "\ncall "); p != nullptr && p < at; p = strstr(p + 1, "\ncall "))
+        call++;
+    return call;
+}
+
+void DebrisBlockSizeSelfTest(const char* file)
+{
+    printf("a wrong block size of the debris cache\n");
+    unsigned size = 0;
+    char* text = ReadWholeFile(file, &size);
+    char* line = strstr(text, "\n  d block ");
+    unsigned offset = 0;
+    unsigned blockSize = 0;
+    int used = 0;
+    if (line == nullptr || sscanf(line, "\n  d block %u %u%n", &offset, &blockSize, &used) != 2)
+        Fatal(file, 0, "a weapons recording whose calls change the debris cache", "d block");
+    char replaced[48];
+    sprintf(replaced, "\n  d block %u %u", offset, blockSize + 8);
+    unsigned length = 0;
+    char* changed = Splice(text, size, line, (unsigned)used, replaced, &length);
+    Outcome out;
+    ReplayChangedText(changed, length, out);
+    Check(out.diverged && out.call == CallOfLine(text, line) && strcmp(out.key, "cache debris") == 0, "a block of another size than the game's is reported at the call that allocated it");
+    free(changed);
+    free(text);
+}
+
+void DebrisWrapSelfTest(const char* file)
+{
+    printf("a debris cache that wraps\n");
+    unsigned size = 0;
+    char* text = ReadWholeFile(file, &size);
+    const char* empty = "\ncache debris 100000 0\n  block 0 100000 null\n";
+    char* start = strstr(text, empty);
+    char* line = strstr(text, "\n  d block 0 ");
+    unsigned blockSize = 0;
+    char owner[40] = "";
+    if (start == nullptr || line == nullptr || sscanf(line, "\n  d block 0 %u %39s", &blockSize, owner) != 2 || blockSize >= 99992)
+        Fatal(file, 0, "a weapons recording that starts from an empty debris cache and allocates from it", "cache debris");
+    unsigned length = 0;
+    char* changed = Splice(text, size, start, (unsigned)strlen(empty), "\ncache debris 100000 99992\n  block 0 99992 null\n  block 99992 8 null\n", &length);
+    Outcome out;
+    ReplayChangedText(changed, length, out);
+    char want[160];
+    sprintf(want, "replayed cache 100000 %u; block 0 %u %s; block %u %u null\n", blockSize, blockSize, owner, blockSize, 99992 - blockSize);
+    Check(out.diverged && out.call == CallOfLine(text, line) && strcmp(out.key, "cache debris") == 0 && strstr(out.log.Data(), want) != nullptr,
+          "a start cursor near the end of the arena makes the first allocation wrap to its start, which leaves a smaller rest than the game's");
+    free(changed);
+    free(text);
+}
+
+void TeamColourSourceSelfTest(const char* file)
+{
+    printf("a team colour face without its sequence\n");
+    unsigned size = 0;
+    char* text = ReadWholeFile(file, &size);
+    char* line = nullptr;
+    char* name = nullptr;
+    for (char* at = strstr(text, ".texTeamSrc FrameTable#"); at != nullptr && line == nullptr; at = strstr(at + 1, ".texTeamSrc FrameTable#")) {
+        name = at;
+        while (name > text && name[-1] != ' ')
+            name--;
+        if (name - text >= 5 && strncmp(name - 5, "\n  w ", 5) == 0)
+            line = at;
+    }
+    char* end = line == nullptr ? nullptr : strchr(line, '\n');
+    if (end == nullptr)
+        Fatal(file, 0, "a weapons recording whose debris has a team colour face", "texTeamSrc");
+    char key[96];
+    sprintf(key, "%.*s", (int)(line - name) + 11, name);
+    const char* value = line + 12;
+    unsigned length = 0;
+    char* changed = Splice(text, size, value, (unsigned)(end - value), "null", &length);
+    Outcome out;
+    ReplayChangedText(changed, length, out);
+    Check(out.diverged && out.call == CallOfLine(text, line) && strcmp(out.key, key) == 0, "a team colour face whose sequence is not copied is reported at the face");
+    free(changed);
+    free(text);
+}
+
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
@@ -8940,6 +9132,7 @@ int SelfTest(const char* file)
     LoadRefusalSelfTest();
     LoadChunkSelfTest();
     DebrisCacheSelfTest();
+    DebrisCacheChangeSelfTest();
     EmptyTargetSelfTest();
     RebindSelfTest();
     RebindToFreshAddressesSelfTest();
@@ -8952,6 +9145,12 @@ int SelfTest(const char* file)
     if (strstr(file, "scripts") != nullptr) {
         LoadByteFlipSelfTest(file);
         SetCobWriteSelfTest(file);
+        return 0;
+    }
+    if (strstr(file, "weapons") != nullptr) {
+        DebrisBlockSizeSelfTest(file);
+        DebrisWrapSelfTest(file);
+        TeamColourSourceSelfTest(file);
         return 0;
     }
     for (int mutation = MUT_ARGUMENT; mutation <= MUT_MISSING; mutation++) {

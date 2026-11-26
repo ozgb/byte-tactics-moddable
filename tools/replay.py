@@ -169,7 +169,7 @@ def check_form(text: str, subsystem: str = "wind_meteors") -> list[str]:
             caching = True
         elif not inside and caching and line.startswith("  block "):
             pass
-        elif not (inside and len(line) > 4 and line.startswith("  ") and line[2] in "raciow" and line[3] == " "):
+        elif not (inside and len(line) > 4 and line.startswith("  ") and line[2] in "raciowd" and line[3] == " "):
             problems.append(f"line {n} is neither a call nor a line of one: {line!r}")
     return problems
 

@@ -335,7 +335,7 @@ the unit. Among the fields units owns, `workTime` is read by economy (the cloak 
   nothing reads them back. Scripts does not read `healthPercent`: the script value for the health percentage is
   computed from `health` and the maximum health. A wrong value of these four delivers nothing, so no run can
   diverge on it, and the record only reports it.
-- Only presentation reads `zBufferFlag`. A wrong value changes only what is drawn, so the frame dumps judge it and
+- Only presentation reads `zBufferFlag`, and the harness's display log, which records it with the model it draws. A wrong value changes only what is drawn, so the frame dumps judge it and
   nothing is hashed in its place.
 - `head` and `hoverBobPhase` drive the unit's own state. With a wrong `hoverBobPhase`, units-transport first diverges at tick 3500, phase units, `units[3].field_64` (the bank angle, 0x0146 against 0xfeba): at tick 3500 every unit's phase was moved by a quarter turn.
 

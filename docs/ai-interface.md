@@ -1,6 +1,6 @@
 # The ai interface
 
-Ai sits behind `interfaces/ai.h` (version 6.0), the seventh module on the scheduler after economy
+Ai sits behind `interfaces/ai.h` (version 6.1), the seventh module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`), map (`docs/map-interface.md`) and players (`docs/players-interface.md`)
 (#968). It is the computer players: what each one sees and wants, its squads and their timers, and the orders and
@@ -20,16 +20,18 @@ run and drained at each phase boundary, synchronous slots that deliver the modul
 outside the tick delivered at once (#970), and events as plain data. This issue changes none of its rules. Event
 kinds are unique across interfaces: economy uses 0 to 4 and 16 to 18, features 32 to 35 and 48 to 51, wind_meteors 64
 to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 136, map 160 to 168 and 176, players 192 to 196 and 208 to
-210, ai 224, 226 to 229 and 240, 241, 243, 245 and 246 (its range is 224 to 255, effects from 240; 225, 242, 244 and 247 are not reused), weapons' effects 272 and 273.
+210, ai 224, 226 to 230 and 240, 241, 243, 245 and 246 (its range is 224 to 255, effects from 240; 225, 242, 244 and 247 are not reused), weapons' effects 272 and 273.
 
 Ai's place in it. Ai's interface has no query another module calls and no event that serves a player who is not a
 computer player.
 - **Events into ai:** REACT_TO_ATTACK, published by the engine's adapter of weapons' ATTACKED (`AiOnWeaponsAttacked`,
   `src/seams/ai_world.cpp`); SET_SQUAD, published by units and the engine (the squad keys and the test harness); PLAN,
-  WEIGHT and LIMIT, published by the engine from the AI scripts and the console. Ai's handler (`AiInbox`,
+  WEIGHT and LIMIT, published by the engine from the console; RELOAD_PROFILES, published by the console's
+  `reloadaiprofiles`. Ai's handler (`AiInbox`,
   `src/seams/ai_world.cpp`) passes each to `Apply`, and records it with its outcome in the trace's dump (section 5).
-- **Routes:** of the six routes into ai, two are synchronous: the REACT_TO_ATTACK adapter's, because the gate diverged
-  with it queued, and units' SET_SQUAD by #952's rule. The engine's four (SET_SQUAD, PLAN, WEIGHT, LIMIT) are queued:
+- **Routes:** of the seven routes into ai, two are synchronous: the REACT_TO_ATTACK adapter's, because the gate diverged
+  with it queued, and units' SET_SQUAD by #952's rule. The engine's five (SET_SQUAD, PLAN, WEIGHT, LIMIT,
+  RELOAD_PROFILES) are queued:
   the engine publishes them only outside the tick, where #970's rule delivers them at once. Of ai's five effects,
   ADD_ORDER, STOP and ACTIVATE are synchronous because the gate diverged with each queued, QUEUE_BUILD and SET_STATES
   by #952's rule (sections 4 and 8).
@@ -67,7 +69,9 @@ computer player.
 | units: a saved unit loaded (`LoadUnit`) | `SetUnitSquad`, the saved squad | SET_SQUAD from units, outside the tick |
 | the squad keys (`CreateSquad`, `src/ingame/selection.cpp`) | `SetUnitSquad`, a direct call into ai's file | SET_SQUAD from the engine, outside the tick |
 | the test harness: the quirk reach check puts a unit in the scout squad (`ReachQuirkGuard`) | `SetUnitSquad` | SET_SQUAD from the engine, outside the tick |
-| the AI scripts and the console: `plan`, `weight`, `limit` (`CmdPlan`, `CmdWeight`, `CmdLimit`) | the slots `CmdPlan`, `CmdWeight`, `CmdLimit` | PLAN, WEIGHT, LIMIT from the engine, outside the tick |
+| the console: `plan`, `weight`, `limit` (`CmdPlan`, `CmdWeight`, `CmdLimit`) | the slots `CmdPlan`, `CmdWeight`, `CmdLimit` | PLAN, WEIGHT, LIMIT from the engine, outside the tick |
+| the console: `reloadaiprofiles` (`CmdReloadAIProfiles`) | the slot `ResetAIPlayers` | RELOAD_PROFILES from the engine, outside the tick |
+| players: a match's set-up (`InitPlayers`) | `LoadDefaultAIScript`, which ran the AI script's lines as console commands | the slot `LoadProfiles` (ai 6.1), outside the tick; the lines are ai's data and publish no event |
 
 **What each event writes.**
 - **REACT_TO_ATTACK** serves the computer players only. Ai's interface has no event that serves a player of another
@@ -85,22 +89,32 @@ computer player.
 - **SET_SQUAD** moves the unit from its squad's list to the new squad's (`Player::groups`) and sets `Unit::group`.
 - **PLAN** switches the AI commands on or off (`g_aiCommandsEnabled`) from the match's difficulty.
 - **WEIGHT** and **LIMIT** write the build weights and limits of the computer players' AI (`PlayerAI`).
+- **RELOAD_PROFILES** does what 3.1c's `ResetAIPlayers` did: it resets the unit tables of every active computer player
+  and loads the profiles again, as the slot `LoadProfiles` does.
 
-**The AI commands are parsed by the engine.** #964's rule for writers from outside the tick: the console command's
+**The AI profiles are ai's.** `LoadProfiles` reads the AI script the mission names (`GetNameSlot(7)`, else
+`ai\default.txt`) through the files seam and runs each of its lines, then, for each active computer player, the
+`ai_weight` lines of the downloadable unit types (`ParseDownloadableAiWeightScripts`,
+`ReparseAiWeightScriptsIfLimitNotSticky`). A line's first word is `plan`, `weight` or `limit`, with the console
+command's arguments; a line of any other word does nothing. 3.1c ran each line as a console command, so another word
+was the command of that name: every shipped AI script holds only the three words and `//` comment lines, which did
+nothing in 3.1c, and no unit type has an `ai_weight` text, so no trace changes.
+
+**The console's AI commands are parsed by the engine.** #964's rule for writers from outside the tick: the console command's
 argument parsing moved out of the module into the engine (`CmdPlanSlot`, `CmdWeightSlot`, `CmdLimitSlot`,
 `src/game/console_commands.cpp`, registered by `RegisterAICommands`), and the module gets plain data. PLAN's words
 (`easy`, `medium`, `hard`, `any`) become four bits, WEIGHT's and LIMIT's unit type or category becomes a set of type
 bits (the engine asks units' `UnitTypeSetAddTypeOrCategory`, as 3.1c's `CmdWeight` did). 3.1c's quirk that `any` is
 looked for only in the first argument is kept by the parser. The parser now names the types even when the commands are
 off, where 3.1c's `CmdWeight` and `CmdLimit` returned first; `UnitTypeSetAddTypeOrCategory` writes only the set it is
-given, so nothing else changes. Every AI command is published outside the tick (the scripts run when a match is set up
-and on the console's `ReloadAIProfiles`), so each is consumed before the publishing statement returns, at 3.1c's point.
+given, so nothing else changes. Every AI command and RELOAD_PROFILES is published outside the tick, from the console, so each
+is consumed before the publishing statement returns, at 3.1c's point.
 
 **Answers.** None. `ReactToAttack`, `MarkOwnerNetDirtyFromDamageSplit`, `SetUnitSquad` and the AI commands returned
 nothing in 3.1c, so none is synchronous by its contract.
 
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 42) and returned to no
-one: 1 for REACT_TO_ATTACK, SET_SQUAD and PLAN; for WEIGHT and LIMIT, 1, or 0 when the AI commands are
+one: 1 for REACT_TO_ATTACK, SET_SQUAD, PLAN and RELOAD_PROFILES; for WEIGHT and LIMIT, 1, or 0 when the AI commands are
 off. `Apply` first rejects, with outcome 0 and no change, an event naming no unit (REACT_TO_ATTACK,
 SET_SQUAD), a SET_SQUAD outside -1 to 9 or for a unit whose player has no squads, a PLAN with a bit above 3, and an
 unknown kind. 3.1c's `SetUnitSquad` had no such checks and wrote outside the squads; every 3.1c caller passed a valid
@@ -117,6 +131,7 @@ squad, so no trace depends on it.
 | `GetVisibleEnemiesInRadius`, `HasReadyUnitInRange`, `IsPointVisible`, `GetFactoriesInRadius` | gone from ai in 5.0: los_radar's (the first three) and units' (the last), section 4 |
 | `CreatePlayerAI`, `DestroyPlayerAI`, `CreateSquads`, `FreeSquads`, `CreateSquadManager`, `ResetAIPlayers`, `RebuildFeatureCells`, `ParseDownloadableAiWeightScripts`, `ReparseAiWeightScriptsIfLimitNotSticky`, `DumpPlayerAI` | set-up, load and debugging slots, outside the tick |
 | (new) `WriteState` | ai's report for the trace's dump (section 5) |
+| (new in 6.1) `LoadProfiles` | the AI profiles' load, which players' `InitPlayers` calls; `ResetAIPlayers` stays for 6.x, and the engine no longer calls it |
 
 **Calls outside the interface.** `docs/schedule.md` listed "a call into ai outside its interface" twice, in orders'
 `TeleportOrder`. Neither was a call into the AI: `TeleportOrder` builds a `Vec`, a 3-vector type whose header lived in
@@ -155,7 +170,7 @@ order list) and asks targeting through orders' outbox, so ai no longer checks or
 `Unit` other than `Unit::group` (the squad, ai's own field of the unit), and none of `Order` or `UnitMotion`. It writes
 its own: the `PlayerAI` of each player, the squad managers and their timers, the squads, `g_aiCommandsEnabled`.
 
-**Payloads.** Every event and effect starts with `AiEventHeader`: `kind` and `unit` (the unit it is about, a block offset; 0 for PLAN, WEIGHT and LIMIT). Each kind has the payload of `interfaces/ai.h` (version 6.0) that starts with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+**Payloads.** Every event and effect starts with `AiEventHeader`: `kind` and `unit` (the unit it is about, a block offset; 0 for PLAN, WEIGHT, LIMIT and RELOAD_PROFILES). Each kind has the payload of `interfaces/ai.h` (version 6.1) that starts with it, or is the header alone. `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -164,6 +179,7 @@ its own: the `PlayerAI` of each player, the squad managers and their timers, the
 | PLAN 227 | `AiPlan` | `difficulties`: bit 0 easy, 1 medium, 2 hard, 3 any |
 | WEIGHT 228 | `AiWeight` | `scale`, `fix` (1 to fix the weights), `types[16]` (a set of unit types: type n is bit n % 32 of word n / 32) |
 | LIMIT 229 | `AiLimit` | `limit`, `fix` (1 to fix the limits), `types[16]` (as in WEIGHT) |
+| RELOAD_PROFILES 230 | the header alone | none |
 | ADD_ORDER 240 | `AiAddOrder` | `type` (the order's type), `queue` (0 replace, 1 queue behind), `target` (a block offset, 0 for none), `hasPos`, `pos[3]` (world coordinates, 16 fractional bits), `params[2]` |
 | QUEUE_BUILD 241 | `AiQueueBuild` | `type` (the unit type), `count` |
 | STOP 243 | `AiStop` | `all`: 1 to delete every order, 0 only those not marked to stay |
@@ -204,7 +220,8 @@ index, which is not ai's (section 5), or no ai state at all:
 | weapons HIT, to orders | synchronous | #952's rule. Queued it stayed equal on the tier. It sets bits 0x2000 or 0x4000 of the shooter's `Unit::netDirtyFlags` in the projectiles phase, and targeting's `SetWeaponTargetUnit` and `SetWeaponTargetPos` clear bits 10 to 14 of the same word (`&= 0x83ff`) later in the same phase, when ai or the unit's weapons retarget it: the `immediate` row orders → targeting, `Unit::netDirtyFlags`, projectiles (ai → targeting before HIT was an effect; mission-radius at tick 1355). Pending, the bit would be set after the clear instead of before it. |
 | units SET_SQUAD | synchronous | #952's rule. Queued it stayed equal on the tier. Orders' `GetBuiltOrder` writes `Unit::group` of a human player's unit when it is finished, in the units phase, and units' SET_SQUAD 0 of the same unit, published when it is made: a unit made and finished in one units phase would get its squad 0 after the factory's, instead of before. A dying unit's SET_SQUAD -1 also leaves its squad's list holding it until the boundary. |
 | engine SET_SQUAD | queued | Published only outside the tick: the squad keys (input, between ticks) and the test harness's quirk reach check (before the tick), where #970's rule delivers it at once. |
-| engine PLAN, WEIGHT, LIMIT | queued | Published only outside the tick: the AI scripts at a match's set-up and the console, where #970's rule delivers them at once (section 2). |
+| engine PLAN, WEIGHT, LIMIT | queued | Published only outside the tick, by the console, where #970's rule delivers them at once (section 2). |
+| engine RELOAD_PROFILES | queued | Published only outside the tick, by the console, where #970's rule delivers it at once. |
 | ai ADD_ORDER, to orders | synchronous | The gate (section 8). |
 | ai QUEUE_BUILD, to orders | synchronous | #952's rule. Queued it stayed equal on the tier. It writes the factory's orders (`Unit::list`), which ai's timers read later in the same player's turn (`!u->list`, the build and scout timers): the read of ADD_ORDER's divergence. Ai's inbox delivery before a run does not deliver orders' inbox, so the order could be pending at that read. |
 | ai STOP, to orders | synchronous | The gate (section 8). |

@@ -771,6 +771,7 @@ void InstallNativeSeams()
     s_ai.WriteState = AiWriteState;
     s_ai.DumpPlayerAI = DumpPlayerAI;
     s_ai.ResetAIPlayers = ResetAIPlayers;
+    s_ai.LoadProfiles = LoadAIProfiles;
     s_ai.CreatePlayerAI = CreatePlayerAI;
     s_ai.DestroyPlayerAI = DestroyPlayerAI;
     s_ai.UpdatePlayerAI = UpdatePlayerAI;

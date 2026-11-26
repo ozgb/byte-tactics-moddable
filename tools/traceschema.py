@@ -1038,7 +1038,7 @@ EVENT_MODULES = [
                  "PLAYERS_EFFECT_CAPTURE_UNIT": "PlayersCaptureUnit"}, size_header="players_event_size.h"),
     EventModule("aiEvents", 42, "Ai", "ai.h", "AiEventHeader", ["AiEventKind", "AiEffectKind"],
                 {"AI_REACT_TO_ATTACK": "AiReactToAttack", "AI_SET_SQUAD": "AiSetSquad", "AI_PLAN": "AiPlan",
-                 "AI_WEIGHT": "AiWeight", "AI_LIMIT": "AiLimit", "AI_EFFECT_ADD_ORDER": "AiAddOrder",
+                 "AI_WEIGHT": "AiWeight", "AI_LIMIT": "AiLimit", "AI_RELOAD_PROFILES": None, "AI_EFFECT_ADD_ORDER": "AiAddOrder",
                  "AI_EFFECT_QUEUE_BUILD": "AiQueueBuild", "AI_EFFECT_STOP": "AiStop",
                  "AI_EFFECT_ACTIVATE": "AiActivate", "AI_EFFECT_SET_STATES": "AiSetStates"}, size_header="ai_event_size.h"),
     EventModule("weaponsEvents", 47, "Weapons", "weapons.h", "WeaponsEventHeader",

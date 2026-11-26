@@ -95,7 +95,9 @@ A group command, for example, reads
     23 ORDERS_GROUP_COMMAND unit 1 mode 3 type 0 queue 0 target - hasPos 1 pos 000086020000010000003601 params 0000000000000000 units 0100...
 
 where `unit` is the local player's first unit, bit `i` of `units` is the unit `unit + i`, and `pos` is three 16.16
-fixed-point numbers (646, 1, 310).
+fixed-point numbers (646, 1, 310). A group key (ctrl and a digit) is one `AI_SET_SQUAD` record for each of the local
+player's units whose squad it sets, in unit order: the group's number for a selected unit, 0 for an unselected unit
+that was in the group.
 
 `tools/interfacelog.py` decodes a `commands.txt`. `tools/reference.py --check` decodes each run's file and compares
 it, line by line, with the stored one, naming the first record that differs. A scenario with `input` lines must have

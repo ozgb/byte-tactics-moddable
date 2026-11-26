@@ -5206,6 +5206,11 @@ int ViewHostOrderDrawMask(unsigned kind)
     return (int)ReadU32At((unsigned)g_missionOrderTableBegin + kind * ORDER_TABLE_STRIDE, 0xc);
 }
 
+int ViewHostOrderPosYUnset(const unsigned char* order)
+{
+    return OrderPosYUnset((unsigned)order);
+}
+
 const ViewWeaponsReport* ViewHostWeaponsReport(void)
 {
     unsigned char* projectiles = (unsigned char*)GameU32(GAME_PROJECTILES);

@@ -478,7 +478,7 @@ static void FillOrders(PlayerView* v, ViewUnit* out, const unsigned char* first)
         rows[n].target = (unsigned short)UnitIdPlusOne(UnitOf(RRef(order, ORDER_TARGET)));
         rows[n].created = R32(order, ORDER_CREATED);
         rows[n].x = RI32(order, ORDER_X);
-        rows[n].y = RI32(order, ORDER_Y);
+        rows[n].y = ViewHostOrderPosYUnset(order) != 0 ? 0 : RI32(order, ORDER_Y);
         rows[n].z = RI32(order, ORDER_Z);
         order = RRef(order, ORDER_NEXT);
     }

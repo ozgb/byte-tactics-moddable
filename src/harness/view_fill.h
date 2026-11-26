@@ -76,6 +76,7 @@ const unsigned char* ViewHostGame(void);
 const unsigned char* ViewHostRef(unsigned stored);
 void ViewHostUnitAccount(const unsigned char* unit, float out[4]);
 int ViewHostOrderDrawMask(unsigned kind);
+int ViewHostOrderPosYUnset(const unsigned char* order);
 const ViewWeaponsReport* ViewHostWeaponsReport(void);
 unsigned ViewHostTakeEvents(const ViewRawEvent** events);
 void ViewHostFail(const char* message);

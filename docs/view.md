@@ -22,8 +22,9 @@ function of presentation reads during play or in its menus, and says where each 
   unless the console's `view` command has made the viewer another player ("The two players").
 - **In sight:** a point is in the viewer's sight when the cell of the sight grid under it says so (`VIEW_SIGHT_IN_SIGHT`)
   with line of sight on, or when the cell is revealed (`VIEW_SIGHT_MAPPED` or in sight) with line of sight off. This is
-  3.1c's one test, repeated by every draw that tests sight. The cell of a point is column `x >> 21` (the whole part
-  over 32) and row `(z - y / 2) >> 21`, in the 16.16 world coordinates; a point off the grid is not in sight.
+  3.1c's one test, repeated by every draw that tests sight. The cell of a point is taken on the whole parts of its 16.16
+  world coordinates (the signed 16-bit values `xw`, `yw`, `zw`): column `xw >> 5` and row `(zw - (yw >> 1)) >> 5`, with
+  arithmetic shifts. A point whose column or row is outside the grid is not in sight.
 - **Own, allied:** a unit's owner is the viewer, or a player allied to the viewer.
 - **Loaded data:** the unit, weapon, feature and side definitions, the models and the animations. The view names them
   by index; their contents come through the files service ("Loaded data").
@@ -39,12 +40,9 @@ section 8.1). They are equal from the match's start. The console's `control` com
 | `viewer` | `game.playerIndex` | Whose sight decides what is drawn and heard; whose economy the resource bars show; whose units have health bars, group numbers and the unit panel's own-only lines. |
 | `controller` | `game.localPlayer` | Whose units the selection and the orders act on; whose unit count the status panel shows; whose row the score panel highlights; whose notices (`SIM_EVENT_WATCH_PROMPT`, `SIM_EVENT_WATCH_MODE_NOTICE`, `SIM_EVENT_CD_ACTIVITY`) reach the presentation. |
 
-The simulation also reads both fields as its perspective (line of sight, unit flags, which messages a command raises).
-`docs/state.md` ("Mixed cases") splits each into the simulation's perspective, fixed by the match setup, and the view's
-player; #1117 makes `view` and `control` events. After the split, the view's two fields come from the view's players,
-and the simulation's perspective is not in the view: the view holds only what is drawn for the viewer and commanded by
-the controller. While `view` has made them differ, 3.1c draws the viewer's units with the controller's input, so the
-viewer's own units cannot be selected: `VIEW_RELATION_CONTROLLED` is clear on them.
+The simulation also reads both fields (line of sight, unit flags, which messages a command raises). How these fields are
+written is #1117's to decide. While `view` has made them differ, 3.1c draws the viewer's units with the controller's
+input, so the viewer's own units cannot be selected: `VIEW_RELATION_CONTROLLED` is clear on them.
 
 ## The world
 
@@ -56,12 +54,35 @@ viewer's own units cannot be selected: `VIEW_RELATION_CONTROLLED` is clear on th
 | `seaLevel` | `Game.seaLevel`, set when the map loads and changed by the map's events (section 8.28); no row hashes it | all |
 | `windX`, `windZ` | `wind.windX`, `wind.windZ` (section 7.6) | all |
 | `gravity` | `Game.gravity`, fixed for the match; no row hashes it | all |
-| `sightOptions` | bits 0 to 2 of `game.mapFlags`: mapping off, line of sight on, true line of sight | all |
-| `endFlags` | bits 2 (the match is over), 5 (won) and 6 (lost) of `game.endGameFlags` | all |
+| `sightOptions` | masks 0x1, 0x2 and 0x4 of `game.mapFlags`: 0x1 mapping on (the map starts unexplored), 0x2 line of sight on, 0x4 true line of sight | all |
+| `endFlags` | masks 0x4 (the match is over), 0x20 (won) and 0x40 (lost) of `game.endGameFlags` | all |
 | `gameType` | `mission.type` (section 8.20) | all |
 | `commanderDeath`, `maxUnits` | `Game.commanderDeath` and `Game.maxUnitsSetting`, options of the match setup that no row hashes | all |
 
 Smoke and timed plumes drift by the wind and gravity of the tick they step in; no other particle reads them.
+
+## Capacities
+
+Each table of the block has a fixed capacity (`VIEW_MAX_*` in `interfaces/view.h`). Most are the game's own bounds:
+
+| Table | Capacity | Basis |
+|---|---|---|
+| `players` | 10 | the ten player slots |
+| `units`, `blips` | 5001 | ten players of at most 500 units (`maxUnits` is capped at 500), and the pool's spare entry |
+| `projectiles`, `debris` | 300 | the simulation's tables of projectiles and of debris |
+| `explodedPieces` | 100 | the simulation's table of exploded pieces |
+| `messages` | 4096 | the sim event queue of one tick (`docs/sim-events.md`, "The queue") |
+
+The game sets no bound on the others: a model's pieces, a unit's queued orders, a map's features and its size. Their
+capacities are larger than any map and model of the game data, and a fill past one drops entries by a fixed rule and
+sets a bit of `PlayerView.truncated`, so that a dropped entry is never silent:
+
+| Table | Capacity | Past it |
+|---|---|---|
+| `pieces` | 131072 | the first unit in `units` whose pieces do not all fit, and every unit after it, has `pieceCount` 0 and no pieces; `VIEW_TRUNCATED_PIECES` |
+| `orders` | 65536 | the same for orders, with `orderCount`; `VIEW_TRUNCATED_ORDERS` |
+| `features` | 65536 | the features after the first 65536, in the order of their anchor cells (row by row), are dropped; `VIEW_TRUNCATED_FEATURES` |
+| `sight` | 1048576 cells (a grid of 1024 by 1024, a map of 32768 pixels a side) | `gridWidth` and `gridHeight` stay the grid's; the cells past the first 1048576, row by row, are dropped, and a draw reads them as `VIEW_SIGHT_HIDDEN`; `VIEW_TRUNCATED_SIGHT` |
 
 ## Sight
 
@@ -84,9 +105,12 @@ simulation copies when the sharing of mapping is on.
 A unit is in `units` when it is live (`units[i].unitDefIndex` not 0) and one of these holds:
 
 - its owner is the viewer;
-- it is not cloaked (bit 4 of `units[i].activateFlags` clear), it is not under water unless sonar has it (the top of
+- it is not cloaked (mask 0x4 of `units[i].activateFlags` clear), it is not under water unless sonar has it (the top of
   its model, its `y` plus the definition's highest model point, is at or above the sea level, or bit 0x200 of
-  `units[i].flags` is set), and one of the four corners of its model's box (its position plus the definition's lowest and highest model points) is in sight.
+  `units[i].flags` is set), and one of four corners of its model's box is in sight. With `lo` the unit's position plus the definition's lowest model
+  point and `hi` its position plus the highest, and `size` the model's size, the four are tested in this order:
+  (`lo.x`, `hi.y`, `lo.z`), (`lo.x + size.x`, `hi.y`, `lo.z`), (`lo.x + size.x`, `hi.y - size.y`, `lo.z + size.z`) and
+  (`lo.x`, `hi.y - size.y`, `lo.z + size.z`).
 
 An ally's units pass by the second rule only: 3.1c draws an ally's unit only in the viewer's own sight, and a cloaked
 ally's unit not at all. Radar does not put a unit in `units`; it makes a blip.
@@ -108,7 +132,8 @@ ally's unit not at all. Radar does not put a unit in `units`; it makes a blip.
 | `firstOrder`, `orderCount` | its orders (section 8.9) | the controller's units; 0 for the rest |
 | `firstPiece`, `pieceCount` | the posed pieces of its model, from the scripts' state (section 8.12) | every unit |
 
-The unit panel shows a unit under the cursor that is not in `units`, a blip, as "unidentified object" with nothing else.
+The unit panel shows a unit under the cursor that is not in `units`, a blip, as "Unidentified object", with the prefix
+"S: " when the blip's `VIEW_BLIP_SONAR` is set and "R: " when it is clear, and nothing else.
 A unit's target in the panel is named only when the target is itself in `units`.
 
 **Control groups.** `group` is the group a unit of the viewer's was put in, 1 to 9, and 0 for none. The view gives it
@@ -139,23 +164,30 @@ weapon coverage) draw from them. A target not in `units` is drawn at its last se
 
 ## Features
 
-A feature is in `features` unless its definition has `nodrawundergray` (bit 8 of its high flags; 3.1c also forces it
-for the dragon's teeth and fortification walls) and the cell's owner is not the viewer and no corner of its footprint is
-in sight. Every other feature, tree, rock and wreck, is drawn whatever the viewer has seen, under the fog: black fog hides
-it, grey fog does not. #1 names this quirk `ui.map-features-ignore-los`; no flag has it yet.
+Every feature on the map is in `features`, in the order of the anchor cells, row by row. Its `drawn` is 0 when its
+definition has `nodrawundergray` (mask 0x8 of its high flags; 3.1c also forces it for the dragon's teeth and
+fortification walls), the cell's owner is not the viewer, and neither of two points, in whole world units, is in sight:
+the cell's corner (`16 * cellX`, the cell's height, `16 * cellZ`) and the corner across the footprint (`16 * (cellX +
+footprintX)`, the same height, `16 * (cellZ + footprintZ)`, with the footprint of its definition). A feature with
+`drawn` 0 gives only its cell and its definition. Every other feature, tree, rock and wreck, has `drawn` 1 and is drawn
+whatever the viewer has seen, under the fog: black fog hides it, grey fog does not. #1 names this quirk
+`ui.map-features-ignore-los`; no flag has it yet.
 
 | Field | Source | Visibility |
 |---|---|---|
-| `cellX`, `cellZ`, `featureIndex` | the anchor cell of the feature and the feature of its cell (`cells[i]`, section 8.2) | by the rule above |
-| `frame`, `shadowFrame` | the frames of its spot's animation (`features[i].anim`, `shadow`, section 7.5) | the same |
-| `model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` | a spot drawn as a model: `features[i].pos` and `rot` | the same |
+| `cellX`, `cellZ`, `featureIndex` | the anchor cell of the feature and the feature of its cell (`cells[i]`, section 8.2) | every feature |
+| `drawn` | the rule above | every feature |
+| `frame`, `shadowFrame` | the frames of its spot's animation (`features[i].anim`, `shadow`, section 7.5) | `drawn` 1; 0 for the rest |
+| `model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` | a spot drawn as a model: `features[i].pos` and `rot` | `drawn` 1; 0 for the rest |
 
-The panel names a feature under the cursor, and its metal and energy, whatever the viewer's sight: 3.1c's quirk, and
-the panel reads them from the feature definition, loaded data.
+The panel names the feature of the cell under the cursor, and its metal and energy, whatever the viewer's sight, a
+feature with `drawn` 0 included: 3.1c's quirk. The cell's entry in `features` gives the definition, and the name, metal and
+energy are the definition's, loaded data.
 
 ## Projectiles
 
-A projectile is in `projectiles` when its slot is in use and its position is in sight. A shot of the viewer's own is
+A projectile is in `projectiles` when it is among the first `projectileCount` entries of the projectile table, its
+`active` (the count of shots of its burst still to fire) is 0, and its position is in sight. A shot of the viewer's own is
 not exempt, in the battle view; on the radar picture it is (`SIM_EVENT_RADAR_UNITS`).
 
 | Field | Source |
@@ -186,8 +218,8 @@ piece is drawn from are those of the unit's model, loaded data.
 The score panel shows only in skirmish and multiplayer, and counts commanders' kills when `commanderDeath` is 2. 3.1c
 shows no ally's resources: the share dialog lists the players to give to, by name only.
 
-Two quirks of 3.1c are the simulation's to fix, not the view's: the readout of each resource bar is fed from the other
-resource's fields, as the source does it, and `players[i].rank` is compacted while the score panel draws (#1113).
+`players[i].rank` is compacted while the score panel draws: a quirk of 3.1c that is the simulation's to fix, not the
+view's (#1113).
 
 ## Messages
 
@@ -218,7 +250,7 @@ Presentation reads these and owns them; they are presentation state, not facts o
 - the unit and the feature under the cursor (the hover unit), and the hot spots of the radar picture's blips;
 - the order mode the cursor is in, and the build placement's height;
 - `interfaceType`, and the view options: the clock, the shake switch, the selection boxes, the health bars and the
-  debug bits 0 and 1 of `endGameFlags` (#1050);
+  debug masks 0x1 and 0x2 of `endGameFlags` (#1050);
 - the pause request and the lag marker, which are the driver's;
 - the message log, the speech queue, the particle lists, the fog tiles and the score panel's flashes;
 - the last place a target was seen, for the weapon coverage overlay.
@@ -241,15 +273,16 @@ reads with the setup, not the view.
 ## The reads
 
 Every sim field (class `sim` or `mixed` in the state classes) that a function of presentation reads, by the access log
-of the reference scenarios or by its static read set, with where it is in the view or why it is not. The list is
-`data/view_reads.csv`, and `tools/presreads.py --check` fails when a read is missing here, or listed here and no longer
-read. A read is left out when no display, sound or command depends on it during play: it is read only by the debug
-overlays (which need the debug bits), only by the menus and setup screens, or only by a cache presentation owns.
+of the reference scenarios or by its static read set, with where it is in the view or why it is not. Each name is a
+field of the state block layout (`layout.json`), a global of it, or a named block of it. (For contributors to the source
+repository: the list is generated there, and a check fails when a read is missing here or a row names no read.) A read
+is left out when no display, sound or command depends on it during play: it is read only by the debug overlays (which
+need the debug bits), only by the menus and setup screens, or only by a cache presentation owns.
 
 | Read | In the view |
 |---|---|
-| `AiSearchGoal::active` | Left out: only the debug overlays draw it, which need the debug bits of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
-| `AiSearchGoal::count` | Left out: only the debug overlays draw it, which need the debug bits of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
+| `AiSearchGoal::active` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
+| `AiSearchGoal::count` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
 | `BroadcastToggleFlags::b0` | Left out: a key's toggle bit, presentation state of the input ("What is not sim"); no output of the tick depends on it. |
 | `BuildMenuPage::count` | Loaded data: the build menus of the unit definitions, through the files service. |
 | `BuildMenuPage::entries` | Loaded data: the build menus of the unit definitions, through the files service. |
@@ -278,29 +311,29 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `Feature::metal` | Loaded data: the feature definition named by `ViewFeature.featureIndex`, through the files service. |
 | `Feature::over` | Loaded data: the feature definition named by `ViewFeature.featureIndex`, through the files service. |
 | `Feature::shadowTable` | Loaded data: the feature definition named by `ViewFeature.featureIndex`, through the files service. |
-| `FeatureAnimEntry::bytes_10` | `ViewFeature.frame`, `shadowFrame` and the model fields (Features). |
-| `FeatureAnimEntry::bytes_8` | `ViewFeature.frame`, `shadowFrame` and the model fields (Features). |
-| `FeatureAnimEntry::src` | `ViewFeature.frame`, `shadowFrame` and the model fields (Features). |
-| `FeatureAnimEntry::state` | `ViewFeature.frame`, `shadowFrame` and the model fields (Features). |
-| `FeaturePseudoUnit::def` | `ViewFeature` model fields (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
-| `FeaturePseudoUnit::flags_110` | `ViewFeature` model fields (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
-| `FeaturePseudoUnit::flags_114` | `ViewFeature` model fields (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
-| `FeaturePseudoUnit::unitDefIndex` | `ViewFeature` model fields (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
-| `FeaturePseudoUnit::unknown_0` | `ViewFeature` model fields (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
-| `FeaturePseudoUnit::unknown_96` | `ViewFeature` model fields (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
-| `FeaturePseudoUnit::unknown_a8` | `ViewFeature` model fields (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
+| `FeatureAnimEntry::bytes_10` | `ViewFeature.frame`, `shadowFrame` and `ViewFeature.model` (Features). |
+| `FeatureAnimEntry::bytes_8` | `ViewFeature.frame`, `shadowFrame` and `ViewFeature.model` (Features). |
+| `FeatureAnimEntry::src` | `ViewFeature.frame`, `shadowFrame` and `ViewFeature.model` (Features). |
+| `FeatureAnimEntry::state` | `ViewFeature.frame`, `shadowFrame` and `ViewFeature.model` (Features). |
+| `FeaturePseudoUnit::def` | `ViewFeature.model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
+| `FeaturePseudoUnit::flags_110` | `ViewFeature.model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
+| `FeaturePseudoUnit::flags_114` | `ViewFeature.model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
+| `FeaturePseudoUnit::unitDefIndex` | `ViewFeature.model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
+| `FeaturePseudoUnit::unknown_0` | `ViewFeature.model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
+| `FeaturePseudoUnit::unknown_96` | `ViewFeature.model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
+| `FeaturePseudoUnit::unknown_a8` | `ViewFeature.model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
 | `FogCell::level0` | `PlayerView.sight` (Sight): the fog drawn over a cell follows from it. |
 | `FogCell::level1` | `PlayerView.sight` (Sight): the fog drawn over a cell follows from it. |
-| `InfoModeFlags::b0` | `PlayerView.endFlags` for bits 2, 5 and 6; bits 0 and 1 are presentation state ("What is not sim"). |
-| `InfoModeFlags::b1` | `PlayerView.endFlags` for bits 2, 5 and 6; bits 0 and 1 are presentation state ("What is not sim"). |
-| `InfoModeFlags::raw` | `PlayerView.endFlags` for bits 2, 5 and 6; bits 0 and 1 are presentation state ("What is not sim"). |
+| `InfoModeFlags::b0` | `PlayerView.endFlags` for masks 0x4, 0x20 and 0x40; masks 0x1 and 0x2 are presentation state ("What is not sim"). |
+| `InfoModeFlags::b1` | `PlayerView.endFlags` for masks 0x4, 0x20 and 0x40; masks 0x1 and 0x2 are presentation state ("What is not sim"). |
+| `InfoModeFlags::raw` | `PlayerView.endFlags` for masks 0x4, 0x20 and 0x40; masks 0x1 and 0x2 are presentation state ("What is not sim"). |
 | `the player slot block` | `PlayerView.sight` (Sight). |
 | `the mapped memory` | `PlayerView.sight` (Sight). |
 | `the plot memory` | `PlayerView.features` (the features of the cells) and `mapWidth`, `mapHeight`; a cell's height is shown only by the debug strip. |
-| `MapViewFlags::bit0` | `PlayerView.sightOptions` (Sight); bit 3, the fog tiles' cache, is presentation state. |
-| `MapViewFlags::bit1` | `PlayerView.sightOptions` (Sight); bit 3, the fog tiles' cache, is presentation state. |
-| `MapViewFlags::bit2` | `PlayerView.sightOptions` (Sight); bit 3, the fog tiles' cache, is presentation state. |
-| `MapViewFlags::raw` | `PlayerView.sightOptions` (Sight); bit 3, the fog tiles' cache, is presentation state. |
+| `MapViewFlags::bit0` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
+| `MapViewFlags::bit1` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
+| `MapViewFlags::bit2` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
+| `MapViewFlags::raw` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
 | `ModelState::bitmap` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
 | `ModelState::cacheDrawCount` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
 | `ModelState::count` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
@@ -327,14 +360,14 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `Player::alliance` | `ViewPlayer.allied` (Players). |
 | `Player::allied` | `ViewPlayer.allied` (Players). |
 | `Player::alliedBy` | Left out: read only by the menus and setup screens, before or after play; the match setup supplies it, not the view. |
-| `Player::commanderKills` | `ViewPlayer` of the same name (Score). |
-| `Player::commanderLosses` | `ViewPlayer` of the same name (Score). |
+| `Player::commanderKills` | `ViewPlayer.commanderKills` (Score). |
+| `Player::commanderLosses` | `ViewPlayer.commanderLosses` (Score). |
 | `Player::displayTimer` | `ViewPlayer.displayTimer` (Economy). |
-| `Player::energy` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::energyCapacity` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::energyIncome` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::energyUsage` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::energyWasted` | `ViewPlayer` of the same name (Score: the end-game screen). |
+| `Player::energy` | `ViewPlayer.energy`, the viewer's only (Economy). |
+| `Player::energyCapacity` | `ViewPlayer.energyCapacity`, the viewer's only (Economy). |
+| `Player::energyIncome` | `ViewPlayer.energyIncome`, the viewer's only (Economy). |
+| `Player::energyUsage` | `ViewPlayer.energyUsage`, the viewer's only (Economy). |
+| `Player::energyWasted` | `ViewPlayer.energyWasted` (Score: the end-game screen). |
 | `Player::explored` | `PlayerView.sight` (Sight). |
 | `Player::exploredHeight` | `PlayerView.sight` (Sight). |
 | `Player::exploredWidth` | `PlayerView.sight` (Sight). |
@@ -343,29 +376,29 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `Player::index` | `ViewPlayer.active`, `type` (Players). |
 | `Player::info` | `ViewPlayer.side`, `color`, `watching` (Players). |
 | `Player::joinTime` | Left out: read only by the menus and setup screens, before or after play; the match setup supplies it, not the view. |
-| `Player::kills` | `ViewPlayer` of the same name (Score). |
+| `Player::kills` | `ViewPlayer.kills` (Score). |
 | `Player::lastIndex` | `ViewUnit.relation` (Units): the controller's units are the ones with `VIEW_RELATION_CONTROLLED`. |
-| `Player::losses` | `ViewPlayer` of the same name (Score). |
-| `Player::messages` | Left out: only the debug overlays draw it, which need the debug bits of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
-| `Player::metal` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::metalCapacity` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::metalIncome` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::metalUsage` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::metalWasted` | `ViewPlayer` of the same name (Score: the end-game screen). |
+| `Player::losses` | `ViewPlayer.losses` (Score). |
+| `Player::messages` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
+| `Player::metal` | `ViewPlayer.metal`, the viewer's only (Economy). |
+| `Player::metalCapacity` | `ViewPlayer.metalCapacity`, the viewer's only (Economy). |
+| `Player::metalIncome` | `ViewPlayer.metalIncome`, the viewer's only (Economy). |
+| `Player::metalUsage` | `ViewPlayer.metalUsage`, the viewer's only (Economy). |
+| `Player::metalWasted` | `ViewPlayer.metalWasted` (Score: the end-game screen). |
 | `Player::ping` | Left out: read only by the menus and setup screens, before or after play; the match setup supplies it, not the view. |
-| `Player::rank` | `ViewPlayer` of the same name (Score). |
+| `Player::rank` | `ViewPlayer.rank` (Score). |
 | `Player::rejectReason` | Left out: read only by the menus and setup screens, before or after play; the match setup supplies it, not the view. |
-| `Player::shareEnergy` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::shareMetal` | `ViewPlayer` of the same name, the viewer's only (Economy). |
-| `Player::totalEnergyProduced` | `ViewPlayer` of the same name (Score: the end-game screen). |
-| `Player::totalMetalProduced` | `ViewPlayer` of the same name (Score: the end-game screen). |
+| `Player::shareEnergy` | `ViewPlayer.shareEnergy`, the viewer's only (Economy). |
+| `Player::shareMetal` | `ViewPlayer.shareMetal`, the viewer's only (Economy). |
+| `Player::totalEnergyProduced` | `ViewPlayer.totalEnergyProduced` (Score: the end-game screen). |
+| `Player::totalMetalProduced` | `ViewPlayer.totalMetalProduced` (Score: the end-game screen). |
 | `Player::type` | `ViewPlayer.active`, `type` (Players). |
-| `Player::unitCount` | `ViewPlayer` of the same name (Score). |
+| `Player::unitCount` | `ViewPlayer.unitCount` (Score). |
 | `Player::unitsBegin` | `ViewUnit.relation` (Units): the controller's units are the ones with `VIEW_RELATION_CONTROLLED`. |
-| `Player::unitsCreated` | `ViewPlayer` of the same name (Score). |
+| `Player::unitsCreated` | `ViewPlayer.unitsCreated` (Score). |
 | `Player::unitsEnd` | `ViewUnit.relation` (Units): the controller's units are the ones with `VIEW_RELATION_CONTROLLED`. |
 | `PlayerInfoEntry::info` | Left out: read only by the menus and setup screens, before or after play; the match setup supplies it, not the view. |
-| `Pool::entries` | `ViewFeature.frame`, `shadowFrame` and the model fields (Features). |
+| `Pool::entries` | `ViewFeature.frame`, `shadowFrame` and `ViewFeature.model` (Features). |
 | `Projectile::active` | `PlayerView.projectiles` (Projectiles). |
 | `Projectile::angles` | `PlayerView.projectiles` (Projectiles). |
 | `Projectile::groundHeightAvg` | `ViewProjectile.groundY` (Projectiles): the two names are the same two bytes. |
@@ -380,8 +413,8 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `SideDef::font` | Loaded data: the side definitions, indexed by `ViewPlayer.side`, through the files service. |
 | `SideDef::metalColor` | Loaded data: the side definitions, indexed by `ViewPlayer.side`, through the files service. |
 | `UiOptionFlags::clock` | Presentation state ("What is not sim"). |
-| `Unit::activateFlags` | `ViewUnit` of the same name (Units). |
-| `Unit::buildLeft` | `ViewUnit` of the same name (Units). |
+| `Unit::activateFlags` | `ViewUnit.activateFlags` (Units). |
+| `Unit::buildLeft` | `ViewUnit.buildLeft` (Units). |
 | `Unit::cargo` | `ViewUnit.carrier` (Units). |
 | `Unit::cargoNext` | `ViewUnit.carrier` (Units). |
 | `Unit::cargoSelectable` | `ViewUnit.relation`, bit `VIEW_RELATION_SELECTABLE` (Units). |
@@ -390,21 +423,21 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `Unit::def` | `ViewUnit.unitDefIndex` (Units). |
 | `Unit::f2c` | `ViewUnit.weaponBuild` (Units), with the weapon definitions as loaded data. |
 | `Unit::f48` | `ViewUnit.weaponBuild` (Units), with the weapon definitions as loaded data. |
-| `Unit::f_1f` | Left out: only the debug overlays draw it, which need the debug bits of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
-| `Unit::f_3b` | Left out: only the debug overlays draw it, which need the debug bits of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
+| `Unit::f_1f` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
+| `Unit::f_3b` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
 | `Unit::f_57` | `ViewUnit.weaponBuild` (Units), with the weapon definitions as loaded data. |
-| `Unit::fireOrder` | `ViewUnit` of the same name (Units). |
+| `Unit::fireOrder` | `ViewUnit.fireOrder` (Units). |
 | `Unit::flags` | `ViewUnit.flags` (Units), cut by its rule; bit 0x10 and the build menu's page bits are presentation state. |
-| `Unit::group` | `ViewUnit` of the same name (Units). |
-| `Unit::health` | `ViewUnit` of the same name (Units). |
+| `Unit::group` | `ViewUnit.group` (Units). |
+| `Unit::health` | `ViewUnit.health` (Units). |
 | `Unit::id` | `ViewUnit.id` (Units). |
-| `Unit::immobile` | `ViewUnit` of the same name (Units). |
-| `Unit::killCount` | `ViewUnit` of the same name (Units). |
+| `Unit::immobile` | `ViewUnit.immobile` (Units). |
+| `Unit::killCount` | `ViewUnit.killCount` (Units). |
 | `Unit::list` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
-| `Unit::list2` | Left out: only the debug overlays draw it, which need the debug bits of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
+| `Unit::list2` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
 | `Unit::mode` | `ViewUnit.ground` (Units). |
 | `Unit::motion` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
-| `Unit::moveOrder` | `ViewUnit` of the same name (Units). |
+| `Unit::moveOrder` | `ViewUnit.moveOrder` (Units). |
 | `Unit::player` | `ViewUnit.owner` (Units). |
 | `Unit::playerIndex` | `ViewUnit.owner` (Units). |
 | `Unit::pos` | `ViewUnit.x`, `y`, `z` (Units). |
@@ -475,8 +508,8 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `WeaponDef::range` | Loaded data: the weapon definition named by `ViewProjectile.weaponIndex`, through the files service. |
 | `WeaponDef::reloadTime` | Loaded data: the weapon definition named by `ViewProjectile.weaponIndex`, through the files service. |
 | `WeaponDef::shotKind` | Loaded data: the weapon definition named by `ViewProjectile.weaponIndex`, through the files service. |
-| `bits` | `PlayerView.endFlags` for bits 2, 5 and 6; bits 0 and 1 are presentation state ("What is not sim"). |
-| `bits_14281` | `PlayerView.sightOptions` (Sight); bit 3, the fog tiles' cache, is presentation state. |
+| `bits` | `PlayerView.endFlags` for masks 0x4, 0x20 and 0x40; masks 0x1 and 0x2 are presentation state ("What is not sim"). |
+| `bits_14281` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
 | `bits_2a44` | Left out: network state, class platform in part: it picks the music's mood and the network lines, neither of which the display log, the sound log or a command records. |
 | `bits_37f2f` | Presentation state ("What is not sim"). |
 | `bits_38a51` | Presentation state: the driver's pause request and the lag marker ("What is not sim"). |
@@ -485,9 +518,9 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `count_1491b` | `PlayerView.debris` (Explosions and debris). |
 | `defs` | Loaded data: the unit definition named by `ViewUnit.unitDefIndex`, through the files service. |
 | `difficulty` | Left out: read only by the menus and setup screens, before or after play; the match setup supplies it, not the view. |
-| `endGameFlags` | `PlayerView.endFlags` for bits 2, 5 and 6; bits 0 and 1 are presentation state ("What is not sim"). |
+| `endGameFlags` | `PlayerView.endFlags` for masks 0x4, 0x20 and 0x40; masks 0x1 and 0x2 are presentation state ("What is not sim"). |
 | `features` | Loaded data: the feature definition named by `ViewFeature.featureIndex`, through the files service. |
-| `flagsByte_3923b` | `PlayerView.endFlags` for bits 2, 5 and 6; bits 0 and 1 are presentation state ("What is not sim"). |
+| `flagsByte_3923b` | `PlayerView.endFlags` for masks 0x4, 0x20 and 0x40; masks 0x1 and 0x2 are presentation state ("What is not sim"). |
 | `flags_2a44` | Left out: network state, class platform in part: it picks the music's mood and the network lines, neither of which the display log, the sound log or a command records. |
 | `flags_38d75` | Left out: network state, class platform in part: it picks the music's mood and the network lines, neither of which the display log, the sound log or a command records. |
 | `g_emptyText` | Left out: a constant, the empty string. |
@@ -500,7 +533,7 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `height` | `PlayerView.mapWidth`, `mapHeight` (The world). |
 | `loaded` | Left out: network state, class platform in part: it picks the music's mood and the network lines, neither of which the display log, the sound log or a command records. |
 | `localPlayer` | `PlayerView.controller` (The two players). |
-| `mapFlags` | `PlayerView.sightOptions` (Sight); bit 3, the fog tiles' cache, is presentation state. |
+| `mapFlags` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
 | `mapHeight` | `PlayerView.mapWidth`, `mapHeight` (The world). |
 | `mapWidth` | `PlayerView.mapWidth`, `mapHeight` (The world). |
 | `maxUnitsSetting` | `PlayerView.maxUnits` (Score). |
@@ -518,13 +551,13 @@ overlays (which need the debug bits), only by the menus and setup screens, or on
 | `projectiles` | `PlayerView.projectiles` (Projectiles). |
 | `seaLevel` | `PlayerView.seaLevel` (The world). |
 | `sides` | Left out: read only by the menus and setup screens, before or after play; the match setup supplies it, not the view. |
-| `spots` | `ViewFeature.frame`, `shadowFrame` and the model fields (Features). |
+| `spots` | `ViewFeature.frame`, `shadowFrame` and `ViewFeature.model` (Features). |
 | `startPos` | Loaded data: the side definitions, indexed by `ViewPlayer.side`, through the files service. |
 | `ticks` | `PlayerView.tick` (The world). |
 | `types` | Loaded data: the unit definition named by `ViewUnit.unitDefIndex`, through the files service. |
 | `uiOptionFlags` | Presentation state ("What is not sim"). |
 | `uiOptionFlags_37f2f_1` | Presentation state ("What is not sim"). |
-| `unit` | `ViewFeature` model fields (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
+| `unit` | `ViewFeature.model`, `x`, `y`, `z`, `rotX`, `rotY`, `rotZ` (Features): the scratch unit a model feature is drawn through holds only the feature's pose. |
 | `unitDefCount` | Loaded data: the unit definition named by `ViewUnit.unitDefIndex`, through the files service. |
 | `units` | `PlayerView.units` (Units). |
 | `unitsEnd` | `PlayerView.units` (Units). |

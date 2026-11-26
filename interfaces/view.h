@@ -10,13 +10,13 @@
 #define VIEW_MAX_PLAYERS 10
 // The units of the largest match: 500 a player and the pool's spare entry.
 #define VIEW_MAX_UNITS 5001
-// The posed model pieces of every unit in the view.
+// The posed model pieces of every unit in the view; past it, VIEW_TRUNCATED_PIECES.
 #define VIEW_MAX_PIECES 131072
-// The queued orders of the controller's units.
+// The queued orders of the controller's units; past it, VIEW_TRUNCATED_ORDERS.
 #define VIEW_MAX_ORDERS 65536
 // The radar and sonar blips: at most one a unit.
 #define VIEW_MAX_BLIPS 5001
-// The features on the map that the viewer may draw.
+// The features on the map; past it, VIEW_TRUNCATED_FEATURES.
 #define VIEW_MAX_FEATURES 65536
 // The projectiles in flight, as many as the simulation keeps.
 #define VIEW_MAX_PROJECTILES 300
@@ -24,9 +24,9 @@
 #define VIEW_MAX_DEBRIS 300
 // The exploded model pieces in flight, as many as the simulation keeps.
 #define VIEW_MAX_EXPLODED_PIECES 100
-// The sim events of one tick that reach the viewer.
-#define VIEW_MAX_MESSAGES 256
-// The cells of the sight grid, at half the map's cell resolution.
+// The sim events of one tick that reach the viewer: the sim event queue's capacity.
+#define VIEW_MAX_MESSAGES 4096
+// The cells of the sight grid, at half the map's cell resolution; past it, VIEW_TRUNCATED_SIGHT.
 #define VIEW_MAX_GRID_CELLS 1048576
 
 // What the viewer knows of a cell of the sight grid.
@@ -61,6 +61,18 @@ enum ViewBlipFlags : unsigned char {
     VIEW_BLIP_OWN = 4,
     // The unit was damaged lately: the blip flashes.
     VIEW_BLIP_DAMAGED = 8,
+};
+
+// Bits of PlayerView.truncated: a table whose entries did not all fit its capacity.
+enum ViewTruncated : unsigned short {
+    // A unit's pieces did not fit: it and every later unit have pieceCount 0.
+    VIEW_TRUNCATED_PIECES = 1,
+    // A unit's orders did not fit: it and every later unit have orderCount 0.
+    VIEW_TRUNCATED_ORDERS = 2,
+    // The features past VIEW_MAX_FEATURES, in the order of their anchor cells, are dropped.
+    VIEW_TRUNCATED_FEATURES = 4,
+    // The sight grid has more cells than VIEW_MAX_GRID_CELLS: the cells past it, row by row, are dropped.
+    VIEW_TRUNCATED_SIGHT = 8,
 };
 
 // One player of the match, as the viewer sees it.
@@ -257,7 +269,7 @@ struct ViewBlip {
     int z;
 };
 
-// One feature the viewer may draw.
+// One feature on the map.
 struct ViewFeature {
     // The feature's anchor cell, x.
     unsigned short cellX;
@@ -271,8 +283,8 @@ struct ViewFeature {
     unsigned short shadowFrame;
     // 1 when the feature draws as a model at the position below, 0 when as a sprite at its cell.
     unsigned char model;
-    // Unused, zero.
-    unsigned char reserved;
+    // 1 when the viewer may draw it; 0 when only its cell and definition are known, and the rest is zero.
+    unsigned char drawn;
     // Model position x, 16.16 fixed point.
     int x;
     // Model position y, 16.16 fixed point.
@@ -413,14 +425,14 @@ struct PlayerView {
     unsigned char gameType;
     // 2 when kills count only commanders, as the score panel shows them.
     unsigned char commanderDeath;
-    // The match's options of sight: bit 0 mapping off, bit 1 line of sight on, bit 2 true line of sight.
+    // The match's options of sight: 0x1 mapping on (the map starts unexplored), 0x2 line of sight on, 0x4 true line of sight.
     unsigned short sightOptions;
-    // The end of the match: bit 2 over, bit 5 won, bit 6 lost.
+    // The end of the match: 0x4 over, 0x20 won, 0x40 lost.
     unsigned short endFlags;
     // The most units a player may have.
     unsigned short maxUnits;
-    // Unused, zero.
-    unsigned short reserved;
+    // The tables that did not fit their capacity, ViewTruncated bits.
+    unsigned short truncated;
     // The map's width in cells of 16 pixels.
     unsigned int mapWidth;
     // The map's height in cells of 16 pixels.

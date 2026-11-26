@@ -33,6 +33,7 @@ struct RadarSurfaceView {
 #include "../network/player_info.h"
 
 #include "../network/player.h"
+#include "../harness/display_game.h"
 
 #include "../weapons/weapon_def.h"
 
@@ -185,6 +186,8 @@ void UpdateRadarMapped(const RadarMappedCapture* capture)
             dst++;
         }
     }
+    if (DisplayLogWants())
+        DisplayLogWritten((Surface*)g_game->mappedSurface);
     g_game->timer.word.flags.pending = 1;
 }
 

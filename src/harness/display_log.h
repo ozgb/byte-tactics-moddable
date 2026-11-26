@@ -19,6 +19,9 @@ struct DlPicture {
     int height;
     int compressed;
     int layered;
+    int xOffset;
+    int yOffset;
+    int transparency;
 };
 
 int DlWants();
@@ -40,8 +43,9 @@ void DlFrameEnd(unsigned number, unsigned tick, unsigned steps, const unsigned c
 void DlRegisterSurface(const void* block, const unsigned char* pixels, int width, int height, int pitch, const char* name);
 void DlRegisterFrame(const void* block, const unsigned char* pixels, int width, int height, const char* name);
 void DlFree(const void* block);
+void DlWritten(const void* block);
 void DlGafBegin(const char* path, const void* base);
-void DlGafFrame(const char* entry, int index, const void* frame);
+void DlGafFrame(const char* entry, int index, const void* frame, int xOffset, int yOffset);
 void DlRegisterModelPiece(const void* object, const char* stem, const char* piece);
 void DlRegisterFont(const void* font, const char* name);
 const char* DlModelName(const void* object, int* known);

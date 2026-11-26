@@ -46,6 +46,7 @@
 #include "../debug/debug_lib.h"
 #include "harness.h"
 #include "display_log.h"
+#include "display_replay.h"
 #include "replay.h"
 #include "../ai/pathfind_hpa.h"
 #include "../ai/ai_idle.h"
@@ -1509,6 +1510,29 @@ static void ParseTestDisplay(char* cmdLine)
     }
 }
 
+static char s_replayPath[260];
+
+static void ParseTestReplay(char* cmdLine)
+{
+    for (char* p = cmdLine; *p != '\0'; p++) {
+        if ((p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "testreplay", 10) == 0
+            && (p[11] == '\0' || isspace((unsigned char)p[11])) && (p == cmdLine || isspace((unsigned char)p[-1]))) {
+            char* q = p + 11;
+            while (*q == ' ' || *q == '\t')
+                q++;
+            char* start = q;
+            while (*q != '\0' && !isspace((unsigned char)*q))
+                q++;
+            if (q == start || q - start >= (int)sizeof s_replayPath)
+                Fail("testmode: -testreplay needs a display list\n");
+            memcpy(s_replayPath, start, (size_t)(q - start));
+            s_replayPath[q - start] = '\0';
+            memset(p, ' ', (size_t)(q - p));
+            return;
+        }
+    }
+}
+
 static void ParseBlockScan(char* cmdLine)
 {
     for (char* p = cmdLine; *p != '\0'; p++) {
@@ -1672,6 +1696,7 @@ void HarnessInit(char* cmdLine)
     }
     ParseTestDump(cmdLine);
     ParseTestDisplay(cmdLine);
+    ParseTestReplay(cmdLine);
 
     char* q = flag + 9;
     while (*q == ' ' || *q == '\t')
@@ -4439,6 +4464,8 @@ void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, 
     if (!HarnessTestMode() || DlIsOn() == 0)
         return;
     unsigned tick = GameU32(GAME_TICK);
+    if (s_replayPath[0] != '\0' && tick >= 1)
+        DisplayReplayRun(s_replayPath, s_frameTicks, s_frameCount);
     int list = s_displayAll;
     for (unsigned i = 0; i < s_frameCount; i++) {
         if (s_frameTicks[i] == tick)

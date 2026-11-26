@@ -1,4 +1,5 @@
 #include "win_types.h"
+#include <stdio.h>
 #include <string.h>
 
 #include "display_game.h"
@@ -22,6 +23,7 @@
 #include "../../link/globals.h"
 
 static const char* s_featureType = nullptr;
+static int s_featureSpot = -1;
 
 static void Surfaceof(Surface* s, DlSurface* out)
 {
@@ -67,6 +69,9 @@ static void PictureOf(const GafFrame* f, DlPicture* out)
     out->height = f->height;
     out->compressed = f->compressed;
     out->layered = f->layers;
+    out->xOffset = f->xOffset;
+    out->yOffset = f->yOffset;
+    out->transparency = f->transparency;
 }
 
 static void Union(const GafFrame* f, int x, int y, int depth, int* x0, int* y0, int* x1, int* y1)
@@ -509,27 +514,27 @@ static void PutHexFloat(float f)
     DlPutHex8(bits);
 }
 
-static void PutPieces(const ModelPiece* p, int depth)
+static void PutPieces(const ModelState* state)
 {
-    for (; p != nullptr && depth < 64; p = p->sibling.get()) {
+    for (int i = 0; i < state->count; i++) {
+        const ModelPiece* p = &state->pieces[i];
         DlPutRaw(" ");
         const char* name = p->object != nullptr && p->object->name != nullptr ? p->object->name : "";
         DlPutName(name, (int)strlen(name));
         DlPutRaw(",");
-        DlPutInt(p->flags.word & 3);
+        DlPutInt(p->flags.word & 7);
+        DlPutRaw(",");
+        DlPutInt(p->short_10);
+        DlPutRaw(",");
+        DlPutInt(p->short_12);
+        DlPutRaw(",");
+        DlPutInt(p->short_14);
         DlPutRaw(",");
         DlPutInt(p->rot_x);
         DlPutRaw(",");
         DlPutInt(p->rot_y);
         DlPutRaw(",");
         DlPutInt(p->rot_z);
-        DlPutRaw(",");
-        DlPutInt(p->offset.x);
-        DlPutRaw(",");
-        DlPutInt(p->offset.y);
-        DlPutRaw(",");
-        DlPutInt(p->offset.z);
-        PutPieces(p->child.get(), depth + 1);
     }
 }
 
@@ -573,9 +578,9 @@ static void ModelItem(const DlSurface* d, const char* kind, UnitDrawView* owner,
     PutInt(owner->pos_x);
     PutInt(owner->pos_y);
     PutInt(owner->pos_z);
-    PutInt(owner->angles.x);
-    PutInt(owner->angles.y);
-    PutInt(owner->angles.z);
+    PutInt(state->pos.x);
+    PutInt(state->pos.y);
+    PutInt(state->pos.z);
     int colour = 0;
     Player* player = &g_game->players_1b63[owner->playerIndex];
     if (player->info.get() != nullptr)
@@ -590,7 +595,54 @@ static void ModelItem(const DlSurface* d, const char* kind, UnitDrawView* owner,
     PutHexFloat(g_lightY);
     DlPutRaw(",");
     PutHexFloat(g_lightZ);
-    PutPieces(root, 0);
+    DlPutRaw(" ");
+    char key[16];
+    if (s_featureType != nullptr)
+        sprintf(key, "f%d", s_featureSpot);
+    else
+        sprintf(key, "%u", (unsigned)owner->id);
+    DlPutRaw(key);
+    GafFrame* picture = state->bitmap;
+    int rebuild = state->cacheDrawCount == 0;
+    if ((owner->flags & 0x20000000) != 0) {
+        if (picture == nullptr)
+            rebuild = 1;
+        else if (owner->buildLeft != 0.0f && (owner->flags & 0x2000) != 0 && picture->scratch == nullptr)
+            rebuild = 1;
+    }
+    if ((owner->zBufferFlag & 1) != 0 && picture == nullptr)
+        rebuild = 1;
+    DlPutRaw(rebuild ? " n" : picture != nullptr ? " k" : " -");
+    int still;
+    if ((owner->flags & 0x20000000) != 0)
+        still = (owner->activateFlags & 1) == 0;
+    else
+        still = *(int*)(owner->motion.get() + 0x20) == 0;
+    unsigned typeFlags = owner->def.get() != nullptr ? owner->def.get()->flags1 : 0;
+    char attrs[16];
+    int n = 0;
+    if ((owner->flags & 0x20000000) != 0)
+        attrs[n++] = 's';
+    if (!still)
+        attrs[n++] = 'm';
+    if ((owner->flags & 0x200) != 0 || owner->playerIndex == g_game->playerIndex)
+        attrs[n++] = 't';
+    if ((owner->zBufferFlag & 1) != 0)
+        attrs[n++] = 'z';
+    if (owner->unitDefIndex != 0)
+        attrs[n++] = 'u';
+    if ((typeFlags & 0x2000000) != 0)
+        attrs[n++] = 'n';
+    if ((typeFlags & 0x40000000) != 0)
+        attrs[n++] = 'h';
+    if ((typeFlags & 0x81000) != 0)
+        attrs[n++] = 'v';
+    if (n == 0)
+        attrs[n++] = '-';
+    attrs[n] = '\0';
+    DlPutRaw(" ");
+    DlPutRaw(attrs);
+    PutPieces(state);
     DlEnd();
 }
 
@@ -728,6 +780,13 @@ void DisplayLogShard(void* dst, Vec3* offset, DebrisPiece* piece, const short* a
     DlEnd();
 }
 
+void DisplayLogWritten(Surface* surface)
+{
+    if (surface == nullptr)
+        return;
+    DlWritten(surface);
+}
+
 void DisplayLogAllocSurface(Surface* surface, const char* name)
 {
     if (DlIsOn() == 0 || surface == nullptr)
@@ -754,8 +813,8 @@ void DisplayLogGaf(const char* path, void* base)
         unsigned short count = *(unsigned short*)record;
         const char* entry = (const char*)(record + 8);
         for (int j = 0; j < (int)count; j++) {
-            int frame = *(int*)(record + 0x28 + j * 8);
-            DlGafFrame(entry, j, (const void*)frame);
+            const GafFrame* frame = *(const GafFrame* const*)(record + 0x28 + j * 8);
+            DlGafFrame(entry, j, frame, frame != nullptr ? frame->xOffset : 0, frame != nullptr ? frame->yOffset : 0);
         }
     }
     DlUnlockRegistries();
@@ -797,9 +856,10 @@ void DisplayLogFont(Font* font, const char* name)
     DlRegisterFont(font, name);
 }
 
-void DisplayLogFeatureType(const char* name)
+void DisplayLogFeatureType(const char* name, int spot)
 {
     s_featureType = name;
+    s_featureSpot = spot;
 }
 
 void DisplayLogFrameEnd(Display* d)

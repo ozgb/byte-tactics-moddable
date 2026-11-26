@@ -332,6 +332,7 @@ char* g_text;
 char* g_lines[MAX_LINES];
 int g_lineCount;
 char g_subsystem[48];
+bool g_importChanges;
 const char* g_file = "";
 
 int g_callIndex;
@@ -546,14 +547,14 @@ struct RegionClash {
 };
 
 const unsigned kRegionChunkHeader = 8;
+const unsigned kRegionFirstChunk = 64;
 
-void __cdecl FindRegionClash(void* payload, unsigned int size, void* context)
+void __cdecl FindRegionClash(void* payload, unsigned int, void* context)
 {
     RegionClash& clash = *(RegionClash*)context;
-    unsigned at = (unsigned)((unsigned char*)payload - (unsigned char*)SimBlockBase());
-    unsigned first = at - kRegionChunkHeader;
-    unsigned end = at + ((size + 7) & ~7u);
-    if (first < clash.end && clash.first < end)
+    unsigned first = (unsigned)((unsigned char*)payload - (unsigned char*)SimBlockBase()) - kRegionChunkHeader;
+    unsigned chunk = *(const unsigned*)((const unsigned char*)payload - kRegionChunkHeader) & ~1u;
+    if (first < clash.end && clash.first < first + chunk)
         clash.found = true;
 }
 
@@ -563,14 +564,24 @@ void* PlaceRegion(unsigned offset, unsigned size, char* why)
     if (p != nullptr)
         return p;
     unsigned block = SimBlockSize();
-    RegionClash clash = { offset - kRegionChunkHeader, offset + ((size + 7) & ~7u), false };
-    if (offset >= kRegionChunkHeader)
-        SimBlockForEach(FindRegionClash, &clash);
-    if (offset > block || size > block - offset)
-        sprintf(why, "block offset %u (%u bytes) is past the block's end at %u", offset, size, block);
-    else if ((offset & 7) != 0 || offset < kRegionChunkHeader)
+    unsigned need = size > block ? block + kMinChunk : ((size + 7) & ~7u) + kRegionChunkHeader;
+    if (need < kMinChunk)
+        need = kMinChunk;
+    if (offset < kRegionFirstChunk + kRegionChunkHeader) {
+        sprintf(why, "block offset %u (%u bytes) puts its chunk header inside the block's own header of %u bytes", offset, size, kRegionFirstChunk);
+        return nullptr;
+    }
+    if ((offset & 7) != 0) {
         sprintf(why, "block offset %u (%u bytes) is not 8-byte aligned", offset, size);
-    else if (clash.found)
+        return nullptr;
+    }
+    if (need > block || offset - kRegionChunkHeader > block - need) {
+        sprintf(why, "block offset %u (%u bytes) is past the block's end at %u, with its %u-byte chunk", offset, size, block, need);
+        return nullptr;
+    }
+    RegionClash clash = { offset - kRegionChunkHeader, offset - kRegionChunkHeader + need, false };
+    SimBlockForEach(FindRegionClash, &clash);
+    if (clash.found)
         sprintf(why, "block offset %u (%u bytes) is not free: it clashes with another allocation", offset, size);
     else
         sprintf(why, "block offset %u (%u bytes) lies in a free range that would leave a leading remainder under %u bytes", offset, size, kMinChunk);
@@ -1288,7 +1299,7 @@ void BindObjectResult(unsigned kind, void* object)
         return;
     unsigned actual = ReplayConcreteKind(kind, object);
     if (actual == kReplayObjectKindCount)
-        return;
+        Fatal(g_file, g_callIndex, "an object result whose kind its vtable does not tell", ReplayFailure() != nullptr ? ReplayFailure() : kReplayObjectKinds[kind].name);
     const char* recorded = OutLine("result");
     const char* hash = recorded == nullptr ? nullptr : strchr(recorded, '#');
     size_t length = strlen(kReplayObjectKinds[actual].name);
@@ -2722,15 +2733,25 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     return true;
 }
 
-void RestoreImportObject(const char* name, const char* value)
+const char* ImportObjectProblem(const char* name, const ReplaySlotSets& sets)
 {
-    if (g_sets == nullptr || strchr(name, '#') == nullptr || strchr(name, '.') == nullptr)
-        return;
     LineKey k;
     if (!ParseLineKey(name, k) || k.field == nullptr)
+        return "an object line after an import that names no object field";
+    if (!InObjectSet(sets.objReads, sets.objReadCount, k.field))
+        return "an object line after an import whose field the slot does not read";
+    if (InObjectSet(sets.objWrites, sets.objWriteCount, k.field))
+        return "an object line after an import whose field the slot writes, which its w lines compare";
+    return nullptr;
+}
+
+void RestoreImportObject(const char* name, const char* value)
+{
+    if (!g_importChanges || g_sets == nullptr || strchr(name, '#') == nullptr)
         return;
-    if (!InObjectSet(g_sets->objReads, g_sets->objReadCount, k.field) || InObjectSet(g_sets->objWrites, g_sets->objWriteCount, k.field))
-        return;
+    const char* problem = ImportObjectProblem(name, *g_sets);
+    if (problem != nullptr)
+        Fatal(g_file, g_callIndex, problem, name);
     RestoreObjectLine(name, value, g_file, g_sets, name);
 }
 
@@ -3210,6 +3231,7 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
     }
     if (known == nullptr)
         Fatal(file, 0, "not a simulation subsystem", g_subsystem);
+    g_importChanges = known->recordsImportChanges != 0;
     if (tail[0] != '\0' || !known->complete)
         Fatal(file, 0, "the annotations of this subsystem are not complete, so its recordings cannot be replayed", g_subsystem);
     char want[32];
@@ -6310,11 +6332,22 @@ void GoalSelfTest()
     ReplaySlotSets goalSets = { "goal", 0, nullptr, 0, nullptr, 0, goalReads, 2, goalWrites, 1 };
     const ReplaySlotSets* outerSets = g_sets;
     g_sets = &goalSets;
-    LoadCall("  i fixture.MakeGoal = FixtureGoalA#1\n  o FixtureGoalA#1.ticks 9\n  o FixtureGoalA#1.heading 5\n");
+    bool outerImportChanges = g_importChanges;
+    g_importChanges = true;
+    LoadCall("  i fixture.MakeGoal = FixtureGoalA#1\n  o FixtureGoalA#1.ticks 9\n");
     BeginImport();
     FixtureGoalA* changed = (FixtureGoalA*)ReplayRefPtr(Imp_fixture_MakeGoal());
     Check(g_diffs == 0 && changed != nullptr && changed->ticks == 9, "the stub sets a field the slot reads from its line after the import");
-    Check(changed != nullptr && changed->heading == 0, "but not a field the slot writes, which its w lines compare");
+    Check(ImportObjectProblem("FixtureGoalA#1.ticks", goalSets) == nullptr, "and the line is one it can place");
+    const char* unparsed = ImportObjectProblem("FixtureGoalA#1.nosuchfield", goalSets);
+    Check(unparsed != nullptr && strstr(unparsed, "names no object field") != nullptr, "a line that names no field of the kind is fatal");
+    ReplaySlotSets ticksOnly = { "ticks", 0, nullptr, 0, nullptr, 0, goalReads, 1, nullptr, 0 };
+    const char* unread = ImportObjectProblem("FixtureGoalA#1.heading", ticksOnly);
+    Check(unread != nullptr && strstr(unread, "does not read") != nullptr, "so is a line for a field the slot does not read");
+    const char* written = ImportObjectProblem("FixtureGoalA#1.heading", goalSets);
+    Check(written != nullptr && strstr(written, "the slot writes") != nullptr, "and a line for a field the slot writes, so the slot's own result is always compared");
+    Check(changed != nullptr && changed->heading == 0, "none of which changes the object");
+    g_importChanges = outerImportChanges;
     g_sets = outerSets;
 }
 
@@ -7641,6 +7674,13 @@ void RegionSelfTest()
     Check(PlaceRegion(SimBlockSize() - 32, 64, why) == nullptr && strstr(why, "is past the block's end") != nullptr, "a region that passes the block's end is refused, naming its offset");
     Check(PlaceRegion(offset + 4096 + 16, 64, why) == nullptr && strstr(why, "lies in a free range that would leave a leading remainder under 16 bytes") != nullptr, "a region too close to the start of a free range is refused as such, not as a clash");
     Check(PlaceRegion(offset + 8196, 64, why) == nullptr && strstr(why, "is not 8-byte aligned") != nullptr, "and a region off the 8-byte grid as that");
+    Check(PlaceRegion(40, 16, why) == nullptr && strstr(why, "inside the block's own header of 64 bytes") != nullptr, "a region whose chunk header would sit in the block's header is refused as such");
+    Check(PlaceRegion(SimBlockSize(), 0, why) == nullptr && strstr(why, "is past the block's end") != nullptr, "and one that passes the block's end only with its smallest chunk is past the end");
+    void* after = PlaceRegion(offset + 8192, 64, why);
+    void* folded = PlaceRegion(offset + 4096 + 8, 4072, why);
+    Check(after != nullptr && folded != nullptr && (*(const unsigned*)((const unsigned char*)folded - 8) & ~1u) == 4088, "a region that leaves a tail under 16 bytes takes the tail into its chunk");
+    SimFree(after);
+    Check(PlaceRegion(offset + 8184, 64, why) == nullptr && strstr(why, "is not free") != nullptr, "so a region whose header lands in that tail clashes with it, not with a leading remainder");
 }
 
 int SelfTest(const char* file)

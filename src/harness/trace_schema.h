@@ -118,7 +118,7 @@ static const TraceField kUnitFields[] = {
     { "health", 0x108, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "activateFlags", 0x10e, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "bit0", 0x10f, 1, TF_SCALAR, TT_NONE, 0x0 },
-    { "flags", 0x110, 4, TF_SCALAR, TT_NONE, 0x0 },
+    { "flags", 0x110, 4, TF_SCALAR, TT_NONE, 0xffffffef },
 };
 
 static const TraceField kUnitPlan[] = {
@@ -149,7 +149,8 @@ static const TraceField kUnitPlan[] = {
     { "", 0xf4, 2, TF_BYTES, TT_NONE, 0x0 },
     { "", 0xf9, 7, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x104, 6, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x10e, 6, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0x10e, 2, TF_BYTES, TT_NONE, 0x0 },
+    { "", 0x110, 4, TF_SCALAR, TT_NONE, 0xffffffef },
 };
 
 static const TraceField kProjectileFields[] = {
@@ -1252,7 +1253,7 @@ static const TraceField kUnitDefDataPlan[] = {
     { "", 0x241, 8, TF_BYTES, TT_NONE, 0x0 },
 };
 
-static const TraceTable kUnitTable = { kUnitFields, 54, kUnitPlan, 28, 0x118 };
+static const TraceTable kUnitTable = { kUnitFields, 54, kUnitPlan, 29, 0x118 };
 static const TraceTable kProjectileTable = { kProjectileFields, 9, kProjectilePlan, 5, 0x6b };
 static const TraceTable kPlayerTable = { kPlayerFields, 64, kPlayerPlan, 12, 0x14b };
 static const TraceTable kDebrisTable = { kDebrisFields, 27, kDebrisPlan, 6, 0x54 };
@@ -3013,7 +3014,7 @@ static const TraceField kGameScalarFields[] = {
     { "spotField_1421f", 0x1421f, 4, TF_POINTER, TT_HEAP, 0x0 },
     { "scanIndex", 0x14257, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "mapFlags", 0x14281, 2, TF_SCALAR, TT_NONE, 0xfff7 },
-    { "endGameFlags", 0x3923b, 2, TF_SCALAR, TT_NONE, 0x0 },
+    { "endGameFlags", 0x3923b, 2, TF_SCALAR, TT_NONE, 0xfffc },
     { "uiOptionFlags", 0x37f2f, 2, TF_SCALAR, TT_NONE, 0x788 },
 };
 

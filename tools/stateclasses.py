@@ -237,7 +237,8 @@ CONSOLE_HANDLER = re.compile(r'^\s*\{"\w+",.*?(\w+),\s*\d+\s*\}', re.M)
 PRESENTATION_WRITE_KINDS = ("field_write", "member_write", "global_write")
 
 MATCH_SETUP = "match setup before the first tick"
-SELECTION = "selection, #1050"
+SELECTION = "the selection bit, view state masked out of the trace"
+BUILD_MENU_PAGE = "a crossing left: the build-menu page bits of Unit::flags (0x400000 and the page), still hashed, #1115"
 BATTLE_ROOM = "battle room setup, outside a match"
 PRESENTATION_SIM_WRITES = [
     ("HandleNewGameClick", "Game::difficulty", MATCH_SETUP),
@@ -252,19 +253,18 @@ PRESENTATION_SIM_WRITES = [
     ("HandleSkirmishClick", "Game::numPlayers", MATCH_SETUP),
     ("HandleSelectGameClick", "Game::netGameFlags", MATCH_SETUP),
     ("OpenBattleRoom", "Game::commanderDeath", MATCH_SETUP),
-    ("HandleDebugHotkey", "Game::bits_3923b_1", "debug bits, #1050"),
     ("ClearSelection", "Unit::flags", SELECTION),
     ("ClearUnitSelectFlags", "Unit::flags", SELECTION),
     ("ClickSelectHoverUnit", "Unit::flags", SELECTION),
     ("CycleSelection", "Unit::flags", SELECTION),
     ("DeselectIfIneligible", "Unit::flags", SELECTION),
-    ("DispatchOrdersPanelPageFlags", "Unit::flags", SELECTION),
+    ("DispatchOrdersPanelPageFlags", "Unit::flags", BUILD_MENU_PAGE),
     ("SelectAllIdleUnits", "Unit::flags", SELECTION),
     ("SelectAllVisibleUnits", "Unit::flags", SELECTION),
     ("SelectSquad", "Unit::flags", SELECTION),
     ("SelectUnitsByCategory", "Unit::flags", SELECTION),
     ("SelectUnitsInBox", "Unit::flags", SELECTION),
-    ("StepBuildMenuPageBack", "Unit::flags", SELECTION),
+    ("StepBuildMenuPageBack", "Unit::flags", BUILD_MENU_PAGE),
     ("ClickSelectHoverUnit", "Unit::selected", SELECTION),
     ("FocusCommander", "Unit::selected", SELECTION),
     ("SelectUnitsInBox", "Unit::selected", SELECTION),

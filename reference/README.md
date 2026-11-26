@@ -141,7 +141,7 @@ scenarios whose `input` lines drive it (the events are in [docs/commands.md](../
 | Pause and resume (the Pause key) | ui-dialogs |
 | The options menu (F2): the interface type (the option the tick reads) and the text lines, saved with OK | ui-dialogs |
 | The exit menu: Cancel, Exit Game with No and with Yes (PLAYERS_LEAVE_GAME) | ui-dialogs |
-| The debug hotkeys `=` and `]` (F11, with `debug_keys 1`) | ui-dialogs |
+| The debug hotkeys `=` and `]` (F11, with `debug_keys 1`) | none: debug mode draws the frame rate, which follows the wall clock (#1130) |
 | The share dialog of game type 3 (`h`): metal, energy, the selected units and the map | ui-share-chat |
 | The chat line (Enter): a message | ui-share-chat |
 | The chat line: a `+` console command | none: the console scenarios cover the commands as `console` lines, and the reference hook in `CmdATM` changes the code of other functions of its file |
@@ -298,7 +298,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
 | ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
 | ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
-| ui-dialogs | The Pass | 2 | 300 | Scripted pause and resume, the options menu (interface type, text lines), the debug hotkeys and the exit menu to Exit Game, which ends the run at tick 61; input while no tick runs (`input <tick>.<frame>`), the dialogs in frames |
+| ui-dialogs | The Pass | 2 | 300 | Scripted pause and resume, the options menu (interface type, text lines) and the exit menu to Exit Game, which ends the run at tick 61; input while no tick runs (`input <tick>.<frame>`), the dialogs in frames |
 | ui-drag-select | The Pass | 2 | 200 | Scripted box selection with and without Shift |
 | ui-groups | The Pass | 2 | 300 | Scripted control groups |
 | ui-keys | The Pass | 2 | 300 | Scripted keyboard shortcuts: attack, patrol, special attack, stop, queueing, self-destruct |
@@ -696,9 +696,9 @@ without it the tier would never enter the resource sharing of a network game.
 holds a target (one a unit, one a ground point), so they are what catches a target saved or loaded wrongly.
 
 `ui-dialogs`, `ui-scroll-groups` and `ui-share-chat` (#1055) are in it by hand, 881 ticks together: each is the only
-scenario of a path of "Interface paths" (input while no tick runs, the dialogs and the debug hotkeys; the factory in a
-control group and the scrolling; the share dialog), and so of the interface events of the share dialog, the debug
-hotkeys and the exit menu.
+scenario of a path of "Interface paths" (input while no tick runs and the dialogs; the factory in a
+control group and the scrolling; the share dialog), and so of the interface events of the share dialog and the exit
+menu.
 
 `uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
 nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the

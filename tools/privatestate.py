@@ -219,7 +219,9 @@ MOVEMENT_WRITE_ITEMS = ("Unit::motion",)
 MOVEMENT_EXCEPT = ("UnitMotion::pathLockStamp",)
 
 
-ORDERS_ALSO_WRITTEN_BY = (("Order::unknown_12", "units"), ("Order::target", "units"), ("Order::unknown_1a", "units"))
+ORDERS_ALSO_WRITTEN_BY = (("Order::unknown_12", "units"), ("Order::target", "units"), ("Order::unknown_1a", "units"),
+                          # TODO(#1131): drop this seams write of Order::pos
+                          ("Order::pos", "seams"))
 
 MOVEMENT_ALSO_WRITTEN_BY = (("PathOrder::ref", "units"),)
 
@@ -233,7 +235,9 @@ UNITS_WRITE_TYPES = ("Unit",)
 
 UNITS_ALSO_WRITTEN_BY = (("Unit::cargoNext", "map"), ("Unit::cobStateFlags", "map"), ("Unit::flags", "los_radar"), ("Unit::flags", "map"),
                          ("Unit::flags", "presentation"), ("Unit::workTime", "los_radar"), ("Unit::extraction", "economy"),
-                         ("Unit::group", "ai"), ("Unit::netDirtyFlags", "targeting"))
+                         ("Unit::group", "ai"), ("Unit::netDirtyFlags", "targeting"),
+                         # TODO(#1131): drop this los_radar write of Unit::recentlyDamagedTimer
+                         ("Unit::recentlyDamagedTimer", "los_radar"))
 
 SCRIPTS_TYPES = ("CobScript", "UnitScript", "Channel", "Piece")
 

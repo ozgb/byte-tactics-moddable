@@ -43,7 +43,9 @@ digit `0` to `9`. A window position is in the 640 by 480 window, `x` from 0 to 6
   and the interface handles it in the frame after. A line that names a frame after a tick
   that the game did not stop at (it ran tick + 1 before that frame) is an error, and so is
   a run that draws 300 frames after the last such line of its tick without running a tick:
-  the game would wait for input forever. The one-event rule holds per frame. The input that
+  the game would wait for input forever. A frame line at the scenario's last tick is an
+  error too, since the run ends when that tick has run, and so is a frame line that the run
+  ends before (a game over or a left game first). The one-event rule holds per frame. The input that
   resumes the game is its last frame line; an event after it is a plain `input <tick + 1>`
   line. Pause pressed with `input 10` takes effect in the frame that runs tick 11, so the
   stopped frames are `11.1`, `11.2` and on; a key pressed at `11.5` is handled in frame 6,

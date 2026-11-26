@@ -121,6 +121,16 @@ class CommandsTest(unittest.TestCase):
         self.assertEqual(len(out), 1)
         self.assertIn("commands/b.txt", out[0])
 
+    def test_an_interface_event_with_no_scenario_needs_no_log(self):
+        doc = DOC.replace("| `ORDERS_CANCEL` | a key | b |", "| `ORDERS_CANCEL` | a key | b |\n| `UNITS_FORGET_ATTACKER` | a key | none |")
+        self.assertEqual(self.problems(GOOD, doc=doc), [])
+
+    def test_a_logged_event_with_no_scenario_fails(self):
+        doc = DOC.replace("| a key | b |", "| a key | none |")
+        out = self.problems(GOOD, doc=doc)
+        self.assertEqual(len(out), 1)
+        self.assertIn("has no scenario", out[0])
+
     def test_a_logged_event_the_table_leaves_out_fails(self):
         out = self.problems(GOOD, logs={"b": LOGS["b"] + "13 PLAYERS_LEAVE_GAME unit -\n"})
         self.assertEqual(len(out), 1)

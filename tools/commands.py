@@ -6,7 +6,8 @@
 Reads the console command table, the order table and the verdict table of docs/commands.md (each found by its fixed
 header line), the verdict table of reference/README.md, every reference/scenarios/*.txt, the interface event table of
 docs/commands.md section 8 and the stored interface logs reference/commands/*.txt: each event of that table must be in a
-stored log, in the log of each scenario its row names, and a stored log must hold no event the table leaves out. Prints
+stored log and in the log of each scenario its row names, unless its scenarios are `none` and no log holds it, and a
+stored log must hold no event the table leaves out. Prints
 one line per problem and exits 1 if there are any. Standard library only.
 """
 
@@ -136,6 +137,11 @@ def interface_problems(root: Path, doc: list[str]) -> list[str]:
         named = [w.strip() for w in row[-1].split(",") if w.strip() not in ("", "-")]
         for kind in kinds:
             listed.add(kind)
+            if named == ["none"]:
+                if kind in logged:
+                    problems.append("%s: interface event %s has no scenario but is in %s/%s.txt"
+                                    % (DOC, kind, INTERFACE_LOGS, sorted(logged[kind])[0]))
+                continue
             if kind not in logged:
                 problems.append("%s: interface event %s is in no stored log of %s" % (DOC, kind, INTERFACE_LOGS))
                 continue

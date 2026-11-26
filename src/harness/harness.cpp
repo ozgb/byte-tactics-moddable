@@ -725,6 +725,8 @@ static void CheckInputs()
         const ScriptedInput* in = &s_inputs[i];
         if (in->tick > s_ticks)
             FailLine(in->lineNo, "has a tick after the last tick", "input", "");
+        if (in->frame != 0 && in->tick == s_ticks)
+            FailLine(in->lineNo, "names a frame after the last tick", "input", ", the run ends when that tick has run");
         for (int k = 0; k < i; k++) {
             if (s_inputs[k].tick == in->tick && s_inputs[k].frame == in->frame && s_inputs[k].mouse == in->mouse)
                 FailLine(in->lineNo, in->mouse ? "is a second mouse event on its frame" : "is a second key event on its frame",
@@ -789,6 +791,15 @@ static void CheckFrameInputsBeforeTick(unsigned tick)
         char detail[100];
         sprintf(detail, ", the game ran tick %u first", tick);
         FailLine(in->lineNo, "names a frame after a tick that the game did not reach", "input", detail);
+    }
+}
+
+static void CheckFrameInputsDelivered()
+{
+    for (int i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* in = &s_inputs[i];
+        if (in->frame != 0 && !in->delivered)
+            FailLine(in->lineNo, "names a frame that the game did not draw", "input", ", the run ended first");
     }
 }
 
@@ -1685,6 +1696,11 @@ static void ResolveQuirks()
 
 void HarnessExit()
 {
+    if (HarnessTestMode())
+        CheckFrameInputsDelivered();
+#if BT_ACCESS_LOG
+    AccessLogFinish();
+#endif
     if (!s_recordSwitch)
         return;
     char error[300];
@@ -1914,6 +1930,7 @@ void HarnessAfterStep()
         s_interfaceOpen = true;
         return;
     }
+    CheckFrameInputsDelivered();
     char msg[64];
     if (s_trace != NULL)
         fclose(s_trace);

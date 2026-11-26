@@ -26659,6 +26659,7 @@ address,function,file,kind,target
 0x48d790,CycleSelection,src/ingame/selection.cpp,function,
 0x48d790,CycleSelection,src/ingame/selection.cpp,global_read,g_game
 0x48d920,CreateSquad,src/ingame/selection.cpp,call,HarnessUiGroup
+0x48d920,CreateSquad,src/ingame/selection.cpp,call,HarnessUiSquads
 0x48d920,CreateSquad,src/ingame/selection.cpp,call,SetUnitSquad
 0x48d920,CreateSquad,src/ingame/selection.cpp,field_escape,Game::players
 0x48d920,CreateSquad,src/ingame/selection.cpp,field_read,Game::localPlayer
@@ -45760,6 +45761,18 @@ address,function,file,kind,target
 ,HarnessUiQueue,src/harness/harness.cpp,call,strncpy
 ,HarnessUiQueue,src/harness/harness.cpp,function,
 ,HarnessUiQueue,src/harness/harness.cpp,global_read,s_iface@src/harness/harness.cpp
+,HarnessUiSquads,src/harness/harness.cpp,call,IfaceLive
+,HarnessUiSquads,src/harness/harness.cpp,call,IfaceStart
+,HarnessUiSquads,src/harness/harness.cpp,call,fprintf
+,HarnessUiSquads,src/harness/harness.cpp,deref_read,*int
+,HarnessUiSquads,src/harness/harness.cpp,deref_read,*unsigned char
+,HarnessUiSquads,src/harness/harness.cpp,deref_read,*unsigned short
+,HarnessUiSquads,src/harness/harness.cpp,field_read,Game::localPlayer
+,HarnessUiSquads,src/harness/harness.cpp,field_read,Player::unitsBegin
+,HarnessUiSquads,src/harness/harness.cpp,field_read,Player::unitsEnd
+,HarnessUiSquads,src/harness/harness.cpp,function,
+,HarnessUiSquads,src/harness/harness.cpp,global_read,g_game
+,HarnessUiSquads,src/harness/harness.cpp,global_read,s_iface@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,function,
 ,HarnessViewRand,src/harness/harness.cpp,global_read,s_viewDraws@src/harness/harness.cpp
 ,HarnessViewRand,src/harness/harness.cpp,global_read,s_viewState@src/harness/harness.cpp

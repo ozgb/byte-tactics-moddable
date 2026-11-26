@@ -993,10 +993,12 @@ done:
 
 void __stdcall SetUnitSquad(Unit* unit, int arg);
 void __stdcall HarnessUiGroup(const char* what, int group);
+void __stdcall HarnessUiSquads(int group);
 
 // FUNCTION: 0x48d920
 void __stdcall CreateSquad(int param_1)
 {
+    HarnessUiSquads(param_1);
     Player* player = &g_game->players[g_game->localPlayer];
     for (Unit* u = player->unitsBegin; u <= player->unitsEnd; u++) {
         if (u->unitDefIndex != 0) {

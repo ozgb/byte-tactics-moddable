@@ -167,6 +167,23 @@ class NamingTest(unittest.TestCase):
         code = b"\xe8" + struct.pack("<i", 0x401100 - 0x401005) + b"\xe9" + struct.pack("<i", 0x401200 - 0x40100a)
         self.assertEqual(bp.call_sites(code, 0x401000, {0x401200}), set())
 
+    def test_a_site_names_the_function_its_call_calls(self):
+        code, sites = self.exe_code(2)
+        code += b"\xe8" + struct.pack("<i", 0x401100 - (0x401000 + len(code) + 5))
+        sites.append(0x401000 + len(code))
+        pe = 0x40
+        head = bytearray(pe + 24 + 0xE0 + 40)
+        struct.pack_into("<I", head, 0x3C, pe)
+        struct.pack_into("<HH", head, pe + 4, 0x14C, 1)
+        struct.pack_into("<H", head, pe + 20, 0xE0)
+        struct.pack_into("<I", head, pe + 24 + 28, 0x400000)
+        struct.pack_into("<8sIIII", head, pe + 24 + 0xE0, b".text", len(code), 0x1000, len(code), len(head))
+        struct.pack_into("<I", head, pe + 24 + 0xE0 + 36, bp.CODE_SECTION)
+        exe = Path(tempfile.mkdtemp()) / "TotalA.exe"
+        exe.write_bytes(bytes(head) + code)
+        self.assertEqual(bp.call_targets(exe, sites + [0x401001]),
+                         {sites[0]: 0x401200, sites[1]: 0x401200, sites[2]: 0x401200, sites[3]: 0x401100})
+
     def test_allocators_come_from_the_map(self):
         text = (" 0001:00000100  ?SimAllocTagged@@YAPAXPBDI@Z  0000000000401100  a.obj\n"
                 " 0001:00000200  ??2@YAPAXI@Z  0000000000401200  a.obj\n"

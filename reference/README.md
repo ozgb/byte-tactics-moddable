@@ -334,10 +334,10 @@ game's settings through the host, which writes the run's own registry, and no sc
 
 In test mode the exe writes `trace.txt` in its working directory: a hash of the
 game state after each phase of each tick, then a hash of the world tables, then one hash of the whole
-state at the end of the tick, flushed every tick. LF line endings.
+state at the end of the tick, then one hash of the player view of the end of the tick (the `view` row, docs/view.md on `moddable`, "The recorded view"), flushed every tick. LF line endings.
 
 ```
-bt-trace 9
+bt-trace 10
 commit <40-hex sha from commit.txt beside the exe, or unknown>
 scenario <path as given to -testmode>
 game_seed <n>
@@ -442,7 +442,7 @@ A dump of a large map is large: the cells, the explored grids and the pass maps
 are one line per record.
 
 ```
-bt-dump 9
+bt-dump 10
 <tick> <phase> <path> <value>
 ```
 
@@ -571,21 +571,21 @@ seeds) and runs deterministically: two runs give identical traces.
 
 `reference/traces/<scenario>.txt` holds one digest per tick, not the phase
 hashes. The digest of a tick is the 64-bit FNV-1a hash of that tick's phase
-hashes in trace order, each as 8 little-endian bytes. In test mode there are 9 rows
-per tick (the 7 phases `units` to `meteors`, since `net` does not run, then `world` and `tick`).
-Since format 9 each line also carries the tick's `tick` row as it is, the end-of-tick state.
+hashes in trace order, each as 8 little-endian bytes. In test mode there are 10 rows
+per tick (the 7 phases `units` to `meteors`, since `net` does not run, then `world`, `tick` and `view`).
+Each line also carries the tick's `tick` row as it is, the end-of-tick state (format 9), and its `view` row (format 10).
 The file:
 
 ```
 bt-digest 9
-trace_format bt-trace 9
+trace_format bt-trace 10
 commit <sha of the build that produced it>
 scenario reference/scenarios/<name>.txt
 game_seed <n>
 crt_seed <n>
 view_seed <n>
 fpu_control_word 0x<hex>
-<tick> <digest, 16 lowercase hex digits> <the tick row, 16 lowercase hex digits>
+<tick> <digest, 16 lowercase hex digits> <the tick row, 16 lowercase hex digits> <the view row, 16 lowercase hex digits>
 ```
 
 `tools/tracedigest.py trace.txt` converts a `trace.txt` to this form.

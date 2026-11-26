@@ -20,6 +20,7 @@
 #include "harness_events.h"
 #include "share_packets.h"
 #include "display_log.h"
+#include "view_fill.h"
 
 extern Game* g_game;
 
@@ -1664,6 +1665,7 @@ static void UiEndOfTick();
 static void VisitSharePackets();
 
 static void WriteTickRow();
+static void WriteViewRow();
 static int s_stepEnded = 0;
 
 void HarnessAfterStep()
@@ -1700,8 +1702,10 @@ void HarnessEndOfTick()
     if (!s_testMode || !s_stepEnded)
         return;
     s_stepEnded = 0;
-    if (s_trace != NULL)
+    if (s_trace != NULL) {
         WriteTickRow();
+        WriteViewRow();
+    }
     int gameOver = (g_game->endGameFlags & (4 | 0x10)) != 0;
     if (!gameOver && (unsigned)g_game->ticks < s_ticks)
         return;
@@ -3460,8 +3464,6 @@ static void DumpWeaponsState()
     for (unsigned d = 0; d < debrisCount; d++) {
         unsigned char* e = GameAt(GAME_DEBRIS) + d * DEBRIS_STRIDE;
         unsigned obj = *(unsigned*)e;
-        if (obj == 0)
-            continue;
         sprintf(record, "weaponsState.debris[%u]", d);
         DumpTable(record, "", e, &kDebrisTable);
         if (obj >= (unsigned)pieces && (obj - (unsigned)pieces) % PIECE_STRIDE == 0
@@ -4681,6 +4683,8 @@ static int EventOpen()
     return s_testMode && s_events != NULL && s_eventSuppress == 0;
 }
 
+static void ViewCaptureEvent(unsigned kind, unsigned flags, const unsigned* args, unsigned count);
+
 static void EventHead(int kind, unsigned flags)
 {
     const char* phase = s_eventPhase >= 0 ? s_eventPhaseNames[s_eventPhase] : (g_game->ticks == 0 ? "load" : "outside");
@@ -4703,11 +4707,17 @@ void __cdecl HarnessEventWords(int kind, unsigned flags, int count, ...)
     int i;
     EventHead(kind, flags);
     EventCount(kind, count);
+    unsigned args[VIEW_REPORT_EVENT_ARGS];
     va_start(list, count);
-    for (i = 0; i < count; i++)
-        fprintf(s_events, " %u", va_arg(list, unsigned int));
+    for (i = 0; i < count; i++) {
+        unsigned value = va_arg(list, unsigned int);
+        if (i < VIEW_REPORT_EVENT_ARGS)
+            args[i] = value;
+        fprintf(s_events, " %u", value);
+    }
     va_end(list);
     fprintf(s_events, "\n");
+    ViewCaptureEvent(kind, flags, args, count);
 }
 
 void __cdecl HarnessEventPtrs(int kind, const int* a, int na, const int* b, int nb, int ntail, ...)
@@ -4718,15 +4728,31 @@ void __cdecl HarnessEventPtrs(int kind, const int* a, int na, const int* b, int 
     int i;
     EventHead(kind, 0);
     EventCount(kind, na + nb + ntail);
-    for (i = 0; i < na; i++)
+    unsigned args[VIEW_REPORT_EVENT_ARGS];
+    unsigned n = 0;
+    for (i = 0; i < na; i++) {
+        if (n < VIEW_REPORT_EVENT_ARGS)
+            args[n] = (unsigned int)a[i];
+        n++;
         fprintf(s_events, " %u", (unsigned int)a[i]);
-    for (i = 0; i < nb; i++)
+    }
+    for (i = 0; i < nb; i++) {
+        if (n < VIEW_REPORT_EVENT_ARGS)
+            args[n] = (unsigned int)b[i];
+        n++;
         fprintf(s_events, " %u", (unsigned int)b[i]);
+    }
     va_start(list, ntail);
-    for (i = 0; i < ntail; i++)
-        fprintf(s_events, " %u", va_arg(list, unsigned int));
+    for (i = 0; i < ntail; i++) {
+        unsigned value = va_arg(list, unsigned int);
+        if (n < VIEW_REPORT_EVENT_ARGS)
+            args[n] = value;
+        n++;
+        fprintf(s_events, " %u", value);
+    }
     va_end(list);
     fprintf(s_events, "\n");
+    ViewCaptureEvent(kind, 0, args, n);
 }
 
 void __stdcall HarnessEventUnit(int kind, const void* unit)
@@ -4734,7 +4760,9 @@ void __stdcall HarnessEventUnit(int kind, const void* unit)
     if (!EventOpen())
         return;
     EventHead(kind, 0);
-    fprintf(s_events, " %u\n", (unsigned int)*(const unsigned short*)((const char*)unit + 0xa8));
+    unsigned id = (unsigned int)*(const unsigned short*)((const char*)unit + 0xa8);
+    fprintf(s_events, " %u\n", id);
+    ViewCaptureEvent(kind, 0, &id, 1);
 }
 
 void __stdcall HarnessEventSpeech(const void* unit, int slot, const char* text, unsigned flags)
@@ -4755,7 +4783,12 @@ void __stdcall HarnessEventSpeech(const void* unit, int slot, const char* text, 
         }
     }
     EventHead(HEV_UNIT_SPEECH, flags);
-    fprintf(s_events, " %u %u %u\n", (unsigned int)*(const unsigned short*)((const char*)unit + 0xa8), (unsigned int)slot, number);
+    unsigned args[3];
+    args[0] = (unsigned int)*(const unsigned short*)((const char*)unit + 0xa8);
+    args[1] = (unsigned int)slot;
+    args[2] = number;
+    fprintf(s_events, " %u %u %u\n", args[0], args[1], args[2]);
+    ViewCaptureEvent(HEV_UNIT_SPEECH, flags, args, 3);
 }
 
 Cell* __stdcall GetMapCell(int x, int y);
@@ -4784,8 +4817,14 @@ void __stdcall HarnessEventSoundAt(int kind, int sound, const int* pos)
     if (!EventOpen())
         return;
     EventHead(kind, 0);
-    fprintf(s_events, " %u %u %u %u %u\n", (unsigned int)sound, (unsigned int)pos[0], (unsigned int)pos[1], (unsigned int)pos[2],
-            HeardMask(pos));
+    unsigned args[5];
+    args[0] = (unsigned int)sound;
+    args[1] = (unsigned int)pos[0];
+    args[2] = (unsigned int)pos[1];
+    args[3] = (unsigned int)pos[2];
+    args[4] = HeardMask(pos);
+    fprintf(s_events, " %u %u %u %u %u\n", args[0], args[1], args[2], args[3], args[4]);
+    ViewCaptureEvent(kind, 0, args, 5);
 }
 
 unsigned char* __stdcall HarnessEventBuffer(void)
@@ -5020,6 +5059,170 @@ static void WriteTickRow()
     fflush(s_trace);
     if (s_dumpNow)
         fflush(s_dump);
+}
+
+static ViewWeaponsReport s_viewReport;
+static ViewRawEvent s_viewEvents[4096];
+static unsigned s_viewEventCount;
+static PlayerView s_view;
+static unsigned char s_viewBytes[sizeof(PlayerView)];
+
+const unsigned char* ViewHostGame(void)
+{
+    return (const unsigned char*)g_game;
+}
+
+const unsigned char* ViewHostRef(unsigned stored)
+{
+    return (const unsigned char*)stored;
+}
+
+void ViewHostUnitAccount(const unsigned char* unit, float out[4])
+{
+    const float* account = (const float*)(unit + 0xbc);
+    out[0] = account[10];
+    out[1] = account[11];
+    out[2] = account[4];
+    out[3] = account[5];
+}
+
+int ViewHostOrderDrawMask(unsigned kind)
+{
+    return (int)ReadU32At((unsigned)g_missionOrderTableBegin + kind * ORDER_TABLE_STRIDE, 0xc);
+}
+
+const ViewWeaponsReport* ViewHostWeaponsReport(void)
+{
+    unsigned char* projectiles = (unsigned char*)GameU32(GAME_PROJECTILES);
+    unsigned projectileCount = GameU32(GAME_PROJECTILE_COUNT);
+    unsigned debrisCount = GameU32(GAME_DEBRIS_COUNT);
+    unsigned char* pieces = GameAt(GAME_PIECES);
+    unsigned i;
+    memset(&s_viewReport, 0, sizeof s_viewReport);
+    for (i = 0; i < EXPLODED_SLOTS; i++) {
+        unsigned char* block = g_explodedPieces[i];
+        ViewReportExploded* e = &s_viewReport.exploded[i];
+        if (block == NULL)
+            continue;
+        e->used = 1;
+        e->unit = *(unsigned*)block;
+        e->index = *(int*)(block + 4);
+        e->flags = *(unsigned*)(block + 40) & 0x3f;
+        e->angle10 = *(short*)(block + 0x30 + 16);
+        e->angle12 = *(short*)(block + 0x30 + 18);
+        e->angle14 = *(short*)(block + 0x30 + 20);
+        e->x = *(int*)(block + 0x30 + 22);
+        e->y = *(int*)(block + 0x30 + 26);
+        e->z = *(int*)(block + 0x30 + 30);
+    }
+    if (debrisCount > PIECE_COUNT)
+        debrisCount = PIECE_COUNT;
+    for (i = 0; i < debrisCount; i++) {
+        const unsigned char* e = GameAt(GAME_DEBRIS) + i * DEBRIS_STRIDE;
+        ViewReportDebris* d = &s_viewReport.debris[i];
+        unsigned obj = *(const unsigned*)e;
+        d->used = 1;
+        d->obj = obj;
+        d->frame = *(const unsigned short*)(e + 4);
+        d->spriteSource = *(const unsigned*)(e + 12);
+        d->shadowFrame = *(const unsigned short*)(e + 16);
+        d->shadowSource = *(const unsigned*)(e + 24);
+        d->x = *(const int*)(e + 28);
+        d->y = *(const int*)(e + 32);
+        d->z = *(const int*)(e + 36);
+        d->angleX = *(const short*)(e + 76);
+        d->angleY = *(const short*)(e + 78);
+        d->angleZ = *(const short*)(e + 80);
+        if (obj >= (unsigned)pieces && (obj - (unsigned)pieces) % PIECE_STRIDE == 0
+            && (obj - (unsigned)pieces) / PIECE_STRIDE < PIECE_COUNT) {
+            unsigned index = (obj - (unsigned)pieces) / PIECE_STRIDE;
+            s_viewReport.pieces[index].used = 1;
+            s_viewReport.pieces[index].faceCount = *(const int*)(obj + 8);
+            s_viewReport.pieces[index].firstFace = *(const int*)(obj + 12);
+        }
+    }
+    for (i = 0; projectiles != NULL && i < projectileCount && i < VIEW_REPORT_PROJECTILES; i++) {
+        const unsigned char* p = projectiles + i * PROJECTILE_STRIDE;
+        ViewReportProjectile* r = &s_viewReport.projectiles[i];
+        if (*(const unsigned short*)(p + 0x69) & 2)
+            continue;
+        s_viewReport.projectileUsed[i] = 1;
+        r->startX = *(const int*)(p + 0x10);
+        r->startY = *(const int*)(p + 0x14);
+        r->startZ = *(const int*)(p + 0x18);
+        r->bank = *(const short*)(p + 0x34);
+        r->heading = *(const short*)(p + 0x36);
+        r->pitch = *(const short*)(p + 0x38);
+        r->spawnTick = *(const unsigned*)(p + 0x42);
+        r->time = *(const unsigned*)(p + 0x46);
+        r->radius = *(const short*)(p + 0x5e);
+        r->active = *(const short*)(p + 0x60);
+        r->propellerSpin = *(const short*)(p + 0x64);
+    }
+    return &s_viewReport;
+}
+
+unsigned ViewHostTakeEvents(const ViewRawEvent** events)
+{
+    unsigned n = s_viewEventCount;
+    s_viewEventCount = 0;
+    *events = s_viewEvents;
+    return n;
+}
+
+void ViewHostFail(const char* message)
+{
+    Fail(message);
+}
+
+static void ViewCaptureEvent(unsigned kind, unsigned flags, const unsigned* args, unsigned count)
+{
+    if (!ViewIsMessageKind(kind))
+        return;
+    if (s_viewEventCount >= sizeof s_viewEvents / sizeof s_viewEvents[0] || count > VIEW_REPORT_EVENT_ARGS) {
+        Fail("testmode: more sim events than the view's event buffer holds\n");
+        return;
+    }
+    ViewRawEvent* e = &s_viewEvents[s_viewEventCount++];
+    memset(e, 0, sizeof *e);
+    e->kind = (unsigned short)kind;
+    e->flags = (unsigned short)(flags & 0x7fff);
+    e->count = count;
+    for (unsigned i = 0; i < count; i++)
+        e->args[i] = args[i];
+}
+
+static void WriteViewRow()
+{
+    unsigned* displayTimer = (unsigned*)(PlayerAt(*GameAt(GAME_PLAYER_INDEX)) + 0xf8);
+    unsigned heldDisplayTimer = *displayTimer;
+    if (*displayTimer < GameU32(GAME_TICK))
+        *displayTimer += 0x1e;
+    ViewFill(&s_view);
+    *displayTimer = heldDisplayTimer;
+    unsigned size = ViewSerialize(&s_view, s_viewBytes);
+    unsigned tick = s_view.tick;
+    s_hashLo = 0x84222325;
+    s_hashHi = 0xcbf29ce4;
+    HashBuf(s_viewBytes, size);
+    fprintf(s_trace, "%u view %08x%08x\n", tick, s_hashHi, s_hashLo);
+    fflush(s_trace);
+    int wanted = s_dumpEnabled && tick == s_dumpTick;
+    for (unsigned i = 0; i < s_frameCount; i++) {
+        if (s_frameTicks[i] == tick)
+            wanted = 1;
+    }
+    if (!wanted)
+        return;
+    char directory[] = "views";
+    char path[32];
+    MakeDirectoryPath(directory);
+    sprintf(path, "views\\%u.bin", tick);
+    if (!ViewWriteFile(path, s_viewBytes, size)) {
+        char msg[100];
+        sprintf(msg, "testmode: cannot write %s\n", path);
+        Fail(msg);
+    }
 }
 
 static void OpenTrace(unsigned controlWord)

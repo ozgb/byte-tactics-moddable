@@ -72,6 +72,8 @@ SAVE_FILE = tracediff.SAVE_FILES[0]
 SAVE_BYTES: dict[str, bytes | None] = {}
 FRAMES = ROOT / "reference/frames"
 FRAME_DUMPS: dict[str, dict[int, bytes | None]] = {}
+VIEWS = ROOT / "reference/views"
+VIEW_DUMPS: dict[str, dict[int, bytes | None]] = {}
 MAX_PARALLEL = 6
 QUICK = ("eight-full-moon", "eight-greenhaven", "duel-coast-to-coast", "duel-great-divide", "orders-move-attack")
 RUN_SECONDS_BASE = 120
@@ -222,6 +224,10 @@ def frame_path(tick: int) -> str:
     return f"frames/{tick}.bin"
 
 
+def view_path(tick: int) -> str:
+    return f"views/{tick}.bin"
+
+
 def difference(want: tuple[dict[str, str], list[tuple[int, str]]], header: dict[str, str],
                digests: list[tuple[int, str]]) -> str | None:
     """Why a run differs from the stored (header, digests), or None when it equals them."""
@@ -285,6 +291,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     for attempt in range(RUN_ATTEMPTS):
         try:
             extra: dict = {"collect": (SOUND_FILE, UI_FILE, INTERFACE_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAY_LIST_FILE, *(frame_path(t) for t in scenario_frames(scenario)),
+                                *(view_path(t) for t in scenario_frames(scenario)),
                                 *dict.fromkeys((*(tracediff.SAVE_FILES if save_to is not None else ()),
                                                 *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if load_from is not None:
@@ -322,6 +329,10 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         for tick in scenario_frames(scenario):
             dump = run / frame_path(tick)
             FRAME_DUMPS[scenario.stem][tick] = dump.read_bytes() if dump.is_file() else None
+        VIEW_DUMPS[scenario.stem] = {}
+        for tick in scenario_frames(scenario):
+            dump = run / view_path(tick)
+            VIEW_DUMPS[scenario.stem][tick] = dump.read_bytes() if dump.is_file() else None
         header, rows = tracediff.parse_trace(tracediff.need(run, "trace.txt"))
         for key in ("game_seed", "crt_seed", "view_seed"):
             if key not in header:
@@ -445,6 +456,10 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
             if dump is None:
                 fail(f"{name}: the run wrote no {frame_path(tick)}; the stored frames are untouched")
     for name in results:
+        for tick, dump in VIEW_DUMPS.get(name, {}).items():
+            if dump is None:
+                fail(f"{name}: the run wrote no {view_path(tick)}; the stored views are untouched")
+    for name in results:
         if scenario_saves(scenarios[name]) and SAVE_BYTES.get(name) is None:
             fail(f"{name}: the run wrote no {SAVE_FILE}; the stored saves are untouched")
     SOUNDS.mkdir(parents=True, exist_ok=True)
@@ -502,6 +517,14 @@ def write_traces(sha: str, exe: Path, game_dir: str | None, parallel: int) -> No
             (FRAMES / name / f"{tick}.bin").write_bytes(dump)
             frames += 1
     print(f"{frames} frames written to {FRAMES.relative_to(ROOT)}")
+    shutil.rmtree(VIEWS, ignore_errors=True)
+    views = 0
+    for name in results:
+        for tick, dump in VIEW_DUMPS.get(name, {}).items():
+            (VIEWS / name).mkdir(parents=True, exist_ok=True)
+            (VIEWS / name / f"{tick}.bin").write_bytes(dump)
+            views += 1
+    print(f"{views} views written to {VIEWS.relative_to(ROOT)}")
     print(f"{len(results)} traces, commit {sha}, total {clock(time.time() - t0)}")
 
 

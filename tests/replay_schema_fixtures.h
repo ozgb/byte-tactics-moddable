@@ -1005,6 +1005,7 @@ static const ReplayEventKind kReplayEventKinds[] = {
     { 227, ROK_AIPLAN },
     { 228, ROK_AIWEIGHT },
     { 229, ROK_AILIMIT },
+    { 230, ROK_AIEVENTHEADER },
     { 240, ROK_AIADDORDER },
     { 241, ROK_AIQUEUEBUILD },
     { 243, ROK_AISTOP },
@@ -1107,13 +1108,13 @@ static const ReplayEventTable kReplayEventTables[] = {
     { ROK_MAPEVENTHEADER, 25, 12 },
     { ROK_WEAPONSEVENTHEADER, 37, 25 },
     { ROK_ORDERSEVENTHEADER, 62, 25 },
-    { ROK_AIEVENTHEADER, 87, 10 },
-    { ROK_MOVEMENTEVENTHEADER, 97, 23 },
-    { ROK_UNITSEVENTHEADER, 120, 31 },
-    { ROK_SCRIPTSEVENTHEADER, 151, 4 },
-    { ROK_ECONOMYEVENTHEADER, 155, 8 },
-    { ROK_PLAYERSEVENTHEADER, 163, 14 },
-    { ROK_FEATURESEVENTHEADER, 177, 9 },
+    { ROK_AIEVENTHEADER, 87, 11 },
+    { ROK_MOVEMENTEVENTHEADER, 98, 23 },
+    { ROK_UNITSEVENTHEADER, 121, 31 },
+    { ROK_SCRIPTSEVENTHEADER, 152, 4 },
+    { ROK_ECONOMYEVENTHEADER, 156, 8 },
+    { ROK_PLAYERSEVENTHEADER, 164, 14 },
+    { ROK_FEATURESEVENTHEADER, 178, 9 },
 };
 static_assert(sizeof(WindMeteorsEventHeader) <= REPLAY_EVENT_MAX, "WindMeteorsEventHeader fits the event buffer");
 static_assert(sizeof(WindMeteorsParams) <= REPLAY_EVENT_MAX, "WindMeteorsParams fits the event buffer");
@@ -1185,6 +1186,7 @@ static_assert(sizeof(AiSetSquad) <= REPLAY_EVENT_MAX, "AiSetSquad fits the event
 static_assert(sizeof(AiPlan) <= REPLAY_EVENT_MAX, "AiPlan fits the event buffer");
 static_assert(sizeof(AiWeight) <= REPLAY_EVENT_MAX, "AiWeight fits the event buffer");
 static_assert(sizeof(AiLimit) <= REPLAY_EVENT_MAX, "AiLimit fits the event buffer");
+static_assert(sizeof(AiEventHeader) <= REPLAY_EVENT_MAX, "AiEventHeader fits the event buffer");
 static_assert(sizeof(AiAddOrder) <= REPLAY_EVENT_MAX, "AiAddOrder fits the event buffer");
 static_assert(sizeof(AiQueueBuild) <= REPLAY_EVENT_MAX, "AiQueueBuild fits the event buffer");
 static_assert(sizeof(AiStop) <= REPLAY_EVENT_MAX, "AiStop fits the event buffer");
@@ -5187,13 +5189,10 @@ enum ReplaySlotId {
     RSL_FEATURES_FINDFEATUREATPOS,
     RSL_AI_APPLY,
     RSL_AI_DUMPPLAYERAI,
-    RSL_AI_RESETAIPLAYERS,
     RSL_AI_CREATEPLAYERAI,
     RSL_AI_DESTROYPLAYERAI,
     RSL_AI_UPDATEPLAYERAI,
     RSL_AI_REBUILDFEATURECELLS,
-    RSL_AI_PARSEDOWNLOADABLEAIWEIGHTSCRIPTS,
-    RSL_AI_REPARSEAIWEIGHTSCRIPTSIFLIMITNOTSTICKY,
     RSL_AI_CREATESQUADS,
     RSL_AI_FREESQUADS,
     RSL_AI_UPDATESQUADS,
@@ -5424,7 +5423,6 @@ enum ReplaySlotId {
     RSL_UNITS_UNITREFSETUNIT,
     RSL_UNITS_UNITREFGET,
     RSL_UNITS_UNITREFSETVALUE,
-    RSL_PLAYERS_LOADDEFAULTAISCRIPT,
     RSL_MAP_UNITSINRANGE,
     RSL_ECONWORLD_TICK,
     RSL_ECONWORLD_DIFFICULTY,
@@ -5544,9 +5542,6 @@ static const unsigned short kReplayAiDumpPlayerAIAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayAiDumpPlayerAIReads[] = { 0, 15, 39, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85 };
 static const unsigned short kReplayAiDumpPlayerAIObjReads[] = { 22, 38, 146, 152, 366, 367, 369 };
 static const unsigned short kReplayAiDumpPlayerAIObjWrites[] = { 38, 146, 152 };
-static const unsigned short kReplayAiResetAIPlayersAllOf[] = { ROK_UNITDEF };
-static const unsigned char kReplayAiResetAIPlayersReads[] = { 39, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85 };
-static const unsigned short kReplayAiResetAIPlayersObjReads[] = { 0, 22, 130, 155, 364, 367, 368, 369, 370, 377 };
 static const unsigned short kReplayAiCreatePlayerAIAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayAiCreatePlayerAIReads[] = { 4, 13, 39, 43, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85 };
 static const unsigned short kReplayAiCreatePlayerAIObjReads[] = { 23, 109, 113, 118, 129, 133, 134, 135, 136, 138, 140, 151, 156, 157, 159, 189, 192, 197, 364, 366, 372, 376 };
@@ -5562,16 +5557,6 @@ static const unsigned short kReplayAiRebuildFeatureCellsAllOf[] = { ROK_CELL, RO
 static const unsigned char kReplayAiRebuildFeatureCellsReads[] = { 1, 2, 19, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85 };
 static const unsigned short kReplayAiRebuildFeatureCellsObjReads[] = { 239, 363, 421, 429 };
 static const unsigned short kReplayAiRebuildFeatureCellsObjWrites[] = { 363 };
-static const unsigned short kReplayAiParseDownloadableAiWeightScriptsAllOf[] = { ROK_UNITDEF };
-static const unsigned char kReplayAiParseDownloadableAiWeightScriptsReads[] = { 39, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85 };
-static const unsigned char kReplayAiParseDownloadableAiWeightScriptsWrites[] = { 75 };
-static const unsigned short kReplayAiParseDownloadableAiWeightScriptsObjReads[] = { 136, 153, 368 };
-static const unsigned short kReplayAiParseDownloadableAiWeightScriptsObjWrites[] = { 153 };
-static const unsigned short kReplayAiReparseAiWeightScriptsIfLimitNotStickyAllOf[] = { ROK_UNITDEF };
-static const unsigned char kReplayAiReparseAiWeightScriptsIfLimitNotStickyReads[] = { 39, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85 };
-static const unsigned char kReplayAiReparseAiWeightScriptsIfLimitNotStickyWrites[] = { 75 };
-static const unsigned short kReplayAiReparseAiWeightScriptsIfLimitNotStickyObjReads[] = { 136, 153, 370 };
-static const unsigned short kReplayAiReparseAiWeightScriptsIfLimitNotStickyObjWrites[] = { 153 };
 static const unsigned short kReplayAiCreateSquadsObjReads[] = { 37 };
 static const unsigned short kReplayAiCreateSquadsObjWrites[] = { 37, 691, 692, 693, 694 };
 static const unsigned short kReplayAiFreeSquadsObjReads[] = { 37, 695 };
@@ -5903,13 +5888,10 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "FindFeatureAtPos", SUB_FEATURES, kReplayFeaturesFindFeatureAtPosReads, 2, nullptr, 0, kReplayFeaturesFindFeatureAtPosObjReads, 6, nullptr, 0, kReplayFeaturesFindFeatureAtPosAllOf, 2 },
     { "Apply", SUB_AI, kReplayAiApplyReads, 17, kReplayAiApplyWrites, 4, kReplayAiApplyObjReads, 13, kReplayAiApplyObjWrites, 4, nullptr, 0 },
     { "DumpPlayerAI", SUB_AI, kReplayAiDumpPlayerAIReads, 13, nullptr, 0, kReplayAiDumpPlayerAIObjReads, 7, kReplayAiDumpPlayerAIObjWrites, 3, kReplayAiDumpPlayerAIAllOf, 1 },
-    { "ResetAIPlayers", SUB_AI, kReplayAiResetAIPlayersReads, 11, nullptr, 0, kReplayAiResetAIPlayersObjReads, 10, nullptr, 0, kReplayAiResetAIPlayersAllOf, 1 },
     { "CreatePlayerAI", SUB_AI, kReplayAiCreatePlayerAIReads, 14, nullptr, 0, kReplayAiCreatePlayerAIObjReads, 22, kReplayAiCreatePlayerAIObjWrites, 2, kReplayAiCreatePlayerAIAllOf, 1 },
     { "DestroyPlayerAI", SUB_AI, kReplayAiDestroyPlayerAIReads, 10, kReplayAiDestroyPlayerAIWrites, 10, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UpdatePlayerAI", SUB_AI, kReplayAiUpdatePlayerAIReads, 20, kReplayAiUpdatePlayerAIWrites, 3, kReplayAiUpdatePlayerAIObjReads, 32, kReplayAiUpdatePlayerAIObjWrites, 6, kReplayAiUpdatePlayerAIAllOf, 2 },
     { "RebuildFeatureCells", SUB_AI, kReplayAiRebuildFeatureCellsReads, 13, nullptr, 0, kReplayAiRebuildFeatureCellsObjReads, 4, kReplayAiRebuildFeatureCellsObjWrites, 1, kReplayAiRebuildFeatureCellsAllOf, 2 },
-    { "ParseDownloadableAiWeightScripts", SUB_AI, kReplayAiParseDownloadableAiWeightScriptsReads, 11, kReplayAiParseDownloadableAiWeightScriptsWrites, 1, kReplayAiParseDownloadableAiWeightScriptsObjReads, 3, kReplayAiParseDownloadableAiWeightScriptsObjWrites, 1, kReplayAiParseDownloadableAiWeightScriptsAllOf, 1 },
-    { "ReparseAiWeightScriptsIfLimitNotSticky", SUB_AI, kReplayAiReparseAiWeightScriptsIfLimitNotStickyReads, 11, kReplayAiReparseAiWeightScriptsIfLimitNotStickyWrites, 1, kReplayAiReparseAiWeightScriptsIfLimitNotStickyObjReads, 3, kReplayAiReparseAiWeightScriptsIfLimitNotStickyObjWrites, 1, kReplayAiReparseAiWeightScriptsIfLimitNotStickyAllOf, 1 },
     { "CreateSquads", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiCreateSquadsObjReads, 1, kReplayAiCreateSquadsObjWrites, 5, nullptr, 0 },
     { "FreeSquads", SUB_AI, nullptr, 0, nullptr, 0, kReplayAiFreeSquadsObjReads, 2, kReplayAiFreeSquadsObjWrites, 2, nullptr, 0 },
     { "UpdateSquads", SUB_AI, kReplayAiUpdateSquadsReads, 22, kReplayAiUpdateSquadsWrites, 3, kReplayAiUpdateSquadsObjReads, 123, kReplayAiUpdateSquadsObjWrites, 22, kReplayAiUpdateSquadsAllOf, 2 },
@@ -6140,7 +6122,6 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UnitRefSetUnit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitRefGet", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitRefSetValue", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "LoadDefaultAIScript", SUB_PLAYERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitsInRange", SUB_MAP, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Tick", SUB_ECONWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Difficulty", SUB_ECONWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -6191,22 +6172,22 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "wind_meteors", 3, 1, 1, 0, 8, RET_WIND_METEORS },
     { "economy", 5, 0, 1, 8, 11, RET_ECONOMY },
     { "features", 5, 1, 1, 19, 10, RET_FEATURES },
-    { "ai", 6, 0, 1, 29, 14, RET_AI },
-    { "pathfinding", 4, 1, 1, 43, 8, RET_COUNT },
-    { "weapons", 4, 0, 1, 51, 9, RET_WEAPONS },
-    { "targeting", 4, 0, 1, 60, 7, RET_TARGETING },
-    { "los_radar", 5, 1, 1, 67, 22, RET_LOS_RADAR },
-    { "orders", 6, 2, 0, 89, 7, RET_ORDERS },
-    { "units", 7, 2, 1, 96, 8, RET_UNITS },
-    { "players", 5, 2, 1, 104, 9, RET_PLAYERS },
-    { "map", 9, 2, 1, 113, 11, RET_MAP },
-    { "scripts", 3, 0, 0, 124, 24, RET_SCRIPTS },
-    { "movement", 5, 0, 0, 148, 20, RET_MOVEMENT },
-    { "mission", 2, 0, 1, 168, 12, RET_COUNT },
-    { "files", 3, 0, 0, 180, 58, RET_COUNT },
-    { "network", 2, 0, 0, 238, 22, RET_COUNT },
-    { "econworld", 5, 0, 1, 260, 0, RET_COUNT },
-    { "pathworld", 4, 1, 1, 260, 0, RET_COUNT },
+    { "ai", 6, 1, 1, 29, 11, RET_AI },
+    { "pathfinding", 4, 1, 1, 40, 8, RET_COUNT },
+    { "weapons", 4, 0, 1, 48, 9, RET_WEAPONS },
+    { "targeting", 4, 0, 1, 57, 7, RET_TARGETING },
+    { "los_radar", 5, 1, 1, 64, 22, RET_LOS_RADAR },
+    { "orders", 6, 2, 0, 86, 7, RET_ORDERS },
+    { "units", 7, 2, 1, 93, 8, RET_UNITS },
+    { "players", 5, 2, 1, 101, 9, RET_PLAYERS },
+    { "map", 9, 2, 1, 110, 11, RET_MAP },
+    { "scripts", 3, 0, 0, 121, 24, RET_SCRIPTS },
+    { "movement", 5, 0, 0, 145, 20, RET_MOVEMENT },
+    { "mission", 2, 0, 1, 165, 12, RET_COUNT },
+    { "files", 3, 0, 0, 177, 58, RET_COUNT },
+    { "network", 2, 0, 0, 235, 22, RET_COUNT },
+    { "econworld", 5, 0, 1, 257, 0, RET_COUNT },
+    { "pathworld", 4, 1, 1, 257, 0, RET_COUNT },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

@@ -109,7 +109,7 @@ The class is the one of section 3. Command words are compared in any case.
 | `ai` | converted | cheat | PLAYERS_SET_TYPE |
 | `kill` | converted | cheat | UNITS_KILL_ALL or PLAYERS_KILL_UNITS, then PLAYERS_DEACTIVATE_CONDITIONS |
 | `reload` | converted | cheat | UNITS_RELOAD_TYPE |
-| `reloadaiprofiles` | direct | cheat | none |
+| `reloadaiprofiles` | converted | cheat | AI_RELOAD_PROFILES |
 | `burnall` | converted | cheat | FEATURES_REMOVE_ALL |
 | `burnone` | converted | cheat | FEATURES_REMOVE |
 | `feature` | converted | cheat | FEATURES_PLACE |
@@ -181,6 +181,9 @@ Each command below says its guards and then its events, in publication order. "T
   byte. Then, always, PLAYERS_DEACTIVATE_CONDITIONS.
 - **`reload <unit type>`.** Nothing with one word. The unit type is looked up by name in any case (no wildcard); nothing
   when there is none. UNITS_RELOAD_TYPE with `type` its number.
+- **`reloadaiprofiles`.** Arguments are ignored. AI_RELOAD_PROFILES, always, the header alone. The AI module reads the
+  profile files itself when it consumes it: the lines of the AI script are AI data, not console lines, so they publish
+  no event of their own.
 - **`burnall`.** FEATURES_REMOVE_ALL, always.
 - **`burnone`.** Nothing unless the cursor's feature is below 0xfffb (there is a feature). FEATURES_REMOVE with `x` 40,
   `z` 16, `force` 1.
@@ -225,10 +228,6 @@ These are written by the game directly or through a module's own function, not b
   Both fields are the machine's own player and the tick reads them, so a change during play is a change of the
   perspective the simulation computes for one machine, not a command every player runs. They become events once the
   fields are split into the simulation's perspective, fixed by the match setup, and the view's player.
-- **`reloadaiprofiles`.** The AI players are reset and their profiles loaded again, which runs the AI script's own
-  console lines (`plan`, `weight`, `limit` and the others the script holds), each publishing its AI event as section 4.2
-  would. It is not an event because an event whose handling runs console lines would put the console inside the
-  simulation; where the loading of AI profiles belongs is a question for the human on #1049.
 - **`sharemetal`, `shareenergy`, `shareall`, `setsharemetal`, `setshareenergy`.** They act only when bit 0 of
   `netGameFlags` is set, which no test-mode run does, so in every scenario they do nothing. When it is set:
   `sharemetal` and `shareenergy` flip the local player's metal or energy sharing switch, add a line to the message log
@@ -403,7 +402,7 @@ one of those, and a scenario that uses a console command or an order kind that t
 | console-features | judged | - |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
-| console-sight | left out | console commands that are not events: `view`, `reloadaiprofiles` |
+| console-sight | left out | console commands that are not events: `view` |
 | console-units | judged | - |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |

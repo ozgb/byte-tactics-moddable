@@ -61,6 +61,14 @@ inline void AiPublishLimit(int outbox, const unsigned int* types, int limit, int
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void AiPublishReloadProfiles(int outbox)
+{
+    AiEventHeader event;
+    memset(&event, 0, sizeof(event));
+    event.kind = AI_RELOAD_PROFILES;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 template <class U>
 inline void AiPublishAddOrder(U* unit, int kind, int remove, Unit* target, const void* pos, int p6, int p7)
 {

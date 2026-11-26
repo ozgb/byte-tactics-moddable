@@ -1278,7 +1278,6 @@ ai,orders,Vec3::y,-,unobserved,0,,
 ai,orders,Vec3::z,-,unobserved,0,,
 ai,pathfinding,Point16::x,-,unobserved,0,,
 ai,pathfinding,Point16::y,-,unobserved,0,,
-ai,players,LoadDefaultAIScript,-,unobserved,0,,indirect
 ai,players,Point16::x,-,unobserved,0,,
 ai,players,Point16::y,-,unobserved,0,,
 ai,players,Ref<Unit>::offset,-,unobserved,0,,
@@ -2142,7 +2141,7 @@ players,ai,CreateSquads,-,unobserved,0,,indirect
 players,ai,DestroyPlayerAI,-,unobserved,0,,indirect
 players,ai,FreeSquads,-,unobserved,0,,indirect
 players,ai,Game::mapFlags,-,unobserved,0,,
-players,ai,ParseDownloadableAiWeightScripts,-,unobserved,0,,indirect
+players,ai,LoadAIProfiles,-,unobserved,0,,indirect
 players,ai,Player::active,-,unobserved,0,,
 players,ai,Player::ai,-,unobserved,0,,
 players,ai,Player::allied,-,unobserved,0,,
@@ -2166,7 +2165,6 @@ players,ai,Point16::x,-,unobserved,0,,
 players,ai,Point16::y,-,unobserved,0,,
 players,ai,RebuildFeatureCells,-,unobserved,0,,indirect
 players,ai,Ref<Unit>::offset,-,unobserved,0,,
-players,ai,ReparseAiWeightScriptsIfLimitNotSticky,-,unobserved,0,,indirect
 players,ai,Vec3::x,-,unobserved,0,,
 players,ai,Vec3::y,-,unobserved,0,,
 players,ai,Vec3::z,-,unobserved,0,,
@@ -2494,6 +2492,7 @@ units,ai,Unit::player,-,unobserved,0,,
 units,ai,Unit::pos,-,unobserved,0,,
 units,ai,Unit::unitDefIndex,-,unobserved,0,,
 units,ai,Unit::yWhole,-,unobserved,0,,
+units,ai,UnitDef::aiWeight,-,unobserved,0,,
 units,ai,UnitDef::c04,-,unobserved,0,,
 units,ai,UnitDef::c08,-,unobserved,0,,
 units,ai,UnitDef::canbuild,-,unobserved,0,,
@@ -2516,6 +2515,7 @@ units,ai,UnitDef::unitname,-,unobserved,0,,
 units,ai,UnitDef::weaponCategories,-,unobserved,0,,
 units,ai,UnitDef::weapons,-,unobserved,0,,
 units,ai,UnitDef::windgenerator,-,unobserved,0,,
+units,ai,UnitTypeSet::bits,-,unobserved,0,,
 units,ai,Vec3::x,-,unobserved,0,,
 units,ai,Vec3::y,-,unobserved,0,,
 units,ai,Vec3::z,-,unobserved,0,,

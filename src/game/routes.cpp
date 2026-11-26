@@ -112,6 +112,7 @@ static const SchedRoute s_routes[] = {
     {SCHED_ENGINE, AI_PLAN, SCHED_AI, AiInbox, 0},
     {SCHED_ENGINE, AI_WEIGHT, SCHED_AI, AiInbox, 0},
     {SCHED_ENGINE, AI_LIMIT, SCHED_AI, AiInbox, 0},
+    {SCHED_ENGINE, AI_RELOAD_PROFILES, SCHED_AI, AiInbox, 0},
     {SCHED_AI, AI_EFFECT_ADD_ORDER, SCHED_ORDERS, OrdersOnAiAddOrder, 1},
     {SCHED_AI, AI_EFFECT_QUEUE_BUILD, SCHED_ORDERS, OrdersOnAiQueueBuild, 1},
     {SCHED_AI, AI_EFFECT_STOP, SCHED_ORDERS, OrdersOnAiStop, 1},

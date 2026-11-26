@@ -37,7 +37,7 @@ of the record that 3.1c's callers read directly (mission 1.1, section 5). The ca
 | Slot | 3.1c | Callers | Inside the tick |
 |---|---|---|---|
 | `GetGameType` | `Mission::GetGameType` | 48: units (`ApplyUnitDeath`, `ComparePlayers`), orders (`ResurrectOrder`), features (`DamageFeature`, `ReclaimFeature`), players (the player updates, the slot set-up and the victory conditions), ai (`GetBuildRating`), network, game, presentation (`LoadMapList` among them) | yes: units, orders, features, players, ai, network |
-| `GetNameSlot` | `Mission::GetNameSlot` | 12: ai (`DumpPlayerAI`, the AI profile parser), players (`LoadDefaultAIScript`, `ApplyUseOnlyUnits`), los_radar (`LoadTntMap`), presentation | at an AI's load and the console's dump only |
+| `GetNameSlot` | `Mission::GetNameSlot` | 12: ai (`DumpPlayerAI`, `LoadAIProfiles`, the AI profile parser), players (`ApplyUseOnlyUnits`), los_radar (`LoadTntMap`), presentation | at an AI's load and the console's dump only |
 | `SetMissionType` | `SetMissionType` | 12: game, presentation, network (the lobby), harness | no |
 | `FreeOtaEnumCacheAndMission` | `FreeOtaEnumCacheAndMission` | 1: game (`ShutdownGame`) | no |
 | `AdvanceMission` | `Mission::AdvanceMission` | 1: game (`SaveGameFile`) | no |

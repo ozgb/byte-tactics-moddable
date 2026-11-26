@@ -2041,9 +2041,8 @@ address,function,file,kind,target
 0x409f20,IsUnderLimit,src/ai/ai_player.cpp,function,
 0x409f20,IsUnderLimit,src/ai/ai_player.cpp,global_read,g_game
 0x409f20,IsUnderLimit,src/ai/ai_player.cpp,global_read,g_playerAI
-0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,CommandArgs::InitArgs
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,EnableAICommands
-0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,ExecuteCommandText
+0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,RunProfileText
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,operator UnitDef *
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,call,operator[]
@@ -2060,9 +2059,8 @@ address,function,file,kind,target
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,function,
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,global_read,g_game
 0x409f80,ParseDownloadableAiWeightScripts,src/ai/ai_player.cpp,global_read,g_playerAI
-0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,CommandArgs::InitArgs
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,EnableAICommands
-0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,ExecuteCommandText
+0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,RunProfileText
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,operator PlayerAI *
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,operator UnitDef *
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,call,operator[]
@@ -2079,17 +2077,14 @@ address,function,file,kind,target
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,function,
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,global_read,g_game
 0x40a040,ReparseAiWeightScriptsIfLimitNotSticky,src/ai/ai_player.cpp,global_read,g_playerAI
+0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,call,LoadAIProfiles
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,call,PlayerAI::InitUnitTables
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,call,operator->
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,field_read,Player::active
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,field_read,Player::type
-0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,field_read,PlayersSeam::LoadDefaultAIScript
-0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,field_read,Seams::players
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,function,
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,global_read,g_game
 0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,global_read,g_playerAI
-0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,global_read,g_seams
-0x40a100,ResetAIPlayers,src/ai/ai_player.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [PlayersSeam::LoadDefaultAIScript]
 0x40a150,PlayerAI::InitPlacementGrid,src/ai/ai_player.cpp,call,RandomInt
 0x40a150,PlayerAI::InitPlacementGrid,src/ai/ai_player.cpp,field_read,PlayerAI::margin0
 0x40a150,PlayerAI::InitPlacementGrid,src/ai/ai_player.cpp,field_read,PlayerAI::margin1
@@ -4708,11 +4703,8 @@ address,function,file,kind,target
 0x417490,CmdReload,src/game/console_commands.cpp,global_maybe_written,g_emptyText
 0x417490,CmdReload,src/game/console_commands.cpp,global_read,g_seams
 0x417490,CmdReload,src/game/console_commands.cpp,indirect_call,indirect via unsigned short (*)(const char *) __attribute__((stdcall)) [UnitsSeam::FindUnitTypeId]
-0x4174d0,CmdReloadAIProfiles,src/game/console_commands.cpp,field_read,AiSeam::ResetAIPlayers
-0x4174d0,CmdReloadAIProfiles,src/game/console_commands.cpp,field_read,Seams::ai
+0x4174d0,CmdReloadAIProfiles,src/game/console_commands.cpp,call,AiPublishReloadProfiles
 0x4174d0,CmdReloadAIProfiles,src/game/console_commands.cpp,function,
-0x4174d0,CmdReloadAIProfiles,src/game/console_commands.cpp,global_read,g_seams
-0x4174d0,CmdReloadAIProfiles,src/game/console_commands.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [AiSeam::ResetAIPlayers]
 0x4174e0,CmdBigBrother,src/game/console_commands.cpp,call,ClearCameraFollowState
 0x4174e0,CmdBigBrother,src/game/console_commands.cpp,field_read,Game::autoFollow
 0x4174e0,CmdBigBrother,src/game/console_commands.cpp,field_write,Game::autoFollow
@@ -20544,30 +20536,20 @@ address,function,file,kind,target
 0x464700,InitPlayerSlot,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::CreatePlayerAI]
 0x464700,InitPlayerSlot,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [LosRadarSeam::CreateUnitIndex]
 0x464700,InitPlayerSlot,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [UnitsSeam::CreateFactoryIndex]
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,call,CommandArgs::InitArgs
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,call,ExecuteCommandText
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,call,GameFreeThunk
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,call,HAPI_LoadFile
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_escape,Game::players
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_read,AiSeam::ParseDownloadableAiWeightScripts
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_read,AiSeam::ReparseAiWeightScriptsIfLimitNotSticky
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_read,MissionSeam::GetNameSlot
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_read,Player::active
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_read,Player::type
+0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_read,AiSeam::LoadProfiles
 0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_read,Seams::ai
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,field_read,Seams::mission
 0x4648e0,LoadDefaultAIScript,src/game/players.cpp,function,
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,global_read,g_game
 0x4648e0,LoadDefaultAIScript,src/game/players.cpp,global_read,g_seams
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,indirect_call,indirect via const char *(*)(int) __attribute__((stdcall)) [MissionSeam::GetNameSlot]
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::ParseDownloadableAiWeightScripts]
-0x4648e0,LoadDefaultAIScript,src/game/players.cpp,indirect_call,indirect via void (*)(int) __attribute__((stdcall)) [AiSeam::ReparseAiWeightScriptsIfLimitNotSticky]
+0x4648e0,LoadDefaultAIScript,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [AiSeam::LoadProfiles]
 0x464990,InitPlayers,src/game/players.cpp,call,InitPlayerSlot
-0x464990,InitPlayers,src/game/players.cpp,call,LoadDefaultAIScript
 0x464990,InitPlayers,src/game/players.cpp,field_escape,Game::players
+0x464990,InitPlayers,src/game/players.cpp,field_read,AiSeam::LoadProfiles
 0x464990,InitPlayers,src/game/players.cpp,field_read,Player::type
+0x464990,InitPlayers,src/game/players.cpp,field_read,Seams::ai
 0x464990,InitPlayers,src/game/players.cpp,function,
 0x464990,InitPlayers,src/game/players.cpp,global_read,g_game
+0x464990,InitPlayers,src/game/players.cpp,global_read,g_seams
+0x464990,InitPlayers,src/game/players.cpp,indirect_call,indirect via void (*)() __attribute__((stdcall)) [AiSeam::LoadProfiles]
 0x4649d0,RebuildAIFeatureCells,src/game/players.cpp,call,operator bool
 0x4649d0,RebuildAIFeatureCells,src/game/players.cpp,field_read,AiSeam::RebuildFeatureCells
 0x4649d0,RebuildAIFeatureCells,src/game/players.cpp,field_read,Player::ai
@@ -42972,6 +42954,7 @@ address,function,file,kind,target
 ,AiApply,src/ai/ai_player.cpp,call,AiEventSize
 ,AiApply,src/ai/ai_player.cpp,call,AiUnitOf
 ,AiApply,src/ai/ai_player.cpp,call,ReactToAttack
+,AiApply,src/ai/ai_player.cpp,call,ResetAIPlayers
 ,AiApply,src/ai/ai_player.cpp,call,ScaleWeights
 ,AiApply,src/ai/ai_player.cpp,call,SetAiCommandsEnabled
 ,AiApply,src/ai/ai_player.cpp,call,SetLimits
@@ -43030,6 +43013,10 @@ address,function,file,kind,target
 ,AiPublishPlan,src/game/ai_events.h,call,SchedPublish
 ,AiPublishPlan,src/game/ai_events.h,field_write,AiPlan::difficulties
 ,AiPublishPlan,src/game/ai_events.h,function,
+,AiPublishReloadProfiles,src/game/ai_events.h,call,SchedPublish
+,AiPublishReloadProfiles,src/game/ai_events.h,call,memset
+,AiPublishReloadProfiles,src/game/ai_events.h,field_write,AiEventHeader::kind
+,AiPublishReloadProfiles,src/game/ai_events.h,function,
 ,AiPublishWeight,src/game/ai_events.h,call,AiFillHeader
 ,AiPublishWeight,src/game/ai_events.h,call,SchedPublish
 ,AiPublishWeight,src/game/ai_events.h,call,memcpy
@@ -49406,10 +49393,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::DumpPlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::FreeSquadManager
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::FreeSquads
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::ParseDownloadableAiWeightScripts
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::RebuildFeatureCells
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::ReparseAiWeightScriptsIfLimitNotSticky
-,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::ResetAIPlayers
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::UpdatePlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,field_write,AiSeam::UpdateSquads
 ,HookSeams,src/harness/replay_hooks.inc,field_write,EconomySeam::Apply
@@ -49597,7 +49581,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::Apply
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::DeactivateConditions
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::Init
-,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::LoadDefaultAIScript
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::RegionSize
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::Shutdown
 ,HookSeams,src/harness/replay_hooks.inc,field_write,PlayersSeam::UpdatePlayerBody
@@ -49694,10 +49677,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiDumpPlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiFreeSquadManager
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiFreeSquads
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiParseDownloadableAiWeightScripts
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiRebuildFeatureCells
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiReparseAiWeightScriptsIfLimitNotSticky
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiResetAIPlayers
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiUpdatePlayerAI
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecAiUpdateSquads
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecEconomyApply
@@ -49885,7 +49865,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersApply
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersDeactivateConditions
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersInit
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersLoadDefaultAIScript
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersRegionSize
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersShutdown
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecPlayersUpdatePlayerBody
@@ -50581,6 +50560,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::DumpPlayerAI
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::FreeSquadManager
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::FreeSquads
+,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::LoadProfiles
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ParseDownloadableAiWeightScripts
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::RebuildFeatureCells
 ,InstallNativeSeams,src/seams/native.cpp,field_write,AiSeam::ReparseAiWeightScriptsIfLimitNotSticky
@@ -51170,6 +51150,7 @@ address,function,file,kind,target
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,KillUnit
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,KillUnitsOfType
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,ListDirectoryNative
+,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadAIProfiles
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadCampaignNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadConditionsNative
 ,InstallNativeSeams,src/seams/native.cpp,fn_ref,LoadDefaultAIScript
@@ -52034,6 +52015,20 @@ address,function,file,kind,target
 ,LiveOf,src/wasm/wind_meteors_glue.cpp,function,
 ,LiveOf,src/wasm/wind_meteors_glue.cpp,global_escape,s_error
 ,LiveOf,src/wasm/wind_meteors_glue.cpp,global_maybe_written,s_error
+,LoadAIProfiles,src/ai/ai_player.cpp,call,GameFreeThunk
+,LoadAIProfiles,src/ai/ai_player.cpp,call,HAPI_LoadFile
+,LoadAIProfiles,src/ai/ai_player.cpp,call,ParseDownloadableAiWeightScripts
+,LoadAIProfiles,src/ai/ai_player.cpp,call,ReparseAiWeightScriptsIfLimitNotSticky
+,LoadAIProfiles,src/ai/ai_player.cpp,call,RunProfileText
+,LoadAIProfiles,src/ai/ai_player.cpp,field_escape,Game::players
+,LoadAIProfiles,src/ai/ai_player.cpp,field_read,MissionSeam::GetNameSlot
+,LoadAIProfiles,src/ai/ai_player.cpp,field_read,Player::active
+,LoadAIProfiles,src/ai/ai_player.cpp,field_read,Player::type
+,LoadAIProfiles,src/ai/ai_player.cpp,field_read,Seams::mission
+,LoadAIProfiles,src/ai/ai_player.cpp,function,
+,LoadAIProfiles,src/ai/ai_player.cpp,global_read,g_game
+,LoadAIProfiles,src/ai/ai_player.cpp,global_read,g_seams
+,LoadAIProfiles,src/ai/ai_player.cpp,indirect_call,indirect via const char *(*)(int) __attribute__((stdcall)) [MissionSeam::GetNameSlot]
 ,LoadCampaignNative,src/seams/native.cpp,call,Mission::LoadCampaign
 ,LoadCampaignNative,src/seams/native.cpp,call,TheMission
 ,LoadCampaignNative,src/seams/native.cpp,function,
@@ -56043,6 +56038,7 @@ address,function,file,kind,target
 ,RecAiApply,src/harness/replay_hooks.inc,call,EventRoots
 ,RecAiApply,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiApply,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecAiApply,src/harness/replay_hooks.inc,field_read,AiEventHeader::kind
 ,RecAiApply,src/harness/replay_hooks.inc,field_read,AiSeam::Apply
 ,RecAiApply,src/harness/replay_hooks.inc,function,
 ,RecAiApply,src/harness/replay_hooks.inc,global_read,s_call
@@ -56110,14 +56106,6 @@ address,function,file,kind,target
 ,RecAiFreeSquads,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiFreeSquads,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiFreeSquads,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Player *) __attribute__((stdcall)) [AiSeam::FreeSquads]
-,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,call,ArgValue
-,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,field_read,AiSeam::ParseDownloadableAiWeightScripts
-,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,function,
-,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiParseDownloadableAiWeightScripts,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [AiSeam::ParseDownloadableAiWeightScripts]
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,call,ArgValue
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -56126,20 +56114,6 @@ address,function,file,kind,target
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,global_read,s_call
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,global_read,s_inner_ai
 ,RecAiRebuildFeatureCells,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [AiSeam::RebuildFeatureCells]
-,RecAiReparseAiWeightScriptsIfLimitNotSticky,src/harness/replay_hooks.inc,call,ArgValue
-,RecAiReparseAiWeightScriptsIfLimitNotSticky,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiReparseAiWeightScriptsIfLimitNotSticky,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiReparseAiWeightScriptsIfLimitNotSticky,src/harness/replay_hooks.inc,field_read,AiSeam::ReparseAiWeightScriptsIfLimitNotSticky
-,RecAiReparseAiWeightScriptsIfLimitNotSticky,src/harness/replay_hooks.inc,function,
-,RecAiReparseAiWeightScriptsIfLimitNotSticky,src/harness/replay_hooks.inc,global_read,s_call
-,RecAiReparseAiWeightScriptsIfLimitNotSticky,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiReparseAiWeightScriptsIfLimitNotSticky,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(int) __attribute__((stdcall)) [AiSeam::ReparseAiWeightScriptsIfLimitNotSticky]
-,RecAiResetAIPlayers,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecAiResetAIPlayers,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecAiResetAIPlayers,src/harness/replay_hooks.inc,field_read,AiSeam::ResetAIPlayers
-,RecAiResetAIPlayers,src/harness/replay_hooks.inc,function,
-,RecAiResetAIPlayers,src/harness/replay_hooks.inc,global_read,s_inner_ai
-,RecAiResetAIPlayers,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [AiSeam::ResetAIPlayers]
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,call,ArgValue
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecAiUpdatePlayerAI,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -58624,15 +58598,6 @@ address,function,file,kind,target
 ,RecPlayersInit,src/harness/replay_hooks.inc,global_read,s_call
 ,RecPlayersInit,src/harness/replay_hooks.inc,global_read,s_inner_players
 ,RecPlayersInit,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(const PlayersMapInfo *, void *, unsigned int) __attribute__((stdcall)) [PlayersSeam::Init]"
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,FinishImport
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,SlotScope::Import
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,field_read,PlayersSeam::LoadDefaultAIScript
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,function,
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,global_read,s_inner_players
-,RecPlayersLoadDefaultAIScript,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [PlayersSeam::LoadDefaultAIScript]
 ,RecPlayersRegionSize,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPlayersRegionSize,src/harness/replay_hooks.inc,call,ArgValueStruct
 ,RecPlayersRegionSize,src/harness/replay_hooks.inc,call,SlotScope::Open
@@ -61573,6 +61538,34 @@ address,function,file,kind,target
 ,RunImport,src/wasm/wind_meteors_glue.cpp,global_write,s_importDepth
 ,RunImport,src/wasm/wind_meteors_glue.cpp,global_write,s_importThread
 ,RunImport,src/wasm/wind_meteors_glue.cpp,indirect_call,"indirect via const char *(*const)(void *, wasmtime_val_raw_t *) __attribute__((cdecl)) [ImportDef::function]"
+,RunProfileLine,src/ai/ai_player.cpp,call,CommandArgs::GetArg
+,RunProfileLine,src/ai/ai_player.cpp,call,CommandArgs::GetFloatArg
+,RunProfileLine,src/ai/ai_player.cpp,call,CommandArgs::GetIntArg
+,RunProfileLine,src/ai/ai_player.cpp,call,ScaleWeights
+,RunProfileLine,src/ai/ai_player.cpp,call,SetAiCommandsEnabled
+,RunProfileLine,src/ai/ai_player.cpp,call,SetLimits
+,RunProfileLine,src/ai/ai_player.cpp,call,_strcmpi
+,RunProfileLine,src/ai/ai_player.cpp,call,memcpy
+,RunProfileLine,src/ai/ai_player.cpp,call,memset
+,RunProfileLine,src/ai/ai_player.cpp,field_escape,AiLimit::types
+,RunProfileLine,src/ai/ai_player.cpp,field_escape,AiWeight::types
+,RunProfileLine,src/ai/ai_player.cpp,field_escape,UnitTypeSet::bits
+,RunProfileLine,src/ai/ai_player.cpp,field_maybe_written,AiLimit::fix
+,RunProfileLine,src/ai/ai_player.cpp,field_maybe_written,AiWeight::fix
+,RunProfileLine,src/ai/ai_player.cpp,field_read,CommandArgs::count
+,RunProfileLine,src/ai/ai_player.cpp,field_read,Seams::units
+,RunProfileLine,src/ai/ai_player.cpp,field_read,UnitsSeam::UnitTypeSetAddTypeOrCategory
+,RunProfileLine,src/ai/ai_player.cpp,field_write,AiLimit::limit
+,RunProfileLine,src/ai/ai_player.cpp,field_write,AiWeight::scale
+,RunProfileLine,src/ai/ai_player.cpp,function,
+,RunProfileLine,src/ai/ai_player.cpp,global_read,g_seams
+,RunProfileLine,src/ai/ai_player.cpp,indirect_call,"indirect via void (*)(UnitTypeSet *, const char *, int *) __attribute__((stdcall)) [UnitsSeam::UnitTypeSetAddTypeOrCategory]"
+,RunProfileText,src/ai/ai_player.cpp,call,CommandArgs::InitArgs
+,RunProfileText,src/ai/ai_player.cpp,call,CommandArgs::Tokenize
+,RunProfileText,src/ai/ai_player.cpp,call,RunProfileLine
+,RunProfileText,src/ai/ai_player.cpp,deref_read,*char
+,RunProfileText,src/ai/ai_player.cpp,field_read,CommandArgs::count
+,RunProfileText,src/ai/ai_player.cpp,function,
 ,RunPull,src/ai/pathfind_hpa.cpp,call,ClassOfActive
 ,RunPull,src/ai/pathfind_hpa.cpp,call,ClearLine
 ,RunPull,src/ai/pathfind_hpa.cpp,call,FinishSearch

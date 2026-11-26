@@ -458,6 +458,8 @@ listed under them). Entry points that run no other subsystem's step are left out
 
 1. a draw from the Park-Miller generator (`rng`)
 1. a call into units outside its interface
+1. `mission.GetNameSlot`: query
+1. `units.UnitTypeSetAddTypeOrCategory`: mixed
 
 ### `ai.UpdatePlayerAI`
 
@@ -1192,11 +1194,13 @@ is not listed.
 | caller | entry point | class |
 |---|---|---|
 | ai | `economy.GetEnergyUse` | mixed |
+| ai | `mission.GetNameSlot` | query |
 | ai | `orders.Apply` | mixed |
 | ai | `targeting.Apply` | mixed |
 | ai | `targeting.FindWeaponTarget` | mixed |
 | ai | `targeting.GetWeaponTargetUnit` | query |
 | ai | `units.Apply` | mixed |
+| ai | `units.UnitTypeSetAddTypeOrCategory` | mixed |
 | ai | `weapons.FindTargetableProjectile` | query |
 | economy | `ai.Apply` | mixed |
 | economy | `features.Apply` | mixed |
@@ -1558,18 +1562,18 @@ it writes and reads, and how many of its edges fall inside one entity's update.
 | wind_meteors | 0 / 0 | 0 / 0 | 0 / 2 | 1 / 0 | 0 | 0 | 0 |
 | economy | 0 / 0 | 1 / 1 | 1 / 2 | 9 / 7 | 39 | 3 | 41 |
 | features | 1 / 0 | 6 / 5 | 1 / 0 | 9 / 6 | 13 | 3 | 16 |
-| ai | 0 / 0 | 2 / 0 | 0 / 2 | 5 / 4 | 0 | 18 | 18 |
+| ai | 0 / 0 | 3 / 0 | 0 / 2 | 6 / 4 | 0 | 18 | 18 |
 | pathfinding | 1 / 0 | 1 / 0 | 2 / 3 | 0 / 1 | 0 | 0 | 0 |
 | weapons | 0 / 2 | 10 / 5 | 0 / 2 | 11 / 5 | 19 | 47 | 66 |
 | targeting | 1 / 0 | 3 / 4 | 0 / 0 | 2 / 7 | 3 | 28 | 31 |
 | los_radar | 0 / 0 | 1 / 14 | 0 / 5 | 0 / 6 | 11 | 22 | 32 |
 | orders | 3 / 0 | 21 / 2 | 1 / 3 | 30 / 6 | 8 | 47 | 55 |
-| units | 1 / 1 | 7 / 6 | 14 / 3 | 18 / 18 | 130 | 22 | 152 |
+| units | 1 / 1 | 7 / 6 | 14 / 3 | 18 / 19 | 130 | 22 | 152 |
 | players | 1 / 0 | 3 / 0 | 11 / 0 | 8 / 4 | 1 | 12 | 11 |
 | map | 0 / 1 | 3 / 15 | 0 / 2 | 1 / 8 | 16 | 25 | 41 |
 | scripts | 0 / 0 | 1 / 9 | 0 / 7 | 0 / 15 | 14 | 15 | 29 |
 | movement | 0 / 0 | 3 / 1 | 3 / 2 | 9 / 12 | 14 | 26 | 40 |
-| mission | 0 / 4 | 0 / 0 | 0 / 0 | 0 / 4 | 0 | 0 | 0 |
+| mission | 0 / 4 | 0 / 1 | 0 / 0 | 0 / 4 | 0 | 0 | 0 |
 
 ## Routes
 
@@ -1654,6 +1658,7 @@ delivery to the same subscriber. No inbox holds an effect when the tick ends.
 | engine | `AI_PLAN` | ai | queued |
 | engine | `AI_WEIGHT` | ai | queued |
 | engine | `AI_LIMIT` | ai | queued |
+| engine | `AI_RELOAD_PROFILES` | ai | queued |
 | ai | `AI_EFFECT_ADD_ORDER` | orders | synchronous |
 | ai | `AI_EFFECT_QUEUE_BUILD` | orders | synchronous |
 | ai | `AI_EFFECT_STOP` | orders | synchronous |

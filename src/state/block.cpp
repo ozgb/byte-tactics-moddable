@@ -38,7 +38,6 @@ struct BlockChunk {
 
 const unsigned int kFreeBit = 1;
 const unsigned int kChunkHeader = sizeof(BlockChunk);
-const unsigned int kMinChunk = 16;
 const unsigned int kFirstChunk = sizeof(BlockHeader);
 
 char* g_base;

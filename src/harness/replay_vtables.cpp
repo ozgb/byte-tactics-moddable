@@ -34,6 +34,13 @@ extern void (* const g_buildTimerVtable[])() __asm__("??_7BuildTimer@@6B@");
 extern void (* const g_spatialTimerVtable[])() __asm__("??_7SpatialTimer@@6B@");
 extern void (* const g_plainTimerVtable[])() __asm__("??_7SquadTimer@@6B@");
 extern void (* const g_pathOrderAttachVtable[])() __asm__("??_7PathOrderAttach@@6B@");
+extern void (* const g_pointMarkerVtable[])();
+extern void (* const g_airManeuverOrderVtable[])();
+extern void (* const g_vtsym_AiSearchGoal[])() __asm__("??_7AiSearchGoal@@6B@");
+extern void (* const g_vtsym_PatrolGoal[])() __asm__("??_7PatrolGoal@@6B@");
+extern void (* const g_vtsym_PackedPosGoal[])() __asm__("??_7PackedPosGoal@@6B@");
+extern void (* const g_vtsym_LiteGoal[])() __asm__("??_7LiteGoal@@6B@");
+extern void* g_orderFxVtable[];
 extern void (* const g_vtsec_VictoryKillAllMobileUnits_UnitScanVisitor[])() __asm__("??_7VictoryKillAllMobileUnits@@6BUnitScanVisitor@@@");
 extern void (* const g_vtsec_VictoryBuildUnitType_UnitScanVisitor[])() __asm__("??_7VictoryBuildUnitType@@6BUnitScanVisitor@@@");
 extern void (* const g_vtsec_VictoryKillAllOfType_UnitScanVisitor[])() __asm__("??_7VictoryKillAllOfType@@6BUnitScanVisitor@@@");
@@ -110,6 +117,20 @@ const void* ReplayVtable(unsigned kind)
         return g_plainTimerVtable;
     case ROK_PATHORDERATTACH:
         return g_pathOrderAttachVtable;
+    case ROK_POINTMARKER:
+        return g_pointMarkerVtable;
+    case ROK_AIRMANEUVERORDER:
+        return g_airManeuverOrderVtable;
+    case ROK_AISEARCHGOAL:
+        return g_vtsym_AiSearchGoal;
+    case ROK_PATROLGOAL:
+        return g_vtsym_PatrolGoal;
+    case ROK_PACKEDPOSGOAL:
+        return g_vtsym_PackedPosGoal;
+    case ROK_LITEGOAL:
+        return g_vtsym_LiteGoal;
+    case ROK_PLAINORDERFX:
+        return g_orderFxVtable;
     default:
         return nullptr;
     }
@@ -180,6 +201,20 @@ const char* ReplayVtableName(unsigned kind)
         return "g_plainTimerVtable";
     case ROK_PATHORDERATTACH:
         return "g_pathOrderAttachVtable";
+    case ROK_POINTMARKER:
+        return "g_pointMarkerVtable";
+    case ROK_AIRMANEUVERORDER:
+        return "g_airManeuverOrderVtable";
+    case ROK_AISEARCHGOAL:
+        return "g_vtsym_AiSearchGoal";
+    case ROK_PATROLGOAL:
+        return "g_vtsym_PatrolGoal";
+    case ROK_PACKEDPOSGOAL:
+        return "g_vtsym_PackedPosGoal";
+    case ROK_LITEGOAL:
+        return "g_vtsym_LiteGoal";
+    case ROK_PLAINORDERFX:
+        return "g_orderFxVtable";
     default:
         return "";
     }

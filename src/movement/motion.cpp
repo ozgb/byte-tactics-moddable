@@ -214,6 +214,10 @@ static inline void ClampToCell(Vec3& pos, Point16 cell, Point16 draft)
         pos.z = cz - 0x7ffff;
 }
 
+#ifndef BT_REPLAY_INJECT_SPEED_DIVISOR
+#define BT_REPLAY_INJECT_SPEED_DIVISOR 0x640000
+#endif
+
 // FUNCTION: 0x43cc20
 void UnitMotion::UpdateVelocityFromHeading(Unit* unit, int amount)
 {
@@ -227,7 +231,7 @@ void UnitMotion::UpdateVelocityFromHeading(Unit* unit, int amount)
         idx = 5;
 
     int range = (int)(((__int64)(g_slopeSpeedFactor[idx] << 16) * ((UnitDefMoveView*)unit->def.get())->maxvelocity) >> 16);
-    range = (int)(((__int64)range << 16) / 0x640000);
+    range = (int)(((__int64)range << 16) / BT_REPLAY_INJECT_SPEED_DIVISOR);
     if (unit->yWhole < g_game->seaLevel && !(((UnitDefMoveView*)unit->def.get())->flags1 & 0x81000))
         range = (int)(((__int64)range * 0x8000) >> 16);
     if (speed > range)

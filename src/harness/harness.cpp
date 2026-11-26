@@ -1698,6 +1698,8 @@ void HarnessExit()
 {
     if (HarnessTestMode())
         CheckFrameInputsDelivered();
+    if (HarnessTestMode() && s_blockScan)
+        BlockScanWrite(strcmp(s_commit, "unknown") == 0 ? "-" : s_commit);
 #if BT_ACCESS_LOG
     AccessLogFinish();
 #endif

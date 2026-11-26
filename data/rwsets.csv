@@ -48816,12 +48816,16 @@ address,function,file,kind,target
 ,HarnessEventText,src/harness/harness.cpp,call,fputs
 ,HarnessEventText,src/harness/harness.cpp,function,
 ,HarnessEventText,src/harness/harness.cpp,global_read,s_events@src/harness/harness.cpp
+,HarnessExit,src/harness/harness.cpp,call,BlockScanWrite
 ,HarnessExit,src/harness/harness.cpp,call,CheckFrameInputsDelivered
 ,HarnessExit,src/harness/harness.cpp,call,Fail
 ,HarnessExit,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessExit,src/harness/harness.cpp,call,ReplayWrite
 ,HarnessExit,src/harness/harness.cpp,call,sprintf
+,HarnessExit,src/harness/harness.cpp,call,strcmp
 ,HarnessExit,src/harness/harness.cpp,function,
+,HarnessExit,src/harness/harness.cpp,global_escape,s_commit@src/harness/harness.cpp
+,HarnessExit,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
 ,HarnessExit,src/harness/harness.cpp,global_read,s_recordSwitch@src/harness/harness.cpp
 ,HarnessFeaturesEvent,src/harness/harness.cpp,call,RecordEvent
 ,HarnessFeaturesEvent,src/harness/harness.cpp,function,

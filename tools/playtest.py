@@ -267,6 +267,29 @@ def find_game_dir(arg: str | None) -> Path:
     raise SystemExit("no Total Annihilation install found: pass --game-dir")
 
 
+X_SOCKET_DIR = Path("/tmp/.X11-unix")
+
+
+def x_socket_dir_read_only(socket_dir: Path = X_SOCKET_DIR) -> bool:
+    return socket_dir.exists() and not os.access(socket_dir, os.W_OK)
+
+
+def x_command(window: str | None, fd: int, socket_dir: Path = X_SOCKET_DIR) -> list[str]:
+    """The X server command: a Xephyr window titled `window`, or an invisible Xvfb when it is None.
+
+    A read-only socket directory (WSLg's) leaves the server on Linux's abstract socket only.
+    """
+    if window is None:
+        cmd = ["Xvfb", "-displayfd", str(fd), "-screen", "0", "640x480x24", "-ac", "-br", "-noreset",
+               "-nolisten", "tcp"]
+    else:
+        cmd = ["Xephyr", "-displayfd", str(fd), "-screen", "800x600x24", "-ac", "-br", "-noreset",
+               "-title", window]
+    if x_socket_dir_read_only(socket_dir):
+        cmd += ["-nolisten", "unix"]
+    return cmd
+
+
 def wine_env(prefix: Path, display: str = "") -> dict[str, str]:
     env = dict(os.environ)
     env.update(WINEPREFIX=str(prefix), WINEARCH=os.environ.get("WINEARCH", "win32"), WINEDLLOVERRIDES="mscoree,mshtml=", WINEDEBUG="-all")
@@ -427,15 +450,11 @@ class Instance:
             subprocess.run(["wineserver", "-w"], env=env)
 
     def start_x(self) -> None:
+        if self.run.window and not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
+            raise RuntimeError("Xephyr needs a desktop to open its window on (DISPLAY is not set)")
         r, w = os.pipe()
-        if self.run.window:
-            if not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
-                raise RuntimeError("Xephyr needs a desktop to open its window on (DISPLAY is not set)")
-            cmd = ["Xephyr", "-displayfd", str(w), "-screen", "800x600x24", "-ac", "-br", "-noreset",
-                   "-title", f"TA play test: {self.run.name}{self.suffix}"]
-        else:
-            cmd = ["Xvfb", "-displayfd", str(w), "-screen", "0", "640x480x24", "-ac", "-br", "-noreset",
-                   "-nolisten", "tcp"]
+        title = f"TA play test: {self.run.name}{self.suffix}" if self.run.window else None
+        cmd = x_command(title, w)
         self.xserver = subprocess.Popen(
             cmd, pass_fds=(w,), stdout=(self.run.out / f"xserver{self.suffix}.log").open("w"),
             stderr=subprocess.STDOUT, start_new_session=True)

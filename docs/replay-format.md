@@ -1073,7 +1073,7 @@ A holder is a state kind with a table in `Game` or `SimGlobals`, and element N o
 element (`UnitDef.data`, which holds the script), or in element N of the array that the `Game` member `game` leads to (`Game.types[N]`, which holds the model of unit
 type N). A load kind may have several holders (a later issue adds the models of feature types), and a holder needs no format change: the line names its kind. A
 replayer stores the address of its copy of a `game` holder's file in element N of that array, and allocates the array when the `Ref` is null, as many elements as the
-`alloc` of the holder kind's table, so the module finds the model of a unit type where the game keeps it (`InitUnitScript` reads `Game.types[N]` before it passes the model
+`alloc` of the holder kind's table, so the module finds the model of a unit type where the game keeps it (units reads `Game.types[N]` when it starts a unit's script, before it passes the model
 to `scripts.CreatePlayerObjectState`). A slot reads that element as the field of the state kind `UnitModel`, a table over `Game.types` whose one field `model` is
 of kind `load` (`o UnitModel#34.model UnitDef#34`). In the same way, `FeatureHeap` is a second view of `Game.features` with the one field `dead`, the word that units
 reads of a feature it reaches by its index (`r FeatureHeap#295.dead 65535`). The
@@ -1699,10 +1699,10 @@ units:
 
 units is complete with its whole tick seam recorded: the slots below are `record: false` with the reason in the schema, or recorded and reached by no stored window.
 
-- `KillUnit` is recorded, but only the game's shutdown (`ShutdownIngameSystems`) calls it through the seam, which no scenario run reaches before it ends; the death of a unit in a tick is `Apply` of UNITS_KILL, which `console-units` holds.
+- `KillUnit` is recorded, but only the game's shutdown calls it through the seam, which no scenario run reaches before it ends; the death of a unit in a tick is `Apply` of UNITS_KILL, which `console-units` holds.
 - `FreeFactoryIndex` is recorded, and called only when a match is unloaded (`FreePlayers`). `GetFactoriesInRadius` and `UnitRefUnlink` are recorded, and only an aircraft that looks for a repair pad, and movement's targets of an air unit, call them: `orders-air-repair` reaches both over ticks 231 to 699 (one pad search at tick 382, an unlink every 30 ticks), which replays equal, but the stored window of that scenario is the self-repair of ticks 848 to 853.
 - `Apply` of SET_POSITION, ATTACH_TO_PIECE, FINISH_CONSTRUCTION, BUILD_DECAY, REPAIR, SET_STANCE, SET_ANGLES, SET_BUILD_STATE, CHANGE_CELL, SEND, CAPTURE and FORGET_ATTACKER is recorded, and no stored window holds it. KILL_ALL and RELOAD_TYPE are console commands that reload the unit types (`unrecorded`, `load class`).
-- `FindMissionUnit`: only units' own `RunInitialMission` calls it, through the seam, while `CreateMissionUnits` places the units of a mission at its load, which no recording holds.
+- `FindMissionUnit`: only units itself calls it, through the seam, while it places the units of a mission at the mission's load, which no recording holds.
 - `UpdateAllUnits` is the scheduler's loop over every unit. It calls `UpdateUnitHead`, `UpdateUnitBody` and `UpdateUnitTail` through the seam, and other subsystems' slots between them, so its recording would hold a call of another recorded subsystem inside it; the head and body slots are recorded one by one.
 - `WriteState`, `SaveUnits`, `GetMovementLimits`, `CreateFactoryIndex` and `FreeFactoryIndex` are queries or set-up outside the tick, and the load slots are load class.
 - `UpdateUnitBody`'s water damage (`mission.waterDoesDamage` with a damage and a unit at or under the sea level that does not float) and its selection reset (`selected` with `selectable` cleared): no recorded window has a mission that sets water damage, and a unit is selected only by the interface.
@@ -1942,7 +1942,7 @@ The recordings of units (7.0), which the modern build runs as native code in eve
 - `units-transport`, ticks 4098 to 4101 only: `CanLoad` 1 call, and `Apply` of SCRIPT_VALUE.
 - `orders-guard-attacked`, ticks 28 to 32 only: the health percentage at tick 30.
 
-`replay_inject_test.exe` is also built with two injected changes. The percentage-scale injection of 99 (the 100 of `health * 100 / maxHealth` in `UpdateUnitBody`) is reported at call 62 of `orders-guard-attacked` and at `Unit#1.healthPercent` (recorded 100, replayed 99); the last attacker slot of 9 that a new unit starts with (10 in the game, set by `InitUnitFromType` under `CreateUnit`) is reported at call 3 of `orders-factory` and at `Unit#2.lastAttackerSlot`:
+`replay_inject_test.exe` is also built with two injected changes. The percentage-scale injection of 99 (the 100 of `health * 100 / maxHealth` in `UpdateUnitBody`) is reported at call 62 of `orders-guard-attacked` and at `Unit#1.healthPercent` (recorded 100, replayed 99); the last attacker slot of 9 that a new unit starts with (10 in the game, set under `CreateUnit`) is reported at call 3 of `orders-factory` and at `Unit#2.lastAttackerSlot`:
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 62 Unit#1.healthPercent tests/replay/units/orders-guard-attacked.txt

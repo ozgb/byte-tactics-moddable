@@ -1143,6 +1143,17 @@
     ]
    }
   },
+  "MakeGoal": {
+   "ret": "unsigned int",
+   "params": [],
+   "args": {},
+   "result": {
+    "mode": "object",
+    "kind": "FixtureGoalBase",
+    "poly": "FixtureGoalBase",
+    "ref": true
+   }
+  },
   "Drain": {
    "ret": "int",
    "params": [
@@ -1207,6 +1218,26 @@
     "height": {
      "mode": "scalar",
      "dir": "out"
+    }
+   }
+  },
+  "HandGoal": {
+   "ret": "int",
+   "params": [
+    {
+     "type": "unsigned int",
+     "name": "goal"
+    }
+   ],
+   "args": {
+    "goal": {
+     "mode": "scalar",
+     "import": {
+      "mode": "object",
+      "kind": "FixtureGoalBase",
+      "poly": "FixtureGoalBase",
+      "ref": true
+     }
     }
    }
   }

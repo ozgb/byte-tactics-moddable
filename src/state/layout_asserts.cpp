@@ -2227,7 +2227,7 @@ static_assert(sizeof(SoundSettingFlags) == 2, "");
 static_assert(offsetof(SoundSettingFlags, word) == 0, "");
 static_assert(offsetof(SoundSettingFlags, bits) == 0, "");
 static_assert(sizeof(SpatialBucket) == 10, "");
-static_assert(offsetof(SpatialBucket, unknown_0) == 0, "");
+static_assert(offsetof(SpatialBucket, bytes) == 0, "");
 static_assert(offsetof(SpatialBucket, head) == 6, "");
 static_assert(sizeof(SpatialTimer) == 60, "");
 static_assert(offsetof(SpatialTimer, best) == 20, "");

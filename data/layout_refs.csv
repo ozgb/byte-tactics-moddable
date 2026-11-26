@@ -137,6 +137,8 @@ LzssSetPreset,0x4d1670,src/files/sqsh.cpp,end-of,g_lzssPresetTree,0,g_lzssPreset
 MovementWriteState,,src/movement/movement_apply.cpp,end-of,g_liteGoalVtable,0,g_packedGoalVtable,,
 MovementWriteState,,src/movement/movement_apply.cpp,end-of,g_packedPosGoalVtable,0,g_liteGoalVtable,,
 MovementWriteState,,src/movement/movement_apply.cpp,end-of,g_patrolGoalVtable,0,g_aiSearchGoalVtable,,
+ReplayVtable,,src/harness/replay_vtables.cpp,end-of,g_packedPosGoalVtable,0,g_liteGoalVtable,,
+ReplayVtable,,src/harness/replay_vtables.cpp,end-of,g_patrolGoalVtable,0,g_aiSearchGoalVtable,,
 ScriptsOnWeaponsStartScript,,src/seams/scripts_world.cpp,end-of,g_hitByWeaponScriptName,0,g_takeDamageScriptName,,
 ScriptsOnWeaponsStartScript,,src/seams/scripts_world.cpp,past-end,g_aimScriptNames,-16,g_aimScriptNames,g_fireScriptNames+0x0,none
 ScriptsOnWeaponsStartScript,,src/seams/scripts_world.cpp,past-end,g_fireScriptNames,-4,g_fireScriptNames,g_screenshotPrefix+0x8,none

@@ -100,7 +100,8 @@ resolution (unresolved items, accesses to code or constants that no row names). 
 of the scenario to `<scenario>.raw.txt` (ACCESSLOG_RAW=1), for debugging only.
 
 An access is attributed to the function that contains the callback's return address; a function missing from
-data/subsystems.csv is `unknown`. The functions of src/state/block.cpp (the allocator, SimBlockBase and
+data/subsystems.csv is `unknown`. A function whose code the link left out (an empty section in its object,
+blockpointers.empty_functions) has the next live function's address in the map, so it names no range. The functions of src/state/block.cpp (the allocator, SimBlockBase and
 SimOwns, which Ref<T>::get calls) are ignored by address, so a Ref<T> dereference counts for the function
 that made it: the helper's own load of the block base is skipped and the access through the pointer is
 instrumented in the caller.
@@ -231,12 +232,13 @@ def object_source(obj: str) -> str:
     return m.group(1) if m else obj
 
 
-def function_names(info: MapInfo) -> tuple[list[int], list[str], list[str]]:
-    """The functions of the map by address: their start, their name by blockpointers.parse_map and their object."""
+def function_names(info: MapInfo, dead: frozenset[str] = frozenset()) -> tuple[list[int], list[str], list[str]]:
+    """The functions of the map by address: their start, their name by blockpointers.parse_map (a function in `dead`, whose code
+    the link left out, does not name the live function at its address) and the object of that name."""
     lines = [" 0001:%08x       %s %016x     %s" % (0, n, a, ob) for a, n, ob in info.code()]
-    code_map = blockpointers.parse_map("\n".join(lines))
+    code_map = blockpointers.parse_map("\n".join(lines), set(dead))
     objects = {}
-    for a, n, ob in info.code():
+    for a, n, ob in sorted(info.code(), key=lambda s: s[1] in dead):
         objects.setdefault(a, ob)
     return code_map.addresses, code_map.names, [objects[a] for a in code_map.addresses]
 
@@ -291,9 +293,9 @@ def subsystem_of(name: str, obj: str, rows: Subsystems) -> str:
     return next(iter(in_file)) if len(in_file) == 1 else UNKNOWN
 
 
-def attribution_table(info: MapInfo, rows: Subsystems) -> tuple[list[str], list[tuple[int, int, int]], dict]:
-    """(subsystem names with unknown first, [(start, end, id)] sorted, counts by kind) for the functions of a map."""
-    addresses, names, objects = function_names(info)
+def attribution_table(info: MapInfo, rows: Subsystems, dead: frozenset[str] = frozenset()) -> tuple[list[str], list[tuple[int, int, int]], dict]:
+    """(subsystem names with unknown first, [(start, end, id)] sorted, counts by kind) for the functions of a map, `dead` the functions with no code."""
+    addresses, names, objects = function_names(info, dead)
     code_end = max((a for s, o, _, a, _ in info.symbols if info.sections.get(s, (0, "", ""))[2] == "CODE"), default=0) + 0x1000
     subs = [UNKNOWN]
     ids = {UNKNOWN: 0}
@@ -321,10 +323,10 @@ def attribution_table(info: MapInfo, rows: Subsystems) -> tuple[list[str], list[
     return subs, ranges, counts
 
 
-def function_table(info: MapInfo) -> list[tuple[int, int, str]]:
+def function_table(info: MapInfo, dead: frozenset[str] = frozenset()) -> list[tuple[int, int, str]]:
     """[(start, end, name)] of every function of the map, sorted: the names accesslog.funcs holds, as blockpointers
     demangles them."""
-    addresses, names, _ = function_names(info)
+    addresses, names, _ = function_names(info, dead)
     code_end = max((a for s, o, _, a, _ in info.symbols if info.sections.get(s, (0, "", ""))[2] == "CODE"), default=0) + 0x1000
     return [(a, addresses[i + 1] if i + 1 < len(addresses) else code_end, blockpointers.demangle(names[i]))
             for i, a in enumerate(addresses)]
@@ -851,9 +853,10 @@ def tables(build_dir: Path) -> None:
     if not map_path.is_file():
         raise SystemExit("accesslog: no %s (link the build first)" % map_path)
     info = parse_map(map_path.read_text(errors="replace"))
-    subs, ranges, counts = attribution_table(info, read_subsystems())
+    dead = frozenset(blockpointers.empty_functions(build_dir / "objs"))
+    subs, ranges, counts = attribution_table(info, read_subsystems(), dead)
     (build_dir / ATTR_NAME).write_bytes(pack_attr(subs, ranges))
-    (build_dir / FUNCS_NAME).write_bytes(pack_funcs(function_table(info)))
+    (build_dir / FUNCS_NAME).write_bytes(pack_funcs(function_table(info, dead)))
     items, stats = build_items(info, map_path, layouts_of(build_dir), read_csv(STATE_CLASSES), read_csv(GLOBALS))
     (build_dir / ITEMS_NAME).write_bytes(items.pack())
     print("accesslog: %(functions)d functions, %(unknown)d unknown, %(ignored)d ignored" % counts, file=sys.stderr)
@@ -868,8 +871,8 @@ def trace_difference(trace: Path, reference: Path) -> str | None:
     _, want = tracedigest.parse_digest(reference)
     if have == want:
         return None
-    for (tick, digest, state), (wanted_tick, wanted, wanted_state) in zip(have, want):
-        if (tick, digest, state) != (wanted_tick, wanted, wanted_state):
+    for (tick, digest, *rest), (wanted_tick, wanted, *wanted_rest) in zip(have, want):
+        if (tick, digest, *rest) != (wanted_tick, wanted, *wanted_rest):
             return "first difference at tick %d (%s, stored %s)" % (tick, digest, wanted)
     return "%d ticks, stored %d" % (len(have), len(want))
 

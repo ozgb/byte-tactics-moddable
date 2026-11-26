@@ -547,6 +547,15 @@ class MapTest(unittest.TestCase):
         self.assertEqual(ranges[0][0], 0x401000)
         self.assertTrue(all(a[1] <= b[0] for a, b in zip(ranges, ranges[1:])))
 
+    def test_a_function_with_no_code_names_no_range(self):
+        dead_line = " 0001:00000180       ?Aaa@@YAXXZ               0000000000401180     0004_other.cpp.obj\n"
+        info = al.parse_map(MAP.replace(" 0001:00000180", dead_line + " 0001:00000180", 1))
+        subs, ranges, _ = al.attribution_table(info, self.rows, frozenset({"?Aaa@@YAXXZ"}))
+        self.assertEqual(subs[next(sub for start, end, sub in ranges if start <= 0x401180 < end)], "presentation")
+        self.assertIn((0x401180, 0x4011c0, "Helper"), al.function_table(info, frozenset({"?Aaa@@YAXXZ"})))
+        subs, ranges, _ = al.attribution_table(info, self.rows)
+        self.assertEqual(subs[next(sub for start, end, sub in ranges if start <= 0x401180 < end)], "orders")
+
     def test_attr_round_trip(self):
         subs, ranges, _ = al.attribution_table(self.info, self.rows)
         self.assertEqual(al.unpack_attr(al.pack_attr(subs, ranges)), (subs, ranges))
@@ -828,16 +837,16 @@ class RunTest(unittest.TestCase):
     def test_equal_and_different_traces(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
-            header = "bt-digest 9\ntrace_format bt-trace 9\ncommit x\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\nfpu_control_word 0x1\n"
-            trace = "\n".join(["bt-trace 9", "commit x", "scenario s", "game_seed 1", "crt_seed 1", "view_seed 1",
-                               "fpu_control_word 0x1", "1 units 00000000000000aa", "1 tick 00000000000000a1", "2 units 00000000000000bb", "2 tick 00000000000000b1", ""])
+            header = "bt-digest 10\ntrace_format bt-trace 10\ncommit x\nscenario s\ngame_seed 1\ncrt_seed 1\nview_seed 1\nfpu_control_word 0x1\n"
+            trace = "\n".join(["bt-trace 10", "commit x", "scenario s", "game_seed 1", "crt_seed 1", "view_seed 1",
+                               "fpu_control_word 0x1", "1 units 00000000000000aa", "1 tick 00000000000000a1", "1 view 00000000000000a2", "2 units 00000000000000bb", "2 tick 00000000000000b1", "2 view 00000000000000b2", ""])
             (tmp / "trace.txt").write_text(trace)
             import tracedigest
             _, rows = tracedigest.parse_trace(tmp / "trace.txt")
             digests = tracedigest.digests(rows)
-            (tmp / "ref.txt").write_text(header + "".join("%d %s %s\n" % d for d in digests))
+            (tmp / "ref.txt").write_text(header + "".join("%d %s %s %s\n" % d for d in digests))
             self.assertIsNone(al.trace_difference(tmp / "trace.txt", tmp / "ref.txt"))
-            (tmp / "other.txt").write_text(header + "1 %s %s\n2 %s %s\n" % (digests[0][1], digests[0][2], "0" * 16, digests[1][2]))
+            (tmp / "other.txt").write_text(header + "1 %s %s %s\n2 %s %s %s\n" % (digests[0][1], digests[0][2], digests[0][3], "0" * 16, digests[1][2], digests[1][3]))
             self.assertIn("tick 2", al.trace_difference(tmp / "trace.txt", tmp / "other.txt"))
 
     def test_steady_leaves_out_the_presentation_rows(self):

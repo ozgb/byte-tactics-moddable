@@ -1,4 +1,6 @@
 writer,reader,item,phase,class,runs,example,flags
+-,ai,AssaultTimer::kind,players,read-only,1,ui-scroll-groups@300,
+-,ai,AssaultTimer::limit,players,read-only,1,ui-scroll-groups@300,
 -,ai,EscortTimer::other,players,read-only,76,ai-antinuke-intercept@30,
 -,ai,Group::id,players,read-only,50,ai-antinuke-intercept@30,
 -,ai,Group::player,players,read-only,50,ai-antinuke-intercept@30,
@@ -903,7 +905,7 @@ writer,reader,item,phase,class,runs,example,flags
 -,targeting,units,units,read-only,27,load-targets@1,
 -,targeting,unknown_1a6b,players,read-only,94,mission-build-unit@1,
 -,targeting,unknown_1a6b,units,read-only,96,ai-antinuke-intercept@3,
--,units,DAT_00501fcc,players,read-only,5,console-edge@1,
+-,units,DAT_00501fcc,players,read-only,3,console-edge@1,
 -,units,Feature::dead,units,read-only,25,mission-build-unit@71,
 -,units,LoadUnitInfo: GameAllocIgnoreTag char,players,read-only,5,console-edge@30,
 -,units,LoadUnitInfo: GameAllocIgnoreTag char,units,read-only,5,console-edge@1,

@@ -559,6 +559,63 @@ class FrameTest(unittest.TestCase):
         self.assertIn("frame 60: the run wrote no frame", lines[0])
 
 
+class ViewReportTest(unittest.TestCase):
+    @staticmethod
+    def view(tick: int = 30, metal: float = 1.0) -> bytes:
+        import test_viewblock as tv
+        return reference.viewblock.FILE_HEADER + tv.header(tick=tick) + tv.players(metal)
+
+    def report(self, stored: dict[int, bytes], got: dict[int, bytes]):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            scenario = root / "a.txt"
+            scenario.write_text("ticks 100\nframes 30 60\n")
+            plain = root / "b.txt"
+            plain.write_text("ticks 100\n")
+            for tick, data in stored.items():
+                (root / "views" / "a").mkdir(parents=True, exist_ok=True)
+                (root / "views" / "a" / f"{tick}.bin").write_bytes(data)
+            with mock.patch.object(reference, "ROOT", root):
+                return reference.view_report({"a": scenario, "b": plain}, {"a": got}, root / "views")
+
+    def test_report_equal(self):
+        views = {30: self.view(30), 60: self.view(60)}
+        differing, lines = self.report(views, views)
+        self.assertEqual((differing, lines), ([], ["views: 1 of 1 scenarios equal, 0 differ, 1 with no frames line"]))
+
+    def test_report_names_the_tick_and_field(self):
+        differing, lines = self.report({30: self.view(30), 60: self.view(60)}, {30: self.view(30), 60: self.view(60, metal=2.0)})
+        self.assertEqual(differing, ["a"])
+        self.assertEqual(lines[0], "DIFF a view 60: players[0].metal: stored 1, got 2")
+
+    def test_missing_stored_view_and_missing_run_view_fail(self):
+        differing, lines = self.report({30: self.view(30)}, {30: self.view(30), 60: self.view(60)})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("view 60: no stored view", lines[0])
+        differing, lines = self.report({30: self.view(30), 60: self.view(60)}, {30: self.view(30)})
+        self.assertIn("view 60: the run wrote no view", lines[0])
+
+    def test_a_file_that_is_not_a_view_is_named(self):
+        differing, lines = self.report({30: b"BTFRxxxxxxxx", 60: self.view(60)}, {30: self.view(30), 60: self.view(60)})
+        self.assertIn("view 30: not a view file", lines[0])
+
+    def test_the_branch_views_replace_the_stored_ones(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "branch/a").mkdir(parents=True)
+            (root / "branch/a/30.bin").write_bytes(b"new")
+            (root / "reference/views/old").mkdir(parents=True)
+            (root / "reference/views/old/1.bin").write_bytes(b"old")
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "VIEWS", root / "reference/views"), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.copy_views(root / "branch")
+            self.assertEqual([p.relative_to(root / "reference/views").as_posix() for p in (root / "reference/views").rglob("*.bin")], ["a/30.bin"])
+            self.assertIn("1 views copied", out.getvalue())
+
+    def test_the_views_are_in_the_gate_key(self):
+        self.assertIn("reference/views", reference.KEY_TREES)
+
+
 class SaveReportTest(unittest.TestCase):
     @staticmethod
     def bank(box: bytes) -> bytes:
@@ -738,11 +795,13 @@ class CheckQuirksTest(unittest.TestCase):
                 d = tmp / name
                 d.mkdir()
                 rows = [f"{t} {ph} {h}" for t, ph, h in phase_hashes]
-                (d / "trace.txt").write_text("bt-trace 9\n" + "\n".join(rows) + "\n")
+                (d / "trace.txt").write_text("bt-trace 10\n" + "\n".join(rows) + "\n")
                 return d
 
-            quirk_rows = [(1, "units", "1" * 16), (1, "tick", "4" * 16), (2, "units", "2" * 16), (2, "players", "9" * 16), (2, "tick", "5" * 16)]
-            off_rows = [(1, "units", "1" * 16), (1, "tick", "4" * 16), (2, "units", "2" * 16), (2, "players", "3" * 16), (2, "tick", "5" * 16)]
+            quirk_rows = [(1, "units", "1" * 16), (1, "tick", "4" * 16), (1, "view", "7" * 16), (2, "units", "2" * 16), (2, "players", "9" * 16),
+                          (2, "tick", "5" * 16), (2, "view", "7" * 16)]
+            off_rows = [(1, "units", "1" * 16), (1, "tick", "4" * 16), (1, "view", "7" * 16), (2, "units", "2" * 16), (2, "players", "3" * 16),
+                        (2, "tick", "5" * 16), (2, "view", "7" * 16)]
 
             def fake_play_all(exe, scenarios, game_dir, parallel, expected, poison, failed, keep_always=False, scans=None, scan_every=1, watch=None):
                 if keep_always:
@@ -877,15 +936,15 @@ class ScanRunTest(unittest.TestCase):
 
 
 class EarlyExitTest(unittest.TestCase):
-    HEADER = "bt-trace 9\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
+    HEADER = "bt-trace 10\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
 
     @staticmethod
     def rows(first, last):
-        return "".join(f"{tick} tick {tick:016x}\n" for tick in range(first, last + 1))
+        return "".join(f"{tick} tick {tick:016x}\n{tick} view {tick:016x}\n" for tick in range(first, last + 1))
 
     def stored(self, ticks):
         header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
-        rows = [(tick, "tick", f"{tick:016x}") for tick in range(1, ticks + 1)]
+        rows = [(tick, phase, f"{tick:016x}") for tick in range(1, ticks + 1) for phase in ("tick", "view")]
         return header, reference.tracedigest.digests(rows)
 
     def play(self, trace_text, ticks=5, result=None, wine_log=None, want=True):
@@ -942,7 +1001,7 @@ class EarlyExitTest(unittest.TestCase):
         return Path(handle.name)
 
     def test_a_full_length_trace_with_a_different_digest_is_a_difference_not_an_early_exit(self):
-        trace = self.HEADER + self.rows(1, 4) + "5 tick " + "f" * 16 + "\n"
+        trace = self.HEADER + self.rows(1, 4) + "5 tick " + "f" * 16 + "\n5 view " + "5" * 16 + "\n"
         (header, digests, _, kept), _ = self.play(trace)
         self.assertEqual(len(digests), 5)
         self.assertIn("tick 5", reference.difference(self.stored(5), header, digests))
@@ -1225,7 +1284,7 @@ class LoadOrderTest(unittest.TestCase):
 
 class ReplayTest(unittest.TestCase):
     HEADER = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
-    ROWS = [(1, "tick", "1" * 16), (2, "tick", "2" * 16)]
+    ROWS = [(1, "tick", "1" * 16), (1, "view", "3" * 16), (2, "tick", "2" * 16), (2, "view", "4" * 16)]
 
     def scenarios(self, tmp: Path) -> dict[str, Path]:
         texts = {"clicks": "ticks 9\ninput 2 char a\n", "plain": "ticks 50\n"}
@@ -1318,7 +1377,7 @@ class ReplayTest(unittest.TestCase):
 
     def test_report(self):
         same = reference.tracedigest.digests(self.ROWS)
-        other = reference.tracedigest.digests(self.ROWS[:1] + [(2, "tick", "9" * 16)])
+        other = reference.tracedigest.digests(self.ROWS[:2] + [(2, "tick", "9" * 16), self.ROWS[3]])
         bad, stale, lines = self.report(same, {})
         self.assertEqual((bad, stale), ([], []))
         self.assertRegex(lines[0], r"^ok   clicks\+commands \[wasm\] \(2 ticks")
@@ -1424,13 +1483,13 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
 
     def test_the_other_runs_are_stopped_and_the_report_names_the_tick(self):
         header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
-        good = [(1, "tick", "1" * 16), (2, "tick", "2" * 16), (3, "tick", "3" * 16), (4, "tick", "4" * 16)]
-        bad = good[:1] + [(2, "tick", "9" * 16)] + good[2:]
+        good = [row for t in "1234" for row in ((int(t), "tick", t * 16), (int(t), "view", "7" * 16))]
+        bad = good[:2] + [(2, "tick", "9" * 16), (2, "view", "7" * 16)] + good[4:]
         stored = (header, reference.tracedigest.digests(good))
         procs, paths, calls, reported = {}, {}, [], []
 
         def rows(items):
-            return "bt-trace 9\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in items)
+            return "bt-trace 10\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in items)
 
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
@@ -1489,9 +1548,9 @@ class CheckStopsAtFirstDifferenceTest(unittest.TestCase):
 
     def test_a_partial_last_line_is_not_compared(self):
         tail = reference.tracedigest.TraceTail()
-        text = b"bt-trace 9\nseed 1\n1 tick " + b"1" * 16 + b"\n2 tick " + b"2" * 16 + b"\n3 ti"
+        text = b"bt-trace 10\nseed 1\n1 tick " + b"1" * 16 + b"\n1 view " + b"7" * 16 + b"\n2 tick " + b"2" * 16 + b"\n2 view " + b"7" * 16 + b"\n3 ti"
         self.assertEqual(len(tail.feed(text)), 1)
-        self.assertEqual(tail.feed(b"ck " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "tick", "2" * 16)])[0]])
+        self.assertEqual(tail.feed(b"ck " + b"3" * 16 + b"\n"), [reference.tracedigest.digests([(2, "tick", "2" * 16), (2, "view", "7" * 16)])[0]])
 
 
 class KeyLockTest(unittest.TestCase):
@@ -1670,11 +1729,11 @@ class BothModesTest(unittest.TestCase):
 
     def test_the_watch_judges_a_native_run_against_the_scenarios_digests_and_names_the_mode(self):
         header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
-        good = [(1, "tick", "1" * 16), (2, "tick", "2" * 16)]
+        good = [(1, "tick", "1" * 16), (1, "view", "7" * 16), (2, "tick", "2" * 16), (2, "view", "7" * 16)]
         expected = {"a": (header, reference.tracedigest.digests(good))}
         with tempfile.TemporaryDirectory() as tmp:
             trace = Path(tmp) / "trace.txt"
-            trace.write_text("bt-trace 9\n1 tick " + "1" * 16 + "\n2 tick " + "9" * 16 + "\n3 tick " + "3" * 16 + "\n")
+            trace.write_text("bt-trace 10\n" + "".join(f"{t} tick {v * 16}\n{t} view {'7' * 16}\n" for t, v in ((1, "1"), (2, "9"), (3, "3"))))
             proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
             watch = reference.Watch(expected, lambda pid, started: trace)
             try:
@@ -1691,7 +1750,7 @@ class BothModesTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             run = Path(tmp) / "run"
             run.mkdir()
-            (run / "trace.txt").write_text("bt-trace 9\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 tick " + "1" * 16 + "\n")
+            (run / "trace.txt").write_text("bt-trace 10\ngame_seed 1\ncrt_seed 1\nview_seed 1\n1 tick " + "1" * 16 + "\n1 view " + "7" * 16 + "\n")
             (run / "blockptrs.txt").write_text("scan")
             (run / "sound.txt").write_text("header\n")
             (run / reference.UI_FILE).write_text("ui\n")
@@ -1752,14 +1811,14 @@ class BothModesTest(unittest.TestCase):
 
 
 class RecheckTest(unittest.TestCase):
-    HEADER = "bt-trace 9\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
+    HEADER = "bt-trace 10\ngame_seed 1\ncrt_seed 1\nview_seed 1\n"
 
     def rows(self, tick_values):
-        return "".join(f"{t} tick {v * 16}\n" for t, v in tick_values)
+        return "".join(f"{t} tick {v * 16}\n{t} view {'7' * 16}\n" for t, v in tick_values)
 
     def found(self, tmp, kept_text, watch_text):
         """Run a Watch over `watch_text` (the live trace), keeping a trace.txt of `kept_text` in place of the real copy."""
-        good = reference.tracedigest.digests([(t, "tick", v * 16) for t, v in ((1, "1"), (2, "2"), (3, "3"))])
+        good = reference.tracedigest.digests([(t, phase, h) for t, v in ((1, "1"), (2, "2"), (3, "3")) for phase, h in (("tick", v * 16), ("view", "7" * 16))])
         live = Path(tmp) / "work/i1/game/trace.txt"
         live.parent.mkdir(parents=True)
         live.write_text(self.HEADER + watch_text)
@@ -1807,7 +1866,7 @@ class RecheckTest(unittest.TestCase):
 
 
 class EndOfTickTest(unittest.TestCase):
-    STORED = [(1, "d1", "s1"), (2, "d2", "s2"), (3, "d3", "s3")]
+    STORED = [(1, "d1", "s1", "v1"), (2, "d2", "s2", "v2"), (3, "d3", "s3", "v3")]
     NAMES = ("eq", "diff", "bad")
 
     def report(self, end_of_tick, got_by_name):
@@ -1840,7 +1899,7 @@ class EndOfTickTest(unittest.TestCase):
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "report_fuel", lambda *a, **k: 0), \
                     mock.patch.multiple(reference, **{n: (lambda *a, **k: ([], [])) for n in
-                                                      ("sound_report", "ui_report", "interface_report", "events_report", "display_report", "display_list_report", "frame_report", "save_report")}), \
+                                                      ("sound_report", "ui_report", "interface_report", "events_report", "display_report", "display_list_report", "frame_report", "view_report", "save_report")}), \
                     mock.patch.object(reference, "report_divergence", lambda *a: divergences.append(a) or (_ for _ in ()).throw(SystemExit(1))), \
                     contextlib.redirect_stdout(out):
                 try:
@@ -1851,7 +1910,7 @@ class EndOfTickTest(unittest.TestCase):
         return status, out.getvalue(), columns
 
     def test_end_of_tick_marks_a_digest_only_difference_without_failing(self):
-        digest_only = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        digest_only = [(1, "d1", "s1", "v1"), (2, "x2", "s2", "v2"), (3, "d3", "s3", "v3")]
         status, out, columns = self.report(True, {"eq": self.STORED, "diff": digest_only, "bad": self.STORED})
         self.assertEqual(columns, [reference.STATE])
         self.assertIsNone(status)
@@ -1859,8 +1918,14 @@ class EndOfTickTest(unittest.TestCase):
         self.assertRegex(out, r"ok   eq \(3 ticks, [^)]*\)\n")
         self.assertRegex(out, r"3 of 3 scenarios equal, total [^\n]*\n2 of 3 scenarios equal on every row\n")
 
+    def test_end_of_tick_marks_a_view_only_difference_without_failing(self):
+        view_only = [(1, "d1", "s1", "v1"), (2, "d2", "s2", "w2"), (3, "d3", "s3", "v3")]
+        status, out, _ = self.report(True, {"eq": self.STORED, "diff": view_only, "bad": self.STORED})
+        self.assertIsNone(status)
+        self.assertRegex(out, r"ok   diff \(3 ticks, [^)]*\) \[view differs from tick 2\]\n")
+
     def test_end_of_tick_fails_a_state_difference_and_runs_tracediff_on_it(self):
-        state = [(1, "d1", "s1"), (2, "x2", "y2"), (3, "d3", "s3")]
+        state = [(1, "d1", "s1", "v1"), (2, "x2", "y2", "v2"), (3, "d3", "s3", "v3")]
         status, out, _ = self.report(True, {"eq": self.STORED, "diff": state, "bad": self.STORED})
         self.assertEqual(status, 1)
         self.assertRegex(out, r"DIFF diff \(3 ticks, [^)]*\) tick 2: stored s2, got y2 \[digest differs from tick 2\]\n")
@@ -1869,7 +1934,7 @@ class EndOfTickTest(unittest.TestCase):
         self.assertEqual([(d[0], d[-1]) for d in self.divergences], [("diff", True)])
 
     def test_without_the_switch_the_digest_decides_and_nothing_is_added(self):
-        digest_only = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        digest_only = [(1, "d1", "s1", "v1"), (2, "x2", "s2", "v2"), (3, "d3", "s3", "v3")]
         status, out, columns = self.report(False, {"eq": self.STORED, "diff": digest_only, "bad": self.STORED})
         self.assertEqual(columns, [reference.DIGEST])
         self.assertEqual(status, 1)
@@ -1878,16 +1943,16 @@ class EndOfTickTest(unittest.TestCase):
         self.assertNotIn("on every row", out)
 
     def test_the_digest_column_is_compared_by_default(self):
-        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        got = [(1, "d1", "s1", "v1"), (2, "x2", "s2", "v2"), (3, "d3", "s3", "v3")]
         self.assertEqual(reference.first_difference(self.STORED, got), "tick 2: stored d2, got x2")
         self.assertEqual(reference.first_difference(self.STORED, got, reference.DIGEST), "tick 2: stored d2, got x2")
 
     def test_the_state_column_ignores_the_digest(self):
-        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        got = [(1, "d1", "s1", "v1"), (2, "x2", "s2", "v2"), (3, "d3", "s3", "v3")]
         self.assertIsNone(reference.first_difference(self.STORED, got, reference.STATE))
 
     def test_the_state_column_reports_the_state(self):
-        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "x3", "y3")]
+        got = [(1, "d1", "s1", "v1"), (2, "x2", "s2", "v2"), (3, "x3", "y3", "v3")]
         self.assertEqual(reference.first_difference(self.STORED, got, reference.STATE), "tick 3: stored s3, got y3")
 
     def test_a_short_trace_differs_in_either_column(self):
@@ -1896,14 +1961,14 @@ class EndOfTickTest(unittest.TestCase):
 
     def test_difference_takes_the_column_and_still_checks_the_seeds(self):
         header = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
-        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "d3", "s3")]
+        got = [(1, "d1", "s1", "v1"), (2, "x2", "s2", "v2"), (3, "d3", "s3", "v3")]
         self.assertIsNone(reference.difference((header, self.STORED), header, got, reference.STATE))
         self.assertIsNotNone(reference.difference((header, self.STORED), header, got))
         seeds = {**header, "game_seed": "2"}
         self.assertIn("seeds differ", reference.difference((header, self.STORED), seeds, self.STORED, reference.STATE))
 
     def test_the_note_names_the_first_tick_whose_digest_differs(self):
-        got = [(1, "d1", "s1"), (2, "x2", "s2"), (3, "x3", "s3")]
+        got = [(1, "d1", "s1", "v1"), (2, "x2", "s2", "v2"), (3, "x3", "s3", "v3")]
         self.assertEqual(reference.digest_note(self.STORED, got), " [digest differs from tick 2]")
         self.assertEqual(reference.digest_note(self.STORED, self.STORED), "")
         self.assertEqual(reference.digest_note(self.STORED, self.STORED[:1]), " [digest differs from tick 2]")
@@ -1926,9 +1991,9 @@ class EndOfTickTest(unittest.TestCase):
     def watch_over(self, tmp, column):
         """A Watch over a live trace whose second tick differs in its `units` row only, the `tick` rows being equal."""
         def text(units2):
-            rows = [(1, "units", "1" * 16), (1, "tick", "a" * 16), (2, "units", units2 * 16), (2, "tick", "b" * 16),
-                    (3, "units", "3" * 16), (3, "tick", "c" * 16)]
-            return "bt-trace 9\ngame_seed 1\ncrt_seed 1\nview_seed 1\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in rows)
+            rows = [(1, "units", "1" * 16), (1, "tick", "a" * 16), (1, "view", "7" * 16), (2, "units", units2 * 16), (2, "tick", "b" * 16),
+                    (2, "view", "7" * 16), (3, "units", "3" * 16), (3, "tick", "c" * 16), (3, "view", "7" * 16)]
+            return "bt-trace 10\ngame_seed 1\ncrt_seed 1\nview_seed 1\n" + "".join(f"{t} {ph} {h}\n" for t, ph, h in rows)
 
         live = Path(tmp) / "live/trace.txt"
         live.parent.mkdir(parents=True)
@@ -1964,8 +2029,8 @@ class EndOfTickTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
             live = tmp / "trace.txt"
-            live.write_text("bt-trace 9\n1 tick " + "a" * 16 + "\n2 tick " + "9" * 16 + "\n3 tick " + "c" * 16 + "\n")
-            good = reference.tracedigest.digests([(1, "tick", "a" * 16), (2, "tick", "b" * 16), (3, "tick", "c" * 16)])
+            live.write_text("bt-trace 10\n" + "".join(f"{t} tick {v * 16}\n{t} view {'7' * 16}\n" for t, v in ((1, "a"), (2, "9"), (3, "c"))))
+            good = reference.tracedigest.digests([(t, ph, h) for t, v in ((1, "a"), (2, "b"), (3, "c")) for ph, h in (("tick", v * 16), ("view", "7" * 16))])
             kept = tmp / "kept"
             kept.mkdir()
             (kept / "trace.txt").write_text(live.read_text())
@@ -1985,7 +2050,7 @@ class EndOfTickTest(unittest.TestCase):
     def test_recheck_reads_the_column_the_watch_judged(self):
         found = reference.Found("a", "d", 2, 1.0, None, tick=2, stored="b" * 16, got="9" * 16)
         with tempfile.TemporaryDirectory() as tmp:
-            (Path(tmp) / "trace.txt").write_text("bt-trace 9\n1 tick " + "a" * 16 + "\n2 tick " + "b" * 16 + "\n3 tick " + "c" * 16 + "\n")
+            (Path(tmp) / "trace.txt").write_text("bt-trace 10\n" + "".join(f"{t} tick {v * 16}\n{t} view {'7' * 16}\n" for t, v in ((1, "a"), (2, "b"), (3, "c"))))
             found.kept = Path(tmp)
             self.assertIn("a different value", reference.recheck(found, reference.STATE))
             self.assertIsNone(reference.recheck(found, reference.DIGEST))

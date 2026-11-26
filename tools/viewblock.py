@@ -30,7 +30,8 @@ ROOT_STRUCT = "PlayerView"
 HEADER_END = "players"
 TABLES = (("units", "unitCount"), ("pieces", "pieceCount"), ("orders", "orderCount"), ("blips", "blipCount"),
           ("features", "featureCount"), ("projectiles", "projectileCount"), ("debris", "debrisCount"),
-          ("explodedPieces", "explodedPieceCount"), ("messages", "messageCount"))
+          ("explodedPieces", "explodedPieceCount"), ("debrisVertices", "debrisVertexCount"), ("debrisFaces", "debrisFaceCount"),
+          ("debrisIndices", "debrisIndexCount"), ("textures", "textureCount"), ("messages", "messageCount"))
 SIGHT = "sight"
 
 FNV_OFFSET = 0xCBF29CE484222325
@@ -234,11 +235,14 @@ def fields(data: bytes) -> list[tuple[str, int | float, bytes]]:
             out += [(f"sight[{i}]", data[at + i], data[at + i:at + i + 1]) for i in range(min(n, max(len(data) - at, 0)))]
             continue
         field = next(f for f in layouts()[ROOT_STRUCT].fields if f.name == table)
-        element = layouts()[field.type]
         for i in range(n):
             if at + (i + 1) * size > len(data):
                 break
-            out += [(p, v, r) for p, (v, r, _) in scalar_values(data, element, at + i * size, f"{table}[{i}].")]
+            if field.type in SCALARS:
+                raw = data[at + i * size:at + (i + 1) * size]
+                out.append((f"{table}[{i}]", struct.unpack("<" + SCALARS[field.type][0], raw)[0], raw))
+                continue
+            out += [(p, v, r) for p, (v, r, _) in scalar_values(data, layouts()[field.type], at + i * size, f"{table}[{i}].")]
     return out
 
 

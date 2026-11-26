@@ -99,6 +99,84 @@ unsigned ViewSightCells(const PlayerView* v)
     return w * h;
 }
 
+int ViewGeometryBegin(PlayerView* v, ViewGeometryMark* mark)
+{
+    mark->vertices = v->debrisVertexCount;
+    mark->faces = v->debrisFaceCount;
+    mark->indices = v->debrisIndexCount;
+    mark->textures = v->textureCount;
+    return (v->truncated & VIEW_TRUNCATED_DEBRIS) == 0;
+}
+
+ViewDebrisVertex* ViewGeometryVertices(PlayerView* v, unsigned count)
+{
+    ViewDebrisVertex* rows;
+    if (count > VIEW_MAX_DEBRIS_VERTICES - v->debrisVertexCount)
+        return 0;
+    rows = &v->debrisVertices[v->debrisVertexCount];
+    memset(rows, 0, count * sizeof(ViewDebrisVertex));
+    v->debrisVertexCount += count;
+    return rows;
+}
+
+ViewDebrisFace* ViewGeometryFace(PlayerView* v)
+{
+    return (ViewDebrisFace*)AddRow(v->debrisFaces, &v->debrisFaceCount, VIEW_MAX_DEBRIS_FACES, sizeof(ViewDebrisFace));
+}
+
+unsigned short* ViewGeometryIndices(PlayerView* v, ViewDebrisFace* face, unsigned count)
+{
+    unsigned short* rows;
+    if (count > 0xffff || count > VIEW_MAX_DEBRIS_INDICES - v->debrisIndexCount)
+        return 0;
+    rows = &v->debrisIndices[v->debrisIndexCount];
+    memset(rows, 0, count * sizeof(unsigned short));
+    face->firstIndex = count != 0 ? v->debrisIndexCount : 0;
+    face->indexCount = (unsigned short)count;
+    v->debrisIndexCount += count;
+    return rows;
+}
+
+unsigned ViewGeometryTexture(PlayerView* v, const char* name)
+{
+    ViewTexture key;
+    unsigned i;
+    memset(&key, 0, sizeof key);
+    for (i = 0; i < VIEW_TEXTURE_NAME && name[i] != 0; i++)
+        key.name[i] = name[i];
+    for (i = 0; i < v->textureCount; i++) {
+        if (memcmp(v->textures[i].name, key.name, VIEW_TEXTURE_NAME) == 0)
+            return i;
+    }
+    if (v->textureCount >= VIEW_MAX_TEXTURES)
+        return VIEW_NO_TEXTURE;
+    v->textures[v->textureCount] = key;
+    return v->textureCount++;
+}
+
+void ViewGeometryEnd(PlayerView* v, const ViewGeometryMark* mark, unsigned* firstVertex, unsigned* vertexCount,
+                     unsigned* firstFace, unsigned* faceCount)
+{
+    *vertexCount = v->debrisVertexCount - mark->vertices;
+    *firstVertex = *vertexCount != 0 ? mark->vertices : 0;
+    *faceCount = v->debrisFaceCount - mark->faces;
+    *firstFace = *faceCount != 0 ? mark->faces : 0;
+}
+
+void ViewGeometryFail(PlayerView* v, const ViewGeometryMark* mark, unsigned* firstVertex, unsigned* vertexCount,
+                      unsigned* firstFace, unsigned* faceCount)
+{
+    v->debrisVertexCount = mark->vertices;
+    v->debrisFaceCount = mark->faces;
+    v->debrisIndexCount = mark->indices;
+    v->textureCount = mark->textures;
+    v->truncated = (unsigned short)(v->truncated | VIEW_TRUNCATED_DEBRIS);
+    *firstVertex = 0;
+    *vertexCount = 0;
+    *firstFace = 0;
+    *faceCount = 0;
+}
+
 void ViewSetGrid(PlayerView* v, unsigned width, unsigned height)
 {
     v->gridWidth = width;
@@ -114,6 +192,8 @@ unsigned ViewSerializedSize(const PlayerView* v)
         + v->orderCount * (unsigned)sizeof(ViewOrder) + v->blipCount * (unsigned)sizeof(ViewBlip)
         + v->featureCount * (unsigned)sizeof(ViewFeature) + v->projectileCount * (unsigned)sizeof(ViewProjectile)
         + v->debrisCount * (unsigned)sizeof(ViewDebris) + v->explodedPieceCount * (unsigned)sizeof(ViewExplodedPiece)
+        + v->debrisVertexCount * (unsigned)sizeof(ViewDebrisVertex) + v->debrisFaceCount * (unsigned)sizeof(ViewDebrisFace)
+        + v->debrisIndexCount * (unsigned)sizeof(unsigned short) + v->textureCount * (unsigned)sizeof(ViewTexture)
         + v->messageCount * (unsigned)sizeof(ViewMessage) + ViewSightCells(v);
 }
 
@@ -136,6 +216,10 @@ unsigned ViewSerialize(const PlayerView* v, unsigned char* out)
     at = Put(at, v->projectiles, v->projectileCount * (unsigned)sizeof(ViewProjectile));
     at = Put(at, v->debris, v->debrisCount * (unsigned)sizeof(ViewDebris));
     at = Put(at, v->explodedPieces, v->explodedPieceCount * (unsigned)sizeof(ViewExplodedPiece));
+    at = Put(at, v->debrisVertices, v->debrisVertexCount * (unsigned)sizeof(ViewDebrisVertex));
+    at = Put(at, v->debrisFaces, v->debrisFaceCount * (unsigned)sizeof(ViewDebrisFace));
+    at = Put(at, v->debrisIndices, v->debrisIndexCount * (unsigned)sizeof(unsigned short));
+    at = Put(at, v->textures, v->textureCount * (unsigned)sizeof(ViewTexture));
     at = Put(at, v->messages, v->messageCount * (unsigned)sizeof(ViewMessage));
     at = Put(at, v->sight, ViewSightCells(v));
     return (unsigned)(at - out);

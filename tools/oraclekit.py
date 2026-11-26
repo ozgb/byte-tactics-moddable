@@ -172,6 +172,7 @@ CONTENTS = [
     ("dir", "reference/display", "the stored display digests"),
     ("dir", "reference/displaylists", "the stored display lists up to the last frame with stored pixels, with the pictures the game made"),
     ("dir", "reference/saves", "the saved games the scenarios load"),
+    ("dir", "reference/setup", "the stored setup logs of the scenarios that start at the main menu"),
     ("file", "docs/sound-log.md", "the sound log format"),
     ("file", "docs/frame-dump.md", "the frame dump format"),
     ("file", "docs/ui-log.md", "the UI log format"),

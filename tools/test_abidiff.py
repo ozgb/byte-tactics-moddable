@@ -118,8 +118,8 @@ class MajorBumpTest(unittest.TestCase):
         result = verdict(old, header([SLOT_A], major=2, data="unsigned a; int b;"), modules=manifest(built=None))
         self.assertTrue(result.ok, result)
 
-    def test_a_field_that_changes_width_fails(self):
-        result = verdict(self.old, header([SLOT_A], major=2, data="int a; short b;"), modules=manifest(built=None))
+    def test_a_field_that_changes_width_fails_against_a_built_module(self):
+        result = verdict(self.old, header([SLOT_A], major=2, data="int a; short b;"), modules=manifest())
         self.assertIn("moved or changed size", result.summary)
 
     def test_going_down_fails(self):
@@ -249,11 +249,20 @@ class RetypeBeforeTagTest(unittest.TestCase):
 class MovedFieldTest(unittest.TestCase):
     old = header([SLOT_A], data="int a; int b;")
 
-    def test_moved_field_fails_with_a_bump(self):
-        for bump in ({"minor": 1}, {"major": 2}):
-            result = verdict(self.old, header([SLOT_A], data="short pad; int a; int b;", **bump))
-            self.assertFalse(result.ok)
-            self.assertIn("moved or changed size", result.summary)
+    def test_moved_field_fails_with_a_minor_bump(self):
+        result = verdict(self.old, header([SLOT_A], data="short pad; int a; int b;", minor=1))
+        self.assertFalse(result.ok)
+        self.assertIn("moved or changed size", result.summary)
+
+    def test_moved_field_passes_a_major_bump_no_module_was_built_against(self):
+        result = verdict(self.old, header([SLOT_A], data="short pad; int a; int b;", major=2))
+        self.assertTrue(result.ok, result)
+        self.assertEqual(result.summary, "ok (major 1->2, no module built against 1)")
+
+    def test_moved_field_fails_a_major_bump_a_module_was_built_against(self):
+        result = verdict(self.old, header([SLOT_A], data="short pad; int a; int b;", major=2), modules=manifest())
+        self.assertFalse(result.ok)
+        self.assertIn("moved or changed size", result.summary)
 
     def test_resized_field_fails_with_a_bump(self):
         result = verdict(self.old, header([SLOT_A], data="short a; int b;", minor=1))

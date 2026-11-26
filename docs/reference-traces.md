@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v49` is the fixed target for anyone writing a new
+The git tag `reference-traces-v51` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v49`**.
+code as a base. This page names the current tag: **`reference-traces-v51`**.
 
 ## What the tag holds
 
@@ -22,7 +22,7 @@ code as a base. This page names the current tag: **`reference-traces-v49`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v49
+git checkout reference-traces-v51
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -139,7 +139,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v49
+git checkout reference-traces-v51
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -211,9 +211,9 @@ What the code shows about the players fields (the player loader and saver):
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v49`
+the digests that should become a target gets a new tag (`reference-traces-v52`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v49`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v51`
+`reference-traces-v51`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v53`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
@@ -470,6 +470,6 @@ traces and the sound logs, and `tools/reference.py --check` compares each scenar
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v49 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v51 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

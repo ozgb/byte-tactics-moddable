@@ -107,10 +107,10 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 NewConditions), run outside the tick, from the loader, the menus, the saved game and the console; their callers are ApplySlotsToGamePlayers
                 (src/frontend/skirmish_menu.cpp), CampaignSetupFrame (src/game/main_loop.cpp), CmdKill (src/game/console_commands.cpp), CreateMissionUnits
                 (src/units/unit_commands.cpp), LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp), LoadMatch (src/game/game_load.cpp), LoadSavedGameState and
-                SaveGameFile (src/game/settings_campaign.cpp), Mission::LoadMission and Mission::~Mission (src/mission/map_list.cpp) and ResetAIPlayers (src/ai/ai_player.cpp, which the console runs).
+                SaveGameFile (src/game/settings_campaign.cpp) and Mission::LoadMission and Mission::~Mission (src/mission/map_list.cpp).
                 Ai's set-up slots, DumpPlayerAI, ResetAIPlayers, CreatePlayerAI, DestroyPlayerAI, RebuildFeatureCells, ParseDownloadableAiWeightScripts,
-                ReparseAiWeightScriptsIfLimitNotSticky, CreateSquads, FreeSquads, CreateSquadManager and FreeSquadManager, run outside the tick, from the console and
-                players' set-up; their callers are CmdPrintWeights and CmdReloadAIProfiles (src/game/console_commands.cpp) and FreePlayers, InitPlayerSlot,
+                ReparseAiWeightScriptsIfLimitNotSticky, CreateSquads, FreeSquads, CreateSquadManager, FreeSquadManager and LoadProfiles, run outside the tick, from the console and
+                players' set-up; their callers are CmdPrintWeights (src/game/console_commands.cpp) and FreePlayers, InitPlayerSlot, InitPlayers,
                 LoadDefaultAIScript and RebuildAIFeatureCells (src/game/players.cpp).
                 Weapons' set-up slots, AllocWeaponArray, FreeWeaponArray, LoadWeaponTypes, FreeWeaponTypes, InitExplosions, FreeExplosions, LoadState and SaveState, run outside the tick;
                 their callers are LoadBattleAssets and ShutdownIngameSystems (src/game/game_state.cpp) and LoadUnit and SaveUnits (src/units/unit_save.cpp, the saved game).
@@ -358,7 +358,7 @@ PLAYERS = Pilot(
                    ("CmdKill", "src/game/console_commands.cpp"), ("CreateMissionUnits", "src/units/unit_commands.cpp"),
                    ("LoadBattleAssets", "src/game/game_state.cpp"), ("LoadMatch", "src/game/game_load.cpp"),
                    ("LoadSavedGameState", "src/game/settings_campaign.cpp"), ("Mission::LoadMission", "src/mission/map_list.cpp"),
-                   ("Mission::~Mission", "src/mission/map_list.cpp"), ("ResetAIPlayers", "src/ai/ai_player.cpp"),
+                   ("Mission::~Mission", "src/mission/map_list.cpp"),
                    ("SaveGameFile", "src/game/settings_campaign.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")))
 AI = Pilot(
     owner="ai", header="interfaces/ai.h", seam="AiSeam",
@@ -368,9 +368,9 @@ AI = Pilot(
     engine_functions=(),
     rowless_calls=("AiWriteRawVector", "BlockVector::Size", "operator[]", "sprintf"),
     setup=("DumpPlayerAI", "ResetAIPlayers", "CreatePlayerAI", "DestroyPlayerAI", "RebuildFeatureCells", "ParseDownloadableAiWeightScripts",
-           "ReparseAiWeightScriptsIfLimitNotSticky", "CreateSquads", "FreeSquads", "CreateSquadManager", "FreeSquadManager"),
-    setup_callers=(("CmdPrintWeights", "src/game/console_commands.cpp"), ("CmdReloadAIProfiles", "src/game/console_commands.cpp"),
-                   ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp"),
+           "ReparseAiWeightScriptsIfLimitNotSticky", "CreateSquads", "FreeSquads", "CreateSquadManager", "FreeSquadManager", "LoadProfiles"),
+    setup_callers=(("CmdPrintWeights", "src/game/console_commands.cpp"), ("FreePlayers", "src/game/players.cpp"),
+                   ("InitPlayerSlot", "src/game/players.cpp"), ("InitPlayers", "src/game/players.cpp"),
                    ("LoadDefaultAIScript", "src/game/players.cpp"), ("RebuildAIFeatureCells", "src/game/players.cpp")))
 WEAPONS = Pilot(
     owner="weapons", header="interfaces/weapons.h", seam="WeaponsSeam",
@@ -437,7 +437,8 @@ UNITS = Pilot(
                    ("CmdLimitSlot", "src/game/console_commands.cpp"), ("CmdReload", "src/game/console_commands.cpp"),
                    ("CmdWeightSlot", "src/game/console_commands.cpp"), ("LoadSavedGameState", "src/game/settings_campaign.cpp"),
                    ("SaveGameFile", "src/game/settings_campaign.cpp"), ("MenuFrame", "src/game/main_loop.cpp"),
-                   ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp")),
+                   ("FreePlayers", "src/game/players.cpp"), ("InitPlayerSlot", "src/game/players.cpp"),
+                   ("RunProfileLine", "src/ai/ai_player.cpp")),
     slot_callers=UNITS_SLOT_CALLERS)
 SCRIPTS_SLOT_CALLERS = (("QueryScript", "orders"), ("QueryScript", "weapons"), ("GetNanoPiecePosition", "orders"),
                         ("GetAimFromPosition", "weapons"), ("GetSweetSpot", "targeting"),

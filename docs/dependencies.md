@@ -33,8 +33,8 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | targeting | 11 | 31 | 1 | 41 | 111 | 5 of 14 |
 | los_radar | 6 | 33 | 2 | 142 | 275 | 5 of 14 |
 | orders | 18 | 55 | 9 | 141 | 299 | 4 of 14 |
-| units | 28 | 152 | 6 | 82 | 442 | 3 of 14 |
-| players | 4 | 13 | 1 | 74 | 306 | 10 of 14 |
+| units | 28 | 152 | 6 | 82 | 444 | 3 of 14 |
+| players | 4 | 13 | 1 | 74 | 304 | 10 of 14 |
 | map | 9 | 41 | 1 | 100 | 247 | 4 of 14 |
 | scripts | 16 | 29 | 0 | 30 | 137 | 9 of 14 |
 | movement | 0 | 40 | 2 | 70 | 234 | 7 of 14 |
@@ -610,7 +610,7 @@ The 15 groups with the most rows are shown.
 | immediate | 0 | 18 |
 | deferrable | 1 | 1 |
 | read-only | 0 | 103 |
-| unobserved | 75 | 162 |
+| unobserved | 74 | 163 |
 
 **Ordered** (11).
 
@@ -676,10 +676,10 @@ The 15 groups with the most rows are shown.
 | movement | 6 | 7 |
 | orders | 8 | 8 |
 | pathfinding | 2 | 2 |
-| players | 7 | 33 |
+| players | 6 | 32 |
 | scripts | 4 | 4 |
 | targeting | 4 | 4 |
-| units | 7 | 44 |
+| units | 7 | 46 |
 | weapons | 5 | 8 |
 | wind_meteors | 5 | 7 |
 
@@ -1623,7 +1623,7 @@ The 15 groups with the most rows are shown.
 | immediate | 130 | 22 |
 | deferrable | 6 | 0 |
 | read-only | 0 | 82 |
-| unobserved | 309 | 133 |
+| unobserved | 311 | 133 |
 
 **Ordered** (28).
 
@@ -1726,7 +1726,7 @@ The 40 rows with the most runs are shown; the other 112 are in data/dependencies
 
 | other | units is writer | units is reader |
 |---|---|---|
-| ai | 44 | 7 |
+| ai | 46 | 7 |
 | economy | 4 | 1 |
 | features | 13 | 7 |
 | los_radar | 31 | 10 |
@@ -1838,7 +1838,7 @@ The 15 groups with the most rows are shown.
 | immediate | 1 | 12 |
 | deferrable | 0 | 1 |
 | read-only | 0 | 74 |
-| unobserved | 193 | 113 |
+| unobserved | 192 | 112 |
 
 **Ordered** (4).
 
@@ -1883,7 +1883,7 @@ The 15 groups with the most rows are shown.
 
 | other | players is writer | players is reader |
 |---|---|---|
-| ai | 33 | 7 |
+| ai | 32 | 6 |
 | economy | 25 | 19 |
 | features | 9 | 6 |
 | los_radar | 25 | 8 |

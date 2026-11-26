@@ -127,7 +127,7 @@ network (`RemovePlayer` of an unknown id); a module publishing from WASM can rea
 | `UpdatePlayerHead`, `UpdatePlayerBody`, `UpdatePlayerTail`, `UpdatePlayersFinish` | runs, called by the scheduler; the head no longer calls ai's ticks |
 | `UpdatePlayers`, `UpdatePlayersOnStream` | the whole players phase, as the engine calls it outside the scheduler's loop (the load of a match) |
 | `UpdateBlink` | a step of the tail, called by the engine |
-| `LoadDefaultAIScript`, `InitPlayers`, `FreePlayers`, `InitPlayerResources`, `LoadPlayerControllers`, `LoadPlayers`, `SavePlayers`, `RebuildAIFeatureCells`, `SetupPlayerSlot` | set-up, save and load slots, outside the tick |
+| `LoadDefaultAIScript`, `InitPlayers`, `FreePlayers`, `InitPlayerResources`, `LoadPlayerControllers`, `LoadPlayers`, `SavePlayers`, `RebuildAIFeatureCells`, `SetupPlayerSlot` | set-up, save and load slots, outside the tick; `LoadDefaultAIScript` only calls ai's `LoadProfiles` since ai 6.1, which `InitPlayers` calls itself |
 | `NewConditions`, `RegisterConditions`, `DeactivateConditions`, `LoadConditions`, `SaveConditions`, `FreeConditions`, `DeleteConditions` | the conditions' set-up, save and load slots, outside the tick |
 
 **Calls outside the interface.** `docs/schedule.md` listed "a call into players outside its interface" 32 times, in

@@ -740,7 +740,7 @@ void __stdcall CmdReload(CommandArgs* args)
 // FUNCTION: 0x4174d0
 void __stdcall CmdReloadAIProfiles(int arg1)
 {
-    g_seams.ai->ResetAIPlayers();
+    AiPublishReloadProfiles(SCHED_ENGINE);
 }
 
 // FUNCTION: 0x4174e0

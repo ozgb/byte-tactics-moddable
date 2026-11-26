@@ -767,14 +767,6 @@ int __stdcall Imp_orders_GetOrderType(unsigned char a0, Unit* a1, Unit* a2, Vec3
     return ParseResult<int>(r);
 }
 
-void __stdcall Imp_players_LoadDefaultAIScript()
-{
-    ReplayText t;
-    StartImport(t, "players.LoadDefaultAIScript");
-    const char* r = Enter(t);
-    (void)r;
-}
-
 double __stdcall Imp_economy_GetEnergyUse(EconType a0)
 {
     ReplayText t;
@@ -1097,7 +1089,6 @@ MissionSeam g_import_mission;
 PathfindingSeam g_import_pathfinding;
 ScriptsSeam g_import_scripts;
 OrdersSeam g_import_orders;
-PlayersSeam g_import_players;
 EconomySeam g_import_economy;
 PathWorldView g_import_pathworld;
 FeaturesSeam g_import_features;
@@ -1169,6 +1160,7 @@ AiSeam g_native_ai = {
     CreateSquadManagerSlot,
     FreeSquadManagerSlot,
     WriteAiStateSlot,
+    LoadAIProfiles,
 };
 
 PathfindingSeam g_native_pathfinding = {
@@ -1784,12 +1776,6 @@ void Run_ai_DumpPlayerAI()
     g_seams.ai->DumpPlayerAI(p0, p1);
 }
 
-void Run_ai_ResetAIPlayers()
-{
-    SetClosing(nullptr);
-    g_seams.ai->ResetAIPlayers();
-}
-
 void Run_ai_CreatePlayerAI()
 {
     int p0 = ArgScalar<int>("player");
@@ -1816,20 +1802,6 @@ void Run_ai_RebuildFeatureCells()
     int p0 = ArgScalar<int>("player");
     SetClosing(nullptr);
     g_seams.ai->RebuildFeatureCells(p0);
-}
-
-void Run_ai_ParseDownloadableAiWeightScripts()
-{
-    int p0 = ArgScalar<int>("player");
-    SetClosing(nullptr);
-    g_seams.ai->ParseDownloadableAiWeightScripts(p0);
-}
-
-void Run_ai_ReparseAiWeightScriptsIfLimitNotSticky()
-{
-    int p0 = ArgScalar<int>("player");
-    SetClosing(nullptr);
-    g_seams.ai->ReparseAiWeightScriptsIfLimitNotSticky(p0);
 }
 
 void Run_ai_CreateSquads()
@@ -3371,10 +3343,6 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_ai_DumpPlayerAI();
         return true;
     }
-    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ResetAIPlayers") == 0) {
-        Run_ai_ResetAIPlayers();
-        return true;
-    }
     if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreatePlayerAI") == 0) {
         Run_ai_CreatePlayerAI();
         return true;
@@ -3389,14 +3357,6 @@ bool RunSlot(const char* subsystem, const char* slot)
     }
     if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "RebuildFeatureCells") == 0) {
         Run_ai_RebuildFeatureCells();
-        return true;
-    }
-    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ParseDownloadableAiWeightScripts") == 0) {
-        Run_ai_ParseDownloadableAiWeightScripts();
-        return true;
-    }
-    if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "ReparseAiWeightScriptsIfLimitNotSticky") == 0) {
-        Run_ai_ReparseAiWeightScriptsIfLimitNotSticky();
         return true;
     }
     if (strcmp(subsystem, "ai") == 0 && strcmp(slot, "CreateSquads") == 0) {
@@ -4134,8 +4094,6 @@ void BindSeams()
         g_import_weapons.FindTargetableProjectile = Imp_weapons_FindTargetableProjectile;
         g_import_weapons.GetWeaponRange = Imp_weapons_GetWeaponRange;
         g_import_weapons.WeaponCanReachUnit = Imp_weapons_WeaponCanReachUnit;
-        g_seams.players = &g_import_players;
-        g_import_players.LoadDefaultAIScript = Imp_players_LoadDefaultAIScript;
         g_seams.economy = &g_import_economy;
         g_import_economy.GetEnergyUse = Imp_economy_GetEnergyUse;
     }

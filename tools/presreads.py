@@ -1,7 +1,7 @@
 """List the sim state that presentation reads between ticks, with how often and what a player view must do about it.
 
-    uv run tools/presreads.py --write                  # writes data/presentation_reads.csv
-    uv run tools/presreads.py --check                  # fail if the file differs from what the stored data regenerate
+    uv run tools/presreads.py --write                  # writes data/presentation_reads.csv and data/view_reads.csv
+    uv run tools/presreads.py --check                  # fail if either differs from what the stored data regenerate, or docs/view.md misses a read
     uv run tools/presreads.py --store build/access/access   # reduce the access log's presentation files into data/access_presentation/
     uv run tools/test_presreads.py                     # tests, on synthetic inputs
 
@@ -73,6 +73,16 @@ runs showed for other fields of Type, else from a heap row of state_classes.csv 
 members of struct Game in src/game/game.h; a type whose containers are all sim or mixed is sim (or mixed), one whose
 containers are none is not; with the two kinds mixed, or with no container, the item is left out and counted.
 
+The view (#1054). data/view_reads.csv has one row per item that a function of the presentation subsystem reads: the items of
+the stored rows whose reader is `presentation`, and the sim and mixed items of the static read sets of those functions (the
+static-only rows above, without leaving out an item a run showed under another reader). Columns: item; doc_name, the name
+docs/view.md gives it (the item, or its entry in VIEW_NAMES when the item names an allocation site or a source file, which
+the kit may not); runs, the scenarios that showed it read by presentation; functions, the readers, `|` between. --check
+fails when a doc_name has no row in the table under docs/view.md's `## The reads`, a row there is listed twice, is empty,
+names no read, names a `View*.field` that interfaces/view.h does not declare, or neither names one nor starts with a
+category (`Left out: `, `Loaded data: `, `Presentation state`), and when an item naming a source location has no VIEW_NAMES
+entry.
+
 Limits: the evidence is the 85 scenarios' test mode, native modules only (see accesslog.py); a window is a tick's whole
 stretch of main-loop work, so `every-frame` means every tick's, not every drawn frame's; the wall clock makes the
 rare reads (timers, flashes) come and go between two runs of a scenario.
@@ -91,6 +101,9 @@ import sources
 
 ROOT = sources.ROOT
 OUT = ROOT / "data/presentation_reads.csv"
+VIEW_OUT = ROOT / "data/view_reads.csv"
+VIEW_DOC = ROOT / "docs/view.md"
+VIEW_HEADER = ROOT / "interfaces/view.h"
 STORED = ROOT / "data/access_presentation"
 STATE_CLASSES = ROOT / "data/state_classes.csv"
 RWSETS = ROOT / "data/rwsets.csv"
@@ -99,6 +112,20 @@ SERVICES = ROOT / "interfaces/sim_events.h"
 DRAIN = ROOT / "src/ingame/sim_event_drain.cpp"
 GAME_HEADER = ROOT / "src/game/game.h"
 COLUMNS = ["item", "reader", "pattern", "covered_by_event", "visibility", "runs"]
+VIEW_COLUMNS = ["item", "doc_name", "runs", "functions"]
+VIEW_SECTION = "## The reads"
+VIEW_ROW = re.compile(r"^\|\s*`([^`]+)`\s*\|([^|]*)\|")
+VIEW_CATEGORIES = ("Left out: ", "Loaded data: ", "Presentation state")
+VIEW_REF = re.compile(r"`((?:Player)?View\w*)\.(\w+)`")
+VIEW_STRUCT = re.compile(r"^struct (\w+) \{\n(.*?)^\};", re.S | re.M)
+VIEW_MEMBER = re.compile(r"^\s+[\w ]+?\b(\w+)(?:\[\w+\])?;", re.M)
+VIEW_NAMES = {
+    "DebrisCache::InitSimCache: GameAllocIgnoreTag CMemoryCache CCH": "the debris model cache",
+    "InitPlayerSlot: operator new unsigned char": "the player slot block",
+    "LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY": "the mapped memory",
+    "LoadTntMap: GameAllocIgnoreTag PLOT MEMORY": "the plot memory",
+    "g_missionOrderTableVec@src/orders/order_list.cpp": "g_missionOrderTableVec, second copy",
+}
 STORED_COLUMNS = ["item", "reader", "function", "container", "every", "after"]
 SIM_CLASSES = ("sim", "mixed")
 MIN_WINDOWS = 3
@@ -397,6 +424,94 @@ def build(stored: dict[str, list[dict]], classes_rows: list[dict], rwsets_rows: 
     return sorted(out, key=lambda r: (r["item"], r["reader"])), report
 
 
+def view_reads(stored: dict[str, list[dict]], classes_rows: list[dict], rwsets_rows: list[dict], subsystem_rows: list[dict],
+               header: str = "") -> list[dict]:
+    """The rows of data/view_reads.csv: each sim or mixed item a function of the presentation subsystem reads, by a run
+    (reader `presentation`) or by its static read set, with the functions, the runs that showed it and its name in docs/view.md."""
+    graph = CallGraph(rwsets_rows)
+    classes = classes_of(classes_rows)
+    functions: dict[str, set[str]] = defaultdict(set)
+    runs: dict[str, set[str]] = defaultdict(set)
+    for scenario, rows in stored.items():
+        for r in rows:
+            if r["reader"] == "presentation":
+                functions[r["item"]].add(r["function"])
+                runs[r["item"]].add(scenario)
+    presentation = {(r["function"], r["file"]) for r in subsystem_rows if r["subsystem"] == "presentation"}
+    regions = region_index(classes_rows)
+    types = type_classes(stored, classes, classes_rows, header)
+    for (function, file), targets in graph.reads.items():
+        if (function, file) not in presentation:
+            continue
+        for target in targets:
+            found = static_item(target, classes, regions, types)
+            if found is not None and found[1] in SIM_CLASSES:
+                functions[found[0]].add(function)
+    return [{"item": item, "doc_name": VIEW_NAMES.get(item, item), "runs": len(runs[item]),
+             "functions": "|".join(sorted(functions[item]))} for item in sorted(functions)]
+
+
+def doc_reads(text: str) -> list[tuple[str, str]]:
+    """(name, what it is in the view) of each table row under docs/view.md's `## The reads`, up to the next `## ` heading."""
+    out: list[tuple[str, str]] = []
+    inside = False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            inside = line.strip() == VIEW_SECTION
+            continue
+        m = VIEW_ROW.match(line) if inside else None
+        if m:
+            out.append((m.group(1), m.group(2).strip()))
+    return out
+
+
+def header_fields(header: str) -> dict[str, set[str]]:
+    """{struct: its member names} of the structs interfaces/view.h declares."""
+    return {m.group(1): set(VIEW_MEMBER.findall(m.group(2))) for m in VIEW_STRUCT.finditer(header)}
+
+
+def unsafe_name(item: str) -> bool:
+    """True when an item names an allocation site or a source file, which docs/view.md may not repeat."""
+    return ": " in item or "@" in item
+
+
+def row_problem(what: str, fields: dict[str, set[str]]) -> str:
+    """Why a row says nothing checkable, or "" when it names a declared field of the view or starts with a category."""
+    refs = VIEW_REF.findall(what)
+    bad = ["%s.%s" % ref for ref in refs if ref[1] not in fields.get(ref[0], set())]
+    if bad:
+        return "names %s, which interfaces/view.h does not declare" % ", ".join(bad)
+    if refs or what.startswith(VIEW_CATEGORIES):
+        return ""
+    return "neither names a field of interfaces/view.h nor starts with one of %s" % ", ".join(repr(c.strip()) for c in VIEW_CATEGORIES)
+
+
+def view_problems(rows: list[dict], text: str, header: str) -> list[str]:
+    """What docs/view.md gets wrong about the reads: a read it does not list, a row listed twice, a row with nothing said or
+    naming an undeclared field, a row no read has, and a read whose item needs a VIEW_NAMES entry and has none."""
+    entries = doc_reads(text)
+    fields = header_fields(header)
+    listed: dict[str, str] = {}
+    out: list[str] = []
+    for name, what in entries:
+        if name in listed:
+            out.append("%s is listed twice under %s" % (name, VIEW_SECTION))
+        listed[name] = what
+    wanted = {r["doc_name"]: r["item"] for r in rows}
+    out += ["%s needs a VIEW_NAMES entry in tools/presreads.py: it names a source location" % item
+            for item in sorted(wanted.values()) if unsafe_name(item) and item not in VIEW_NAMES]
+    out += ["%s (%s) is read by presentation and not listed under %s" % (name, item, VIEW_SECTION)
+            for name, item in sorted(wanted.items()) if name not in listed]
+    for name, what in sorted(listed.items()):
+        if name not in wanted:
+            out.append("%s is listed under %s but presentation does not read it" % (name, VIEW_SECTION))
+        elif not what:
+            out.append("%s has an empty row under %s" % (name, VIEW_SECTION))
+        elif problem := row_problem(what, fields):
+            out.append("%s: the row %s" % (name, problem))
+    return out
+
+
 def render(rows: list[dict]) -> str:
     """The text of data/presentation_reads.csv."""
     buffer = io.StringIO()
@@ -406,42 +521,61 @@ def render(rows: list[dict]) -> str:
     return buffer.getvalue()
 
 
-def generate() -> tuple[str, dict[str, int]]:
-    """The file's text and the report, from the stored data and the data files."""
-    rows, report = build(load_stored(STORED), read_csv(STATE_CLASSES), read_csv(RWSETS), read_csv(SUBSYSTEMS),
-                         SERVICES.read_text(), DRAIN.read_text(), GAME_HEADER.read_text())
-    return render(rows), report
+def generate() -> tuple[str, dict[str, int], str]:
+    """The text of data/presentation_reads.csv, the report and the text of data/view_reads.csv, from the stored data and the data files."""
+    stored, classes_rows, rwsets_rows, subsystem_rows = load_stored(STORED), read_csv(STATE_CLASSES), read_csv(RWSETS), read_csv(SUBSYSTEMS)
+    header = GAME_HEADER.read_text()
+    rows, report = build(stored, classes_rows, rwsets_rows, subsystem_rows, SERVICES.read_text(), DRAIN.read_text(), header)
+    view = io.StringIO()
+    w = csv.DictWriter(view, VIEW_COLUMNS, lineterminator="\n")
+    w.writeheader()
+    w.writerows(view_reads(stored, classes_rows, rwsets_rows, subsystem_rows, header))
+    return render(rows), report, view.getvalue()
+
+
+def stale(path: Path, text: str) -> bool:
+    """Print the first line where the file differs from the generated text; whether it differs."""
+    if path.is_file() and path.read_text() == text:
+        print("presreads: %s is current" % path.relative_to(ROOT))
+        return False
+    old = path.read_text().splitlines() if path.is_file() else []
+    new = text.splitlines()
+    for i in range(max(len(old), len(new))):
+        a = old[i] if i < len(old) else "<end>"
+        b = new[i] if i < len(new) else "<end>"
+        if a != b:
+            print("presreads: %s differs at line %d:\n  file:      %s\n  generated: %s" % (path.relative_to(ROOT), i + 1, a, b))
+            break
+    return True
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--write", action="store_true", help="write data/presentation_reads.csv")
-    ap.add_argument("--check", action="store_true", help="fail if data/presentation_reads.csv is out of date")
+    ap.add_argument("--write", action="store_true", help="write data/presentation_reads.csv and data/view_reads.csv")
+    ap.add_argument("--check", action="store_true", help="fail if either file is out of date or docs/view.md misses a read")
     ap.add_argument("--store", type=Path, metavar="DIR", help="reduce the presentation files of DIR into data/access_presentation/")
     args = ap.parse_args()
     if args.store:
         print("presreads: stored %d scenarios in %s" % (store(args.store, STORED, classes_of(read_csv(STATE_CLASSES))), STORED))
         return 0
-    text, report = generate()
+    text, report, view = generate()
     print("presreads: %d rows from runs, %d static-only; static items left out: %d unclassified, %d not sim" % (
         report["runtime"], report["static_only"], report["static_unclassified"], report["static_not_sim"]))
     if args.write:
         OUT.write_text(text)
+        VIEW_OUT.write_text(view)
         return 0
     if args.check:
-        if not OUT.is_file() or OUT.read_text() != text:
-            old = OUT.read_text().splitlines() if OUT.is_file() else []
-            new = text.splitlines()
-            for i in range(max(len(old), len(new))):
-                a = old[i] if i < len(old) else "<end>"
-                b = new[i] if i < len(new) else "<end>"
-                if a != b:
-                    print("presreads: data/presentation_reads.csv differs at line %d:\n  file:      %s\n  generated: %s" % (i + 1, a, b))
-                    break
+        failed = stale(OUT, text) | stale(VIEW_OUT, view)
+        if failed:
             print("presreads: run `uv run tools/presreads.py --write`")
-            return 1
-        print("presreads: data/presentation_reads.csv is current")
-        return 0
+        problems = view_problems(list(csv.DictReader(io.StringIO(view))), VIEW_DOC.read_text() if VIEW_DOC.is_file() else "",
+                                 VIEW_HEADER.read_text() if VIEW_HEADER.is_file() else "")
+        for line in problems:
+            print("presreads: docs/view.md: %s" % line)
+        if not problems:
+            print("presreads: docs/view.md lists every presentation read")
+        return 1 if failed or problems else 0
     sys.stdout.write(text)
     return 0
 

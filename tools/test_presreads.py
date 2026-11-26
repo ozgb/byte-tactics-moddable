@@ -177,6 +177,98 @@ class StaticOnlyTest(unittest.TestCase):
         self.assertEqual(rows[("units", "presentation")]["pattern"], "unknown")
 
 
+class ViewTest(unittest.TestCase):
+    def reads(self, stored, extra_rw=()):
+        return pr.view_reads(stored, STATE, RWSETS + list(extra_rw), SUBSYSTEMS)
+
+    def test_presentation_reads_by_run_and_by_static_set(self):
+        rows = self.reads({"s": [stored_row("Unit::x"), stored_row("Unit::y", reader="units", function="Idle")]},
+                          [rw("Draw", "global_read", "wind"), rw("Idle", "field_read", "Game::tick"), rw("Click", "field_read", "Game::gui")])
+        by_item = {r["item"]: r for r in rows}
+        self.assertEqual(sorted(by_item), ["Unit::x", "wind"])
+        self.assertEqual((by_item["Unit::x"]["runs"], by_item["Unit::x"]["functions"]), (1, "Draw"))
+        self.assertEqual((by_item["wind"]["runs"], by_item["wind"]["functions"]), (0, "Draw"))
+
+    def test_a_name_from_the_alias_table(self):
+        item = next(iter(pr.VIEW_NAMES))
+        rows = self.reads({"s": [stored_row(item)]})
+        self.assertEqual(rows[0]["doc_name"], pr.VIEW_NAMES[item])
+
+    HEADER = """struct ViewUnit {
+    // Position x.
+    int x;
+    // Pieces.
+    unsigned int firstPiece;
+};
+
+struct PlayerView {
+    // Units.
+    ViewUnit units[VIEW_MAX_UNITS];
+};
+"""
+
+    DOC = """# The view
+
+| Read | In the view |
+|---|---|
+| `outside` | not under the section |
+
+## The reads
+
+| Read | In the view |
+|---|---|
+| `Unit::x` | `ViewUnit.x` |
+| `wind` |  |
+| `gone` | Left out: no longer read. |
+
+## After
+
+| `later` | not under the section |
+"""
+
+    def doc(self, *rows):
+        return "## The reads\n\n| Read | In the view |\n|---|---|\n" + "".join("| `%s` | %s |\n" % row for row in rows)
+
+    def problems(self, rows, text):
+        return pr.view_problems([{"item": item, "doc_name": name} for item, name in rows], text, self.HEADER)
+
+    def test_doc_rows_only_under_the_section(self):
+        self.assertEqual(pr.doc_reads(self.DOC), [("Unit::x", "`ViewUnit.x`"), ("wind", ""), ("gone", "Left out: no longer read.")])
+
+    def test_header_fields(self):
+        self.assertEqual(pr.header_fields(self.HEADER), {"ViewUnit": {"x", "firstPiece"}, "PlayerView": {"units"}})
+
+    def test_problems_missing_empty_and_stale(self):
+        problems = self.problems([("Unit::x", "Unit::x"), ("wind", "wind"), ("Unit::y", "Unit::y")], self.DOC)
+        self.assertEqual(problems, ["Unit::y (Unit::y) is read by presentation and not listed under ## The reads",
+                                    "gone is listed under ## The reads but presentation does not read it",
+                                    "wind has an empty row under ## The reads"])
+
+    def test_a_junk_row_fails(self):
+        problems = self.problems([("Unit::x", "Unit::x")], self.doc(("Unit::x", "x")))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("neither names a field", problems[0])
+
+    def test_a_row_naming_an_undeclared_field_fails(self):
+        problems = self.problems([("Unit::x", "Unit::x")], self.doc(("Unit::x", "`ViewUnit.x` and `ViewUnit.nosuchfield`")))
+        self.assertEqual(problems, ["Unit::x: the row names ViewUnit.nosuchfield, which interfaces/view.h does not declare"])
+
+    def test_a_duplicate_row_fails(self):
+        problems = self.problems([("Unit::x", "Unit::x")], self.doc(("Unit::x", "`ViewUnit.x`"), ("Unit::x", "Left out: twice.")))
+        self.assertEqual(problems, ["Unit::x is listed twice under ## The reads"])
+
+    def test_an_unmapped_allocation_site_fails(self):
+        item = "LoadSomething: GameAlloc BLOCK"
+        problems = self.problems([(item, item)], self.doc((item, "`PlayerView.units`")))
+        self.assertEqual(problems, ["%s needs a VIEW_NAMES entry in tools/presreads.py: it names a source location" % item])
+
+    def test_a_category_row_and_a_table_row_pass(self):
+        rows = [("Unit::x", "Unit::x"), ("units", "units"), ("cache", "cache"), ("defs", "defs")]
+        text = self.doc(("Unit::x", "`ViewUnit.x`, `y`"), ("units", "`PlayerView.units` (Units)."),
+                        ("cache", "Presentation state."), ("defs", "Loaded data: the definitions."))
+        self.assertEqual(self.problems(rows, text), [])
+
+
 class FilesTest(unittest.TestCase):
     def test_render_and_store_round_trip(self):
         rows, _ = build({"s": [stored_row("Unit::x", every="1")]})

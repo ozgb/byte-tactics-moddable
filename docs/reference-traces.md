@@ -416,12 +416,14 @@ and so on), and this page is updated to name it. The current tag is
   cc2b4f772, the reference commit that holds the interface log and the rule. The sounds, UI logs, interface
   commands, events and frames are those of v44, and the saves decode equal to v44's.
 - `reference-traces-v46`: the 93 scenarios of v45 and three new `ui-*` scenarios (#1055): `ui-dialogs`, `ui-share-chat`
-  and `ui-scroll-groups`, each with its trace, sound, UI, interface command, event and display logs, display lists and
-  frames. `ui-dialogs` ends at tick 61, when its exit menu leaves the game. The trace format is still `bt-trace 9`; the
+  and `ui-scroll-groups`, each with its trace, sound, UI, interface command and event logs and frames, and display logs
+  and lists but for `ui-dialogs`. `ui-dialogs` ends at tick 61, when its exit menu leaves the game. The trace format is still `bt-trace 9`; the
   other traces are those of v45 but for their commit line, which names 0974c9c89, the reference commit that takes
-  `input <tick>.<frame>` and writes the interface records of the dialogs. The new scenarios' display logs and lists
-  are from 4d1f84819, the same change on cc2b4f772, since the reference tip writes the display log 1.1 of #1053 that
-  `moddable` does not yet store. The sounds, UI logs, interface logs, events, display logs, frames and saves of the
+  `input <tick>.<frame>` and writes the interface records of the dialogs. The display logs and lists of
+  `ui-share-chat` and `ui-scroll-groups` are from 4d1f84819, the same change on cc2b4f772, since the reference tip writes
+  the display log 1.1 of #1053 that `moddable` does not yet store. `ui-dialogs` has none yet: 4d1f84819 names one of its
+  exit menu's surfaces by a freed surface that had the same address, and 0974c9c89 names it as `moddable` does but in
+  the display log 1.1. The sounds, UI logs, interface logs, events, display logs, frames and saves of the
   other scenarios are those of v45.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the

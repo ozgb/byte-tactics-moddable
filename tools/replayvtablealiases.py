@@ -70,7 +70,7 @@ def lines(build: Path) -> list[str]:
 def weak_externals(obj: Path) -> dict[str, str]:
     """Each weak external of the game's alias object: the name a caller spells, and the name it is linked to."""
     if not obj.is_file():
-        raise SystemExit("replayvtablealiases: %s is missing; build the game first" % obj)
+        raise SystemExit("replayvtablealiases: %s is missing; build it first (ninja -C %s aliases.obj)" % (obj, obj.parent))
     text = subprocess.run(["llvm-readobj", "--symbols", str(obj)], capture_output=True, text=True, check=True).stdout
     return {m.group(1): m.group(2) for m in re.finditer(r"Name: (\S+)\n(?:.*\n){1,7}?\s*AuxWeakExternal \{\n\s*Linked: (\S+) \(", text)}
 

@@ -192,6 +192,24 @@ class Unrecorded(unittest.TestCase):
         _, errors = build([], ann)
         self.assertTrue(any("Apply has a reason and is recorded" in e for e in errors), errors)
 
+    def test_a_root_needs_an_integer_argument_and_a_kind_with_a_table(self):
+        ann = annotations()
+        ann["subsystems"]["units"]["slots"]["CreateUnit"]["args"]["typeId"]["root"] = "Game"
+        _, errors = build([], ann)
+        self.assertTrue(any("CreateUnit(typeId): root Game needs an integer argument and a kind with a table" in e for e in errors), errors)
+
+    def test_a_slot_frees_only_an_object_argument(self):
+        ann = annotations()
+        ann["subsystems"]["scripts"]["slots"]["DeleteScript"]["frees"] = "noSuchArgument"
+        _, errors = build([], ann)
+        self.assertTrue(any("DeleteScript: frees names noSuchArgument" in e for e in errors), errors)
+
+    def test_an_event_table_names_an_int_member(self):
+        ann = annotations()
+        ann["subsystems"]["units"]["slots"]["Apply"]["args"]["event"]["tables"] = {"UnitsCreate.noSuchMember": "UnitDef"}
+        _, errors = build([], ann)
+        self.assertTrue(any("`tables` of" in e and "UnitsCreate.noSuchMember, which is no int member" in e for e in errors), errors)
+
     def imported(self):
         ann = annotations()
         ann["subsystems"]["weapons"]["slots"]["FindWeaponByName"].update({"record": False, "reason": "#711"})

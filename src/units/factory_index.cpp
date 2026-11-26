@@ -21,31 +21,28 @@ inline unsigned char Unit::PlayerIndex() { return ((Player*)player)->index; }
 #include "factory_index.h"
 #include "../../interfaces/state_writer.h"
 #include <stdio.h>
-
-static FactoryIndex* s_index;
+#include "../state/sim_globals.h"
 
 static FactoryIndex* EnsureFactoryIndex()
 {
-    if (s_index == nullptr) {
-        s_index = new (kSim) FactoryIndex;
-        SimBlockTrack(reinterpret_cast<void**>(&s_index));
-    }
-    return s_index;
+    if (!g_factoryIndex)
+        g_factoryIndex = new (kSim) FactoryIndex;
+    return g_factoryIndex;
 }
 
 const BlockVector<Ref<Unit> >* FactoryIndexOf(int player)
 {
-    if (s_index == nullptr)
+    if (!g_factoryIndex)
         return nullptr;
-    return &s_index->players[player].factories;
+    return &g_factoryIndex->players[player].factories;
 }
 
 static void WriteUnitRecords(const StateWriter* w);
 
 void __stdcall UnitsWriteState(const StateWriter* w)
 {
-    for (int i = 0; s_index != nullptr && i < 10; i++) {
-        FactoryIndexEntry& entry = s_index->players[i];
+    for (int i = 0; g_factoryIndex && i < 10; i++) {
+        FactoryIndexEntry& entry = g_factoryIndex->players[i];
         if (!entry.live)
             continue;
         char name[32];
@@ -90,9 +87,9 @@ void __stdcall CreateFactoryIndex(int player)
 
 void __stdcall FreeFactoryIndex(int player)
 {
-    if (s_index == nullptr)
+    if (!g_factoryIndex)
         return;
-    FactoryIndexEntry& entry = s_index->players[player];
+    FactoryIndexEntry& entry = g_factoryIndex->players[player];
     entry.factories.~BlockVector();
     new (&entry.factories) BlockVector<Ref<Unit> >();
     entry.live = 0;
@@ -100,9 +97,9 @@ void __stdcall FreeFactoryIndex(int player)
 
 void __stdcall RefreshFactoryIndex(int player)
 {
-    if (s_index == nullptr)
+    if (!g_factoryIndex)
         return;
-    FactoryIndexEntry& entry = s_index->players[player];
+    FactoryIndexEntry& entry = g_factoryIndex->players[player];
     if (!entry.live || (unsigned int)g_game->ticks < entry.lastTick + 0x1e)
         return;
     entry.factories.Clear();
@@ -118,7 +115,7 @@ void __stdcall RefreshFactoryIndex(int player)
 // FUNCTION: 0x40b530
 int __stdcall GetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
 {
-    BlockVector<Ref<Unit> >& list = s_index->players[player].factories;
+    BlockVector<Ref<Unit> >& list = g_factoryIndex->players[player].factories;
     radius *= radius;
     int count = 0;
     for (BlockVector<Ref<Unit> >::iterator it = list.Begin(); it != list.End(); ++it) {

@@ -1394,6 +1394,8 @@ void ReplayObjectFieldKey(ReplayText& key, ReplayObjectTable& table, bool assign
 
 namespace {
 
+ReplayWalkSkipFn s_walkSkip;
+
 enum { MAX_WALK_FIELDS = kReplayWalkableFieldCount > 0 ? kReplayWalkableFieldCount : 1, MAX_DEFERRED = 512 };
 
 bool Walkable(const ReplayObjectField& f)
@@ -1446,6 +1448,8 @@ bool InWalkFields(const unsigned short* fields, unsigned count, unsigned field)
 void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned short kind, void* object, const unsigned short* limit, unsigned limitCount)
 {
     if (object == nullptr || kReplayObjectKinds[kind].scope == RS_VALUE)
+        return;
+    if (s_walkSkip != nullptr && s_walkSkip(object))
         return;
     unsigned actual = ReplayConcreteKind(kind, object);
     if (actual == kReplayObjectKindCount)
@@ -1651,6 +1655,21 @@ bool ReplayInReach(const ReplayReach& reach, unsigned at, unsigned fieldIndex)
             return true;
     }
     return false;
+}
+
+void* ReplayTableElement(unsigned kind, unsigned index)
+{
+    unsigned char* base;
+    unsigned count;
+    unsigned stride;
+    if (index == 0 || !TableSpan(kind, &base, &count, &stride) || index >= count)
+        return nullptr;
+    return base + index * stride;
+}
+
+void ReplaySetWalkSkip(ReplayWalkSkipFn skip)
+{
+    s_walkSkip = skip;
 }
 
 void ReplayWalk(ReplayReach& reach, ReplayObjectTable& table, bool assign, const ReplaySlotSets& sets, const unsigned short* rootKinds, void* const* roots, unsigned rootCount,

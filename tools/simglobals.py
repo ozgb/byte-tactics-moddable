@@ -45,11 +45,12 @@ TYPE_OVERRIDES = {
     "g_missionOrderTableVec": "BlockVector<OrderTableEntry>",
     "g_missionOrderTableBegin": "char*",
     "g_playerAI": "PlayerAI*[10]",
+    "g_factoryIndex": "FactoryIndex*",
     "g_losUnitIndex": "LosUnitIndex*",
     "g_quirks": "Quirks",
     "g_passMaps": "PassMapTable",
 }
-REF_FIELDS = {"g_explodedPieces", "g_losUnitIndex", "g_meteorWeapon", "g_playerAI"}
+REF_FIELDS = {"g_explodedPieces", "g_factoryIndex", "g_losUnitIndex", "g_meteorWeapon", "g_playerAI"}
 STATIC_FILES = {"g_movementClasses": "src/units/movement_class.cpp"}
 SIZE_OVERRIDES = {"g_movementClasses": 512}
 ELEMENT_SIZES = {"char": 1, "unsigned char": 1, "signed char": 1, "short": 2, "unsigned short": 2, "int": 4,
@@ -71,7 +72,7 @@ HEADER_INCLUDES = [
     '"../map/pass_map.h"',
     '"../util/vec3.h"',
 ]
-FORWARD_DECLARATIONS = ["struct ExplodedPiece;", "struct LosUnitIndex;", "struct PlayerAI;", "struct WeaponDef;"]
+FORWARD_DECLARATIONS = ["struct ExplodedPiece;", "struct FactoryIndex;", "struct LosUnitIndex;", "struct PlayerAI;", "struct WeaponDef;"]
 
 
 class Row:

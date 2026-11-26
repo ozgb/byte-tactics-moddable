@@ -1,0 +1,17 @@
+# The cheat code enables the debug keys; F11 turns debug mode on and two m keys pick the occupancy overlay.
+game_seed 1054
+crt_seed 2054
+view_seed 3054
+map The Pass
+start_positions fixed
+ticks 60
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +now Film Chris Include Reload Assert
+input 10 key down f11
+input 11 key up f11
+input 20 char m
+input 22 char m
+frames 30

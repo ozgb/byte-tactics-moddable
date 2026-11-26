@@ -39,7 +39,11 @@ LOG_PREFIX = "testreplay: "
 FRAME_HEADER_SIZE = 16
 FRAME_PALETTE_SIZE = 1024
 SECONDS = 900
-LEFT_OUT: dict[str, str] = {}
+LEFT_OUT: dict[str, str] = {
+    "sprite_opaque": "drawn only by the map tiles, inside the terrain item's muted scope",
+    "lens": "needs a weapon with rendertype 2, and the stock data's only one (MINDGUN) is used by nothing",
+    "copy": "only GUI layers with a background copy, and in battle those are the options menus, which stop the ticks",
+}
 
 
 class Error(Exception):

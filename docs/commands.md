@@ -528,14 +528,18 @@ one of those, and a scenario that uses a console command or an order kind that t
 | trio-anteer-strait | judged | - |
 | trio-dark-side | judged | - |
 | trio-etorrep-glacier | judged | - |
+| ui-antinuke-range | left out | has `input` lines: it needs the presentation |
 | ui-build-menu | left out | has `input` lines: it needs the presentation |
 | ui-build-place | left out | has `input` lines: it needs the presentation |
+| ui-chat-dither | left out | has `input` lines: it needs the presentation |
 | ui-click-select | left out | has `input` lines: it needs the presentation |
+| ui-debug-overlay | left out | has `input` lines: it needs the presentation |
 | ui-drag-select | left out | has `input` lines: it needs the presentation |
 | ui-groups | left out | has `input` lines: it needs the presentation |
 | ui-keys | left out | has `input` lines: it needs the presentation |
 | ui-left-click-orders | left out | has `input` lines: it needs the presentation |
 | ui-right-click | left out | has `input` lines: it needs the presentation |
+| ui-tab-menu | left out | has `input` lines: it needs the presentation |
 | units-transport | judged | - |
 | units-transport-ship | judged | - |
 

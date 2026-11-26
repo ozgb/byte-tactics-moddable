@@ -266,14 +266,18 @@ seeds) and runs deterministically: two runs give identical traces.
 | trio-anteer-strait | Anteer Strait | 3 | 5400 | Three players on Anteer Strait, players 0 and 1 allied, three minutes, line of sight type 0 |
 | trio-dark-side | Dark Side | 3 | 9000 | Three players on Dark Side, fixed start positions, five minutes |
 | trio-etorrep-glacier | Etorrep Glacier | 3 | 3600 | Three Core players on Etorrep Glacier, random start positions, two minutes |
+| ui-antinuke-range | The Pass | 2 | 3620 | A human Core anti-nuke builds one missile and is selected: the minimap draws its coverage as a dashed circle (`circle_dashed`) |
 | ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
 | ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
+| ui-chat-dither | The Pass | 2 | 120 | The chat line types and sends `+dither`, so the fog is dithered (`sprite_lit`, `sprite_erase`, `dither`) |
 | ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
+| ui-debug-overlay | The Pass | 2 | 60 | Debug mode (F11 after the cheat code) and its occupancy overlay (`polygon`) |
 | ui-drag-select | The Pass | 2 | 200 | Scripted box selection with and without Shift |
 | ui-groups | The Pass | 2 | 300 | Scripted control groups |
 | ui-keys | The Pass | 2 | 300 | Scripted keyboard shortcuts: attack, patrol, special attack, stop, queueing, self-destruct |
 | ui-left-click-orders | The Pass | 2 | 260 | Scripted left-click orders and command characters (interface type 0) |
 | ui-right-click | The Pass | 2 | 260 | Scripted right-click move and attack, the minimap scroll |
+| ui-tab-menu | The Pass | 2 | 60 | Game type 3: Tab opens the in-game tab menu, whose current button has a lit box (`outline_lit`) |
 
 ## The scenarios of the core's verdict
 
@@ -365,14 +369,18 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | trio-anteer-strait | judged | - |
 | trio-dark-side | judged | - |
 | trio-etorrep-glacier | judged | - |
+| ui-antinuke-range | left out | has `input` lines: it needs the presentation |
 | ui-build-menu | left out | has `input` lines: it needs the presentation |
 | ui-build-place | left out | has `input` lines: it needs the presentation |
+| ui-chat-dither | left out | has `input` lines: it needs the presentation |
 | ui-click-select | left out | has `input` lines: it needs the presentation |
+| ui-debug-overlay | left out | has `input` lines: it needs the presentation |
 | ui-drag-select | left out | has `input` lines: it needs the presentation |
 | ui-groups | left out | has `input` lines: it needs the presentation |
 | ui-keys | left out | has `input` lines: it needs the presentation |
 | ui-left-click-orders | left out | has `input` lines: it needs the presentation |
 | ui-right-click | left out | has `input` lines: it needs the presentation |
+| ui-tab-menu | left out | has `input` lines: it needs the presentation |
 | units-transport | judged | - |
 | units-transport-ship | judged | - |
 

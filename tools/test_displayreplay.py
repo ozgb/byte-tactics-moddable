@@ -98,19 +98,19 @@ class CoverageTest(unittest.TestCase):
         self.assertEqual(set(found), set(displaylog.KINDS))
 
     def test_a_kind_in_no_list_fails_unless_left_out(self):
-        found = {"fill": ["a"], "lens": []}
+        found = {"line": ["a"], "fill": []}
         missing, lines = displayreplay.coverage_report(found)
-        self.assertEqual(missing, ["lens"])
-        self.assertIn("lens: in no stored list", lines)
+        self.assertEqual(missing, ["fill"])
+        self.assertIn("fill: in no stored list", lines)
         old = dict(displayreplay.LEFT_OUT)
-        displayreplay.LEFT_OUT["lens"] = "why"
+        displayreplay.LEFT_OUT["fill"] = "why"
         try:
             missing, lines = displayreplay.coverage_report(found)
         finally:
             displayreplay.LEFT_OUT.clear()
             displayreplay.LEFT_OUT.update(old)
         self.assertEqual(missing, [])
-        self.assertIn("lens: left out (why)", lines)
+        self.assertIn("fill: left out (why)", lines)
 
     def test_a_stored_list_is_the_same_bytes_for_the_same_text(self):
         text = "bt-display 1.1\n" + "x" * 1000

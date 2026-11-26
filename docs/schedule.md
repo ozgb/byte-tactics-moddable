@@ -1616,6 +1616,8 @@ delivery to the same subscriber. No inbox holds an effect when the tick ends.
 | engine | `PLAYERS_SET_TYPE` | players | synchronous |
 | engine | `PLAYERS_END_GAME` | players | synchronous |
 | engine | `PLAYERS_DEACTIVATE_CONDITIONS` | players | synchronous |
+| engine | `PLAYERS_SET_CHEATS` | players | synchronous |
+| engine | `PLAYERS_LEAVE_GAME` | players | synchronous |
 | players | `PLAYERS_EFFECT_KILL_UNIT` | units | synchronous |
 | players | `PLAYERS_EFFECT_SEND_UNIT` | units | synchronous |
 | players | `PLAYERS_EFFECT_CAPTURE_UNIT` | units | synchronous |
@@ -1689,6 +1691,7 @@ delivery to the same subscriber. No inbox holds an effect when the tick ends.
 | map | `LOS_RADAR_CELL_HEIGHTS` | los_radar | queued |
 | players | `LOS_RADAR_RECALCULATE` | los_radar | synchronous |
 | engine | `LOS_RADAR_RECALCULATE` | los_radar | queued |
+| engine | `LOS_RADAR_SET_MODE` | los_radar | queued |
 | engine | `LOS_RADAR_SHARE_MAPPING` | los_radar | queued |
 | engine | `LOS_RADAR_SHARE_RADAR` | los_radar | queued |
 | economy | `LOS_RADAR_SHARE_MAPPING` | los_radar | queued |
@@ -1708,6 +1711,7 @@ delivery to the same subscriber. No inbox holds an effect when the tick ends.
 | units | `MAP_BUCKET_UNLINK` | map | synchronous |
 | units | `MAP_BUCKET_PREPEND` | map | synchronous |
 | map | `MAP_EFFECT_CELLS_CHANGED` | pathfinding | synchronous |
+| engine | `PATHFINDING_SET_SEARCH` | pathfinding | queued |
 | units | `ORDERS_ADD` | orders | synchronous |
 | engine | `ORDERS_COMMAND` | orders | queued |
 | engine | `ORDERS_GROUP_COMMAND` | orders | queued |
@@ -1760,6 +1764,7 @@ delivery to the same subscriber. No inbox holds an effect when the tick ends.
 | engine | `UNITS_SET_FLAGS` | units | queued |
 | engine | `UNITS_CREATE` | units | queued |
 | engine | `UNITS_KILL_ALL` | units | queued |
+| engine | `UNITS_FORGET_ATTACKER` | units | queued |
 | engine | `UNITS_RELOAD_TYPE` | units | queued |
 | scripts | `UNITS_SCRIPT_VALUE` | units | synchronous |
 | scripts | `UNITS_ATTACH_TO_PIECE` | units | synchronous |

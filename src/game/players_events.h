@@ -82,6 +82,24 @@ inline void PlayersPublishDeactivateConditions(int outbox)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void PlayersPublishSetCheats(int outbox, unsigned int clear, unsigned int set)
+{
+    PlayersSetCheats event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = PLAYERS_SET_CHEATS;
+    event.clear = clear;
+    event.set = set;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
+inline void PlayersPublishLeaveGame(int outbox)
+{
+    PlayersEventHeader event;
+    memset(&event, 0, sizeof(event));
+    event.kind = PLAYERS_LEAVE_GAME;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 template <class U>
 inline void PlayersPublishGiveUnit(int outbox, U* unit, int player, const OwnershipTransferPacket* record)
 {

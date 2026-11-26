@@ -1,6 +1,6 @@
 # The players interface
 
-Players sits behind `interfaces/players.h` (version 5.1; 5.0 makes the condition slots stdcall instead of thiscall, with no unused register argument; 5.1 adds the console's kinds SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS), the sixth module on the scheduler after economy
+Players sits behind `interfaces/players.h` (version 5.2; 5.0 makes the condition slots stdcall instead of thiscall, with no unused register argument; 5.1 adds the console's kinds SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS; 5.2 adds SET_CHEATS and LEAVE_GAME), the sixth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`) and map (`docs/map-interface.md`) (#967). It is the players as the
 simulation sees them: each player's update (its resources' bookkeeping, the commander's respawn, the end of the game),
@@ -29,7 +29,11 @@ Players' place in it:
   the engine's console also publishes SET_STORE (`atm`, `nometal`, `noenergy`), SET_TYPE (`ai`), END_GAME (`iwin`,
   `ilose`) and DEACTIVATE_CONDITIONS (`kill`), each from `SCHED_ENGINE` through a synchronous route; they replace the
   console's direct writes to the `Player` record and the game's end-of-match bits, and its calls to `Player::SetType`
-  and to the conditions' `DeactivateConditions` slot.
+  and to the conditions' `DeactivateConditions` slot. Since 5.2 the engine also publishes SET_CHEATS (the console's
+  `doubleshot`, `halfshot`, `radar`, `shootall` and `treedeath`) and LEAVE_GAME (the quit dialog's leave choice and the
+  stop-watching choice of the dialog a defeated player gets), each from `SCHED_ENGINE` through a synchronous route; they
+  replace those writes to the game's option flags and to the end-of-game bits. The debug hotkey that fills the stores
+  now publishes SET_STORE too.
   Players' handler (`PlayersInbox`, `src/seams/players_world.cpp`) passes each to `Apply`, and records it with its
   outcome in the trace's dump (section 5). Economy's SHARE reaches it through `PlayersOnEconomyShare`, which builds a
   TRANSFER and hands it to the same handler; it moved from players' files into the same glue, as it is the engine's
@@ -70,6 +74,9 @@ Players' place in it:
 | the network: an ownership record arrives (packet 0x14) | `GiveUnitToPlayer`, with the record | GIVE_UNIT from the engine, with the record's fields |
 | the network: a share of metal or energy arrives (packet 0x16) | `TransferMetal`, `TransferEnergy`, not announced | TRANSFER from the engine |
 | the console: `+kill`, `+iwin`, `+ilose` (`CmdKill`, `CmdIWin`, `CmdILose`) | `KillPlayerUnits` | KILL_UNITS from the engine |
+| the console: `doubleshot`, `halfshot`, `radar`, `shootall`, `treedeath` | writes to `uiOptionFlags` | SET_CHEATS from the engine |
+| the quit dialog's leave choice, the defeated player's stop-watching choice (`HandleSurrenderChoice`, `ContinueWatchingCallback`) | the end bit of `endGameFlags` | LEAVE_GAME from the engine |
+| the debug hotkey that fills the stores (`HandleDebugHotkey`) | writes to the `Player` record's stores | SET_STORE from the engine |
 | the console: `+give` (`CmdGive`) | `TransferMetal`, `TransferEnergy`, announced | TRANSFER from the engine |
 | the in-game dialogs: give the selected units (`GiveSelectedUnitsToPlayer`), share resources | `GiveUnitToPlayer`, `TransferMetal`, `TransferEnergy` | GIVE_UNIT, TRANSFER from the engine |
 | economy: the SHARE effect (`UpdateResourceSharing`) | `TransferMetal`, `TransferEnergy`, announced | TRANSFER, through `PlayersOnEconomyShare` |
@@ -103,8 +110,8 @@ one: 1 for UNIT_CREATED, UNIT_DIED and KILL_UNITS; for GIVE_UNIT, 1 when players
 CAPTURE_UNIT) and 0 when the unit was already the receiver's, dead, dying, or the receiver could not take it (the
 outcome is players' decision: units can still refuse a local copy at its unit limit, and the unit then stays with its
 old owner); for TRANSFER, 1, or 0 when either player is
-slot 10 or the amount is 0; 1 for SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS. `Apply` first rejects an event naming no unit (GIVE_UNIT, UNIT_CREATED, UNIT_DIED), a
-player above 9 for GIVE_UNIT or above 10 for KILL_UNITS and TRANSFER, a resource other than 0 or 1, a SET_STORE or SET_TYPE for a player above 9, a SET_STORE for a resource other than 0 or 1, an END_GAME for a victory other than 0 or 1, a GIVE_UNIT, UNIT_CREATED or
+slot 10 or the amount is 0; 1 for SET_STORE, SET_TYPE, END_GAME, DEACTIVATE_CONDITIONS and LEAVE_GAME; for SET_CHEATS, 1, or 0 when `clear` or `set` has a bit outside 0x788 (the five cheat toggles). `Apply` first rejects an event naming no unit (GIVE_UNIT, UNIT_CREATED, UNIT_DIED), a
+player above 9 for GIVE_UNIT or above 10 for KILL_UNITS and TRANSFER, a resource other than 0 or 1, a SET_STORE or SET_TYPE for a player above 9, a SET_STORE for a resource other than 0 or 1, an END_GAME for a victory other than 0 or 1, a SET_CHEATS with a bit outside 0x788 in `clear` or `set`, a GIVE_UNIT, UNIT_CREATED or
 UNIT_DIED with no conditions (3.1c's GIVE_UNIT had no such check and crashed there, so no
 trace depends on it), and an
 unknown kind, with outcome 0 and no change. KILL_UNITS takes slot 10, the
@@ -167,7 +174,7 @@ scenario plays (section 6).
 `Unit`, `UnitMotion` or `Order`. It writes its own: the `Player` records' fields it owns (section 4), the conditions'
 objects, and `Game::endGameCountdown` and `Game::endGameFlags`.
 
-**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 5.0; the payloads are unchanged since 4.0) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values sign-extended) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 5.2; the payloads are unchanged since 4.0 besides the new kinds) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values sign-extended) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -179,6 +186,8 @@ objects, and `Game::endGameCountdown` and `Game::endGameFlags`.
 | SET_TYPE 198 | `PlayersSetType` | `player` (0 to 9), `type` (stored as a byte; the kind of the player's info follows it unless it is 3) |
 | END_GAME 199 | `PlayersEndGame` | `victory` (1 raises the victory bit, 0 the defeat bit, and both raise the end bit) |
 | DEACTIVATE_CONDITIONS 200 | the header alone | none |
+| SET_CHEATS 201 | `PlayersSetCheats` | `clear`, `set` (bits of `uiOptionFlags`, within 0x788: `uiOptionFlags` = (`uiOptionFlags` & ~`clear`) \| `set`) |
+| LEAVE_GAME 202 | the header alone | none; raises bit 2 of `endGameFlags`, the end bit |
 | KILL_UNIT 208 | `PlayersKillUnit` | `selfDestruct`: 0 by 30000 damage the unit deals itself, 1 by self-destruct |
 | SEND_UNIT 209 | `PlayersSendUnit` | `player`: the player it goes to |
 | CAPTURE_UNIT 210 | `PlayersCaptureUnit` | `player` (the player the copy is made for), `record` (a `PlayersOwnershipRecord`) |
@@ -229,6 +238,7 @@ as the table below says.
 |---|---|---|
 | units KILL_UNITS | synchronous | The gate (section 8). |
 | engine KILL_UNITS | synchronous | #952's rule. Queued it stayed equal on the tier, which has no network path: the engine publishes it from `RemovePlayer`, a packet of the net phase (`HandleNetPackets`), and the packets after it in the same phase read the dead units (a unit's state packet, a kill packet). The console's `+kill`, `+iwin` and `+ilose` publish it outside the tick (the console runs before `SchedBeginTick`, in the harness and in the main loop's input), where #970's rule delivers it at once. |
+| engine SET_CHEATS, LEAVE_GAME | synchronous | Published only outside the tick (the console, the quit and defeat dialogs), where #970's rule delivers an event at once either way; synchronous like the console's other kinds of 5.1. |
 | units UNIT_CREATED | queued | Equal on the tier, and #952's rule does not need it: no condition type overrides `OnUnitCreated`, so the event writes nothing in the default, and nothing in the phase can read a difference while it is pending. Its order against UNIT_DIED is kept, as a synchronous route delivers players' inbox before it hands over its event. |
 | units UNIT_DIED | synchronous | The gate (section 8). |
 | orders GIVE_UNIT | synchronous | The gate (section 8). |

@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem players 5.1
+subsystem players 5.2
 call 0 RegionSize
   a info (2)
   o result 84
@@ -25501,6 +25501,7 @@ call 498 UpdatePlayerHead
 call 498 UpdatePlayersFinish
   i mission.GetGameType = 1
 call 499 Apply
+  r Game.uiOptionFlags 12
   r Unit#282.player Player#1
   r Player#0.energy f32:0x447a0000
   r Player#0.metal f32:0x447a0000

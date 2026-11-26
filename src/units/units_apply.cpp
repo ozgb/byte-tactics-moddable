@@ -40,7 +40,7 @@ static Unit* UnitOfOffset(unsigned int offset)
 
 static int KnownKind(int kind)
 {
-    return (kind >= UNITS_SET_STATE_BITS && kind <= UNITS_CHANGE_CELL) || (kind >= UNITS_SET_MOVED && kind <= UNITS_RELOAD_TYPE);
+    return (kind >= UNITS_SET_STATE_BITS && kind <= UNITS_CHANGE_CELL) || (kind >= UNITS_SET_MOVED && kind <= UNITS_FORGET_ATTACKER);
 }
 
 static void UnitsApplyAttackedSpeech(Unit* unit)
@@ -169,6 +169,11 @@ int __stdcall UnitsApply(const UnitsEventHeader* e, unsigned int size)
         unit->flags = (unit->flags & ~p->clear) | p->set;
         break;
     }
+    case UNITS_FORGET_ATTACKER:
+        unit->lastAttackerSlot = 10;
+        unit->panel.flag_110 = 1;
+        unit->attacker = nullptr;
+        break;
     case UNITS_SET_NET_DIRTY: {
         const UnitsSetNetDirty* p = reinterpret_cast<const UnitsSetNetDirty*>(e);
         unit->netDirtyFlags = (unsigned short)((unit->netDirtyFlags & ~p->clear) | p->set);

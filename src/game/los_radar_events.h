@@ -96,6 +96,16 @@ inline void LosRadarPublishRecalculate(int outbox, int value)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void LosRadarPublishSetMode(int outbox, unsigned int clear, unsigned int set)
+{
+    LosRadarSetMode event;
+    memset(&event, 0, sizeof(event));
+    event.h.kind = LOS_RADAR_SET_MODE;
+    event.clear = clear;
+    event.set = set;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 inline void LosRadarPublishShareMapping(int outbox, int player)
 {
     LosRadarSharePlayer event;

@@ -449,7 +449,21 @@ and so on), and this page is updated to name it. The current tag is
   still version 1 of the file (`BTVW`). The trace format is still `bt-trace 10`. Every `view` row and so every digest
   changes, and no `tick` row does; the commit line names a30a983b5, the reference tip with the view 2.0 fill (#1148).
   The event digests, sound logs, UI logs, interface commands, display logs, frames and saves are those of v48.
-PENDING_1053_ENTRY
+- `reference-traces-v51` (#1053): the 97 scenarios of v49 and four new ones, `ui-antinuke-range`,
+  `display-chat-dither`, `display-debug-overlay` and `display-tab-menu`, whose frames draw the display kinds no other
+  scenario does. The display log is version 1.2 (`docs/display-log.md`): `picture` lines for the pictures the game
+  made, `pixels` items for what the game writes into a target without a drawing item, the fields of a `model` that
+  choose how it is drawn, a surface that shares its name with another live surface named `<name>#<n>`, and a surface
+  made in pixels freed earlier in the frame a new target (`ui-dialogs` and `ui-share-chat` need the last two). The
+  display lists hold every frame up to the last `frames` tick, stored xz compressed in
+  `reference/displaylists/<scenario>.txt.xz` (thirteen lists, `ui-dialogs` now among them), and drawn from blank
+  targets they give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display digest changes,
+  and `frontend-skirmish` stores its display digest for the first time. The trace format is still `bt-trace 10`. The
+  traces of the 97 are those of v49 but for their commit line, which names 0758dafdb, the reference tip with the
+  display log's target fix (#1154); the four new scenarios store their traces, sounds, UI logs, events, frames and the
+  views of their frame ticks. `display-debug-overlay`'s debug panel reads `FRATE: 0`, as #1147 draws it. The sounds,
+  UI logs, interface commands, events, frames and views of the 97 are those of v49, and the saves decode equal to
+  v49's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

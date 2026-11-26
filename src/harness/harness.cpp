@@ -814,7 +814,7 @@ static void CheckFrameInputsDelivered()
 
 static void HarnessFrameEnd(unsigned tick)
 {
-    if (tick == 0 || tick > s_ticks || s_replay != nullptr)
+    if (tick == 0 || tick > s_ticks)
         return;
     if (tick != s_frameTick) {
         s_frameTick = tick;
@@ -822,7 +822,8 @@ static void HarnessFrameEnd(unsigned tick)
     }
     s_framesAtTick++;
     unsigned last = 0;
-    for (int i = 0; i < s_inputCount; i++) {
+    int scripted = s_replay != nullptr ? 0 : s_inputCount;
+    for (int i = 0; i < scripted; i++) {
         ScriptedInput* in = &s_inputs[i];
         if (in->frame == 0 || in->tick != tick)
             continue;

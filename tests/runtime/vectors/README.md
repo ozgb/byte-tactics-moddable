@@ -47,8 +47,8 @@ their original order.
 
 ## Entries
 
-- `sine` (65536 edge, 0 random of 0): the sine of a 16-bit angle (65536 is a full turn) as a fixed-point int, 8192 being 1.0: entry `(angle >> 7) & 511` of the sine table (Rules); every angle is an edge record
-- `cosine` (65536 edge, 0 random of 0): the cosine of a 16-bit angle in the same fixed point: entry `128 + ((angle >> 7) & 511)` of the sine table (Rules); every angle is an edge record
+- `sine` (65536 edge, 0 random of 0): the sine of a 16-bit angle (65536 is a full turn) as a fixed-point int, 8192 being 1.0: the entry of the sine table that "Sine table" (Rules) gives; every angle is an edge record
+- `cosine` (65536 edge, 0 random of 0): the cosine of a 16-bit angle in the same fixed point: the entry of the sine table that "Sine table" (Rules) gives; every angle is an edge record
 - `mul_hi` (16129 edge, 6666 random of 1000000): the high 32 bits of the signed 64-bit product of two ints
 - `scaled_sine` (1016 edge, 6666 random of 9846344): scale times the sine of an angle, as an int (Rules, "Scaled sine and cosine")
 - `scaled_cosine` (1016 edge, 6666 random of 9846344): scale times the cosine of an angle, as an int (Rules, "Scaled sine and cosine")

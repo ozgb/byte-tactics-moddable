@@ -50,8 +50,8 @@ FIXED = {"i32": 4, "u32": 4, "f64": 8}
 BYTES = re.compile(r"bytes([1-9][0-9]*)")
 
 DESCRIPTIONS = {
-    "sine": "the sine of a 16-bit angle (65536 is a full turn) as a fixed-point int, 8192 being 1.0: entry `(angle >> 7) & 511` of the sine table (Rules); every angle is an edge record",
-    "cosine": "the cosine of a 16-bit angle in the same fixed point: entry `128 + ((angle >> 7) & 511)` of the sine table (Rules); every angle is an edge record",
+    "sine": "the sine of a 16-bit angle (65536 is a full turn) as a fixed-point int, 8192 being 1.0: the entry of the sine table that \"Sine table\" (Rules) gives; every angle is an edge record",
+    "cosine": "the cosine of a 16-bit angle in the same fixed point: the entry of the sine table that \"Sine table\" (Rules) gives; every angle is an edge record",
     "mul_hi": "the high 32 bits of the signed 64-bit product of two ints",
     "scaled_sine": "scale times the sine of an angle, as an int (Rules, \"Scaled sine and cosine\")",
     "scaled_cosine": "scale times the cosine of an angle, as an int (Rules, \"Scaled sine and cosine\")",

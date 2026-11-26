@@ -1057,24 +1057,6 @@ call 19 RunOrders
   o Order#3.link.owner Unit#1
   o Order#3.link.next null
   o Order#3.link.value Order#3
-  o Order#3.state 0
-  o Order#3.attached null
-  o Order#3.next null
-  o Order#3.kind 19
-  o Order#3.ticks 0
-  o Order#3.flags_42 0
-  o Order#3.flags 0
-  o Order#3.wakeFrame 0
-  o Order#3.unit null
-  o Order#3.posX 0
-  o Order#3.posY 0
-  o Order#3.posZ 0
-  o Order#3.start (0,0)
-  o Order#3.cached (0,0)
-  o Order#3.radius 0
-  o Order#3.progress 0
-  o Order#3.created 19
-  o Order#3.subFlags 0
   i scripts.FindScript CobScript#1 "StartBuilding" = 17
   i services.SchedPublish 3 76
   i network.SendScriptCall Unit#1 17 1 59405 0 0 0 = 0
@@ -1085,9 +1067,24 @@ call 19 RunOrders
   w Order#1.flags 14
   w Order#1.subFlags 0
   w Unit#2.list Order#3
+  w Order#3.state 0
+  w Order#3.attached null
+  w Order#3.next null
+  w Order#3.kind 19
+  w Order#3.ticks 0
   w Order#3.flags_42 549
+  w Order#3.flags 0
   w Order#3.wakeFrame 4294967295
   w Order#3.unit Unit#2
+  w Order#3.posX 0
+  w Order#3.posY 0
+  w Order#3.posZ 0
+  w Order#3.start (0,0)
+  w Order#3.cached (0,0)
+  w Order#3.radius 0
+  w Order#3.progress 0
+  w Order#3.created 19
+  w Order#3.subFlags 0
 call 19 RunSecondaryOrders
   r Game.visibilityMask 248:0100 361:0100 586:0100 698:0100 810:0100 922:0100 1033:01000100 1144:01000100 1256:01000100 1367:01000100 1477:01000100
   a unit Unit#1

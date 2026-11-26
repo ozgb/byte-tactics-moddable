@@ -1138,43 +1138,7 @@ call 150 RunOrders
   o Order#5.link.owner null
   o Order#5.link.next null
   o Order#5.link.value Order#5
-  o Order#5.state 0
-  o Order#5.attached null
-  o Order#5.next null
-  o Order#5.kind 34
-  o Order#5.ticks 0
-  o Order#5.flags_42 0
-  o Order#5.flags 0
-  o Order#5.wakeFrame 0
-  o Order#5.unit null
-  o Order#5.posX 0
-  o Order#5.posY 0
-  o Order#5.posZ 0
-  o Order#5.start (0,0)
-  o Order#5.cached (0,0)
-  o Order#5.radius 0
-  o Order#5.progress 0
-  o Order#5.created 150
-  o Order#5.subFlags 0
   i units.UnitRefSetUnit Order#5.link null
-  o Order#5.state 0
-  o Order#5.attached null
-  o Order#5.next null
-  o Order#5.kind 34
-  o Order#5.ticks 0
-  o Order#5.flags_42 1042
-  o Order#5.flags 0
-  o Order#5.wakeFrame 4294967295
-  o Order#5.unit null
-  o Order#5.posX 38341685
-  o Order#5.posY 65536
-  o Order#5.posZ 16019809
-  o Order#5.start (0,0)
-  o Order#5.cached (0,0)
-  o Order#5.radius 0
-  o Order#5.progress 0
-  o Order#5.created 150
-  o Order#5.subFlags 0
   i services.SchedPublish 3 12
   i movement.NewApproachRadius Order#4 45878325 19689825 16 = ApproachRadius#1
   i services.SchedPublish 3 12
@@ -1182,49 +1146,7 @@ call 150 RunOrders
   o ids x:01000200
   i services.RandomInt 1 = 0
   i units.CanRepair Unit#1 Unit#2 = 1
-  o Unit#2.list Order#2
-  o Unit#2.flags 0x30282321
-  o Unit#2.list2 null
-  o Order#2.state 2
-  o Order#2.attached null
-  o Order#2.next null
-  o Order#2.kind 19
-  o Order#2.ticks 0
-  o Order#2.flags_42 549
-  o Order#2.flags 32769
-  o Order#2.wakeFrame 179
-  o Order#2.unit Unit#2
-  o Order#2.posX 0
-  o Order#2.posY 0
-  o Order#2.posZ 0
-  o Order#2.start (0,0)
-  o Order#2.cached (0,0)
-  o Order#2.radius 0
-  o Order#2.progress 0
-  o Order#2.created 36
-  o Order#2.subFlags 0
   i units.CanRepair Unit#1 Unit#2 = 1
-  o Unit#2.list Order#2
-  o Unit#2.flags 0x30282321
-  o Unit#2.list2 null
-  o Order#2.state 2
-  o Order#2.attached null
-  o Order#2.next null
-  o Order#2.kind 19
-  o Order#2.ticks 0
-  o Order#2.flags_42 549
-  o Order#2.flags 32769
-  o Order#2.wakeFrame 179
-  o Order#2.unit Unit#2
-  o Order#2.posX 0
-  o Order#2.posY 0
-  o Order#2.posZ 0
-  o Order#2.start (0,0)
-  o Order#2.cached (0,0)
-  o Order#2.radius 0
-  o Order#2.progress 0
-  o Order#2.created 36
-  o Order#2.subFlags 0
   i services.SimAlloc 86 = alloc#2
   i units.UnitRefInit PathOrderAttach#2 null null
   o PathOrderAttach#2.owner null
@@ -1234,112 +1156,16 @@ call 150 RunOrders
   o Order#6.link.owner null
   o Order#6.link.next null
   o Order#6.link.value Order#6
-  o Order#6.state 0
-  o Order#6.attached null
-  o Order#6.next null
-  o Order#6.kind 26
-  o Order#6.ticks 0
-  o Order#6.flags_42 0
-  o Order#6.flags 0
-  o Order#6.wakeFrame 0
-  o Order#6.unit null
-  o Order#6.posX 0
-  o Order#6.posY 0
-  o Order#6.posZ 0
-  o Order#6.start (0,0)
-  o Order#6.cached (0,0)
-  o Order#6.radius 0
-  o Order#6.progress 0
-  o Order#6.created 150
-  o Order#6.subFlags 0
   i units.UnitRefSetUnit Order#6.link null
-  o Order#6.state 0
-  o Order#6.attached null
-  o Order#6.next null
-  o Order#6.kind 26
-  o Order#6.ticks 0
-  o Order#6.flags_42 1026
-  o Order#6.flags 0
-  o Order#6.wakeFrame 4294967295
-  o Order#6.unit null
-  o Order#6.posX 38341685
-  o Order#6.posY 65536
-  o Order#6.posZ 16019809
-  o Order#6.start (0,0)
-  o Order#6.cached (0,0)
-  o Order#6.radius 0
-  o Order#6.progress 0
-  o Order#6.created 150
-  o Order#6.subFlags 0
   i services.SimAlloc 86 = alloc#3
   i units.UnitRefInit PathOrderAttach#3 Unit#2 null
   o PathOrderAttach#3.owner Unit#2
   o PathOrderAttach#3.next null
   o PathOrderAttach#3.value null
-  o Unit#2.list Order#2
-  o Unit#2.flags 0x30282321
-  o Unit#2.list2 null
-  o Order#2.state 2
-  o Order#2.attached null
-  o Order#2.next null
-  o Order#2.kind 19
-  o Order#2.ticks 0
-  o Order#2.flags_42 549
-  o Order#2.flags 32769
-  o Order#2.wakeFrame 179
-  o Order#2.unit Unit#2
-  o Order#2.posX 0
-  o Order#2.posY 0
-  o Order#2.posZ 0
-  o Order#2.start (0,0)
-  o Order#2.cached (0,0)
-  o Order#2.radius 0
-  o Order#2.progress 0
-  o Order#2.created 36
-  o Order#2.subFlags 0
   i units.UnitRefSetValue PathOrderAttach#3 Order#7
   o Order#7.link.owner Unit#2
   o Order#7.link.next null
   o Order#7.link.value Order#7
-  o Order#7.state 0
-  o Order#7.attached null
-  o Order#7.next null
-  o Order#7.kind 23
-  o Order#7.ticks 0
-  o Order#7.flags_42 0
-  o Order#7.flags 0
-  o Order#7.wakeFrame 0
-  o Order#7.unit null
-  o Order#7.posX 0
-  o Order#7.posY 0
-  o Order#7.posZ 0
-  o Order#7.start (0,0)
-  o Order#7.cached (0,0)
-  o Order#7.radius 0
-  o Order#7.progress 290
-  o Order#7.created 150
-  o Order#7.subFlags 0
-  o Unit#2.list Order#2
-  o Unit#2.flags 0x30282321
-  o Unit#2.list2 null
-  o Order#2.state 2
-  o Order#2.attached null
-  o Order#2.next null
-  o Order#2.kind 19
-  o Order#2.ticks 0
-  o Order#2.flags_42 549
-  o Order#2.flags 32769
-  o Order#2.wakeFrame 179
-  o Order#2.unit Unit#2
-  o Order#2.posX 0
-  o Order#2.posY 0
-  o Order#2.posZ 0
-  o Order#2.start (0,0)
-  o Order#2.cached (0,0)
-  o Order#2.radius 0
-  o Order#2.progress 0
-  o Order#2.created 36
-  o Order#2.subFlags 0
   i services.SchedPublish 3 12
   i movement.NewRingApproach Order#7 42467328 17301504 107 47 = RingApproach#1
   i services.SchedPublish 3 12
@@ -1348,15 +1174,57 @@ call 150 RunOrders
   w Order#7.state 1
   w Order#7.attached RingApproach#1
   w Order#7.next Order#6
+  w Order#7.kind 23
+  w Order#7.ticks 0
   w Order#7.flags_42 1049096
   w Order#7.flags 232
   w Order#7.wakeFrame 4294967295
   w Order#7.unit Unit#1
+  w Order#7.posX 0
+  w Order#7.posY 0
+  w Order#7.posZ 0
   w Order#7.start (585,244)
+  w Order#7.cached (0,0)
+  w Order#7.radius 0
+  w Order#7.progress 290
+  w Order#7.created 150
+  w Order#7.subFlags 0
+  w Order#6.state 0
+  w Order#6.attached null
   w Order#6.next Order#5
+  w Order#6.kind 26
+  w Order#6.ticks 0
+  w Order#6.flags_42 1026
+  w Order#6.flags 0
+  w Order#6.wakeFrame 4294967295
   w Order#6.unit Unit#1
+  w Order#6.posX 38341685
+  w Order#6.posY 65536
+  w Order#6.posZ 16019809
+  w Order#6.start (0,0)
+  w Order#6.cached (0,0)
+  w Order#6.radius 0
+  w Order#6.progress 0
+  w Order#6.created 150
+  w Order#6.subFlags 0
+  w Order#5.state 0
+  w Order#5.attached null
   w Order#5.next Order#4
+  w Order#5.kind 34
+  w Order#5.ticks 0
+  w Order#5.flags_42 1042
+  w Order#5.flags 0
+  w Order#5.wakeFrame 4294967295
   w Order#5.unit Unit#1
+  w Order#5.posX 38341685
+  w Order#5.posY 65536
+  w Order#5.posZ 16019809
+  w Order#5.start (0,0)
+  w Order#5.cached (0,0)
+  w Order#5.radius 0
+  w Order#5.progress 0
+  w Order#5.created 150
+  w Order#5.subFlags 0
   w Order#4.state 1
   w Order#4.attached ApproachRadius#1
   w Order#4.flags_42 46099

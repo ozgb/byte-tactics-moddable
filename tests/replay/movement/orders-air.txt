@@ -850,6 +850,7 @@ call 4095 UpdateMotion
   o PathOrder#4.posY 65536
   o PathOrder#4.posZ 21393069
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
   o PathOrder#4.posY 65536
   i services.SchedPublish 14 12
   o Unit#3.heading -22556
@@ -948,6 +949,7 @@ call 4096 UpdateMotion
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
   o PathOrder#4.posY 65536
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
   o PathOrder#4.posY 65536
   i services.SchedPublish 14 12
   o Unit#3.heading -22684
@@ -1044,6 +1046,7 @@ call 4097 UpdateMotion
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
   o PathOrder#4.posY 65536
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
   o PathOrder#4.posY 65536
   i services.SchedPublish 14 12
   o Unit#3.heading -22812
@@ -1130,6 +1133,7 @@ call 4098 UpdateMotion
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
   o PathOrder#4.posY 65536
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
   o PathOrder#4.posY 65536
   i services.SchedPublish 14 12
   o Unit#3.heading -22940
@@ -1223,6 +1227,7 @@ call 4099 UpdateMotion
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
   o PathOrder#4.posY 65536
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
   o PathOrder#4.posY 65536
   i services.SchedPublish 14 12
   o Unit#3.heading -23068
@@ -1337,6 +1342,7 @@ call 4100 UpdateMotion
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
   o PathOrder#4.posY 65536
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
   o PathOrder#4.posY 65536
   i services.SchedPublish 14 12
   o Unit#3.heading -23196
@@ -1469,6 +1475,7 @@ call 4101 UpdateMotion
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
   o PathOrder#4.posY 65536
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
   o PathOrder#4.posY 65536
   i services.SchedPublish 14 12
   o Unit#3.heading -23324
@@ -1557,6 +1564,7 @@ call 4102 UpdateMotion
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
   o PathOrder#4.posY 65536
   i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
   o PathOrder#4.posY 65536
   i services.SchedPublish 14 12
   o Unit#3.heading -23452

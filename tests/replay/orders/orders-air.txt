@@ -2844,43 +2844,7 @@ call 4100 RunOrders
   o Order#12.link.owner null
   o Order#12.link.next null
   o Order#12.link.value Order#12
-  o Order#12.state 0
-  o Order#12.attached null
-  o Order#12.next null
-  o Order#12.kind 56
-  o Order#12.ticks 0
-  o Order#12.flags_42 0
-  o Order#12.flags 0
-  o Order#12.wakeFrame 0
-  o Order#12.unit null
-  o Order#12.posX 0
-  o Order#12.posY 0
-  o Order#12.posZ 0
-  o Order#12.start (0,0)
-  o Order#12.cached (0,0)
-  o Order#12.radius 0
-  o Order#12.progress 0
-  o Order#12.created 4100
-  o Order#12.subFlags 0
   i units.UnitRefSetUnit Order#12.link null
-  o Order#12.state 0
-  o Order#12.attached null
-  o Order#12.next null
-  o Order#12.kind 56
-  o Order#12.ticks 0
-  o Order#12.flags_42 1042
-  o Order#12.flags 0
-  o Order#12.wakeFrame 4294967295
-  o Order#12.unit null
-  o Order#12.posX 64257579
-  o Order#12.posY 22347776
-  o Order#12.posZ 25607439
-  o Order#12.start (0,0)
-  o Order#12.cached (0,0)
-  o Order#12.radius 0
-  o Order#12.progress 0
-  o Order#12.created 4100
-  o Order#12.subFlags 0
   i services.RecordSimEvent 1 0 [5,5,19] 3
   i services.SchedPublish 3 12
   o Unit#5.weapon0Flags 2
@@ -2899,7 +2863,24 @@ call 4100 RunOrders
   w Order#11.flags_42 37907
   w Order#11.flags 225
   w Order#11.wakeFrame 4130
+  w Order#12.state 0
+  w Order#12.attached null
+  w Order#12.next null
+  w Order#12.kind 56
+  w Order#12.ticks 0
+  w Order#12.flags_42 1042
+  w Order#12.flags 0
+  w Order#12.wakeFrame 4294967295
   w Order#12.unit Unit#5
+  w Order#12.posX 64257579
+  w Order#12.posY 22347776
+  w Order#12.posZ 25607439
+  w Order#12.start (0,0)
+  w Order#12.cached (0,0)
+  w Order#12.radius 0
+  w Order#12.progress 0
+  w Order#12.created 4100
+  w Order#12.subFlags 0
 call 4100 RunSecondaryOrders
   a unit Unit#5
 call 4100 RunOrders

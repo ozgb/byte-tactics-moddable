@@ -1266,70 +1266,10 @@ call 852 RunOrders
   o PathOrderAttach#1.owner Unit#1
   o PathOrderAttach#1.next null
   o PathOrderAttach#1.value null
-  o Unit#1.list Order#1
-  o Unit#1.flags 0x90c00021
-  o Unit#1.list2 null
-  o Order#1.state 1
-  o Order#1.attached null
-  o Order#1.next null
-  o Order#1.kind 41
-  o Order#1.ticks 0
-  o Order#1.flags_42 147456
-  o Order#1.flags 65537
-  o Order#1.wakeFrame 871
-  o Order#1.unit Unit#1
-  o Order#1.posX 0
-  o Order#1.posY 0
-  o Order#1.posZ 0
-  o Order#1.start (0,0)
-  o Order#1.cached (0,0)
-  o Order#1.radius 0
-  o Order#1.progress 0
-  o Order#1.created 15
-  o Order#1.subFlags 0
   i units.UnitRefSetValue PathOrderAttach#1 Order#5
   o Order#5.link.owner Unit#1
   o Order#5.link.next null
   o Order#5.link.value Order#5
-  o Order#5.state 0
-  o Order#5.attached null
-  o Order#5.next null
-  o Order#5.kind 49
-  o Order#5.ticks 0
-  o Order#5.flags_42 0
-  o Order#5.flags 0
-  o Order#5.wakeFrame 0
-  o Order#5.unit null
-  o Order#5.posX 0
-  o Order#5.posY 0
-  o Order#5.posZ 0
-  o Order#5.start (0,0)
-  o Order#5.cached (0,0)
-  o Order#5.radius 0
-  o Order#5.progress 0
-  o Order#5.created 852
-  o Order#5.subFlags 0
-  o Unit#1.list Order#1
-  o Unit#1.flags 0x90c00021
-  o Unit#1.list2 null
-  o Order#1.state 1
-  o Order#1.attached null
-  o Order#1.next null
-  o Order#1.kind 41
-  o Order#1.ticks 0
-  o Order#1.flags_42 147456
-  o Order#1.flags 65537
-  o Order#1.wakeFrame 871
-  o Order#1.unit Unit#1
-  o Order#1.posX 0
-  o Order#1.posY 0
-  o Order#1.posZ 0
-  o Order#1.start (0,0)
-  o Order#1.cached (0,0)
-  o Order#1.radius 0
-  o Order#1.progress 0
-  o Order#1.created 15
-  o Order#1.subFlags 0
   i services.RandomInt 15 = 9
   i services.SchedPublish 3 12
   i services.SchedPublish 3 12
@@ -1351,6 +1291,7 @@ call 852 RunOrders
   w Order#5.state 2
   w Order#5.attached PathOrder#1
   w Order#5.next Order#3
+  w Order#5.kind 49
   w Order#5.ticks 10037
   w Order#5.flags_42 512
   w Order#5.flags 249
@@ -1359,7 +1300,12 @@ call 852 RunOrders
   w Order#5.posX 36700160
   w Order#5.posY 65536
   w Order#5.posZ 15728640
+  w Order#5.start (0,0)
+  w Order#5.cached (0,0)
   w Order#5.radius 1
+  w Order#5.progress 0
+  w Order#5.created 852
+  w Order#5.subFlags 0
   w Order#3.state 1
   w Order#3.ticks 9431
   w Order#3.flags 1

@@ -3314,8 +3314,8 @@ void CaptureFace(PieceFrame* face, unsigned offset, void* context)
     memset(&bind, 0, sizeof bind);
     bind.offset = offset;
     bind.flags = flags;
-    bind.type = (unsigned)face->unknown_0;
-    bind.word14 = (unsigned)face->unknown_14;
+    bind.type = (unsigned)face->fillColor;
+    bind.word14 = (unsigned)face->texKind;
     const void* src = face->color;
     if ((flags & 2) != 0 && src != nullptr && !InImage(src, (unsigned)(size_t)c->base, c->size, 1)) {
         ReplayText name;

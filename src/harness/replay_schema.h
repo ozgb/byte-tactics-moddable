@@ -2344,9 +2344,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "texIndex", offsetof(Face, tex.index), sizeof(((Face*)nullptr)->tex.index), ROK_DEBRISFACE, RK_U16, 0, 0, 0, { 797, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
     { "texValue", offsetof(Face, tex.value), sizeof(((Face*)nullptr)->tex.value), ROK_DEBRISFACE, RK_U16, 0, 0, 0, { 797, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
     { "texKind", offsetof(Face, tex.kind), sizeof(((Face*)nullptr)->tex.kind), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "texPad0", offsetof(Face, tex.unknown_5[0]), sizeof(((Face*)nullptr)->tex.unknown_5[0]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "texPad1", offsetof(Face, tex.unknown_5[1]), sizeof(((Face*)nullptr)->tex.unknown_5[1]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "texPad2", offsetof(Face, tex.unknown_5[2]), sizeof(((Face*)nullptr)->tex.unknown_5[2]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "texPad0", offsetof(Face, tex.kindHigh[0]), sizeof(((Face*)nullptr)->tex.kindHigh[0]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "texPad1", offsetof(Face, tex.kindHigh[1]), sizeof(((Face*)nullptr)->tex.kindHigh[1]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "texPad2", offsetof(Face, tex.kindHigh[2]), sizeof(((Face*)nullptr)->tex.kindHigh[2]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "texSrc", offsetof(Face, tex.src), sizeof(void*), ROK_DEBRISFACE, RK_PTR, ROK_FRAMETABLE, 0, 0, { 797, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
     { "obj", offsetof(Debris, obj), sizeof(((Debris*)nullptr)->obj), ROK_DEBRIS, RK_REF, ROK_DEBRISPIECE, 0, 0, {}, 0, 0 },
     { "ref1", offsetof(Debris, ref1), sizeof(((Debris*)nullptr)->ref1), ROK_DEBRIS, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
@@ -4005,9 +4005,9 @@ static_assert(__is_pointer(decltype(((Face*)nullptr)->tex.pic)), "Face::texPic i
 static_assert(sizeof(((Face*)nullptr)->tex.index) == 2, "Face::texIndex has the size the schema says");
 static_assert(sizeof(((Face*)nullptr)->tex.value) == 2, "Face::texValue has the size the schema says");
 static_assert(sizeof(((Face*)nullptr)->tex.kind) == 1, "Face::texKind has the size the schema says");
-static_assert(sizeof(((Face*)nullptr)->tex.unknown_5[0]) == 1, "Face::texPad0 has the size the schema says");
-static_assert(sizeof(((Face*)nullptr)->tex.unknown_5[1]) == 1, "Face::texPad1 has the size the schema says");
-static_assert(sizeof(((Face*)nullptr)->tex.unknown_5[2]) == 1, "Face::texPad2 has the size the schema says");
+static_assert(sizeof(((Face*)nullptr)->tex.kindHigh[0]) == 1, "Face::texPad0 has the size the schema says");
+static_assert(sizeof(((Face*)nullptr)->tex.kindHigh[1]) == 1, "Face::texPad1 has the size the schema says");
+static_assert(sizeof(((Face*)nullptr)->tex.kindHigh[2]) == 1, "Face::texPad2 has the size the schema says");
 static_assert(__is_pointer(decltype(((Face*)nullptr)->tex.src)), "Face::texSrc is a raw pointer");
 static_assert(sizeof(((Debris*)nullptr)->obj) == 4, "Debris::obj has the size the schema says");
 static_assert(sizeof(((Debris*)nullptr)->ref1) == sizeof(Handle), "Debris::ref1 has the size of its kind");

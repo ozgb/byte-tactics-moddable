@@ -5974,7 +5974,7 @@
      {
       "name": "texPad0",
       "kind": "u8",
-      "member": "tex.unknown_5[0]",
+      "member": "tex.kindHigh[0]",
       "aliases": [
        "Face::tex"
       ]
@@ -5982,7 +5982,7 @@
      {
       "name": "texPad1",
       "kind": "u8",
-      "member": "tex.unknown_5[1]",
+      "member": "tex.kindHigh[1]",
       "aliases": [
        "Face::tex"
       ]
@@ -5990,7 +5990,7 @@
      {
       "name": "texPad2",
       "kind": "u8",
-      "member": "tex.unknown_5[2]",
+      "member": "tex.kindHigh[2]",
       "aliases": [
        "Face::tex"
       ]
@@ -18400,7 +18400,7 @@
   {"name": "LosTable", "type": "LosTable", "scope": "value", "table": null, "inside": null, "fields": [{"name": "lines", "kind": "vector", "base": true, "elem": {"mode": "value", "kind": "LosLine"}, "vector": 15}]},
   {"name": "DebrisPiece", "type": "DebrisPiece", "scope": "state", "table": {"base": "game", "member": "slots", "count": 300}, "inside": null, "fields": [{"name": "state", "kind": "u8"}]},
   {"name": "DebrisVertex", "type": "Vec3", "scope": "state", "table": {"base": "game", "member": "vertices_1e88f", "count": 2400}, "inside": null, "delta": true, "fields": [{"name": "vx", "kind": "i32", "member": "x"}, {"name": "vy", "kind": "i32", "member": "y"}, {"name": "vz", "kind": "i32", "member": "z"}]},
-  {"name": "DebrisFace", "type": "Face", "scope": "state", "table": {"base": "game", "member": "frames", "count": 1800}, "inside": null, "delta": true, "fields": [{"name": "color", "kind": "i32"}, {"name": "flags", "kind": "u32", "aliases": ["FaceFlags::raw"]}, {"name": "texPic", "kind": "ptr", "target": "GafFrame", "member": "tex.pic", "when": {"field": "flags", "mask": 3, "equals": 0}, "aliases": ["GafRef::pic", "Face::tex"], "condMask": 3, "condField": 797, "condValue": 0, "condKind": "DebrisFace"}, {"name": "texIndex", "kind": "u16", "member": "tex.index", "when": {"field": "flags", "mask": 2, "equals": 2}, "aliases": ["Face::tex"], "condMask": 2, "condField": 797, "condValue": 2, "condKind": "DebrisFace"}, {"name": "texValue", "kind": "u16", "member": "tex.value", "when": {"field": "flags", "mask": 2, "equals": 2}, "aliases": ["Face::tex"], "condMask": 2, "condField": 797, "condValue": 2, "condKind": "DebrisFace"}, {"name": "texKind", "kind": "u8", "member": "tex.kind", "aliases": ["Face::tex"]}, {"name": "texPad0", "kind": "u8", "member": "tex.unknown_5[0]", "aliases": ["Face::tex"]}, {"name": "texPad1", "kind": "u8", "member": "tex.unknown_5[1]", "aliases": ["Face::tex"]}, {"name": "texPad2", "kind": "u8", "member": "tex.unknown_5[2]", "aliases": ["Face::tex"]}, {"name": "texSrc", "kind": "ptr", "target": "FrameTable", "member": "tex.src", "aliases": ["GafRef::src", "Face::tex"], "when": {"field": "flags", "mask": 2, "equals": 2}, "condMask": 2, "condField": 797, "condValue": 2, "condKind": "DebrisFace"}]},
+  {"name": "DebrisFace", "type": "Face", "scope": "state", "table": {"base": "game", "member": "frames", "count": 1800}, "inside": null, "delta": true, "fields": [{"name": "color", "kind": "i32"}, {"name": "flags", "kind": "u32", "aliases": ["FaceFlags::raw"]}, {"name": "texPic", "kind": "ptr", "target": "GafFrame", "member": "tex.pic", "when": {"field": "flags", "mask": 3, "equals": 0}, "aliases": ["GafRef::pic", "Face::tex"], "condMask": 3, "condField": 797, "condValue": 0, "condKind": "DebrisFace"}, {"name": "texIndex", "kind": "u16", "member": "tex.index", "when": {"field": "flags", "mask": 2, "equals": 2}, "aliases": ["Face::tex"], "condMask": 2, "condField": 797, "condValue": 2, "condKind": "DebrisFace"}, {"name": "texValue", "kind": "u16", "member": "tex.value", "when": {"field": "flags", "mask": 2, "equals": 2}, "aliases": ["Face::tex"], "condMask": 2, "condField": 797, "condValue": 2, "condKind": "DebrisFace"}, {"name": "texKind", "kind": "u8", "member": "tex.kind", "aliases": ["Face::tex"]}, {"name": "texPad0", "kind": "u8", "member": "tex.kindHigh[0]", "aliases": ["Face::tex"]}, {"name": "texPad1", "kind": "u8", "member": "tex.kindHigh[1]", "aliases": ["Face::tex"]}, {"name": "texPad2", "kind": "u8", "member": "tex.kindHigh[2]", "aliases": ["Face::tex"]}, {"name": "texSrc", "kind": "ptr", "target": "FrameTable", "member": "tex.src", "aliases": ["GafRef::src", "Face::tex"], "when": {"field": "flags", "mask": 2, "equals": 2}, "condMask": 2, "condField": 797, "condValue": 2, "condKind": "DebrisFace"}]},
   {"name": "Debris", "type": "Debris", "scope": "state", "table": {"base": "game", "member": "debris", "count": 300, "capacity": 300}, "inside": null, "fields": [{"name": "obj", "kind": "ref", "target": "DebrisPiece", "aliases": ["DebrisView::obj"]}, {"name": "ref1", "kind": "embed", "target": "Handle", "aliases": ["DebrisView::ref1"]}, {"name": "ref2", "kind": "embed", "target": "Handle", "aliases": ["DebrisView::ref2"]}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["Debris::pos", "DebrisView::pos"]}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["Debris::pos", "DebrisView::pos"]}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["Debris::pos", "DebrisView::pos"]}, {"name": "sizeX", "kind": "i32", "member": "size.x", "aliases": ["Debris::size", "DebrisView::size"]}, {"name": "sizeY", "kind": "i32", "member": "size.y", "aliases": ["Debris::size", "DebrisView::size"]}, {"name": "sizeZ", "kind": "i32", "member": "size.z", "aliases": ["Debris::size", "DebrisView::size"]}, {"name": "velX", "kind": "i32", "member": "vel.x", "aliases": ["Debris::vel", "DebrisView::vel"]}, {"name": "velY", "kind": "i32", "member": "vel.y", "aliases": ["Debris::vel", "DebrisView::vel"]}, {"name": "velZ", "kind": "i32", "member": "vel.z", "aliases": ["Debris::vel", "DebrisView::vel"]}, {"name": "spinX", "kind": "i32", "member": "spin.x", "aliases": ["Debris::spin", "DebrisView::spin"]}, {"name": "spinY", "kind": "i32", "member": "spin.y", "aliases": ["Debris::spin", "DebrisView::spin"]}, {"name": "spinZ", "kind": "i32", "member": "spin.z", "aliases": ["Debris::spin", "DebrisView::spin"]}, {"name": "angle_x", "kind": "i16", "aliases": ["DebrisView::angle_x"]}, {"name": "angle_y", "kind": "i16", "aliases": ["DebrisView::angle_y"]}, {"name": "angle_z", "kind": "i16", "aliases": ["DebrisView::angle_z"]}, {"name": "flags", "kind": "u16", "aliases": ["DebrisView::flag"]}]},
   {"name": "ExplodedSlot", "type": "Ref<ExplodedPiece>", "scope": "state", "table": {"base": "sim", "member": "g_explodedPieces", "count": 100}, "inside": null, "fields": [{"name": "piece", "kind": "ref", "target": "ExplodedPiece", "member": "offset"}]},
   {"name": "PieceRec", "type": "PieceRec", "scope": "state", "table": null, "inside": null, "fields": [{"name": "angle_10", "kind": "i16"}, {"name": "angle_12", "kind": "i16"}, {"name": "angle_14", "kind": "i16"}, {"name": "posX", "kind": "i32", "member": "pos.x", "aliases": ["PieceRec::pos"]}, {"name": "posY", "kind": "i32", "member": "pos.y", "aliases": ["PieceRec::pos"]}, {"name": "posZ", "kind": "i32", "member": "pos.z", "aliases": ["PieceRec::pos"]}]},

@@ -25,7 +25,7 @@ struct GafRef {
         };
     };
     unsigned char kind;
-    char unknown_5[3];
+    char kindHigh[3];
     GafSequence* src;
 };
 

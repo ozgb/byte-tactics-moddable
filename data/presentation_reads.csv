@@ -125,10 +125,10 @@ Order::unit,orders,unknown,,per-player-filter,5
 Order::unit,presentation,ui-action,,per-player-filter,2
 PieceFrame::always0,presentation,unknown,,per-player-filter,0
 PieceFrame::count,presentation,ui-action,,per-player-filter,8
+PieceFrame::fillColor,presentation,ui-action,,per-player-filter,8
 PieceFrame::flags,presentation,ui-action,,per-player-filter,8
 PieceFrame::indices,presentation,ui-action,,per-player-filter,8
 PieceFrame::ptr_10,presentation,ui-action,,per-player-filter,8
-PieceFrame::unknown_0,presentation,ui-action,,per-player-filter,8
 Player::active,presentation,ui-action,,own,0
 Player::alliance,presentation,ui-action,,own,0
 Player::allied,presentation,unknown,,own,0

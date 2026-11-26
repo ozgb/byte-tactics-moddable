@@ -2748,8 +2748,8 @@ void BindModelFaces(const char* file, void* base, unsigned size, const std::vect
         if (face == nullptr)
             Fatal(file, 0, "a bind line names no face of its model", "bind");
         *(unsigned*)&face->flags = binds[i].flags;
-        face->unknown_0 = (int)binds[i].type;
-        face->unknown_14 = (int)binds[i].word14;
+        face->fillColor = (int)binds[i].type;
+        face->texKind = (int)binds[i].word14;
         face->ptr_10 = 0;
         if (strcmp(binds[i].src, "null") != 0) {
             unsigned kind = 0;
@@ -8282,9 +8282,9 @@ void LoadBindSelfTest()
     *(unsigned*)&model->faces[1].flags = 0x1e;
     model->faces[1].color = sequence;
     model->faces[1].ptr_10 = 0x50003;
-    model->faces[1].unknown_14 = 7;
+    model->faces[1].texKind = 7;
     *(unsigned*)&model->faces[2].flags = 0x1;
-    model->faces[2].unknown_0 = 0xd1;
+    model->faces[2].fillColor = 0xd1;
     model->faces[2].ptr_10 = (int)(size_t)((char*)model + 200);
     UnitDef* defs = (UnitDef*)Fresh(2 * (unsigned)sizeof(UnitDef));
     g_game->defs = defs;
@@ -8318,7 +8318,7 @@ void LoadBindSelfTest()
     void* made = g_objects.Pointer(ROK_FRAMETABLE, 1);
     Check((*(unsigned*)&again->faces[0].flags & 7) == 0 && *(unsigned*)&again->faces[1].flags == 0x1e && *(unsigned*)&again->faces[2].flags == 0x1, "the replayer clears the bits of every face and sets those of the lines");
     Check(made != nullptr && (void*)again->faces[1].color == made && again->faces[2].color == nullptr, "and names the object of a sequence as the services' answers do, FrameTable#1, so a later line resolves to it");
-    Check(again->faces[1].ptr_10 == 0x50003 && again->faces[1].unknown_14 == 7 && again->faces[2].unknown_0 == 0xd1 && again->faces[2].ptr_10 == (int)(size_t)((char*)again + 200), "and the type, the picture word, a name inside the model and the word after the picture");
+    Check(again->faces[1].ptr_10 == 0x50003 && again->faces[1].texKind == 7 && again->faces[2].fillColor == 0xd1 && again->faces[2].ptr_10 == (int)(size_t)((char*)again + 200), "and the type, the picture word, a name inside the model and the word after the picture");
     Check(ReplayFaceAt(again, sizeof file, 77) == nullptr && ReplayFaceAt(again, sizeof file, 96) == again->faces + 1, "a face is found by its offset in the file");
 }
 

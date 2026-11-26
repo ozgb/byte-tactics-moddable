@@ -10,12 +10,12 @@ struct PieceFrameFlags {
 };
 
 struct PieceFrame {
-    int unknown_0;
+    int fillColor;
     int count;
     int always0;
     unsigned short* indices;
     int ptr_10;
-    int unknown_14;
+    int texKind;
     unsigned short* color;
     PieceFrameFlags flags;
 };

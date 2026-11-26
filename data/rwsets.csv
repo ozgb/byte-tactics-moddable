@@ -43594,9 +43594,9 @@ address,function,file,kind,target
 ,CaptureFace,src/harness/replay_objects.cpp,field_read,BindCapture::table
 ,CaptureFace,src/harness/replay_objects.cpp,field_read,BindCapture::use
 ,CaptureFace,src/harness/replay_objects.cpp,field_read,PieceFrame::color
+,CaptureFace,src/harness/replay_objects.cpp,field_read,PieceFrame::fillColor
 ,CaptureFace,src/harness/replay_objects.cpp,field_read,PieceFrame::ptr_10
-,CaptureFace,src/harness/replay_objects.cpp,field_read,PieceFrame::unknown_0
-,CaptureFace,src/harness/replay_objects.cpp,field_read,PieceFrame::unknown_14
+,CaptureFace,src/harness/replay_objects.cpp,field_read,PieceFrame::texKind
 ,CaptureFace,src/harness/replay_objects.cpp,field_write,ReplayLoadBind::flags
 ,CaptureFace,src/harness/replay_objects.cpp,field_write,ReplayLoadBind::offset
 ,CaptureFace,src/harness/replay_objects.cpp,field_write,ReplayLoadBind::src

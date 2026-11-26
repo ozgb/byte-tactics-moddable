@@ -614,9 +614,9 @@ static void PutHexFloat(float f)
 static void PutPieces(const char* state)
 {
     int count = RdI(state, 0);
-    const char* pieces = (const char*)RdP(state, 34);
+    const char* pieces = state + 34;
     int i;
-    for (i = 0; i < count && pieces != 0; i++) {
+    for (i = 0; i < count; i++) {
         const char* p = pieces + i * 54;
         const char* object = (const char*)RdP(p, 0);
         const char* name = object != 0 && RdP(object, 28) != 0 ? (const char*)RdP(object, 28) : "";

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
@@ -240,18 +241,44 @@ const ReplaySlotSets& SetsOfKind(unsigned slot, int kind)
     return kReplaySlots[slot];
 }
 
-enum { MAX_FREED = 16 };
-
-const void* s_freed[MAX_FREED];
+const void** s_freed;
 unsigned s_freedCount;
+unsigned s_freedCapacity;
 
-bool Freed(const void* p)
+int FreedIndex(const void* p)
 {
     for (unsigned i = 0; i < s_freedCount; i++) {
         if (s_freed[i] == p)
-            return true;
+            return (int)i;
     }
-    return false;
+    return -1;
+}
+
+bool Freed(const void* p)
+{
+    return FreedIndex(p) >= 0;
+}
+
+void MarkFreed(const void* p)
+{
+    if (Freed(p))
+        return;
+    if (s_freedCount == s_freedCapacity) {
+        unsigned wanted = s_freedCapacity == 0 ? 64 : s_freedCapacity * 2;
+        const void** grown = (const void**)realloc((void*)s_freed, wanted * sizeof(const void*));
+        if (grown == nullptr)
+            abort();
+        s_freed = grown;
+        s_freedCapacity = wanted;
+    }
+    s_freed[s_freedCount++] = p;
+}
+
+void MarkAllocated(const void* p)
+{
+    int at = FreedIndex(p);
+    if (at >= 0)
+        s_freed[at] = s_freed[--s_freedCount];
 }
 
 void AddLiveRoots(ReplayRoots& to, const ReplayRoots& from)
@@ -291,14 +318,15 @@ void ImportObjects(ReplayText& t, const ReplayRoots* extra)
 
 void ImportServiceObjects(ReplayText& t, const ReplayImport& c)
 {
-    if (c.id != RI_SIM_FREE) {
-        ImportObjects(t, nullptr);
+    if (!s_recording || !kReplaySubsystems[s_sub].recordsImportChanges)
+        return;
+    if (c.id == RI_SIM_FREE) {
+        MarkFreed(c.args[0].v.p);
         return;
     }
-    if (s_freedCount < MAX_FREED)
-        s_freed[s_freedCount++] = c.args[0].v.p;
-    else
-        ReplayFail("more than 16 allocations are freed in one recorded call");
+    if ((c.id == RI_SIM_ALLOC || c.id == RI_SIM_ALLOC_TAGGED || c.id == RI_SIM_CAPTURE_ALLOC) && c.result.kind == 1)
+        MarkAllocated(c.result.v.p);
+    ImportObjects(t, nullptr);
 }
 
 void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)

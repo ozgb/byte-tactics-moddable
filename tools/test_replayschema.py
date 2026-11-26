@@ -1132,7 +1132,7 @@ class Polymorphic(unittest.TestCase):
         self.assertIn("kReplayCodeOrderNotify[] = {", text)
         self.assertIn("    (const void*)StopOrder,", text)
         self.assertIn('{ "orderNotify", kReplayCodeOrderNotify, %d },' % len(model["code_tables"][0]["entries"]), text)
-        self.assertIn('static_assert(sizeof(((OrderTableEntry*)nullptr)->notify) == sizeof(void*), "OrderTableEntry::notify is a code pointer");', text)
+        self.assertIn('static_assert(__is_pointer(decltype(((OrderTableEntry*)nullptr)->notify)), "OrderTableEntry::notify is a code pointer");', text)
         row_ = [l for l in text.split("\n") if l.startswith('    { "notify",')][0]
         self.assertIn("RK_CODE, 0,", row_)
 
@@ -3087,7 +3087,7 @@ class LoadForms(unittest.TestCase):
         self.assertIn("{ RL_COB, ROK_UNITDEF, RLH_MEMBER, offsetof(UnitDef, data) },", text)
         self.assertRegex(text, r"\{ RL_MODEL, ROK_UNITDEF, RLH_GAME, \d+ \},")
         self.assertIn('{ "cob", 0, 1 },\n    { "model", 1, 1 },', text)
-        self.assertIn('static_assert(sizeof(((UnitDef*)nullptr)->data) == sizeof(void*)', text)
+        self.assertIn('static_assert(__is_pointer(decltype(((UnitDef*)nullptr)->data)), "UnitDef::data holds the pointer of a cob load");', text)
         self.assertIn("enum ReplayLoadId {\n    RL_COB,\n    RL_MODEL,\n    RL_COUNT\n};", files[rs.SERVICES_H])
 
     def test_a_load_kind_of_the_tests_comes_after_the_real_ones(self):

@@ -148,8 +148,8 @@ Unit::f48,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag 
 Unit::f_1f,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::field_18,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::field_1e,presentation,RefreshBuildCountTexts,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
-Unit::field_64,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::field_64,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::bank,platform,RotateByAngles,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::bank,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,

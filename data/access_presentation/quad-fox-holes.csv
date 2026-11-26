@@ -141,7 +141,7 @@ Unit::def,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnore
 Unit::def,presentation,SpeechQueue::PlaySpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::def,presentation,UnitTable::DrawLitPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::def,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
-Unit::field_64,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+Unit::bank,scripts,UpdateObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,CMemoryCache::MergeIntoComposite,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,3

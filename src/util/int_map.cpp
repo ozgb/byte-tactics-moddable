@@ -22,6 +22,8 @@ struct CobScriptOffsetEntry {
 #include "../files/files_api.h"
 #include "math.h"
 #include "../graphics/object_pool.h"
+#include "../harness/replay.h"
+#include "../harness/replay_services.h"
 
 // FUNCTION: 0x4b2290 _$E6
 // FUNCTION: 0x4b2340 _$E4
@@ -48,6 +50,7 @@ CobScriptHeader* __stdcall LoadCobScript(char* name)
     CobScriptHeader* data = (CobScriptHeader*)HAPI_LoadFile(name, 0);
     if (data == 0)
         return 0;
+    ReplayLoaded(RL_COB, name, data);
     int sum = ComputeChecksum((unsigned char*)data, HAPI_FileLengthByName(name));
     s_cobScriptCache[(int)data] = sum;
     Relocate(data);

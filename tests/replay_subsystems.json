@@ -38,6 +38,7 @@
     }
   },
   "weapons": {
+    "self_test": "combat-deaths.txt",
     "inject": [
       {
         "define": "BT_REPLAY_INJECT_RELOAD_BASE=150",
@@ -107,6 +108,15 @@
       "recording": "console-units.txt",
       "expect": 542,
       "field": "import 0 services.SimAlloc"
+    }
+  },
+  "scripts": {
+    "self_test": "orders-air.txt",
+    "inject": {
+      "define": "BT_REPLAY_INJECT_TURN_SCALE=2",
+      "recording": "orders-air.txt",
+      "expect": 22,
+      "field": "ModelState#5.pieces[1].short_12"
     }
   },
   "pathfinding": {

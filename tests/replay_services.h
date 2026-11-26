@@ -395,6 +395,16 @@ int __stdcall ComputeChecksum(unsigned char* data, int len)
     Space(t);
     t.AddInt((int)len);
     const char* result = Enter(t);
+    if (g_loading) {
+        unsigned char a = 0, b = 0, c = 0, d = 0;
+        for (int i = 0; i < len; i++) {
+            a += data[i];
+            b ^= data[i];
+            c += i ^ data[i];
+            d ^= i + data[i];
+        }
+        return (d << 24) | (c << 16) | (b << 8) | a;
+    }
     return atoi(result);
 }
 
@@ -679,21 +689,6 @@ int __stdcall StepGafSequence(Handle* player)
     return atoi(result);
 }
 
-void* __stdcall Load3do(char* path)
-{
-    ReplayText t;
-    StartImport(t, RI_LOAD_3DO);
-    Space(t);
-    t.AddString(path);
-    const char* result = Enter(t);
-    void* o = (void*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
-    ApplyReach(o, ROK_OBJECT3DO, ".vertexCount");
-    ApplyReach(o, ROK_OBJECT3DO, ".box_x");
-    ApplyReach(o, ROK_OBJECT3DO, ".box_y");
-    ApplyReach(o, ROK_OBJECT3DO, ".box_z");
-    return o;
-}
-
 void* __stdcall LoadObject3d(const char* name)
 {
     ReplayText t;
@@ -707,16 +702,6 @@ void* __stdcall LoadObject3d(const char* name)
     ApplyReach(o, ROK_OBJECT3DO, ".box_y");
     ApplyReach(o, ROK_OBJECT3DO, ".box_z");
     return o;
-}
-
-int __stdcall GetObjectHeight(Object3do* model)
-{
-    ReplayText t;
-    StartImport(t, RI_GET_OBJECT_HEIGHT);
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, model, false);
-    const char* result = Enter(t);
-    return atoi(result);
 }
 
 int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int mask)
@@ -817,6 +802,29 @@ bool ReplayAnswerImport(ReplayImport& c)
         const char* r = Enter(t);
         (void)r;
         return false;
+    }
+    case RI_LOAD_3DO: {
+        ReplayText t;
+        StartImport(t, RI_LOAD_3DO);
+        Space(t);
+        t.AddString((const char*)c.args[0].v.p);
+        const char* result = Enter(t);
+        void* o = (void*)ReplayResolveObject(result, nullptr, g_objects, AllocObject);
+        ApplyReach(o, ROK_OBJECT3DO, ".vertexCount");
+        ApplyReach(o, ROK_OBJECT3DO, ".box_x");
+        ApplyReach(o, ROK_OBJECT3DO, ".box_y");
+        ApplyReach(o, ROK_OBJECT3DO, ".box_z");
+        c.Return(o);
+        return true;
+    }
+    case RI_GET_OBJECT_HEIGHT: {
+        ReplayText t;
+        StartImport(t, RI_GET_OBJECT_HEIGHT);
+        Space(t);
+        ReplayAddObjectName(t, g_objects, ROK_OBJECT3DO, c.args[0].v.p, false);
+        const char* result = Enter(t);
+        c.Return(atoi(result));
+        return true;
     }
     default:
         return false;

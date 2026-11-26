@@ -682,11 +682,11 @@ game,harness,shared_write,PlayerInfo::color,2
 game,harness,shared_write,PlayersEventHeader::kind,1
 game,harness,shared_write,Point16::x,1
 game,harness,shared_write,Point16::y,1
+game,harness,shared_write,ScriptsEventHeader::kind,1
 game,harness,shared_write,UnitDef::flags1,2
 game,harness,shared_write,Vec3::x,8
 game,harness,shared_write,Vec3::y,6
 game,harness,shared_write,Vec3::z,8
-game,harness,shared_write,WeaponsEventHeader::kind,1
 game,los_radar,indirect,ExpireEyeballs,1
 game,los_radar,indirect,FreeMapResources,1
 game,los_radar,indirect,GetMapCellAtPosition,1
@@ -1715,7 +1715,7 @@ harness,game,call,QuirksFlipFirstSim,1
 harness,game,call,QuirksHash,2
 harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
-harness,game,call,ReplayGateRef,7
+harness,game,call,ReplayGateRef,8
 harness,game,call,SaveGameFile,1
 harness,game,call,SchedRoutes,1
 harness,game,call,SimAllocTagged,1
@@ -1880,7 +1880,6 @@ harness,network,shared_write,Player::progress,2
 harness,network,shared_write,Player::type,69
 harness,network,shared_write,PlayerInfo::color,7
 harness,network,shared_write,ScriptsSeam::FindScript,2
-harness,network,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,network,shared_write,Seams::mission,7
 harness,network,shared_write,Seams::movement,1
 harness,network,shared_write,Seams::scripts,3
@@ -2003,7 +2002,9 @@ harness,platform,call,host_mutex_unlock,5
 harness,platform,call,host_thread_id,5
 harness,platform,call,host_time_counter,1
 harness,platform,call,host_wall_seconds,1
-harness,platform,call,operator new,3
+harness,platform,call,operator delete,3
+harness,platform,call,operator new,8
+harness,platform,call,operator==,1
 harness,platform,shared_write,GafFrame::pixelsOrLayers,1
 harness,platform,shared_write,Game::ticks,2
 harness,platform,shared_write,Player::type,2
@@ -2282,7 +2283,6 @@ harness,seams,shared_write,PlayersSeam::UpdatePlayersFinish,1
 harness,seams,shared_write,ScriptsSeam::Apply,2
 harness,seams,shared_write,ScriptsSeam::CreateObjectState,1
 harness,seams,shared_write,ScriptsSeam::CreatePlayerObjectState,1
-harness,seams,shared_write,ScriptsSeam::DeleteScript,1
 harness,seams,shared_write,ScriptsSeam::FindScript,1
 harness,seams,shared_write,ScriptsSeam::FreeObjectState,1
 harness,seams,shared_write,ScriptsSeam::GetAimFromPosition,1
@@ -2297,7 +2297,6 @@ harness,seams,shared_write,ScriptsSeam::QueryScript,1
 harness,seams,shared_write,ScriptsSeam::RunScripts,1
 harness,seams,shared_write,ScriptsSeam::SetCob,1
 harness,seams,shared_write,ScriptsSeam::SetObjectState,1
-harness,seams,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,1
 harness,seams,shared_write,Seams::ai,2
 harness,seams,shared_write,Seams::economy,5
 harness,seams,shared_write,Seams::features,3
@@ -2378,7 +2377,6 @@ harness,units,shared_write,OrdersSeam::GetOrderFlags,1
 harness,units,shared_write,Player::type,6
 harness,units,shared_write,ScriptsSeam::CreateObjectState,1
 harness,units,shared_write,ScriptsSeam::CreatePlayerObjectState,1
-harness,units,shared_write,ScriptsSeam::DeleteScript,1
 harness,units,shared_write,ScriptsSeam::FreeObjectState,1
 harness,units,shared_write,ScriptsSeam::NewUnitScript,1
 harness,units,shared_write,ScriptsSeam::QueryScript,1
@@ -4008,6 +4006,7 @@ platform,harness,call,ReplayImport::Nested,1
 platform,harness,call,ReplayImport::Ptr,29
 platform,harness,call,ReplayImport::Result,14
 platform,harness,call,ReplayImport::~ReplayImport,33
+platform,harness,call,ReplayLoaded,1
 platform,harness,shared_write,CommandArgs::args,1
 platform,harness,shared_write,CommandArgs::count,1
 platform,harness,shared_write,Fixed::whole,1
@@ -4794,10 +4793,14 @@ presentation,harness,call,HarnessSimEventPhase,1
 presentation,harness,call,HarnessSoundEvent,6
 presentation,harness,call,HarnessUiGroup,2
 presentation,harness,call,HarnessViewRand,19
+presentation,harness,call,ReplayImport::Answered,2
+presentation,harness,call,ReplayImport::AnsweredInt,1
+presentation,harness,call,ReplayImport::AnsweredPointer,1
 presentation,harness,call,ReplayImport::Int,2
 presentation,harness,call,ReplayImport::Ptr,7
 presentation,harness,call,ReplayImport::Result,1
 presentation,harness,call,ReplayImport::~ReplayImport,7
+presentation,harness,call,ReplayLoaded,1
 presentation,harness,shared_write,Fixed::whole,1
 presentation,harness,shared_write,GafFrame::height,6
 presentation,harness,shared_write,GafFrame::pixelsOrLayers,8
@@ -4811,8 +4814,8 @@ presentation,harness,shared_write,Game::numPlayers,2
 presentation,harness,shared_write,Game::uiOptionFlags,1
 presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,ModelState::cacheDrawCount,2
-presentation,harness,shared_write,Object3do::child,2
-presentation,harness,shared_write,Object3do::sibling,2
+presentation,harness,shared_write,Object3do::child,3
+presentation,harness,shared_write,Object3do::sibling,3
 presentation,harness,shared_write,Player::allied,1
 presentation,harness,shared_write,Player::alliedBy,1
 presentation,harness,shared_write,PlayerInfo::color,2
@@ -4824,6 +4827,7 @@ presentation,harness,shared_write,Unit::selected,2
 presentation,harness,shared_write,Vec3::x,8
 presentation,harness,shared_write,Vec3::y,6
 presentation,harness,shared_write,Vec3::z,8
+presentation,harness,shared_write,g_explodedPieces,1
 presentation,los_radar,call,BuildFogTiles,1
 presentation,los_radar,call,GetMapCell,1
 presentation,los_radar,call,GetMapCellAtPosition,1
@@ -5719,7 +5723,7 @@ seams,harness,shared_write,FilesSeam::FindFirst,2
 seams,harness,shared_write,FilesSeam::FindNext,2
 seams,harness,shared_write,FilesSeam::IsInArchive,2
 seams,harness,shared_write,FilesSeam::Length,2
-seams,harness,shared_write,FilesSeam::LengthByName,2
+seams,harness,shared_write,FilesSeam::LengthByName,3
 seams,harness,shared_write,FilesSeam::ListDirectory,2
 seams,harness,shared_write,FilesSeam::Load,2
 seams,harness,shared_write,FilesSeam::LoadOpenFile,2
@@ -5812,7 +5816,6 @@ seams,harness,shared_write,Ref<Unit>::offset,1
 seams,harness,shared_write,ScriptsSeam::Apply,2
 seams,harness,shared_write,ScriptsSeam::CreateObjectState,2
 seams,harness,shared_write,ScriptsSeam::CreatePlayerObjectState,2
-seams,harness,shared_write,ScriptsSeam::DeleteScript,2
 seams,harness,shared_write,ScriptsSeam::FindScript,2
 seams,harness,shared_write,ScriptsSeam::FreeObjectState,2
 seams,harness,shared_write,ScriptsSeam::GetAimFromPosition,2
@@ -5827,11 +5830,10 @@ seams,harness,shared_write,ScriptsSeam::QueryScript,2
 seams,harness,shared_write,ScriptsSeam::RunScripts,2
 seams,harness,shared_write,ScriptsSeam::SetCob,2
 seams,harness,shared_write,ScriptsSeam::SetObjectState,2
-seams,harness,shared_write,ScriptsSeam::StartScriptWithArgsByIndex,2
 seams,harness,shared_write,Seams::ai,3
 seams,harness,shared_write,Seams::economy,2
 seams,harness,shared_write,Seams::features,2
-seams,harness,shared_write,Seams::files,1
+seams,harness,shared_write,Seams::files,2
 seams,harness,shared_write,Seams::los_radar,3
 seams,harness,shared_write,Seams::map,3
 seams,harness,shared_write,Seams::mission,4
@@ -7158,6 +7160,8 @@ weapons,game,shared_write,Ref<Unit>::offset,7
 weapons,game,shared_write,Vec3::x,4
 weapons,game,shared_write,Vec3::y,2
 weapons,game,shared_write,Vec3::z,4
+weapons,harness,shared_write,DebrisCache::cap,1
+weapons,harness,shared_write,DebrisCache::cur,1
 weapons,harness,shared_write,DebrisPiece::faceCount,2
 weapons,harness,shared_write,DebrisPiece::faces,2
 weapons,harness,shared_write,DebrisPiece::verts,2
@@ -7176,6 +7180,7 @@ weapons,harness,shared_write,Ref<Unit>::offset,1
 weapons,harness,shared_write,Vec3::x,8
 weapons,harness,shared_write,Vec3::y,6
 weapons,harness,shared_write,Vec3::z,8
+weapons,harness,shared_write,g_explodedPieces,1
 weapons,los_radar,indirect,GetMapCell,1
 weapons,los_radar,indirect,GetMapCellAtPosition,3
 weapons,los_radar,shared_write,GafFrame::transparency,3

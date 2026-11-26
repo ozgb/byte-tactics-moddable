@@ -1,6 +1,8 @@
 #ifndef HARNESS_REPLAY_OBJECTS_H
 #define HARNESS_REPLAY_OBJECTS_H
 
+#include <vector>
+
 #include "../state/block.h"
 #include "replay_text.h"
 #include "replay_types.h"
@@ -25,10 +27,49 @@ enum { REPLAY_MAX_OBJECTS = 8192, REPLAY_MAX_ROOTS = 16, REPLAY_REACH_HASH = 163
 
 ReplayOrdinals& ReplayHandles();
 
+struct PieceFrame;
+
+struct ReplayLoadBind {
+    unsigned offset;
+    unsigned flags;
+    char src[40];
+    unsigned fillColor;
+    char tex[40];
+    unsigned texKind;
+};
+
+struct ReplayCacheBlock {
+    unsigned offset;
+    unsigned size;
+    int owner;
+    bool live;
+};
+
+struct ReplayCacheStart {
+    ReplayCacheStart() : taken(false), cap(0), cur(0) {}
+    bool taken;
+    unsigned cap;
+    unsigned cur;
+    std::vector<ReplayCacheBlock> blocks;
+};
+
+struct ReplayLoadUse {
+    unsigned short load;
+    unsigned short kind;
+    unsigned index;
+    char name[260];
+    std::vector<unsigned char> bytes;
+    std::vector<ReplayLoadBind> binds;
+};
+
 class ReplayObjectTable {
 public:
     ReplayObjectTable() { Reset(); }
+    ~ReplayObjectTable() { ClearLoadUses(); }
     void Reset();
+    void ClearLoadUses();
+    std::vector<ReplayLoadUse*>& LoadUses() { return loadUses; }
+    const std::vector<ReplayLoadUse*>& LoadUses() const { return loadUses; }
     unsigned Find(unsigned kind, const void* p) const;
     unsigned Name(unsigned kind, const void* p);
     void* Pointer(unsigned kind, unsigned ordinal) const;
@@ -41,6 +82,7 @@ private:
     ReplayObjectTable& operator=(const ReplayObjectTable&);
     enum { KINDS = REPLAY_OBJECT_KINDS, HASH = 16384 };
     void Rebuild(unsigned kind);
+    std::vector<ReplayLoadUse*> loadUses;
     unsigned count[KINDS];
     unsigned empty[KINDS];
     void* objects[KINDS][REPLAY_MAX_OBJECTS];
@@ -179,6 +221,18 @@ void ReplayAddWeapon(ReplayText& t, const void* p);
 void* ReplayParseWeapon(const char* value);
 void* ReplayWeaponAt(int index);
 void ReplayAddObjectName(ReplayText& t, ReplayObjectTable& table, unsigned kind, const void* p, bool assign);
+void ReplayLoadNote(unsigned load, const char* name, const void* data, unsigned size);
+void ReplayLoadAdopt(unsigned load, unsigned kind, unsigned index, const void* base, unsigned size);
+void ReplayLoadsReset();
+void ReplayEachFace(const void* base, unsigned size, void (*visit)(PieceFrame* face, unsigned offset, void* context), void* context);
+PieceFrame* ReplayFaceAt(const void* base, unsigned size, unsigned offset);
+bool ReplayAddLoadName(ReplayText& t, ReplayObjectTable& table, unsigned load, const void* p, bool assign = true);
+const void* ReplayParseLoad(unsigned load, const char* text, bool* found);
+void ReplayAddLoadLines(const ReplayObjectTable& table, ReplayText& out);
+const char* ReplayReadDebrisCache(ReplayCacheStart& start);
+void ReplayCaptureDebrisCache(ReplayCacheStart& start);
+void ReplayAddCacheChanges(const ReplayCacheStart& before, const ReplayCacheStart& after, ReplayText& out);
+void ReplayAddCacheLines(const ReplayCacheStart& start, ReplayText& out);
 bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, ReplayObjectTable& table, bool assign, ReplayText& out);
 bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const char* value, ReplayObjectTable& table, ReplayAllocFn alloc);
 const ReplayObjectField* ReplayFindObjectField(unsigned kind, const char* name);

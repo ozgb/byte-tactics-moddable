@@ -127,6 +127,28 @@ WeaponDef* __stdcall Imp_fixture_Pick()
     return w;
 }
 
+int __stdcall Imp_fixture_Attach(void* a0, void* a1)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Attach");
+    Space(t);
+    ReplayAddLoadName(t, g_objects, RL_FIXTURE_SCRIPT, a0, false);
+    Space(t);
+    ReplayAddLoadName(t, g_objects, RL_FIXTURE_SHAPE, a1, false);
+    const char* r = Enter(t);
+    return ParseResult<int>(r);
+}
+
+void* __stdcall Imp_fixture_Lookup(int a0)
+{
+    ReplayText t;
+    StartImport(t, "fixture.Lookup");
+    Space(t);
+    ReplayValue(t, a0);
+    const char* r = Enter(t);
+    return (void*)ParseLoadResult(RL_FIXTURE_SCRIPT, r);
+}
+
 unsigned int __stdcall Imp_fixture_MakeGoal()
 {
     ReplayText t;
@@ -300,6 +322,35 @@ void Run_fixture_Pick()
 void After_fixture_Pick()
 {
     CompareWeaponResult(g_result_fixture_Pick);
+}
+
+int g_result_fixture_Attach;
+
+void Run_fixture_Attach()
+{
+    void* p0 = (void*)ArgLoad("script", RL_FIXTURE_SCRIPT);
+    void* p1 = (void*)ArgLoad("shape", RL_FIXTURE_SHAPE);
+    SetClosing("result");
+    g_result_fixture_Attach = Native_fixture_Attach(p0, p1);
+}
+
+void After_fixture_Attach()
+{
+    CompareResult(g_result_fixture_Attach);
+}
+
+void* g_result_fixture_Lookup;
+
+void Run_fixture_Lookup()
+{
+    int p0 = ArgScalar<int>("lane");
+    SetClosing("result");
+    g_result_fixture_Lookup = Native_fixture_Lookup(p0);
+}
+
+void After_fixture_Lookup()
+{
+    CompareLoadResult(RL_FIXTURE_SCRIPT, g_result_fixture_Lookup);
 }
 
 unsigned int g_result_fixture_MakeGoal;

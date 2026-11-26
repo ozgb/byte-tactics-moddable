@@ -3,6 +3,7 @@
 #include "../src/harness/replay_objects.h"
 #include "../src/game/victory_conditions.h"
 
+extern void (* const g_vtsym_UnitScript[])() __asm__("??_7UnitScript@@6B@");
 extern void (* const g_approachRadiusVtable[])();
 extern void (* const g_ringApproachVtable[])();
 extern void (* const g_pathOrderVtable[])();
@@ -63,6 +64,8 @@ extern void (* const g_vtsec_FixtureTwin_FixtureScanBase[])() __asm__("??_7Fixtu
 const void* ReplayVtable(unsigned kind)
 {
     switch (kind) {
+    case ROK_COBSCRIPT:
+        return g_vtsym_UnitScript;
     case ROK_APPROACHRADIUS:
         return g_approachRadiusVtable;
     case ROK_RINGAPPROACH:
@@ -161,6 +164,8 @@ const void* ReplayVtable(unsigned kind)
 const char* ReplayVtableName(unsigned kind)
 {
     switch (kind) {
+    case ROK_COBSCRIPT:
+        return "g_vtsym_UnitScript";
     case ROK_APPROACHRADIUS:
         return "g_approachRadiusVtable";
     case ROK_RINGAPPROACH:

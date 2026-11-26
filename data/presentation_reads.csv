@@ -134,10 +134,10 @@ Order::unit,orders,unknown,,per-player-filter,5
 Order::unit,presentation,ui-action,,per-player-filter,2
 PieceFrame::always0,presentation,ui-action,,per-player-filter,0
 PieceFrame::count,presentation,ui-action,,per-player-filter,8
+PieceFrame::fillColor,presentation,ui-action,,per-player-filter,8
 PieceFrame::flags,presentation,ui-action,,per-player-filter,8
 PieceFrame::indices,presentation,ui-action,,per-player-filter,8
 PieceFrame::ptr_10,presentation,ui-action,,per-player-filter,8
-PieceFrame::unknown_0,presentation,ui-action,,per-player-filter,8
 Player::active,presentation,ui-action,,own,0
 Player::alliance,presentation,ui-action,,own,0
 Player::allied,presentation,unknown,,own,0
@@ -202,6 +202,8 @@ Unit::activateFlags,los_radar,ui-action,,per-player-filter,12
 Unit::activateFlags,network,unknown,,per-player-filter,1
 Unit::activateFlags,presentation,every-frame,,per-player-filter,96
 Unit::activateFlags,units,unknown,,per-player-filter,1
+Unit::bank,platform,ui-action,,per-player-filter,9
+Unit::bank,scripts,every-frame,,per-player-filter,96
 Unit::buildLeft,presentation,after-event,SIM_EVENT_DESELECT_IF_INELIGIBLE,per-player-filter,0
 Unit::cargo,harness,every-frame,,per-player-filter,4
 Unit::cargo,presentation,every-frame,,per-player-filter,96
@@ -225,8 +227,6 @@ Unit::f_57,presentation,ui-action,,per-player-filter,5
 Unit::f_57,weapons,unknown,,per-player-filter,6
 Unit::field_18,presentation,ui-action,,per-player-filter,1
 Unit::field_1e,presentation,ui-action,SIM_EVENT_BUILD_MENU_UPDATE,per-player-filter,1
-Unit::field_64,platform,ui-action,,per-player-filter,9
-Unit::field_64,scripts,every-frame,,per-player-filter,96
 Unit::fireOrder,presentation,unknown,,per-player-filter,0
 Unit::flags,harness,every-frame,,per-player-filter,4
 Unit::flags,los_radar,ui-action,,per-player-filter,12

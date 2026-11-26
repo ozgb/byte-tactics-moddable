@@ -14,11 +14,13 @@ enum {
     RSL_FIXTURE_NOTIFY = RSL_COUNT + 7,
     RSL_FIXTURE_LOCATE = RSL_COUNT + 8,
     RSL_FIXTURE_PICK = RSL_COUNT + 9,
-    RSL_FIXTURE_MAKEGOAL = RSL_COUNT + 10,
-    RSL_FIXTURE_DRAIN = RSL_COUNT + 11,
-    RSL_FIXTURE_GATHER = RSL_COUNT + 12,
-    RSL_FIXTURE_DIMS = RSL_COUNT + 13,
-    RSL_FIXTURE_HANDGOAL = RSL_COUNT + 14
+    RSL_FIXTURE_ATTACH = RSL_COUNT + 10,
+    RSL_FIXTURE_LOOKUP = RSL_COUNT + 11,
+    RSL_FIXTURE_MAKEGOAL = RSL_COUNT + 12,
+    RSL_FIXTURE_DRAIN = RSL_COUNT + 13,
+    RSL_FIXTURE_GATHER = RSL_COUNT + 14,
+    RSL_FIXTURE_DIMS = RSL_COUNT + 15,
+    RSL_FIXTURE_HANDGOAL = RSL_COUNT + 16
 };
 
 struct FixtureSeam {
@@ -32,6 +34,8 @@ struct FixtureSeam {
     int (__stdcall* Notify)(FixtureNotify*, Callback*, int);
     int (__stdcall* Locate)(FixtureAmount*, FixtureAmount*);
     WeaponDef* (__stdcall* Pick)();
+    int (__stdcall* Attach)(void*, void*);
+    void* (__stdcall* Lookup)(int);
     unsigned int (__stdcall* MakeGoal)();
     int (__stdcall* Drain)(void*, unsigned int);
     int (__stdcall* Gather)(int*, int);
@@ -292,6 +296,54 @@ WeaponDef* __stdcall RecFixturePick()
     return result;
 }
 
+int __stdcall RecFixtureAttach(void* a0, void* a1)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FIXTURE_ATTACH, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+        ArgLoad(s_call, "script", RL_FIXTURE_SCRIPT, a0);
+        ArgLoad(s_call, "shape", RL_FIXTURE_SHAPE, a1);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.Attach");
+        ImportLoad(line, RL_FIXTURE_SCRIPT, a0);
+        ImportLoad(line, RL_FIXTURE_SHAPE, a1);
+    }
+    int result = s_inner_fixture->Attach(a0, a1);
+    if (scope.Import()) {
+        ImportResult(line, result);
+        FinishImport(line, roots);
+    }
+    if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+void* __stdcall RecFixtureLookup(int a0)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FIXTURE_LOOKUP, SUB_FIXTURE, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "lane", a0);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i fixture.Lookup");
+        ImportValue(line, a0);
+    }
+    void* result = s_inner_fixture->Lookup(a0);
+    if (scope.Import()) {
+        ImportResultLoad(line, RL_FIXTURE_SCRIPT, result);
+        FinishImport(line, roots);
+    }
+    if (scope.Open()) {
+        ArgLoadResult(s_tail, RL_FIXTURE_SCRIPT, result);
+    }
+    return result;
+}
+
 unsigned int __stdcall RecFixtureMakeGoal()
 {
     ReplayRoots roots;
@@ -420,6 +472,8 @@ FixtureSeam s_rec_fixture = {
     RecFixtureNotify,
     RecFixtureLocate,
     RecFixturePick,
+    RecFixtureAttach,
+    RecFixtureLookup,
     RecFixtureMakeGoal,
     RecFixtureDrain,
     RecFixtureGather,

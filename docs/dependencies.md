@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1237 read-only, 1541 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1219 read-only, 1541 unobserved.
 
 ## Cutting rule
 
@@ -27,17 +27,17 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | wind_meteors | 0 | 0 | 0 | 18 | 126 | 14 of 14 |
 | economy | 0 | 42 | 0 | 4 | 85 | 5 of 14 |
 | features | 15 | 16 | 2 | 77 | 207 | 8 of 14 |
-| ai | 11 | 18 | 2 | 105 | 237 | 6 of 14 |
+| ai | 11 | 18 | 2 | 104 | 237 | 6 of 14 |
 | pathfinding | 0 | 0 | 0 | 66 | 57 | 14 of 14 |
-| weapons | 30 | 66 | 2 | 231 | 208 | 4 of 14 |
-| targeting | 11 | 31 | 1 | 42 | 111 | 5 of 14 |
-| los_radar | 6 | 33 | 2 | 142 | 275 | 5 of 14 |
-| orders | 18 | 55 | 9 | 141 | 299 | 4 of 14 |
-| units | 28 | 152 | 6 | 82 | 444 | 3 of 14 |
-| players | 4 | 13 | 1 | 74 | 304 | 10 of 14 |
-| map | 9 | 41 | 1 | 100 | 247 | 4 of 14 |
-| scripts | 16 | 29 | 0 | 30 | 137 | 9 of 14 |
-| movement | 0 | 40 | 2 | 70 | 234 | 7 of 14 |
+| weapons | 30 | 66 | 2 | 229 | 208 | 4 of 14 |
+| targeting | 11 | 31 | 1 | 40 | 111 | 5 of 14 |
+| los_radar | 6 | 33 | 2 | 138 | 275 | 5 of 14 |
+| orders | 18 | 55 | 9 | 138 | 299 | 4 of 14 |
+| units | 28 | 152 | 6 | 79 | 444 | 3 of 14 |
+| players | 4 | 13 | 1 | 75 | 304 | 10 of 14 |
+| map | 9 | 41 | 1 | 98 | 247 | 4 of 14 |
+| scripts | 16 | 29 | 0 | 29 | 137 | 9 of 14 |
+| movement | 0 | 40 | 2 | 69 | 234 | 7 of 14 |
 | mission | 0 | 0 | 0 | 55 | 111 | 14 of 14 |
 
 ## Tightly coupled groups
@@ -119,15 +119,15 @@ The runs add no evidence on paths the suite does not reach. The control (tests/d
 
 ## Presentation reads
 
-The sim state that presentation reads between ticks (data/presentation_reads.csv, 713 rows), by pattern and visibility. Rows of `ui-action` are an upper bound (see the limits).
+The sim state that presentation reads between ticks (data/presentation_reads.csv, 739 rows), by pattern and visibility. Rows of `ui-action` are an upper bound (see the limits).
 
 | pattern | all-players | own | per-player-filter | all |
 |---|---|---|---|---|
-| after-event | 4 | 4 | 8 | 16 |
-| every-frame | 45 | 11 | 108 | 164 |
-| ui-action | 77 | 41 | 73 | 191 |
-| unknown | 146 | 49 | 147 | 342 |
-| all | 272 | 105 | 336 | 713 |
+| after-event | 4 | 4 | 6 | 14 |
+| every-frame | 47 | 12 | 113 | 172 |
+| ui-action | 77 | 41 | 85 | 203 |
+| unknown | 154 | 49 | 147 | 350 |
+| all | 282 | 106 | 351 | 739 |
 
 ## Presentation feeds
 
@@ -576,10 +576,10 @@ The rows themselves are in data/phase_dependencies.csv.
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| features | `AllocFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 18 |
+| features | `MoveFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 18 |
 | features | `UpdateFeatureSpot` | 4 | 0 | `FeatureAnimEntry::next` | 21 |
-| units | `AllocFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 9 |
-| units.players | `AllocFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 5 |
+| units | `MoveFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 9 |
+| units.players | `MoveFeatureSpot` | 4 | 2 | `FeatureAnimEntry::next` | 5 |
 | projectiles | `DamageFeature` | 3 | 2 | `FeatureAnimEntry::bytes_10` | 2 |
 | units | `KillFeature` | 3 | 2 | `FeatureAnimEntry::bytes_10` | 5 |
 | units.players | `KillFeature` | 3 | 2 | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | 3 |
@@ -610,7 +610,7 @@ The 15 groups with the most rows are shown.
 | ordered | 5 | 6 |
 | immediate | 0 | 18 |
 | deferrable | 1 | 1 |
-| read-only | 0 | 105 |
+| read-only | 0 | 104 |
 | unobserved | 74 | 163 |
 
 **Ordered** (11).
@@ -663,7 +663,7 @@ The 15 groups with the most rows are shown.
 
 | other | ai is writer | ai is reader |
 |---|---|---|
-| (no writer) | 0 | 105 |
+| (no writer) | 0 | 104 |
 
 **Unobserved**, by the other subsystem.
 
@@ -723,31 +723,28 @@ The rows themselves are in data/phase_dependencies.csv.
 | pass | stream | function | entities | draws | start_state | evidence |
 |---|---|---|---|---|---|---|
 | features | rng.parkMiller | `AiApply` | 1 | 1 | fixed | - |
-| players | rng.parkMiller | `??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 1 to 2 | depends-on-earlier | unresolved:block;unresolved:image;Unit::flags;unknown_1b8e |
-| players | rng.parkMiller | `??0SpatialTimer@@QAE@PAVSquadManager@@PAX@Z` | 3 | 1 | fixed | - |
-| players | rng.parkMiller | `??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 1 to 8 | depends-on-earlier | unresolved:image;SquadManager::countdown;SquadManager::SquadManager: new BuildTimer;unknown_1b8e |
+| players | rng.parkMiller | `BuildTimer::OnTimer` | 2 | 1 to 2 | depends-on-earlier | unresolved:block;unresolved:image;Unit::flags;unknown_1b8e |
 | players | rng.parkMiller | `ChooseBuildOption` | 10 | 1 to 144 | depends-on-earlier | unresolved:image;unknown_1b8e;unresolved:block;PlayerAI::centre |
 | players | rng.parkMiller | `FindBuildPosition` | 9 | 1 to 10 | depends-on-earlier | unresolved:image;unknown_1b8e;unresolved:block;PlayerAI::centre |
 | players | rng.parkMiller | `PlayerAI::FindRandomPlacementCell` | 5 | 3 to 938 | depends-on-earlier | unresolved:image;unknown_1b8e;SquadManager::SquadManager: new BuildTimer;SquadManager::countdown |
-| players | rng.parkMiller | `PlayerAI::UpdateEveryThirtyTicks` | 10 | 1 | fixed | - |
 | players | rng.parkMiller | `ScoutTimer::OnTimer` | 1 | 1 | fixed | - |
-| players | rng.parkMiller | `SpatialTimer::OnTimer` | 2 | 1 | fixed | - |
-| players | rng.parkMiller | `SquadScoutTimer::OnTimer` | 1 | 6 to 8 | depends-on-earlier | unresolved:image |
-| players | rng.parkMiller | `UpdatePlayerAI` | 2 | 1 | fixed | - |
+| players | rng.parkMiller | `SpatialTimer::OnTimer` | 3 | 1 | fixed | - |
+| players | rng.parkMiller | `SquadScoutTimer::OnTimer` | 2 | 1 to 8 | depends-on-earlier | unresolved:image;SquadManager::countdown;SquadManager::SquadManager: new BuildTimer;unknown_1b8e |
+| players | rng.parkMiller | `UpdatePlayerAI` | 10 | 1 | fixed | - |
 | projectiles | rng.parkMiller | `AiApply` | 5 | 1 | fixed | - |
 | units | rng.parkMiller | `AiApply` | 1 | 1 to 2 | depends-on-earlier | Unit::f_1f;f14353;unresolved:image;NewUnitScript: new UnitScript |
 
 ### Within-pass reads
 
-78 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+80 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| players | `SquadManager::TickIfActive` | 9 | 2 | `unknown_1b8e` | 90 |
+| players | `SquadManager::TickIfActive` | 11 | 2 | `unknown_1b8e` | 90 |
 | players | `SquadManager::FindNearestEnemyUnit` | 7 | 5 | `Unit::activateFlags` | 6 |
 | players | `SquadManager::RetargetWeapons` | 7 | 3 | `SquadManager::cursor` | 94 |
 | units | `SetUnitSquad` | 6 | 4 | `Unit::group` | 16 |
-| players | `??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 5 | 2 | `Unit::flags` | 48 |
+| players | `BuildTimer::OnTimer` | 5 | 2 | `Unit::flags` | 49 |
 | players | `ScoutTimer::OnTimer` | 5 | 0 | `PlayerAI::centre` | 80 |
 | players | `PlayerAI::RefreshUnitLists` | 4 | 3 | `unknown_1b8e` | 91 |
 | units | `AiApply` | 4 | 3 | `Unit::def` | 10 |
@@ -755,9 +752,9 @@ The rows themselves are in data/phase_dependencies.csv.
 | players | `AssaultTimer::RebalanceAssaultGroupByCentroid` | 3 | 0 | `SquadManager::SquadManager: new EscortTimer` | 28 |
 | players | `SetUnitSquad` | 3 | 1 | `Group::units` | 31 |
 | units.players | `AiApply` | 3 | 2 | `pad_1df4` | 4 |
-| players | `??0BuildTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 0 | `Unit::flags` | 31 |
-| players | `??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 0 | `PlayerAI::centre` | 24 |
+| players | `AssaultTimer::OnTimer` | 2 | 0 | `Group::units` | 10 |
 | players | `FindBuildPosition` | 2 | 0 | `PlayerAI::centre` | 68 |
+| players | `OrderSquad` | 2 | 1 | `pad_1df4` | 12 |
 
 The 15 groups with the most rows are shown.
 
@@ -828,14 +825,14 @@ No draws.
 
 ### Within-pass reads
 
-49 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+50 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
 | units | `Pathfinder::Cancel` | 13 | 9 | `PathExtra::eventCount` | 23 |
 | units.players | `Pathfinder::Cancel` | 10 | 6 | `PathExtra::eventCount` | 29 |
-| units | `Pathfinder::FindPending` | 9 | 6 | `LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets` | 20 |
-| units.players | `Pathfinder::FindPending` | 9 | 6 | `LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets` | 28 |
+| units.players | `Pathfinder::Submit` | 10 | 7 | `LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets` | 28 |
+| units | `Pathfinder::Submit` | 9 | 6 | `LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets` | 20 |
 | players | `Pathfinder::Cancel` | 8 | 5 | `PathExtra::eventCount` | 5 |
 
 ### Deferral confirmation
@@ -851,7 +848,7 @@ It has no deferrable edge.
 | ordered | 16 | 14 |
 | immediate | 19 | 47 |
 | deferrable | 1 | 1 |
-| read-only | 0 | 231 |
+| read-only | 0 | 229 |
 | unobserved | 97 | 111 |
 
 **Ordered** (30).
@@ -947,7 +944,7 @@ The 40 rows with the most runs are shown; the other 26 are in data/dependencies.
 
 | other | weapons is writer | weapons is reader |
 |---|---|---|
-| (no writer) | 0 | 231 |
+| (no writer) | 0 | 229 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1061,7 +1058,7 @@ The 15 groups with the most rows are shown.
 | ordered | 5 | 6 |
 | immediate | 3 | 28 |
 | deferrable | 0 | 1 |
-| read-only | 0 | 42 |
+| read-only | 0 | 40 |
 | unobserved | 50 | 61 |
 
 **Ordered** (11).
@@ -1126,7 +1123,7 @@ The 15 groups with the most rows are shown.
 
 | other | targeting is writer | targeting is reader |
 |---|---|---|
-| (no writer) | 0 | 42 |
+| (no writer) | 0 | 40 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1184,7 +1181,7 @@ The rows themselves are in data/phase_dependencies.csv.
 
 | pass | stream | function | entities | draws | start_state | evidence |
 |---|---|---|---|---|---|---|
-| players | rng.parkMiller | `FindWeaponTarget` | 3 | 1 to 250 | depends-on-earlier | unresolved:image;SquadManager::cursor;SquadManager::countdown;g_allocSerial |
+| players | rng.parkMiller | `FindWeaponTarget` | 3 | 1 to 250 | depends-on-earlier | unresolved:image;SquadManager::cursor;SquadManager::countdown;Unit::current |
 | units | rng.parkMiller | `FindWeaponTarget` | 9 | 1 to 100 | depends-on-earlier | f14353;unresolved:image;Unit::f_1f;Unit::f_57 |
 
 ### Within-pass reads
@@ -1226,7 +1223,7 @@ The 15 groups with the most rows are shown.
 | ordered | 3 | 3 |
 | immediate | 11 | 22 |
 | deferrable | 1 | 1 |
-| read-only | 0 | 142 |
+| read-only | 0 | 138 |
 | unobserved | 122 | 153 |
 
 **Ordered** (6).
@@ -1289,7 +1286,7 @@ The 15 groups with the most rows are shown.
 
 | other | los_radar is writer | los_radar is reader |
 |---|---|---|
-| (no writer) | 0 | 142 |
+| (no writer) | 0 | 138 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1399,7 +1396,7 @@ The 15 groups with the most rows are shown.
 | ordered | 9 | 9 |
 | immediate | 8 | 47 |
 | deferrable | 2 | 7 |
-| read-only | 0 | 141 |
+| read-only | 0 | 138 |
 | unobserved | 126 | 173 |
 
 **Ordered** (18).
@@ -1490,7 +1487,7 @@ The 40 rows with the most runs are shown; the other 15 are in data/dependencies.
 
 | other | orders is writer | orders is reader |
 |---|---|---|
-| (no writer) | 0 | 141 |
+| (no writer) | 0 | 138 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1559,7 +1556,6 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | rng.parkMiller | `AirToGroundOrder` | 2 | 1 | fixed | - |
 | units | rng.parkMiller | `AttackChaseOrder` | 10 | 1 | fixed | - |
 | units | rng.parkMiller | `AttackUTypeOrder` | 7 | 1 to 9 | depends-on-earlier | f14353;unresolved:image;Unit::def;Unit::f_1f |
-| units | rng.parkMiller | `DamagedAllyCollector::Visit` | 2 | 1 | fixed | - |
 | units | rng.parkMiller | `FollowGroundOrder` | 7 | 1 | fixed | - |
 | units | rng.parkMiller | `GuardNoMoveOrder` | 7 | 1 to 58 | depends-on-earlier | Unit::f_1f;f14353;unresolved:image;NewUnitScript: new UnitScript |
 | units | rng.parkMiller | `PatrolOrder` | 6 | 1 | fixed | - |
@@ -1582,7 +1578,7 @@ The rows themselves are in data/phase_dependencies.csv.
 
 ### Within-pass reads
 
-799 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+792 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -1596,11 +1592,11 @@ The rows themselves are in data/phase_dependencies.csv.
 | units.players | `AttackChaseOrder` | 14 | 1 | `Unit::flags` | 10 |
 | units.players | `VtolMobileBuildOrder` | 14 | 1 | `Order::state` | 4 |
 | units | `AttackChaseOrder` | 13 | 0 | `Unit::flags` | 8 |
+| units | `RepairPatrolOrder` | 13 | 6 | `Order::state` | 5 |
 | units | `AirStrikeOrder` | 12 | 1 | `Unit::pos` | 2 |
 | units | `BuildingBuildOrder` | 12 | 3 | `Order::state` | 21 |
 | units | `MobileBuildOrder` | 12 | 1 | `Order::state` | 9 |
 | units.players | `FollowGroundOrder` | 12 | 0 | `Unit::list` | 5 |
-| units.players | `GetOrderType` | 12 | 5 | `Unit::flags` | 11 |
 
 The 15 groups with the most rows are shown.
 
@@ -1627,7 +1623,7 @@ The 15 groups with the most rows are shown.
 | ordered | 14 | 14 |
 | immediate | 130 | 22 |
 | deferrable | 6 | 0 |
-| read-only | 0 | 82 |
+| read-only | 0 | 79 |
 | unobserved | 311 | 133 |
 
 **Ordered** (28).
@@ -1725,7 +1721,7 @@ The 40 rows with the most runs are shown; the other 112 are in data/dependencies
 
 | other | units is writer | units is reader |
 |---|---|---|
-| (no writer) | 0 | 82 |
+| (no writer) | 0 | 79 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1800,7 +1796,7 @@ The rows themselves are in data/phase_dependencies.csv.
 
 ### Within-pass reads
 
-362 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+355 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -1814,8 +1810,8 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `FinishConstruction` | 9 | 5 | `Unit::flags` | 5 |
 | units.players | `AlignUnitToGround` | 9 | 1 | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | 13 |
 | units | `ApplyAttachUnit` | 8 | 4 | `Unit::cargoNext` | 7 |
-| units | `CreateUnitCorpse` | 8 | 0 | `Unit::def` | 15 |
-| units.players | `CreateUnitCorpse` | 8 | 0 | `Unit::def` | 9 |
+| units | `CreateUnitCorpse` | 8 | 0 | `Unit::def` | 14 |
+| units.players | `CreateUnitCorpse` | 8 | 0 | `Unit::def` | 8 |
 | units | `AddBuildProgress` | 7 | 3 | `Unit::flags` | 25 |
 | units | `Unit::CanRepair` | 7 | 3 | `Unit::flags` | 5 |
 | units | `Unit::SetStateBits` | 7 | 5 | `Unit::activateFlags` | 26 |
@@ -1842,7 +1838,7 @@ The 15 groups with the most rows are shown.
 | ordered | 2 | 2 |
 | immediate | 1 | 12 |
 | deferrable | 0 | 1 |
-| read-only | 0 | 74 |
+| read-only | 0 | 75 |
 | unobserved | 192 | 112 |
 
 **Ordered** (4).
@@ -1882,7 +1878,7 @@ The 15 groups with the most rows are shown.
 
 | other | players is writer | players is reader |
 |---|---|---|
-| (no writer) | 0 | 74 |
+| (no writer) | 0 | 75 |
 
 **Unobserved**, by the other subsystem.
 
@@ -1948,7 +1944,7 @@ No draws.
 | units | `VictoryKillUnitType::OnUnitDied` | 2 | 1 | `Unit::def` | 1 |
 | units.players | `DefeatAllUnitsKilledOfType::VisitUnit` | 2 | 1 | `Unit::unitDefIndex` | 1 |
 | units.players | `MissionConditions::NotifyUnitDied` | 2 | 2 | `MissionConditions::RegisterConditions: new DefeatUnitTypeKilled` | 1 |
-| players | `IsLocalPlayerOutOfUnits` | 1 | 1 | `unknown_1b8e` | 5 |
+| players | `MissionConditions::CheckVictory` | 1 | 1 | `unknown_1b8e` | 5 |
 | players | `UpdatePlayerHead` | 1 | 1 | `pad_1df4` | 2 |
 | tail | `UpdateBlink` | 1 | 1 | `bits_142f1` | 20 |
 | units | `DefeatAllUnitsKilledOfType::OnUnitDied` | 1 | 0 | `Unit::def` | 3 |
@@ -1972,7 +1968,7 @@ The 15 groups with the most rows are shown.
 | ordered | 5 | 4 |
 | immediate | 16 | 25 |
 | deferrable | 0 | 1 |
-| read-only | 0 | 100 |
+| read-only | 0 | 98 |
 | unobserved | 109 | 138 |
 
 **Ordered** (9).
@@ -2046,7 +2042,7 @@ The 40 rows with the most runs are shown; the other 1 are in data/dependencies.c
 
 | other | map is writer | map is reader |
 |---|---|---|
-| (no writer) | 0 | 100 |
+| (no writer) | 0 | 98 |
 
 **Unobserved**, by the other subsystem.
 
@@ -2120,9 +2116,9 @@ The rows themselves are in data/phase_dependencies.csv.
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
 | units.players | `ClaimFootprintCells` | 11 | 7 | `Unit::cell` | 7 |
-| units | `ClaimFootprintsInArea` | 10 | 5 | `Rec::field_6` | 9 |
+| units | `VisitObjectsInArea` | 10 | 5 | `Rec::field_6` | 9 |
 | units | `ClaimFootprintCells` | 9 | 5 | `Unit::cell` | 9 |
-| units.players | `ClaimFootprintsInArea` | 9 | 4 | `Rec::field_6` | 5 |
+| units.players | `VisitObjectsInArea` | 9 | 4 | `Rec::field_6` | 5 |
 | units | `UnitsInRange` | 8 | 4 | `Unit::pos` | 6 |
 | units | `RemoveUnitFromMap` | 7 | 2 | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | 32 |
 | units.players | `RemoveUnitFromMap` | 7 | 2 | `Unit::flags` | 52 |
@@ -2152,7 +2148,7 @@ The 15 groups with the most rows are shown.
 | ordered | 8 | 8 |
 | immediate | 14 | 15 |
 | deferrable | 0 | 0 |
-| read-only | 0 | 30 |
+| read-only | 0 | 29 |
 | unobserved | 58 | 79 |
 
 **Ordered** (16).
@@ -2218,7 +2214,7 @@ None.
 
 | other | scripts is writer | scripts is reader |
 |---|---|---|
-| (no writer) | 0 | 30 |
+| (no writer) | 0 | 29 |
 
 **Unobserved**, by the other subsystem.
 
@@ -2275,7 +2271,7 @@ The rows themselves are in data/phase_dependencies.csv.
 
 ### Within-pass reads
 
-390 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+388 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -2310,7 +2306,7 @@ It has no deferrable edge.
 | ordered | 0 | 0 |
 | immediate | 14 | 26 |
 | deferrable | 1 | 1 |
-| read-only | 0 | 70 |
+| read-only | 0 | 69 |
 | unobserved | 88 | 146 |
 
 **Ordered** (0).
@@ -2373,7 +2369,7 @@ None.
 
 | other | movement is writer | movement is reader |
 |---|---|---|
-| (no writer) | 0 | 70 |
+| (no writer) | 0 | 69 |
 
 **Unobserved**, by the other subsystem.
 
@@ -2434,7 +2430,7 @@ No draws.
 
 ### Within-pass reads
 
-397 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+387 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -2445,7 +2441,7 @@ No draws.
 | units | `MovementApply` | 11 | 1 | `UnitMotion::UnitMotion: new PackedPosGoal` | 21 |
 | units | `UnitMotion::SteerAircraft` | 11 | 1 | `UnitMotion::flags` | 17 |
 | units | `AiSearchGoal::SetPathOrder` | 10 | 2 | `UnitMotion::UnitMotion: new PackedPosGoal` | 22 |
-| units | `UnitMotion::ApplyClampedTurnDelta` | 10 | 5 | `UnitMotion::speed` | 49 |
+| units | `UnitMotion::UpdateVelocityFromHeading` | 10 | 5 | `UnitMotion::speed` | 51 |
 | units | `AiSearchGoal::TickTowardGoal` | 9 | 2 | `UnitMotion::UnitMotion: new PackedPosGoal` | 39 |
 | units | `UnitMotion::SteerGroundUnit` | 9 | 2 | `UnitMotion::UnitMotion: new PackedPosGoal` | 39 |
 | units | `PathOrder::FillWorldPos` | 8 | 2 | `Unit::spatialBucket` | 13 |

@@ -1,0 +1,387 @@
+bt-replay 2
+subsystem movement 5.0
+call 148 UpdateMotion
+  r Game.seaLevel 0
+  r Game.width_142a3 28
+  r Game.height_142a7 13
+  r Game.overflowBucket OverflowBucket#1
+  r Game.gravity 8155
+  r Unit#1.cell (36,14)
+  r Unit#1.footprint (2,2)
+  r Unit#1.id 1
+  r Unit#1.spatialBucket SpatialBucket#32
+  r Unit#1.transportPiece 255
+  r Unit#1.heading -26558
+  r Unit#1.list Order#1
+  r Unit#1.flags 0x90e00321
+  r Unit#1.carrier null
+  r Unit#1.def UnitDef#34
+  r Unit#1.player Player#0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 38341685
+  r Unit#1.posY 65536
+  r Unit#1.posZ 16019809
+  r SpatialBucket#32.bytes x:010100000000
+  r Order#1.flags_42 5256457
+  r Order#1.unit Unit#1
+  r UnitDef#34.draft 0
+  r UnitDef#34.flags1 0x0495c0c8
+  r UnitDef#34.maxvelocity 78643
+  r UnitDef#34.altitude 0
+  r UnitDef#34.brakerate 19660
+  r UnitDef#34.acceleration 9830
+  r UnitDef#34.bankscale 65536
+  r UnitDef#34.pitchscale 0
+  r UnitDef#34.moverate1 157286
+  r UnitDef#34.moverate2 157286
+  r UnitDef#34.turnrate 1044
+  r Player#0.active 1
+  r Player#0.type 1
+  r UnitMotion#1.obj AiSearchGoal#1
+  r UnitMotion#1.velocityX 0
+  r UnitMotion#1.velocityY 0
+  r UnitMotion#1.velocityZ 0
+  r UnitMotion#1.speed 0
+  r UnitMotion#1.flags 1
+  r UnitMotion#1.turn 0
+  r UnitMotion#1.lastMoveTick 38
+  r UnitMotion#1.p2X 0
+  r UnitMotion#1.p2Y 0
+  r UnitMotion#1.p2Z 0
+  r AiSearchGoal#1.target null
+  r AiSearchGoal#1.owner Unit#1
+  r AiSearchGoal#1.points x:3002f00080024001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#1.count 2
+  r AiSearchGoal#1.repathClaimTick 0
+  r AiSearchGoal#1.flags 8
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 148 UpdateMotion
+  r Unit#251.cell (207,84)
+  r Unit#251.footprint (2,2)
+  r Unit#251.id 251
+  r Unit#251.spatialBucket SpatialBucket#306
+  r Unit#251.transportPiece 255
+  r Unit#251.heading 8311
+  r Unit#251.list Order#2
+  r Unit#251.flags 0x90e40025
+  r Unit#251.carrier null
+  r Unit#251.def UnitDef#167
+  r Unit#251.player Player#1
+  r Unit#251.motion UnitMotion#2
+  r Unit#251.posX 218606335
+  r Unit#251.posY 65536
+  r Unit#251.posZ 89572921
+  r SpatialBucket#306.bytes x:010100000000
+  r Order#2.flags_42 1062153
+  r Order#2.unit Unit#251
+  r UnitDef#167.draft 0
+  r UnitDef#167.flags1 0x0495c0c8
+  r UnitDef#167.maxvelocity 70123
+  r UnitDef#167.altitude 0
+  r UnitDef#167.brakerate 20971
+  r UnitDef#167.acceleration 10485
+  r UnitDef#167.bankscale 65536
+  r UnitDef#167.pitchscale 0
+  r UnitDef#167.moverate1 140246
+  r UnitDef#167.moverate2 140246
+  r UnitDef#167.turnrate 1030
+  r Player#1.active 1
+  r Player#1.type 2
+  r UnitMotion#2.obj AiSearchGoal#2
+  r UnitMotion#2.velocityX -50187
+  r UnitMotion#2.velocityY 0
+  r UnitMotion#2.velocityZ -48971
+  r UnitMotion#2.speed 70123
+  r UnitMotion#2.flags 1
+  r UnitMotion#2.turn 0
+  r UnitMotion#2.lastMoveTick 147
+  r UnitMotion#2.p2X 0
+  r UnitMotion#2.p2Y 0
+  r UnitMotion#2.p2Z 0
+  r AiSearchGoal#2.target PointMarker#1
+  r AiSearchGoal#2.owner Unit#251
+  r AiSearchGoal#2.points x:300d8005e00c3005e00b3005d00b200500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#2.count 4
+  r AiSearchGoal#2.repathClaimTick 91
+  r AiSearchGoal#2.flags 9
+  r PointMarker#1.source Order#2
+  r PointMarker#1.x1 183
+  r PointMarker#1.x2 188
+  r PointMarker#1.y1 76
+  r PointMarker#1.y2 81
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218556148
+  o Unit#251.posZ 89523950
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 148
+call 149 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 149 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218505961
+  o Unit#251.posZ 89474979
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 149
+call 150 UnitTarget
+  a unit Unit#1
+  o result null
+call 150 Apply
+  r Unit#1.list null
+  r PointMarker#2.source Order#1
+  r PointMarker#2.x1 36
+  r PointMarker#2.x2 43
+  r PointMarker#2.y1 12
+  r PointMarker#2.y2 19
+  r UnitDef#34.movementclass MovementClass#2
+  r UnitMotion#1.movementClass MovementClass#2
+  r Order#1.flags_42 1062153
+  a event.kind 327
+  a event.unit Unit#1
+  a event.target PointMarker#2
+  a size 12
+  i services.SimFree alloc#?
+  o result 1
+call 150 NewApproachRadius
+  r Order#3.unit Unit#1
+  r Unit#1.weapon2Def weapondef#22
+  r Unit#1.weapon0Def weapondef#20
+  r Unit#1.weapon1Def weapondef#0
+  r weapondef#22.range 240
+  r weapondef#20.range 200
+  r weapondef#0.range 16
+  a order Order#3
+  a x 45878325
+  a y 19689825
+  a radius 16
+  i services.SimAlloc 20 = alloc#1
+  w ApproachRadius#1.source Order#3
+  w ApproachRadius#1.pos (43,18)
+  w ApproachRadius#1.radius 16
+  w ApproachRadius#1.radiusSq 1
+  o result ApproachRadius#1
+call 150 Apply
+  r Unit#1.list Order#3
+  r Order#3.flags_42 46099
+  a event.kind 326
+  a event.unit Unit#1
+  a event.target ApproachRadius#1
+  a size 12
+  i pathfinding.Cancel AiSearchGoal#1
+  i pathfinding.Submit (Unit#1,60,1,(43,18),16,0,0,0,0,0,AiSearchGoal#1,ApproachRadius#1,0,(0,0))
+  w AiSearchGoal#1.target ApproachRadius#1
+  w AiSearchGoal#1.flags 11
+  o result 1
+call 150 NewRingApproach
+  r Order#4.unit Unit#1
+  a order Order#4
+  a x 42467328
+  a y 17301504
+  a inner 107
+  a outer 47
+  i services.SimAlloc 28 = alloc#2
+  w RingApproach#1.source Order#4
+  w RingApproach#1.pos (40,16)
+  w RingApproach#1.inner 47
+  w RingApproach#1.outer 107
+  w RingApproach#1.innerSq 4
+  w RingApproach#1.outerSq 36
+  o result RingApproach#1
+call 150 Apply
+  r Unit#1.list Order#4
+  r Order#4.flags_42 1049096
+  a event.kind 326
+  a event.unit Unit#1
+  a event.target RingApproach#1
+  a size 12
+  i pathfinding.Cancel AiSearchGoal#1
+  i services.SchedPublish 14 16
+  i pathfinding.Submit (Unit#1,60,2,(40,16),47,107,0,0,0,0,AiSearchGoal#1,RingApproach#1,0,(0,0))
+  w AiSearchGoal#1.target RingApproach#1
+  o result 1
+call 150 UpdateMotion
+  r AiSearchGoal#1.points x:4902f4004802f400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  a unit Unit#1
+  i services.SchedPublish 14 16
+  i pathfinding.Cancel AiSearchGoal#1
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 8
+  w AiSearchGoal#1.target null
+  w AiSearchGoal#1.points x:4802f4004802f400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  w AiSearchGoal#1.count 1
+  w AiSearchGoal#1.flags 8
+call 150 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  o Unit#251.heading 8310
+  o Unit#251.flags 0x90e50025
+  i services.SchedPublish 14 20
+  o Unit#251.posX 218455774
+  o Unit#251.posZ 89426008
+  i services.SchedPublish 14 8
+  w UnitMotion#2.turn -1
+  w UnitMotion#2.lastMoveTick 150
+call 151 UpdateMotion
+  r Order#4.flags_42 5243400
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 151 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218405587
+  o Unit#251.posZ 89377037
+  i services.SchedPublish 14 8
+  w UnitMotion#2.turn 0
+  w UnitMotion#2.lastMoveTick 151
+call 152 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 152 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218355400
+  o Unit#251.posZ 89328066
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 152
+call 153 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 153 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218305213
+  o Unit#251.posZ 89279095
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 153
+call 154 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 154 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218255026
+  o Unit#251.posZ 89230124
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 154
+call 155 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 155 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  o Unit#251.heading 8309
+  o Unit#251.flags 0x90e50025
+  i services.SchedPublish 14 20
+  o Unit#251.posX 218204839
+  o Unit#251.posZ 89181153
+  i services.SchedPublish 14 8
+  w UnitMotion#2.turn -1
+  w UnitMotion#2.lastMoveTick 155
+call 156 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 156 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218154652
+  o Unit#251.posZ 89132182
+  i services.SchedPublish 14 8
+  w UnitMotion#2.turn 0
+  w UnitMotion#2.lastMoveTick 156
+call 157 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 157 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218104465
+  o Unit#251.posZ 89083211
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 157
+call 158 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 158 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 218054278
+  o Unit#251.posZ 89034240
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 158
+call 159 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 159 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  o Unit#251.heading 8308
+  o Unit#251.flags 0x90e50025
+  i services.SchedPublish 14 20
+  o Unit#251.posX 218004091
+  o Unit#251.posZ 88985269
+  i services.SchedPublish 14 8
+  w UnitMotion#2.turn -1
+  w UnitMotion#2.lastMoveTick 159
+call 160 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 160 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 217953904
+  o Unit#251.posZ 88936298
+  i services.SchedPublish 14 8
+  w UnitMotion#2.turn 0
+  w UnitMotion#2.lastMoveTick 160
+call 161 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 161 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 20
+  o Unit#251.flags 0x90e50025
+  o Unit#251.posX 217903717
+  o Unit#251.posZ 88887327
+  i services.SchedPublish 14 8
+  w UnitMotion#2.lastMoveTick 161
+call 162 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 162 UpdateMotion
+  r Unit#251.flags 0x90e40025
+  a unit Unit#251
+  i services.SchedPublish 14 12
+  o Unit#251.heading 8307
+  o Unit#251.flags 0x90e50025
+  i services.SchedPublish 14 20
+  o Unit#251.posX 217853530
+  o Unit#251.posZ 88838356
+  i services.SchedPublish 14 8
+  w UnitMotion#2.turn -1
+  w UnitMotion#2.lastMoveTick 162

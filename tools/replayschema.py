@@ -171,7 +171,8 @@ def flatten_event_fields(structs: dict, name: str, path: str = "", refs: dict | 
             if member not in handles and traceschema.is_unit_ref(ctype, member):
                 field.update({"kind": "ref", "target": "Unit"})
             elif "%s.%s" % (name, member) in refs and ctype == "unsigned int" and length is None:
-                field.update({"kind": "ref", "target": refs["%s.%s" % (name, member)]})
+                note = refs["%s.%s" % (name, member)]
+                field.update({"kind": "ref", "target": note} if isinstance(note, str) else {"kind": "ref", "target": note["kind"], "poly": note["poly"]})
             elif ctype in EVENT_SCALARS:
                 field["kind"] = EVENT_SCALARS[ctype]
             else:
@@ -820,8 +821,8 @@ def check_vptr(ann: dict) -> list[str]:
     errors = []
     taken = {vtable_name(spec): name for name, spec in ann["objects"].items() if has_vtable(spec)}
     for name, spec in ann["objects"].items():
-        if "vptr_unset" in spec and ("vptr" not in spec or not isinstance(spec["vptr_unset"], str) or not spec["vptr_unset"]):
-            errors.append("%s: `vptr_unset` is the reason a kind with a vptr may hold 0 in it" % name)
+        if "vptr_unset" in spec and (("vptr" not in spec and not (has_vtable(spec) and spec.get("inside"))) or not isinstance(spec["vptr_unset"], str) or not spec["vptr_unset"]):
+            errors.append("%s: `vptr_unset` is the reason a kind with a vptr, or an embedded kind with a vtable, may hold 0 in it" % name)
         if "vptr" not in spec:
             continue
         if not isinstance(spec["vptr"], str) or not VTABLE_NAME.match(spec["vptr"]):
@@ -1380,14 +1381,17 @@ def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict
         errors.append("%s: `refs` of %s maps a payload member to the kind it leads to" % (where, label))
         refs = {}
     structs = interface_structs(a["events"])
-    for key, kind in refs.items():
+    for key, note in refs.items():
+        kind = note if isinstance(note, str) else note.get("kind") if isinstance(note, dict) else None
+        if isinstance(note, dict) and (set(note) != {"kind", "poly"} or note["poly"] != kind):
+            errors.append("%s: `refs` of %s leads %s to {\"kind\": KIND, \"poly\": KIND}, with the same kind in both" % (where, label, key))
         struct, _, member = key.partition(".")
         ctype = next((c for c, m, n in structs.get(struct, []) if m == member and n is None), None)
         if kinds.get(kind, {}).get("scope") != "state":
             errors.append("%s: `refs` of %s leads %s to %s, which is no state kind" % (where, label, key, kind))
         elif ctype != "unsigned int":
             errors.append("%s: `refs` of %s names %s, which is no unsigned int member of a struct of interfaces/%s.h" % (where, label, key, a["events"]))
-        elif traceschema.is_unit_ref(ctype, member):
+        elif traceschema.is_unit_ref(ctype, member) and member not in traceschema.module_of_header(a["events"] + ".h").handles:
             errors.append("%s: `refs` of %s names %s, which is a unit ref already" % (where, label, key))
     return errors
 
@@ -1397,6 +1401,15 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
     errors = []
     kinds = ann["objects"]
     names = [a["name"] for a in args]
+    for item, label in [(a, "the argument %s" % a["name"]) for a in args] + [(result, "the result")]:
+        over = None if item is None else item.get("import")
+        if over is None:
+            continue
+        spec = kinds.get(over.get("kind")) if isinstance(over, dict) else None
+        if not isinstance(over, dict) or over.get("mode") not in ("object", "scalar", "text", "value") or (over.get("mode") in ("object", "value") and (spec is None or spec["scope"] != ("state" if over["mode"] == "object" else "value"))):
+            errors.append("%s: `import` of %s is an object (a state kind), value (a value kind), scalar or text form, which the import side records in place of the slot side's" % (where, label))
+        elif item.get("mode") not in ("scalar", "struct", "value"):
+            errors.append("%s: `import` of %s is for a scalar or a value of the slot side" % (where, label))
 
     def value_kind(item: dict, label: str, pointer: bool) -> None:
         spec = kinds.get(item.get("kind"))
@@ -1674,7 +1687,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "vtable_symbol", "vtable_secondary", "vptr", "vptr_unset", "kinds", "delta"):
+        for key in ("vtable", "vtable_declared", "vtable_symbol", "vtable_secondary", "vptr", "vptr_unset", "kinds", "delta"):
             if spec.get(key):
                 entry[key] = spec[key]
         if spec.get("vtable_symbol"):
@@ -1925,6 +1938,9 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     errors += resolve_reach("%s.%s(%s)" % (sub, s["name"], a["name"]), a, a["kind"], ann, object_fields, object_index, reach_table)
             result = classify_result(s["ret"], {"mode": "region"} if region is not None and s["name"] == region["shutdown"] else note.get("result"), ann)
             errors += check_forms("%s.%s" % (sub, s["name"]), args, result, ann)
+            if any("import" in x for x in args + [result or {}]):
+                view = import_view({"args": args, "result": result})
+                errors += [e for e in check_forms("%s.%s (import side)" % (sub, s["name"]), view["args"], view["result"], ann) if "`import` of" not in e]
             errors += ["%s.%s(%s): a scalar out value is recorded for an import, and this slot is recorded" % (sub, s["name"], a["name"])
                        for a in args if is_scalar_out(a) and not skipped]
             errors += ["%s.%s(%s): a scratch buffer is for a recorded slot, and this slot is imported" % (sub, s["name"], a["name"])
@@ -1988,6 +2004,10 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             subsystems[sub]["world"] = True
         if spec.get("issue"):
             subsystems[sub]["issue"] = spec["issue"]
+        if "import_objects" in spec:
+            if not isinstance(spec["import_objects"], str) or not spec["import_objects"]:
+                errors.append("%s: import_objects needs a reason" % sub)
+            subsystems[sub]["importObjects"] = spec["import_objects"]
         if unrecorded:
             subsystems[sub]["unrecorded"] = unrecorded
         left = {k: v for k, v in done.items() if v}
@@ -2471,7 +2491,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     first = 0
     for sub, spec in subsystems.items():
         n = len(spec["slots"])
-        L.append('    { "%s", %d, %d, %d, %d, %d, %s },' % (sub, spec["version"][0], spec["version"][1], int(spec["status"] == "complete"), first, n, "RET_" + upper(sub) if sub in events else "RET_COUNT"))
+        L.append('    { "%s", %d, %d, %d, %d, %d, %s, %d },' % (sub, spec["version"][0], spec["version"][1], int(spec["status"] == "complete"), first, n, "RET_" + upper(sub) if sub in events else "RET_COUNT", int("importObjects" in spec)))
         first += n
     L += ["};", "static const unsigned kReplaySubsystemCount = SUB_COUNT;", "", "#endif", ""]
     return "\n".join(L)
@@ -2619,6 +2639,31 @@ def self_buffer(s: dict):
     return None
 
 
+def import_roots(s: dict) -> list[str]:
+    """The import side's FinishImport call, with the objects that an argument's `import` override names added to the
+    slot's roots, so the walk after the import visits every object the import's arguments name."""
+    extra = []
+    for i, a in enumerate(s["args"]):
+        over = a.get("import")
+        if over is None or over.get("mode") != "object":
+            continue
+        extra.append("        importRoots.Add(ROK_%s, %s);" % (upper(over["kind"]), ("ReplayRefPtr(a%d)" if over.get("ref") else "a%d") % i))
+    if not extra:
+        return ["        FinishImport(line, roots);"]
+    return ["        ReplayRoots importRoots = roots;"] + extra + ["        FinishImport(line, importRoots);"]
+
+
+def import_view(s: dict) -> dict:
+    """The slot as its import side records it: an argument or the result with an `import` annotation takes that form there and keeps its own on the slot side."""
+    def side(a):
+        if a is None or "import" not in a:
+            return a
+        out = {k: v for k, v in a.items() if k in ("name", "type", "line", "param")}
+        out.update(a["import"])
+        return out
+    return {**s, "args": [side(a) for a in s["args"]], "result": side(s["result"])}
+
+
 def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: bool, unrecorded: bool = False,
             object_fields: list = ()) -> list[str]:
     params = ", ".join("%s a%d" % (raw_type(s, i), i) for i in range(len(s["args"])))
@@ -2691,7 +2736,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             head = 'line.Add("\\n    c %s.%s");' % (sub, slot)
         L.append("    if (%s) {" % condition)
         L.append("        " + head)
-        for i, a in enumerate(s["args"]):
+        for i, a in enumerate(import_view(s)["args"]):
             if own is None or i != own[1]:
                 L += ["        " + x for x in arg_out(a, i, "i", objects)]
         L.append("    }")
@@ -2706,7 +2751,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L.append("    cb%d.Stop();" % i)
         L.append("    if (scope.Import()) {")
         if res is not None and own is None:
-            L += ["        " + x for x in result_out(res, objects, "i")]
+            L += ["        " + x for x in result_out(import_view(s)["result"], objects, "i")]
         for i, a in enumerate(s["args"]):
             if is_value_out(a):
                 L.append("        ImportResultValue(line, ROK_%s, %s);" % (upper(a["kind"]), arg_var(a, i)))
@@ -2735,7 +2780,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        ImportOutInOutScalar(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif is_named_out(a):
                 L.append('        ImportOutInOut(line, "%s", ROK_%s, %s);' % (a["line"], upper(a["kind"]), arg_var(a, i)))
-        L.append("        FinishImport(line);")
+        L += import_roots(s)
         L.append("    }")
     if nest:
         L.append("    if (scope.Nested()) {")
@@ -2911,7 +2956,9 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
         if mode == "scalar":
             return ['ArgValue(s_tail, "result", result, "o");']
         if mode == "object":
-            return ['ArgObject(s_tail, "result", ROK_%s, %s, "o");' % (upper(res["kind"]), "ReplayRefPtr(result)" if res.get("ref") else "result")]
+            if res.get("ref"):
+                return ['ArgObject(s_tail, "result", ROK_%s, ReplayRefPtr(result), "o");' % upper(res["kind"]), 'ResultRoot(ROK_%s, ReplayRefPtr(result));' % upper(res["kind"])]
+            return ['ArgObject(s_tail, "result", ROK_%s, result, "o");' % upper(res["kind"])]
         if mode == "value":
             return ['ArgValueStruct(s_tail, "o", "result", ROK_%s, &result);' % upper(res["kind"])]
         if mode == "region":
@@ -2957,7 +3004,7 @@ def render_slots(ann: dict, model: dict) -> str:
         spec = subsystems[seam]
         for slot in slots:
             entry = {**spec["slots"], **imported_unrecorded(spec)}[slot]
-            L += list_stub(seam, slot, entry) if self_buffer(entry) is not None else import_stub(seam, slot, entry)
+            L += list_stub(seam, slot, entry) if self_buffer(entry) is not None else import_stub(seam, slot, import_view(entry))
         for slot, s in spec["slots"].items():
             if s.get("playsAs") in slots:
                 replays.setdefault(seam, []).append(slot)
@@ -3115,7 +3162,7 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         elif m == "callback":
             L.append("    Space(t);\n    AddObject(t, OBJ_CALLBACK + RCB_%s, %s);" % (upper(a["callback"]), v))
         elif m == "object":
-            L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, false);" % (upper(a["kind"]), "ReplayRefPtr(%s)" % v if a.get("ref") else v))
+            L.append("    Space(t);\n    ReplayAddObjectName(t, g_objects, ROK_%s, %s, true);" % (upper(a["kind"]), "ReplayRefPtr(%s)" % v if a.get("ref") else v))
         elif m == "bytes-in":
             L.append("    Space(t);\n    AddBytes(t, %s, %s);" % (v, length_parts(a, i)[1]))
         elif is_value_out(a):
@@ -3331,6 +3378,8 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
         g = "g_result_%s_%s" % (sub, slot)
         head.append("%s %s;" % (s["ret"], g))
         L.append("    %s = %s;" % (g, expr))
+        if res["mode"] == "object" and res.get("ref"):
+            L.append("    BindObjectResult(ROK_%s, ReplayRefPtr(%s));" % (upper(res["kind"]), g))
         if res["mode"] == "object":
             after.append("    CompareObjectResult(ROK_%s, %s);" % (upper(res["kind"]), "ReplayRefPtr(%s)" % g if res.get("ref") else g))
         elif res["mode"] == "scalar":
@@ -3747,7 +3796,7 @@ def render_service_end(services: list[dict]) -> str:
                 L.append("        t.AddString((const char*)a[%d].v.p);" % index[o["text"]])
         L.append("        break;")
         L.append("    }")
-    L += ["    }", "    ImportRng(t, c.id);", "    t.AddChar('\\n');", "    ReplayCalls() = 1;", "}", ""]
+    L += ["    }", "    ImportRng(t, c.id);", "    t.AddChar('\\n');", "    ImportServiceObjects(t, c);", "    ReplayCalls() = 1;", "}", ""]
     return "\n".join(L)
 
 
@@ -3897,7 +3946,7 @@ def render_vtables(model: dict, fixtures: bool = False) -> str:
     headers = dict.fromkeys(h for h in map(declaring_header, secondary) if h)
     if headers:
         L[-1:-1] = ['#include "%s"' % callback_include(h, base) for h in headers]
-    L += ["extern void (* const %s[])()%s;" % (o.get("vtable") or o["vptr"], ' __asm__("%s")' % o["vtable_symbol"] if o.get("vtable_symbol") else "") for o in kinds]
+    L += [("extern void* %s[];" % o["vtable"] if o.get("vtable_declared") else "extern void (* const %s[])()%s;" % (o.get("vtable") or o["vptr"], ' __asm__("%s")' % o["vtable_symbol"] if o.get("vtable_symbol") else "")) for o in kinds]
     L += ["extern void (* const g_vtsec_%s_%s[])() __asm__(\"%s\");" % (o["type"], b, "??_7%s@@6B%s@@@" % (o["type"], b)) for o in kinds for b in o.get("vtable_secondary", [])]
     for fn, ret, expr in (("ReplayVtable", "const void*", "%s"), ("ReplayVtableName", "const char*", '"%s"')):
         L += ["", "%s %s(unsigned kind)" % (ret, fn), "{", "    switch (kind) {"]
@@ -4082,7 +4131,7 @@ def render_shapes(ann: dict) -> str:
     L = [GENERATED, "", "// included by replay_native_test.cpp after its helpers, which define Native_fixture_<Slot> for each runner", ""]
     slots, _ = shape_slots(ann)
     for s in slots:
-        L += import_stub("fixture", s["name"], s)
+        L += import_stub("fixture", s["name"], import_view(s))
     for s in slots:
         if runnable(s):
             L += runner("fixture", s["name"], s, native_name(s["name"]))

@@ -7,7 +7,7 @@
 `--check --exe` plays every scenario in reference/scenarios/ (`--parallel N` at a
 time, default half the CPUs and at most 6 (10 with `--both-modes`), under Wine through tools/playtest.py)
 and compares the digest of each tick (tools/tracedigest.py) with the stored one. It also compares
-each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), each run's ui.txt with reference/ui/<scenario>.txt the same way (docs/ui-log.md), and the digest of each run's events.txt with reference/events/<scenario>.txt the same way (docs/events-log.md), naming the first differing record by playing the reference build.
+each run's sound.txt with reference/sounds/<scenario>.txt, line by line, when that file exists (docs/sound-log.md), each run's ui.txt with reference/ui/<scenario>.txt the same way (docs/ui-log.md), the decoded interface records of each run's commands.txt with reference/commands/<scenario>.txt the same way (tools/interfacelog.py), and the digest of each run's events.txt with reference/events/<scenario>.txt the same way (docs/events-log.md), naming the first differing record by playing the reference build.
 Each run's display.txt is compared, line by line, with reference/display/<scenario>.txt, and for a scenario with a `frames` line its displaylist.txt with reference/displaylists/<scenario>.txt frame by frame (docs/display-log.md, tools/displaylog.py); when a digest differs at a frame with no stored list, the first differing item is named by playing the reference build (tools/tracediff.py `--display`).
 A scenario with a `frames` line also has its frame dumps compared, byte for byte, with reference/frames/<scenario>/ (docs/frame-dump.md); a missing stored frame fails.
 It also compares the harness.sav of each scenario with a `save` line with
@@ -37,7 +37,7 @@ exclusive lock made them queue. A run that waits for a slot prints once which ga
 A second `--check` with the same cache key waits for the first on a key lock (bt-gate-key-<key>.lock) and then reports its cached pass.
 `--no-lock` takes no slot and no key lock. A scenario with a `load` line starts as soon as the scenario it loads has finished.
 A passing `--check` stores its output under ~/.cache/bt-gate/<key>.txt, the key being a SHA-256 of the exe, the files beside it
-(wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,events,display,displaylists,frames,saves}, the four tools that play and compare
+(wasmtime_host.dll, *.wasm, modules.json), reference/{scenarios,traces,sounds,ui,commands,events,display,displaylists,frames,saves}, the four tools that play and compare
 (commit.txt is left out) and the options; a later `--check` with the same key, looked up before the lock and again after it, prints
 `cached pass from <date> at <commit>` and the stored lines and exits 0. `--no-cache` plays anyway.
 
@@ -59,7 +59,7 @@ and the block pointers are scanned and checked as in any full `--check`.
 `--traces` checks out origin/reference in build/reference/branch, runs that
 branch's own `tools/reference.py HEAD --traces` there (it links the matching
 build with the original compiler and plays the scenarios), and copies the
-traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the UI logs it wrote into reference/ui/, the sim event logs it wrote into reference/events/ (if it wrote any), the display digests and lists it wrote into reference/display/ and reference/displaylists/ (if it wrote any), the
+traces it wrote into reference/traces/, the sound logs it wrote into reference/sounds/ (if it wrote any), the UI logs it wrote into reference/ui/, the interface commands it wrote into reference/commands/, the sim event logs it wrote into reference/events/ (if it wrote any), the display digests and lists it wrote into reference/display/ and reference/displaylists/ (if it wrote any), the
 frames it wrote into reference/frames/ (if it wrote any) and the saves it wrote into reference/saves/ (if it wrote any).
 Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
@@ -69,6 +69,7 @@ import argparse
 import ast
 import contextlib
 import fcntl
+import functools
 import hashlib
 import json
 import os
@@ -88,6 +89,7 @@ from pathlib import Path
 import blockpointers
 import displaylog
 import eventdigest
+import interfacelog
 import playtest
 import savefile
 import tracediff
@@ -101,6 +103,8 @@ SOUNDS = ROOT / "reference/sounds"
 SOUND_FILE = "sound.txt"
 UIS = ROOT / "reference/ui"
 UI_FILE = "ui.txt"
+COMMANDS = ROOT / "reference/commands"
+COMMANDS_FILE = "commands.txt"
 EVENTS = ROOT / "reference/events"
 EVENTS_FILE = "events.txt"
 DISPLAYS = ROOT / "reference/display"
@@ -108,7 +112,7 @@ DISPLAY_FILE = "display.txt"
 DISPLAYLISTS = ROOT / "reference/displaylists"
 DISPLAYLIST_FILE = "displaylist.txt"
 UI_PREFIX = "ui-"
-UI_EFFECTS = ("order", "qbuild", "cancel", "group", "groupsel")
+UI_EFFECTS = ("group", "groupsel")
 FRAMES = ROOT / "reference/frames"
 FRAME_HEADER_SIZE = 16
 FRAME_PALETTE_SIZE = 1024
@@ -168,6 +172,7 @@ FUEL_FILE = "fuel.txt"
 FUEL: dict[str, dict[str, tuple[int, int]]] = {}
 SOUND_LOGS: dict[str, str | None] = {}
 UI_LOGS: dict[str, str | None] = {}
+INTERFACE_LOGS: dict[str, str | None] = {}
 EVENT_LOGS: dict[str, str | None] = {}
 DISPLAY_LOGS: dict[str, str | None] = {}
 DISPLAY_LISTS: dict[str, str | None] = {}
@@ -179,10 +184,10 @@ KEY_LOCK_FILE = "bt-gate-key-{}.lock"
 SLOTS_ENV = "BT_GATE_SLOTS"
 SLOT_POLL_SECONDS = 0.25
 CACHE_ENV = "BT_GATE_CACHE"
-KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/events", "reference/display", "reference/displaylists", "reference/frames", "reference/saves",
+KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/commands", "reference/events", "reference/display", "reference/displaylists", "reference/frames", "reference/saves",
             "tools/playtest")
 KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py", "tools/savefile.py",
-             "tools/blockpointers.py", "tools/eventdigest.py", "tools/displaylog.py", "tools/tracerehash.py")
+             "tools/blockpointers.py", "tools/eventdigest.py", "tools/displaylog.py", "tools/tracerehash.py", "tools/interfacelog.py")
 KEY_DATA = ("data/block_pointers.csv", "docs/sim-events.md")
 KEY_RUNTIME_FILES = ("wasmtime_host.dll", "modules.json")
 RETRY_DIALOG = "dialog-directx"
@@ -318,7 +323,7 @@ def keep_run(run: Path, scenario: str, suffix: str = "", logs: bool = False) -> 
     """
     kept = ROOT / "build/scratch" / f"check-{scenario}{suffix}-{time.strftime('%Y%m%d-%H%M%S')}"
     kept.mkdir(parents=True, exist_ok=True)
-    names = ["trace.txt", SOUND_FILE, UI_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAYLIST_FILE, "dump.txt", "blockptrs.txt"]
+    names = ["trace.txt", SOUND_FILE, UI_FILE, COMMANDS_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAYLIST_FILE, "dump.txt", "blockptrs.txt"]
     if logs:
         names += ["result.json", "crash.txt", *sorted(p.name for p in run.glob("wine*.log"))]
     for name in names:
@@ -939,7 +944,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     for attempt in range(RUN_ATTEMPTS):
         try:
             frame_files = tuple(f"frames/{tick}.bin" for tick in scenario_frames(scenario))
-            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAYLIST_FILE, *frame_files, *dict.fromkeys(
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, COMMANDS_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAYLIST_FILE, *frame_files, *dict.fromkeys(
                 (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if watch is not None:
                 extra["started"] = watch.started(key)
@@ -972,6 +977,9 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         SOUND_LOGS[key] = sound_log.read_text() if sound_log.is_file() else None
         ui_log = run / UI_FILE
         UI_LOGS[key] = ui_log.read_text() if ui_log.is_file() else None
+        commands_log = run / COMMANDS_FILE
+        INTERFACE_LOGS[key] = (
+            interfacelog.decode(commands_log.read_text(), trace_schema()) if commands_log.is_file() else None)
         events_log = run / EVENTS_FILE
         EVENT_LOGS[key] = event_digest(events_log)
         display_log = run / DISPLAY_FILE
@@ -1402,6 +1410,11 @@ def unlisted_frame(name: str, logs: dict[str, str | None], stored: str, end_of_t
     return frame[1]
 
 
+@functools.cache
+def trace_schema() -> dict:
+    return json.loads((ROOT / "data/trace_schema.json").read_text())
+
+
 def ui_difference(stored: str, got: str) -> str | None:
     """Where two UI logs first differ (a line number with both lines), or None when they are equal."""
     want, have = stored.splitlines(), got.splitlines()
@@ -1415,8 +1428,10 @@ def ui_difference(stored: str, got: str) -> str | None:
     return None
 
 
-def ui_gives_nothing(log: str) -> bool:
-    """Whether a UI log has no order, queued build, cancel or group line and never selects a unit (a broken ui scenario)."""
+def ui_gives_nothing(log: str, interface: str | None = None) -> bool:
+    """Whether a UI log has no group line and never selects a unit, and the decoded interface commands have no record."""
+    if interface is not None and len(interface.splitlines()) > 1:
+        return False
     for line in log.splitlines():
         words = line.split()
         if len(words) >= 2 and words[1] in UI_EFFECTS:
@@ -1427,11 +1442,11 @@ def ui_gives_nothing(log: str) -> bool:
 
 
 def ui_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path,
-              known: set[str] | None = None) -> tuple[list[str], list[str]]:
+              known: set[str] | None = None, interface_logs: dict[str, str | None] | None = None) -> tuple[list[str], list[str]]:
     """(the scenarios whose UI log fails, the report lines).
 
     A scenario fails when its stored log in `directory` differs from the run's, when its name starts with ui- and it
-    has no stored log or its run's log gives no order and selects nothing, and a stored log with no scenario (among
+    has no stored log or its run gives no command (`interface_logs`) and selects nothing, and a stored log with no scenario (among
     `known`, default every scenario file) is reported too. Other scenarios without a stored log are only counted.
     """
     known = set(scenario_files()) if known is None else known
@@ -1451,8 +1466,8 @@ def ui_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory
                 unstored.append(name)
             continue
         diff = ui_difference(stored.read_text(), got) if got is not None else f"the run wrote no {UI_FILE}"
-        if not diff and ui_scenario and ui_gives_nothing(got or ""):
-            diff = "the input gives no order and selects no unit"
+        if not diff and ui_scenario and ui_gives_nothing(got or "", (interface_logs or {}).get(name)):
+            diff = "the input gives no command and selects no unit"
         if diff:
             differing.append(name)
             lines.append(f"DIFF {name} {diff}")
@@ -1463,6 +1478,64 @@ def ui_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory
             differing.append(path.stem)
             lines.append(f"DIFF {path.stem} stored UI log has no scenario of that name")
     lines.append(f"ui logs: {equal} of {len(scenarios)} equal, {len(differing)} differ, {len(unstored)} with no stored log in {directory.relative_to(ROOT)}")
+    return differing, lines
+
+
+def interface_difference(stored: str, got: str) -> str | None:
+    """Where two decoded interface command logs first differ (a line number with both lines), or None when equal."""
+    want, have = stored.splitlines(), got.splitlines()
+    for number, (a, b) in enumerate(zip(want, have), 1):
+        if a != b:
+            return f"interface line {number}: stored `{a}`, got `{b}`"
+    if len(want) != len(have):
+        number = min(len(want), len(have)) + 1
+        longer, which = (want, "stored") if len(want) > len(have) else (have, "got")
+        return f"interface line {number}: only the {which} log has it (`{longer[number - 1]}`)"
+    return None
+
+
+def interface_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path,
+                     known: set[str] | None = None, texts: dict[str, str] | None = None) -> tuple[list[str], list[str]]:
+    """(the scenarios whose interface commands fail, the report lines).
+
+    A scenario with an `input` line (its text from `texts`, default its file) must have a stored file in `directory`
+    equal to the decoded run. A scenario without one must have no stored file and its run no record. A stored file
+    with no scenario (among `known`, default every scenario file) fails too.
+    """
+    known = set(scenario_files()) if known is None else known
+    differing: list[str] = []
+    lines: list[str] = []
+    with_input = equal = 0
+    relative = directory.relative_to(ROOT)
+    for name, path in scenarios.items():
+        text = texts[name] if texts is not None else path.read_text()
+        stored = directory / f"{name}.txt"
+        got = logs.get(name)
+        if interfacelog.has_input(text):
+            with_input += 1
+            if not stored.is_file():
+                differing.append(name)
+                lines.append(f"DIFF {name} has no stored interface commands in {relative}")
+                continue
+            diff = interface_difference(stored.read_text(), got) if got is not None else f"the run wrote no {COMMANDS_FILE}"
+            if diff:
+                differing.append(name)
+                lines.append(f"DIFF {name} {diff}")
+            else:
+                equal += 1
+            continue
+        records = (got or "").splitlines()[1:]
+        if stored.is_file():
+            differing.append(name)
+            lines.append(f"DIFF {name} stored interface commands for a scenario without input lines")
+        elif records:
+            differing.append(name)
+            lines.append(f"DIFF {name} the interface sent commands without input lines: {records[0]}")
+    for path in sorted(directory.glob("*.txt")) if directory.is_dir() else []:
+        if path.stem not in known:
+            differing.append(path.stem)
+            lines.append(f"DIFF {path.stem} stored interface commands have no scenario of that name")
+    lines.append(f"interface commands: {equal} of {with_input} equal, {len(differing)} differ")
     return differing, lines
 
 
@@ -1655,8 +1728,11 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         label = f"[{mode}] " if both_modes else ""
         sound_names, sound_lines = sound_report(scenarios, mode_view(SOUND_LOGS, scenarios, mode), SOUNDS)
         print("\n".join(label + line for line in sound_lines))
-        ui_names, ui_lines = ui_report(scenarios, mode_view(UI_LOGS, scenarios, mode), UIS)
+        interface_view = mode_view(INTERFACE_LOGS, scenarios, mode)
+        ui_names, ui_lines = ui_report(scenarios, mode_view(UI_LOGS, scenarios, mode), UIS, interface_logs=interface_view)
         print("\n".join(label + line for line in ui_lines))
+        interface_names, interface_lines = interface_report(scenarios, interface_view, COMMANDS)
+        print("\n".join(label + line for line in interface_lines))
         events_names, events_lines = events_report(scenarios, mode_view(EVENT_LOGS, scenarios, mode), EVENTS, end_of_tick)
         print("\n".join(label + line for line in events_lines))
         display_names, display_lines = display_report(scenarios, mode_view(DISPLAY_LOGS, scenarios, mode), DISPLAYS, end_of_tick)
@@ -1668,7 +1744,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         save_names, save_lines = save_report(scenarios, mode_view(SAVE_BYTES, scenarios, mode), SAVES)
         print("\n".join(label + line for line in save_lines))
         sound_bad += len(sound_names)
-        ui_bad += len(ui_names)
+        ui_bad += len(ui_names) + len(interface_names)
         events_bad += len(events_names)
         if events_names and first_events is None:
             first_events = (events_names[0], mode)
@@ -1927,6 +2003,20 @@ def copy_ui(directory: Path) -> None:
     print(f"{len(logs)} UI logs copied to {UIS.relative_to(ROOT)}")
 
 
+def copy_commands(directory: Path) -> None:
+    """Replace reference/commands/ by the decoded interface commands the reference branch checkout `directory` wrote (none written leaves it as it is)."""
+    logs = sorted((directory / "reference/commands").glob("*.txt"))
+    if not logs:
+        print("the reference branch wrote no interface commands; reference/commands/ is untouched")
+        return
+    COMMANDS.mkdir(parents=True, exist_ok=True)
+    for old in COMMANDS.glob("*.txt"):
+        old.unlink()
+    for path in logs:
+        shutil.copyfile(path, COMMANDS / path.name)
+    print(f"{len(logs)} interface command logs copied to {COMMANDS.relative_to(ROOT)}")
+
+
 def copy_events(directory: Path) -> None:
     """Replace reference/events/ by the digests of the sim event logs the reference branch checkout `directory` wrote (none written leaves it as it is)."""
     logs = sorted((directory / "reference/events").glob("*.txt"))
@@ -1981,6 +2071,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     copy_frames(directory / "reference/frames")
     copy_saves(directory)
     copy_ui(directory)
+    copy_commands(directory)
     copy_events(directory)
     copy_display(directory)
     sounds = sorted((directory / "reference/sounds").glob("*.txt"))

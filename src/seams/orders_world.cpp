@@ -24,14 +24,6 @@ void OrdersInbox(const void* event, unsigned int size)
 
 void OrdersOnCommand(const void* event, unsigned int size)
 {
-    if (size >= sizeof(OrdersAdd)) {
-        const OrdersAdd* p = static_cast<const OrdersAdd*>(event);
-        Ref<Unit> unit;
-        unit.offset = p->h.unit;
-        Ref<Unit> target;
-        target.offset = p->target;
-        HarnessUiOrder((unsigned char)p->type, p->queue, unit.get(), target.get(), p->hasPos ? p->pos : nullptr, p->params[0], p->params[1]);
-    }
     OrdersInbox(event, size);
 }
 

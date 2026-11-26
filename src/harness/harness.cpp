@@ -121,6 +121,7 @@ static char s_commit[64] = "-";
 static char s_scenarioPath[512];
 static FILE* s_trace = NULL;
 static FILE* s_commands = nullptr;
+static bool s_interfaceOpen = false;
 static FILE* s_dump = NULL;
 static FILE* s_sound = nullptr;
 static char s_soundBuffer[4096];
@@ -755,7 +756,7 @@ static void DeliverScriptedInput(const ScriptedInput* in)
     ev.a = in->a;
     ev.x = in->x;
     ev.y = in->y;
-    ev.time_ms = in->tick * 1000 / 30;
+    ev.time_ms = (in->tick * 1000 + 29) / 30;
     if (ev.type == HOST_EVENT_KEY_DOWN || ev.type == HOST_EVENT_KEY_UP) {
         if (s_altHeld || in->a == 0x12)
             ev.type = ev.type == HOST_EVENT_KEY_DOWN ? HOST_EVENT_SYS_KEY_DOWN : HOST_EVENT_SYS_KEY_UP;
@@ -1854,8 +1855,10 @@ void HarnessAfterStep()
     ModulesCheckStatics((unsigned)g_game->ticks);
     UiEndOfTick();
     int gameOver = (g_game->endGameFlags & 4) != 0 || g_game->endGameVictory != 0;
-    if (!gameOver && (unsigned)g_game->ticks < s_ticks)
+    if (!gameOver && (unsigned)g_game->ticks < s_ticks) {
+        s_interfaceOpen = true;
         return;
+    }
     char msg[64];
     if (s_trace != NULL)
         fclose(s_trace);
@@ -4071,6 +4074,7 @@ static char s_commandText[COMMAND_TEXT_BYTES];
 static unsigned s_commandLength = 0;
 static unsigned s_commandEvents = 0;
 static bool s_commandOpen = false;
+static bool s_commandUnitsWritten = false;
 
 static const int kCommandSubscribers[ES_COUNT] = {
     SCHED_ECONOMY, SCHED_WIND_METEORS, SCHED_FEATURES, SCHED_TARGETING, SCHED_LOS_RADAR, SCHED_MAP, SCHED_PLAYERS,
@@ -4091,10 +4095,8 @@ static const TraceEventModule* CommandEventModule(int kind)
     return nullptr;
 }
 
-void __stdcall HarnessCommandEvent(const void* event, unsigned int size)
+static unsigned CommandEventText(char* out, unsigned room, const void* event, unsigned int size)
 {
-    if (!s_commandOpen)
-        return;
     int kind = *(const int*)event;
     const TraceEventModule* module = CommandEventModule(kind);
     const TraceEventKind* found = module ? FindEventKind(module, kind) : nullptr;
@@ -4104,12 +4106,26 @@ void __stdcall HarnessCommandEvent(const void* event, unsigned int size)
     else
         sprintf(name, "KIND_%d", kind);
     unsigned need = (unsigned)strlen(name) + 2 + size * 2;
-    if (s_commandLength + need >= COMMAND_TEXT_BYTES)
-        Fail("testmode: a scripted command published more events than commands.txt can hold\n");
-    s_commandLength += (unsigned)sprintf(s_commandText + s_commandLength, " %s ", name);
+    if (need >= room)
+        Fail("testmode: a command published more events than commands.txt can hold\n");
+    unsigned length = (unsigned)sprintf(out, " %s ", name);
     for (unsigned i = 0; i < size; i++)
-        s_commandLength += (unsigned)sprintf(s_commandText + s_commandLength, "%02x", ((const unsigned char*)event)[i]);
-    s_commandEvents++;
+        length += (unsigned)sprintf(out + length, "%02x", ((const unsigned char*)event)[i]);
+    return length;
+}
+
+void __stdcall HarnessCommandEvent(const void* event, unsigned int size)
+{
+    if (s_commandOpen) {
+        s_commandLength += CommandEventText(s_commandText + s_commandLength, COMMAND_TEXT_BYTES - s_commandLength, event, size);
+        s_commandEvents++;
+        return;
+    }
+    if (!s_interfaceOpen || s_commands == nullptr)
+        return;
+    static char text[4096];
+    CommandEventText(text, sizeof text, event, size);
+    fprintf(s_commands, "%u interface - 1%s\n", GameU32(GAME_TICK) + 1, text);
 }
 
 static void CommandBegin()
@@ -4131,10 +4147,15 @@ void HarnessBeforeStep()
     if (!HarnessTestMode())
         return;
     s_recordPhase = 0;
+    s_interfaceOpen = false;
 #if BT_ACCESS_LOG
     AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PENDING);
 #endif
     unsigned tick = GameU32(GAME_TICK);
+    if (!s_commandUnitsWritten && s_commands != nullptr) {
+        s_commandUnitsWritten = true;
+        fprintf(s_commands, "units %u %u\n", Ref<Unit>((Unit*)GameRef(GAME_UNITS)).offset, (unsigned)UNIT_STRIDE);
+    }
     if (s_gameType == 3) {
         for (int i = 0; i < MAX_PLAYERS; i++)
             g_game->players[i].progress = 100;
@@ -4199,122 +4220,6 @@ static int UiLive()
 static void UiLineStart(const char* what)
 {
     fprintf(s_ui, "%u %s", GameU32(GAME_TICK), what);
-}
-
-static const char* UiOrderName(unsigned char kind)
-{
-    const char* name = g_missionOrderTableVec[kind].name;
-    return name != nullptr && name[0] != '\0' ? name : "-";
-}
-
-static int UiKindTakesUnitType(const char* name)
-{
-    return _stricmp(name, "MOBILEBUILD") == 0 || _stricmp(name, "VTOL_MOBILEBUILD") == 0 || _stricmp(name, "BUILDINGBUILD") == 0;
-}
-
-static void UiUnitType(unsigned short defIndex)
-{
-    const char* name = nullptr;
-    if (defIndex != 0 && defIndex < GameU32(GAME_DEF_COUNT))
-        name = (const char*)GameRef(GAME_DEFS) + defIndex * UNITDEF_STRIDE + UNITDEF_NAME;
-    fprintf(s_ui, " %s", name != nullptr ? name : "-");
-}
-
-void __stdcall HarnessUiOrder(unsigned char kind, int remove, const Unit* unit, const Unit* target, const int* pos, int typeId, int amount)
-{
-    if (!UiLive())
-        return;
-#if BT_ACCESS_LOG
-    AccessLogEmit(1, __builtin_return_address(0));
-#endif
-    const char* name = UiOrderName(kind);
-    UiLineStart("order");
-    fprintf(s_ui, " %s unit %u target ", name, UiUnitIndex(unit));
-    if (target != nullptr)
-        fprintf(s_ui, "%u", UiUnitIndex(target));
-    else
-        fprintf(s_ui, "-");
-    if (pos != nullptr)
-        fprintf(s_ui, " pos %d %d %d", pos[0] >> 16, pos[1] >> 16, pos[2] >> 16);
-    else
-        fprintf(s_ui, " pos -");
-    fprintf(s_ui, " type");
-    if (UiKindTakesUnitType(name))
-        UiUnitType((unsigned short)typeId);
-    else
-        fprintf(s_ui, " -");
-    if (UiKindTakesUnitType(name))
-        fprintf(s_ui, " param -");
-    else
-        fprintf(s_ui, " param %d", typeId);
-    fprintf(s_ui, " amount %d remove %d\n", amount, remove != 0);
-}
-
-void __stdcall HarnessUiQueue(const char* name, const Unit* unit, int count)
-{
-    if (!UiLive())
-        return;
-#if BT_ACCESS_LOG
-    AccessLogEmit(1, __builtin_return_address(0));
-#endif
-    UiLineStart("qbuild");
-    fprintf(s_ui, " %u %s %d\n", UiUnitIndex(unit), name, count);
-}
-
-void __stdcall HarnessUiCancel(unsigned char kind, const Unit* unit)
-{
-    if (!UiLive())
-        return;
-#if BT_ACCESS_LOG
-    AccessLogEmit(1, __builtin_return_address(0));
-#endif
-    UiLineStart("cancel");
-    fprintf(s_ui, " %s unit %u\n", UiOrderName(kind), UiUnitIndex(unit));
-}
-
-void __stdcall HarnessUiCommand(const OrdersGroupCommand* command)
-{
-    if (!UiLive())
-        return;
-#if BT_ACCESS_LOG
-    AccessLogEmit(1, __builtin_return_address(0));
-#endif
-    int build = command->h.kind == ORDERS_GROUP_BUILD;
-    UiLineStart("command");
-    if (build) {
-        fprintf(s_ui, " build type");
-        UiUnitType((unsigned short)command->params[0]);
-    } else {
-        fprintf(s_ui, " order mode %d kind %s", command->mode, command->mode ? "-" : UiOrderName((unsigned char)command->type));
-    }
-    fprintf(s_ui, " units");
-    Ref<Unit> first;
-    first.offset = command->h.unit;
-    unsigned base = UiUnitIndex(first.get());
-    int any = 0;
-    for (int i = 0; i < ORDERS_GROUP_UNITS; i++) {
-        if (!((command->units[i >> 5] >> (i & 31)) & 1))
-            continue;
-        fprintf(s_ui, "%s%u", any ? "," : " ", base + i);
-        any = 1;
-    }
-    if (!any)
-        fprintf(s_ui, " -");
-    if (!build) {
-        Ref<Unit> target;
-        target.offset = command->target;
-        if (target.get() != nullptr)
-            fprintf(s_ui, " target %u", UiUnitIndex(target.get()));
-        else
-            fprintf(s_ui, " target -");
-    }
-    if (command->hasPos)
-        fprintf(s_ui, " pos %d %d %d", command->pos[0] >> 16, command->pos[1] >> 16, command->pos[2] >> 16);
-    else
-        fprintf(s_ui, " pos -");
-    if (!build)
-        fprintf(s_ui, " param %d amount %d", command->params[0], command->params[1]);
-    fprintf(s_ui, " remove %d\n", command->queue != 0);
 }
 
 static void UiListUnits(int group, int selectedOnly)
@@ -4668,7 +4573,7 @@ static void OpenTrace(unsigned controlWord)
     s_commands = fopen("commands.txt", "wb");
     if (s_commands == nullptr)
         Fail("testmode: cannot write commands.txt\n");
-    fputs("bt-commands 1\n", s_commands);
+    fputs("bt-commands 2\n", s_commands);
     s_sound = fopen("sound.txt", "wb");
     if (s_sound == nullptr)
         Fail("testmode: cannot write sound.txt\n");
@@ -4683,7 +4588,7 @@ static void OpenTrace(unsigned controlWord)
     if (s_ui == nullptr)
         Fail("testmode: cannot write ui.txt\n");
     setvbuf(s_ui, s_uiBuffer, _IOFBF, sizeof s_uiBuffer);
-    fprintf(s_ui, "bt-ui 1\n");
+    fprintf(s_ui, "bt-ui 2\n");
     DlOpen(s_displayAll);
     fprintf(s_trace, "bt-trace %d\ncommit %s\nscenario %s\ngame_seed %u\ncrt_seed %u\nview_seed %u\n"
                      "fpu_control_word 0x%05X\n",

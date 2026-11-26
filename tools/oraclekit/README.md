@@ -17,6 +17,7 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | `reference/sounds/` | the stored sound logs | `docs/sound-log.md` |
 | `reference/frames/` | the stored frames | `docs/frame-dump.md` |
 | `reference/ui/` | the stored UI logs | `docs/ui-log.md` |
+| `reference/commands/` | the stored interface commands | `docs/commands.md` |
 | `reference/events/` | the stored sim event digests: for each scenario, the tick, phase, record count and hash of each run of sim events, and for each tick its count, the hash of the records whose order counts and the hash of their set | `docs/events-log.md` |
 | `docs/events-log.md`, `tools/eventdigest.py` | the sim event log format, the digest format and the tool that makes a digest from a log and compares it with a stored one (standard library only, with `tools/tracerehash.py`; it reads the order classes from `docs/sim-events.md`) | `docs/events-log.md` |
 | `reference/display/` | the stored display digests: for each scenario, each frame's number, tick, item count, the hash of its display list in order and the hash of its items with their layers | `docs/display-log.md` |
@@ -35,6 +36,7 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | `docs/schedule.md` | the order of effects: the phases of a tick, each pass's loop and the order of the entry points within an entity, the class of each call one subsystem makes to another, and where a write is read back within one entity's update (the split points) | itself, with `coupling/dependencies.csv` |
 | `docs/files-gate.md`, `tools/filesfixtures.py`, `reference/files/` | the files gate: how a data loader is run and judged, the tool that builds its fixture game directories (standard library only), and the vectors the in-repo engine made on them | `docs/files-gate.md` |
 | `docs/core-gate.md`, `tools/corefixtures.py`, `reference/core/` | the core gate: how an engine core is run and judged in each group, the tool that builds the loader and fuel groups' WebAssembly fixtures (standard library and wasm-tools only), and the vectors the in-repo engine made with their inputs | `docs/core-gate.md` |
+| `docs/view.md` | the view: the facts of the simulation a presentation reads for one player, each with its source in the judged state or the sim events and its rule of visibility; `interfaces/view.h` is its layout | itself |
 | `coupling/` | what the subsystems read of each other's state, and what presentation reads (below) | itself |
 | `runtime/` | the plain-maths runtime under the MIT licence: the fixed-point and floating-point maths the game logic calls, its table generator, `runtime/LICENSE` and a header on each file | itself |
 | `runtime/vectors/` | the test vectors of that maths, with their manifest; the format is described in `runtime/vectors/README.md` | `runtime/vectors/README.md` |

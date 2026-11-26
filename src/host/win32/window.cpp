@@ -95,7 +95,7 @@ void Queue(unsigned int type, unsigned int a, unsigned int b)
     ev.x = 0;
     ev.y = 0;
     ev.buttons = 0;
-    ev.time_ms = 0;
+    ev.time_ms = host_time_ms();
     Push(ev);
 }
 

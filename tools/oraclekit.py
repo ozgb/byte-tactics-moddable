@@ -127,7 +127,7 @@ CODE_TABLE_COLUMNS = ["table", "entry", "kit_name"]
 SLOT_SOURCE_FIELDS = ("functions", "through", "allOf", "native")
 SERVICE_SOURCE_FIELDS = ("header", "pre", "effect", "id")
 SCHEMA_CHECK_ANNOTATIONS = ("exempt", "exempt_types", "rules")
-KIND_SOURCE_FIELDS = ("vtable", "vtable_symbol", "vtable_secondary", "vptr")
+KIND_SOURCE_FIELDS = ("vtable", "vtable_declared", "vtable_symbol", "vtable_secondary", "vptr")
 FIELD_SOURCE_FIELDS = ("aliases", "reachFirst", "reachCount")
 UNDECLARED_POINTER = re.compile(r"\b(\w+)\s*\*")
 FORBIDDEN = ("src/", "include/", "orig/", "lib/", "build/", "cmake/")
@@ -165,6 +165,7 @@ CONTENTS = [
     ("dir", "reference/sounds", "the stored sound logs"),
     ("dir", "reference/frames", "the stored frames"),
     ("dir", "reference/ui", "the stored UI logs"),
+    ("dir", "reference/commands", "the stored interface commands"),
     ("dir", "reference/events", "the stored sim event digests"),
     ("dir", "reference/display", "the stored display digests"),
     ("dir", "reference/displaylists", "the stored display lists of the frames with stored pixels"),
@@ -192,6 +193,7 @@ CONTENTS = [
     ("file", "tools/filesfixtures.py", "builds the fixture game directories of the files gate, standard library only"),
     ("dir", "reference/files", "the files gate's vectors and the digests of its fixtures"),
     ("file", "docs/core-gate.md", "the core gate: the calls an engine core answers in each group, and how a core is judged"),
+    ("file", "docs/view.md", "the view: what a presentation reads of the simulation for one player, and the rule of visibility of each fact"),
     ("file", "tools/corefixtures.py", "builds the WebAssembly fixtures of the core gate's loader and fuel groups, standard library and wasm-tools only"),
     ("dir", "reference/core", "the core gate's vectors and their inputs"),
 ]

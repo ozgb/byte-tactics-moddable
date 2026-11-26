@@ -1652,9 +1652,10 @@ class ReentrantServices(unittest.TestCase):
         self.assertIn('PlayNestedCalls("services.ExecuteCommandText");', answers)
 
     def nested_generated(self):
-        """The generator's output with a command slot CmdPlan added to the orders seam, as the Cmd slots were before #964 took them out of the interfaces."""
+        """The generator's output with a command slot CmdPlan added to the orders seam, as the Cmd slots were before #964 took them out of the interfaces, and orders pending, as it was then."""
         ann = annotations()
         ann["subsystems"]["orders"].setdefault("slots", {})["CmdPlan"] = {"args": {"args": {"mode": "argv"}}}
+        ann["subsystems"]["orders"]["status"] = "pending"
         with tempfile.TemporaryDirectory() as d:
             for h in rs.INTERFACES.glob("*.h"):
                 (Path(d) / h.name).write_text(h.read_text())
@@ -3509,8 +3510,9 @@ class LinkSources(unittest.TestCase):
         listed = set(replay_subsystems.load())
         with rs.SUBSYSTEMS.open(newline="") as f:
             rows = list(csv.DictReader(f))
-        other = next(r for r in rows if r["subsystem"] not in listed)
-        self.assertNotIn(other["file"], rs.replay_link_sources())
+        linked = rs.replay_link_sources()
+        other = next(r for r in rows if r["subsystem"] not in listed and r["file"] not in linked)
+        self.assertNotIn(other["file"], linked)
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "replay_subsystems.json"
             path.write_text(json.dumps({other["subsystem"]: {}}))

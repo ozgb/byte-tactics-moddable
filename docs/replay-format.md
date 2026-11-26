@@ -1552,7 +1552,7 @@ orders:
 
 - `Apply` of ADD with a queue, QUEUE_BUILD, STOP, BE_CARRIED, ATTACKED, PARALYZE, COMMAND and CANCEL: the recorded windows publish ADD once and STATUS_FLAGS, and the other kinds come from the user interface, ai, weapons and units outside them (an order added through the interface is `ExpandGroupCommand`, recorded).
 - `GetOrderFlags` and `MissionTypeFromName` at top level: ai and the interface call them outside the recorded windows (`GetOrderType` is called once, in `units-transport`).
-- The loading constructor of an order (`Order::Order(Unit*, HapiBank*, char*)`, with `OrderKindFromName`, `OrderKindFromSavedIndex` and `ResolveUnitTypeKey`): it runs only when a saved game loads, which is load class. Its rows go under the same name as the other constructors, so the rules on `OrderSaveRecord` say it, and the slots' function lists leave its helpers out.
+- The constructor that loads an order from a saved game, and the helpers that resolve its kind and unit type by name: it runs only when a saved game loads, which is load class. Its rows go under the same name as the other constructors of `Order`, so the schema's rules on the saved record say it, and the slots' function lists leave its helpers out.
 - A build order of the unit type with index 0: the `unitid` fields that lead the walk from an order's `type` to its `UnitDef` follow no id of 0, as for a unit id, so `UnitDef#1` would have no `r` lines. No recorded window builds it.
 
 ## Replaying

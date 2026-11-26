@@ -63945,9 +63945,7 @@ address,function,file,kind,target
 ,SeedNetworkTable,src/harness/harness.cpp,function,
 ,SeedNetworkTable,src/harness/harness.cpp,global_read,g_game
 ,SeedNetworkTable,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
-,SeedTrackReplies,src/host/win32/music.cpp,call,host_dir_close
-,SeedTrackReplies,src/host/win32/music.cpp,call,host_dir_first
-,SeedTrackReplies,src/host/win32/music.cpp,call,host_dir_next
+,SeedTrackReplies,src/host/win32/music.cpp,call,HeadlessMusicTrackCount
 ,SeedTrackReplies,src/host/win32/music.cpp,call,strcpy
 ,SeedTrackReplies,src/host/win32/music.cpp,call,wsprintfA
 ,SeedTrackReplies,src/host/win32/music.cpp,function,

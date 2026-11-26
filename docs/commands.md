@@ -145,7 +145,9 @@ The text after the tick and the `+` of a `console` line (at most 79 characters) 
 
 The groups: `events` commands published events before this change; `converted` commands wrote simulation state
 directly and now publish events; `direct` commands still write state directly and are not events (a scenario that uses
-one is not judged); `presentation` commands touch nothing the simulation or the trace reads, and a core ignores them.
+one is not judged; no command is in this group now); `inert` commands do nothing in any scenario (section 4.3), so a
+core publishes nothing for them and a scenario that uses one is judged; `presentation` commands touch nothing the
+simulation or the trace reads, and a core ignores them.
 The class is the one of section 3. Command words are compared in any case.
 
 | Command | Group | Class | Events |
@@ -169,8 +171,8 @@ The class is the one of section 3. Command words are compared in any case.
 | `feature` | converted | cheat | FEATURES_PLACE |
 | `selectable` | converted | always | UNITS_SET_FLAGS |
 | `armflea`, `armpw`, `corak` | converted | cheat | UNITS_CREATE |
-| `control` | direct | cheat | none |
-| `view` | direct | skirmish | none |
+| `control` | converted | cheat | PLAYERS_SET_CONTROL |
+| `view` | converted | skirmish | PLAYERS_SET_VIEW |
 | `doubleshot` | converted | skirmish | PLAYERS_SET_CHEATS |
 | `halfshot` | converted | skirmish | PLAYERS_SET_CHEATS |
 | `radar` | converted | skirmish | PLAYERS_SET_CHEATS |
@@ -181,11 +183,11 @@ The class is the one of section 3. Command words are compared in any case.
 | `mapping` | converted | skirmish | LOS_RADAR_SET_MODE, LOS_RADAR_RECALCULATE |
 | `nowisee` | converted | skirmish | LOS_RADAR_SET_MODE, LOS_RADAR_RECALCULATE |
 | `search` | converted | cheat | PATHFINDING_SET_SEARCH |
-| `sharemetal` | direct | always | none |
-| `shareenergy` | direct | always | none |
-| `shareall` | direct | always | LOS_RADAR_SHARE_MAPPING, LOS_RADAR_SHARE_RADAR |
-| `setsharemetal` | direct | always | none |
-| `setshareenergy` | direct | always | none |
+| `sharemetal` | inert | always | none |
+| `shareenergy` | inert | always | none |
+| `shareall` | inert | always | none |
+| `setsharemetal` | inert | always | none |
+| `setshareenergy` | inert | always | none |
 | `now` | presentation | always | none |
 | `iface` | presentation | always | none |
 | `move` | presentation | cheat | none |
@@ -269,21 +271,20 @@ Each command below says its guards and then its events, in publication order. "T
   `hasScale` is 1, else 0. The engine consumes it: when `steps` is not 0 the search steps per tick of the block header
   (the scenario key `search_steps`) become it, and when `hasScale` is 1 and the pathfinding module has the optional
   slot `SetSearchScale`, it is called with `scale`.
+- **`control <player>`.** PLAYERS_SET_CONTROL with `player` argument 1 (default 0) cut to a byte, always. Players
+  applies it only when `player` is a player that exists (below 10, active, of type 1 to 3 and with index other than
+  10): `localPlayer` and `playerIndex` become it (outcome 1); else nothing changes (outcome 0).
+- **`view <player>`.** PLAYERS_SET_VIEW with `player` as for `control`, always. The same test where players applies
+  it; only `playerIndex` becomes it.
 
-### 4.3 Commands that are not events
+  Both fields stay game state that the tick reads (`docs/state.md`, "Mixed cases and how to split them"): `control`
+  changes the player the simulation computes as this machine's, and `view` the player whose sight decides.
 
-These are written by the game directly or through a module's own function, not by an event. The core's verdict
-(section 7) does not include a scenario that uses one. Each does exactly this:
+### 4.3 Commands that do nothing in a scenario
 
-- **`control <player>`.** When argument 1 (cut to a byte) is a player that exists: `localPlayer` and `playerIndex` become
-  it.
-- **`view <player>`.** The same test; only `playerIndex` becomes it.
-
-  Both fields are the machine's own player and the tick reads them, so a change during play is a change of the
-  perspective the simulation computes for one machine, not a command every player runs. They become events once the
-  fields are split into the simulation's perspective, fixed by the match setup, and the view's player.
 - **`sharemetal`, `shareenergy`, `shareall`, `setsharemetal`, `setshareenergy`.** They act only when bit 0 of
-  `netGameFlags` is set, which no test-mode run does, so in every scenario they do nothing. When it is set:
+  `netGameFlags` is set, which no test-mode run does, so in every scenario they do nothing and publish no event. Their
+  events belong to the multiplayer of Milestone 3. When it is set:
   `sharemetal` and `shareenergy` flip the local player's metal or energy sharing switch, add a line to the message log
   and send the player's info to the other machines; `shareall` does both and then publishes LOS_RADAR_SHARE_MAPPING and
   LOS_RADAR_SHARE_RADAR for the local player; `setsharemetal n` and `setshareenergy n` set the local player's metal or
@@ -439,7 +440,8 @@ gets nothing.
 
 A core is judged on the scenarios marked `judged`: it turns each one's lines into events by this page, and its traces must
 equal the stored ones. A scenario is `left out` when it needs something the core does not have: the presentation (its
-`input` lines), saving and loading (not in the core spec), or a console command of section 4.3, which is not an event.
+`input` lines), saving and loading (not in the core spec), or a console command of the group `direct`, which is not an
+event.
 `tools/commands.py --check` keeps this table equal to the one of `reference/README.md` and refuses a judged scenario with
 one of those, and a scenario that uses a console command or an order kind that this page does not list.
 
@@ -451,12 +453,12 @@ one of those, and a scenario that uses a console command or an order kind that t
 | commander-death | judged | - |
 | conditions-dark-side | judged | - |
 | conditions-shore-to-shore | judged | - |
-| console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
+| console-economy | judged | - |
 | console-edge | judged | - |
 | console-features | judged | - |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
-| console-sight | left out | console commands that are not events: `view` |
+| console-sight | judged | - |
 | console-units | judged | - |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |

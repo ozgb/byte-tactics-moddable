@@ -21,6 +21,9 @@ inline unsigned int PlayersEventSize(int kind)
         return sizeof(PlayersEndGame);
     case PLAYERS_SET_CHEATS:
         return sizeof(PlayersSetCheats);
+    case PLAYERS_SET_CONTROL:
+    case PLAYERS_SET_VIEW:
+        return sizeof(PlayersSetPlayer);
     case PLAYERS_EFFECT_KILL_UNIT:
         return sizeof(PlayersKillUnit);
     case PLAYERS_EFFECT_SEND_UNIT:

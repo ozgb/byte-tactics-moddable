@@ -213,7 +213,7 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v49`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v48`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v50`
+`reference-traces-v48`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v51`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the

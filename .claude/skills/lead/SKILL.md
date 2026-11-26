@@ -17,17 +17,17 @@ Work through these in order, and start again from step 0 after each pass. Issue 
 
 ### 0. Your messages
 
-Read the maintainer's messages to you on every pass, before anything else. They arrive on the Valkey stream `bt:to-lead`, and they often come before GitHub shows the same thing: a new issue first in "Priority now", a review verdict, the human's approval. Your cursor, the id of the last message you read, is the key `bt:cursor:<name>` (`docs/team.md`, the Valkey paragraph):
+Read the maintainer's messages to you on every pass, before anything else. They arrive on the Redis stream `bt:to-lead`, and they often come before GitHub shows the same thing: a new issue first in "Priority now", a review verdict, the human's approval. Your cursor, the id of the last message you read, is the key `bt:cursor:<name>` (`docs/team.md`, the Redis paragraph):
 
 ```sh
-P="$(cat ~/.local/share/bt-valkey/password)"; V() { valkey-cli -p 6390 -a "$P" --no-auth-warning "$@"; }
+V() { uv run tools/notes.py "$@"; }              # exits 2 when Redis can't be reached
 C="$(V GET "bt:cursor:${BT_LEAD_NAME:-lead}")"
 V XRANGE bt:to-lead "($C" +                          # when C is set
 V XREVRANGE bt:to-lead + - COUNT 10                  # when it is empty
 V SET "bt:cursor:${BT_LEAD_NAME:-lead}" <id>         # the newest id you read, once you have read them
 ```
 
-Act on each new message with no `to` field or with `to <name>`, in the steps below, and skip those addressed `to` another lead. To answer, or to tell the maintainer what you took: `V XADD bt:to-maintainer '*' from <name> type <note|done|pause> ref '#N' body 'Lead: ...'`. A message doesn't replace GitHub: reviews, claims and questions for the human still go there. When Valkey can't be reached (a lead on another machine without its tunnel), work from GitHub alone and say so in your report.
+Act on each new message with no `to` field or with `to <name>`, in the steps below, and skip those addressed `to` another lead. To answer, or to tell the maintainer what you took: `V XADD bt:to-maintainer '*' from <name> type <note|done|pause> ref '#N' body 'Lead: ...'`. A message doesn't replace GitHub: reviews, claims and questions for the human still go there. When Redis can't be reached (`V` exits 2, or `~/.local/share/bt-upstash/rest.env` is missing), work from GitHub alone and say so in your report.
 
 ### 1. Your pull requests
 

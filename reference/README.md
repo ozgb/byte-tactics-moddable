@@ -322,12 +322,12 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | commander-death | judged | - |
 | conditions-dark-side | judged | - |
 | conditions-shore-to-shore | judged | - |
-| console-economy | left out | console commands that are not events: `shareall`, `sharemetal`, `shareenergy`, `setsharemetal`, `setshareenergy`, `control`, `view` |
+| console-economy | judged | - |
 | console-edge | judged | - |
 | console-features | judged | - |
 | console-ilose | judged | - |
 | console-iwin | judged | - |
-| console-sight | left out | console commands that are not events: `view` |
+| console-sight | judged | - |
 | console-units | judged | - |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |

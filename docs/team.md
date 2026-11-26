@@ -9,19 +9,23 @@ The plan in #2 sets the goals and the decisions. The human makes every major arc
 
 They share one GitHub account, and they talk through GitHub: pull request reviews, review comments, issue comments and the labels below. This file is the contract between them. Both roles also follow `AGENTS.md`.
 
-They also send each other quick notes on two Valkey streams, `bt:to-lead` and `bt:to-maintainer` (port 6390, password in `~/.local/share/bt-valkey/password`), so that a new verdict, issue or decision is seen on the next pass. A note points at GitHub and never replaces it: the review, comment or label it mentions is on GitHub too. Each role reads its own stream on every pass and answers on the other's: the leads read `bt:to-lead` (`.claude/skills/lead/SKILL.md`, step 0) and the maintainer reads `bt:to-maintainer` (`.claude/skills/maintainer/SKILL.md`, step 0).
+They also send each other quick notes on two Redis streams, `bt:to-lead` and `bt:to-maintainer`, on an Upstash database, reached over its REST API with `uv run tools/notes.py <command> <args>...` (its URL and token in `~/.local/share/bt-upstash/rest.env`), so that a new verdict, issue or decision is seen on the next pass. A note points at GitHub and never replaces it: the review, comment or label it mentions is on GitHub too. Each role reads its own stream on every pass and answers on the other's: the leads read `bt:to-lead` (`.claude/skills/lead/SKILL.md`, step 0) and the maintainer reads `bt:to-maintainer` (`.claude/skills/maintainer/SKILL.md`, step 0).
 
 Every note has a `from` field: `maintainer`, or the sending lead's name. A note to one lead also has `to <name>`; a lead acts on the notes with no `to` or with its own name, and skips the rest. Each reader keeps the id of the last note it read in its own key, `bt:cursor:<name>` for a lead and `bt:cursor:maintainer` for the maintainer, read with `GET` and moved with `SET`, so no reader moves another's.
 
-A lead on another machine reaches Valkey through an SSH tunnel to port 6390 of the maintainer's host, with the password file copied to the same path. Both run on the lead's host, outside its sandbox, before the session starts:
+Upstash is on the public internet over HTTPS, so a lead on any machine reaches it with no tunnel and no Redis client. The human gives each lead's host the credentials file once, outside the sandbox, before the session starts:
 
 ```sh
-mkdir -p ~/.local/share/bt-valkey
-scp <maintainer host>:.local/share/bt-valkey/password ~/.local/share/bt-valkey/password
-ssh -N -L 6390:localhost:6390 <maintainer host>
+mkdir -p ~/.local/share/bt-upstash
+install -m 600 /dev/stdin ~/.local/share/bt-upstash/rest.env <<'EOF'
+UPSTASH_REDIS_REST_URL=https://<host>.upstash.io
+UPSTASH_REDIS_REST_TOKEN=<token>
+EOF
 ```
 
-Without the tunnel the notes are missed, not the work: GitHub stays the record, and a lead that can't reach Valkey works from GitHub alone and says so in its report.
+The token gives full access to the database: send it to a friend privately, never through GitHub, and rotate it in the Upstash console when a lead leaves.
+
+Without the credentials file the notes are missed, not the work: GitHub stays the record, and a lead that can't reach Redis works from GitHub alone and says so in its report.
 
 ## Directories
 
@@ -44,9 +48,9 @@ Both roles normally run inside a [bwai sandbox](https://github.com/ozgb/bubblewr
 
 ## More than one lead
 
-Every lead acts as the same GitHub account, so each one names itself:
+Leads on the human's machines act as the same GitHub account, and a lead on a friend's machine acts as the friend's own (a collaborator on this repository; `docs/remote-lead.md` sets one up). Either way each lead names itself:
 
-- **`BT_LEAD_NAME`** names the lead: letters, digits, `-` and `_`, unique among the leads, and never `maintainer` (whose Valkey cursor it would share). Unset, it is `lead`, and a single lead behaves as it always has.
+- **`BT_LEAD_NAME`** names the lead (`lead-c`, `lead-d` and so on for friends): letters, digits, `-` and `_`, unique among the leads, and never `maintainer` (whose Redis cursor it would share). Unset, it is `lead`, and a single lead behaves as it always has.
 - **`BT_LEAD_LANE`** is a comma-separated list of parent issues. The lead takes only the issues that are those parents' sub-issues, at any depth. Unset, it takes from all of #2.
 
 ```sh
@@ -55,9 +59,9 @@ cd ~/source/repos/byte-tactics-moddable-lead2 && BT_ROLE=lead BT_LEAD_NAME=north
 
 The name is in everything a lead leaves on GitHub, and each lead counts and services only what carries its own:
 
-- **Claims:** `Lead: Claimed by <tool> / <model>, lead <name>. Branch issue-<N>.`, and `Lead: Released, lead <name>.` (`AGENTS.md` step 2). A claim without a name is `lead`'s. When two leads claim the same issue, the earlier comment holds it, and the later lead releases without unassigning.
+- **Claims:** `Lead: Claimed by <tool> / <model>, lead <name>. Branch issue-<N>.`, and `Lead: Released, lead <name>.` (`AGENTS.md` step 2). A claim without a name is `lead`'s. When two leads claim the same issue, the earlier comment holds it, and the later lead releases, unassigning itself only when the issue has two assignees (the leads are on different accounts).
 - **Pull requests:** a `Lead: <name>` line under `Model:` in the body. A pull request without one is `lead`'s.
-- **Valkey:** its own cursor, `from <name>`, and the notes addressed `to` it (above).
+- **Redis:** its own cursor, `from <name>`, and the notes addressed `to` it (above).
 
 `tools/available.py` applies all of it: the list for step 2 (with `--lane`, from `BT_LEAD_LANE`), `--check` and `--holder` around a claim, `--claims` for the lead's own claims and `--prs` for its own pull requests. Its name comes from `BT_LEAD_NAME`, which subagents inherit.
 
@@ -69,7 +73,7 @@ An issue agent is the lead to everyone else: it signs `Lead:`, follows this file
 
 ## Signing
 
-GitHub shows both roles as the same account, so every comment, review and reply starts with the role:
+GitHub may show both roles as the same account, so every comment, review and reply starts with the role:
 
 ```
 Lead: ...

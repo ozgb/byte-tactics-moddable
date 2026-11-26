@@ -474,28 +474,13 @@ void __stdcall CmdSeaLevel(CommandArgs* args)
 // FUNCTION: 0x416ab0
 void __stdcall CmdControl(CommandArgs* args)
 {
-    unsigned char i = args->GetIntArg(1, 0);
-    if (i < 10) {
-        Player* p = &g_game->players[i];
-        if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
-            && p->index != 10) {
-            g_game->localPlayer = args->GetIntArg(1, 0);
-            g_game->playerIndex = args->GetIntArg(1, 0);
-        }
-    }
+    PlayersPublishSetControl(SCHED_ENGINE, (unsigned char)args->GetIntArg(1, 0));
 }
 
 // FUNCTION: 0x416b50
 void __stdcall CmdView(CommandArgs* args)
 {
-    unsigned char i = args->GetIntArg(1, 0);
-    if (i < 10) {
-        Player* p = &g_game->players[i];
-        if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
-            && p->index != 10) {
-            g_game->playerIndex = args->GetIntArg(1, 0);
-        }
-    }
+    PlayersPublishSetView(SCHED_ENGINE, (unsigned char)args->GetIntArg(1, 0));
 }
 
 // FUNCTION: 0x416bd0

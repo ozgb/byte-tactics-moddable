@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem players 5.2
+subsystem players 5.3
 call 0 RegionSize
   a info (2)
   o result 84
@@ -66,6 +66,7 @@ call 0 Apply
   r Player#0.unitCount 1
   r Player#0.energy f32:0x00000000
   r Player#0.metal f32:0x00000000
+  r Player#0.index 0
   r Player#1.active 1
   r Player#1.unitsBegin Unit#251
   r Player#1.unitsEnd Unit#500
@@ -74,6 +75,7 @@ call 0 Apply
   r Player#1.unitCount 0
   r Player#1.energy f32:0x00000000
   r Player#1.metal f32:0x00000000
+  r Player#1.index 1
   r Player#2.active 0
   r Player#2.unitsBegin Unit#501
   r Player#2.unitsEnd Unit#750
@@ -82,6 +84,7 @@ call 0 Apply
   r Player#2.unitCount 0
   r Player#2.energy f32:0x00000000
   r Player#2.metal f32:0x00000000
+  r Player#2.index 10
   r Player#3.active 0
   r Player#3.unitsBegin Unit#751
   r Player#3.unitsEnd Unit#1000
@@ -90,6 +93,7 @@ call 0 Apply
   r Player#3.unitCount 0
   r Player#3.energy f32:0x00000000
   r Player#3.metal f32:0x00000000
+  r Player#3.index 10
   r Player#4.active 0
   r Player#4.unitsBegin Unit#1001
   r Player#4.unitsEnd Unit#1250
@@ -98,6 +102,7 @@ call 0 Apply
   r Player#4.unitCount 0
   r Player#4.energy f32:0x00000000
   r Player#4.metal f32:0x00000000
+  r Player#4.index 10
   r Player#5.active 0
   r Player#5.unitsBegin Unit#1251
   r Player#5.unitsEnd Unit#1500
@@ -106,6 +111,7 @@ call 0 Apply
   r Player#5.unitCount 0
   r Player#5.energy f32:0x00000000
   r Player#5.metal f32:0x00000000
+  r Player#5.index 10
   r Player#6.active 0
   r Player#6.unitsBegin Unit#1501
   r Player#6.unitsEnd Unit#1750
@@ -114,6 +120,7 @@ call 0 Apply
   r Player#6.unitCount 0
   r Player#6.energy f32:0x00000000
   r Player#6.metal f32:0x00000000
+  r Player#6.index 10
   r Player#7.active 0
   r Player#7.unitsBegin Unit#1751
   r Player#7.unitsEnd Unit#2000
@@ -122,6 +129,7 @@ call 0 Apply
   r Player#7.unitCount 0
   r Player#7.energy f32:0x00000000
   r Player#7.metal f32:0x00000000
+  r Player#7.index 10
   r Player#8.active 0
   r Player#8.unitsBegin Unit#2001
   r Player#8.unitsEnd Unit#2250
@@ -130,6 +138,7 @@ call 0 Apply
   r Player#8.unitCount 0
   r Player#8.energy f32:0x00000000
   r Player#8.metal f32:0x00000000
+  r Player#8.index 10
   r Player#9.active 0
   r Player#9.unitsBegin Unit#2251
   r Player#9.unitsEnd Unit#2500
@@ -138,6 +147,7 @@ call 0 Apply
   r Player#9.unitCount 0
   r Player#9.energy f32:0x00000000
   r Player#9.metal f32:0x00000000
+  r Player#9.index 10
   r SideDef#0.commander "ARMCOM"
   r SideDef#1.commander "CORCOM"
   r SideDef#2.commander ""
@@ -27664,6 +27674,8 @@ call 0 Apply
   a event.kind 194
   a event.unit Unit#1
   a size 8
+  w Game.playerIndex 0
+  w Game.localPlayer 0
   o result 1
 call 0 Apply
   r Unit#2.cell (273,222)
@@ -28213,16 +28225,6 @@ call 0 Apply
   a size 8
   o result 1
 call 0 UpdatePlayerHead
-  r Player#0.index 0
-  r Player#1.index 1
-  r Player#2.index 10
-  r Player#3.index 10
-  r Player#4.index 10
-  r Player#5.index 10
-  r Player#6.index 10
-  r Player#7.index 10
-  r Player#8.index 10
-  r Player#9.index 10
   a player 0
   o result 1
 call 0 UpdatePlayerBody
@@ -28230,7 +28232,6 @@ call 0 UpdatePlayerBody
   r Game.height 552
   r Game.seaLevel 47
   r Game.mapFlags 7
-  r Game.localPlayer 0
   r Game.baseX 8736
   r Game.baseY 8832
   r Game.commanderDeath 0
@@ -28388,7 +28389,6 @@ call 0 UpdatePlayerBody
   w VictoryMoveUnitToRadius#1.posZ 310771712
   o result 2
 call 0 UpdatePlayerTail
-  r Game.playerIndex 0
   r SimGlobals.g_economyPacketTick 0
   a player 0
   i mission.GetGameType = 1

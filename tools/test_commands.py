@@ -16,6 +16,7 @@ DOC = """# Doc
 | `give` | events | always | X |
 | `armpw`, `corak` | converted | cheat | Y |
 | `control` | direct | cheat | none |
+| `shareall` | inert | always | none |
 
 | Order | Mode | Target | Events |
 | --- | --- | --- | --- |
@@ -100,6 +101,15 @@ class CommandsTest(unittest.TestCase):
         out = self.problems(dict(GOOD, a2="console 1 +control 0\n"), doc=both[0], readme=both[1])
         self.assertEqual(len(out), 1)
         self.assertIn("judged", out[0])
+
+    def test_a_judged_scenario_with_an_inert_command_passes(self):
+        self.assertEqual(self.problems(dict(GOOD, a=GOOD["a"] + "console 3 +shareall\n")), [])
+
+    def test_an_unknown_group_fails(self):
+        doc = DOC.replace("| `shareall` | inert |", "| `shareall` | sleepy |")
+        out = self.problems(GOOD, doc=doc)
+        self.assertEqual(len(out), 1)
+        self.assertIn("sleepy", out[0])
 
     def test_a_judged_scenario_with_an_input_line_fails(self):
         out = self.problems(dict(GOOD, a="input 3 key down a\n"))

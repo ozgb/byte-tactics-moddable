@@ -462,6 +462,7 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `the player slot block` | `PlayerView.sight` (Sight). |
 | `the mapped memory` | `PlayerView.sight` (Sight). |
 | `the plot memory` | `PlayerView.features` (the features of the cells) and `mapWidth`, `mapHeight`; a cell's height is shown only by the debug strip. |
+| `the unit model table` | Loaded data: the model of each unit type, which the battle frame draws a unit with and the cursor hit-tests it against, through the files service. |
 | `MapViewFlags::bit0` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
 | `MapViewFlags::bit1` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
 | `MapViewFlags::bit2` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |

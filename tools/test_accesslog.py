@@ -808,6 +808,35 @@ void Other()
                          ["GameAllocIgnoreTag TILE MAP", "GameAllocIgnoreTag MODEL", "GameAllocIgnoreTag unsigned short"])
 
 
+class SiteRowsTest(unittest.TestCase):
+    def rows(self, *names):
+        return [({"name": "LoadUnitInfo: " + n}, al.HEAP_ROW.match("LoadUnitInfo: " + n)) for n in names]
+
+    def named(self, sites, rows, callees):
+        return [(hex(s), r["name"].split(": ", 1)[1]) for s, (r, _) in al.site_rows(sites, rows, callees)]
+
+    def test_an_inlined_allocation_takes_no_row_of_the_function(self):
+        rows = self.rows("GameAllocIgnoreTag UnitDef", "GameAllocIgnoreTag char")
+        callees = {0x10: {"??_U@YAPAXIABUSimHeap@@@Z"}, 0x20: {"?SimAllocTagged@@YAPAXPBDI@Z"}, 0x30: {"?GameAllocIgnoreTag@@YAPAXPBDI@Z"}}
+        self.assertEqual(self.named([0x10, 0x20, 0x30], rows, callees), [("0x20", "GameAllocIgnoreTag UnitDef"), ("0x30", "GameAllocIgnoreTag char")])
+
+    def test_a_free_call_at_an_allocators_address_is_no_site_of_a_row(self):
+        rows = self.rows("GameAllocShared char", "GameAllocShared char #2")
+        callees = {0x10: {"?CountFree@@YAXH@Z", "?GameReallocIgnoreTag@@YAPAXPAHH@Z"}, 0x20: {"?CountAlloc@@YAXI@Z", "?GameAllocShared@@YAPAXI@Z"},
+                   0x30: {"?GameAllocShared@@YAPAXI@Z"}}
+        self.assertEqual(self.named([0x10, 0x20, 0x30], rows, callees), [("0x20", "GameAllocShared char"), ("0x30", "GameAllocShared char #2")])
+
+    def test_sites_whose_callees_do_not_settle_it_take_the_rows_by_rank(self):
+        rows = self.rows("new Order", "new Order #2")
+        callees = {0x10: {"??2@YAPAXI@Z"}, 0x20: {"??2@YAPAXIABUSimHeap@@@Z"}, 0x30: {"??2@YAPAXIABUSimHeap@@@Z"}}
+        self.assertEqual(self.named([0x10, 0x20, 0x30], rows, callees), [("0x10", "new Order"), ("0x20", "new Order #2"), ("0x30", "new Order #2")])
+
+    def test_a_site_per_row_takes_the_rows_by_rank_whatever_it_calls(self):
+        rows = self.rows("GameAllocIgnoreTag UnitDef", "GameAllocIgnoreTag char")
+        callees = {0x10: {"??_U@YAPAXI@Z"}, 0x20: {"?GameAllocIgnoreTag@@YAPAXPBDI@Z"}}
+        self.assertEqual(self.named([0x10, 0x20], rows, callees), [("0x10", "GameAllocIgnoreTag UnitDef"), ("0x20", "GameAllocIgnoreTag char")])
+
+
 class PresentationTest(unittest.TestCase):
     def test_funcs_round_trip(self):
         data = al.pack_funcs([(0x401000, 0x401040, "Draw"), (0x401040, 0x401100, "Unit::Move")])

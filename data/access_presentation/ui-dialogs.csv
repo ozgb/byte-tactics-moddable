@@ -1,8 +1,8 @@
 item,reader,function,container,every,after
 AddOrder: new Order,orders,OrdersApply,AddOrder: new Order,0,-
 BuildAllPassMaps: operator new unsigned int,map,RefreshPassMapsForUnit,BuildAllPassMaps: operator new unsigned int,0,-
-BuildMenuPage::count,presentation,DisableUnavailableBuildMenuEntries,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
-BuildMenuPage::entries,presentation,DisableUnavailableBuildMenuEntries,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
+BuildMenuPage::count,presentation,OpenBuildMenuGui,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
+BuildMenuPage::entries,presentation,OpenBuildMenuGui,LoadDownloadMenus: GameAllocIgnoreTag BuildMenuPage,0,-
 DamageTable::v,weapons,FreeWeaponTypes,LoadWeaponType: new DamageTable,0,-
 Debris::flags,weapons,BreakPieceIntoDebris,debris,0,-
 Debris::obj,weapons,BreakPieceIntoDebris,debris,0,-
@@ -91,6 +91,9 @@ LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,BlitFeatureGaf,LoadTntMa
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,presentation,DrawBattleFrame,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,1,
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,ApplyAreaDamage,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,0,-
 LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,weapons,DetonateProjectile,LoadTntMap: GameAllocIgnoreTag PLOT MEMORY,0,-
+LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,DrawBattleFrame,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
+LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,presentation,HitTestUnitScreenHull,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,
+LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,units,FreeUnitTypes,LoadUnitTypes: GameAllocIgnoreTag MODEL PTRS,0,-
 Mission::gravity,mission,Mission::GetParams,SetMissionType: new Mission,0,-
 Mission::killMul,mission,Mission::GetParams,SetMissionType: new Mission,0,-
 Mission::lavaWorld,mission,Mission::GetParams,SetMissionType: new Mission,0,-
@@ -117,9 +120,9 @@ ModelState::animDirty,scripts,UpdateObjectState,CreatePlayerObjectState: GameAll
 ModelState::animDirty,weapons,StartExplodePiece,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::bitmap,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
-ModelState::bitmap,presentation,CMemoryCache::AddModelBounds,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::AllocTwoPlaneBitmap,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
 ModelState::bitmap,presentation,CMemoryCache::DrawObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,presentation,CMemoryCache::DrawObjectPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::DrawObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,
@@ -231,7 +234,7 @@ NewUnitScript: new UnitScript,scripts,??1CobScript@@UAE@XZ,NewUnitScript: new Un
 NewUnitScript: new UnitScript,scripts,CobScript::QueryScript,NewUnitScript: new UnitScript,0,-
 NewUnitScript: new UnitScript,scripts,CobScript::QueryScriptByIndex,NewUnitScript: new UnitScript,0,-
 NewUnitScript: new UnitScript,scripts,CobScript::RunThread,NewUnitScript: new UnitScript,0,-
-NewUnitScript: new UnitScript,scripts,CobScript::StartScriptByIndex,NewUnitScript: new UnitScript,0,-
+NewUnitScript: new UnitScript,scripts,CobScript::StartScriptWithArgs,NewUnitScript: new UnitScript,0,-
 NewUnitScript: new UnitScript,scripts,CobScript::Wake,NewUnitScript: new UnitScript,0,-
 NewUnitScript: new UnitScript,seams,DeleteScriptNative,NewUnitScript: new UnitScript,0,-
 Order::attached,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,-
@@ -246,8 +249,8 @@ Order::flags_42,orders,GetOrderFlags,IssueAttackOrder: new Order #3,0,-
 Order::flags_42,orders,InsertOrderAfterMarked,AddOrder: new Order,0,-
 Order::next,orders,DeleteOrders,AddOrder: new Order,0,-
 Order::next,orders,DeleteOrders,IssueAttackOrder: new Order #3,0,-
-Order::subFlags,orders,GetTableEntryByTypeByte,AddOrder: new Order,0,-
-Order::subFlags,orders,GetTableEntryByTypeByte,IssueAttackOrder: new Order #3,0,-
+Order::subFlags,orders,Order::OrStatusFlags,AddOrder: new Order,0,-
+Order::subFlags,orders,Order::OrStatusFlags,IssueAttackOrder: new Order #3,0,-
 Order::target,orders,??1Order@@QAE@XZ,AddOrder: new Order,0,-
 Order::target,orders,??1Order@@QAE@XZ,IssueAttackOrder: new Order #3,0,-
 Order::target,units,ClearUnitRefs,IssueAttackOrder: new Order #3,0,-
@@ -313,13 +316,13 @@ Unit::def,los_radar,RemoveUnitLineOfSight,AllocateUnitMemory: GameAllocIgnoreTag
 Unit::def,orders,Attacked,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,orders,GetOrderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::def,orders,GetOrderType,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
-Unit::def,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::def,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::def,presentation,DisableUnavailableBuildMenuEntries,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::def,presentation,OpenBuildMenuGui,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,presentation,PickUnitUnderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::def,presentation,RefreshOrderButtons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::def,presentation,RefreshSelectionOrders,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,presentation,SetPrevNextGadgetNames,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,presentation,SpeechQueue::PlaySpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::def,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -336,16 +339,16 @@ Unit::f_57,weapons,Unit::ReleaseWeapons,AllocateUnitMemory: GameAllocIgnoreTag U
 Unit::flags,los_radar,IsUnitVisibleToPlayer,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,map,RemoveUnitFromMap,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,players,KillPlayerUnits,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
-Unit::flags,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,CMemoryCache::DrawObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,CMemoryCache::DrawObjectState,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::flags,presentation,DisableUnavailableBuildMenuEntries,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::flags,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,OpenBuildMenuGui,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,QueueUnitSpeech,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,RefreshOrderButtons,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::flags,presentation,RefreshSelectionOrders,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::flags,presentation,SendGroupCommand,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::flags,presentation,UnitTable::BuildObjectPicture,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
@@ -370,7 +373,7 @@ Unit::health,weapons,ApplyUnitDamage,AllocateUnitMemory: GameAllocIgnoreTag UNIT
 Unit::id,map,RemoveUnitFromMap,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::id,network,NetSendUnitKilled,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::id,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::id,presentation,DisableUnavailableBuildMenuEntries,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::id,presentation,OpenBuildMenuGui,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::id,presentation,PickUnitUnderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::id,units,ApplyUnitDeath,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::id,units,KillUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
@@ -454,7 +457,7 @@ Unit::speed,harness,ModelItem,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY
 Unit::speed,orders,Attacked,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::speed,presentation,CMemoryCache::ShadeByIntensity,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::speed,presentation,ClickSelectHoverUnit,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
-Unit::speed,presentation,DisableUnavailableBuildMenuEntries,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
+Unit::speed,presentation,OpenBuildMenuGui,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::speed,presentation,ResolveCursorModeForSelection,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::speed,presentation,UnitTable::DrawPieces,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::speed,units,ApplyUnitDeath,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
@@ -470,13 +473,13 @@ Unit::state,weapons,StartExplodePiece,AllocateUnitMemory: GameAllocIgnoreTag UNI
 Unit::unitDefIndex,game,BattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::unitDefIndex,game,ShutdownIngameSystems,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::unitDefIndex,orders,Attacked,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
-Unit::unitDefIndex,presentation,BuildEntryGuiName,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::unitDefIndex,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
-Unit::unitDefIndex,presentation,DisableUnavailableBuildMenuEntries,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::unitDefIndex,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::unitDefIndex,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::unitDefIndex,presentation,HitTestUnitScreenHull,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::unitDefIndex,presentation,OpenBuildMenuGui,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::unitDefIndex,presentation,PickUnitUnderCursor,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
+Unit::unitDefIndex,presentation,RefreshSelectionOrders,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::unknown_4c,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::weapon,presentation,DrawUnitInfoPanel,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,
 Unit::xWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
@@ -507,6 +510,45 @@ Unit::zFraction,weapons,BreakPieceIntoDebris,AllocateUnitMemory: GameAllocIgnore
 Unit::zFraction,weapons,StartExplodePiece,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,0,-
 Unit::zWhole,presentation,CollectVisibleUnitIds,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
 Unit::zWhole,presentation,DrawBattleFrame,AllocateUnitMemory: GameAllocIgnoreTag UNIT MEMORY,1,
+UnitDef::buildMenuPageCount,presentation,RefreshOrderButtons,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::buildMenuPageCount,presentation,RefreshSelectionOrders,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::buildMenuPageCount,presentation,SetPrevNextGadgetNames,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::corpse,units,CreateUnitCorpse,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::data,units,FreeUnitTypes,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::explodeas,weapons,DetonateUnitWeapon,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::f14e,units,FreeUnitTypes,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags1,orders,Attacked,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags1,orders,GetOrderType,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags1,presentation,CMemoryCache::DrawObjectPicture,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::flags1,presentation,UnitTable::DrawPieces,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::flags2,ai,AiApply,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags2,orders,GetOrderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::flags2,orders,GetOrderType,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags2,presentation,DrawUnitInfoPanel,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::flags2,presentation,RefreshSelectionOrders,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::id,presentation,OpenBuildMenuGui,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::id,units,FindUnitTypeId,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::ids,units,FreeUnitTypes,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::maxHealth,presentation,DrawUnitInfoPanel,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::maxHealth,units,KillUnit,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::modelMaxX,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMaxY,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::modelMaxYHigh,los_radar,RemoveUnitLineOfSight,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::modelMaxYHigh,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMaxYHigh,units,ApplyUnitDeath,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::modelMaxZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMinX,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::modelMinX,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMinY,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelMinZ,los_radar,IsUnitVisibleToPlayer,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::modelMinZ,presentation,CollectVisibleUnitIds,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
+UnitDef::modelSizeX,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::modelSizeY,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::modelSizeZ,presentation,PickUnitUnderCursor,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,
+UnitDef::range,los_radar,RemoveUnitLineOfSight,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::range,units,ApplyUnitDeath,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::soundcategory,presentation,SpeechQueue::PlaySpeech,LoadUnitInfo: GameAllocIgnoreTag UnitDef,0,-
+UnitDef::unitname,harness,ModelItem,LoadUnitInfo: GameAllocIgnoreTag UnitDef,1,
 UnitMotion::UnitMotion: new PackedPosGoal,movement,AiSearchGoal::SetPathOrder,UnitMotion::UnitMotion: new PackedPosGoal,0,-
 UnitMotion::UnitMotion: new PackedPosGoal,movement,MovementApply,UnitMotion::UnitMotion: new PackedPosGoal,0,-
 UnitMotion::UnitMotion: new PackedPosGoal,movement,MovementUnitTarget,UnitMotion::UnitMotion: new PackedPosGoal,0,-
@@ -553,23 +595,23 @@ bits_2a44,game,MainLoopTick,bits_2a44,1,
 bits_2a44,game,ShutdownIngameSystems,bits_2a44,0,-
 bits_2a44,network,BroadcastPacket,bits_2a44,0,
 bits_2a44,network,RemoveLocalPlayers,bits_2a44,0,-
-bits_2a44,presentation,BlitOptionsPanel,bits_2a44,0,-
-bits_2a44,presentation,ClearScreenWithHudPalette,bits_2a44,0,-
 bits_2a44,presentation,HandleInGameOptionsClick,bits_2a44,0,-
+bits_2a44,presentation,HandleOptionsPanelClick,bits_2a44,0,-
+bits_2a44,presentation,OpenOptionsLayout,bits_2a44,0,-
 bits_2a44,presentation,OpenOptionsPanel,bits_2a44,0,-
 bits_2a44,presentation,UpdateCdCategoryByActivity,bits_2a44,1,
 bits_37f2f,game,SaveSettings,bits_37f2f,0,-
 bits_37f2f,presentation,AccumulateScreenShake,bits_37f2f,0,-
 bits_37f2f,presentation,DrawBattleFrame,bits_37f2f,1,
 bits_38a51,game,MainLoopTick,bits_38a51,0,
-bits_38a51,presentation,BlitOptionsPanel,bits_38a51,0,-
 bits_38a51,presentation,DrawBattleFrame,bits_38a51,1,
 bits_38a51,presentation,HandleGameKey,bits_38a51,0,-
 bits_38a51,presentation,HandleInGameOptionsClick,bits_38a51,0,-
 bits_38a51,presentation,OpenInGameOptions,bits_38a51,0,-
+bits_38a51,presentation,OpenOptionsLayout,bits_38a51,0,-
 block,presentation,OpenOptionsPanel,block,0,-
-cells,los_radar,FreeLosTables,cells,1,
 cells,los_radar,FreeMapResources,cells,0,-
+cells,los_radar,GetMapCell,cells,1,
 cells,los_radar,GetMapCellAtPosition,cells,0,
 cells,los_radar,SoundHeardMask,cells,0,-
 cells,map,FootprintValue,cells,0,-
@@ -582,7 +624,7 @@ count_14277,los_radar,AddEyeball,count_14277,0,-
 count_1491b,presentation,DrawExplosions,count_1491b,1,
 count_1491b,weapons,AddExplosionEffect,count_1491b,0,-
 count_1491b,weapons,BreakPieceIntoDebris,count_1491b,0,-
-defs,presentation,BuildEntryGuiName,defs,0,-
+defs,presentation,RefreshSelectionOrders,defs,0,-
 defs,units,ApplyUnitDeath,defs,0,-
 defs,units,FindUnitTypeId,defs,0,
 defs,units,FreeUnitTypes,defs,0,-
@@ -603,8 +645,8 @@ g_emptyText,presentation,??0StringRef@@QAE@PBD@Z,g_emptyText,0,-
 g_explodedPieces,presentation,DrawExplosions,g_explodedPieces,1,
 g_explodedPieces,weapons,DebrisCache::AllocBytes,g_explodedPieces,0,-
 g_explodedPieces,weapons,StartExplodePiece,g_explodedPieces,0,-
+g_losTables,los_radar,LosTables::GetLosTable,g_losTables,0,-
 g_losTables,los_radar,LosTables::GetLosTableCount,g_losTables,0,-
-g_losTables,unknown,??4?$vector@ULosStep@@V?$allocator@ULosStep@@@std@@@std@@QAEAAV01@ABV01@@Z,g_losTables,0,-
 g_missionOrderTableVec,orders,??0MissionType@@QAE@PBD@Z,g_missionOrderTableVec,0,-
 g_missionOrderTableVec,orders,??0Order@@QAE@EHHHHH@Z,g_missionOrderTableVec,0,-
 g_missionOrderTableVec,orders,GetOrderName,g_missionOrderTableVec,0,
@@ -614,7 +656,7 @@ g_randomSeed,platform,RandomInt,g_randomSeed,0,-
 gravity,weapons,BreakPieceIntoDebris,gravity,0,-
 height,los_radar,AddLineOfSight,height,0,-
 height,los_radar,BuildFogTiles,height,0,-
-height,los_radar,FreeLosTables,height,1,
+height,los_radar,GetMapCell,height,1,
 height,los_radar,GetMapCellAtPosition,height,0,
 height,los_radar,RemoveLineOfSight,height,0,-
 height,los_radar,RevealAroundUnit,height,0,-
@@ -624,11 +666,11 @@ height,map,GetGroundHeight,height,1,
 height,presentation,DrawBattleFrame,height,1,
 height,weapons,ApplyAreaDamage,height,0,-
 list_391ed,players,PlayersApply,list_391ed,0,-
-localPlayer,presentation,BuildEntryGuiName,localPlayer,0,-
 localPlayer,presentation,ClickSelectHoverUnit,localPlayer,0,-
-localPlayer,presentation,DisableUnavailableBuildMenuEntries,localPlayer,0,-
 localPlayer,presentation,DrawBattleFrame,localPlayer,1,
 localPlayer,presentation,HandleGameSpeedSlider,localPlayer,0,-
+localPlayer,presentation,OpenBuildMenuGui,localPlayer,0,-
+localPlayer,presentation,RefreshSelectionOrders,localPlayer,0,-
 localPlayer,presentation,ResolveCursorModeForSelection,localPlayer,0,
 localPlayer,presentation,SendGroupCommand,localPlayer,0,-
 localPlayer,weapons,ApplyUnitDamage,localPlayer,0,-
@@ -734,7 +776,7 @@ units,presentation,PickUnitUnderCursor,units,0,
 units,presentation,ResolveCursorModeForSelection,units,0,
 units,seams,WorldUnitSlot,units,0,
 units,units,ApplyUnitDeath,units,0,-
-units,units,ComparePlayers,units,0,-
+units,units,FreeUnitMemory,units,0,-
 units,weapons,ApplyUnitDamage,units,0,-
 unitsEnd,game,ShutdownIngameSystems,unitsEnd,0,-
 unitsEnd,orders,OrdersExpandGroupCommand,unitsEnd,0,-
@@ -759,10 +801,10 @@ unknown_1b8e,platform,GetSlotDpid,unknown_1b8e,0,
 unknown_1b8e,players,FreePlayers,unknown_1b8e,0,-
 unknown_1b8e,players,KillPlayerUnits,unknown_1b8e,0,-
 unknown_1b8e,presentation,AnnounceForcesDestroyed,unknown_1b8e,0,-
-unknown_1b8e,presentation,BuildEntryGuiName,unknown_1b8e,0,-
 unknown_1b8e,presentation,CollectEndGameStats,unknown_1b8e,0,-
 unknown_1b8e,presentation,DrawBattleFrame,unknown_1b8e,1,
 unknown_1b8e,presentation,DrawUnitInfoPanel,unknown_1b8e,0,-
+unknown_1b8e,presentation,RefreshSelectionOrders,unknown_1b8e,0,-
 unknown_1b8e,presentation,ResolveCursorModeForSelection,unknown_1b8e,0,
 unknown_1b8e,presentation,SendGroupCommand,unknown_1b8e,0,-
 unknown_1b8e,seams,FreeSquadManagerNative,unknown_1b8e,0,-
@@ -790,7 +832,7 @@ unknown_1cd9,weapons,DetonateProjectile,unknown_1cd9,0,-
 vertices,weapons,BreakPieceIntoDebris,vertices,0,-
 width,los_radar,AddLineOfSight,width,0,-
 width,los_radar,BuildFogTiles,width,0,-
-width,los_radar,FreeLosTables,width,1,
+width,los_radar,GetMapCell,width,1,
 width,los_radar,GetMapCellAtPosition,width,0,
 width,los_radar,RemoveLineOfSight,width,0,-
 width,los_radar,RevealAroundUnit,width,0,-

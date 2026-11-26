@@ -2703,6 +2703,8 @@ void OpenRestartDialog()
     SetCursorMode(0x13);
 }
 
+void __stdcall HarnessUiLeaveGame();
+
 // FUNCTION: 0x4605c0
 void __stdcall HandleSurrenderChoice(Gui* gui)
 {
@@ -2722,6 +2724,7 @@ void __stdcall HandleSurrenderChoice(Gui* gui)
             SetGameMode(1);
             return;
         case 2:
+            HarnessUiLeaveGame();
             g_game->endGameFlags |= 4;
             ShutdownIngameAndQuit();
             return;

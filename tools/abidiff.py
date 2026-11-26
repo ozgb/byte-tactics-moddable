@@ -28,7 +28,8 @@ Every change is classed, and the class decides which bump it needs:
             needs a minor bump, or a major bump
   breaking  a slot or an entry removed, reordered, inserted before the end or retyped: needs a major bump, and an
             adapter for each changed slot unless no module was built against the old major
-  layout    a field that moves or changes size: fails whatever the bump
+  layout    a field that moves or changes size: needs a major bump, and no module built against the old major
+            (no adapter can cover a data layout)
 
 A major bump with changes passes in one of two ways, read from wasm/modules.json (#566):
 
@@ -458,8 +459,8 @@ def judge(old: Interface, new: Interface, changes: list[Change], manifest: dict 
 
     if (new.major, new.minor) < (old.major, old.minor):
         return fail("version went down, %s" % versions)
-    if "layout" in kinds:
-        return fail("a field moved or changed size, which no version bump allows")
+    if "layout" in kinds and not (major_up and not built_against(manifest, new.name, old.major)):
+        return fail("a field moved or changed size, which only a major bump with no module built against the old major allows")
     if not changes:
         bump = ", " + bump_text(old, new) if (old.major, old.minor) != (new.major, new.minor) else ""
         return Result(new.name, True, "ok (no change%s)" % bump)

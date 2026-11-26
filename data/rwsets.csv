@@ -47771,9 +47771,8 @@ address,function,file,kind,target
 ,FreeWindowed,src/host/win32/headless.cpp,global_read,g_windowed
 ,FreeWindowed,src/host/win32/headless.cpp,global_write,g_windowed
 ,FreeWindowed,src/host/win32/headless.cpp,global_write,g_windowedPalette
+,Freed,src/harness/replay.cpp,call,FreedIndex
 ,Freed,src/harness/replay.cpp,function,
-,Freed,src/harness/replay.cpp,global_read,s_freed
-,Freed,src/harness/replay.cpp,global_read,s_freedCount
 ,FreedBlockAllocator::allocate,src/debug/debug_lib.cpp,call,host_mem_alloc
 ,FreedBlockAllocator::allocate,src/debug/debug_lib.cpp,function,
 ,FreedBlockAllocator::allocate,src/debug/debug_lib.cpp,global_read,g_outOfMemoryHandler
@@ -47784,6 +47783,10 @@ address,function,file,kind,target
 ,FreedBlockAllocator::deallocate,src/debug/debug_lib.cpp,function,
 ,FreedBlockAllocator::destroy,src/debug/debug_lib.cpp,function,
 ,FreedBlockAllocator::max_size,src/debug/debug_lib.cpp,function,
+,FreedIndex,src/harness/replay.cpp,deref_read,*void
+,FreedIndex,src/harness/replay.cpp,function,
+,FreedIndex,src/harness/replay.cpp,global_read,s_freed
+,FreedIndex,src/harness/replay.cpp,global_read,s_freedCount
 ,FuelBegin,src/wasm/wind_meteors_glue.cpp,call,FuelSet
 ,FuelBegin,src/wasm/wind_meteors_glue.cpp,field_read,Game::ticks
 ,FuelBegin,src/wasm/wind_meteors_glue.cpp,function,
@@ -50414,13 +50417,16 @@ address,function,file,kind,target
 ,ImportRng,src/harness/replay.cpp,global_read,s_rngAt
 ,ImportRng,src/harness/replay.cpp,global_write,s_rngAt
 ,ImportServiceObjects,src/harness/replay.cpp,call,ImportObjects
-,ImportServiceObjects,src/harness/replay.cpp,call,ReplayFail
+,ImportServiceObjects,src/harness/replay.cpp,call,MarkAllocated
+,ImportServiceObjects,src/harness/replay.cpp,call,MarkFreed
 ,ImportServiceObjects,src/harness/replay.cpp,field_read,<anon>::p
+,ImportServiceObjects,src/harness/replay.cpp,field_read,ReplayArg::kind
 ,ImportServiceObjects,src/harness/replay.cpp,field_read,ReplayImport::id
+,ImportServiceObjects,src/harness/replay.cpp,field_read,ReplaySubsystem::recordsImportChanges
 ,ImportServiceObjects,src/harness/replay.cpp,function,
-,ImportServiceObjects,src/harness/replay.cpp,global_read,s_freedCount
-,ImportServiceObjects,src/harness/replay.cpp,global_write,s_freed
-,ImportServiceObjects,src/harness/replay.cpp,global_write,s_freedCount
+,ImportServiceObjects,src/harness/replay.cpp,global_read,kReplaySubsystems@src/harness/replay_schema.h
+,ImportServiceObjects,src/harness/replay.cpp,global_read,s_recording
+,ImportServiceObjects,src/harness/replay.cpp,global_read,s_sub
 ,ImportServiceObjects,src/harness/replay.cpp,member_read,ReplayArg::v
 ,ImportStructIn,src/harness/replay.cpp,call,ImportValueStruct
 ,ImportStructIn,src/harness/replay.cpp,call,ReplayText::Add
@@ -52578,6 +52584,24 @@ address,function,file,kind,target
 ,MapWriteState,src/map/terrain.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Handle]"
 ,MapWriteState,src/map/terrain.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
 ,MapWriteState,src/map/terrain.cpp,indirect_call,"indirect via void (*const)(int, const char *) __attribute__((stdcall)) [StateWriter::Begin]"
+,MarkAllocated,src/harness/replay.cpp,call,FreedIndex
+,MarkAllocated,src/harness/replay.cpp,deref_read,*void
+,MarkAllocated,src/harness/replay.cpp,deref_write,*void
+,MarkAllocated,src/harness/replay.cpp,function,
+,MarkAllocated,src/harness/replay.cpp,global_read,s_freed
+,MarkAllocated,src/harness/replay.cpp,global_read,s_freedCount
+,MarkAllocated,src/harness/replay.cpp,global_write,s_freedCount
+,MarkFreed,src/harness/replay.cpp,call,Freed
+,MarkFreed,src/harness/replay.cpp,call,abort
+,MarkFreed,src/harness/replay.cpp,call,realloc
+,MarkFreed,src/harness/replay.cpp,deref_write,*void
+,MarkFreed,src/harness/replay.cpp,function,
+,MarkFreed,src/harness/replay.cpp,global_read,s_freed
+,MarkFreed,src/harness/replay.cpp,global_read,s_freedCapacity
+,MarkFreed,src/harness/replay.cpp,global_read,s_freedCount
+,MarkFreed,src/harness/replay.cpp,global_write,s_freed
+,MarkFreed,src/harness/replay.cpp,global_write,s_freedCapacity
+,MarkFreed,src/harness/replay.cpp,global_write,s_freedCount
 ,MarkRng,src/harness/replay.cpp,call,RngReadable
 ,MarkRng,src/harness/replay.cpp,call,RngValue
 ,MarkRng,src/harness/replay.cpp,field_read,ReplayField::base
@@ -58306,6 +58330,7 @@ address,function,file,kind,target
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,global_read,s_call
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,global_read,s_inner_orders
 ,RecOrdersRunSecondaryOrders,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(Unit *) __attribute__((stdcall)) [OrdersSeam::RunSecondaryOrders]
+,RecPathfindingCancel,src/harness/replay_hooks.inc,call,Add
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,call,ArgValue
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,call,FinishImport
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,call,ImportObject

@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v43` is the fixed target for anyone writing a new
+The git tag `reference-traces-v44` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v43`**.
+code as a base. This page names the current tag: **`reference-traces-v44`**.
 
 ## What the tag holds
 
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v43`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v43
+git checkout reference-traces-v44
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -136,7 +136,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v43
+git checkout reference-traces-v44
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -208,9 +208,9 @@ What the code shows about the players fields (the player loader and saver):
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v44`
+the digests that should become a target gets a new tag (`reference-traces-v45`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v43`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v43`
+`reference-traces-v44`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v44`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
@@ -404,6 +404,11 @@ and so on), and this page is updated to name it. The current tag is
   `endGameFlags`). The trace format is still `bt-trace 9`. A masked field is hashed as four bytes, so the `world` and
   `tick` rows of every tick change, and so does every digest. The event digests, sound logs, UI logs, display logs and
   frames are those of v42, and the saves decode equal to v42's.
+- `reference-traces-v44`: the 93 scenarios of v43, whose display logs leave out the draws that change no pixel
+  (#1110, `docs/display-log.md`, "Draws that change no pixel"): every display digest and the six display lists
+  change, and no stored item has an empty area. The traces are those of v43, with the view bits masked, but for
+  their commit line, which names 3960f45f4, the reference commit that holds both those masks and the rule. The
+  sounds, UI logs, events and frames are those of v43, and the saves decode equal to v43's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

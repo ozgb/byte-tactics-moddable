@@ -63,7 +63,7 @@ As of the last read of `data/state_classes.csv` (2556 rows). `tools/test_statecl
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
 | static | 6 | 28 | 634 | 0 | 67 | 735 |
-| game-region | 118 | 490 | 130 | 44 | 0 | 782 |
+| game-region | 117 | 491 | 130 | 44 | 0 | 782 |
 | heap | 154 | 48 | 89 | 0 | 0 | 291 |
 
 ## Mixed cases and how to split them
@@ -104,9 +104,10 @@ Crossings left during play, each waiting on another decision:
 - `WriteScreenshot` (keys.cpp), the poster key, turns mapping and line of sight off, calls `RecalculateLineOfSight`,
   draws the whole map and turns them back on with a second `RecalculateLineOfSight`. A presentation that draws from the
   view (#1052) needs neither.
-- `HandleGameKey` (keys.cpp) and `HandleDebugHotkey` (game_dialogs.cpp) flip bits 0 and 1 of `endGameFlags`, the debug
-  mode and the debug display. Only presentation reads them, but they share the word the trace hashes with the
-  simulation's end-of-game bits. #1050 takes them out of the judged state.
+- `DispatchOrdersPanelPageFlags` and `StepBuildMenuPageBack` (control_panel.cpp) write the build-menu page bits of
+  `Unit.flags`: bit 0x400000, the build menu rather than the orders, and the page number. Only presentation reads
+  them, but the trace still hashes them, since the mask covers only the selection bit 0x10. #1115 finds and masks
+  the presentation writes that remain hashed.
 - `DrawScorePanel` (game_dialogs.cpp) decrements `Player.rank` of each counted player above a rank no player holds,
   while it draws the score panel; the kill credit of `units.cpp` (the rank update when a unit dies) reads and writes the
   same ranks. It becomes the simulation's own compaction, or an event, in a later issue.
@@ -181,6 +182,40 @@ tick's. A module restores its own state at load, through its own load slot or th
 LOAD, map's LOAD_PATH_LOCK_STAMP, wind_meteors' LIMITS and RESET); section 5 of each interface document lists what it
 restores. `tools/seamlink.py --private-state` reads `data/rwsets.csv`, which has every function and no windows, so it
 covers the save and load code as it covers the tick's.
+
+## The selection
+
+The selection is view state (#1047, decided by the human on 2026-11-24), though it is a bit of the simulation's unit
+record: `selected`, bit 0x10 of `Unit.flags` (+0x110). It stays there in this repository, as 3.1c lays it out; moving
+it is work for the re-implementation. The trace masks it out of the `Unit` table (`tools/traceschema.py`, mask
+0xffffffef), so no row hashes it (the phase rows, `world` and the end-of-tick `tick` row), and two runs that differ
+only in what is selected have equal traces. The save keeps the bit as 3.1c writes it. What a presentation is judged on
+is the UI log's `select` record (`docs/ui-log.md`), and the group command a click sends carries its units
+(`OrdersGroupCommand`), so the simulation never needs the selection to carry out an order.
+
+Who touches the bit:
+- Presentation sets and clears it (the functions of selection.cpp) and reads it: the panels (control_panel.cpp,
+  info_panel.cpp), and `SendGroupCommand` (selection.cpp), which turns the selection into the units of a group command.
+  `ExpandGroupCommand`'s default reads the units from the command alone.
+- Game logic reads it once: `UpdateUnitBody` (unit_position.cpp) clears it when the unit can no longer be selected (not
+  selectable, still being built, in its hold-off after a transfer, or carried by a unit whose cargo is not selectable).
+  The read changes nothing but the bit. It is 3.1c's deselection rule, a rule of the view that runs in the tick.
+- Game logic writes it twice more, and reads it nowhere else: `InitUnitFromType` (units.cpp) clears it for a new unit, and
+  `LoadUnit` (unit_save.cpp) restores it from the save.
+- The harness reads it for the UI log's `select` record.
+
+## The debug bits of endGameFlags
+
+Bits 0 and 1 of `endGameFlags` (+0x3923b) are view state too: bit 0 is the debug display (`INFO ON`) and bit 1 debug
+mode. The trace masks them out of the game scalars (mask 0xfffc). The word's other bits are the simulation's (bit 2,
+the game is over, and bit 3, set when a saved game is chosen to load), so the rows of `data/state_classes.csv` for the whole word keep class `sim`. The row `bits_3923b_1`, the member
+that names only bit 0, is `view`, so `tools/stateclasses.py --check` passes `HandleDebugHotkey`'s write.
+
+- Presentation sets them: `HandleGameKey` (keys.cpp) flips bit 1 and clears bit 0 with it, and `HandleDebugHotkey`
+  (game_dialogs.cpp) flips bit 0. It reads them in the panels (info_panel.cpp) and the keys (keys.cpp).
+- Game logic reads bit 1 once: `CmdDebugBreak` (console_commands.cpp), a console command, which with the cheats on
+  runs the out-of-memory tests. Nothing in the tick reads either bit.
+- Game logic writes them once: `InitGame` (game_state.cpp) clears both.
 
 ## Determinism findings
 

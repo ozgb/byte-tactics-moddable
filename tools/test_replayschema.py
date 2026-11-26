@@ -2667,12 +2667,22 @@ class ElementForms(unittest.TestCase):
     def test_import_objects_is_a_reason_and_reaches_the_subsystem_row(self):
         files, errors, _ = self.generated()
         self.assertEqual(errors, [])
-        self.assertRegex(files[rs.SCHEMA_H], r'\{ "movement", \d+, \d+, \d+, \d+, \d+, RET_MOVEMENT, 1 \},')
-        self.assertRegex(files[rs.SCHEMA_H], r'\{ "weapons", \d+, \d+, \d+, \d+, \d+, RET_WEAPONS, 0 \},')
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "movement", \d+, \d+, \d+, \d+, \d+, RET_MOVEMENT, 1, 0 \},')
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "orders", \d+, \d+, \d+, \d+, \d+, RET_ORDERS, 1, 1 \},')
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "weapons", \d+, \d+, \d+, \d+, \d+, RET_WEAPONS, 0, 0 \},')
         for value in ("", True):
             ann = annotations()
             ann["subsystems"]["weapons"]["import_objects"] = value
             self.has(ann, "weapons: import_objects needs a reason")
+
+    def test_fresh_allocations_is_a_reason_of_a_subsystem_with_import_objects(self):
+        for value in ("", True):
+            ann = annotations()
+            ann["subsystems"]["orders"]["fresh_allocations"] = value
+            self.has(ann, "orders: fresh_allocations needs a reason")
+        ann = annotations()
+        ann["subsystems"]["weapons"]["fresh_allocations"] = "a reason"
+        self.has(ann, "weapons: fresh_allocations names the blocks of the import lines, and the subsystem has no import_objects")
 
     def test_an_embedded_polymorphic_kind_has_a_vtable_and_a_site(self):
         files, errors, _ = self.generated()

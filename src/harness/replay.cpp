@@ -294,6 +294,129 @@ void AddLiveRoots(ReplayRoots& to, const ReplayRoots& from)
 unsigned short s_importChanged[kReplayObjectFieldCount];
 ReplayReach s_importReach;
 
+enum { BEFORE_MAX = 65536, BEFORE_HASH = 131072, BEFORE_BYTES = 1 << 20 };
+
+struct BeforeEntry {
+    const unsigned char* object;
+    unsigned short field;
+    unsigned at;
+};
+
+BeforeEntry s_before[BEFORE_MAX];
+int s_beforeSlots[BEFORE_HASH];
+unsigned char s_beforeBytes[BEFORE_BYTES];
+unsigned s_beforeCount;
+unsigned s_beforeUsed;
+bool s_beforeTaken;
+ReplayReach s_beforeReach;
+ReplayKnown s_beforeKnown;
+
+unsigned BeforeHash(const void* object, unsigned field)
+{
+    return (unsigned)(((size_t)object >> 2) * 2654435761u + field * 40503u) % BEFORE_HASH;
+}
+
+bool WrittenFieldSaved(const ReplayObjectField& f)
+{
+    return f.kind != RK_EMBED && f.kind != RK_EMBEDS && f.kind != RK_UNITID && f.kind != RK_SELF;
+}
+
+void ImportBefore()
+{
+    s_beforeTaken = false;
+    if (!s_recording || !kReplaySubsystems[s_sub].recordsImportChanges)
+        return;
+    Recording& r = *s_rec[s_sub];
+    const ReplaySlotSets& sets = SetsOfKind(s_slot, s_kind);
+    if (sets.objWriteCount == 0)
+        return;
+    ReplayRoots roots;
+    AddLiveRoots(roots, s_roots);
+    ReplayWalk(s_beforeReach, r.table, false, sets, roots.kind, roots.object, roots.count);
+    memset(s_beforeSlots, 0xff, sizeof s_beforeSlots);
+    s_beforeCount = 0;
+    s_beforeUsed = 0;
+    for (unsigned at = 0; at < s_beforeReach.count; at++) {
+        const unsigned char* object = (const unsigned char*)s_beforeReach.object[at];
+        for (unsigned j = 0; j < sets.objWriteCount; j++) {
+            const ReplayObjectField& f = kReplayObjectFields[sets.objWrites[j]];
+            if (f.object != s_beforeReach.kind[at] || !WrittenFieldSaved(f))
+                continue;
+            if (s_beforeCount == BEFORE_MAX || s_beforeUsed + f.size > BEFORE_BYTES) {
+                ReplayFail("the fields a slot writes, saved before an import, pass the room of the recorder");
+                return;
+            }
+            BeforeEntry& e = s_before[s_beforeCount];
+            e.object = object;
+            e.field = sets.objWrites[j];
+            e.at = s_beforeUsed;
+            memcpy(s_beforeBytes + s_beforeUsed, object + f.offset, f.size);
+            s_beforeUsed += f.size;
+            unsigned slot = BeforeHash(object, e.field);
+            while (s_beforeSlots[slot] >= 0)
+                slot = (slot + 1) % BEFORE_HASH;
+            s_beforeSlots[slot] = (int)s_beforeCount++;
+        }
+    }
+    s_beforeTaken = true;
+}
+
+bool ChangedSinceBefore(const unsigned char* object, unsigned field)
+{
+    const ReplayObjectField& f = kReplayObjectFields[field];
+    for (unsigned slot = BeforeHash(object, field); s_beforeSlots[slot] >= 0; slot = (slot + 1) % BEFORE_HASH) {
+        const BeforeEntry& e = s_before[s_beforeSlots[slot]];
+        if (e.object == object && e.field == field)
+            return memcmp(s_beforeBytes + e.at, object + f.offset, f.size) != 0;
+    }
+    return true;
+}
+
+void KnowObjectLines(ReplayKnown& known, const ReplayText& lines)
+{
+    std::vector<char> line;
+    for (const char* at = lines.Data(); at != nullptr && *at != '\0';) {
+        const char* end = strchr(at, '\n');
+        size_t length = end == nullptr ? strlen(at) : (size_t)(end - at);
+        line.assign(at, at + length);
+        line.push_back('\0');
+        char* name = &line[0] + 4;
+        char* space = strchr(name, ' ');
+        if (length > 4 && space != nullptr) {
+            *space = '\0';
+            known.Set(name, space + 1);
+        }
+        at = end == nullptr ? at + length : end + 1;
+    }
+}
+
+void ImportWrittenObjects(ReplayText& t, Recording& r, const ReplaySlotSets& sets)
+{
+    ReplayText key;
+    ReplayText value;
+    ReplayText lines;
+    s_beforeKnown.Reset();
+    for (unsigned at = 0; at < s_importReach.count; at++) {
+        unsigned kind = s_importReach.kind[at];
+        const unsigned char* object = (const unsigned char*)s_importReach.object[at];
+        for (unsigned j = 0; j < sets.objWriteCount; j++) {
+            const ReplayObjectField& f = kReplayObjectFields[sets.objWrites[j]];
+            if (f.object != kind || !WrittenFieldSaved(f) || !ReplayInReach(s_importReach, at, sets.objWrites[j]) || !ReplayFieldLive(f, object))
+                continue;
+            if (!ChangedSinceBefore(object, sets.objWrites[j]))
+                continue;
+            ReplayObjectFieldKey(key, r.table, true, kind, object, f);
+            ReplayEmitField(lines, s_beforeKnown, r.table, 'o', key.Data(), f, object, value);
+        }
+    }
+    KnowObjectLines(r.known, lines);
+    t.AddText(lines);
+    lines.Free();
+    key.Free();
+    value.Free();
+    s_beforeTaken = false;
+}
+
 void ImportObjects(ReplayText& t, const ReplayRoots* extra)
 {
     if (!s_recording || !kReplaySubsystems[s_sub].recordsImportChanges)
@@ -308,14 +431,17 @@ void ImportObjects(ReplayText& t, const ReplayRoots* extra)
         if (!written)
             s_importChanged[n++] = sets.objReads[i];
     }
-    if (n == 0)
+    if (n == 0 && !s_beforeTaken)
         return;
     ReplayRoots roots;
     AddLiveRoots(roots, s_roots);
     if (extra != nullptr)
         AddLiveRoots(roots, *extra);
     ReplayWalk(s_importReach, r.table, true, sets, roots.kind, roots.object, roots.count);
-    ReplayCaptureObjects(t, r.known, r.table, s_importReach, s_importChanged, n, 'o');
+    if (n != 0)
+        ReplayCaptureObjects(t, r.known, r.table, s_importReach, s_importChanged, n, 'o');
+    if (s_beforeTaken)
+        ImportWrittenObjects(t, r, sets);
 }
 
 void ImportServiceObjects(ReplayText& t, const ReplayImport& c)
@@ -402,6 +528,7 @@ public:
             ReplayFail("a call of a recorded subsystem made inside a call of another recorded subsystem is not recorded: record each in its own run");
         } else if (s_recording && ReplayOwned() && IsImportOf(s_sub, slot)) {
             role = 2;
+            ImportBefore();
             ReplayCalls() = 0;
         } else if (s_recording && ReplayNestedDepth() != 0 && !s_nestedSlot && ReplayOwner() == host_thread_id() && IsNestedSlot(slot)) {
             role = 3;
@@ -1084,6 +1211,8 @@ void AddAlloc(ReplayText& t, const void* p, const char* tag)
         t.Add("null");
         return;
     }
+    if (s_recording && kReplaySubsystems[s_sub].forgetsAllocations)
+        Table().Forget(p);
     unsigned kind = ROK_ALLOC;
     for (unsigned i = 0; tag != nullptr && i < kReplayAllocTagCount; i++) {
         if (strcmp(kReplayAllocTags[i].tag, tag) == 0)
@@ -1103,6 +1232,11 @@ void AddResult(ReplayText& t, const ReplayArg& r)
 }
 
 #include "replay_services.inc"
+
+void ReplayImportBegin(ReplayImport&)
+{
+    ImportBefore();
+}
 
 int ReplayConfigure(const char* value, char* error, int size)
 {
@@ -1130,6 +1264,7 @@ int ReplayConfigure(const char* value, char* error, int size)
         return 0;
     }
     ReplayEndHook() = ReplayImportEnd;
+    ReplayBeginHook() = ReplayImportBegin;
     s_rec[sub] = new Recording();
     s_rec[sub]->windowed = fields == 3;
     s_rec[sub]->first = first;

@@ -124,5 +124,13 @@
       "expect": 1,
       "field": "UnitMotion#2.velocityX"
     }
+  },
+  "orders": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_STATE_STEP=2",
+      "recording": "orders-guard-attacked.txt",
+      "expect": 22,
+      "field": "Order#3.state"
+    }
   }
 }

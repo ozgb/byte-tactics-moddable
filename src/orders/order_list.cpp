@@ -773,6 +773,10 @@ static void ClearAllWeaponTargets(Unit* unit)
         TargetingPublishClear(SCHED_ORDERS, unit, i);
 }
 
+#ifndef BT_REPLAY_INJECT_STATE_STEP
+#define BT_REPLAY_INJECT_STATE_STEP 1
+#endif
+
 // FUNCTION: 0x43b7c0
 void __stdcall RunOrders(Unit* unit)
 {
@@ -798,7 +802,7 @@ void __stdcall RunOrders(Unit* unit)
             DelayOrderWake(node, 0xf);
             break;
         case 1:
-            node->state++;
+            node->state += BT_REPLAY_INJECT_STATE_STEP;
             break;
         case 0:
             node->state = 0;

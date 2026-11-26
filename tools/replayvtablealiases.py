@@ -4,7 +4,8 @@
     uv run tools/replayvtablealiases.py --build-dir build/modern --check  # exit 1 when it is out of date
 
 The game link maps those names to the methods by address (tools/aliases.py). The replay link has no address map, so a virtual call on a rebuilt
-OrderFx would call 0 without them.
+OrderFx would call 0 without them. The file also binds every other name a module object uses and does not define, such as a constructor
+that orders declares with other parameter types, to the definition the game's aliases.obj maps it to, when the replay link holds that definition.
 """
 
 import argparse
@@ -50,7 +51,28 @@ def lines(build: Path) -> list[str]:
             if m and m.group(1) in tables and symbol != tables[m.group(1)] and symbol not in seen:
                 seen.add(symbol)
                 out.append("/alternatename:%s=%s" % (symbol, tables[m.group(1)]))
+    linked = weak_externals(build / "aliases.obj")
+    held = {symbol for obj in objects for symbol in nm(obj, "--defined-only")}
+    bound = {line.split(":", 1)[1].split("=")[0] for line in out}
+    for obj in objects:
+        for symbol in nm(obj, "-u"):
+            target = symbol
+            for _ in range(8):
+                target = linked.get(target)
+                if target is None or target in held:
+                    break
+            if target in held and symbol not in held and symbol not in bound:
+                bound.add(symbol)
+                out.append("/alternatename:%s=%s" % (symbol, target))
     return sorted(out)
+
+
+def weak_externals(obj: Path) -> dict[str, str]:
+    """Each weak external of the game's alias object: the name a caller spells, and the name it is linked to."""
+    if not obj.is_file():
+        raise SystemExit("replayvtablealiases: %s is missing; build the game first" % obj)
+    text = subprocess.run(["llvm-readobj", "--symbols", str(obj)], capture_output=True, text=True, check=True).stdout
+    return {m.group(1): m.group(2) for m in re.finditer(r"Name: (\S+)\n(?:.*\n){1,7}?\s*AuxWeakExternal \{\n\s*Linked: (\S+) \(", text)}
 
 
 def main() -> int:

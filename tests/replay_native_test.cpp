@@ -229,21 +229,6 @@ ConstructedElement::~ConstructedElement()
 {
 }
 
-int __stdcall StopOrder(Unit*, Order*, int)
-{
-    return 1;
-}
-
-int __stdcall MakeSelectableOrder(Unit*, Order*, int)
-{
-    return 2;
-}
-
-int __stdcall WaitOrder(Unit*, Order*, int)
-{
-    return 3;
-}
-
 int __stdcall FixtureOtherNotify(Unit*, Order*, int)
 {
     return 4;
@@ -333,6 +318,7 @@ char* g_lines[MAX_LINES];
 int g_lineCount;
 char g_subsystem[48];
 bool g_importChanges;
+bool g_forgetAllocations;
 const char* g_file = "";
 
 int g_callIndex;
@@ -1450,6 +1436,8 @@ void* AllocAnswer(const char* result, unsigned size)
     if (strcmp(result, "null") == 0)
         return nullptr;
     void* p = SimAlloc(size);
+    if (g_forgetAllocations)
+        g_objects.Forget(p);
     const char* hash = strchr(result, '#');
     int kind = hash == nullptr ? -1 : ReplayFindObjectKind(result, (unsigned)(hash - result));
     if (kind >= 0 && hash[1] != '?')
@@ -2738,10 +2726,8 @@ const char* ImportObjectProblem(const char* name, const ReplaySlotSets& sets)
     LineKey k;
     if (!ParseLineKey(name, k) || k.field == nullptr)
         return "an object line after an import that names no object field";
-    if (!InObjectSet(sets.objReads, sets.objReadCount, k.field))
-        return "an object line after an import whose field the slot does not read";
-    if (InObjectSet(sets.objWrites, sets.objWriteCount, k.field))
-        return "an object line after an import whose field the slot writes, which its w lines compare";
+    if (!InObjectSet(sets.objReads, sets.objReadCount, k.field) && !InObjectSet(sets.objWrites, sets.objWriteCount, k.field))
+        return "an object line after an import whose field the slot neither reads nor writes";
     return nullptr;
 }
 
@@ -3232,6 +3218,7 @@ void ReplayFile(const char* file, Outcome& out, int mutation = MUT_NONE)
     if (known == nullptr)
         Fatal(file, 0, "not a simulation subsystem", g_subsystem);
     g_importChanges = known->recordsImportChanges != 0;
+    g_forgetAllocations = known->forgetsAllocations != 0;
     if (tail[0] != '\0' || !known->complete)
         Fatal(file, 0, "the annotations of this subsystem are not complete, so its recordings cannot be replayed", g_subsystem);
     char want[32];
@@ -6343,9 +6330,8 @@ void GoalSelfTest()
     Check(unparsed != nullptr && strstr(unparsed, "names no object field") != nullptr, "a line that names no field of the kind is fatal");
     ReplaySlotSets ticksOnly = { "ticks", 0, nullptr, 0, nullptr, 0, goalReads, 1, nullptr, 0 };
     const char* unread = ImportObjectProblem("FixtureGoalA#1.heading", ticksOnly);
-    Check(unread != nullptr && strstr(unread, "does not read") != nullptr, "so is a line for a field the slot does not read");
-    const char* written = ImportObjectProblem("FixtureGoalA#1.heading", goalSets);
-    Check(written != nullptr && strstr(written, "the slot writes") != nullptr, "and a line for a field the slot writes, so the slot's own result is always compared");
+    Check(unread != nullptr && strstr(unread, "neither reads nor writes") != nullptr, "so is a line for a field the slot neither reads nor writes");
+    Check(ImportObjectProblem("FixtureGoalA#1.heading", goalSets) == nullptr, "a line for a field the slot writes is one it can place too: the import changed it, and the w lines compare what the slot writes after");
     Check(changed != nullptr && changed->heading == 0, "none of which changes the object");
     g_importChanges = outerImportChanges;
     g_sets = outerSets;

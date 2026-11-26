@@ -1069,7 +1069,8 @@ static void CheckRegion(Region* r)
         if (r->live == 0 || r->surface == 0 || r->shadow == 0 || r->pixels == 0)
             return;
         int x0 = r->width, y0 = -1, x1 = -1, y1 = -1;
-        for (int y = 0; y < r->height; y++) {
+        int y;
+        for (y = 0; y < r->height; y++) {
             const unsigned char* a = r->pixels + (size_t)y * r->pitch;
             const unsigned char* b = r->shadow + (size_t)y * r->width;
             if (memcmp(a, b, (size_t)r->width) == 0)

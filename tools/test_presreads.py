@@ -177,6 +177,59 @@ class StaticOnlyTest(unittest.TestCase):
         self.assertEqual(rows[("units", "presentation")]["pattern"], "unknown")
 
 
+class ViewTest(unittest.TestCase):
+    def reads(self, stored, extra_rw=()):
+        return pr.view_reads(stored, STATE, RWSETS + list(extra_rw), SUBSYSTEMS)
+
+    def test_presentation_reads_by_run_and_by_static_set(self):
+        rows = self.reads({"s": [stored_row("Unit::x"), stored_row("Unit::y", reader="units", function="Idle")]},
+                          [rw("Draw", "global_read", "wind"), rw("Idle", "field_read", "Game::tick"), rw("Click", "field_read", "Game::gui")])
+        by_item = {r["item"]: r for r in rows}
+        self.assertEqual(sorted(by_item), ["Unit::x", "wind"])
+        self.assertEqual((by_item["Unit::x"]["runs"], by_item["Unit::x"]["functions"]), (1, "Draw"))
+        self.assertEqual((by_item["wind"]["runs"], by_item["wind"]["functions"]), (0, "Draw"))
+
+    def test_a_name_from_the_alias_table(self):
+        item = next(iter(pr.VIEW_NAMES))
+        rows = self.reads({"s": [stored_row(item)]})
+        self.assertEqual(rows[0]["doc_name"], pr.VIEW_NAMES[item])
+
+    DOC = """# The view
+
+| Read | In the view |
+|---|---|
+| `outside` | not under the section |
+
+## The reads
+
+| Read | In the view |
+|---|---|
+| `Unit::x` | `ViewUnit.x` |
+| `wind` |  |
+| `gone` | left out |
+
+## After
+
+| `later` | not under the section |
+"""
+
+    def test_doc_rows_only_under_the_section(self):
+        self.assertEqual(pr.doc_reads(self.DOC), {"Unit::x": "`ViewUnit.x`", "wind": "", "gone": "left out"})
+
+    def test_problems_missing_empty_and_stale(self):
+        rows = [{"item": "Unit::x", "doc_name": "Unit::x"}, {"item": "wind", "doc_name": "wind"},
+                {"item": "a: b", "doc_name": "the a block"}]
+        problems = pr.view_problems(rows, self.DOC)
+        self.assertEqual(len(problems), 3)
+        self.assertIn("the a block (a: b) is read by presentation and not listed", problems[0])
+        self.assertIn("wind has an empty row", problems[1])
+        self.assertIn("gone is listed", problems[2])
+
+    def test_a_complete_doc_has_no_problem(self):
+        rows = [{"item": "Unit::x", "doc_name": "Unit::x"}]
+        self.assertEqual(pr.view_problems(rows, "## The reads\n\n| `Unit::x` | `ViewUnit.x` |\n"), [])
+
+
 class FilesTest(unittest.TestCase):
     def test_render_and_store_round_trip(self):
         rows, _ = build({"s": [stored_row("Unit::x", every="1")]})

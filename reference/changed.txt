@@ -123,6 +123,7 @@
 0x49e830 GameMain
 0x49f6c0 PlayWavFromDisk
 0x4b5cc0 WindowProc
+0x4b66a0 GetFrameRate
 0x4b7f90 DrawFrame
 0x4b8150 DrawFrameOpaque
 0x4b8310 DrawFrameLit

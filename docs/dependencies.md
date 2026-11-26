@@ -98,17 +98,17 @@ Each deferrable edge was held back to the end of its phase in a full-suite run (
 
 Results: 45 equal.
 
-`defer_held` is 0 for every one of the 45 edges in 12 groups (1100 scenario runs counted in all): in no run did a reader meet a write that the barrier held back.
+`defer_held` is 0 for every one of the 45 edges in 12 groups (1116 scenario runs counted in all): in no run did a reader meet a write that the barrier held back.
 
 The runs add no evidence on paths the suite does not reach. The control (tests/defer/immediate-control.defer) shows that the barrier changes a trace on an immediate edge, so the barrier can change what a run shows.
 
 | group | edges | scenarios | counted | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|
-| g1 | 14 | 97 | 95 | equal | 0 | 0 |
-| g10 | 1 | 97 | 95 | equal | 0 | 0 |
-| g11 | 3 | 97 | 95 | equal | 0 | 0 |
-| g12 | 1 | 97 | 95 | equal | 0 | 0 |
-| g2 | 4 | 97 | 95 | equal | 0 | 0 |
+| g1 | 14 | 101 | 99 | equal | 0 | 0 |
+| g10 | 1 | 101 | 99 | equal | 0 | 0 |
+| g11 | 3 | 101 | 99 | equal | 0 | 0 |
+| g12 | 1 | 101 | 99 | equal | 0 | 0 |
+| g2 | 4 | 101 | 99 | equal | 0 | 0 |
 | g3 | 9 | 92 | 90 | equal | 0 | 1688 |
 | g4 | 3 | 92 | 90 | equal | 0 | 0 |
 | g5 | 1 | 92 | 90 | equal | 0 | 0 |
@@ -598,8 +598,8 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 97 | equal | 0 | 0 |
-| features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 97 | equal | 0 | 0 |
+| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 101 | equal | 0 | 0 |
+| features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 101 | equal | 0 | 0 |
 
 ## ai
 
@@ -765,8 +765,8 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| ai -> orders | `Unit::group` | units | g1 | 97 | equal | 0 | 0 |
-| units -> ai | `Unit::group` | units | g11 | 97 | equal | 0 | 0 |
+| ai -> orders | `Unit::group` | units | g1 | 101 | equal | 0 | 0 |
+| units -> ai | `Unit::group` | units | g11 | 101 | equal | 0 | 0 |
 
 ## pathfinding
 
@@ -1049,8 +1049,8 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 97 | equal | 0 | 0 |
-| weapons -> orders | `Unit::field_1e` | units | g3 | 97 | equal | 0 | 1688 |
+| features -> weapons | `FeatureAnimEntry::bytes_8` | projectiles | g1 | 101 | equal | 0 | 0 |
+| weapons -> orders | `Unit::field_1e` | units | g3 | 101 | equal | 0 | 1688 |
 
 ## targeting
 
@@ -1215,7 +1215,7 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| units -> targeting | `Unit::activateFlags` | units | g2 | 97 | equal | 0 | 0 |
+| units -> targeting | `Unit::activateFlags` | units | g2 | 101 | equal | 0 | 0 |
 
 ## los_radar
 
@@ -1387,8 +1387,8 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| los_radar -> players | `bits_142f1` | tail | g1 | 97 | equal | 0 | 0 |
-| orders -> los_radar | `Order::pos` | units | g1 | 97 | equal | 0 | 0 |
+| los_radar -> players | `bits_142f1` | tail | g1 | 101 | equal | 0 | 0 |
+| orders -> los_radar | `Order::pos` | units | g1 | 101 | equal | 0 | 0 |
 
 ## orders
 
@@ -1608,15 +1608,15 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| ai -> orders | `Unit::group` | units | g1 | 97 | equal | 0 | 0 |
-| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 97 | equal | 0 | 0 |
-| orders -> los_radar | `Order::pos` | units | g1 | 97 | equal | 0 | 0 |
-| orders -> movement | `Order::unit` | projectiles | g11 | 97 | equal | 0 | 0 |
-| units -> orders | `Unit::activateFlags` | units | g3 | 97 | equal | 0 | 1688 |
-| units -> orders | `Unit::group` | units | g12 | 97 | equal | 0 | 0 |
-| units -> orders | `Unit::killCount` | units | g3 | 97 | equal | 0 | 1688 |
-| units -> orders | `Unit::lastDamageType` | units | g10 | 97 | equal | 0 | 0 |
-| weapons -> orders | `Unit::field_1e` | units | g3 | 97 | equal | 0 | 1688 |
+| ai -> orders | `Unit::group` | units | g1 | 101 | equal | 0 | 0 |
+| features -> orders | `FeatureAnimEntry::bytes_10` | units | g2 | 101 | equal | 0 | 0 |
+| orders -> los_radar | `Order::pos` | units | g1 | 101 | equal | 0 | 0 |
+| orders -> movement | `Order::unit` | projectiles | g11 | 101 | equal | 0 | 0 |
+| units -> orders | `Unit::activateFlags` | units | g3 | 101 | equal | 0 | 1688 |
+| units -> orders | `Unit::group` | units | g12 | 101 | equal | 0 | 0 |
+| units -> orders | `Unit::killCount` | units | g3 | 101 | equal | 0 | 1688 |
+| units -> orders | `Unit::lastDamageType` | units | g10 | 101 | equal | 0 | 0 |
+| weapons -> orders | `Unit::field_1e` | units | g3 | 101 | equal | 0 | 1688 |
 
 ## units
 
@@ -1826,12 +1826,12 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| units -> ai | `Unit::group` | units | g11 | 97 | equal | 0 | 0 |
-| units -> orders | `Unit::activateFlags` | units | g3 | 97 | equal | 0 | 1688 |
-| units -> orders | `Unit::group` | units | g12 | 97 | equal | 0 | 0 |
-| units -> orders | `Unit::killCount` | units | g3 | 97 | equal | 0 | 1688 |
-| units -> orders | `Unit::lastDamageType` | units | g10 | 97 | equal | 0 | 0 |
-| units -> targeting | `Unit::activateFlags` | units | g2 | 97 | equal | 0 | 0 |
+| units -> ai | `Unit::group` | units | g11 | 101 | equal | 0 | 0 |
+| units -> orders | `Unit::activateFlags` | units | g3 | 101 | equal | 0 | 1688 |
+| units -> orders | `Unit::group` | units | g12 | 101 | equal | 0 | 0 |
+| units -> orders | `Unit::killCount` | units | g3 | 101 | equal | 0 | 1688 |
+| units -> orders | `Unit::lastDamageType` | units | g10 | 101 | equal | 0 | 0 |
+| units -> targeting | `Unit::activateFlags` | units | g2 | 101 | equal | 0 | 0 |
 
 ## players
 
@@ -1961,7 +1961,7 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| los_radar -> players | `bits_142f1` | tail | g1 | 97 | equal | 0 | 0 |
+| los_radar -> players | `bits_142f1` | tail | g1 | 101 | equal | 0 | 0 |
 
 ## map
 
@@ -2141,7 +2141,7 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| movement -> map | `PathOrder::pos_z` | units | g11 | 97 | equal | 0 | 0 |
+| movement -> map | `PathOrder::pos_z` | units | g11 | 101 | equal | 0 | 0 |
 
 ## scripts
 
@@ -2460,8 +2460,8 @@ The 15 groups with the most rows are shown.
 
 | edge | item | phase | group | scenarios | result | defer_held | defer_third_stores |
 |---|---|---|---|---|---|---|---|
-| movement -> map | `PathOrder::pos_z` | units | g11 | 97 | equal | 0 | 0 |
-| orders -> movement | `Order::unit` | projectiles | g11 | 97 | equal | 0 | 0 |
+| movement -> map | `PathOrder::pos_z` | units | g11 | 101 | equal | 0 | 0 |
+| orders -> movement | `Order::unit` | projectiles | g11 | 101 | equal | 0 | 0 |
 
 ## mission
 

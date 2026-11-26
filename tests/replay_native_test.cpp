@@ -62,6 +62,7 @@
 #include "../src/ingame/radar.h"
 #include "../src/ingame/info_panel.h"
 #include "../src/harness/replay_services.h"
+#include "../src/harness/display_game.h"
 #include "../src/harness/replay.h"
 #include "../src/harness/replay_text.h"
 #include "../src/harness/replay_values.h"
@@ -83,6 +84,10 @@ int __stdcall CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, P
 extern "C" int __cdecl bx_rand(void* state);
 extern "C" int __cdecl bx_ScaledSin(short angle, int scale);
 extern "C" int __cdecl bx_ScaledCos(short angle, int scale);
+
+void __stdcall DisplayLog3do(const char*, Object3do*)
+{
+}
 
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);

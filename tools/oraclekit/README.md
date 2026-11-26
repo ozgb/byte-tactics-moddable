@@ -19,6 +19,9 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | `reference/ui/` | the stored UI logs | `docs/ui-log.md` |
 | `reference/events/` | the stored sim event digests: for each scenario, the tick, phase, record count and hash of each run of sim events, and for each tick its count, the hash of the records whose order counts and the hash of their set | `docs/events-log.md` |
 | `docs/events-log.md`, `tools/eventdigest.py` | the sim event log format, the digest format and the tool that makes a digest from a log and compares it with a stored one (standard library only, with `tools/tracerehash.py`; it reads the order classes from `docs/sim-events.md`) | `docs/events-log.md` |
+| `reference/display/` | the stored display digests: for each scenario, each frame's number, tick, item count, the hash of its display list in order and the hash of its items with their layers | `docs/display-log.md` |
+| `reference/displaylists/` | the stored display lists of the frames whose pixels are stored, for the scenarios with a `frames` line | `docs/display-log.md` |
+| `docs/display-log.md`, `tools/displaylog.py` | the display log format, which orders of its items count, the digest format and the tool that makes a digest from a display list and compares lists and digests (standard library only) | `docs/display-log.md` |
 | `interfaces/` | the subsystem interface headers (the seams) | `docs/module-abi.md` |
 | `docs/scenario-format.md` | the scenario format, the test-mode run and its outputs | itself |
 | `docs/module-abi.md` | the module ABI | itself |

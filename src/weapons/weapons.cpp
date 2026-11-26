@@ -1773,6 +1773,7 @@ int __stdcall PointInRect(void* region, int x, int y);
 void __stdcall DrawLine(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
 int __stdcall GetGafFrameCount(void* gaf);
 #include "../harness/harness.h"
+#include "../harness/display_game.h"
 
 // FUNCTION: 0x49be60
 void __stdcall DrawProjectiles(void* surface)
@@ -1881,6 +1882,8 @@ void __stdcall DrawProjectiles(void* surface)
                     int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
                     DrawFrameBlended(surface, frame0, sx, sy);
                     Angles16 rot3;
+                    if (DisplayLogWants())
+                        DisplayLogNoAngles();
                     DrawModel3doProjected(surface, &sp, type->model, &rot3);
                 } else if (type->shotKind == 4) {
                     if (type->colour < 0xff) {

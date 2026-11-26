@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v41` is the fixed target for anyone writing a new
+The git tag `reference-traces-v42` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v41`**.
+code as a base. This page names the current tag: **`reference-traces-v42`**.
 
 ## What the tag holds
 
@@ -20,7 +20,7 @@ code as a base. This page names the current tag: **`reference-traces-v41`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v41
+git checkout reference-traces-v42
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -136,7 +136,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v41
+git checkout reference-traces-v42
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -208,9 +208,9 @@ What the code shows about the players fields (the player loader and saver):
 ## Later versions
 
 A tag is never moved. A later change to the trace format, the scenario list or
-the digests that should become a target gets a new tag (`reference-traces-v42`
+the digests that should become a target gets a new tag (`reference-traces-v43`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v41`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v40`
+`reference-traces-v42`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v41`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
@@ -394,6 +394,11 @@ and so on), and this page is updated to name it. The current tag is
   which the human Arm commander reclaims a tree that the console places. The trace format is still `bt-trace 9`; the
   92 traces are those of v40, and the new scenario adds its own trace, events, sound and UI logs. The saves are those
   of v40.
+- `reference-traces-v42`: the 93 scenarios of v41 with their display logs (#1052, `docs/display-log.md`): a
+  display digest for every frame of each scenario in `reference/display/`, and the full display lists of the six
+  scenarios with `frames` in `reference/displaylists/`. The trace format is still `bt-trace 9`; the traces are those
+  of v41 but for their commit line, which now names 0da95c095, the reference commit that writes the display log. The
+  sounds, UI logs, events and saves are those of v41.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

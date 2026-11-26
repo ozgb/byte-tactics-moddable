@@ -5,6 +5,7 @@
 #include <setjmp.h>
 
 #include "../util/vec3.h"
+#include "../harness/display_game.h"
 #include "../../interfaces/ref.h"
 #include "explosion_types.h"
 
@@ -606,6 +607,22 @@ int __stdcall DrawExplodedPiece(void* surface, ExplodedPiece* obj)
     angles[0] = inner->angle_14;
     angles[2] = inner->angle_10;
     angles[1] = inner->angle_12;
+
+    if (DisplayLogWants()) {
+        int ox = inner->pos.x - (g_game->scrollX << 16);
+        int oz = inner->pos.z - (g_game->scrollY << 16);
+        int sx = (short)(ox >> 16) + 0x80;
+        int sy = (short)(oz >> 16) - ((short)(inner->pos.y >> 16) >> 1) + 0x20;
+        if (PointInRect(&g_game->viewport[0], sx, sy)) {
+            int colour = 0;
+            Unit* unit = obj->unit.get();
+            Player* player = unit != nullptr ? unit->player.get() : nullptr;
+            if (player != nullptr && player->info.get() != nullptr)
+                colour = player->info.get()->color;
+            DisplayLogDebris(surface, inner->desc, colour, ox, inner->pos.y, oz, angles);
+        }
+    }
+    DisplayLogScope displayScope;
 
     int n = inner->desc->vertexCount;
     for (int i = n - 1; i >= 0; i--) {

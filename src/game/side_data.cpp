@@ -20,6 +20,7 @@ void* __stdcall FindGafEntry(void* gaf, const char* name);
 #include "../graphics/display.h"
 #include "../graphics/object_pool.h"
 #include "side_data.h"
+#include "../harness/display_game.h"
 #include "../files/files_api.h"
 
 // FUNCTION: 0x4318c0
@@ -126,6 +127,7 @@ void __stdcall LoadSideData(void)
             font = (Font*)HAPI_LoadFile(fontPath, 0);
             if (font == 0)
                 FatalError(fontPath);
+            DisplayLogFont(font, name);
             s->font = font;
         }
         s->energyColor = parser.current->GetFieldInt("energycolor", 0);

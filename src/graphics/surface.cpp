@@ -8,6 +8,7 @@
 
 #include "display.h"
 #include "../harness/harness.h"
+#include "../harness/display_game.h"
 
 #pragma pack(push, 1)
 struct LockEntry {
@@ -277,6 +278,7 @@ static inline int RestoreSurfacesInline(Display* d)
 // FUNCTION: 0x4c63a0
 void FlipScreen(void)
 {
+    DisplayLogScope displayScope;
     Display* d = GetDisplay();
     unsigned short flags = d->flags.word;
 
@@ -286,6 +288,7 @@ void FlipScreen(void)
         DrawSurface(p, d->overrideSurface, 0, 0);
         HarnessFrameDrawn(p->pixels, p->pitch, p->width, p->height, d->entries);
         DrawCursor(d, p);
+        DisplayLogFrameEnd(d);
         host_frame_present_rect(0, 0, p->width, d->cached.height);
         Unlock(held);
         return;
@@ -309,6 +312,7 @@ void FlipScreen(void)
             out.pixels = frame.pixels;
             HarnessFrameDrawn(bmp->pixels, bmp->pitch, bmp->width, bmp->height, d->entries);
             DrawCursor(d, bmp);
+            DisplayLogFrameEnd(d);
             BlitSurface(&out, bmp, 0, 0);
             if (d->cursorThreadEnabled != 0 && d->cursorOverlayEnabled != 0)
                 DrawSurface(bmp, d->saveMouse1, d->x, d->y);
@@ -373,6 +377,9 @@ static void clear_screen(Display* o, int colour)
 // FUNCTION: 0x4c6890
 int __stdcall FillSurface(Surface* surface, int colour)
 {
+    if (DisplayLogWants())
+        DisplayLogClear(surface, colour);
+    DisplayLogScope displayScope;
     Display* obj = GetDisplay();
     int ret = 1;
     if (surface == 0) {
@@ -419,6 +426,7 @@ Surface* __stdcall AllocSurface(char* name, int width, int height)
 {
     Surface* s = (Surface*)GameAllocIgnoreTag(name, height * width + 0x30);
     InitSurface(s, width, height, width, (int)(s + 1));
+    DisplayLogAllocSurface(s, name);
     return s;
 }
 
@@ -482,6 +490,9 @@ int GetDisplayFieldE4()
 // FUNCTION: 0x4c6b70
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y)
 {
+    if (DisplayLogWants())
+        DisplayLogBlit(dst, bmp, x, y);
+    DisplayLogScope displayScope;
     if (dst == 0) {
         if (bmp == 0)
             return;
@@ -531,6 +542,9 @@ void __cdecl BlitTile32x32(Surface* dst, Surface* src, Rect* rect, Point* pos);
 // FUNCTION: 0x4c6d20
 void __stdcall CopySurfaceRect(Surface* dst, Surface* src, Rect* rect, Point* pos)
 {
+    if (DisplayLogWants())
+        DisplayLogCopy(dst, src, rect, pos);
+    DisplayLogScope displayScope;
     if (dst == 0) {
         Surface screen;
         if (LockScreen(&screen)) {
@@ -603,6 +617,7 @@ static inline Surface* NewSurface(char* name, int w, int h)
     r.right = w - 1;
     r.bottom = h - 1;
     s->clip = r;
+    DisplayLogAllocSurface(s, name);
     return s;
 }
 
@@ -845,6 +860,9 @@ struct FrameQuadScanline {
 void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
                             FrameQuad* dst, FrameQuad* src)
 {
+    if (DisplayLogWants())
+        DisplayLogQuad(surf, bmp, dst != nullptr ? dst->p : nullptr, src != nullptr ? src->p : nullptr);
+    DisplayLogScope displayScope;
     if (bmp == 0)
         return;
     if (dst == 0)

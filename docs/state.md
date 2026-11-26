@@ -74,8 +74,18 @@ mask each, counted from the row's first byte, on the row and on every alias of t
 masks:
 
 - `players` (+0x1b63): platform for the net slot, ping, `info` and `name`; sim for the rest (type, units, squads, explored map, resources, alliances).
-- `localPlayer` (+0x2a42): sim reads it as the perspective player. Fix a sim perspective player at match start; keep a separate view local player. Both uses take the whole byte, so its sim bits and its view bits are both 0xff.
-- `playerIndex` (+0x2a43): the watched player in the views, but sim reads it (unit flag, visibility, line of sight). Same split as `localPlayer`, with the same masks.
+- `localPlayer` (+0x2a42): this machine's player, and the player the view's input acts for. Both uses take the whole byte, so its sim bits and its view bits are both 0xff.
+- `playerIndex` (+0x2a43): the watched player in the views, but sim reads it (unit flag, visibility, line of sight). The same masks as `localPlayer`.
+
+  Both stay game state, written by the match setup, by load and by players' SET_CONTROL and SET_VIEW (the console's
+  `control` and `view`). In multiplayer `localPlayer` differs from machine to machine, since each machine runs its own
+  units, so there is no perspective every machine shares to split them into. The tick keeps these 3.1c behaviours,
+  each a quirk for #1 to give a flag later:
+  - the sim and the AI see by `1 << playerIndex` (`IsSeen`, `IsPointVisible`, `CanBuildAt`, `GetOrderType`): the
+    watched player's sight decides for everyone;
+  - a loss is credited by `players[localPlayer].shareVision` (`ApplyUnitDeath`): the local view decides a sim counter;
+  - victory, defeat and the commander respawn are the local player's (`AreEnemiesEliminated`, `CheckVictory`,
+    `CheckDefeat`, `CreateUnit(localPlayer, ...)`).
 - `weapons` (+0x2cf3): view for the text, animation, model, sound, shake and colour fields; sim for damage, range, reload, velocity and flags.
 - `mapFlags` (+0x14281): sim bits for line of sight and mapping mode; the "view needs refresh" bit cleared by the camera becomes view state. Sim bits 0xfff7 (bits 0 to 2, and the unnamed bits the trace hashes), view bits 0x0008.
 - `defs` (+0x1439b): view for `soundcategory` and `field_18e`; sim for the rest.
@@ -101,8 +111,6 @@ row can change any bit. So the camera's `mapFlags &= 0xfff7` passes, and a direc
 classed `mixed` without masks (`players`, `weapons`, `defs`, `net`) is split by sub-field and not checked.
 
 Crossings left during play, each waiting on another decision:
-- `CmdControl` and `CmdView` (console_commands.cpp) write `localPlayer` and `playerIndex`, which the tick reads. They
-  become events (#1117).
 - The share commands (`CmdShareMetal` and the others of share_commands.cpp) write a player's sharing switches and
   levels, in a network game only (no test-mode run has one).
 - `WriteScreenshot` (keys.cpp), the poster key, turns mapping and line of sight off, calls `RecalculateLineOfSight`,

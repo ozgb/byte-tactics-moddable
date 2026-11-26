@@ -4536,8 +4536,10 @@ PlayersPublishEndGame,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishKillUnits,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishLeaveGame,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishSetCheats,src/game/players_events.h,game,file:src/game/players,game
+PlayersPublishSetControl,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishSetStore,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishSetType,src/game/players_events.h,game,file:src/game/players,game
+PlayersPublishSetView,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishTransfer,src/game/players_events.h,game,file:src/game/players,game
 PlayersRegionSize,src/game/players.cpp,players,file:src/game/players,
 PlayersShutdown,src/game/players.cpp,players,file:src/game/players,

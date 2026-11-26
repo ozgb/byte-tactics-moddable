@@ -33,7 +33,8 @@ section 2). The game runs 30 ticks per second of game time.
 
 A test-mode run starts from the scenario alone: it opens no menu, reads no keyboard or mouse (the only input is
 what the scenario scripts), and uses no window, display or sound device. It starts the match the scenario
-describes, plays it tick by tick, writes the outputs of section 7 and exits.
+describes, plays it tick by tick, writes the outputs of section 7 and exits. A scenario with `frontend 1`
+starts at the main menu instead, and its `input` lines set up the match through the menus (section 3.5).
 
 - **Seeds.** The game-logic random generator, the C runtime's `rand` and the presentation random generator
   (screen shake, particles and menu effects, which game logic never reads) start from `game_seed`,
@@ -87,7 +88,9 @@ describes, plays it tick by tick, writes the outputs of section 7 and exits.
 | `line_of_sight` | 0 or 1 | 1 | 1: line of sight is on. |
 | `los_type` | 0 or 1 | 1 | The line of sight type. |
 | `start_positions` | `fixed` or `random` | `fixed` | `fixed`: player N starts at start position N. `random`: the start positions are shuffled. |
+| `player_slots` | 2 to 10 | the highest named slot plus one | The game's player count: the slots of the skirmish menu, named or open (section 3.2). It must be above every named slot. Not under game type 1. One line only. |
 | `local_player` | slot 0 to 9 | the first human slot, else 0 | The slot whose view the game shows and whose state the victory and defeat conditions of a mission are checked for. It must be a slot some `player<N>.*` key names. |
+| `frontend` | 0 or 1 | 0 | 1: the run starts at the main menu, and the menus set up the match (section 3.5). One line only. |
 | `save` | tick | none | Saves the game after the step of this tick (section 5). One line only. |
 | `load` | a scenario's file name | none | Starts from a saved game instead of from a map and players (section 5). One line only. |
 | `frames` | ticks | none | Ticks at which the run dumps the frame drawn at the end of that tick's loop pass (`docs/frame-dump.md`). One line only. |
@@ -112,8 +115,10 @@ status 2.
 
 The keys `player<N>.*` describe the players of a skirmish or a multiplayer game. N is a slot from 0 to 9. A
 slot exists when any key names it; the slots no key names are open. At least two slots must exist. The game's
-player count is the highest named slot plus one. A map with fewer start positions than there are named slots
-exits with status 2.
+player count is `player_slots`, or the highest named slot plus one without it. An open slot below the player count
+is an open slot of the skirmish menu: the game sets it up as an empty player, with its starting metal and energy
+0, and an open slot at or above it is not set up at all, so the two differ in the trace. A map with fewer start
+positions than there are named slots exits with status 2.
 
 | Key | Value | Default | What the run does with it |
 | --- | --- | --- | --- |
@@ -170,10 +175,65 @@ without them), and a share it receives is booked as income but never reaches its
 finding it the poorest and gives to it every share pass. The packets the local slots would send it are written to
 the dump (`docs/trace-format.md`, section 8.23).
 
+### 3.5 Starting at the main menu
+
+With `frontend 1` the run builds no match from the scenario. The game starts as it does for a player, at the
+main menu, and the scenario's `input` lines drive the menus until a battle starts: `input 0.<frame>` addresses
+the frames drawn before tick 1 (section 4.4). The match is what the menus set up, and the run writes it to
+`setup.txt` (section 3.6) when the battle loads.
+
+- **Keys.** The keys that set the match are errors in such a scenario, since the menus set it up: `game_type`,
+  `campaign`, `map`, `difficulty`, `commander_death`, `mapping`, `line_of_sight`, `los_type`, `start_positions`,
+  `player_slots`, `local_player`, `block_bytes`, `search_steps`, every `player<N>.*` key, `save`, `spawn`,
+  `order`, `console` and `load`. The others keep their meaning, and `ticks` is still required.
+- **Seeds.** The seeds are the scenario's: the main stream of `rand` is seeded when the program starts, and
+  the game-logic generator and the load stream when the battle loads, as in every run.
+- **What the run skips.** The intro movie, and the dialogs that depend on the machine (the DirectX version
+  warning, the missing sound driver, the CD player), are skipped. The menus otherwise run as the game's.
+- **What the menus read.** The skirmish menu starts from the settings in the registry, and the map list and the
+  sides from the game data. The kit's runs start with no saved settings, so the menu shows its defaults: four
+  player slots, the first a human and the second a computer player, and the others open. A run that saves
+  settings changes no other run.
+- The 300-frame guard of `docs/ui-log.md`, "While no tick runs", holds before tick 1 too: a run that draws 300
+  frames after its last `0.<frame>` line without starting the battle exits with status 2.
+
+The scenarios of the kit that start at the main menu cover the skirmish menu: from the main menu to a battle of
+two players, a map chosen from the list and an option changed. The multiplayer lobby is not covered.
+
+### 3.6 The setup log
+
+Every run that does not load a saved game writes `setup.txt` when the match loads. It is the match the battle
+starts with, as the match keys of a scenario (sections 3.1 to 3.3): read back as a scenario, with the seeds and
+`ticks` added, it sets up the same battle, and the first tick of its trace equals the first tick of the run's.
+
+    # bt-setup 1
+    map Coast To Coast
+    los_type 0
+    player_slots 4
+    player0.controller human
+    player1.controller ai
+
+- The first line is `# bt-setup 1`, the format's version, which the loader reads as a comment.
+- Then the keys in the order of sections 3.1 and 3.2: `game_type`, `campaign`, `map`, `difficulty`,
+  `commander_death`, `mapping`, `line_of_sight`, `los_type`, `start_positions`, `player_slots`,
+  `local_player`, then for each slot that is not open, from slot 0 up, `player<N>.controller`,
+  `player<N>.side`, `player<N>.team`, `player<N>.color`, `player<N>.metal` and `player<N>.energy`.
+- **The rule:** a key whose value is its default is left out, except `map` and `player<N>.controller`, which
+  are always written (`map` is required, and the controller line is what makes a slot exist). `start_positions`
+  is written only as `random`. Under game type 1, `campaign` is written, and the keys the mission decides
+  (section 3.3) and `player_slots` are not.
+- A value is written as its key takes it: numbers in decimal, a side by its name in the game's side data, a map
+  and a campaign by their names.
+- A slot's start position is not in the log: with `start_positions fixed` it is the slot's number, and with
+  `random` the shuffle comes from the game-logic generator, so the seeds decide it.
+
+The stored setup logs of the kit are those of the scenarios with `frontend 1`, in `reference/setup/<scenario>.txt`.
+
 ## 4. Scripted lines
 
 Four keys script what the game would otherwise get from a person. Each takes at most 256 lines (`input`:
-1024). A line's tick is from 1 to `ticks`; a tick after the last tick is an error. Within one tick the run
+1024). A line's tick is from 1 to `ticks` (an `input` line of a `frontend 1` scenario may also name tick 0,
+section 4.4); a tick after the last tick is an error. Within one tick the run
 does these in this order: the `spawn` lines, the `order` lines, the `console` lines and the `input` lines,
 each in file order.
 
@@ -275,7 +335,8 @@ Sends the game raw input, below the interface, so that the game's own code turns
 orders. The event is queued at the start of `<tick>`, and the interface handles it in the next frame, before the
 phases of tick + 1. `<tick>.<frame>` is for the frames the game draws while it runs no tick (paused, or a dialog
 open): the event is queued at the end of the `<frame>`-th frame after tick `<tick>`; the rules are in
-`docs/ui-log.md`, "While no tick runs". The events, the keys, the characters and the rules the lines must keep (one mouse event and
+`docs/ui-log.md`, "While no tick runs". In a `frontend 1` scenario, `0.<frame>` is the `<frame>`-th frame the game
+draws from the start of the run, before tick 1, while the menus are up; elsewhere tick 0 is an error. The events, the keys, the characters and the rules the lines must keep (one mouse event and
 one key or `char` event per tick, a button released at most 1 tick after its press unless the mouse moved at
 least 32 units in between, a position inside the 640 by 480 window, `steps_per_frame` 1) are in
 `docs/ui-log.md`, "Scripted input". A breach is an error. A right-click gives an order only with interface type
@@ -303,8 +364,8 @@ the game cannot load, exits with status 2 and a message that names the file.
   take effect when the match loads.
 - **Keys it may not set:** the save decides them, so a scenario with a `load` line that sets one exits with
   status 2 and names it: `game_type`, `campaign`, `map`, `difficulty`, `commander_death`, `mapping`,
-  `line_of_sight`, `los_type`, `start_positions`, `local_player`, `block_bytes`, `search_steps`, every
-  `player<N>.*` key, `save`, `spawn`, `order` and `console`. `map` and the `player<N>.*` keys are not required.
+  `line_of_sight`, `los_type`, `start_positions`, `player_slots`, `local_player`, `block_bytes`, `search_steps`, every
+  `player<N>.*` key, `save`, `spawn`, `order` and `console`. `frontend 1` is an error too. `map` and the `player<N>.*` keys are not required.
 - **The tick.** The save holds the game's tick counter, so the loaded game continues from the saved tick. The
   save is made after the step of its tick, so the first row of the loaded run's trace is tick saved tick + 1
   (901 for `save-midgame`), and the trace has no rows before it. `ticks` is the last tick traced, counted from
@@ -347,6 +408,7 @@ A test-mode run writes these files in its working directory. Two builds conform 
 | `sound.txt` | every run: the sounds the game asks to start or stop | `docs/sound-log.md` | `reference/sounds/<scenario>.txt` |
 | `ui.txt` | every run: the input delivered, the orders it turned into, the selection and the camera after each tick | `docs/ui-log.md` | `reference/ui/<scenario>.txt` |
 | `events.txt` | every run: the sim events the presentation drains, with the tick and the drain that delivered each | `docs/events-log.md` | `reference/events/<scenario>.txt` (the digest of the log) |
+| `setup.txt` | every run that does not load a saved game, when the match loads: the match it starts | section 3.6 | `reference/setup/<scenario>.txt`, for the scenarios with `frontend 1` |
 | `frames/<tick>.bin` | a run whose scenario has a `frames` line: one file per listed tick | `docs/frame-dump.md` | `reference/frames/<scenario>/<tick>.bin` |
 | `savegame\harness.sav`, `savegame\harness.opt` | a run whose scenario has a `save` line | section 5 | `reference/saves/<scenario>.sav` (the `.opt` file is not stored) |
 | `replay-<subsystem>.txt` | a run with `record` lines | `docs/replay-format.md` | `tests/replay/<subsystem>/<scenario>.txt` |

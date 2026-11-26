@@ -467,6 +467,7 @@ one of those, and a scenario that uses a console command or an order kind that t
 | eight-full-moon | judged | - |
 | eight-greenhaven | judged | - |
 | eight-pincushion-teams | judged | - |
+| frontend-skirmish | left out | has `input` lines: it needs the presentation, and the menus set up its match |
 | hailstorm-los-off | judged | - |
 | load-midgame | left out | saves or loads a game: save and load are not in the core spec |
 | load-targets | left out | saves or loads a game: save and load are not in the core spec |

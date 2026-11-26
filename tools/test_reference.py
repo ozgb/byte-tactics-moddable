@@ -589,6 +589,48 @@ class SaveReportTest(unittest.TestCase):
                 self.assertEqual(differing, ["saver"])
 
 
+class SetupLogTest(unittest.TestCase):
+    SETUP = "# bt-setup 1\nmap Coast To Coast\nplayer0.controller human\nplayer1.controller ai\n"
+
+    def test_only_frontend_scenarios_are_compared_and_each_needs_a_stored_log(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            directory = root / "setup"
+            directory.mkdir()
+            menu, unstored, plain = (root / n for n in ("menu.txt", "unstored.txt", "plain.txt"))
+            menu.write_text("frontend 1\nticks 10\n")
+            unstored.write_text("frontend 1\nticks 10\n")
+            plain.write_text("ticks 10\nmap The Pass\n")
+            (directory / "menu.txt").write_text(self.SETUP)
+            scenarios = {"menu": menu, "unstored": unstored, "plain": plain}
+            with mock.patch.object(reference, "ROOT", root):
+                differing, lines = reference.setup_report(scenarios, {"menu": self.SETUP, "unstored": self.SETUP, "plain": "x"}, directory)
+                self.assertEqual(differing, ["unstored"])
+                self.assertIn("setup logs: 1 of 2 equal", lines[-1])
+                differing, _ = reference.setup_report(scenarios, {"menu": self.SETUP.replace("ai", "human"), "unstored": None}, directory)
+                self.assertEqual(differing, ["menu", "unstored"])
+
+    def test_the_readback_is_the_setup_log_with_the_seeds_for_one_tick(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            scenario = Path(tmp) / "menu.txt"
+            scenario.write_text("# menus\nfrontend 1\ngame_seed 5\ncrt_seed 6\nview_seed 7\nticks 300\ninput 0.20 mouse move 1 2\n")
+            text = reference.readback_scenario(scenario, self.SETUP)
+        self.assertEqual(text, self.SETUP + "game_seed 5\ncrt_seed 6\nview_seed 7\nticks 1\n")
+
+    def test_copy_setup_replaces_the_stored_logs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "branch/reference/setup").mkdir(parents=True)
+            (root / "branch/reference/setup/a.txt").write_text(self.SETUP)
+            (root / "reference/setup").mkdir(parents=True)
+            (root / "reference/setup/old.txt").write_text("old")
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "SETUPS", root / "reference/setup"), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.copy_setup(root / "branch")
+            self.assertEqual(sorted(p.name for p in (root / "reference/setup").iterdir()), ["a.txt"])
+            self.assertIn("1 setup logs copied", out.getvalue())
+
+
 class CopySavesTest(unittest.TestCase):
     def test_the_branch_saves_replace_the_stored_ones(self):
         with tempfile.TemporaryDirectory() as tmp:

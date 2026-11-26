@@ -167,6 +167,10 @@ static unsigned s_roundTrips[16];
 static int s_roundTripCount = 0;
 static char s_loadName[64];
 static int s_loadLine = 0;
+static int s_frontend = 0;
+static int s_frontendLine = 0;
+static int s_playerSlots = 0;
+static int s_playerSlotsLine = 0;
 static char s_decidedKey[32];
 static int s_decidedLine = 0;
 static int s_loadAhead = 0;
@@ -659,8 +663,8 @@ static void ReadInput(int lineNo, char* value)
             FailLine(lineNo, "needs a frame of at least 1 after the dot", "input", "");
     }
     in->tick = ParseNumber(lineNo, "input", tickText);
-    if (in->tick == 0)
-        FailLine(lineNo, "needs a tick of at least 1", "input", "");
+    if (in->tick == 0 && in->frame == 0)
+        FailLine(lineNo, "needs a tick of at least 1, or 0.<frame>", "input", "");
     if (strcmp(kind, "key") == 0) {
         char* direction = NextToken(&cursor);
         char* keyText = direction != nullptr ? NextToken(&cursor) : nullptr;
@@ -727,6 +731,8 @@ static void CheckInputs()
             FailLine(in->lineNo, "has a tick after the last tick", "input", "");
         if (in->frame != 0 && in->tick == s_ticks)
             FailLine(in->lineNo, "names a frame after the last tick", "input", ", the run ends when that tick has run");
+        if (in->tick == 0 && !s_frontend)
+            FailLine(in->lineNo, "names a frame before tick 1", "input", ", which needs frontend 1");
         for (int k = 0; k < i; k++) {
             if (s_inputs[k].tick == in->tick && s_inputs[k].frame == in->frame && s_inputs[k].mouse == in->mouse)
                 FailLine(in->lineNo, in->mouse ? "is a second mouse event on its frame" : "is a second key event on its frame",
@@ -805,7 +811,7 @@ static void CheckFrameInputsDelivered()
 
 static void HarnessFrameEnd(unsigned tick)
 {
-    if (tick == 0 || tick > s_ticks)
+    if ((tick == 0 && !s_frontend) || tick > s_ticks)
         return;
     if (tick != s_frameTick) {
         s_frameTick = tick;
@@ -827,6 +833,9 @@ static void HarnessFrameEnd(unsigned tick)
     if (s_framesAtTick > last + STOPPED_FRAME_LIMIT) {
         char msg[100];
         sprintf(msg, "testmode: no tick ran for %u frames after tick %u\n", (unsigned)STOPPED_FRAME_LIMIT, tick);
+        DlFlush();
+        if (s_ui != nullptr)
+            fflush(s_ui);
         Fail(msg);
     }
 }
@@ -905,7 +914,7 @@ static int KeyIsDecidedByLoad(const char* key)
 {
     static const char* const keys[] = { "game_type", "campaign", "map", "difficulty", "commander_death", "mapping",
         "line_of_sight", "los_type", "start_positions", "local_player", "spawn", "order", "console", "save", "block_bytes",
-        "search_steps" };
+        "search_steps", "player_slots" };
     for (unsigned i = 0; i < sizeof keys / sizeof keys[0]; i++) {
         if (strcmp(key, keys[i]) == 0)
             return 1;
@@ -1066,6 +1075,18 @@ static void ReadKey(int lineNo, const char* key, char* value)
         }
         strcpy(s_loadName, value);
         s_loadLine = lineNo;
+    } else if (strcmp(key, "player_slots") == 0) {
+        if (s_playerSlotsLine != 0)
+            FailLine(lineNo, "is a second player_slots line", key, "");
+        s_playerSlots = ParseRange(lineNo, key, value, MAX_PLAYERS);
+        if (s_playerSlots < 2)
+            FailLine(lineNo, "must be from 2 to 10", key, "");
+        s_playerSlotsLine = lineNo;
+    } else if (strcmp(key, "frontend") == 0) {
+        if (s_frontendLine != 0)
+            FailLine(lineNo, "is a second frontend line", key, "");
+        s_frontend = ParseRange(lineNo, key, value, 1);
+        s_frontendLine = lineNo;
     } else if (strcmp(key, "order") == 0)
         ReadOrder(lineNo, value);
     else if (strcmp(key, "spawn") == 0)
@@ -1116,6 +1137,7 @@ static void CheckGameType()
         RejectUnderMission(s_lineOfSightLine, "line_of_sight");
         RejectUnderMission(s_losTypeLine, "los_type");
         RejectUnderMission(s_startPositionsLine, "start_positions");
+        RejectUnderMission(s_playerSlotsLine, "player_slots");
         for (int i = 0; i < MAX_PLAYERS; i++) {
             char key[32];
             sprintf(key, "player%d.metal", i);
@@ -1176,8 +1198,28 @@ static void CheckRemoteSlots()
         Fail("testmode: a scenario with a remote slot needs a human slot that is not remote\n");
 }
 
+static void CheckFrontendScenario()
+{
+    if (s_loadLine != 0)
+        FailLine(s_loadLine, "cannot be set by a scenario with frontend 1", "load", ", the menus set up the match");
+    if (s_decidedLine != 0)
+        FailLine(s_decidedLine, "cannot be set by a scenario with frontend 1", s_decidedKey, ", the menus set up the match");
+    if (s_ticks == 0)
+        Fail("testmode: scenario needs a ticks line\n");
+    CheckFrames();
+    CheckInputs();
+    for (int i = 0; i < s_roundTripCount; i++) {
+        if (s_roundTrips[i] > s_ticks)
+            Fail("testmode: a roundtrip line has a tick after the last tick\n");
+    }
+}
+
 static void CheckScenario()
 {
+    if (s_frontend) {
+        CheckFrontendScenario();
+        return;
+    }
     if (s_loadLine != 0) {
         CheckLoadScenario();
         CheckFrames();
@@ -1188,6 +1230,13 @@ static void CheckScenario()
         named += s_players[i].named;
     if (named < 2)
         Fail("testmode: scenario needs at least 2 players (player<N>.* keys, N 0 to 9)\n");
+    for (int i = s_playerSlots; s_playerSlots != 0 && i < MAX_PLAYERS; i++) {
+        if (s_players[i].named) {
+            char detail[100];
+            sprintf(detail, ", player%d is named", i);
+            FailLine(s_playerSlotsLine, "must be above every named slot", "player_slots", detail);
+        }
+    }
     if (s_ticks == 0)
         Fail("testmode: scenario needs a ticks line\n");
     if (s_map[0] == '\0')
@@ -1349,7 +1398,12 @@ static void SetUpSkirmish()
     int active = 0;
 
     memset(t, 0, sizeof *t);
-    for (int i = 0; i < MAX_PLAYERS; i++) {
+    for (int n = 0; n < MAX_PLAYERS; n++) {
+        if (s_players[n].named)
+            highest = n;
+    }
+    int count = s_playerSlots != 0 ? s_playerSlots : highest + 1;
+    for (int i = 0; i < count; i++) {
         PlayerSpec* p = &s_players[i];
         SkirmishPlayer* slot = &t->players[i];
         slot->controller = p->named ? (p->human ? 1 : 2) : 0;
@@ -1371,8 +1425,6 @@ static void SetUpSkirmish()
         slot->metal = p->metal;
         slot->energy = p->energy;
         slot->color = p->color;
-        if (p->named)
-            highest = i;
         if (slot->controller != 0)
             active++;
     }
@@ -1410,7 +1462,7 @@ static void SetUpSkirmish()
         Fail(msg);
     }
 
-    g_game->playerCount = highest + 1;
+    g_game->playerCount = count;
     g_game->numPlayers = (unsigned short)active;
     ResetPlayerSlots();
     ApplySlotsToGamePlayers();
@@ -1822,12 +1874,82 @@ int HarnessViewRand()
     return (s_viewState >> 16) & 0x7fff;
 }
 
+static void SetupKey(FILE* f, const char* key, int value, int fallback)
+{
+    if (value != fallback)
+        fprintf(f, "%s %d\n", key, value);
+}
+
+static void WriteSetupLog()
+{
+    const OptionsTable* t = ScenarioTable();
+    int type = g_seams.mission->GetGameType();
+    FILE* f = fopen("setup.txt", "wb");
+    if (f == nullptr) {
+        Fail("testmode: cannot write setup.txt\n");
+        return;
+    }
+    fputs("# bt-setup 1\n", f);
+    SetupKey(f, "game_type", type, 2);
+    if (type == 1 && g_seams.mission->GetCampaignName() != nullptr)
+        fprintf(f, "campaign %s\n", g_seams.mission->GetCampaignName());
+    fprintf(f, "map %s\n", t->mapName);
+    SetupKey(f, "difficulty", t->difficulty, 1);
+    if (type != 1) {
+        SetupKey(f, "commander_death", t->commanderDeath, 1);
+        SetupKey(f, "mapping", t->mapping, 1);
+        SetupKey(f, "line_of_sight", t->lineOfSight, 1);
+        SetupKey(f, "los_type", t->losType, 1);
+        if (t->fixedLocations == 0)
+            fputs("start_positions random\n", f);
+    }
+    int firstHuman = -1;
+    int highest = 0;
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (t->players[i].controller == 1 && firstHuman < 0)
+            firstHuman = i;
+        if (t->players[i].controller != 0)
+            highest = i;
+    }
+    if (type != 1)
+        SetupKey(f, "player_slots", g_game->playerCount, highest + 1);
+    SetupKey(f, "local_player", g_game->localPlayer, firstHuman < 0 ? 0 : firstHuman);
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        const SkirmishPlayer* slot = &t->players[i];
+        if (slot->controller == 0)
+            continue;
+        char key[32];
+        fprintf(f, "player%d.controller %s\n", i, slot->controller == 1 ? "human" : "ai");
+        int side = i % 2 < g_game->sides ? i % 2 : 0;
+        if (slot->side != side && slot->side >= 0 && slot->side < g_game->sides)
+            fprintf(f, "player%d.side %s\n", i, g_game->sideDefs[slot->side].name);
+        sprintf(key, "player%d.team", i);
+        SetupKey(f, key, slot->allyGroup, 5);
+        sprintf(key, "player%d.color", i);
+        SetupKey(f, key, slot->color, i);
+        if (type != 1) {
+            sprintf(key, "player%d.metal", i);
+            SetupKey(f, key, slot->metal, 1000);
+            sprintf(key, "player%d.energy", i);
+            SetupKey(f, key, slot->energy, 1000);
+        }
+    }
+    if (fclose(f) != 0)
+        Fail("testmode: cannot write setup.txt\n");
+}
+
 static void* s_loadEnded = nullptr;
 
 void HarnessLoadBegins()
 {
-    if (HarnessTestMode())
-        s_loadEnded = host_event_create(1, 0);
+    if (!HarnessTestMode())
+        return;
+    s_loadEnded = host_event_create(1, 0);
+    if (s_loadLine != 0)
+        return;
+    if (s_frontend)
+        strcpy(s_map, ScenarioTable()->mapName);
+    WriteSetupLog();
 }
 
 void HarnessLoadEnded()
@@ -1849,10 +1971,20 @@ void HarnessStartSkirmish()
     if (!HarnessTestMode() || s_started)
         return;
     s_started = 1;
+    if (s_frontend) {
+        g_game->cmdlineSkipIntroMovie = 1;
+        g_game->playMovie = 0;
+        g_directXCheckDone = 1;
+        g_noSoundDriverShown = 1;
+        g_cdPlayerDialogShown = 1;
+        return;
+    }
     if (s_loadLine != 0)
         SetUpLoadedGame();
     else
         SetUpSkirmish();
+    if (g_seams.mission->GetGameType() != 3)
+        g_game->netGameFlags_2a44.bits.b3 = 1;
     g_game->gui.hotGadgetIndex = -1;
 }
 

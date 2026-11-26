@@ -434,7 +434,7 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `PieceFrame::flags` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
 | `PieceFrame::indices` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
 | `PieceFrame::ptr_10` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `PieceFrame::unknown_0` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
+| `PieceFrame::fillColor` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
 | `Player::active` | `ViewPlayer.active`, `type` (Players). |
 | `Player::alliance` | `ViewPlayer.allied` (Players). |
 | `Player::allied` | `ViewPlayer.allied` (Players). |

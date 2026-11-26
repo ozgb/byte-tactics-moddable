@@ -386,24 +386,6 @@ Order::~Order()
     OrdersPublishUnlink(link.owner.get(), &link);
 }
 
-short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
-{
-    char key[0x80];
-    sprintf(key, "UTYPENAME%4d", id);
-    if (file->HasItem(key))
-        return g_seams.units->FindUnitTypeId(file->GetStringItem(key, 0));
-    int i, n = 0;
-    unsigned short k = 0;
-    for (i = 1; i < g_game->unitDefCount; i++, n++) {
-        if (!(g_game->defs.get()[(unsigned short)i].flags1Byte & 0x20)) {
-            if (k == id)
-                return n;
-            k++;
-        }
-    }
-    return 0;
-}
-
 static unsigned char OrderKindFromName(const char* s)
 {
     OrderTableEntry* e = LowerBoundOrderTypes(g_missionOrderTableVec.Begin(), g_missionOrderTableVec.End(), s, OrderTypeNameLess, 0);

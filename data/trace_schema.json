@@ -1201,7 +1201,7 @@
         {"name": "extraction", "offset": 88, "size": 4, "kind": "scalar", "target": null},
         {"name": "list", "offset": 92, "size": 4, "kind": "ref", "target": "heap"},
         {"name": "list2", "offset": 96, "size": 4, "kind": "ref", "target": "heap"},
-        {"name": "field_64", "offset": 100, "size": 2, "kind": "scalar", "target": null},
+        {"name": "bank", "offset": 100, "size": 2, "kind": "scalar", "target": null},
         {"name": "heading", "offset": 102, "size": 2, "kind": "scalar", "target": null},
         {"name": "pitch", "offset": 104, "size": 2, "kind": "scalar", "target": null},
         {"name": "pos.x", "offset": 106, "size": 4, "kind": "scalar", "target": null},

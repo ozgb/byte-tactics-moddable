@@ -330,7 +330,9 @@ jobs:
 
       - name: Check the vtable aliases of the replay link
         if: steps.changed.outputs.run == 'true'
-        run: uv run tools/replayvtablealiases.py --check
+        run: |
+          ninja -C build/modern aliases.obj
+          uv run tools/replayvtablealiases.py --check
 
       - name: Compile the game and data with the access log
         if: steps.changed.outputs.run == 'true'

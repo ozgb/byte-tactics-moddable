@@ -429,7 +429,7 @@ tick, phase and field.
 | Route queued | Tier | First divergence |
 |---|---|---|
 | units ADD_UNIT | equal | none (synchronous by #952's rule, section 4) |
-| orders ADD_UNIT | diverged | orders-air-fights, tick 1276, units phase: `units[4].field_64`, then 96 fields of the units' headings, positions and motion. |
+| orders ADD_UNIT | diverged | orders-air-fights, tick 1276, units phase: `units[4].bank`, then 96 fields of the units' headings, positions and motion. |
 | units REMOVE_UNIT | diverged | mission-capture, tick 1, world phase: `cells[561]` still names unit 5 (reference `00…`, queued `05…`). |
 | orders REMOVE_UNIT | diverged | mission-radius, tick 20, world phase: `cells[3408]` still names unit 9. |
 | units CLEAR_UNIT | diverged | conditions-dark-side: equal to tick 451, then the game exits with code 3 during tick 452. |

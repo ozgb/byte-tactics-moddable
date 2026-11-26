@@ -2,7 +2,7 @@
 
 A recording holds the calls one subsystem received in a test-mode run: the state each call could read, the
 imports it made with their arguments and results, and the state it changed. `bt-replay 2` is the format.
-Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units, ai, los_radar and pathfinding have recordings so far. The tables behind the format are `data/replay_schema.json`
+Recordings are in `tests/replay/<subsystem>/<scenario>.txt`; wind_meteors, targeting, map, weapons, economy, players, features, mission, units, ai, los_radar, pathfinding and scripts have recordings so far. The tables behind the format are `data/replay_schema.json`
 (`uv run tools/replayschema.py` writes it, and the generated sources, from the interface headers,
 `data/subsystems.csv`, `data/rwsets.csv` and the annotations the file itself holds).
 
@@ -55,6 +55,9 @@ Text, LF line endings. The header is two lines: `bt-replay 2` and `subsystem win
 version). A subsystem whose annotations are not complete yet (`status` in the schema is `pending`) writes
 `incomplete` after the version, and the replayer refuses such a file. The file name carries the scenario.
 
+Between the header and the first call there may be load lines, which carry the files the recording's pointers to load-time data lead
+to (see Load inputs).
+
 A call is a line `call <ticks> <Slot>`, where `ticks` is `Game.ticks` when the call starts (`-` before the
 game record exists) and `Slot` is a slot of the interface. Calls are in the order they start. A slot called by
 another slot of the same subsystem (UpdateWind calls its helper for a stream in a native build) is part of the outer
@@ -68,7 +71,9 @@ call and has no line of its own. The lines of a call, indented by two spaces, in
 | `c <handle>#<n>.<Method> <arguments> [= <result>]` | indented by four spaces, right after an `i` line and before its `o` lines: one call the import made on a callback object it was given, in call order (see Callbacks) |
 | `c <handle>#<n>.<Method> <arguments> [= <result>]` | indented by two spaces, after the `i` lines and before the closing `o` lines: one call the module made during the slot on a callback object it holds or was given, in call order (see Callbacks, "A callback held in state") |
 | `o <name> <value>` | right after an `i` line: a value the import wrote through a pointer argument (`o dst "text"`, `o dst x:0102`) or reached through its result (`o weapondef#17.flags 0x00000001`, `o Cell#1.metal 12`) |
+| `b <name> <value>` | right after an `i` line, before that import's `o` line of the same name: the value a field of the slot's write set had before the import, when the slot wrote it earlier in the call and the import then changed it (see An object field that an import changes) |
 | `w <field> <value>` | a field of the slot's write set that differs from the last known value after the call |
+| `d cache <size> <cursor>`, then `d block <offset> <size> <owner>` | a call of `weapons` that changed the debris cache: its cursor after the call, and each block whose header the call wrote (see The start state of the debris cache) |
 | `o <name> <value>` | last in the call: a value the slot wrote through its own pointer argument, or `o result <value>` for its result |
 
 A call without any such line is idle. The last known value of a field is the one on the latest `r` or `w` line
@@ -356,6 +361,15 @@ A field of kind `embeds` is `count` structs of a kind laid out in place (`CobScr
 `"inside": [{"kind": "CobScript", "member": "channels[]"}]`. An element is named by its site and index, and its fields are written one by one, so a changed element
 is its changed fields: `r CobScript#3.channels[2].pc 7`. The index is read off the address, and the replayer resolves `CobScript#3.channels[2]` to the bytes inside the container.
 
+An array whose live length is a member of the owner (`ModelState.pieces`, `count` pieces after a header of 34 bytes, allocated at `34 + 54 * count`) has a `count` that is a length
+expression over the owner's members, as an array's `length` is (see Arrays), and a `capacity`, a positive integer:
+`{"name": "pieces", "kind": "embeds", "count": "count", "capacity": 128, "target": "ModelPiece", "member": "pieces[]"}`. The walk, the lines and the comparison go over the first `count`
+elements, read from the object each time, and the elements are named by their site and index as before (`ModelState#3.pieces[14]`, `ModelState#3.pieces[14].short_12`). The member in the C struct
+holds one element (`ModelPiece pieces[1]`), the rest of the elements being the memory that follows the struct. The capacity is what the replayer allocates: it makes the owner (a kind
+named at first sight, or the object a service answers for) with room for `capacity` elements after the member's offset, the size of its type if that is larger, and a name past `capacity` resolves to nothing. A run whose
+object has a `count` above the capacity ends with `ModelState.pieces has 130 elements, past the capacity of 128 that the schema gives`, so the capacity is chosen from the largest object the shipped data builds:
+the 773 models of `objects3d` in the archives of `~/.ta` (counted from the first node by its sibling and child offsets) have at most 36 pieces (`armscorp`), and 128 leaves room for the mods that add more. The count member has to be in the slot's read set (a rule's `reads` adds it), so that the replayer restores it before it reads the elements.
+
 A member of each element is a site too, when the array is of a struct that is no kind: `{"name": "callbacks", "kind": "embeds", "count": 3, "target": "AimCallback",
 "member": "weapons[].callbacks"}` in `Unit`, and `"inside": [{"kind": "Unit", "member": "weapons[].callbacks"}]` in the kind, give `Unit#3.weapons[1].callbacks` in walk lines, service lines and argument values.
 
@@ -508,6 +522,7 @@ that reads the member (`field_read Game::src1`, `global_read g_explodedPieces`) 
 | string | double quotes, C escapes, up to the first NUL |
 | string behind a pointer (`cstring`) | the same, or `null` for a null pointer |
 | pointer to an object (`ref` or `ptr`) | `Unit#17`, `UnitDef#2`, `weapondef#17`, `Feature#5.anim`, or `null` |
+| pointer to load-time data | `UnitDef#12`, `UnitDef#12+448`, or `null` (see Load inputs) |
 | object handed to an import | `file#1`, `rec#2`, `bank#1` |
 | random stream | `main` or `load` |
 
@@ -546,6 +561,14 @@ characters, so a long array is several lines with the same name, in order, and a
 lines have the same forms, against the value known after the last `r` or `w` line. The replayer keeps the array in its block
 and applies the runs to it; at the end of the call it is compared with the value the lines made known, and a difference is
 reported at the field, as `byte 25 of 32: recorded 15, replayed 14, 1 bytes differ`.
+
+### An array whose length is in load-time data
+
+A factor of the `length` of an array field may follow a field of kind `load` to a member of the loaded type: `{"name": "pieces", "kind": "array", "elem": "u8", "ref": true, "length": "table->pieceCount*76"}`
+in `CobScript`, where `table` is the `load` field that holds the unit's `ScriptTable`, and `pieceCount` a member of that type; `{"name": "points", "kind": "array", "elem": "u8", "ref": true, "length": "object->vertexCount*12"}`
+in `ModelPiece`, where `object` leads to the `Object3do` node of the piece. The recorder reads the pointer from the object and the member from the file in memory, and the replayer does the same from the
+copy of the file it loaded (see Load inputs): a null pointer is a length of 0. `member->member` is one factor, with the shifts and addends of any factor, and only the length of an array field of a state
+kind may have one. `replayschema.py --check` fails for a field that is no field of kind `load` of the kind, and for a member that is no byte, short or int of the loaded type.
 
 ## Struct arguments
 
@@ -635,8 +658,8 @@ For example, the lines `a event.kind 66`, `a event.weapon "Meteor"`, `a event.ra
 `interval` at 48, 52 bytes in all, in hex
 `42000000` `4d6574656f72` followed by 26 `00` bytes, `2c010000` `00000040` `0000a040` `00007042`.
 
-`"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: weapons' `Apply` leaves
-`WEAPONS_EXPLODE_PIECE` (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
+`"unrecorded"` maps the enum name of a kind to the reason the slot does not record it: scripts' `Apply` leaves
+`SCRIPTS_FREE_STATE` and `SCRIPTS_INIT_STATE` (see "Not recorded"). The recorder passes an event of such a kind (one at least as long
 as the header) through with no lines, as it does a slot with `"record": false`, so what the call changes reaches the next
 recorded call as `r` lines. `replayschema.py --check` fails for a name that is no kind of the table and for an empty reason.
 `"kindWrites"` maps the enum name of a kind to object fields that only that kind writes, added to the slot's write set for an
@@ -646,7 +669,7 @@ every call, an import's spend of the store would be a write of the module). The 
 fails for a kind that is no kind of the table, one that is also `unrecorded`, an empty list, and a field that is not among the slot's reads (no `r` line would record its value before the write).
 `"refs"` maps a struct member (`Struct.member`) to the state kind its block offset leads to, for a ref that is no unit:
 `{"WeaponsAimDone.callback": "WeaponAimCobCb", "WeaponsStartScript.callback": "WeaponAimCobCb"}` makes `callback` of those
-two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). The check fails
+two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). Scripts' `ScriptsStart.callback` is a ref of the same kind, and `ScriptsState.state` one to a `ModelState`. The check fails
 for a kind that is no state kind, for a member that is no `unsigned int` of a struct of the module's interface header, and for
 a member that is a unit ref already, which is a member named `unit`, `target`, `source`, `attacker` or `builder` that the module does not list as a handle.
 A handle member (movement's `target`, an offset of an `OrderFx`) is named by `refs` as any other: a base kind takes the object form, `{"MovementTarget.target": {"kind": "OrderFx", "poly": "OrderFx"}}`, with the same kind in both keys, and the line is written
@@ -1021,6 +1044,136 @@ and a return that records the buffer. When a module links the radar source, the 
 through a function with the signature of the capture allocator, one of 700 bytes, and checks the lines, an equal replay, a changed byte,
 a snapshot the stub did not allocate and a buffer of another size.
 
+## Load inputs
+
+Some data the game loads from a file stays on the heap, outside the state block, and the code only reads it afterwards: the compiled script of a unit type
+(`ScriptTable`, which its loader relocates in place) and its 3D model (`Object3do`, which its loader relocates and mirrors). A recording
+does not carry that data. It carries the inputs of the load, the name and the bytes of each file, and the replayer gives them to the same loaders before the first
+call, so the data it replays against is what the game had. The loaders and the seams do not change for it: the code that holds the data keeps a plain pointer.
+
+A pointer to such data is written as what identifies it, never as its bytes: the holder of the file and an offset into it. A holder is the unit type whose
+script or model it is, written `UnitDef#12` (the unit type is the index of the `UnitDef` in `Game.defs`).
+
+### The load kinds
+
+`annotations.loads` lists the load kinds. Each names the type of the data, the functions that load it and its holders:
+
+```json
+"loads": {
+ "cob": {"type": "ScriptTable", "loader": ["..."], "holders": [{"kind": "UnitDef", "member": "data"}]},
+ "model": {"type": "Object3do", "loader": ["...", "..."], "holders": [{"kind": "UnitDef", "game": "types"}]}
+}
+```
+
+A holder is a state kind with a table in `Game` or `SimGlobals`, and element N of its table is the holder `Kind#N`. It holds its pointer either in a `member` of the
+element (`UnitDef.data`, which holds the script), or in element N of the array that the `Game` member `game` leads to (`Game.types[N]`, which holds the model of unit
+type N). A load kind may have several holders (a later issue adds the models of feature types), and a holder needs no format change: the line names its kind. The
+`loader` lists the functions of the source that load and prepare the data, in the order they run (the oracle kit's copy of the schema leaves it out); the replayer calls them. The type of a load kind needs no rule: a field row of the
+type (`field_read ScriptTable::code`, `Object3do::sibling`) of a complete subsystem is not an untracked target, because the replayer has the real bytes.
+
+### The load lines
+
+A recording lists each load that any of its lines named, between its two header lines and its first call, in the order the lines of the calls first named them:
+
+```
+bt-replay 2
+subsystem scripts 2.0
+load cob UnitDef#12 "scripts\\ARMCOM.COB" [4812]
+  x 0:0b0000000300000001000000...
+  x 512:00ab...
+load model UnitDef#12 "objects3d\\armcom.3do" [9120]
+  x 0:...
+call 1 SetCob
+```
+
+A load line is `load <load kind> <holder> "<file name>" [<size>]`: the file is the one the loader was given (the name as the game wrote it, with C escapes), `size` is its
+length in bytes. The lines `  x <offset>:<hex>` that follow carry the bytes of the file as it was read, before the loader relocated it in place, in chunks of at most 512 bytes,
+each at its offset in the file. A chunk of 512 bytes that is all zero is left out (as an all-zero run of a region is), so a byte that no line names is 0. A file that the
+lines of no call named is not listed. A holder holds one file in a recording: a unit type whose script was reloaded to a file with other bytes fails the recording.
+
+The recorder keeps, for every file a loader of the schema read while any recording is configured, its address, size, name and bytes, and a later load at the same address
+replaces the earlier entry. The loaders hand the file to the recorder between reading it and relocating it, and do nothing else when no recording is configured. A line
+that names a pointer is mapped when it is written: the file whose bytes hold the pointer, the holder whose pointer is the start of the file, and the offset.
+
+### Faces a later load step bound
+
+A model is more than its file once the game has bound its textures: that step reads the GAF files, which a recording does not carry, and sets the flags, the fill colour, the picture or animation word and the animation sequence of the faces that have a texture. The simulation reads them (the debris of a shattered piece copies a face's texture and takes the team colour texture of a face that has one, and the animation of a sequence reads the sequence). A `model` load line is therefore followed, after its `x` lines, by one line for each face the bind touched:
+
+```
+load model UnitDef#12 "objects3d\\armcom.3do" [9120]
+  x 0:...
+  bind 908 1638430 FrameTable#12 209 =3932160 1
+  bind 972 3473414 null 0 GafFrame#2 0
+```
+
+`bind <offset> <flags> <src> <fillColor> <picture> <texKind>`: the face is named by its byte offset from the start of the file (as `UnitDef#12+offset` names a node). Every number is decimal, so that no value reads as a code address. `flags` is the whole flags word of the face. `src` is the animation sequence, `FrameTable#N` named as the services name it (so that `i services.GetGafFrame FrameTable#12 0` resolves to the same object), or `null` when the face has none (a face whose flags bit 1 is clear). `fillColor` is the first word of the face (209 for a face whose texture was not found). `picture` is the word at offset 16: `=<number>` when flags bit 1 is set (the index and the duration of the sequence, a number), and otherwise `null`, `+<offset>` for a pointer into the model's own file (the name of a texture that was not found), or the picture as a `GafFrame#N` object. `texKind` is the word at offset 20: the kind of the sequence in its low byte, and the three bytes after it. The recorder takes the lines from the live model the first time a line names it. A face with none of the bits 0 to 2 of its flags set and no word at offset 16 has no line.
+
+The replayer runs the loaders as before, clears bits 0 to 2 of the flags of every face, then sets the words of each listed face, its picture word to the number, the place in its own copy of the file or the object the line gives, and its animation sequence to the object the name gives, made empty as for a `ptr` that no line named. A `bind` line that names no face, or an object it cannot make, stops the replay. The self-test builds a model with three faces, binds two, and checks the lines, the replayed words, and that the named object is the one later lines resolve to.
+
+The reader refuses a load line whose bytes are not an even run of lower case hex digits, a byte line past the size of its file, a `bind` line under a load that is not a model, a bind line of another form, and a second load line for a holder that already has one. Each of these stops the replay at the line, and each has a self-test.
+
+### The start state of the debris cache
+
+The debris pieces are allocated from a cache of blocks whose cursor and block headers decide when an allocation evicts older pieces. The cache is tick state, so a recording of `weapons` carries the state it started from, after its load lines:
+
+```
+cache debris 100000 4812
+  block 0 134 ExplodedSlot#7 live
+  block 134 120 ExplodedSlot#2
+  block 254 99746 null
+```
+
+`cache debris <size> <cursor>`: the size of the arena and the offset of the cursor, which is at the start of a block. Each `block <offset> <size> <owner>` line lists a block in address order, and the blocks tile the arena. The owner is the slot of `g_explodedPieces` that the block was allocated for (`null` for a free block), and `live` marks a block whose owner still points at it. The recorder takes the state when the first call of the recording that finds the cache installed starts (the match load installs it, so a call before the load does not touch it), and fails the recording when the blocks do not tile the arena. A recording with no such call has no cache line, and the replayer starts from an empty cache. The replayer builds the arena of the game, sets the headers and the cursor from the lines, and points each live slot at its block; the first line that names such a slot's piece (`r ExplodedSlot#7.piece ExplodedPiece#3`) names the object in the block. An eviction that the allocation makes therefore happens on the tick it happened in the game, and the slots it clears are compared like any write.
+
+The cursor and the headers are tick state too, and each call of `weapons` that changes them records what it left, as `d` lines after its `w` lines:
+
+```
+call 912 Apply
+  ...
+  d cache 100000 342
+  d block 134 208 ExplodedSlot#3
+  d block 342 99658 null
+```
+
+`d cache <size> <cursor>` is the cursor after the call, and each `d block <offset> <size> <owner>` line is a block of the arena after the call whose offset, size or owner the call changed, in address order (a block the call left as it was has no line, and a block that another one swallowed has none either, since the blocks after the call tile the arena). `live` is not written: the slots are `w` lines. A call that installs the cache lists every block, and one that frees it is `d cache none`. The recorder reads the arena when each call of `weapons` starts and when it ends, and the replayer does the same with its own arena and compares the lines it would write with the recorded ones, as `cache debris`:
+
+```
+    cache debris: recorded cache 100000 342; block 134 208 ExplodedSlot#3; block 342 99658 null, replayed cache 100000 334; block 134 200 ExplodedSlot#3; block 334 99666 null
+```
+
+So a module that leaves out the 8-byte header of a block, does not split off the rest of a free block, or does not wrap to the start of the arena differs at the call that allocates, whether or not the allocation evicts a piece. A replayed arena whose blocks do not tile it differs as `cache debris` too, and one that does not tile before a call stops the replay. The self-test checks the lines of an allocation that splits a free block and of one that wraps and evicts, and edits `weapons/combat-deaths`: a recorded block size 8 bytes larger differs at the call that allocated it, and a start cursor 8 bytes before the end of the arena makes the first allocation wrap, which the replay shows as a smaller rest than the game's.
+
+### A pointer to load-time data
+
+A pointer into a loaded file is written `<holder>` when it is the start of the file, `<holder>+<offset>` (decimal bytes) when it is not, and `null` for a null pointer. It is a
+node inside a model (`UnitDef#12+448`) as well as the model. Three places carry it, each with a form that names the load kind:
+
+| Where | Annotation | Written |
+|---|---|---|
+| a slot argument, or an import's | `{"mode": "load", "load": "cob"}` | `a data UnitDef#12`, and ` UnitDef#12+448` in an import line |
+| a slot result, or an import's | `{"mode": "load", "load": "cob"}` | `o result UnitDef#12`, and ` = UnitDef#12` in an import line |
+| a field of an object | `{"name": "table", "kind": "load", "load": "cob"}` | `r CobScript#3.table UnitDef#12`, `w ...` as any field |
+
+The mode needs a C type that is a pointer; the argument may be `void*` or the type of the load. A field of kind `load` is a member that holds the pointer (`CobScript.table`;
+`ModelPiece.object`, which leads to a node inside a model). `PieceRec.desc` is not a field: the module reads that node through the unit's model state (`ModelPiece.object`), which the rule of the read names, and nothing else reads it in a tick. The replayer restores such a field, passes such an argument and answers such an import
+with the address in its own copy of the file, `base + offset`, where `base` is what the loader returned for the holder's line. It compares a result and a field by their
+text, so a difference is reported as the field or the result names it:
+
+```
+FixtureLane#0.script: recorded FixtureLane#2+4, replayed FixtureLane#2+8
+```
+
+A pointer that leads into no file of the loader's kind is `?` in a replay (it differs from every recorded name), and fails a recording with `a pointer into no cob load`; one into a
+file that no holder holds fails it with `no holder holds the cob load of <file>`, naming the file, since the recording could not name it.
+
+### Replaying a load line
+
+The replayer reads the load lines before the first call. For each, it registers the bytes under the file name, calls the loaders of the load kind, the game's own, with the reads of the file
+(its length, and its contents in a new buffer) answered from the registered bytes, and keeps the address the loader returned as the file of the load kind
+and the holder. The imports the loader makes are not part of any call and are answered without a line; the checksum of a script's file, which the script's `checksum` field takes from its load, is computed from the registered bytes, as the game computes it, so a changed byte of a load is reported at that field. A line, argument or result that names a holder
+that no load line gave, or an offset past the end of a file, stops the replay at that line: `a load that no load line names`. A field whose line does is restored, and the field is
+refused (`a value that cannot be restored`) when its text is no name.
+
 ## Fields
 
 Block fields are named as `data/rwsets.csv` names them: `Game.windCounter` for the member `windCounter` of `Game`,
@@ -1122,10 +1275,40 @@ last gave:
 ```
 
 The replayer's answer to the import stores the value in the field before the module goes on, as for the fields of a service (`A service that leaves a block field behind`).
-A field of the write set never has the line, so a field the slot computes is compared by its `w` line and never set from the recording. The replayer stops with an error on a
-line of this form that it cannot place (one that names no field of a known kind, or a field outside the slot's read set or inside its write set), so a recording that broke that
-rule fails rather than going uncompared. An object the import frees (`services.SimFree`) is not walked until `services.SimAlloc` hands its address out again; the list of freed
-addresses has no limit. The walk runs after every import, so a subsystem has the lines only when its annotation asks for them with a reason, `"import_objects": "<reason>"` (movement has it); `replayschema.py --check` fails for one with no reason. The other subsystems record as before: their slots read such fields again from the `r` lines of their next call, and a slot whose read set has none has no lines. The self-test replays the
+An import can change a field of the write set too: orders' `RunOrders` calls `movement.NewApproachRadius`, whose MOVEMENT_EFFECT_ORDER_FLAGS runs orders' own `Apply` on a
+synchronous route and sets the order's `subFlags` inside the import, and the unit that `units.CreateUnit` makes has its `flags` before orders writes them. Before each import the
+recorder saves the bytes of every field of the write set of every object reached from the same roots as the walk after it (the slot's roots and the objects the import's
+arguments name), and after the import it writes an `o` line for each such field whose bytes changed:
+
+```
+  i movement.NewApproachRadius Order#4 45878325 19689825 16 = ApproachRadius#1
+  o Order#4.subFlags 128
+```
+
+A field of the write set that the import left alone has no `o` line, so what the slot wrote stays for its `w` lines to compare. The one exception is a field the recording has
+never given, of an object that the walk reaches for the first time and that no `services.SimAlloc` of the call allocated (the unit `units.CreateUnit` makes, once the next
+import names it): the replayer has no value for it, so the recorder gives it once, as for a field of the read set. A block that the call's own `SimAlloc` allocated is the
+module's, and its fields are what the module writes, so they have `o` lines only when an import changes them.
+
+When the slot wrote a field of its write set earlier in the call and the import then changed it, its value before the import differs from what the recording last gave. The
+recorder writes that value on a `b <name> <value>` line before the import's `o` lines, and the replayer compares the module's value with it before it stores the `o` line's
+value. For a field with no `b` line the replayer compares the module's value with the last known one, so a wrong write that an import then overwrites still fails
+(movement's `UpdateMotion` sets `PathOrder#4.posY` between two `scripts.GetPiecePosition` calls, `orders-air`):
+
+```
+  i scripts.GetPiecePosition Unit#1 -1 = (39226580,65536,21393069)
+  b PathOrder#4.posY 5963776
+  o PathOrder#4.posY 65536
+```
+
+The line is also what the recording knows of the field, so the slot's `w` lines compare what it writes after the import, and a field the slot computes is never set from the
+recording unless an import changed it. The replayer stops with an error on a line of this form that it cannot place (one that names no field of a known kind, or a field the
+slot neither reads nor writes), so a recording that broke that rule fails rather than going uncompared. An object the import frees (`services.SimFree`) is not walked until `services.SimAlloc` hands its address out again; the list of freed
+addresses has no limit. The walk runs after every import, so a subsystem has the lines only when its annotation asks for them with a reason, `"import_objects": "<reason>"` (movement and orders have it); `replayschema.py --check` fails for one with no reason.
+A subsystem that frees an object and allocates the next at the same address also gives `"fresh_allocations": "<reason>"` (orders has it): the recorder forgets the names other
+objects held at the block's first address before it names the block of `services.SimAlloc`, and the replayer forgets them before it binds the block, so a new order is
+`Order#5`, not the name of the order freed there. Only the first address is forgotten: a `PathOrderAttach` named on its own at an offset inside the freed block (as
+`units.UnitRefInit`'s argument) keeps its name, in the recorder and the replayer alike. `replayschema.py --check` fails for one with no reason or on a subsystem with no `import_objects`. The other subsystems record as before: their slots read such fields again from the `r` lines of their next call, and a slot whose read set has none has no lines. The self-test replays the
 form on a fixture (`an object field that an import changes`).
 
 ## The schema and its annotations
@@ -1134,7 +1317,7 @@ form on a fixture (`an object field that an import changes`).
 `fields`, `objects` and `subsystems` (one entry per simulation subsystem, with its slots and their read and write
 sets). The annotations hold what no header says. The copy in the oracle kit leaves out the fields that name the source: the
 `includes`, the `functions` and `through` of each slot, the `header` of each code table and callback, and the `header`, `pre`
-and `effect` of each service (the replayer's own code); its code tables name their entries as Code pointers says. It also leaves
+and `effect` of each service (the replayer's own code), and the `loader` of each load kind; its code tables name their entries as Code pointers says. It also leaves
 out what only the recorder, the replayer and `replayschema.py --check` read, which names the source's globals, types and
 functions: the `exempt`, `exempt_types` and `rules` annotations, the `id` of each service, the `vtable` or `vptr` of each kind,
 the `aliases` of each field, the indices that tie a field or a slot argument to the replayer's table of reached fields, and the
@@ -1168,14 +1351,17 @@ from the layout), and the export refuses a copy that names any other source name
   that is no `embed` field of its container, for one that two kinds claim, and for the old single-site object form.
 - Array forms and hand-made vtables (see An array of refs, An array of embedded structs, A table behind a ref field, A vtable pointer the code sets by hand):
   field kinds `refs` and `embeds` with a `count`, a `table` whose `base` is `{"object", "field"}`, `inside` members with `[]`, and `vptr` (with an optional `vptr_unset` reason) on a kind.
-  `replayschema.py --check` fails for a count that is no positive integer, a base that is no ref field leading to the kind, a site no `embeds` field leads to, a `vptr` that is no global name, is also a vtable, or is on a kind with a table, kinds or a vtable, and a `vptr_unset` with no reason or on a kind with no `vptr`.
+  `replayschema.py --check` fails for a count that is no positive integer (or a length expression with a `capacity`, for `embeds`; see An array of embedded structs), a base that is no ref field leading to the kind, a site no `embeds` field leads to, a `vptr` that is no global name, is also a vtable, or is on a kind with a table, kinds or a vtable, and a `vptr_unset` with no reason or on a kind with no `vptr`.
 - `when` (an object, see A condition on a field): `{"field", "equals"}` with an optional `mask`, `via` and `kind`, on a field of
   a state kind. `replayschema.py --check` fails for a field it reads that is not an integer or flags field, that has a `when` of its own, or
   a mask and a value that can never meet.
-- Field kinds that point rather than hold a value. `unitid` is a 16-bit unit id (`weapon0TargetX` holds either an x position or
+- Field kinds that point rather than hold a value. `load` is a pointer to load-time data (`{"name": "table", "kind": "load", "load": "cob"}`): it is written, restored and compared as the
+  name of the file's holder and the offset into the file (see Load inputs, "A pointer to load-time data"). `unitid` is a 16-bit unit id (`weapon0TargetX` holds either an x position or
   a unit id; `weapon0TargetUnit` is the same bytes read as an id) that the walker follows to `Unit#<id>`, but only when its `when`
   field (`weapon0TargetZ`) equals the given value (-32768, the sentinel that says the slot holds a unit); it is never written
-  as a line, and the unit it leads to records only the fields of its `reach`. A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
+  as a line, and the unit it leads to records only the fields of its `reach`. Its `target` may be another kind with a table: an order's `type`, the
+  index of the unit type a build order makes, is `mobileBuildDef` (and three more, one for each build kind of the order's `when`), a `unitid` over `UnitDef`
+  with `"size": 4`, since the member is an `int` and the id is its low 16 bits, so a mobile build order of type 112 leads to `UnitDef#112`, recorded with the fields of the `reach` (`orders-build-patrol`). A `weapon` field leads the walk to `weapondef#N`, whose fields the slot reads
   are recorded as `r weapondef#17.flags` lines. A field may name a `member` of its type that is not its own name
   (`weapons[1].aimTarget`, `pos.x`), so that an array element or a part of a `Vec3` is a field.
 - `reach`: a list of `Kind.field` names with an explicit `depth` (the number of objects from the root to the farthest, at most 2),
@@ -1188,6 +1374,10 @@ from the layout), and the export refuses a copy that names any other source name
   so that a change made outside the seam is recorded at the entry as an `r` line, not mistaken for a write of the module.
   The same goes for a field the module writes only some of the time (the `workTime` of a unit, the fields of a new projectile): a field in the write set and not in
   the read set would show a change made outside the seam, such as the move of a projectile by `UpdateProjectiles`, as a `w` line the module never made. A rule on the `field_write` row of the field with `reads` naming it puts the field in the read set.
+- `loads` (an object, see Load inputs): the kinds of load-time data, each `{"type", "loader", "holders"}`, and the field kind `load` that holds a pointer to
+  such data. `replayschema.py --check` fails for a loader that is no function, a holder that is no state kind with a table, a `game` that is no `Ref` member of
+  `Game`, a `load` that names no entry, and a load field or argument on a type it cannot hold. The types of a load kind are exempt from the field-row check
+  below (`field_read ScriptTable::count` needs no rule and is no untracked target), because the replayer has the real bytes.
 - `exempt_types`: `{"OpenHeap": "reason"}`, a struct type that is no kind and is genuinely local (a stack copy read from a bank, a
   union summed in a local). A field row (`field_read`, `field_write`, `field_maybe_written`) of a complete subsystem on a type that
   is none of these is an error naming the row (`field_read OpenHeap.count`): the type of a kind or of a value kind, an alias of a kind's field
@@ -1217,12 +1407,13 @@ from the layout), and the export refuses a copy that names any other source name
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
 | `object` | a pointer to a state kind, in | `a player Player#1`, its fields as `r` and `w` |
 | `struct` (`dir` in, out or inout) | a pointer to a value kind, `nullable` when in or inout | `a params.field value` in, `o params.field value` out; an out struct with `"when": "result != 0"` is recorded and compared only when the call returns nonzero, for a call that leaves the struct untouched otherwise (`GetWeaponTargetPos`, whose caller passes a stack local); a `Vec3` out of an import is the `o <name> (x,y,z)` line a `vec3` out argument writes, only when `when` holds, and its stub writes it (`weapons` imports `targeting.GetWeaponTargetPos`) |
-| `event` (`events`, `size`, optional `unrecorded` and `refs`) | a pointer to a subsystem's event header and a `size` argument | the lines of the payload struct of the event's kind (see Event arguments) |
+| `event` (`events`, `size`, optional `unrecorded` and `refs`) | a pointer to a subsystem's event header, or to one of its payload structs (`OrdersGroupCommand*`), and a `size` argument | the lines of the payload struct of the event's kind (see Event arguments) |
 | `structs` | a pointer to a value kind and a `count` argument | `a points[0].x 1` for each element (see Struct arguments) |
 | `value` | a value kind by value | `a kind (5)` (see Struct arguments) |
 | `value` (`dir: inout`) | a pointer to an `int`, `short` or `unsigned char` (or the unsigned forms), `{"mode": "value", "dir": "inout", "nullable": true}` | `a count (5)` or `a count null`, and `o count (9)` when the pointer is not null (see Struct arguments) |
 | `argv` | a pointer to the argument list of a command (a count and its strings) | `a args.count 2`, `a args[0] "x"` |
 | `bytes-in`, `bytes-out` | `void*` with a `length` argument, or a `length` that is a path through `Game` | ` x:0102` in an import line, `o dst x:0102` after it (`bytes-out` is as long as the result, at most the length; with `"resultElem": "u16"` the result counts elements of that size, as `UnitsInRange`'s count of ids does, and the bytes are `result * 2`). A `length` of `Game.net.unitCount` is read from the state at the call (`g_game->net->unitCount`: every step but the last is a `Ref` or a pointer, a null one is a length of 0), and `"elem": "i32"` makes it a count of 4-byte elements |
+| `load` (`load`) | a pointer to load-time data, `{"mode": "load", "load": "cob"}`, as an argument or a result of a slot or an import | `a data UnitDef#12`, `a data UnitDef#12+448` or `a data null`, in an import line ` UnitDef#12`, and `o result UnitDef#12` or ` = UnitDef#12` for a result (see Load inputs, "A pointer to load-time data") |
 | `bytes-out` (slot) | `void*` with a `length` argument that a recorded slot fills, and a result that is its length in bytes (`pathfinding.Poll`'s `out`, the payload of an event, whose length is the result and at most the size argument) | no `a` line; `o out x:0102` after the call, as long as the result and at most the length, and no line for a result of 0; the replayer passes a zeroed buffer of the length argument and compares the bytes (a difference is reported at the argument, `out`) |
 | `scratch` (`capacity`) | a pointer to elements that a recorded slot fills, with an integer `capacity` argument after it (`pathfinding.Poll`'s `points`) | nothing: no `a` line and no `o` line. The replayer passes a zeroed buffer of `capacity` elements, and what the call writes to it is not compared. Only a recorded slot takes it (`--check` fails for an imported one), and `--check` fails for a `capacity` that does not name an integer argument after it |
 | `scalar` (`dir: out`) | an `int*` or another scalar pointer that an import fills, `{"mode": "scalar", "dir": "out"}` (`pathworld.SeenSize`'s `width` and `height`) | nothing goes in the import line; `o width 12` follows it for a pointer that is not null, and the stub writes the value through the pointer. Only an import takes it (`--check` fails for a recorded slot), and the pointer is one of `int*`, `unsigned int*`, `short*`, `unsigned short*` and `unsigned char*` |
@@ -1384,7 +1575,8 @@ A service whose definition is in a source that the replayer links (`SimAlloc`, t
 defined by the replayer. The hook in the real function asks `call.Answered()`, which is true only while the replayer runs a slot, and the
 generated answer takes the place of the function: it checks the `i` line the module would have written, makes the real allocation and names the
 block as the recording does (`alloc#1`, or the object of the tag's kind) or, for `SimFree`, lets the real free go on. The replayer's own
-allocations are never answered. A service in a source nothing links keeps the definition the tool writes.
+allocations are never answered. The services of a 3D model (its load and its height) are linked the same way, since the replayer links the source of the model loader to run the load lines (see Load inputs):
+inside a slot they answer from the recording's `i` lines, and the replayer's own call of the model loader for a load line is no import. A service in a source nothing links keeps the definition the tool writes.
 
 A service that runs a command text through the command slots is re-entrant (`"nested": true`). The commands it runs through the slots named `Cmd...` are `c` lines after its `i` line, in call order,
 as the calls of a callback are:
@@ -1470,7 +1662,7 @@ weapons:
 - `network.SendWeaponFire` and `network.SendUnitDamage`, and the `Game.netGameFlags` branch that calls them: they act only in a network game.
 - The hit of a paralyzer weapon, a DAMAGE event of kind 2: the recorded DAMAGE events are of kinds 3 and 10, and the paralysis order is orders' handler of weapons' PARALYZE effect.
 - `Apply` of REMOTE_DAMAGE, SET_STOCKPILES and ADD_STOCKPILE: REMOTE_DAMAGE comes only from the network, and no recorded window builds or sets a stockpile.
-- `Apply` of EXPLODE_PIECE: the slot leaves it `unrecorded`, so the exploded pieces of `combat-deaths` reach the recording only through what they change. It allocates the piece in the debris chunk cache, a block of chunks in the block that the schema has no form for, and reads the model of the unit (#1081). DETONATE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES are recorded: the detonation and the area damage reach the cells around a shot as roots and their units by id (A unit reached by its id, per slot).
+- `Apply` of EXPLODE_PIECE is recorded with the allocator behind it. The cache of the exploded blocks is the start state of the recording (The start state of the debris cache), an `exempt` target and `exempt_types` as a variable, and the debris pieces (the slots, faces and vertices that match load sets up) are set up before the first call by the one function that the game's load and the replayer both run. The vertices and faces of the debris pieces are state kinds (`DebrisVertex`, `DebrisFace`, tables of `Game`, recorded as changed elements) that the allocation of a piece reaches as roots; the face's texture words come from the model's bind lines (Faces a later load step bound). A face's word at offset 24 (the sequence of a face with none is the file's colour word, a number) is recorded only when the face has a sequence: as `texSrc` while flags bit 1 is set, and as `texTeamSrc`, a second view of the same word, when bits 0 to 2 are 4, the flags of a team colour face whose copy cleared bit 1 (it took its picture from the sequence and kept the sequence). Binding sets bit 2 of a named face only with bit 1, and the faces without a texture name in the models of the recordings all have bit 0 set, so bits 0 to 2 at 4 mark a team colour face (a model with an unnamed face whose file flags are 4 would need a condition on its bind line instead); the self-test sets the recorded `texTeamSrc` of a face of `combat-deaths` to `null` and checks that the replay differs at that face. DETONATE, AREA_DAMAGE, SPAWN and REMOVE_PROJECTILES are recorded: the detonation and the area damage reach the cells around a shot as roots and their units by id (A unit reached by its id, per slot).
 - The store of the aim callbacks' vtable word by `Apply` of `INIT_SLOTS`: the word is never recorded, and the replayer sets it before the call ("A vtable pointer the code sets by hand").
 
 economy:
@@ -1533,6 +1725,28 @@ map:
 
 - `Apply` of RECLAIM_FOOTPRINT and LOAD_PATH_LOCK_STAMP: `LoadUnit` publishes them for the units of a loaded game (RECLAIM_FOOTPRINT only for a unit with bit 4 of `cobStateFlags`), and no map recording loads one.
 
+scripts:
+
+- `StartScriptWithArgsByIndex`: only a remote machine starts a script by its index (`network`), and no scenario is a network game. The slot is `record: false`; a START event of the form by index, which `Apply` handles, is recorded in its place when a scenario publishes one (the recorded windows hold the forms by name).
+- `DeleteScript`: `record: false`, since the slot destroys its argument: the walk that follows the call finds the object with the vtable of its base class and its memory freed. The death of a unit reaches it (`console-iwin`, tick 30), and `FreeObjectState`, which the death calls too, is recorded.
+- `SaveScriptState` and `LoadScriptState`: `record: false` (save class): they write and read a bank of a saved game.
+- `WriteState`: `record: false`, a query for the trace's dump, outside the tick.
+- `PoseUnitModel`: `record: false`, no caller outside scripts (it runs inside `GetSweetSpot` and the DETACH_PIECE event).
+- `UpdateObjectState`: `record: false`, called by the renderer and by a script's sound-and-smoke effect; no scenario draws a unit.
+- `ObjectStateSize`: `record: false`, only features calls it, and features' recordings hold it as an import with the model as an `Object3do` object (`Feature.object`, which no holder of the load kinds names), so its argument is not the `model` load form.
+- `GetAimFromPosition`, `GetNanoPiecePosition` and `GetSweetSpot`: `record: false`. Their out `Vec3` is written in the import form (`o out (x,y,z)`) by the recordings of weapons, targeting and orders, which a slot form would change; weapons' and targeting's recordings hold the first and the third as imports, and their results are checked there.
+- `Apply` of FREE_STATE and INIT_STATE: unrecorded (`unrecorded` of the slot). They free and build the model state of a feature spot from `Feature.object`, the model of a feature type, which no holder of the load kinds names, so the pointer could not be written. DETACH_PIECE: weapons publishes it when a piece of a unit explodes (EXPLODE_PIECE, recorded in weapons' `combat-deaths`), and no scripts window holds an exploding piece.
+- `CreateObjectState` is a recorded slot that no committed recording calls: it builds the model state of a unit type that has no script, and every unit type that the scenarios checked (`orders-factory`, `orders-air`, `mission-victory`, `console-units`) create has one.
+- A script that sets a unit value and reads it back in the same call (the factory's opcode pair on value 18, the yard): the scheduler runs the handler of the event before it returns, and the handler writes `Unit.cobStateFlags`, which the script then reads, so the replay would take the other branch. No form records a block field that a handler of an import wrote, so no recorded window holds such a call: the recordings avoid the tick at which `orders-factory` finishes a unit (793). An import line that names a block field its handler wrote is the form that would record it.
+- The paths of a script that no recorded window reaches: the sound-and-smoke effect (smoke and thrust, with the `los_radar.IsUnitVisibleToPlayer` import), the attach and drop of a transport, the angle, distance and ground height cases of a unit value read (`map.GetGroundHeight`), the explosion of a piece (weapons' EXPLODE_PIECE, which no scripts window reaches), and a start with a callback by its index.
+orders:
+
+- `Apply` of ADD with a queue, QUEUE_BUILD, STOP, BE_CARRIED, ATTACKED, PARALYZE, COMMAND and CANCEL: the recorded windows publish ADD once and STATUS_FLAGS, and the other kinds come from the user interface, ai, weapons and units outside them (an order added through the interface is `ExpandGroupCommand`, recorded).
+- `GetOrderFlags` and `MissionTypeFromName` at top level: ai and the interface call them outside the recorded windows (`GetOrderType` is called once, in `units-transport`).
+- The constructor that loads an order from a saved game, and the helpers that resolve its kind and unit type by name: it runs only when a saved game loads, which is load class. Its rows go under the same name as the other constructors of `Order`, so the schema's rules on the saved record say it, and the slots' function lists leave its helpers out.
+- A build order of the unit type with index 0: the `unitid` fields that lead the walk from an order's `type` to its `UnitDef` follow no id of 0, as for a unit id, so `UnitDef#0` would have no `r` lines, and the walk also skips an id at or past the
+count of the definition table. No recorded window builds either.
+
 ## Replaying
 
 The native replay test replays a recording against the native module (`replay_native_test.exe`, built by
@@ -1566,8 +1780,10 @@ second object, with a changed result reported at `import 0 fixture.Scan.c[0]`) a
 that gets a third: the module's calls on them replay equal, and a different, a missing, an extra and a misplaced call are each reported at `callback#3.Complete`). Three
 more use the `Fixture*` kinds: a table with a capacity (`FixtureEye`, written past its live count, restored without a store into the count, allocated by the module's `operator new`
 and freed by the test with `operator delete`), pointers into an object's own members (a `FixtureEye` moved by assignment between calls, and a `FixtureHeap` whose `top` is an index into its
-own `pool`, which the module grows), and a write to a `Game` field through a pointer, reported at the field. With a
-recording it finally mutates the recording and expects each mutation reported. `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
+own `pool`, which the module grows), a write to a `Game` field through a pointer, reported at the field, and load inputs (the real loaders of a script and a model run on a synthetic script and model
+that the test registers as files, a pointer into them is written as `UnitDef#N` or `UnitDef#N+offset` by the recorder's mapping, a `FixtureLane` whose `script` field and slot arguments and result are
+load pointers replays equal, a changed offset, a changed holder and a pointer into no load are each reported at `FixtureLane#0.script` or `result`, and a load that no load line names is refused). With a
+recording it finally mutates the recording and expects each mutation reported. With a scripts recording it instead flips a byte of the load of the script a `SetCob` call takes and expects the difference at the script's `checksum`, and changes a byte of the `pieces` that the call writes and expects the difference at that call and field (the script argument of `SetCob` is a root of kind `CobScript`, so its fields are compared after the call). `replay_inject_test.exe --expect CALL FIELD FILE` runs the module built
 with one changed constant and expects that divergence.
 
 The self-test also replays a module's region (`a module's region`): a whole write that leaves out the zero chunks, a changed run, and a changed byte reported at `region` with its byte, and a region at its recorded offset (see A module's region and world view, "A region that holds block offsets"). It runs the forms of out buffers too (`a byte buffer a slot fills`, `a scratch buffer`, `a scalar the import writes`). A result larger than its buffer is as long as the buffer, and a call with no bytes has no `o` line whatever its result. It replays an event that holds the offset of a polymorphic object (`a event.target ApproachRadius#1`, resolved to an object of that kind with its vtable, and `null`), and a region placed where it would clash, where it is not 8-byte aligned, and where it would leave a free remainder under the smallest chunk, each reported as such.
@@ -1686,7 +1902,7 @@ wine build/modern/replay_inject_test.exe --expect 393 Unit#2.weapon0ReloadTimer 
 wine build/modern/replay_inject_test.exe --expect 8 Projectile#0.spawnTick tests/replay/weapons/console-features.txt
 ```
 
-The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), in a window of ticks (a window cannot start at tick 0) but `console-ilose`, a whole run. They hold every slot of weapons, and the `Apply` of every kind but EXPLODE_PIECE, which it leaves unrecorded ("Event arguments", "Not recorded"): the damage, claims, releases, slot set-ups, aim answers, detonations, area damage, spawns and removals that reach weapons as events. `UpdateProjectiles` and the detonation and area damage reach every cell of the map (`all-of` over `Game.cells`, a table recorded as changed elements), so each file starts with a first record of every cell, written as runs: 102,400 cells in about 86 KB for `mission-timer`, and 262,144 cells in about 1 MB of the 2 MB of `long-greenhaven-8p`. The nine files are about 10 MB, and none is over 2.3 MB. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
+The recordings of weapons, which the modern build runs as native code in every mode (it has no WASM module yet), in a window of ticks (a window cannot start at tick 0) but `console-ilose`, a whole run. They hold every slot of weapons, and the `Apply` of every kind ("Not recorded" says what of EXPLODE_PIECE is left out): the damage, claims, releases, slot set-ups, aim answers, detonations, area damage, spawns and removals that reach weapons as events. `UpdateProjectiles` and the detonation and area damage reach every cell of the map (`all-of` over `Game.cells`, a table recorded as changed elements), so each file starts with a first record of every cell, written as runs: 102,400 cells in about 86 KB for `mission-timer`, and 262,144 cells in about 1 MB of the 2 MB of `long-greenhaven-8p`. The nine files are about 10 MB, and none is over 2.3 MB. An aim answer names the callback by its site, `a event.callback Unit#2.weapons[0].aimCob`, and writes its `nAimCobDone`:
 
 - `orders-guard-attacked`, ticks 1 to 250 (`Apply`: 23 DAMAGE, 33 RELEASE, 140 CLAIM, 4 INIT_SLOTS and 39 AIM_DONE): two walkers (turret weapons) and a fighter (a line-of-sight weapon) guard and are attacked; `UpdateUnitWeapons` aims through the script (weapons' START_SCRIPT effect `AimPrimary` through `services.SchedPublish`, `scripts.GetAimFromPosition`, `network.SendScriptCallByName`), fires (`services.RandomInt` for the spread, the reload timer set and counted down), and `WeaponCanReachUnit` (167 calls) and `GetWeaponRange` (32) are called.
 - `console-ilose`, the whole run of 100 ticks (1,930 calls; `Apply`: 1 DAMAGE, 9 RELEASE, 2 INIT_SLOTS, 1 DETONATE and 1 REMOVE_PROJECTILES): the load-time `FindWeaponByName` (1,790 calls: the first call names every weapon of the array, `r WeaponName#N.name "..."`, and each returns its weapon, `o result weapondef#N` with `o weapondef#N.flags`, or null), a few `UpdateUnitWeapons` and `GetWeaponRange`.
@@ -1726,10 +1942,49 @@ The recordings of ai 6.1, which the modern build runs as native code in every mo
 wine build/modern/replay_inject_test.exe --expect 76 SquadManager#1.countdown tests/replay/ai/skirmish2.txt
 ```
 
+The recordings of scripts, which the modern build runs as native code in every mode, each of a window of a few ticks, since `RunScripts` runs for every unit with a script at every tick and each call holds the whole script, model state and
+pieces of its unit at its first record. A recording carries the files of the unit types that its lines name (`load cob` and `load model`), about half of its size:
+
+| Recording | Window | Calls | Reaches |
+|---|---|---|---|
+| `orders-air` | 1025 to 1027 | `RunScripts` 18, `QueryScript` 4, `GetPiecePosition` 4, `Apply` 4 (START), `GetPieceOffset` 3, `GetPieceAngles` 3, and the creation of a unit: `NewUnitScript`, `SetCob`, `CreatePlayerObjectState` (16 `services.SimAllocTagged`), `SetObjectState` | a unit is built: the piece queries of movement, the scripts that answer them, the model state built from the model and the script table of its unit type |
+| `orders-factory` | 19 to 20 | `RunScripts` 6, `QueryScript` 3, `GetPieceOffset` 3, `Apply` 3, `FindScript` 1, and the creation of a unit | `FindScript` of an order, the start of `Create` and `SetMaxReloadTime` of a new unit |
+| `console-iwin` | 28 to 34 | `RunScripts` 6, `QueryScript` 1, `FreeObjectState` 1 (17 `services.SimFree`) | the death of a unit: its model state and the point lists of its pieces are freed |
+| `orders-move-attack` | 5 to 8 | `RunScripts` 8, `Apply` 2 (START of `StartMoving` and `MoveRate1`) | two commanders that start to move: a thread of the script starts and the pieces turn |
+
+A `RunScripts` call reaches the script of its unit (`CobScript#N`: the 8 channels, the statics and the pieces, whose lengths are read from the `ScriptTable` of `table`), the model state (`ModelState#N`, with the `count` pieces after it, each `ModelPiece` with the `Object3do` node it leads to, the offsets and rotations
+that the script writes, and the points of the piece) and the fields of the unit that the script reads. The scripts' kind `CobScript` is the class `UnitScript`, the only concrete class (`vtable_symbol`
+`??_7UnitScript@@6B@`), under the name the recordings of weapons and features already use for `Unit.script`; its base `CobScriptBase` is the class `CobScript`, which the virtual calls of the module name.
+
+The injected change of scripts is the turn step of a piece animation scaled by 2 (the compile time define of the inject, 1 in the game): the divergence is reported at call 22 of `orders-air` and at `ModelState#5.pieces[1].short_12`, the angle of a piece that turns (recorded 5423, replayed 6074):
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 22 "ModelState#5.pieces[1].short_12" tests/replay/scripts/orders-air.txt
+```
+
 The recordings of movement 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), are windows of a few ticks to a hundred, each of 10 to 80 KB: `orders-guard-attacked` (ticks 8 to 30: `UpdateMotion` 130, `Apply` 6, `UnitTarget` 3, `NewApproachRadius` 2), `orders-air-fights` (ticks 8 to 40: `UpdateMotion` 221, `Apply` 9, `UnitTarget` 4, `NewPathOrderAt` and `NewPointMarker`), `orders-air-repair` (ticks 668 to 760: `UpdateMotion` 279, `Apply` 27, `NewPathOrderToUnitAtAngle` 6, with 182 `scripts.GetPiecePosition` and the links and unlinks of the reference a `PathOrder` embeds), `orders-air` (ticks 4090 to 4102: `UpdateMotion` 78, `NewPathOrderAt` and `NewPathOrderToUnit`, with `scripts.GetPieceAngles`), `units-transport` (ticks 4408 to 4416: `UpdateMotion` 27 and a `NewPointMarker`) and `orders-build-patrol` (ticks 148 to 162: `UpdateMotion` 30, `NewApproachRadius` and `NewRingApproach`, with `pathfinding.Submit` and `Cancel`). The new orders are the object result form (`o result ApproachRadius#1`), a target in an event is its offset (`a event.target ApproachRadius#1`), and most imports are the `services.SchedPublish` of an effect, after which the fields that units' handlers change are `o` lines (`An object field that an import changes`). `replay_inject_test.exe` is also built with the speed-divisor injection of 0x6c0000 (the 0x640000 that divides the speed range of a unit when its velocity is set from its heading), and the divergence is reported at call 1 of `orders-build-patrol` and at `UnitMotion#2.velocityX` (recorded -50187, replayed -46469):
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 1 UnitMotion#2.velocityX tests/replay/movement/orders-build-patrol.txt
+```
+
+The recordings of orders 6.2, which the modern build runs as native code in every mode (it has no WASM module yet), are windows of 6 to 23 ticks, each of 90 to 150 KB:
+`orders-guard-attacked` (ticks 8 to 30: `RunOrders` and `RunSecondaryOrders` 130 each, `ExpandGroupCommand` 3, with `targeting.ChooseWeapon` and `weapons.WeaponCanReachUnit`),
+`orders-move-attack` (ticks 98 to 106: 18 each, `ExpandGroupCommand` and an `Apply` of ADD, with `weapons.GetWeaponRange`), `orders-build-patrol` (ticks 148 to 162: 45 each, a
+mobile build and the repair patrol after it, with `map.UnitsInRange`, `units.CanRepair`, `units.AddBuildProgress` and `scripts.GetNanoPiecePosition`), `orders-air-repair` (ticks 848
+to 853: 24 each, a self-repair with `units.AddRepairProgress` and the VTOL follow and guard orders), `units-transport` (ticks 4408 to 4416: 90 each, the ground unload and the carried units, with `movement.NewPointMarker` and the one `GetOrderType`),
+`orders-air` (ticks 4090 to 4102: 169 each, the air orders with `movement.NewPathOrderAt` and `NewPathOrderToUnit`), `ui-right-click` (ticks 19 to 26: 24 each, the order a right
+click gives, with `los_radar.GetMapCellAtPosition`) and `orders-factory` (ticks 15 to 22: 20 each, a factory that builds a unit, with `map.SnapWorldPosToFootprint` and
+`units.CreateUnit`). Every `Apply` of these windows but one is a STATUS_FLAGS (`a event.order Order#4`, the `refs` of the payload). A new order is the object result
+form of `services.SimAlloc` and the embedded attachment it links (`i units.UnitRefSetValue PathOrderAttach#1 Order#5`), and a field an import changes, read or written,
+is an `o` line (`An object field that an import changes`). `replay_inject_test.exe` is also built with two injections. The state-step injection of 2 (the step of 1 by which
+`RunOrders` moves an order's state on when its handler returns 1) is reported at call 19 of `ui-right-click` and at `Order#4.state` (recorded 1, replayed 2). The created-shift
+injection of 1 (a new order's `created` one tick past the tick it is made on) is reported at call 10 of `orders-guard-attacked` and at `Order#3.created` (recorded 10,
+replayed 11), on the `w` line of the call that makes the order. Each row uses a recording whose first divergence is its own injection:
+
+```sh
+wine build/modern/replay_inject_test.exe --expect 19 Order#4.state tests/replay/orders/ui-right-click.txt
+wine build/modern/replay_inject_test.exe --expect 10 Order#3.created tests/replay/orders/orders-guard-attacked.txt
 ```
 
 ### Against the WASM module

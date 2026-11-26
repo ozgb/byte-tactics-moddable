@@ -81,7 +81,7 @@ static const TraceField kUnitFields[] = {
     { "extraction", 0x58, 4, TF_SCALAR, TT_NONE, 0x0 },
     { "list", 0x5c, 4, TF_REF, TT_HEAP, 0x0 },
     { "list2", 0x60, 4, TF_REF, TT_HEAP, 0x0 },
-    { "field_64", 0x64, 2, TF_SCALAR, TT_NONE, 0x0 },
+    { "bank", 0x64, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "heading", 0x66, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "pitch", 0x68, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "pos.x", 0x6a, 4, TF_SCALAR, TT_NONE, 0x0 },

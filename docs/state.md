@@ -6,7 +6,7 @@
 
 One row per item, sorted by kind, then address, then name. Kinds: `global` (a row of `data/globals.csv`), `static` (a variable the source defines that `data/globals.csv` does not list), `game-region` (a top-level field of `struct Game`) and `heap` (an allocation site in game logic).
 
-Columns: `name, address, kind, proposed, class, rule, phases_write, phases_read, presentation, load_write, writers, readers, note`. The tool's docstring describes each one.
+Columns: `name, address, kind, proposed, class, rule, phases_write, phases_read, presentation, load_write, writers, readers, note, sim_bits, view_bits`. The tool's docstring describes each one.
 
 The classes:
 
@@ -24,7 +24,7 @@ movement's. Their notes name the owner. A movement target is allocated by the sl
 orders that called `new` themselves. The classes did not change (sim), and the state stays hashed where it was
 (section 5 of `docs/scripts-interface.md` and of `docs/movement-interface.md`).
 
-`proposed` comes from the rules below and is rewritten on every run. `class` is the hand review, starts empty, and is kept by regeneration, as is `note`.
+`proposed` comes from the rules below and is rewritten on every run. `class` is the hand review, starts empty, and is kept by regeneration, as are `note`, `sim_bits` and `view_bits`.
 
 ```sh
 uv run tools/stateclasses.py                 # regenerate, keeping class and note
@@ -57,28 +57,32 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2561 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
+As of the last read of `data/state_classes.csv` (2580 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
-| static | 6 | 28 | 637 | 0 | 70 | 741 |
-| game-region | 117 | 491 | 130 | 44 | 0 | 782 |
+| static | 6 | 28 | 655 | 0 | 71 | 760 |
+| game-region | 112 | 491 | 130 | 49 | 0 | 782 |
 | heap | 154 | 48 | 88 | 0 | 0 | 290 |
 
 ## Mixed cases and how to split them
 
-The ten game-region rows with class `mixed`:
+The eleven game-region rows with class `mixed`. The ones split by bit carry the split in `sim_bits` and `view_bits`, a
+mask each, counted from the row's first byte, on the row and on every alias of the same bytes (`uiOptionBits`,
+`bits_14281` and the others); a bit in neither is platform or unused. The others are split by sub-field and have no
+masks:
 
 - `players` (+0x1b63): platform for the net slot, ping, `info` and `name`; sim for the rest (type, units, squads, explored map, resources, alliances).
-- `localPlayer` (+0x2a42): sim reads it as the perspective player. Fix a sim perspective player at match start; keep a separate view local player.
-- `playerIndex` (+0x2a43): the watched player in the views, but sim reads it (unit flag, visibility, line of sight). Same split as `localPlayer`.
+- `localPlayer` (+0x2a42): sim reads it as the perspective player. Fix a sim perspective player at match start; keep a separate view local player. Both uses take the whole byte, so its sim bits and its view bits are both 0xff.
+- `playerIndex` (+0x2a43): the watched player in the views, but sim reads it (unit flag, visibility, line of sight). Same split as `localPlayer`, with the same masks.
 - `weapons` (+0x2cf3): view for the text, animation, model, sound, shake and colour fields; sim for damage, range, reload, velocity and flags.
-- `mapFlags` (+0x14281): sim bits for line of sight and mapping mode; the "view needs refresh" bit cleared by the camera becomes view state.
+- `mapFlags` (+0x14281): sim bits for line of sight and mapping mode; the "view needs refresh" bit cleared by the camera becomes view state. Sim bits 0xfff7 (bits 0 to 2, and the unnamed bits the trace hashes), view bits 0x0008.
 - `defs` (+0x1439b): view for `soundcategory` and `field_18e`; sim for the rest.
-- `uiOptionFlags` (+0x37f2f): sim bits for treedeath and the cheat toggles (halfshot, shootall, drop, radar); view bits for clock, noshake, selboxes; bit 0 (skip net timeouts) is platform.
-- `net_flags` (+0x38d75, with its aliases `flags_38d75`, `loadingFlags`, `netBits`, `net_bits`): sim bits 0 and 1 (`DropPlayer`) and 2 (`MainLoopTick`, packet 21); bit 3 (start positions assigned, read by the load screen) is platform. Split bits 0 to 2 into a sim word.
-- `otherFlags` (+0x38a51): bit 0 is the pause request, written by the net and the UI. Give it to the driver; the other bits are UI.
+- `uiOptionFlags` (+0x37f2f): sim bits for treedeath and the cheat toggles (halfshot, shootall, drop, radar); view bits for clock, noshake, selboxes; bit 0 (skip net timeouts) is platform. Sim bits 0x0788 (bit 3 and bits 7 to 10, the bits the trace hashes), view bits 0x0056 (`now` bit 1, selboxes bit 2, noshake bit 4, clock bit 6). The byte views take their byte of each: `uiOptionFlags_37f2f_1` 0x88 and 0x56, `matchFlags` (+0x37f30) 0x07 and 0x00.
+- `net_flags` (+0x38d75, with its aliases `flags_38d75`, `loadingFlags`, `netBits`, `net_bits`): sim bits 0 and 1 (`DropPlayer`) and 2 (`MainLoopTick`, packet 21); bit 3 (start positions assigned, read by the load screen) is platform. Split bits 0 to 2 into a sim word. Sim bits 0x0007, no view bits, on `loadingFlags`; its other aliases are classed sim.
+- `otherFlags` (+0x38a51): bit 0 is the pause request, written by the net and the UI. Give it to the driver; the other bits are UI. No sim bits: bit 0 is the driver's (platform), view bits 0xfffe (0xfe for the byte `pauseFlags`, 0xff for `pad_38a52`).
+- `endGameFlags` (+0x3923b, with its aliases `endGameFlags_3923b`, `flagsByte_3923b`, `bits_3923b` and `bits`): bits 0 and 1, the debug display and debug mode, are view state; the rest is the simulation's ("The debug bits of endGameFlags" below). Sim bits 0xfffc, view bits 0x0003 (0xfc and 0x03 for the byte `flagsByte_3923b`).
 - `net` (+0x391e9): the mission object. Sim for wind, tide, water damage, kill and time multipliers, start positions and the TDF lists; view for names, description, planet and the text fields.
 
 ## Presentation writes sim state (#22 crossings)
@@ -89,19 +93,22 @@ During play, presentation changes the simulation only through the events of `doc
 presentation folder, or a console command handler of src/game/console_commands.cpp's command table) writes a field
 classed `sim` of the game or a global, a bit field of the game through the member that holds it, or a field of `Unit`,
 `Player`, `Order`, `Feature` or `Projectile` that a phase or a load function touches, unless `PRESENTATION_SIM_WRITES`
-in that tool names the write with its reason. It does not see a write to a field classed `mixed` (`uiOptionFlags`,
-`mapFlags`, `localPlayer`, `playerIndex`, `otherFlags`), because the classes are per field, not per bit; a direct write
-of the cheat bits or of bits 0 to 2 of `mapFlags` would pass it.
+in that tool names the write with its reason. A field classed `mixed` with `sim_bits` (`uiOptionFlags`, `mapFlags`,
+`localPlayer`, `playerIndex`, `otherFlags`, `loadingFlags` and their aliases) is judged by bit: the write fails when the
+bits it can change meet the sim bits. `tools/rwsets.py` gives those bits as a `mask_*` row where the syntax tree bounds
+them (`|=`, `&=` or `^=` with a constant, or a write of a bit-field, for the member that holds it); a write with no mask
+row can change any bit. So the camera's `mapFlags &= 0xfff7` passes, and a direct write of a cheat bit fails. A field
+classed `mixed` without masks (`players`, `weapons`, `defs`, `net`) is split by sub-field and not checked.
 
 Crossings left during play, each waiting on another decision:
 - `CmdControl` and `CmdView` (console_commands.cpp) write `localPlayer` and `playerIndex`, which the tick reads. They
-  become events once the fields are split into the simulation's perspective, fixed by the match setup, and the view's
-  player.
+  become events (#1117).
 - The share commands (`CmdShareMetal` and the others of share_commands.cpp) write a player's sharing switches and
   levels, in a network game only (no test-mode run has one).
 - `WriteScreenshot` (keys.cpp), the poster key, turns mapping and line of sight off, calls `RecalculateLineOfSight`,
   draws the whole map and turns them back on with a second `RecalculateLineOfSight`. A presentation that draws from the
-  view (#1052) needs neither.
+  view (#1052) needs neither. It also clears and restores the clock, bit 6 of `uiOptionFlags`, a view bit, but by
+  assignment, which the mask cannot bound, so the table lists that write too.
 - `DispatchOrdersPanelPageFlags` and `StepBuildMenuPageBack` (control_panel.cpp) write the build-menu page bits of
   `Unit.flags`: bit 0x400000, the build menu rather than the orders, and the page number. Only presentation reads
   them, but the trace still hashes them, since the mask covers only the selection bit 0x10. #1115 finds and masks
@@ -113,6 +120,8 @@ Crossings left during play, each waiting on another decision:
   selection.cpp; #1050 takes it out of the judged state.
 
 Not crossings:
+- `HandleGameKey` (keys.cpp), the debug key, toggles bits 0 and 1 of `endGameFlags` (the debug display and debug mode)
+  through `endGameFlags_3923b`. Those two bits are its view bits, so the write passes by its mask.
 - `DrawWeaponCoverage` (markers.cpp) writes `Order.cached` and bit 0x200000 of `Order.flags_42`, its own cache of the
   last place it saw a target: nothing in the tick reads them, and the trace leaves both out (tools/traceschema.py).
 - The pause request, bit 0 of `otherFlags`, written by the options screens and the keys: it is the driver's, which
@@ -206,8 +215,9 @@ Who touches the bit:
 
 Bits 0 and 1 of `endGameFlags` (+0x3923b) are view state too: bit 0 is the debug display (`INFO ON`) and bit 1 debug
 mode. The trace masks them out of the game scalars (mask 0xfffc). The word's other bits are the simulation's (bit 2,
-the game is over, and bit 3, set when a saved game is chosen to load), so the rows of `data/state_classes.csv` for the whole word keep class `sim`. The row `bits_3923b_1`, the member
-that names only bit 0, is `view`, so `tools/stateclasses.py --check` passes `HandleDebugHotkey`'s write.
+the game is over, and bit 3, set when a saved game is chosen to load), so the rows of `data/state_classes.csv` for the whole word are `mixed`, with sim bits 0xfffc and view bits 0x0003.
+The row `bits_3923b_1`, the member that names only bit 0, is `view`, so `tools/stateclasses.py --check` passes
+`HandleDebugHotkey`'s write; `bits_3923b_2`, which names only bit 2, is `sim`.
 
 - Presentation sets them: `HandleGameKey` (keys.cpp) flips bit 1 and clears bit 0 with it, and `HandleDebugHotkey`
   (game_dialogs.cpp) flips bit 0. It reads them in the panels (info_panel.cpp) and the keys (keys.cpp).

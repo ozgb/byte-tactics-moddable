@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <vector>
+#include <map>
 
 #include "../../interfaces/ref.h"
 #include "replay_schema.h"
@@ -15,6 +17,9 @@
 #include "replay_text.h"
 #include "replay_types.h"
 #include "replay_objects.h"
+#include "../graphics/object3do.h"
+#include "../graphics/piece_frame.h"
+#include "../graphics/memory_cache.h"
 
 void* __cdecl operator new(unsigned int size);
 
@@ -46,6 +51,12 @@ unsigned FactorValue(const ReplayFactor& f, const void* object)
     if (f.size == 0)
         return f.offset;
     const unsigned char* at = (const unsigned char*)object + f.offset;
+    if (f.through) {
+        const unsigned char* data = *(const unsigned char* const*)((const unsigned char*)object + f.hop);
+        if (data == nullptr)
+            return 0;
+        at = data + f.offset;
+    }
     unsigned v = f.size == 1 ? *at : f.size == 2 ? *(const unsigned short*)at : *(const unsigned*)at;
     return (v + f.add) >> f.shift;
 }
@@ -328,8 +339,16 @@ bool ReplayIsEmbedded(unsigned kind, const void* p, const ReplayObjectTable& tab
     return InsideSite(table, kind, p, &site, &ordinal, &index);
 }
 
+void ReplayObjectTable::ClearLoadUses()
+{
+    for (size_t i = 0; i < loadUses.size(); i++)
+        delete loadUses[i];
+    loadUses.clear();
+}
+
 void ReplayObjectTable::Reset()
 {
+    ClearLoadUses();
     for (unsigned k = 0; k < KINDS; k++) {
         count[k] = 0;
         empty[k] = HASH;
@@ -413,6 +432,21 @@ void ReplayObjectTable::Bind(unsigned kind, unsigned ordinal, void* p)
     slots[kind][i] = (short)(ordinal - 1);
     if (empty[kind] < HASH / 4)
         Rebuild(kind);
+}
+
+void ReplayObjectTable::Forget(const void* p)
+{
+    for (unsigned k = 0; k < KINDS; k++) {
+        bool forgot = false;
+        for (unsigned at = 0; at < count[k]; at++) {
+            if (objects[k][at] == p) {
+                objects[k][at] = nullptr;
+                forgot = true;
+            }
+        }
+        if (forgot)
+            Rebuild(k);
+    }
 }
 
 void ReplayObjectTable::Rebuild(unsigned kind)
@@ -1045,6 +1079,9 @@ bool ReplayFormatObjectField(const ReplayObjectField& f, const void* object, Rep
     case RK_BLOB:
         FormatArray(f, object, out);
         break;
+    case RK_LOAD:
+        ReplayAddLoadName(out, table, f.target, *(void* const*)at, assign);
+        break;
     default:
         return false;
     }
@@ -1304,6 +1341,14 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
         *(void**)at = target;
         break;
     }
+    case RK_LOAD: {
+        bool found = false;
+        const void* target = ReplayParseLoad(f.target, value, &found);
+        if (!found)
+            return false;
+        *(const void**)at = target;
+        break;
+    }
     case RK_CBREF:
     case RK_CBPTR: {
         void* target = nullptr;
@@ -1449,6 +1494,20 @@ struct Deferred {
     unsigned short field[MAX_DEFERRED];
 };
 
+unsigned ElementCount(const ReplayObjectField& field, const ReplayElemSpec& elems, const unsigned char* base)
+{
+    if (!elems.live)
+        return elems.count;
+    unsigned n = ReplayLengthOf(elems.used, base);
+    if (n > elems.count) {
+        char message[200];
+        sprintf(message, "%s.%s has %u elements, past the capacity of %u that the schema gives", kReplayObjectKinds[field.object].name, field.name, n, elems.count);
+        ReplayFail(message);
+        return elems.count;
+    }
+    return n;
+}
+
 void ExpandObject(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned kind, unsigned char* base, const unsigned short* limit, unsigned limitCount,
                   const unsigned short* fields, unsigned fieldCount, Deferred& deferred)
 {
@@ -1464,7 +1523,7 @@ void ExpandObject(ReplayReach& reach, ReplayObjectTable& table, bool assign, uns
         }
         if (field.kind == RK_EMBEDS) {
             const ReplayElemSpec& elems = kReplayElems[field.array - 1];
-            for (unsigned e = 0; e < elems.count; e++)
+            for (unsigned e = 0, n = ElementCount(field, elems, base); e < n; e++)
                 Visit(reach, table, assign, field.target, base + field.offset + e * elems.stride, limit, limitCount);
             continue;
         }
@@ -3083,4 +3142,497 @@ unsigned ReplayFirstSnapshotDifference(const char* hex, const void* data, unsign
             return i;
     }
     return length == bytes ? ~0u : common;
+}
+
+namespace {
+
+struct LoadEntry {
+    unsigned base;
+    unsigned size;
+    unsigned short load;
+    unsigned short kind;
+    unsigned index;
+    bool held;
+    char name[260];
+    std::vector<unsigned char> bytes;
+};
+
+typedef std::map<unsigned long long, LoadEntry*> LoadKeyMap;
+
+std::vector<LoadEntry*>* s_loadEntriesAt;
+LoadKeyMap* s_loadKeysAt;
+
+std::vector<LoadEntry*>& LoadEntries()
+{
+    if (s_loadEntriesAt == nullptr)
+        s_loadEntriesAt = new std::vector<LoadEntry*>;
+    return *s_loadEntriesAt;
+}
+
+LoadKeyMap& LoadKeys()
+{
+    if (s_loadKeysAt == nullptr)
+        s_loadKeysAt = new LoadKeyMap;
+    return *s_loadKeysAt;
+}
+
+unsigned long long LoadKey(unsigned load, unsigned kind, unsigned index)
+{
+    return ((unsigned long long)load << 48) | ((unsigned long long)kind << 32) | index;
+}
+
+size_t LoadAfter(unsigned base)
+{
+    size_t low = 0;
+    size_t high = LoadEntries().size();
+    while (low < high) {
+        size_t mid = (low + high) / 2;
+        if (LoadEntries()[mid]->base <= base)
+            low = mid + 1;
+        else
+            high = mid;
+    }
+    return low;
+}
+
+void LoadForget(size_t at)
+{
+    LoadEntry* e = LoadEntries()[at];
+    if (e->held && LoadKeys()[LoadKey(e->load, e->kind, e->index)] == e)
+        LoadKeys().erase(LoadKey(e->load, e->kind, e->index));
+    delete e;
+    LoadEntries().erase(LoadEntries().begin() + at);
+}
+
+void LoadInsert(LoadEntry* e)
+{
+    size_t after = LoadAfter(e->base);
+    while (after > 0 && LoadEntries()[after - 1]->base + LoadEntries()[after - 1]->size > e->base) {
+        LoadForget(after - 1);
+        after--;
+    }
+    while (after < LoadEntries().size() && LoadEntries()[after]->base < e->base + e->size)
+        LoadForget(after);
+    LoadEntries().insert(LoadEntries().begin() + after, e);
+}
+
+LoadEntry* LoadContaining(const void* p)
+{
+    unsigned at = (unsigned)(size_t)p;
+    size_t after = LoadAfter(at);
+    if (after == 0)
+        return nullptr;
+    LoadEntry* e = LoadEntries()[after - 1];
+    return at - e->base < e->size ? e : nullptr;
+}
+
+const unsigned char* LoadHolderElement(const ReplayLoadHolder& h, unsigned index, unsigned char* base, unsigned stride)
+{
+    if (h.how == RLH_MEMBER)
+        return base + (size_t)index * stride + h.offset;
+    if (g_game == nullptr)
+        return nullptr;
+    unsigned char* array = BlockAt(*(const unsigned*)((const unsigned char*)g_game + h.offset));
+    return array == nullptr ? nullptr : array + (size_t)index * sizeof(void*);
+}
+
+bool LoadResolve(LoadEntry* e)
+{
+    if (e->held)
+        return true;
+    const ReplayLoadKind& load = kReplayLoads[e->load];
+    for (unsigned n = 0; n < load.holderCount; n++) {
+        const ReplayLoadHolder& h = kReplayLoadHolders[load.firstHolder + n];
+        unsigned char* base;
+        unsigned count;
+        unsigned stride;
+        if (!TableSpan(h.kind, &base, &count, &stride))
+            continue;
+        for (unsigned i = 0; i < count; i++) {
+            const unsigned char* slot = LoadHolderElement(h, i, base, stride);
+            if (slot != nullptr && *(const unsigned*)slot == e->base) {
+                e->kind = h.kind;
+                e->index = i;
+                e->held = true;
+                LoadKeys()[LoadKey(e->load, e->kind, e->index)] = e;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void LoadFail(const char* format, const char* load, const char* detail)
+{
+    char message[400];
+    _snprintf(message, sizeof message, format, load, detail);
+    message[sizeof message - 1] = '\0';
+    ReplayFail(message);
+}
+
+bool LoadSame(const ReplayLoadUse& use, const LoadEntry& e)
+{
+    return strcmp(use.name, e.name) == 0 && use.bytes.size() == e.bytes.size() && (e.bytes.empty() || memcmp(&use.bytes[0], &e.bytes[0], e.bytes.size()) == 0);
+}
+
+}
+
+
+namespace {
+
+bool InImage(const void* p, unsigned base, unsigned size, unsigned bytes)
+{
+    unsigned at = (unsigned)(size_t)p;
+    return at >= base && at - base <= size && size - (at - base) >= bytes;
+}
+
+void WalkFaces(unsigned base, unsigned size, const Object3do* node, unsigned depth, void (*visit)(PieceFrame*, unsigned, void*), void* context)
+{
+    for (; node != nullptr && depth < 64; node = node->sibling) {
+        if (!InImage(node, base, size, sizeof(Object3do)))
+            return;
+        if (node->faceCount > 0 && InImage(node->faces, base, size, (unsigned)node->faceCount * sizeof(PieceFrame))) {
+            for (int i = 0; i < node->faceCount; i++)
+                visit(node->faces + i, (unsigned)(size_t)(node->faces + i) - base, context);
+        }
+        if (node->child != nullptr)
+            WalkFaces(base, size, node->child, depth + 1, visit, context);
+    }
+}
+
+struct FaceFind {
+    unsigned offset;
+    PieceFrame* face;
+};
+
+void FindFace(PieceFrame* face, unsigned offset, void* context)
+{
+    FaceFind* f = (FaceFind*)context;
+    if (offset == f->offset)
+        f->face = face;
+}
+
+struct BindCapture {
+    ReplayObjectTable* table;
+    ReplayLoadUse* use;
+    const void* base;
+    unsigned size;
+};
+
+void CaptureFace(PieceFrame* face, unsigned offset, void* context)
+{
+    BindCapture* c = (BindCapture*)context;
+    unsigned flags = *(unsigned*)&face->flags;
+    if ((flags & 7) == 0 && face->ptr_10 == 0)
+        return;
+    ReplayLoadBind bind;
+    memset(&bind, 0, sizeof bind);
+    bind.offset = offset;
+    bind.flags = flags;
+    bind.fillColor = (unsigned)face->fillColor;
+    bind.texKind = (unsigned)face->texKind;
+    const void* src = face->color;
+    if ((flags & 2) != 0 && src != nullptr && !InImage(src, (unsigned)(size_t)c->base, c->size, 1)) {
+        ReplayText name;
+        ReplayAddObjectName(name, *c->table, ROK_FRAMETABLE, src, true);
+        _snprintf(bind.src, sizeof bind.src, "%s", name.Data());
+        bind.src[sizeof bind.src - 1] = '\0';
+    } else {
+        strcpy(bind.src, "null");
+    }
+    if ((flags & 2) != 0) {
+        _snprintf(bind.tex, sizeof bind.tex, "=%u", (unsigned)face->ptr_10);
+    } else if (face->ptr_10 == 0) {
+        strcpy(bind.tex, "null");
+    } else if (InImage((const void*)(size_t)face->ptr_10, (unsigned)(size_t)c->base, c->size, 1)) {
+        _snprintf(bind.tex, sizeof bind.tex, "+%u", (unsigned)((const char*)(size_t)face->ptr_10 - (const char*)c->base));
+    } else {
+        ReplayText name;
+        ReplayAddObjectName(name, *c->table, ROK_GAFFRAME, (const void*)(size_t)face->ptr_10, true);
+        _snprintf(bind.tex, sizeof bind.tex, "%s", name.Data());
+    }
+    bind.tex[sizeof bind.tex - 1] = '\0';
+    c->use->binds.push_back(bind);
+}
+
+}
+
+void ReplayEachFace(const void* base, unsigned size, void (*visit)(PieceFrame*, unsigned, void*), void* context)
+{
+    WalkFaces((unsigned)(size_t)base, size, (const Object3do*)base, 0, visit, context);
+}
+
+PieceFrame* ReplayFaceAt(const void* base, unsigned size, unsigned offset)
+{
+    FaceFind f = { offset, nullptr };
+    ReplayEachFace(base, size, FindFace, &f);
+    return f.face;
+}
+
+void ReplayLoadsReset()
+{
+    for (size_t i = 0; i < LoadEntries().size(); i++)
+        delete LoadEntries()[i];
+    LoadEntries().clear();
+    LoadKeys().clear();
+}
+
+void ReplayLoadNote(unsigned load, const char* name, const void* data, unsigned size)
+{
+    if (data == nullptr || size == 0 || load >= kReplayLoadCount)
+        return;
+    LoadEntry* e = new LoadEntry;
+    e->base = (unsigned)(size_t)data;
+    e->size = size;
+    e->load = (unsigned short)load;
+    e->kind = 0;
+    e->index = 0;
+    e->held = false;
+    _snprintf(e->name, sizeof e->name, "%s", name);
+    e->name[sizeof e->name - 1] = '\0';
+    e->bytes.assign((const unsigned char*)data, (const unsigned char*)data + size);
+    LoadInsert(e);
+}
+
+void ReplayLoadAdopt(unsigned load, unsigned kind, unsigned index, const void* base, unsigned size)
+{
+    LoadEntry* e = new LoadEntry;
+    e->base = (unsigned)(size_t)base;
+    e->size = size;
+    e->load = (unsigned short)load;
+    e->kind = (unsigned short)kind;
+    e->index = index;
+    e->held = true;
+    e->name[0] = '\0';
+    LoadInsert(e);
+    LoadKeys()[LoadKey(load, kind, index)] = e;
+}
+
+bool ReplayAddLoadName(ReplayText& t, ReplayObjectTable& table, unsigned load, const void* p, bool assign)
+{
+    if (p == nullptr) {
+        t.Add("null");
+        return true;
+    }
+    LoadEntry* e = LoadContaining(p);
+    if (e == nullptr || e->load != load) {
+        if (assign && e == nullptr)
+            LoadFail("a pointer into no %s load: %s", kReplayLoads[load].name, "no file that a loader read holds it");
+        else if (assign)
+            LoadFail("a pointer into no %s load: it is in the load of %s", kReplayLoads[load].name, e->name);
+        t.Add("?");
+        return false;
+    }
+    if (!LoadResolve(e)) {
+        if (assign)
+            LoadFail("no holder holds the %s load of %s", kReplayLoads[load].name, e->name);
+        t.Add("?");
+        return false;
+    }
+    if (assign) {
+        std::vector<ReplayLoadUse*>& uses = table.LoadUses();
+        ReplayLoadUse* use = nullptr;
+        for (size_t i = 0; i < uses.size() && use == nullptr; i++) {
+            if (uses[i]->load == e->load && uses[i]->kind == e->kind && uses[i]->index == e->index)
+                use = uses[i];
+        }
+        if (use == nullptr) {
+            use = new ReplayLoadUse;
+            use->load = e->load;
+            use->kind = e->kind;
+            use->index = e->index;
+            _snprintf(use->name, sizeof use->name, "%s", e->name);
+            use->name[sizeof use->name - 1] = '\0';
+            use->bytes = e->bytes;
+            uses.push_back(use);
+            if (strcmp(kReplayLoads[load].name, "model") == 0) {
+                BindCapture capture = { &table, use, (const void*)(size_t)e->base, e->size };
+                ReplayEachFace(capture.base, e->size, CaptureFace, &capture);
+            }
+        } else if (!LoadSame(*use, *e)) {
+            LoadFail("the same holder has two different files in the %s load of %s", kReplayLoads[load].name, e->name);
+        }
+    }
+    t.Add(kReplayObjectKinds[e->kind].name);
+    t.AddChar('#');
+    t.AddUnsigned(e->index);
+    unsigned offset = (unsigned)(size_t)p - e->base;
+    if (offset != 0) {
+        t.AddChar('+');
+        t.AddUnsigned(offset);
+    }
+    return true;
+}
+
+const void* ReplayParseLoad(unsigned load, const char* text, bool* found)
+{
+    *found = false;
+    if (strcmp(text, "null") == 0) {
+        *found = true;
+        return nullptr;
+    }
+    const char* hash = strchr(text, '#');
+    if (hash == nullptr)
+        return nullptr;
+    int kind = ReplayFindObjectKind(text, (unsigned)(hash - text));
+    if (kind < 0)
+        return nullptr;
+    char* end;
+    unsigned long index = strtoul(hash + 1, &end, 10);
+    if (end == hash + 1)
+        return nullptr;
+    unsigned long offset = 0;
+    if (*end == '+' && end[1] >= '0' && end[1] <= '9')
+        offset = strtoul(end + 1, &end, 10);
+    if (*end != '\0')
+        return nullptr;
+    LoadKeyMap::const_iterator at = LoadKeys().find(LoadKey(load, (unsigned)kind, (unsigned)index));
+    if (at == LoadKeys().end() || offset >= at->second->size)
+        return nullptr;
+    *found = true;
+    return (const void*)(size_t)(at->second->base + offset);
+}
+
+void ReplayAddLoadLines(const ReplayObjectTable& table, ReplayText& out)
+{
+    const std::vector<ReplayLoadUse*>& uses = table.LoadUses();
+    for (size_t i = 0; i < uses.size(); i++) {
+        const ReplayLoadUse& use = *uses[i];
+        out.Add("load ");
+        out.Add(kReplayLoads[use.load].name);
+        out.AddChar(' ');
+        out.Add(kReplayObjectKinds[use.kind].name);
+        out.AddChar('#');
+        out.AddUnsigned(use.index);
+        out.AddChar(' ');
+        out.AddString(use.name);
+        out.Add(" [");
+        out.AddUnsigned((unsigned)use.bytes.size());
+        out.Add("]\n");
+        for (size_t at = 0; at < use.bytes.size(); at += REPLAY_SNAPSHOT_LINE_BYTES) {
+            size_t run = use.bytes.size() - at < REPLAY_SNAPSHOT_LINE_BYTES ? use.bytes.size() - at : REPLAY_SNAPSHOT_LINE_BYTES;
+            const unsigned char* p = &use.bytes[at];
+            size_t k = 0;
+            while (k < run && p[k] == 0)
+                k++;
+            if (k == run)
+                continue;
+            out.Add("  x ");
+            out.AddUnsigned((unsigned)at);
+            out.AddChar(':');
+            AddHex(out, p, (unsigned)run);
+            out.AddChar('\n');
+        }
+        for (size_t b = 0; b < use.binds.size(); b++) {
+            const ReplayLoadBind& bind = use.binds[b];
+            char hex[96];
+            out.Add("  bind ");
+            out.AddUnsigned(bind.offset);
+            _snprintf(hex, sizeof hex, " %u %s %u %s %u\n", bind.flags, bind.src, bind.fillColor, bind.tex, bind.texKind);
+            out.Add(hex);
+        }
+    }
+}
+
+const char* ReplayReadDebrisCache(ReplayCacheStart& start)
+{
+    start = ReplayCacheStart();
+    DebrisCache& cache = g_debrisMemCache;
+    const unsigned char* base = (const unsigned char*)cache.base.get();
+    if (base == nullptr)
+        return nullptr;
+    start.taken = true;
+    start.cap = (unsigned)cache.cap;
+    start.cur = (unsigned)((const unsigned char*)cache.cur.get() - base);
+    const unsigned char* slots = (const unsigned char*)&g_explodedPieces[0];
+    bool curAtBlock = false;
+    for (unsigned at = 0; at < start.cap;) {
+        const DebrisCacheChunk* chunk = (const DebrisCacheChunk*)(base + at);
+        ReplayCacheBlock block;
+        block.offset = at;
+        block.size = (unsigned)chunk->size;
+        block.owner = -1;
+        block.live = false;
+        if (chunk->size < 8 || block.size > start.cap - at)
+            return "the blocks of the debris cache do not tile its arena";
+        const unsigned char* owner = (const unsigned char*)chunk->owner.get();
+        if (owner != nullptr) {
+            unsigned index = (unsigned)(owner - slots) / (unsigned)sizeof(g_explodedPieces[0]);
+            if (owner < slots || (owner - slots) % sizeof(g_explodedPieces[0]) != 0 || index >= sizeof(g_explodedPieces) / sizeof(g_explodedPieces[0]))
+                return "a block of the debris cache is owned by something other than a slot of g_explodedPieces";
+            block.owner = (int)index;
+            block.live = (const unsigned char*)g_explodedPieces[index].get() == base + at + 8;
+        }
+        curAtBlock = curAtBlock || at == start.cur;
+        start.blocks.push_back(block);
+        at += block.size;
+    }
+    return curAtBlock ? nullptr : "the cursor of the debris cache is not at the start of a block";
+}
+
+void ReplayCaptureDebrisCache(ReplayCacheStart& start)
+{
+    const char* failure = ReplayReadDebrisCache(start);
+    if (failure != nullptr)
+        ReplayFail(failure);
+}
+
+namespace {
+
+void AddCacheBlock(ReplayText& out, const char* prefix, const ReplayCacheBlock& b, bool live)
+{
+    out.Add(prefix);
+    out.AddUnsigned(b.offset);
+    out.AddChar(' ');
+    out.AddUnsigned(b.size);
+    out.AddChar(' ');
+    if (b.owner < 0) {
+        out.Add("null");
+    } else {
+        out.Add("ExplodedSlot#");
+        out.AddUnsigned((unsigned)b.owner);
+        if (live && b.live)
+            out.Add(" live");
+    }
+    out.AddChar('\n');
+}
+
+}
+
+void ReplayAddCacheChanges(const ReplayCacheStart& before, const ReplayCacheStart& after, ReplayText& out)
+{
+    ReplayText blocks;
+    size_t j = 0;
+    for (size_t i = 0; i < after.blocks.size(); i++) {
+        const ReplayCacheBlock& b = after.blocks[i];
+        while (j < before.blocks.size() && before.blocks[j].offset < b.offset)
+            j++;
+        const ReplayCacheBlock* was = j < before.blocks.size() ? &before.blocks[j] : nullptr;
+        if (was == nullptr || was->offset != b.offset || was->size != b.size || was->owner != b.owner)
+            AddCacheBlock(blocks, "  d block ", b, false);
+    }
+    if (!after.taken && before.taken) {
+        out.Add("  d cache none\n");
+    } else if (after.taken && (!before.taken || before.cap != after.cap || before.cur != after.cur || blocks.Size() != 0)) {
+        out.Add("  d cache ");
+        out.AddUnsigned(after.cap);
+        out.AddChar(' ');
+        out.AddUnsigned(after.cur);
+        out.AddChar('\n');
+        out.AddText(blocks);
+    }
+    blocks.Free();
+}
+
+void ReplayAddCacheLines(const ReplayCacheStart& start, ReplayText& out)
+{
+    if (start.blocks.empty())
+        return;
+    out.Add("cache debris ");
+    out.AddUnsigned(start.cap);
+    out.AddChar(' ');
+    out.AddUnsigned(start.cur);
+    out.AddChar('\n');
+    for (size_t i = 0; i < start.blocks.size(); i++)
+        AddCacheBlock(out, "  block ", start.blocks[i], true);
 }

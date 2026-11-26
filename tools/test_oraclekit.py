@@ -996,6 +996,11 @@ class ReplaySchemaKitTest(unittest.TestCase):
         self.assertEqual(kit["annotations"]["services"], [{"name": "SimAlloc"}])
         self.assertEqual(list(kit["annotations"]["callbacks"]), ["UnitVisitor"])
 
+    def test_a_load_kind_loses_the_functions_that_load_it(self):
+        schema = json.dumps({"annotations": {"loads": {"cob": {"type": "ScriptTable", "loader": ["LoadCobScript"], "holders": [{"kind": "UnitDef", "member": "data"}]}}}}).encode()
+        kit = json.loads(oraclekit.kit_schema(schema, {}))
+        self.assertEqual(kit["annotations"]["loads"], {"cob": {"type": "ScriptTable", "holders": [{"kind": "UnitDef", "member": "data"}]}})
+
     def test_a_member_service_takes_the_free_function_declaration_of_the_services_header(self):
         header = ("// Loads a file.\nint __stdcall TdfFile_LoadFile(TdfFileLayout* file,\n                             const char* path);\n"
                   "// Draws a number.\nint __cdecl GameRand(RandStream stream);\nclass TdfRecord;\n")

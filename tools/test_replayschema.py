@@ -130,7 +130,7 @@ class Accounting(unittest.TestCase):
 
     def test_a_pending_subsystem_lists_what_is_left(self):
         assignment = rs.read_assignment()
-        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons", "features", "ai", "orders", "economy", "units", "players", "mission", "los_radar")
+        sub, struct, slot = [(m, st, x["name"]) for m, st in rs.seam_members() if m not in ("wind_meteors", "targeting", "map", "weapons", "features", "ai", "orders", "economy", "units", "players", "mission", "los_radar", "scripts")
                              for x in rs.parse_interface(m, st)["slots"] if x["name"] in assignment.get(m, [])][0]
         model, errors = build([row(slot, "field_read", "Game::scrollSpeed"), row(slot, "field_escape", "Unit::unmatched")])
         pending = model["subsystems"][sub]["pending"]
@@ -1158,7 +1158,7 @@ class Polymorphic(unittest.TestCase):
         self.assertIn("kReplayCodeOrderNotify[] = {", text)
         self.assertIn("    (const void*)StopOrder,", text)
         self.assertIn('{ "orderNotify", kReplayCodeOrderNotify, %d },' % len(model["code_tables"][0]["entries"]), text)
-        self.assertIn('static_assert(sizeof(((OrderTableEntry*)nullptr)->notify) == sizeof(void*), "OrderTableEntry::notify is a code pointer");', text)
+        self.assertIn('static_assert(__is_pointer(decltype(((OrderTableEntry*)nullptr)->notify)), "OrderTableEntry::notify is a code pointer");', text)
         row_ = [l for l in text.split("\n") if l.startswith('    { "notify",')][0]
         self.assertIn("RK_CODE, 0,", row_)
 
@@ -1652,9 +1652,10 @@ class ReentrantServices(unittest.TestCase):
         self.assertIn('PlayNestedCalls("services.ExecuteCommandText");', answers)
 
     def nested_generated(self):
-        """The generator's output with a command slot CmdPlan added to the orders seam, as the Cmd slots were before #964 took them out of the interfaces."""
+        """The generator's output with a command slot CmdPlan added to the orders seam, as the Cmd slots were before #964 took them out of the interfaces, and orders pending, as it was then."""
         ann = annotations()
         ann["subsystems"]["orders"].setdefault("slots", {})["CmdPlan"] = {"args": {"args": {"mode": "argv"}}}
+        ann["subsystems"]["orders"]["status"] = "pending"
         with tempfile.TemporaryDirectory() as d:
             for h in rs.INTERFACES.glob("*.h"):
                 (Path(d) / h.name).write_text(h.read_text())
@@ -1864,7 +1865,7 @@ class InsideSites(unittest.TestCase):
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, anim), "anim", 0, 1, 0 },', text)
         self.assertIn('    { ROK_HANDLE, ROK_FIXTUREHOLDER, offsetof(FixtureHolder, shadow), "shadow", 0, 1, 0 },', text)
         self.assertIn('    { ROK_LOSUNITINDEXENTRY, ROK_LOSUNITINDEX, offsetof(LosUnitIndex, players[0]), "players[]", sizeof(((LosUnitIndex*)nullptr)->players[0]), 10, 0 },', text)
-        self.assertIn("kReplayInsideSiteCount = 21;", text)
+        self.assertIn("kReplayInsideSiteCount = 24;", text)
 
     def test_a_kind_points_at_its_sites(self):
         files, _, _ = self.generated()
@@ -1925,7 +1926,7 @@ class FeatureKinds(unittest.TestCase):
         self.assertEqual(kinds["Feature"]["table"], {"base": "game", "member": "features", "ref": True, "count": "featureCount", "alloc": 2048})
         self.assertEqual(kinds["Spot"]["table"], {"base": "game", "member": "spots", "ref": True, "count": 2048, "alloc": 2048})
         self.assertEqual(kinds["Pool"]["table"], {"base": "game", "member": "pool", "count": 1})
-        self.assertEqual(kinds["ModelState"]["fields"], [])
+        self.assertEqual(kinds["ModelState"]["type"], "ModelState")
         self.assertEqual(self.field("Spot", "state")["target"], "ModelState")
 
     def test_the_two_sides_of_a_union_are_never_live_together(self):
@@ -2667,12 +2668,22 @@ class ElementForms(unittest.TestCase):
     def test_import_objects_is_a_reason_and_reaches_the_subsystem_row(self):
         files, errors, _ = self.generated()
         self.assertEqual(errors, [])
-        self.assertRegex(files[rs.SCHEMA_H], r'\{ "movement", \d+, \d+, \d+, \d+, \d+, RET_MOVEMENT, 1 \},')
-        self.assertRegex(files[rs.SCHEMA_H], r'\{ "weapons", \d+, \d+, \d+, \d+, \d+, RET_WEAPONS, 0 \},')
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "movement", \d+, \d+, \d+, \d+, \d+, RET_MOVEMENT, 1, 0 \},')
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "orders", \d+, \d+, \d+, \d+, \d+, RET_ORDERS, 1, 1 \},')
+        self.assertRegex(files[rs.SCHEMA_H], r'\{ "weapons", \d+, \d+, \d+, \d+, \d+, RET_WEAPONS, 0, 0 \},')
         for value in ("", True):
             ann = annotations()
             ann["subsystems"]["weapons"]["import_objects"] = value
             self.has(ann, "weapons: import_objects needs a reason")
+
+    def test_fresh_allocations_is_a_reason_of_a_subsystem_with_import_objects(self):
+        for value in ("", True):
+            ann = annotations()
+            ann["subsystems"]["orders"]["fresh_allocations"] = value
+            self.has(ann, "orders: fresh_allocations needs a reason")
+        ann = annotations()
+        ann["subsystems"]["weapons"]["fresh_allocations"] = "a reason"
+        self.has(ann, "weapons: fresh_allocations names the blocks of the import lines, and the subsystem has no import_objects")
 
     def test_an_embedded_polymorphic_kind_has_a_vtable_and_a_site(self):
         files, errors, _ = self.generated()
@@ -2991,7 +3002,7 @@ class CStrings(unittest.TestCase):
         self.assertIn("{ 1, 0, 0 } }, 1, 1 },", text)
         self.assertIn("{ 1, 0, 0 } }, 0, 2 },", text)
         self.assertIn("{ 1, 0, 0 } }, 0, 1 },", text)
-        self.assertEqual([(a["raw"], a["strings"], a["ref"]) for a in model["arrays"][-5:-2]], [(True, 1, False), (False, 2, True), (False, 1, False)])
+        self.assertEqual([(a["raw"], a["strings"], a["ref"]) for a in model["arrays"] if a["owner"] == "FixtureNamed" and a["strings"]], [(True, 1, False), (False, 2, True), (False, 1, False)])
 
     def test_the_header_checks_the_storage_and_the_element_type_of_an_array(self):
         text = self.generated()[0][rs.FIXTURE_SCHEMA_H]
@@ -3100,6 +3111,185 @@ class Blobs(unittest.TestCase):
         ann = annotations()
         self.field(ann, "entries")["target"] = "Unit"
         self.has(ann, "FixtureProgram.entries: the target Unit of a blob has a table")
+
+
+class LoadForms(unittest.TestCase):
+    """Load-time data a recording carries as the inputs of its load: the `loads` annotation, the pointer modes and the field kind that name a load."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, name):
+        return next(f for f in ann["objects"]["FixtureLane"]["fields"] if f["name"] == name)
+
+    def test_the_real_loads_have_holders_and_ids(self):
+        files, errors, model = rs.generate(rs.read_rows())
+        self.assertEqual(errors, [])
+        self.assertEqual([(l["name"], [h["kind"] for h in l["holders"]]) for l in model["loads"]], [("cob", ["UnitDef"]), ("model", ["UnitDef"])])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("{ RL_COB, ROK_UNITDEF, RLH_MEMBER, offsetof(UnitDef, data) },", text)
+        self.assertRegex(text, r"\{ RL_MODEL, ROK_UNITDEF, RLH_GAME, \d+ \},")
+        self.assertIn('{ "cob", 0, 1 },\n    { "model", 1, 1 },', text)
+        self.assertIn('static_assert(__is_pointer(decltype(((UnitDef*)nullptr)->data)), "UnitDef::data holds the pointer of a cob load");', text)
+        self.assertIn("enum ReplayLoadId {\n    RL_COB,\n    RL_MODEL,\n    RL_COUNT\n};", files[rs.SERVICES_H])
+
+    def test_a_load_kind_of_the_tests_comes_after_the_real_ones(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        self.assertEqual([l["name"] for l in model["loads"]], ["cob", "model", "fixture_script", "fixture_shape"])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("    RL_FIXTURE_SCRIPT = 2,\n    RL_FIXTURE_SHAPE = 3,", text)
+        self.assertIn("{ RL_FIXTURE_SCRIPT, ROK_FIXTURELANE, RLH_MEMBER, offsetof(FixtureLane, script) },", text)
+        self.assertIn("RL_FIXTURE_SHAPE, ROK_FIXTURELANE, RLH_GAME,", text)
+
+    def test_a_load_field_is_a_pointer_that_names_its_load(self):
+        files, _, _ = self.generated()
+        row = [l for l in files[rs.FIXTURE_SCHEMA_H].split("\n") if l.startswith('    { "script", offsetof(FixtureLane, script)')][0]
+        self.assertIn("sizeof(void*), ROK_FIXTURELANE, RK_LOAD, RL_FIXTURE_SCRIPT,", row)
+        self.assertIn('static_assert(__is_pointer(decltype(((FixtureLane*)nullptr)->script)), "FixtureLane::script is a raw pointer");', files[rs.FIXTURE_SCHEMA_H])
+
+    def test_a_load_argument_and_result_are_recorded_and_replayed_by_their_name(self):
+        files, _, _ = self.generated()
+        hooks = files[rs.FIXTURE_HOOKS_INC]
+        self.assertIn('ArgLoad(s_call, "script", RL_FIXTURE_SCRIPT, a0);', hooks)
+        self.assertIn("ImportLoad(line, RL_FIXTURE_SHAPE, a1);", hooks)
+        self.assertIn("ArgLoadResult(s_tail, RL_FIXTURE_SCRIPT, result);", hooks)
+        self.assertIn("ImportResultLoad(line, RL_FIXTURE_SCRIPT, result);", hooks)
+        shapes = files[rs.SHAPES_SLOTS]
+        self.assertIn("ReplayAddLoadName(t, g_objects, RL_FIXTURE_SCRIPT, a0, false);", shapes)
+        self.assertIn("return (void*)ParseLoadResult(RL_FIXTURE_SCRIPT, r);", shapes)
+        self.assertIn('void* p0 = (void*)ArgLoad("script", RL_FIXTURE_SCRIPT);', shapes)
+        self.assertIn("CompareLoadResult(RL_FIXTURE_SCRIPT, g_result_fixture_Lookup);", shapes)
+
+    def test_the_types_of_a_load_kind_need_no_rule(self):
+        model, errors = build([row("UpdateUnitWeapons", "field_read", "ScriptTable::count"), row("UpdateUnitWeapons", "field_read", "Object3do::sibling")])
+        self.assertEqual([e for e in errors if "ScriptTable" in e or "Object3do" in e], [])
+        ann = annotations()
+        ann["loads"] = {}
+        model, errors = build([row("UpdateUnitWeapons", "field_read", "ScriptTable::count"), row("UpdateUnitWeapons", "field_read", "Object3do::sibling")], ann)
+        self.assertTrue(any("field_read ScriptTable::count" in e for e in errors), errors)
+        self.assertTrue(any("Object3do::sibling" in e for e in errors), errors)
+
+    def test_a_load_kind_is_checked(self):
+        ann = annotations()
+        ann["loads"]["cob"]["loader"] = ["LoadCobScript", "NoSuchLoader"]
+        self.has(ann, "load cob: the loader NoSuchLoader is no function")
+        ann = annotations()
+        ann["loads"]["cob"]["holders"] = []
+        self.has(ann, "load cob: `holders` lists at least one holder")
+        ann = annotations()
+        ann["loads"]["cob"]["holders"] = [{"kind": "Handle", "member": "data"}]
+        self.has(ann, "load cob: the holder kind Handle is no state kind with a table")
+        ann = annotations()
+        ann["loads"]["cob"]["holders"] = [{"kind": "FixtureView", "member": "data"}]
+        self.has(ann, "load cob: the holder kind FixtureView is no state kind with a table")
+        ann = annotations()
+        ann["loads"]["model"]["holders"] = [{"kind": "UnitDef", "game": "unitDefCount"}]
+        errors = self.generated(ann)[1]
+        self.assertEqual(errors, [])
+        ann["loads"]["model"]["holders"] = [{"kind": "UnitDef", "game": "noSuchMember"}]
+        self.has(ann, "load model: the holder's `game` noSuchMember is no Ref member of Game")
+        ann = annotations()
+        ann["loads"]["cob"]["holders"] = [{"kind": "UnitDef", "member": "data", "game": "types"}]
+        self.has(ann, "load cob: a holder is {\"kind\", \"member\"} or {\"kind\", \"game\"}")
+        ann = annotations()
+        ann["loads"]["cob"]["unit"] = 1
+        self.has(ann, "load cob: a load kind is {\"type\", \"loader\", \"holders\"}")
+        ann = annotations()
+        ann["loads"]["Cob"] = ann["loads"].pop("cob")
+        self.has(ann, "load Cob: the name of a load kind is lower case")
+
+    def test_a_load_field_is_checked(self):
+        ann = annotations()
+        self.field(ann, "script")["load"] = "nowhere"
+        self.has(ann, "FixtureLane.script: the `load` nowhere is no entry of `loads`")
+        ann = annotations()
+        self.field(ann, "script")["target"] = "Unit"
+        self.has(ann, "FixtureLane.script: a load field is {\"name\", \"kind\", \"load\"}")
+        ann = annotations()
+        self.field(ann, "level")["load"] = "cob"
+        self.has(ann, "FixtureLane.level: only a field of kind load has a `load`")
+
+    def test_a_load_argument_is_checked(self):
+        def has(change, text):
+            fixtures = json.loads(rs.FIXTURES_JSON.read_text())
+            change(fixtures["fixtures"])
+            errors = rs.generate(rs.read_rows(), annotations(), fixtures=fixtures)[1]
+            self.assertTrue(any(text in e for e in errors), (text, errors))
+
+        has(lambda f: f["Attach"]["args"]["script"].update(load="nowhere"), "names the load nowhere, which is no entry of `loads`")
+        has(lambda f: f["Attach"]["params"][0].update(type="int"), "is int, and a load is a pointer")
+        has(lambda f: f["Lookup"]["result"].update(load="nowhere"), "the result names the load nowhere")
+        has(lambda f: f["Lookup"]["args"].update(lane={"mode": "scalar", "load": "cob"}), "has the mode scalar and a `load` key, which only the mode load takes")
+
+
+class CountedForms(unittest.TestCase):
+    """An array of embedded structs counted by a member of its owner, and an array whose length follows a load field to the loaded file."""
+
+    def generated(self, ann=None):
+        return rs.generate(rs.read_rows(), ann or annotations())
+
+    def has(self, ann, text):
+        errors = self.generated(ann)[1]
+        self.assertTrue(any(text in e for e in errors), (text, errors))
+
+    def field(self, ann, kind, name):
+        return next(f for f in ann["objects"][kind]["fields"] if f["name"] == name)
+
+    def test_the_real_schema_counts_the_pieces_of_a_model_state(self):
+        files, errors, model = rs.generate(rs.read_rows())
+        self.assertEqual(errors, [])
+        text = files[rs.SCHEMA_H]
+        self.assertIn("REPLAY_MAX_SIZE(sizeof(ModelState), offsetof(ModelState, pieces[0]) + 128 * sizeof(((ModelState*)nullptr)->pieces[0]))", text)
+        self.assertIn("{ 128, sizeof(((ModelState*)nullptr)->pieces[0]), 1, { { offsetof(ModelState, count),", text)
+        self.assertIn('"pieces[]", sizeof(((ModelState*)nullptr)->pieces[0]), 128, 0 },', text)
+        self.assertIn("offsetof(ScriptTable, pieceCount), (unsigned char)sizeof(((ScriptTable*)nullptr)->pieceCount), 0, 0u, 1, offsetof(UnitScript, table) }, { 76, 0, 0 }", text)
+        self.assertIn("offsetof(Object3do, vertexCount), (unsigned char)sizeof(((Object3do*)nullptr)->vertexCount), 0, 0u, 1, offsetof(ModelPiece, object) }, { 12, 0, 0 }", text)
+
+    def test_a_counted_array_is_sized_for_its_capacity(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn('{ "FixtureTrack", REPLAY_MAX_SIZE(sizeof(FixtureTrack), offsetof(FixtureTrack, laps[0]) + 5 * sizeof(((FixtureTrack*)nullptr)->laps[0])),', text)
+        self.assertIn('    { ROK_FIXTURELAP, ROK_FIXTURETRACK, offsetof(FixtureTrack, laps[0]), "laps[]", sizeof(((FixtureTrack*)nullptr)->laps[0]), 5, 0 },', text)
+        self.assertIn("FixtureTrack::laps[]: count is a byte, a short or an int", text)
+        self.assertIn("FixtureTrack::laps holds one element of its kind and room for the rest after it", text)
+
+    def test_a_counted_array_is_checked(self):
+        ann = annotations()
+        del self.field(ann, "FixtureTrack", "laps")["capacity"]
+        self.has(ann, "FixtureTrack.laps: an array of embeds with a counted length has a `capacity`")
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "laps")["capacity"] = 0
+        self.has(ann, "FixtureTrack.laps: an array of embeds with a counted length has a `capacity`")
+        ann = annotations()
+        self.field(ann, "FixtureScript", "channels")["capacity"] = 8
+        self.has(ann, "FixtureScript.channels: only an array of embeds whose `count` is a length expression has a `capacity`")
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "laps")["count"] = "count*count*count"
+        self.has(ann, "FixtureTrack.laps: the length `count*count*count` is not one or two factors joined by *")
+
+    def test_a_length_that_follows_a_pointer_names_a_load_field(self):
+        files, errors, model = self.generated()
+        self.assertEqual(errors, [])
+        text = files[rs.FIXTURE_SCHEMA_H]
+        self.assertIn("offsetof(FixtureFile, lapCount), (unsigned char)sizeof(((FixtureFile*)nullptr)->lapCount), 0, 0u, 1, offsetof(FixtureTrack, table) }, { 2, 0, 0 }", text)
+        self.assertIn("FixtureTrack::marks: table is a pointer", text)
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "marks")["length"] = "count->lapCount*2"
+        self.has(ann, "FixtureTrack.marks: the length follows `count`, which is no field of kind load of the kind")
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "marks")["length"] = "nowhere->lapCount*2"
+        self.has(ann, "FixtureTrack.marks: the length follows `nowhere`, which is no field of kind load of the kind")
+
+    def test_only_the_length_of_an_array_of_an_object_follows_a_pointer(self):
+        ann = annotations()
+        self.field(ann, "FixtureTrack", "laps")["count"] = "table->lapCount"
+        self.has(ann, "the factor `table->lapCount` follows a pointer, which only the length of an array of an object may do")
 
 
 class NestedVectors(unittest.TestCase):
@@ -3304,16 +3494,16 @@ class EventForms(unittest.TestCase):
     def test_a_kind_left_unrecorded_is_passed_through_before_any_line(self):
         files, _, _ = rs.generate(rs.read_rows(), rs.load_annotations())
         hooks = files[rs.HOOKS_H]
-        body = hooks[hooks.index("RecWeaponsApply"):]
+        body = hooks[hooks.index("RecScriptsApply"):]
         body = body[:body.index("\n}\n")]
-        unrecorded = rs.load_annotations()["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["unrecorded"]
-        self.assertEqual(set(unrecorded), {"WEAPONS_EXPLODE_PIECE"})
+        unrecorded = rs.load_annotations()["subsystems"]["scripts"]["slots"]["Apply"]["args"]["event"]["unrecorded"]
+        self.assertEqual(set(unrecorded), {"SCRIPTS_FREE_STATE", "SCRIPTS_INIT_STATE"})
         guard = body.index("if (a0 != nullptr && a1 >= sizeof(*a0) && (")
         self.assertLess(guard, body.index("ReplayRoots roots;"))
         for name in unrecorded:
             self.assertIn("a0->kind == %s" % name, body[guard:body.index("ReplayRoots roots;")])
-        self.assertIn("return s_inner_weapons->Apply(a0, a1);", body)
-        self.assertIn('ArgEvent(s_call, "event", RET_WEAPONS, a0, a1);', body)
+        self.assertIn("return s_inner_scripts->Apply(a0, a1);", body)
+        self.assertIn('ArgEvent(s_call, "event", RET_SCRIPTS, a0, a1);', body)
 
     def test_refs_name_a_member_of_one_struct(self):
         structs = rs.interface_structs("weapons")
@@ -3499,8 +3689,8 @@ class LinkSources(unittest.TestCase):
         listed = set(replay_subsystems.load())
         with rs.SUBSYSTEMS.open(newline="") as f:
             rows = list(csv.DictReader(f))
-        other = next(r for r in rows if r["subsystem"] not in listed)
-        self.assertNotIn(other["file"], rs.replay_link_sources())
+        linked = rs.replay_link_sources()
+        other = next(r for r in rows if r["subsystem"] not in listed and r["file"] not in linked)
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "replay_subsystems.json"
             path.write_text(json.dumps({other["subsystem"]: {}}))

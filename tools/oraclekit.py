@@ -19,7 +19,7 @@ generated file or the fuel pass that still names a source (SOURCE_NAME).
 
 `data/replay_schema.json` is exported without the fields that name the source: the `includes`, each slot's `functions` and
 `through`, the `header` of each code table and callback, and the `header`, `pre` and `effect`
-(the replayer's own code) of each service. The entries of a code table are functions of the source, so each becomes its
+(the replayer's own code) of each service, and the `loader` of each load kind. The entries of a code table are functions of the source, so each becomes its
 `kit_name` in tools/oraclekit/code_tables.csv (table, entry, kit_name): the order type's name for `orderNotify`, the bit of
 `WeaponDef.flags` that selects the handler for `weaponFire`. The export is refused when an entry has no row or a row no entry.
 The copy also leaves out what only the replayer and its checks read, all of which names source globals, types and functions:
@@ -779,6 +779,8 @@ def kit_schema(data: bytes, names: dict[tuple[str, str], str], undeclared: set[s
             annotations["services"] = kit_services(annotations["services"], services_header)
     for service in annotations.get("services", []):
         drop(service, SERVICE_SOURCE_FIELDS)
+    for load in annotations.get("loads", {}).values():
+        drop(load, ("loader",))
     entries = set()
     for table, spec in annotations.get("code_tables", {}).items():
         spec.pop("headers", None)

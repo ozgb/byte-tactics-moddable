@@ -753,6 +753,7 @@ static char s_text[kTextBytes];
 static int s_textUsed = 0;
 static int s_open = 0;
 static int s_curStart = 0;
+static int s_dropItem = 0;
 
 static TargetSlot* SlotFor(const unsigned char* base, int width, int height, int name)
 {
@@ -1011,20 +1012,18 @@ int DlBegin(const char* kind, const DlSurface* dst, int x0, int y0, int x1, int 
     Resolve(dst, &r);
     g_dlOffX = r.offX;
     g_dlOffY = r.offY;
+    s_curStart = s_textUsed;
+    s_dropItem = x0 >= x1 || y0 >= y1;
+    if (s_dropItem != 0)
+        return -1;
     TargetSlot* t = SlotFor(r.base, r.width, r.height, r.name);
-    int drawn = x0 < x1 && y0 < y1;
-    if (drawn) {
-        x0 += r.offX;
-        x1 += r.offX;
-        y0 += r.offY;
-        y1 += r.offY;
-    }
-    int depends = -1;
-    if (drawn) {
-        depends = Query(t, x0, y0, x1, y1);
-        if (t->maxRead > depends)
-            depends = t->maxRead;
-    }
+    x0 += r.offX;
+    x1 += r.offX;
+    y0 += r.offY;
+    y1 += r.offY;
+    int depends = Query(t, x0, y0, x1, y1);
+    if (t->maxRead > depends)
+        depends = t->maxRead;
     TargetSlot* source = nullptr;
     if (reads != nullptr) {
         int sr = FindContaining(reads);
@@ -1035,8 +1034,7 @@ int DlBegin(const char* kind, const DlSurface* dst, int x0, int y0, int x1, int 
             depends = source->maxDraw;
     }
     int layer = depends + 1;
-    if (drawn)
-        Add(t, x0, y0, x1, y1, layer);
+    Add(t, x0, y0, x1, y1, layer);
     if (source != nullptr && layer > source->maxRead)
         source->maxRead = layer;
     s_curStart = s_textUsed;
@@ -1060,6 +1058,11 @@ int DlBegin(const char* kind, const DlSurface* dst, int x0, int y0, int x1, int 
 
 void DlEnd()
 {
+    if (s_dropItem != 0) {
+        s_textUsed = s_curStart;
+        s_dropItem = 0;
+        return;
+    }
     DlPutRaw("\n");
     s_items[s_itemCount].end = s_textUsed;
     s_itemCount++;

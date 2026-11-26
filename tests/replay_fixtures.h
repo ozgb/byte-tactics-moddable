@@ -61,6 +61,8 @@ struct FixtureLane {
     int level;
     unsigned short unit;
     unsigned short flags;
+    void* script;
+    void* shape;
 };
 
 struct FixtureSpan {
@@ -176,6 +178,23 @@ struct FixtureChannel {
 struct FixtureScript {
     int id;
     FixtureChannel channels[4];
+};
+
+struct FixtureFile {
+    int lapCount;
+    int markCount;
+};
+
+struct FixtureLap {
+    unsigned short time;
+    short mark;
+};
+
+struct FixtureTrack {
+    int count;
+    FixtureFile* table;
+    Ref<unsigned char> marks;
+    FixtureLap laps[1];
 };
 
 struct FixtureOrder;

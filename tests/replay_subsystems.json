@@ -38,6 +38,7 @@
     }
   },
   "weapons": {
+    "self_test": "combat-deaths.txt",
     "inject": [
       {
         "define": "BT_REPLAY_INJECT_RELOAD_BASE=150",
@@ -109,6 +110,15 @@
       "field": "import 0 services.SimAlloc"
     }
   },
+  "scripts": {
+    "self_test": "orders-air.txt",
+    "inject": {
+      "define": "BT_REPLAY_INJECT_TURN_SCALE=2",
+      "recording": "orders-air.txt",
+      "expect": 22,
+      "field": "ModelState#5.pieces[1].short_12"
+    }
+  },
   "pathfinding": {
     "inject": {
       "define": "BT_REPLAY_INJECT_STEP_BUDGET=0x500",
@@ -124,5 +134,21 @@
       "expect": 1,
       "field": "UnitMotion#2.velocityX"
     }
+  },
+  "orders": {
+    "inject": [
+      {
+        "define": "BT_REPLAY_INJECT_STATE_STEP=2",
+        "recording": "ui-right-click.txt",
+        "expect": 19,
+        "field": "Order#4.state"
+      },
+      {
+        "define": "BT_REPLAY_INJECT_CREATED_SHIFT=1",
+        "recording": "orders-guard-attacked.txt",
+        "expect": 10,
+        "field": "Order#3.created"
+      }
+    ]
   }
 }

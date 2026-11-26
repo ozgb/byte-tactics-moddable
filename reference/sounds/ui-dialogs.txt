@@ -16,4 +16,5 @@ bt-sound 1
 61 play OPTIONS -585 - - -
 61 play EXIT -585 - - -
 61 play MessageArrived -585 - - -
+61 play xplomed2 -585 - - -
 61 play MessageArrived -585 - - -

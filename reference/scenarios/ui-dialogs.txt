@@ -1,4 +1,4 @@
-# Pause and resume, the options panel's interface type (left click to right click) and text lines, the debug hotkeys, and the exit menu: Cancel, then Exit Game with No, then with Yes, which leaves the game and ends the run.
+# Pause and resume, the options panel's interface type (left click to right click) and text lines, and the exit menu: Cancel, then Exit Game with No, then with Yes, which leaves the game and ends the run.
 game_seed 319
 crt_seed 1319
 view_seed 2319
@@ -9,7 +9,6 @@ player0.controller human
 player0.side Arm
 player1.controller ai
 player1.side Core
-debug_keys 1
 console 1 +iface 0
 spawn 2 1 CORAK 470 300
 input 5 mouse move 384 240
@@ -42,11 +41,6 @@ input 21.24 mouse left up 62 434
 input 30 mouse move 464 330
 input 31 mouse right down 464 330
 input 32 mouse right up 464 330
-input 40 key down f11
-input 41 key up f11
-input 45 char =
-input 50 mouse move 294 290
-input 51 char ]
 input 60 key down f2
 input 61 key up f2
 input 61.2 mouse move 61 374
@@ -73,5 +67,4 @@ input 61.28 mouse left up 385 222
 input 61.30 mouse move 312 255
 input 61.31 mouse left down 312 255
 input 61.32 mouse left up 312 255
-input 61.34 mouse move 300 200
 frames 11 21 61

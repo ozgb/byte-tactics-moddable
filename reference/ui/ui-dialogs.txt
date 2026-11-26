@@ -35,11 +35,6 @@ bt-ui 2
 31 input mouse right down 464 330
 32 input mouse right up 464 330
 33 view 3
-40 input key down 122
-41 input key up 122
-45 input char 61
-50 input mouse move 294 290
-51 input char 93
 60 input key down 113
 61 input key up 113
 61 input mouse move 61 374

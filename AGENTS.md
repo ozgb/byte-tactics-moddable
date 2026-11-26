@@ -86,8 +86,9 @@ cd "$(tools/worktree.sh <N>)"
 ```
 
 When `--holder` names another lead, its claim came first: comment
-`Lead: Released, lead <name>.` and stop, but leave the assignee, which is
-that lead's too (every lead is the same account).
+`Lead: Released, lead <name>.` and stop. Unassign yourself only when the
+issue has more than one assignee: with one, it is that lead's too (the two
+leads share an account).
 
 Keep scratch files in `build/scratch/<N>/`. If you stop before finishing,
 comment `Lead: Released, lead <name>.` on the issue and unassign yourself.

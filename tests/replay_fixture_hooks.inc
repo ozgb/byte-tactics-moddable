@@ -399,7 +399,9 @@ int __stdcall RecFixtureHandGoal(unsigned int a0)
     int result = s_inner_fixture->HandGoal(a0);
     if (scope.Import()) {
         ImportResult(line, result);
-        FinishImport(line, roots);
+        ReplayRoots importRoots = roots;
+        importRoots.Add(ROK_FIXTUREGOALBASE, ReplayRefPtr(a0));
+        FinishImport(line, importRoots);
     }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");

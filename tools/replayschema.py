@@ -2639,6 +2639,20 @@ def self_buffer(s: dict):
     return None
 
 
+def import_roots(s: dict) -> list[str]:
+    """The import side's FinishImport call, with the objects that an argument's `import` override names added to the
+    slot's roots, so the walk after the import visits every object the import's arguments name."""
+    extra = []
+    for i, a in enumerate(s["args"]):
+        over = a.get("import")
+        if over is None or over.get("mode") != "object":
+            continue
+        extra.append("        importRoots.Add(ROK_%s, %s);" % (upper(over["kind"]), ("ReplayRefPtr(a%d)" if over.get("ref") else "a%d") % i))
+    if not extra:
+        return ["        FinishImport(line, roots);"]
+    return ["        ReplayRoots importRoots = roots;"] + extra + ["        FinishImport(line, importRoots);"]
+
+
 def import_view(s: dict) -> dict:
     """The slot as its import side records it: an argument or the result with an `import` annotation takes that form there and keeps its own on the slot side."""
     def side(a):
@@ -2766,7 +2780,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        ImportOutInOutScalar(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif is_named_out(a):
                 L.append('        ImportOutInOut(line, "%s", ROK_%s, %s);' % (a["line"], upper(a["kind"]), arg_var(a, i)))
-        L.append("        FinishImport(line, roots);")
+        L += import_roots(s)
         L.append("    }")
     if nest:
         L.append("    if (scope.Nested()) {")

@@ -430,6 +430,15 @@ class TargetingForms(unittest.TestCase):
         self.assertIn("ImportObject(line, ROK_FIXTUREGOALBASE, ReplayRefPtr(a0));", body)
         self.assertIn('ArgValue(s_call, "goal", a0);', body)
 
+    def test_an_object_an_import_annotation_names_is_a_root_of_the_import_side_only(self):
+        files, errors, _ = self.generated()
+        self.assertEqual(errors, [])
+        hooks = files[rs.FIXTURE_HOOKS_INC]
+        body = hooks[hooks.index("RecFixtureHandGoal"):]
+        body = body[:body.index("\n}\n")]
+        self.assertIn("ReplayRoots importRoots = roots;\n        importRoots.Add(ROK_FIXTUREGOALBASE, ReplayRefPtr(a0));\n        FinishImport(line, importRoots);", body)
+        self.assertNotIn("    roots.Add(", body)
+
     def test_an_import_annotation_is_for_a_scalar_and_a_known_form(self):
         fixtures = json.loads(rs.FIXTURES_JSON.read_text())
         fixtures["fixtures"]["HandGoal"]["args"]["goal"]["import"] = {"mode": "object", "kind": "NoSuchKind"}

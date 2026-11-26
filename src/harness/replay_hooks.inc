@@ -726,7 +726,9 @@ void __stdcall RecPathfindingCancel(PathHandle a0)
     }
     s_inner_pathfinding->Cancel(a0);
     if (scope.Import()) {
-        FinishImport(line, roots);
+        ReplayRoots importRoots = roots;
+        importRoots.Add(ROK_PATHGOAL, ReplayRefPtr(a0));
+        FinishImport(line, importRoots);
     }
     if (scope.Open()) {
     }

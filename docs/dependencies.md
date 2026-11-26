@@ -14,7 +14,7 @@ An edge is a writer, a reader, an item and a phase. The class is the first that 
 - **read-only**: the reader reads the item and no run shows anyone writing it in that phase.
 - **unobserved**: an edge of data/coupling.csv that no run enters.
 
-Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1235 read-only, 1541 unobserved.
+Edges in data/dependencies.csv: 74 ordered, 268 immediate, 14 deferrable, 1237 read-only, 1541 unobserved.
 
 ## Cutting rule
 
@@ -27,7 +27,7 @@ S can be cut from T when no edge between them, in either direction, is `immediat
 | wind_meteors | 0 | 0 | 0 | 18 | 126 | 14 of 14 |
 | economy | 0 | 42 | 0 | 4 | 85 | 5 of 14 |
 | features | 15 | 16 | 2 | 77 | 207 | 8 of 14 |
-| ai | 11 | 18 | 2 | 103 | 237 | 6 of 14 |
+| ai | 11 | 18 | 2 | 105 | 237 | 6 of 14 |
 | pathfinding | 0 | 0 | 0 | 66 | 57 | 14 of 14 |
 | weapons | 30 | 66 | 2 | 231 | 208 | 4 of 14 |
 | targeting | 11 | 31 | 1 | 42 | 111 | 5 of 14 |
@@ -83,13 +83,13 @@ From data/phase_boundaries.csv. `needed` is `yes` when an `immediate` row spans 
 | boundary | needed | edges | direct | carried | mergeable | example |
 |---|---|---|---|---|---|---|
 | 0\|1 | absent | 0 | 0 | 0 | absent | - |
-| 1\|2 | yes | 208 | 68 | 92 | no | mission-build-unit@1 |
-| 2\|3 | yes | 162 | 1 | 99 | no | mission-build-unit@1 |
-| 3\|4 | yes | 159 | 0 | 99 | no | mission-build-unit@1 |
-| 4\|5 | yes | 47 | 11 | 34 | no | mission-defeat-passes-x@5 |
-| 5\|6 | yes | 10 | 0 | 26 | no | mission-build-unit@16 |
-| 6\|7 | yes | 10 | 0 | 22 | no | mission-build-unit@16 |
-| 7\|tail | yes | 8 | 0 | 20 | no | mission-build-unit@16 |
+| 1\|2 | yes | 208 | 68 | 91 | no | mission-build-unit@1 |
+| 2\|3 | yes | 162 | 1 | 98 | no | mission-build-unit@1 |
+| 3\|4 | yes | 159 | 0 | 98 | no | mission-build-unit@1 |
+| 4\|5 | yes | 47 | 11 | 33 | no | mission-defeat-passes-x@5 |
+| 5\|6 | yes | 10 | 0 | 25 | no | mission-build-unit@16 |
+| 6\|7 | yes | 10 | 0 | 21 | no | mission-build-unit@16 |
+| 7\|tail | yes | 8 | 0 | 19 | no | mission-build-unit@16 |
 | tail\|presentation | yes | 48 | 48 | 0 | no | mission-build-unit@1 |
 
 ## Deferral confirmation
@@ -610,7 +610,7 @@ The 15 groups with the most rows are shown.
 | ordered | 5 | 6 |
 | immediate | 0 | 18 |
 | deferrable | 1 | 1 |
-| read-only | 0 | 103 |
+| read-only | 0 | 105 |
 | unobserved | 74 | 163 |
 
 **Ordered** (11).
@@ -663,7 +663,7 @@ The 15 groups with the most rows are shown.
 
 | other | ai is writer | ai is reader |
 |---|---|---|
-| (no writer) | 0 | 103 |
+| (no writer) | 0 | 105 |
 
 **Unobserved**, by the other subsystem.
 
@@ -732,12 +732,14 @@ The rows themselves are in data/phase_dependencies.csv.
 | players | rng.parkMiller | `PlayerAI::UpdateEveryThirtyTicks` | 10 | 1 | fixed | - |
 | players | rng.parkMiller | `ScoutTimer::OnTimer` | 1 | 1 | fixed | - |
 | players | rng.parkMiller | `SpatialTimer::OnTimer` | 2 | 1 | fixed | - |
+| players | rng.parkMiller | `SquadScoutTimer::OnTimer` | 1 | 6 to 8 | depends-on-earlier | unresolved:image |
+| players | rng.parkMiller | `UpdatePlayerAI` | 2 | 1 | fixed | - |
 | projectiles | rng.parkMiller | `AiApply` | 5 | 1 | fixed | - |
 | units | rng.parkMiller | `AiApply` | 1 | 1 to 2 | depends-on-earlier | Unit::f_1f;f14353;unresolved:image;NewUnitScript: new UnitScript |
 
 ### Within-pass reads
 
-76 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+78 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -745,7 +747,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | players | `SquadManager::FindNearestEnemyUnit` | 7 | 5 | `Unit::activateFlags` | 6 |
 | players | `SquadManager::RetargetWeapons` | 7 | 3 | `SquadManager::cursor` | 93 |
 | units | `SetUnitSquad` | 6 | 4 | `Unit::group` | 16 |
-| players | `??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 5 | 2 | `Unit::flags` | 49 |
+| players | `??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 5 | 2 | `Unit::flags` | 48 |
 | players | `ScoutTimer::OnTimer` | 5 | 0 | `PlayerAI::centre` | 79 |
 | players | `PlayerAI::RefreshUnitLists` | 4 | 3 | `unknown_1b8e` | 90 |
 | units | `AiApply` | 4 | 3 | `Unit::def` | 10 |
@@ -1340,7 +1342,7 @@ Cannot be cut from, with the edge of the most runs:
 | players -> units | 0 | 0 | 7 | 5 |
 | presentation -> features | 0 | 0 | 1 | 0 |
 | presentation -> projectiles | 0 | 0 | 1 | 0 |
-| presentation -> units | 0 | 0 | 2 | 1 |
+| presentation -> units | 0 | 0 | 1 | 1 |
 | projectiles -> players | 0 | 6 | 0 | 0 |
 | projectiles -> presentation | 0 | 2 | 0 | 0 |
 | units -> explosions | 1 | 0 | 0 | 0 |
@@ -1580,7 +1582,7 @@ The rows themselves are in data/phase_dependencies.csv.
 
 ### Within-pass reads
 
-798 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+799 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -1774,7 +1776,7 @@ Cannot be cut from, with the edge of the most runs:
 | players -> presentation | 4 | 0 | 0 | 0 |
 | players -> projectiles | 0 | 0 | 4 | 2 |
 | players -> units | 0 | 0 | 9 | 5 |
-| presentation -> units | 0 | 0 | 3 | 2 |
+| presentation -> units | 0 | 0 | 3 | 1 |
 | projectiles -> features | 1 | 0 | 0 | 0 |
 | projectiles -> players | 7 | 0 | 0 | 0 |
 | projectiles -> presentation | 1 | 0 | 0 | 0 |
@@ -1798,7 +1800,7 @@ The rows themselves are in data/phase_dependencies.csv.
 
 ### Within-pass reads
 
-355 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+362 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -2273,7 +2275,7 @@ The rows themselves are in data/phase_dependencies.csv.
 
 ### Within-pass reads
 
-388 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+390 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -2432,7 +2434,7 @@ No draws.
 
 ### Within-pass reads
 
-387 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
+397 rows in data/pass_reads.csv, grouped by pass and function (the item shown is the one most runs saw):
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
@@ -2443,7 +2445,7 @@ No draws.
 | units | `MovementApply` | 11 | 1 | `UnitMotion::UnitMotion: new PackedPosGoal` | 21 |
 | units | `UnitMotion::SteerAircraft` | 11 | 1 | `UnitMotion::flags` | 17 |
 | units | `AiSearchGoal::SetPathOrder` | 10 | 2 | `UnitMotion::UnitMotion: new PackedPosGoal` | 22 |
-| units | `UnitMotion::ApplyClampedTurnDelta` | 10 | 5 | `UnitMotion::speed` | 51 |
+| units | `UnitMotion::ApplyClampedTurnDelta` | 10 | 5 | `UnitMotion::speed` | 49 |
 | units | `AiSearchGoal::TickTowardGoal` | 9 | 2 | `UnitMotion::UnitMotion: new PackedPosGoal` | 39 |
 | units | `UnitMotion::SteerGroundUnit` | 9 | 2 | `UnitMotion::UnitMotion: new PackedPosGoal` | 39 |
 | units | `PathOrder::FillWorldPos` | 8 | 2 | `Unit::spatialBucket` | 13 |

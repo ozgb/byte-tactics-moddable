@@ -368,7 +368,6 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,deref_read,*Point16
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_escape,Order::link
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_escape,UnitDef::footprintx
-0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_maybe_written,Order::pos
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Game::defs
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Order::count
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_read,Order::flags
@@ -406,6 +405,7 @@ address,function,file,kind,target
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_write,Box::lo
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_write,Order::count
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_write,Order::flags
+0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_write,Order::pos
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_write,Vec3::x
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_write,Vec3::y
 0x402640,BuildingBuildOrder,src/orders/unit_orders.cpp,field_write,Vec3::z
@@ -15668,6 +15668,7 @@ address,function,file,kind,target
 0x44e3c0,PathOrder::FillWorldPos,src/movement/order_targets.cpp,field_read,Vec3::x
 0x44e3c0,PathOrder::FillWorldPos,src/movement/order_targets.cpp,field_read,Vec3::y
 0x44e3c0,PathOrder::FillWorldPos,src/movement/order_targets.cpp,field_read,Vec3::z
+0x44e3c0,PathOrder::FillWorldPos,src/movement/order_targets.cpp,field_write,PathOrder::pos
 0x44e3c0,PathOrder::FillWorldPos,src/movement/order_targets.cpp,field_write,Vec3::x
 0x44e3c0,PathOrder::FillWorldPos,src/movement/order_targets.cpp,field_write,Vec3::y
 0x44e3c0,PathOrder::FillWorldPos,src/movement/order_targets.cpp,field_write,Vec3::z

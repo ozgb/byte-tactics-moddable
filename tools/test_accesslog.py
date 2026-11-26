@@ -547,6 +547,15 @@ class MapTest(unittest.TestCase):
         self.assertEqual(ranges[0][0], 0x401000)
         self.assertTrue(all(a[1] <= b[0] for a, b in zip(ranges, ranges[1:])))
 
+    def test_a_function_with_no_code_names_no_range(self):
+        dead_line = " 0001:00000180       ?Aaa@@YAXXZ               0000000000401180     0004_other.cpp.obj\n"
+        info = al.parse_map(MAP.replace(" 0001:00000180", dead_line + " 0001:00000180", 1))
+        subs, ranges, _ = al.attribution_table(info, self.rows, frozenset({"?Aaa@@YAXXZ"}))
+        self.assertEqual(subs[next(sub for start, end, sub in ranges if start <= 0x401180 < end)], "presentation")
+        self.assertIn((0x401180, 0x4011c0, "Helper"), al.function_table(info, frozenset({"?Aaa@@YAXXZ"})))
+        subs, ranges, _ = al.attribution_table(info, self.rows)
+        self.assertEqual(subs[next(sub for start, end, sub in ranges if start <= 0x401180 < end)], "orders")
+
     def test_attr_round_trip(self):
         subs, ranges, _ = al.attribution_table(self.info, self.rows)
         self.assertEqual(al.unpack_attr(al.pack_attr(subs, ranges)), (subs, ranges))

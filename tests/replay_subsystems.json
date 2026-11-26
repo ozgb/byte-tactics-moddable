@@ -116,5 +116,13 @@
       "expect": 1,
       "field": "region"
     }
+  },
+  "movement": {
+    "inject": {
+      "define": "BT_REPLAY_INJECT_SPEED_DIVISOR=0x6c0000",
+      "recording": "orders-build-patrol.txt",
+      "expect": 1,
+      "field": "UnitMotion#2.velocityX"
+    }
   }
 }

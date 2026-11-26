@@ -29,7 +29,7 @@ rows() {
   "$py" tools/replay_subsystems.py list "$1"
 }
 
-for t in block_test ref_test pathfinding_writer_test economy_writer_test features_writer_test targeting_writer_test los_radar_writer_test map_writer_test players_writer_test ai_writer_test units_writer_test weapons_writer_test orders_writer_test units_hash_test request_guard_test replay_test; do
+for t in block_test ref_test pathfinding_writer_test economy_writer_test features_writer_test targeting_writer_test los_radar_writer_test map_writer_test players_writer_test ai_writer_test units_writer_test weapons_writer_test orders_writer_test movement_writer_test scripts_writer_test units_hash_test request_guard_test replay_test; do
   run "$t" "$t" "$bindir/$t.exe"
 done
 while IFS=$'\t' read -r log name; do

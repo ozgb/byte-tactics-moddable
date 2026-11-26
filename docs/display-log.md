@@ -114,7 +114,8 @@ replaced by `%` and two uppercase hexadecimal digits (a space is `%20`). An empt
   made it, as a name. When a surface the game has not yet freed already has that name, the
   new one is `<name>#<n>` with the smallest `n` from 2 that no surface the game has not yet
   freed has (two dialogs open at once each keep a `SAVE%20UNDER`, the second
-  `SAVE%20UNDER#2`). The surface of the frame, the one the frame dump writes and the frame's
+  `SAVE%20UNDER#2`). A surface made in pixels that were freed earlier in the frame is a
+  new target, whatever its name and size. The surface of the frame, the one the frame dump writes and the frame's
   items mostly draw on, is `screen`. A surface the game made without a name is
   `?<width>x<height>`.
 - A **font** is the name the game loads it by (`comix`), in lower case, or the side's font

@@ -355,8 +355,11 @@ static int FindByBlock(const void* block)
     return HashFind(s_blockHash, block, BlockKey);
 }
 
+static void RetireTargets(const unsigned char* base);
+
 static void RemoveRegion(int index)
 {
+    RetireTargets(s_regions[index].pixels);
     HashRemove(s_pixelHash, PixelKey, index);
     HashRemove(s_blockHash, BlockKey, index);
     s_regions[index].live = 0;
@@ -770,6 +773,7 @@ struct TargetSlot {
     int overflow;
     int maxDraw;
     int maxRead;
+    int retired;
 };
 
 static TargetSlot s_targets[kMaxTargets];
@@ -797,7 +801,7 @@ static TargetSlot* SlotFor(const unsigned char* base, int width, int height, int
 {
     for (int i = 0; i < s_targetCount; i++) {
         const TargetSlot* s = &s_targets[i];
-        if (s->base == base && s->name == name && s->width == width && s->height == height)
+        if (s->base == base && s->retired == 0)
             return &s_targets[i];
     }
     if (s_targetCount >= kMaxTargets)
@@ -820,7 +824,16 @@ static TargetSlot* SlotFor(const unsigned char* base, int width, int height, int
     t->overflow = -1;
     t->maxDraw = -1;
     t->maxRead = -1;
+    t->retired = 0;
     return t;
+}
+
+static void RetireTargets(const unsigned char* base)
+{
+    for (int i = 0; i < s_targetCount; i++) {
+        if (s_targets[i].base == base)
+            s_targets[i].retired = 1;
+    }
 }
 
 static int NewNode(int x0, int y0, int x1, int y1, int layer, int next)

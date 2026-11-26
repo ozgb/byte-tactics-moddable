@@ -531,11 +531,14 @@ one of those, and a scenario that uses a console command or an order kind that t
 | ui-build-menu | left out | has `input` lines: it needs the presentation |
 | ui-build-place | left out | has `input` lines: it needs the presentation |
 | ui-click-select | left out | has `input` lines: it needs the presentation |
+| ui-dialogs | left out | has `input` lines: it needs the presentation |
 | ui-drag-select | left out | has `input` lines: it needs the presentation |
 | ui-groups | left out | has `input` lines: it needs the presentation |
 | ui-keys | left out | has `input` lines: it needs the presentation |
 | ui-left-click-orders | left out | has `input` lines: it needs the presentation |
 | ui-right-click | left out | has `input` lines: it needs the presentation |
+| ui-scroll-groups | left out | has `input` lines: it needs the presentation |
+| ui-share-chat | left out | has `input` lines: it needs the presentation |
 | units-transport | judged | - |
 | units-transport-ship | judged | - |
 
@@ -552,10 +555,36 @@ at once. These are the events it publishes, besides the group commands of a clic
   other choices of that dialog leave the battle screen and change nothing the simulation reads.
 - **The dialog a defeated player gets**, its second choice (stop watching): PLAYERS_LEAVE_GAME. The first choice
   (keep watching) changes nothing the simulation reads.
-- **The debug hotkeys** (with debug mode on, which needs the cheat code): the key that fills every player's stores
-  publishes, for each player that exists in slot order, PLAYERS_SET_STORE with `resource` 0, `add` 0 and `amount` the
-  player's energy capacity, then the same with `resource` 1 and its metal capacity; the key that makes the unit under
-  the cursor forget its attacker publishes UNITS_FORGET_ATTACKER with that unit, when there is one.
+- **The debug hotkeys**, with debug mode on: F11 turns it on when bit 1 of `uiOptionFlags` is set, which 3.1c sets
+  only from the registry (a scenario sets it with `debug_keys 1`, docs/scenario-format.md). The key that fills every
+  player's stores publishes, for each player that exists in slot order, PLAYERS_SET_STORE with `resource` 0, `add` 0 and
+  `amount` the player's energy capacity, then the same with `resource` 1 and its metal capacity; the key that makes the
+  unit under the cursor forget its attacker publishes UNITS_FORGET_ATTACKER with that unit, when there is one.
+- **The share dialog** (game type 3, the `h` key), its OK button with a player chosen in the list, when that player is
+  in the game and alive: PLAYERS_TRANSFER from the local player to that player with `resource` 1 and `amount` the metal
+  slider, then with `resource` 0 and the energy slider, both with `announce` 1; then, when the units button is on,
+  PLAYERS_GIVE_UNIT with that player and no record for each selected unit that is not a commander, not being built and
+  not carried or carrying; then, when the map button is on, LOS_RADAR_SHARE_MAP from the local player to that player.
+- **The chat line** (Enter): a line that starts with `+` runs as a console line (section 3) and publishes what that
+  command publishes (section 4) as the interface's events; any other line is a chat message and publishes nothing.
+
+The interface's events, the paths that publish them and the scenarios whose stored logs
+(`reference/commands/<scenario>.txt`) hold them. `tools/commands.py --check` fails when an event of the first column is
+in no stored log, or a stored log holds an interface event the table does not list.
+
+| Interface event | Paths | Scenarios |
+| --- | --- | --- |
+| `AI_SET_SQUAD` | a control group key (Ctrl+digit) | ui-groups, ui-scroll-groups |
+| `LOS_RADAR_SHARE_MAP` | the share dialog | ui-share-chat |
+| `ORDERS_CANCEL` | the self-destruct key on a unit that is counting down | ui-keys |
+| `ORDERS_GROUP_BUILD` | a build site placed from the build menu | ui-build-place |
+| `ORDERS_GROUP_COMMAND` | a click order, a command key and a click, a minimap order, the self-destruct key | ui-dialogs, ui-groups, ui-keys, ui-left-click-orders, ui-right-click, ui-scroll-groups |
+| `ORDERS_QUEUE_BUILD` | the build menu of a factory | ui-build-menu, ui-scroll-groups |
+| `PLAYERS_GIVE_UNIT` | the share dialog | ui-share-chat |
+| `PLAYERS_LEAVE_GAME` | the quit dialog, the defeated player's dialog | ui-dialogs |
+| `PLAYERS_SET_STORE` | the debug hotkey `=` | ui-dialogs |
+| `PLAYERS_TRANSFER` | the share dialog | ui-share-chat |
+| `UNITS_FORGET_ATTACKER` | the debug hotkey `]` | ui-dialogs |
 
 The pause request (bit 0 of `otherFlags`) is the driver's: it decides whether ticks run, and the tick reads it only in
 the network's timeout check, which runs on the wall clock. The bit of `mapFlags` that the camera clears (bit 3) says

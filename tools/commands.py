@@ -1,11 +1,13 @@
-"""Fail when a scenario uses a command that docs/commands.md does not list, or the verdict tables disagree.
+"""Fail when a scenario uses a command that docs/commands.md does not list, the verdict tables disagree, or a stored log misses an interface event.
 
     python3 tools/commands.py --check            # check the repository
     python3 tools/commands.py --check --root DIR # check another tree
 
 Reads the console command table, the order table and the verdict table of docs/commands.md (each found by its fixed
-header line), the verdict table of reference/README.md and every reference/scenarios/*.txt. Prints one line per problem
-and exits 1 if there are any. Standard library only.
+header line), the verdict table of reference/README.md, every reference/scenarios/*.txt, the interface event table of
+docs/commands.md section 8 and the stored interface logs reference/commands/*.txt: each event of that table must be in a
+stored log, in the log of each scenario its row names, and a stored log must hold no event the table leaves out. Prints
+one line per problem and exits 1 if there are any. Standard library only.
 """
 
 import argparse
@@ -18,6 +20,8 @@ README = "reference/README.md"
 CONSOLE_HEADER = "| Command | Group | Class | Events |"
 ORDER_HEADER = "| Order | Mode | Target | Events |"
 VERDICT_HEADER = "| Scenario | Verdict | Reason |"
+INTERFACE_HEADER = "| Interface event | Paths | Scenarios |"
+INTERFACE_LOGS = "reference/commands"
 VERDICT_HEADING = "The scenarios of the core's verdict"
 NOT_EVENTS = "direct"
 
@@ -110,6 +114,37 @@ def check(root: Path) -> list[str]:
                     problems.append("%s: order kind %s is not in the order table of %s" % (where, kind, DOC))
             elif key in ("input", "save", "load") and judged:
                 problems.append("%s: a %s line in a judged scenario" % (where, key))
+    problems.extend(interface_problems(root, doc))
+    return problems
+
+
+def interface_problems(root: Path, doc: list[str]) -> list[str]:
+    """What is wrong between the interface event table and the stored interface logs."""
+    rows = table(doc, INTERFACE_HEADER)
+    if not rows:
+        return ["%s: no interface event table (header %s)" % (DOC, INTERFACE_HEADER)]
+    logged: dict[str, set[str]] = {}
+    for path in sorted((root / INTERFACE_LOGS).glob("*.txt")):
+        for line in path.read_text().splitlines()[1:]:
+            parts = line.split()
+            if len(parts) >= 2:
+                logged.setdefault(parts[1], set()).add(path.stem)
+    problems = []
+    listed = set()
+    for row in rows:
+        kinds = re.findall(r"`([^`]+)`", row[0])
+        named = [w.strip() for w in row[-1].split(",") if w.strip() not in ("", "-")]
+        for kind in kinds:
+            listed.add(kind)
+            if kind not in logged:
+                problems.append("%s: interface event %s is in no stored log of %s" % (DOC, kind, INTERFACE_LOGS))
+                continue
+            for name in named:
+                if name not in logged[kind]:
+                    problems.append("%s: interface event %s is not in %s/%s.txt" % (DOC, kind, INTERFACE_LOGS, name))
+    for kind in sorted(set(logged) - listed):
+        problems.append("%s/%s.txt: interface event %s is not in the interface event table of %s"
+                        % (INTERFACE_LOGS, sorted(logged[kind])[0], kind, DOC))
     return problems
 
 

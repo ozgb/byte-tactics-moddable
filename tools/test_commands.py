@@ -21,6 +21,10 @@ DOC = """# Doc
 | --- | --- | --- | --- |
 | `move` | 2 | yes | Z |
 
+| Interface event | Paths | Scenarios |
+| --- | --- | --- |
+| `ORDERS_CANCEL` | a key | b |
+
 ## The scenarios of the core's verdict
 
 | Scenario | Verdict | Reason |
@@ -31,7 +35,10 @@ DOC = """# Doc
 README = "# R\n\n" + DOC[DOC.index("## The scenarios"):]
 
 
-def tree(tmp: str, scenarios: dict, doc: str = DOC, readme: str = README) -> Path:
+LOGS = {"b": "bt-interface 1\n12 ORDERS_CANCEL unit 1 type 4\n"}
+
+
+def tree(tmp: str, scenarios: dict, doc: str = DOC, readme: str = README, logs: dict = LOGS) -> Path:
     root = Path(tmp)
     (root / "docs").mkdir()
     (root / "reference" / "scenarios").mkdir(parents=True)
@@ -39,6 +46,9 @@ def tree(tmp: str, scenarios: dict, doc: str = DOC, readme: str = README) -> Pat
     (root / "reference" / "README.md").write_text(readme)
     for name, text in scenarios.items():
         (root / "reference" / "scenarios" / (name + ".txt")).write_text(text)
+    (root / "reference" / "commands").mkdir()
+    for name, text in logs.items():
+        (root / "reference" / "commands" / (name + ".txt")).write_text(text)
     return root
 
 
@@ -100,6 +110,21 @@ class CommandsTest(unittest.TestCase):
         doc = DOC.replace("uses control", "-")
         out = self.problems(GOOD, doc=doc, readme="# R\n\n" + doc[doc.index("## The scenarios"):])
         self.assertTrue(any("no reason" in p for p in out))
+
+    def test_an_interface_event_in_no_stored_log_fails(self):
+        out = self.problems(GOOD, logs={})
+        self.assertEqual(len(out), 1)
+        self.assertIn("ORDERS_CANCEL", out[0])
+
+    def test_an_interface_event_missing_from_a_named_log_fails(self):
+        out = self.problems(GOOD, logs={"a": LOGS["b"]})
+        self.assertEqual(len(out), 1)
+        self.assertIn("commands/b.txt", out[0])
+
+    def test_a_logged_event_the_table_leaves_out_fails(self):
+        out = self.problems(GOOD, logs={"b": LOGS["b"] + "13 PLAYERS_LEAVE_GAME unit -\n"})
+        self.assertEqual(len(out), 1)
+        self.assertIn("PLAYERS_LEAVE_GAME", out[0])
 
     def test_an_unsorted_table_fails(self):
         doc = DOC.replace("| a | judged | - |\n| b | left out | uses control |", "| b | left out | uses control |\n| a | judged | - |")

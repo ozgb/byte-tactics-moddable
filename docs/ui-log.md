@@ -16,6 +16,7 @@ A scenario file gives the input with one `input` line per event. Lines may repea
 accumulate.
 
     input <tick> <event>
+    input <tick>.<frame> <event>
 
 | Event | Meaning |
 | --- | --- |
@@ -35,6 +36,18 @@ digit `0` to `9`. A window position is in the 640 by 480 window, `x` from 0 to 6
   simulation has finished, before the next tick starts. The interface handles one mouse
   event and one key or character event per frame, so a scenario has at most one of each
   on a tick and runs one tick per frame.
+- **While no tick runs.** The game runs no tick while it is paused (the Pause key) or while
+  a dialog that stops the game is open (the options menu of F2, the exit menu), but it
+  keeps drawing frames and handling input. `<tick>.<frame>` addresses those frames: the
+  event is queued at the end of the `<frame>`-th frame (from 1) drawn after tick `<tick>`,
+  and the interface handles it in the frame after. A line that names a frame after a tick
+  that the game did not stop at (it ran tick + 1 before that frame) is an error, and so is
+  a run that draws 300 frames after the last such line of its tick without running a tick:
+  the game would wait for input forever. The one-event rule holds per frame. The input that
+  resumes the game is its last frame line; an event after it is a plain `input <tick + 1>`
+  line. Pause pressed with `input 10` takes effect in the frame that runs tick 11, so the
+  stopped frames are `11.1`, `11.2` and on; a key pressed at `11.5` is handled in frame 6,
+  which runs no tick yet, and frame 7 runs tick 12.
 - **State.** A key is held from its `key down` to its `key up`, a mouse button from its
   `down` to its `up`, and the cursor is where the last mouse event put it. While Alt is
   held, key events reach the game as system key events, as on Windows. The time of an
@@ -87,7 +100,7 @@ interface did with the input.
 
 | Kind | Fields | Meaning |
 | --- | --- | --- |
-| `input` | `key down <vk>`, `key up <vk>`, `char <code>`, `mouse move <x> <y>`, `mouse left down <x> <y>` and the like | An event of the scenario's `input` lines, in decimal, at the tick of its line. |
+| `input` | `key down <vk>`, `key up <vk>`, `char <code>`, `mouse move <x> <y>`, `mouse left down <x> <y>` and the like | An event of the scenario's `input` lines, in decimal, at the tick of its line (a frame line's at its `<tick>`). |
 | `scroll` | `<x> <z>` | The camera scroll, at tick 1 and at the end of any tick where it differs from the last `scroll` line. Every scenario logs it (see below). |
 | `view` | `<draws>` | The number of draws made so far from the view random stream, counted from the start of the run, at the end of any tick where it differs from the last `view` line. A draw made between two steps counts into the next tick. See below. |
 | `select` | `<units>` | The local player's selected units, at tick 1 and at the end of any tick where the selection differs from the last `select` line. The selection is view state, which no trace row hashes: this record is what a presentation is judged on. |

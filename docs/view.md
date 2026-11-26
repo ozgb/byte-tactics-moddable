@@ -254,6 +254,33 @@ not exempt, in the battle view; on the radar picture it is (`SIM_EVENT_RADAR_UNI
 3.1c tests no sight for them: each is drawn anywhere on screen, and only the fog over its cell hides it. The faces a
 piece is drawn from are those of the unit's model, loaded data.
 
+`debris` has a row for each entry `d` of the debris table, in the table's order, an explosion with no model included.
+The fields of a row come from `weaponsState.debris[d]`:
+
+- `frame` and `shadowFrame` are `ref1.index` and `ref2.index`.
+- `x`, `y`, `z` are `pos`, and `rotX`, `rotY`, `rotZ` are `angle_x`, `angle_y`, `angle_z`.
+- `sprite` is the index, in the sprite catalogue below, of the animation `ref1.src` names: the first entry equal to it,
+  and 0xffff when `ref1.src` is null or equals no entry.
+- `shadowSprite` is the index of the first of the three animation pointers that start 0x1ab8f bytes into the game record
+  equal to `ref2.src`, and 0xffff when `ref2.src` is null or equals none.
+- `firstFace` and `faceCount` are those of the piece record that `obj` names (`weaponsState.pieces[i]`), and 0 when `obj`
+  is null.
+- `unitDefIndex` is 0xffff and `pieceIndex` 0 in every row: a debris keeps no record of the unit or piece it broke from.
+  A debris with a model is made of faces copied from the broken piece, with their own vertices and textures, which the
+  view does not hold; carrying them, and naming the sprites by a table of their own, is #1123.
+
+The sprite catalogue lists the explosion animations in this order:
+
+- indexes 0 to 8: the nine animation pointers that start 0x147eb bytes into the game record, in their order (the sea
+  splash, the lava splash, the flame stream, then `src3`, `explode2`, `explode3`, `explode4`, `explode5` and `nuke1`);
+- then, for each weapon definition `w` in order, index 9 + 2w is its `splash` animation and index 10 + 2w its
+  `explosionSeq` animation.
+
+`explodedPieces` has a row for each slot of the exploded-piece table that holds a block, in slot order, from
+`weaponsState.explodedPieces[slot]`: `unitDefIndex` and `owner` are those of the unit `unit` names, `pieceIndex` is
+`index`, `x`, `y`, `z` are the piece record's `pos` and `rotX`, `rotY`, `rotZ` its angles `angle_10`, `angle_12` and
+`angle_14`. `trail` is 1 when bit 0x2 of `flags` is set, else 2 when bit 0x1 is set, else 0.
+
 ## Players, economy and score
 
 `players` has a row for each of the ten slots (`players[i]`, section 7.4).

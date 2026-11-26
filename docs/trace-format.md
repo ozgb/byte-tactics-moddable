@@ -1656,7 +1656,7 @@ fields in the schema's order, a pointer as `null` or `heap`):
 
 ```
 weaponsState.explodedPieces[s].<field>         # for each slot s in 0 .. 99 with a block: the table ExplodedPiece, then PieceRec as rec.<field>
-weaponsState.debris[d].<field>                 # for d in 0 .. min(count, 300)-1 with a used entry: the table Debris
+weaponsState.debris[d].<field>                 # for every d in 0 .. min(count, 300)-1, a debris without a model included: the table Debris
 weaponsState.pieces[i].<field>                 # for each piece of debris i remembered: the table Piece,
 weaponsState.pieces[i].vertices                #   a hex: line of 96 bytes, and for k in 0 .. 5
 weaponsState.pieces[i].faces[k].<field>        #   the table Face

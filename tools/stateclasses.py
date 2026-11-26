@@ -63,6 +63,9 @@ Columns:
                        those phases reach first; a name ending `?` only maybe-writes or
                        takes the address
   note                 free text, kept by regeneration
+  sim_bits, view_bits  for a `mixed` row split by bit, the masks of its sim bits and of its
+                       view bits (`0x...`, counted from its first byte; a bit in neither is
+                       platform), kept by regeneration; empty for every other row
 
 Phases. The roots are those of hazards.ROOTS, each walked separately over the `call` rows
 of data/rwsets.csv and the hand-resolved edges of data/hazard_edges.csv (hazards.Graph),
@@ -167,13 +170,16 @@ table the loop walks) is not accessed by it: that escape is dropped. `DAT_000000
 the source names for a read of absolute address 0 (UnitSync::ProcessSync reads it in the
 `direct != 0` branch, a null address in the shipped exe too), is no variable and no row.
 
-Presentation writes. --check also fails on a `global_write` or `field_write` row of data/rwsets.csv
+Presentation writes. --check also fails on a `global_write`, `field_write` or `member_write` row of data/rwsets.csv
 by a function of data/subsystems.csv's `presentation` in a PRESENTATION_DIRS file whose target is a
 global or a Game field of class sim in data/state_classes.csv (#1049): presentation asks the sim to
 change sim state through an event and writes none itself. A Game field joins the game-region rows
 by name, and a bit field of an anonymous struct (`<anon>::bit0_3923b`) by the address in its name;
-a target that joins nothing, or rows of different classes, is not checked. PRESENTATION_SIM_WRITES
-lists the writes that remain, each with its reason; an entry that matches no write fails as stale.
+a target that joins nothing, or rows of different classes, is not checked. A Game field whose rows are
+`mixed` with `sim_bits` (or sim) is checked by bit: the write fails when the bits its `mask_*` row of
+data/rwsets.csv says it can change meet the sim bits, and a write with no mask row can change any bit.
+PRESENTATION_SIM_WRITES lists the writes that remain, each with its reason; an entry that matches no
+write fails as stale.
 
 Limits. Inline assembly is not looked into (an `asm` function may touch more). A call
 through a function pointer or a virtual method only follows the edges of
@@ -210,10 +216,10 @@ SUBSYSTEMS = ROOT / "data/subsystems.csv"
 GLOBALS_HEADER = (ROOT / "link" / "globals.h").resolve()
 OUT = ROOT / "data/state_classes.csv"
 COLUMNS = ["name", "address", "kind", "proposed", "class", "rule", "phases_write", "phases_read",
-           "presentation", "load_write", "writers", "readers", "note"]
+           "presentation", "load_write", "writers", "readers", "note", "sim_bits", "view_bits"]
 KINDS = ["game-region", "global", "heap", "static"]
 CLASSES = ("sim", "view", "platform", "mixed", "const")
-KEPT = ("class", "note")
+KEPT = ("class", "note", "sim_bits", "view_bits")
 
 PHASE_LABELS = {"HandleNetPackets": "0", "UpdateAllUnits": "1", "UpdateProjectiles": "2",
                 "UpdateExplosions": "3", "UpdatePlayers": "4", "UpdateFeatures": "5",
@@ -240,6 +246,8 @@ MATCH_SETUP = "match setup before the first tick"
 SELECTION = "the selection bit, view state masked out of the trace"
 BUILD_MENU_PAGE = "a crossing left: the build-menu page bits of Unit::flags (0x400000 and the page), still hashed, #1115"
 BATTLE_ROOM = "battle room setup, outside a match"
+CONSOLE_PLAYER = "a crossing left: the console's control and view switch, until the fields are split (#1117)"
+POSTER = "a crossing left: the poster key turns these bits off and back on around drawing the whole map (docs/state.md)"
 PRESENTATION_SIM_WRITES = [
     ("HandleNewGameClick", "Game::difficulty", MATCH_SETUP),
     ("HandleEndMissionClick", "Game::difficulty", MATCH_SETUP),
@@ -285,6 +293,14 @@ PRESENTATION_SIM_WRITES = [
     ("CompactActivePlayerSlots", "Player::active", BATTLE_ROOM),
     ("SwapPlayerSlots", "Player::active", BATTLE_ROOM),
     ("SwapPlayerSlots", "Player::index", BATTLE_ROOM),
+    ("CmdControl", "Game::localPlayer", CONSOLE_PLAYER),
+    ("CmdControl", "Game::playerIndex", CONSOLE_PLAYER),
+    ("CmdView", "Game::playerIndex", CONSOLE_PLAYER),
+    ("WriteScreenshot", "Game::mapFlags", POSTER),
+    ("WriteScreenshot", "Game::uiOptionFlags", "clears and restores bit 6, the clock (a view bit), by assignment, "
+                                               "which the mask cannot bound"),
+    ("HandleGameKey", "Game::endGameFlags_3923b", "bits 0 and 1, the debug display and debug mode, are view bits "
+                                                  "of a field classed sim; the trace masks them (0xfffc)"),
 ]
 
 PLATFORM_TYPE = re.compile(r"\b(HWND|HDC|HANDLE|HINSTANCE|HMODULE|HBITMAP|HPALETTE|HFONT|HICON|HCURSOR|HKEY|"
@@ -932,7 +948,7 @@ def make_row(kind: str, name: str, address: str, ev: Evidence, platform: str | N
             "presentation": ("r" if ev.pres_read else "") + ("w" if ev.pres_write else ""),
             "load_write": "yes" if ev.load_write else "",
             "writers": format_functions(ev.writers, writer_weak),
-            "readers": format_functions(ev.readers), "note": "",
+            "readers": format_functions(ev.readers), "note": "", "sim_bits": "", "view_bits": "",
             "strong_write": ev.strong_write, "strong_load": ev.strong_load}
 
 
@@ -1110,7 +1126,7 @@ def merge_kept(rows: list[dict], old: list[dict]) -> list[dict]:
         before = kept.get((row["kind"], row["name"]))
         if before:
             for column in KEPT:
-                row[column] = before[column]
+                row[column] = before.get(column) or ""
     return rows
 
 
@@ -1181,7 +1197,7 @@ def presentation_sim_writes(rwsets_rows: list[list[str]], subsystems: dict[tuple
                             classes: list[dict], globals_rows: list[dict],
                             sim_targets: set[str] | None = None, console: set[str] | None = None
                             ) -> list[tuple[str, str]]:
-    """The (function, target) pairs where presentation code writes a global or field that is sim state.
+    """The (function, target) pairs where presentation code writes a global or field that is sim state, or a sim bit.
 
     Presentation code is the presentation subsystem's functions in a presentation folder and the
     console command handlers. A Game field or global is sim by its class. A bit field of an unnamed
@@ -1194,28 +1210,49 @@ def presentation_sim_writes(rwsets_rows: list[list[str]], subsystems: dict[tuple
     for row in classes:
         if row["kind"] == "game-region":
             for name in row["name"].split("|"):
-                by_name[name].append(row["class"])
+                by_name[name].append(row)
     state = {(r["kind"], r["name"]): r["class"] for r in classes}
     joiner = Items([], globals_rows)
     sim_targets = sim_targets or set()
     console = console or set()
 
-    def target_classes(kind: str, target: str) -> list[str]:
+    masks = write_masks(rwsets_rows)
+
+    def sim_bits(kind: str, target: str) -> int | None:
+        """The sim bits of the target, -1 for all of them, None when it is not checked."""
         if kind == "global_write":
-            return [state.get(joiner.join(target) or ("", ""), "")]
+            return -1 if state.get(joiner.join(target) or ("", "")) == "sim" else None
         if target.startswith("Game::"):
-            return by_name.get(target[len("Game::"):], [])
-        return ["sim"] if target in sim_targets and target.startswith(tuple(r + "::" for r in SIM_RECORDS)) else []
+            rows = by_name.get(target[len("Game::"):], [])
+            if not rows or not all(r["class"] == "sim" or (r["class"] == "mixed" and r.get("sim_bits"))
+                                   for r in rows):
+                return None
+            bits = 0
+            for r in rows:
+                bits |= -1 if r["class"] == "sim" else int(r["sim_bits"], 16)
+            return bits
+        return -1 if target in sim_targets and target.startswith(tuple(r + "::" for r in SIM_RECORDS)) else None
 
     found = set()
     for _, function, file, kind, target in rwsets_rows:
         presentation = (file.startswith(PRESENTATION_DIRS) and subsystems.get((function, file)) == "presentation") \
             or (file == CONSOLE_FILE and function in console)
         if kind in PRESENTATION_WRITE_KINDS and presentation:
-            classes_of = target_classes(kind, target)
-            if classes_of and all(c == "sim" for c in classes_of):
+            bits = sim_bits(kind, target)
+            written = masks.get((function, file, kind.split("_")[0], target), -1)
+            if bits is not None and bits & written:
                 found.add((function, target))
     return sorted(found)
+
+
+def write_masks(rwsets_rows: list[list[str]]) -> dict[tuple[str, str, str, str], int]:
+    """(function, file, category, target) to the bits its writes can change, from the `mask_*` rows."""
+    out = {}
+    for _, function, file, kind, target in rwsets_rows:
+        if kind.startswith("mask_"):
+            name, _, mask = target.rpartition(" ")
+            out[(function, file, kind[len("mask_"):], name)] = int(mask, 16)
+    return out
 
 
 def presentation_write_errors(found: list[tuple[str, str]], allowed=None) -> list[str]:

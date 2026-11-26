@@ -24,9 +24,9 @@ ModelState::animDirty,scripts,TransformPieces,CreatePlayerObjectState: GameAlloc
 ModelState::animDirty,scripts,UpdateObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,harness,PutPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,platform,RotateByAngles,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
-ModelState::bitmap,presentation,CMemoryCache::AddModelBounds,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::AllocTwoPlaneBitmap,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
 ModelState::bitmap,presentation,CMemoryCache::DrawObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
+ModelState::bitmap,presentation,CMemoryCache::DrawObjectPieces,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::DrawObjectState,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,CMemoryCache::MergeIntoComposite,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,1,
 ModelState::bitmap,presentation,UnitTable::BuildObjectPicture,CreatePlayerObjectState: GameAllocIgnoreTag ModelState,0,-
@@ -170,7 +170,7 @@ bits_2a44,presentation,UpdateCdCategoryByActivity,bits_2a44,1,
 bits_37f2f,presentation,DrawBattleFrame,bits_37f2f,1,
 bits_38a51,game,MainLoopTick,bits_38a51,1,
 bits_38a51,presentation,DrawBattleFrame,bits_38a51,1,
-cells,los_radar,FreeLosTables,cells,1,
+cells,los_radar,GetMapCell,cells,1,
 cells,map,GetGroundHeight,cells,1,
 cells,presentation,DrawBattleFrame,cells,1,
 count_1491b,presentation,DrawExplosions,count_1491b,1,
@@ -180,7 +180,7 @@ features,presentation,DrawUnitInfoPanel,features,0,-
 flags_38d75,presentation,UpdateCdCategoryByActivity,flags_38d75,1,
 g_explodedPieces,presentation,DrawExplosions,g_explodedPieces,1,
 height,los_radar,BuildFogTiles,height,0,-
-height,los_radar,FreeLosTables,height,1,
+height,los_radar,GetMapCell,height,1,
 height,map,GetGroundHeight,height,1,
 height,presentation,DrawBattleFrame,height,1,
 localPlayer,presentation,DrawBattleFrame,localPlayer,1,
@@ -212,7 +212,7 @@ unknown_1b8e,los_radar,BuildFogTiles,unknown_1b8e,0,-
 unknown_1b8e,presentation,DrawBattleFrame,unknown_1b8e,1,
 unknown_1b8e,presentation,ResolveCursorModeForSelection,unknown_1b8e,1,
 width,los_radar,BuildFogTiles,width,0,-
-width,los_radar,FreeLosTables,width,1,
+width,los_radar,GetMapCell,width,1,
 width,map,GetGroundHeight,width,1,
 width,presentation,BlitFeatureGaf,width,1,
 width,presentation,DrawBattleFrame,width,1,

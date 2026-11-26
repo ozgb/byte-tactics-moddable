@@ -69,10 +69,10 @@ players,InitPlayerSlot: operator new unsigned char,los_radar,RemoveLineOfSight,o
 players,InitPlayerSlot: operator new unsigned char,los_radar,UpdateSensorRadarAndCloak,other-record,2,orders-air-fights@90
 players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.requesterBuckets,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
 players,LoadBattleAssets: GameAllocIgnoreTag AISearch region.unitBuckets,pathfinding,Pathfinder::Cancel,same-record,3,long-greenhaven-8p@11430
-players,LoadBattleAssets: GameAllocIgnoreTag Economy region,economy,EconomyUpdatePlayer,same-record,90,ai-antinuke-intercept@30
+players,LoadBattleAssets: GameAllocIgnoreTag Economy region,economy,EconomyUpdatePlayer,same-record,91,ai-antinuke-intercept@30
 players,LoadBattleAssets: GameAllocIgnoreTag LosRadar region,los_radar,RemoveLineOfSight,same-record,32,mission-kill-mobile@1
 players,LoadBattleAssets: GameAllocIgnoreTag LosRadar region,los_radar,UpdateLineOfSight,same-record,62,mission-build-unit@1
-players,LoadBattleAssets: GameAllocIgnoreTag Players region,players,UpdatePlayerBody,same-record,96,ai-antinuke-intercept@30
+players,LoadBattleAssets: GameAllocIgnoreTag Players region,players,UpdatePlayerBody,same-record,97,ai-antinuke-intercept@30
 players,LoadTntMap: GameAllocIgnoreTag MAPPED MEMORY,los_radar,RevealAroundUnit,same-record,29,mission-capture@21
 players,MovementNewApproachRadius: new ApproachRadius,movement,AiSearchGoal::SetPathOrder,other-record,4,eight-pincushion-teams@8100
 players,MovementNewApproachRadius: new ApproachRadius,movement,MovementApply,other-record,4,eight-pincushion-teams@8100
@@ -89,12 +89,12 @@ players,PathExtra::pendingFree,pathfinding,Pathfinder::Cancel,same-record,3,long
 players,PathPending::nextRequester,pathfinding,Pathfinder::Cancel,other-record,3,long-greenhaven-8p@11430
 players,PathPending::nextUnit,pathfinding,Pathfinder::Cancel,other-record,1,long-greenhaven-8p@27900
 players,PathPending::requester,pathfinding,Pathfinder::Cancel,other-record,3,long-greenhaven-8p@11430
-players,PlayerAI::builders,ai,ScoutTimer::OnTimer,other-record,66,combat-deaths@90
+players,PlayerAI::builders,ai,ScoutTimer::OnTimer,other-record,67,combat-deaths@90
 players,PlayerAI::centre,ai,??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,other-record,24,ai-antinuke-intercept@30
-players,PlayerAI::centre,ai,FindBuildPosition,other-record,67,combat-deaths@90
-players,PlayerAI::centre,ai,ScoutTimer::OnTimer,other-record,79,ai-antinuke-intercept@30
+players,PlayerAI::centre,ai,FindBuildPosition,other-record,68,combat-deaths@90
+players,PlayerAI::centre,ai,ScoutTimer::OnTimer,other-record,80,ai-antinuke-intercept@30
 players,PlayerAI::lastTick,ai,PlayerAI::UpdateEveryThirtyTicks,other-record,91,ai-antinuke-intercept@30
-players,PlayerAI::lastTick,ai,UpdatePlayerAI,other-record,2,ui-scroll-groups@30
+players,PlayerAI::lastTick,ai,UpdatePlayerAI,other-record,3,frontend-skirmish@30
 players,PlayerAI::searchRadius,ai,FindBuildPosition,other-record,30,console-edge@90
 players,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,game,RecordSimEvent,same-record,20,mission-build-unit@30
 players,SquadManager::SquadManager: new BuildTimer,ai,SquadManager::TickIfActive,other-record,31,console-edge@30
@@ -106,15 +106,15 @@ players,SquadManager::SquadManager: new ScoutTimer,ai,SquadManager::TickIfActive
 players,SquadManager::SquadManager: new SpatialTimer,ai,SquadManager::TickIfActive,other-record,31,meteors-earthquake@30
 players,SquadManager::SquadManager: new SquadScoutTimer,ai,SquadManager::TickIfActive,other-record,28,ten-lava-run@30
 players,SquadManager::countdown,ai,SquadManager::TickIfActive,other-record,31,console-edge@1
-players,SquadManager::cursor,ai,SquadManager::RetargetWeapons,other-record,93,ai-antinuke-intercept@1
+players,SquadManager::cursor,ai,SquadManager::RetargetWeapons,other-record,94,ai-antinuke-intercept@1
 players,Unit::activateFlags,ai,SquadManager::FindNearestEnemyUnit,other-record,6,ai-antinuke-intercept@30
 players,Unit::activateFlags,ai,SquadManager::FindNearestEnemyUnit,same-record,6,ai-antinuke-intercept@30
 players,Unit::activateFlags,los_radar,IsUnitVisibleToPlayer,other-record,74,ai-antinuke-intercept@30
-players,Unit::activateFlags,los_radar,IsUnitVisibleToPlayer,same-record,89,ai-antinuke-intercept@30
+players,Unit::activateFlags,los_radar,IsUnitVisibleToPlayer,same-record,90,ai-antinuke-intercept@30
 players,Unit::activateFlags,los_radar,RecordRadarUnits,other-record,6,orders-air-fights@30
 players,Unit::activateFlags,los_radar,RecordRadarUnits,same-record,6,orders-air-fights@60
-players,Unit::activateFlags,seams,WorldUnitInfo,other-record,89,ai-antinuke-intercept@30
-players,Unit::activateFlags,units,Unit::SetStateBits,other-record,90,ai-antinuke-intercept@30
+players,Unit::activateFlags,seams,WorldUnitInfo,other-record,90,ai-antinuke-intercept@30
+players,Unit::activateFlags,units,Unit::SetStateBits,other-record,91,ai-antinuke-intercept@30
 players,Unit::current,targeting,ApplyTargetingEvent,other-record,16,mission-build-unit@31
 players,Unit::current,targeting,GetWeaponTargetUnit,other-record,16,mission-build-unit@31
 players,Unit::f_1f,ai,SquadManager::RetargetWeapons,other-record,3,skirmish4-long@21000
@@ -127,28 +127,28 @@ players,Unit::flags,ai,??0BuildTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,other-re
 players,Unit::flags,ai,??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,other-record,40,mission-build-unit@30
 players,Unit::flags,ai,??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,same-record,48,mission-build-unit@30
 players,Unit::flags,ai,BuildTimer::OnTimer,same-record,1,ui-scroll-groups@480
-players,Unit::flags,ai,PlayerAI::RefreshUnitLists,other-record,89,ai-antinuke-intercept@30
-players,Unit::flags,ai,PlayerAI::RefreshUnitLists,same-record,89,ai-antinuke-intercept@30
+players,Unit::flags,ai,PlayerAI::RefreshUnitLists,other-record,90,ai-antinuke-intercept@30
+players,Unit::flags,ai,PlayerAI::RefreshUnitLists,same-record,90,ai-antinuke-intercept@30
 players,Unit::flags,ai,RetargetWeapon,other-record,44,mission-capture@30
 players,Unit::flags,ai,RetargetWeapon,same-record,11,mission-defeat-passes-x@30
 players,Unit::flags,ai,SquadManager::FindNearestEnemyUnit,other-record,6,ai-antinuke-intercept@30
 players,Unit::flags,ai,SquadManager::FindNearestEnemyUnit,same-record,4,ten-lava-run@30
 players,Unit::flags,ai,SquadManager::RetargetWeapons,other-record,48,edges-economy-targeting@29
 players,Unit::flags,ai,SquadManager::RetargetWeapons,same-record,40,mission-defeat-all-units@30
-players,Unit::flags,game,SchedPlayersPhase,other-record,92,edges-economy-targeting@29
-players,Unit::flags,game,SchedPlayersPhase,same-record,88,ai-antinuke-intercept@30
+players,Unit::flags,game,SchedPlayersPhase,other-record,93,edges-economy-targeting@29
+players,Unit::flags,game,SchedPlayersPhase,same-record,89,ai-antinuke-intercept@30
 players,Unit::flags,los_radar,GetVisibleEnemiesInRadius,other-record,4,mission-radius@1530
-players,Unit::flags,los_radar,IsUnitVisibleToPlayer,other-record,87,ai-antinuke-intercept@30
+players,Unit::flags,los_radar,IsUnitVisibleToPlayer,other-record,88,ai-antinuke-intercept@30
 players,Unit::flags,los_radar,IsUnitVisibleToPlayer,same-record,26,allied-victory@30
-players,Unit::flags,los_radar,RefreshUnitIndex,other-record,89,ai-antinuke-intercept@30
-players,Unit::flags,los_radar,RefreshUnitIndex,same-record,89,ai-antinuke-intercept@30
+players,Unit::flags,los_radar,RefreshUnitIndex,other-record,90,ai-antinuke-intercept@30
+players,Unit::flags,los_radar,RefreshUnitIndex,same-record,90,ai-antinuke-intercept@30
 players,Unit::flags,orders,GetOrderType,other-record,3,skirmish4-long@15900
 players,Unit::flags,orders,GetOrderType,same-record,2,long-greenhaven-8p@27900
-players,Unit::flags,seams,WorldUnitInfo,other-record,86,ai-antinuke-intercept@30
-players,Unit::flags,seams,WorldUnitInfo,same-record,86,ai-antinuke-intercept@30
+players,Unit::flags,seams,WorldUnitInfo,other-record,87,ai-antinuke-intercept@30
+players,Unit::flags,seams,WorldUnitInfo,same-record,87,ai-antinuke-intercept@30
 players,Unit::flags,targeting,FindWeaponTarget,other-record,4,mission-radius@1530
-players,Unit::flags,units,RefreshFactoryIndex,other-record,89,ai-antinuke-intercept@30
-players,Unit::flags,units,RefreshFactoryIndex,same-record,89,ai-antinuke-intercept@30
+players,Unit::flags,units,RefreshFactoryIndex,other-record,90,ai-antinuke-intercept@30
+players,Unit::flags,units,RefreshFactoryIndex,same-record,90,ai-antinuke-intercept@30
 players,Unit::flags,units,Unit::SetStateBits,other-record,6,mission-build-unit@30
 players,Unit::flags,units,Unit::SetStateBits,same-record,1,ten-ring-atoll@8850
 players,Unit::flags,units,UnitsApply,other-record,31,console-edge@29
@@ -173,14 +173,14 @@ players,UnitMotion::UnitMotion: new PackedPosGoal,movement,MovementUnitTarget,ot
 players,UnitMotion::UnitMotion: new PatrolGoal,movement,MovementApply,other-record,1,long-greenhaven-8p@22950
 players,UnitMotion::UnitMotion: new PatrolGoal,movement,MovementUnitTarget,other-record,2,long-greenhaven-8p@14130
 players,UnitMotion::UnitMotion: new PatrolGoal,movement,PathGoal::SetPathOrder,other-record,1,long-greenhaven-8p@22950
-players,UnitResources::energyMake,economy,EconomyUpdatePlayer,other-record,90,ai-antinuke-intercept@30
-players,UnitResources::energyStall,economy,EconomyUpdatePlayer,other-record,90,ai-antinuke-intercept@30
-players,UnitResources::energyUse,economy,EconomyUpdatePlayer,other-record,90,ai-antinuke-intercept@30
-players,UnitResources::energyUsePaid,economy,EconomyUpdatePlayer,other-record,90,ai-antinuke-intercept@30
-players,UnitResources::metalMake,economy,EconomyUpdatePlayer,other-record,90,ai-antinuke-intercept@30
-players,UnitResources::metalStall,economy,EconomyUpdatePlayer,other-record,90,ai-antinuke-intercept@30
-players,UnitResources::metalUse,economy,EconomyUpdatePlayer,other-record,90,ai-antinuke-intercept@30
-players,UnitResources::metalUsePaid,economy,EconomyUpdatePlayer,other-record,90,ai-antinuke-intercept@30
+players,UnitResources::energyMake,economy,EconomyUpdatePlayer,other-record,91,ai-antinuke-intercept@30
+players,UnitResources::energyStall,economy,EconomyUpdatePlayer,other-record,91,ai-antinuke-intercept@30
+players,UnitResources::energyUse,economy,EconomyUpdatePlayer,other-record,91,ai-antinuke-intercept@30
+players,UnitResources::energyUsePaid,economy,EconomyUpdatePlayer,other-record,91,ai-antinuke-intercept@30
+players,UnitResources::metalMake,economy,EconomyUpdatePlayer,other-record,91,ai-antinuke-intercept@30
+players,UnitResources::metalStall,economy,EconomyUpdatePlayer,other-record,91,ai-antinuke-intercept@30
+players,UnitResources::metalUse,economy,EconomyUpdatePlayer,other-record,91,ai-antinuke-intercept@30
+players,UnitResources::metalUsePaid,economy,EconomyUpdatePlayer,other-record,91,ai-antinuke-intercept@30
 players,bits,players,UpdatePlayerBody,same-record,11,mission-build-unit@180
 players,bits_14281,los_radar,AddLineOfSight,same-record,31,mission-passes-z@1
 players,bits_14281,los_radar,IsUnitVisibleToPlayer,same-record,39,edges-economy-targeting@30
@@ -219,11 +219,11 @@ players,pad_1df4,seams,WorldPlayerInfo,same-record,16,allied-victory@30
 players,pad_1df4,targeting,FindWeaponTarget,same-record,15,eight-full-moon@750
 players,pad_1df4,units,RefreshFactoryIndex,same-record,16,allied-victory@30
 players,pad_1df4,units,Unit::SetStateBits,same-record,2,ten-ring-atoll@6540
-players,unknown_1b8e,ai,PlayerAI::RefreshUnitLists,same-record,90,ai-antinuke-intercept@30
+players,unknown_1b8e,ai,PlayerAI::RefreshUnitLists,same-record,91,ai-antinuke-intercept@30
 players,unknown_1b8e,ai,SquadManager::FindNearestEnemyUnit,same-record,6,ai-antinuke-intercept@30
 players,unknown_1b8e,ai,SquadManager::RetargetWeapons,same-record,5,mission-radius@1530
-players,unknown_1b8e,ai,SquadManager::TickIfActive,same-record,89,ai-antinuke-intercept@30
-players,unknown_1b8e,los_radar,RefreshUnitIndex,same-record,90,ai-antinuke-intercept@30
+players,unknown_1b8e,ai,SquadManager::TickIfActive,same-record,90,ai-antinuke-intercept@30
+players,unknown_1b8e,los_radar,RefreshUnitIndex,same-record,91,ai-antinuke-intercept@30
 players,unknown_1b8e,los_radar,UpdateSensorRadarAndCloak,same-record,6,orders-air-fights@30
 players,unknown_1b8e,network,BroadcastPacket,same-record,5,mission-kill-of-type@30
 players,unknown_1b8e,network,NetSendActivateFlags,same-record,5,mission-kill-of-type@30
@@ -231,10 +231,10 @@ players,unknown_1b8e,orders,GetOrderType,same-record,1,long-great-divide-2p@2730
 players,unknown_1b8e,platform,GetSlotDpid,same-record,5,mission-kill-of-type@30
 players,unknown_1b8e,players,CountCombatPlayers,same-record,5,allied-victory@30
 players,unknown_1b8e,players,IsLocalPlayerOutOfUnits,same-record,5,orders-air-fights@30
-players,unknown_1b8e,players,UpdatePlayerBody,same-record,93,ai-antinuke-intercept@30
-players,unknown_1b8e,seams,WorldPlayerInfo,same-record,89,ai-antinuke-intercept@30
+players,unknown_1b8e,players,UpdatePlayerBody,same-record,94,ai-antinuke-intercept@30
+players,unknown_1b8e,seams,WorldPlayerInfo,same-record,90,ai-antinuke-intercept@30
 players,unknown_1b8e,targeting,FindWeaponTarget,same-record,46,mission-capture@30
-players,unknown_1b8e,units,RefreshFactoryIndex,same-record,90,ai-antinuke-intercept@30
+players,unknown_1b8e,units,RefreshFactoryIndex,same-record,91,ai-antinuke-intercept@30
 players,unknown_1b8e,units,Unit::SetStateBits,same-record,5,mission-kill-of-type@30
 players,unknown_1cd9,ai,SquadManager::FindNearestEnemyUnit,same-record,2,skirmish4-long@15900
 players,unknown_1cd9,platform,GetSlotDpid,same-record,2,six-hundred-isles@930
@@ -424,12 +424,12 @@ projectiles,Vec3::x,weapons,UpdateProjectiles,other-record,1,skirmish4-long@2411
 projectiles,count_1491b,weapons,AddExplosionEffect,same-record,11,edges-economy-targeting@36
 projectiles,projectileCount,weapons,CompactProjectiles,same-record,6,orders-guard-attacked@56
 projectiles,projectileCount,weapons,UpdateProjectiles,same-record,4,orders-guard-attacked@163
-tail,FrameTimers::acc,game,RunGameSteps,same-record,96,ai-antinuke-intercept@1
+tail,FrameTimers::acc,game,RunGameSteps,same-record,97,ai-antinuke-intercept@1
 tail,SimEventsCreate: GameAllocIgnoreTag SimEventQueue,presentation,DrainSimEvents,same-record,4,hailstorm-los-off@1
 tail,bits_14281,los_radar,RemoveLineOfSight,same-record,11,mission-build-unit@136
 tail,bits_142f1,los_radar,RemoveLineOfSight,same-record,12,mission-build-unit@136
 tail,bits_142f1,players,UpdateBlink,same-record,20,mission-build-unit@72
-tail,pad_38d81,game,RunGameSteps,same-record,96,ai-antinuke-intercept@1
+tail,pad_38d81,game,RunGameSteps,same-record,97,ai-antinuke-intercept@1
 tail,unknown_1b8e,seams,WorldPlayerInfo,same-record,4,share-all@1
 units,AddOrder: new Order,orders,OrdersApply,other-record,9,mission-kill-mobile@180
 units,AirManeuverOrder::flags,movement,AirManeuverOrder::FillWorldPos,other-record,1,long-greenhaven-8p@40825
@@ -1926,7 +1926,7 @@ units.players,ApproachRadius::y,movement,SubmitRepath,other-record,6,edges-econo
 units.players,BuildAllPassMaps: operator new unsigned int,map,RefreshAndReportAllPassMaps,other-record,15,mission-build-unit@1
 units.players,BuildAllPassMaps: operator new unsigned int,map,RefreshPassMapsForUnit,other-record,10,ten-ring-atoll@103
 units.players,BuildAllPassMaps: operator new unsigned int,map,RefreshPassMapsForUnit,same-record,14,eight-full-moon@103
-units.players,CobScript::SetCob: realloc int,scripts,CobScript::RunThread,other-record,89,mission-capture@1
+units.players,CobScript::SetCob: realloc int,scripts,CobScript::RunThread,other-record,90,mission-capture@1
 units.players,DebrisCache::InitSimCache: GameAllocIgnoreTag CMemoryCache CCH,weapons,DebrisCache::AllocBytes,same-record,4,orders-air-repair@382
 units.players,DebrisCache::cur,weapons,DebrisCache::AllocBytes,same-record,4,orders-air-repair@382
 units.players,DebrisPiece::state,weapons,BreakPieceIntoDebris,other-record,3,orders-air-repair@382
@@ -2109,8 +2109,8 @@ units.players,NewUnitScript: new UnitScript,scripts,CobScript::QueryScript,same-
 units.players,NewUnitScript: new UnitScript,scripts,CobScript::QueryScriptByIndex,other-record,12,edges-targeting-lead@56
 units.players,NewUnitScript: new UnitScript,scripts,CobScript::QueryScriptByIndex,same-record,3,edges-economy-targeting@38
 units.players,NewUnitScript: new UnitScript,scripts,CobScript::RemoveCallback,other-record,91,ai-antinuke-intercept@1
-units.players,NewUnitScript: new UnitScript,scripts,CobScript::RunScripts,other-record,2,ui-scroll-groups@1
-units.players,NewUnitScript: new UnitScript,scripts,CobScript::RunThread,other-record,90,ai-antinuke-intercept@1
+units.players,NewUnitScript: new UnitScript,scripts,CobScript::RunScripts,other-record,3,frontend-skirmish@1
+units.players,NewUnitScript: new UnitScript,scripts,CobScript::RunThread,other-record,91,ai-antinuke-intercept@1
 units.players,NewUnitScript: new UnitScript,scripts,CobScript::StartScriptByIndex,other-record,9,mission-defeat@1
 units.players,NewUnitScript: new UnitScript,scripts,CobScript::StartScriptWithArgsByIndex,other-record,5,edges-targeting-lead@864
 units.players,NewUnitScript: new UnitScript,scripts,CobScript::StartThread,other-record,1,mission-passes-z@98
@@ -2495,7 +2495,7 @@ units.players,Unit::f_1f,weapons,FireTurretWeapon,other-record,11,edges-economy-
 units.players,Unit::f_1f,weapons,InitUnitWeaponSlots,other-record,2,mission-passes-z@99
 units.players,Unit::f_1f,weapons,Unit::ClaimWeapons,other-record,6,orders-guard-attacked@61
 units.players,Unit::f_1f,weapons,Unit::ReleaseWeapons,other-record,8,mission-passes-z@99
-units.players,Unit::f_1f,weapons,UpdateUnitWeapons,other-record,93,ai-antinuke-intercept@1
+units.players,Unit::f_1f,weapons,UpdateUnitWeapons,other-record,94,ai-antinuke-intercept@1
 units.players,Unit::f_3b,orders,GetOrderType,other-record,1,long-greenhaven-8p@52574
 units.players,Unit::f_3b,targeting,GetWeaponTargetPos,other-record,1,long-greenhaven-8p@29226
 units.players,Unit::f_3b,weapons,ComputeProjectileTime,other-record,1,long-greenhaven-8p@29230
@@ -2510,7 +2510,7 @@ units.players,Unit::f_57,weapons,FireTurretWeapon,other-record,6,orders-guard-at
 units.players,Unit::f_57,weapons,InitUnitWeaponSlots,other-record,3,mission-passes-z@99
 units.players,Unit::f_57,weapons,Unit::ClaimWeapons,other-record,5,orders-guard-attacked@61
 units.players,Unit::f_57,weapons,Unit::ReleaseWeapons,other-record,5,mission-capture@1
-units.players,Unit::f_57,weapons,UpdateUnitWeapons,other-record,82,ai-antinuke-intercept@1
+units.players,Unit::f_57,weapons,UpdateUnitWeapons,other-record,83,ai-antinuke-intercept@1
 units.players,Unit::field_18,weapons,UpdateUnitWeapons,other-record,56,load-targets@1
 units.players,Unit::field_20,targeting,ApplyTargetingEvent,other-record,8,six-yerrot-mountains@1185
 units.players,Unit::field_20,targeting,GetWeaponTargetPos,other-record,4,mission-capture@499
@@ -2642,7 +2642,7 @@ units.players,Unit::health,units,UpdateUnitBody,same-record,1,long-greenhaven-8p
 units.players,Unit::health,weapons,ApplyUnitDamage,other-record,6,edges-economy-targeting@245
 units.players,Unit::health,weapons,FireTurretWeapon,other-record,9,orders-air-fights@211
 units.players,Unit::health,weapons,UpdateUnitWeapons,other-record,9,orders-air-fights@211
-units.players,Unit::healthPercent,units,UpdateUnitBody,other-record,93,ai-antinuke-intercept@30
+units.players,Unit::healthPercent,units,UpdateUnitBody,other-record,94,ai-antinuke-intercept@30
 units.players,Unit::hoverBobPhase,units,AlignUnitToGround,other-record,3,long-great-divide-2p@21542
 units.players,Unit::killCount,targeting,GetWeaponTargetPos,other-record,8,mission-build-unit@75
 units.players,Unit::killCount,targeting,GetWeaponTargetPos,same-record,3,mission-build-unit@94
@@ -2665,10 +2665,10 @@ units.players,Unit::list,orders,FollowGroundOrder,other-record,5,mission-defeat-
 units.players,Unit::list,orders,GetOrderFlags,other-record,2,skirmish4-long@25321
 units.players,Unit::list,orders,Insert,other-record,3,edges-economy-targeting@50
 units.players,Unit::list,orders,InsertOrderAfterMarked,other-record,2,skirmish4-long@25136
-units.players,Unit::list,orders,InsertOrderBefore,other-record,85,ai-antinuke-intercept@1
+units.players,Unit::list,orders,InsertOrderBefore,other-record,86,ai-antinuke-intercept@1
 units.players,Unit::list,orders,IssueAttackOrder,other-record,3,edges-economy-targeting@50
 units.players,Unit::list,orders,IssueRepairOrder,other-record,1,long-greenhaven-8p@25313
-units.players,Unit::list,orders,RunOrders,other-record,93,ai-antinuke-intercept@1
+units.players,Unit::list,orders,RunOrders,other-record,94,ai-antinuke-intercept@1
 units.players,Unit::list2,orders,DeleteOrders,other-record,2,orders-air-repair@382
 units.players,Unit::list2,orders,RunSecondaryOrders,other-record,14,orders-tier2-vader@132
 units.players,Unit::motion,game,SchedUnitsPhase,other-record,31,console-ilose@30
@@ -2703,8 +2703,8 @@ units.players,Unit::motion,units,ApplyUnitDeath,other-record,4,edges-economy-tar
 units.players,Unit::motion,units,SnapUnitToGround,other-record,17,mission-build-unit@75
 units.players,Unit::motion,units,UnitsApply,other-record,31,console-ilose@30
 units.players,Unit::motion,weapons,BreakPieceIntoDebris,other-record,1,long-great-divide-2p@40896
-units.players,Unit::netDirtyFlags,orders,RunOrders,other-record,93,mission-build-unit@1
-units.players,Unit::netDirtyFlags,units,UnitsApply,other-record,90,mission-build-unit@1
+units.players,Unit::netDirtyFlags,orders,RunOrders,other-record,94,mission-build-unit@1
+units.players,Unit::netDirtyFlags,units,UnitsApply,other-record,91,mission-build-unit@1
 units.players,Unit::netDirtyFlags,units,UnitsApplyScriptValue,other-record,39,mission-kill-of-type@90
 units.players,Unit::owner,weapons,UpdateUnitWeapons,other-record,4,orders-air-fights@161
 units.players,Unit::pitch,movement,UnitMotion::ApplyClampedTurnDelta,other-record,51,mission-build-unit@1
@@ -2852,7 +2852,7 @@ units.players,Unit::unitDefIndex,units,??0PathOrderAttach@@QAE@PAUUnit@@PAVOrder
 units.players,Unit::unitDefIndex,units,AlignUnitToGround,other-record,12,mission-build-unit@1
 units.players,Unit::unitDefIndex,units,CreateUnit,other-record,6,eight-pincushion-teams@944
 units.players,Unit::unitDefIndex,units,PathOrderAttach::SetUnit,other-record,4,mission-build-unit@75
-units.players,Unit::unknown_10a,units,SfxOccupyTracker::UpdateSfxOccupy,other-record,93,ai-antinuke-intercept@1
+units.players,Unit::unknown_10a,units,SfxOccupyTracker::UpdateSfxOccupy,other-record,94,ai-antinuke-intercept@1
 units.players,Unit::unknown_14,weapons,FireBallisticProjectile,other-record,2,long-greenhaven-8p@22672
 units.players,Unit::unknown_1a,weapons,FireTurretWeapon,other-record,12,mission-build-unit@54
 units.players,Unit::unknown_1c,weapons,FireBallisticProjectile,other-record,2,skirmish4-long@22010
@@ -3004,8 +3004,8 @@ units.players,UnitMotion::p2,movement,UnitMotion::ApplyBankAndPitch,other-record
 units.players,UnitMotion::pathLockStamp,map,FootprintValue,other-record,18,mission-build-unit@71
 units.players,UnitMotion::pathLockStamp,map,RefreshPassMapsForUnit,other-record,41,mission-capture@17
 units.players,UnitMotion::speed,movement,UnitMotion::ApplyClampedTurnDelta,other-record,90,ai-antinuke-intercept@1
-units.players,UnitMotion::speed,movement,UnitMotion::SteerGroundUnit,other-record,64,load-midgame@1
-units.players,UnitMotion::speed,movement,UnitMotion::UpdateVelocityFromHeading,other-record,2,ui-scroll-groups@1
+units.players,UnitMotion::speed,movement,UnitMotion::SteerGroundUnit,other-record,65,load-midgame@1
+units.players,UnitMotion::speed,movement,UnitMotion::UpdateVelocityFromHeading,other-record,3,frontend-skirmish@1
 units.players,UnitMotion::velocity,targeting,GetWeaponTargetPos,other-record,1,long-greenhaven-8p@35889
 units.players,UnitScript::state,scripts,UnitScript::EmitSfx,other-record,5,ten-ring-atoll@3580
 units.players,UnitScript::state,scripts,UnitScript::GetPieceRotation,other-record,33,orders-air-fights@161
@@ -3034,7 +3034,7 @@ units.players,bits_14281,units,ApplyUnitDeath,same-record,9,mission-build-unit@1
 units.players,count_1491b,weapons,AddExplosionEffect,same-record,6,edges-economy-targeting@245
 units.players,count_1491b,weapons,BreakPieceIntoDebris,same-record,2,edges-economy-targeting@245
 units.players,debris,weapons,BreakPieceIntoDebris,other-record,3,orders-air-repair@382
-units.players,f14353,units,UpdateUnitHead,same-record,93,ai-antinuke-intercept@1
+units.players,f14353,units,UpdateUnitHead,same-record,94,ai-antinuke-intercept@1
 units.players,g_allocSerial,platform,GameAlloc,same-record,5,edges-economy-targeting@50
 units.players,g_bytesRequestedLo,platform,GameAlloc,same-record,5,edges-economy-targeting@50
 units.players,g_currentBytes,platform,GameAlloc,same-record,5,edges-economy-targeting@50

@@ -63,7 +63,7 @@ As of the last read of `data/state_classes.csv` (2559 rows). `tools/test_statecl
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
 | static | 6 | 28 | 634 | 0 | 70 | 738 |
-| game-region | 118 | 490 | 130 | 44 | 0 | 782 |
+| game-region | 117 | 491 | 130 | 44 | 0 | 782 |
 | heap | 154 | 48 | 89 | 0 | 0 | 291 |
 
 ## Mixed cases and how to split them

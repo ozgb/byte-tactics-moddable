@@ -49718,7 +49718,9 @@ address,function,file,kind,target
 ,RemoveNode,src/orders/order_list.cpp,field_write,Order::flags
 ,RemoveNode,src/orders/order_list.cpp,function,
 ,RemoveRegion,src/harness/display_log.cpp,call,HashRemove
+,RemoveRegion,src/harness/display_log.cpp,call,RetireTargets
 ,RemoveRegion,src/harness/display_log.cpp,call,free
+,RemoveRegion,src/harness/display_log.cpp,field_read,Region::pixels
 ,RemoveRegion,src/harness/display_log.cpp,field_read,Region::shadow
 ,RemoveRegion,src/harness/display_log.cpp,field_write,Region::live
 ,RemoveRegion,src/harness/display_log.cpp,field_write,Region::shadow
@@ -49804,6 +49806,12 @@ address,function,file,kind,target
 ,RestoreSurfacesInline,src/graphics/surface.cpp,field_read,Screen::primary
 ,RestoreSurfacesInline,src/graphics/surface.cpp,field_read,Screen::surface
 ,RestoreSurfacesInline,src/graphics/surface.cpp,function,
+,RetireTargets,src/harness/display_log.cpp,field_read,TargetSlot::base
+,RetireTargets,src/harness/display_log.cpp,field_write,TargetSlot::retired
+,RetireTargets,src/harness/display_log.cpp,function,
+,RetireTargets,src/harness/display_log.cpp,global_read,s_targetCount@src/harness/display_log.cpp
+,RetireTargets,src/harness/display_log.cpp,global_read,s_targets@src/harness/display_log.cpp
+,RetireTargets,src/harness/display_log.cpp,global_write,s_targets@src/harness/display_log.cpp
 ,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordAllowed
 ,RunScriptedConsole,src/harness/harness.cpp,call,ConsoleWordIsUnitType
 ,RunScriptedConsole,src/harness/harness.cpp,call,ExecuteCommandLine
@@ -50317,6 +50325,7 @@ address,function,file,kind,target
 ,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::bh
 ,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::bw
 ,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::first
+,SlotFor,src/harness/display_log.cpp,field_read,TargetSlot::retired
 ,SlotFor,src/harness/display_log.cpp,field_write,Bucket::full
 ,SlotFor,src/harness/display_log.cpp,field_write,Bucket::head
 ,SlotFor,src/harness/display_log.cpp,field_write,TargetSlot::base
@@ -50328,6 +50337,7 @@ address,function,file,kind,target
 ,SlotFor,src/harness/display_log.cpp,field_write,TargetSlot::maxRead
 ,SlotFor,src/harness/display_log.cpp,field_write,TargetSlot::name
 ,SlotFor,src/harness/display_log.cpp,field_write,TargetSlot::overflow
+,SlotFor,src/harness/display_log.cpp,field_write,TargetSlot::retired
 ,SlotFor,src/harness/display_log.cpp,field_write,TargetSlot::width
 ,SlotFor,src/harness/display_log.cpp,function,
 ,SlotFor,src/harness/display_log.cpp,global_escape,s_targets@src/harness/display_log.cpp
@@ -50337,7 +50347,6 @@ address,function,file,kind,target
 ,SlotFor,src/harness/display_log.cpp,global_read,kMaxTargets@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_read,s_bucketUsed@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_read,s_targetCount@src/harness/display_log.cpp
-,SlotFor,src/harness/display_log.cpp,global_read,s_targets@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_write,s_bucketUsed@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_write,s_buckets@src/harness/display_log.cpp
 ,SlotFor,src/harness/display_log.cpp,global_write,s_targetCount@src/harness/display_log.cpp

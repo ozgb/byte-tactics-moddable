@@ -546,6 +546,8 @@ enum { MAX_INPUTS = 1024 };
 struct ScriptedInput {
     int lineNo;
     unsigned tick;
+    unsigned frame;
+    int delivered;
     unsigned type;
     unsigned a;
     int x;
@@ -556,6 +558,10 @@ struct ScriptedInput {
 static ScriptedInput s_inputs[MAX_INPUTS];
 static int s_inputCount = 0;
 static int s_altHeld = 0;
+static unsigned s_frameTick = 0;
+static unsigned s_framesAtTick = 0;
+static int s_debugKeys = 0;
+enum { STOPPED_FRAME_LIMIT = 300 };
 
 static unsigned ParseKeyName(int lineNo, const char* text)
 {
@@ -605,6 +611,13 @@ static void ReadInput(int lineNo, char* value)
     ScriptedInput* in = &s_inputs[s_inputCount++];
     memset(in, 0, sizeof *in);
     in->lineNo = lineNo;
+    char* frameText = strchr(tickText, '.');
+    if (frameText != NULL) {
+        *frameText++ = '\0';
+        in->frame = ParseNumber(lineNo, "input", frameText);
+        if (in->frame == 0)
+            FailLine(lineNo, "needs a frame of at least 1 after the dot", "input", "");
+    }
     in->tick = ParseNumber(lineNo, "input", tickText);
     if (in->tick == 0)
         FailLine(lineNo, "needs a tick of at least 1", "input", "");
@@ -667,8 +680,8 @@ static void CheckInputs()
         if (in->tick > s_ticks)
             FailLine(in->lineNo, "has a tick after the last tick", "input", "");
         for (k = 0; k < i; k++) {
-            if (s_inputs[k].tick == in->tick && s_inputs[k].mouse == in->mouse)
-                FailLine(in->lineNo, in->mouse ? "is a second mouse event on its tick" : "is a second key event on its tick",
+            if (s_inputs[k].tick == in->tick && s_inputs[k].frame == in->frame && s_inputs[k].mouse == in->mouse)
+                FailLine(in->lineNo, in->mouse ? "is a second mouse event on its frame" : "is a second key event on its frame",
                          "input", ", the game takes one of each per frame");
         }
     }
@@ -791,6 +804,48 @@ static void DeliverScriptedInput(const ScriptedInput* in)
         break;
     }
     UiLogInput(in);
+}
+
+static void CheckFrameInputsBeforeTick(unsigned tick)
+{
+    int i;
+    for (i = 0; i < s_inputCount; i++) {
+        const ScriptedInput* in = &s_inputs[i];
+        if (in->frame == 0 || in->delivered || in->tick >= tick)
+            continue;
+        char detail[100];
+        sprintf(detail, ", the game ran tick %u first", tick);
+        FailLine(in->lineNo, "names a frame after a tick that the game did not reach", "input", detail);
+    }
+}
+
+static void HarnessFrameEnd(unsigned tick)
+{
+    int i;
+    unsigned last = 0;
+    if (tick == 0 || tick > s_ticks)
+        return;
+    if (tick != s_frameTick) {
+        s_frameTick = tick;
+        s_framesAtTick = 0;
+    }
+    s_framesAtTick++;
+    for (i = 0; i < s_inputCount; i++) {
+        ScriptedInput* in = &s_inputs[i];
+        if (in->frame == 0 || in->tick != tick)
+            continue;
+        if (in->frame > last)
+            last = in->frame;
+        if (in->frame == s_framesAtTick) {
+            in->delivered = 1;
+            DeliverScriptedInput(in);
+        }
+    }
+    if (s_framesAtTick > last + STOPPED_FRAME_LIMIT) {
+        char msg[100];
+        sprintf(msg, "testmode: no tick ran for %u frames after tick %u\n", (unsigned)STOPPED_FRAME_LIMIT, tick);
+        Fail(msg);
+    }
 }
 
 extern void* g_display;
@@ -995,6 +1050,8 @@ static void ReadKey(int lineNo, const char* key, char* value)
     }
     else if (strcmp(key, "frames") == 0)
         ReadFrames(lineNo, value);
+    else if (strcmp(key, "debug_keys") == 0)
+        s_debugKeys = ParseRange(lineNo, key, value, 1);
     else if (strcmp(key, "ticks") == 0) {
         s_ticks = ParseNumber(lineNo, key, value);
         if (s_ticks == 0)
@@ -4326,6 +4383,9 @@ void HarnessBeforeStep()
     }
     if (tick == 1)
         ApplyShareSettings();
+    if (tick == 1 && s_debugKeys)
+        g_game->uiOptionFlags |= 2;
+    CheckFrameInputsBeforeTick(tick);
     for (i = 0; i < s_spawnCount; i++) {
         if (s_spawns[i].tick == tick)
             IssueScriptedSpawn(&s_spawns[i]);
@@ -4341,7 +4401,7 @@ void HarnessBeforeStep()
             RunScriptedConsole(&s_consoles[i]);
     }
     for (i = 0; i < s_inputCount; i++) {
-        if (s_inputs[i].tick == tick)
+        if (s_inputs[i].tick == tick && s_inputs[i].frame == 0)
             DeliverScriptedInput(&s_inputs[i]);
     }
 }
@@ -4478,6 +4538,58 @@ void __stdcall HarnessUiSquads(int group)
         IfaceStart("AI_SET_SQUAD", u);
         fprintf(s_iface, " squad %d\n", squad);
     }
+}
+
+void __stdcall HarnessUiSetStore(int player, int resource, int add, float amount)
+{
+    if (!IfaceLive())
+        return;
+    IfaceStart("PLAYERS_SET_STORE", NULL);
+    fprintf(s_iface, " player %d resource %d add %d amount %d\n", player, resource, add, *(int*)&amount);
+}
+
+void __stdcall HarnessUiTransfer(int from, int to, int resource, float amount, int announce)
+{
+    if (!IfaceLive())
+        return;
+    IfaceStart("PLAYERS_TRANSFER", NULL);
+    fprintf(s_iface, " from %d to %d resource %d amount %d announce %d\n", from, to, resource, *(int*)&amount, announce);
+}
+
+void __stdcall HarnessUiGiveUnit(const void* unit, int player)
+{
+    unsigned char zero[12];
+    if (!IfaceLive())
+        return;
+    memset(zero, 0, sizeof zero);
+    IfaceStart("PLAYERS_GIVE_UNIT", unit);
+    fprintf(s_iface, " player %d record.present 0 record.hitPoints 0 record.buildPercent 0", player);
+    IfaceBytes("record.angles", zero, sizeof zero);
+    IfaceBytes("record.stockpiles", zero, sizeof zero);
+    fprintf(s_iface, "\n");
+}
+
+void __stdcall HarnessUiShareMap(int from, int to)
+{
+    if (!IfaceLive())
+        return;
+    fprintf(s_iface, "%u LOS_RADAR_SHARE_MAP from %d to %d\n", GameU32(GAME_TICK) + 1, from, to);
+}
+
+void __stdcall HarnessUiForgetAttacker(const void* unit)
+{
+    if (!IfaceLive())
+        return;
+    IfaceStart("UNITS_FORGET_ATTACKER", unit);
+    fprintf(s_iface, "\n");
+}
+
+void __stdcall HarnessUiLeaveGame()
+{
+    if (!IfaceLive())
+        return;
+    IfaceStart("PLAYERS_LEAVE_GAME", NULL);
+    fprintf(s_iface, "\n");
 }
 
 static void UiListUnits(int group, int selectedOnly)
@@ -4947,12 +5059,15 @@ void HarnessCursorPosition(int* x, int* y)
 
 void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY)
 {
-    if (!s_testMode || DlIsOn() == 0)
+    if (!s_testMode)
         return;
     unsigned tick = GameU32(GAME_TICK);
+    HarnessFrameEnd(tick);
+    if (DlIsOn() == 0)
+        return;
     int list = s_displayAll;
     for (unsigned i = 0; i < s_frameCount; i++) {
-        if (s_frameTicks[i] == tick)
+        if (s_frameTicks[i] >= tick)
             list = 1;
     }
     if (s_displayTickLine != 0) {

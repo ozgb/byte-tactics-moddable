@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 
 #include <stdarg.h>
@@ -23,6 +24,7 @@ extern float g_lightY;
 extern float g_lightZ;
 
 static const char* s_featureType = 0;
+static int s_featureSpot = -1;
 static int s_noAngles = 0;
 
 static int RdI(const void* p, int off)
@@ -73,6 +75,7 @@ enum {
     GAME_SCROLL_X = 82719,
     GAME_SCROLL_Y = 82723,
     GAME_PLAYERS = 7011,
+    GAME_PLAYER_INDEX = 10819,
     GAME_RECT = 228903,
     GAME_VIEW_WIDTH = 228919,
     GAME_VIEW_HEIGHT = 228923,
@@ -120,6 +123,9 @@ static void PictureOf(const GafFrame* f, DlPicture* out)
     out->height = f->height;
     out->compressed = f->compressed;
     out->layered = f->layers;
+    out->xOffset = f->xOffset;
+    out->yOffset = f->yOffset;
+    out->transparency = f->transparency;
 }
 
 static void Union(const GafFrame* f, int x, int y, int depth, int* x0, int* y0, int* x1, int* y1)
@@ -605,29 +611,85 @@ static void PutHexFloat(float f)
     DlPutHex8(bits);
 }
 
-static void PutPieces(const char* p, int depth)
+static void PutPieces(const char* state)
 {
-    for (; p != 0 && depth < 64; p = (const char*)RdP(p, 42)) {
+    int count = RdI(state, 0);
+    const char* pieces = state + 34;
+    int i;
+    for (i = 0; i < count; i++) {
+        const char* p = pieces + i * 54;
         const char* object = (const char*)RdP(p, 0);
         const char* name = object != 0 && RdP(object, 28) != 0 ? (const char*)RdP(object, 28) : "";
         DlPutRaw(" ");
         DlPutName(name, (int)strlen(name));
         DlPutRaw(",");
-        DlPutInt(RdU16(p, 40) & 3);
+        DlPutInt(RdU16(p, 40) & 7);
+        DlPutRaw(",");
+        DlPutInt(RdS(p, 16));
+        DlPutRaw(",");
+        DlPutInt(RdS(p, 18));
+        DlPutRaw(",");
+        DlPutInt(RdS(p, 20));
         DlPutRaw(",");
         DlPutInt(RdI(p, 4));
         DlPutRaw(",");
         DlPutInt(RdI(p, 8));
         DlPutRaw(",");
         DlPutInt(RdI(p, 12));
-        DlPutRaw(",");
-        DlPutInt(RdI(p, 22));
-        DlPutRaw(",");
-        DlPutInt(RdI(p, 26));
-        DlPutRaw(",");
-        DlPutInt(RdI(p, 30));
-        PutPieces((const char*)RdP(p, 46), depth + 1);
     }
+}
+
+static void PutDrawing(const char* owner, const char* state)
+{
+    char key[16];
+    char attrs[16];
+    const char* picture = (const char*)RdP(state, 16);
+    const char* def = (const char*)RdP(owner, 146);
+    unsigned flags = (unsigned)RdI(owner, 272);
+    unsigned typeFlags = def != 0 ? (unsigned)RdI(def, 577) : 0;
+    int rebuild = RdI(state, 4) == 0;
+    int still;
+    int n = 0;
+    if (s_featureType != 0)
+        sprintf(key, "f%d", s_featureSpot);
+    else
+        sprintf(key, "%u", (unsigned)RdU16(owner, 168));
+    DlPutRaw(" ");
+    DlPutRaw(key);
+    if ((flags & 0x20000000) != 0) {
+        if (picture == 0)
+            rebuild = 1;
+        else if (*(const float*)(owner + 260) != 0.0f && (flags & 0x2000) != 0 && RdP(picture, 20) == 0)
+            rebuild = 1;
+    }
+    if ((RdU8(owner, 276) & 1) != 0 && picture == 0)
+        rebuild = 1;
+    DlPutRaw(rebuild ? " n" : picture != 0 ? " k" : " -");
+    if ((flags & 0x20000000) != 0)
+        still = (RdU8(owner, 270) & 1) == 0;
+    else
+        still = RdI(RdP(owner, 0), 0x20) == 0;
+    if ((flags & 0x20000000) != 0)
+        attrs[n++] = 's';
+    if (!still)
+        attrs[n++] = 'm';
+    if ((flags & 0x200) != 0 || RdU8(owner, 255) == RdU8(g_game, GAME_PLAYER_INDEX))
+        attrs[n++] = 't';
+    if ((RdU8(owner, 276) & 1) != 0)
+        attrs[n++] = 'z';
+    if (RdS(owner, 166) != 0)
+        attrs[n++] = 'u';
+    if ((typeFlags & 0x2000000) != 0)
+        attrs[n++] = 'n';
+    if ((typeFlags & 0x40000000) != 0)
+        attrs[n++] = 'h';
+    if ((typeFlags & 0x81000) != 0)
+        attrs[n++] = 'v';
+    if (n == 0)
+        attrs[n++] = '-';
+    attrs[n] = '\0';
+    DlPutRaw(" ");
+    DlPutRaw(attrs);
 }
 
 static void ModelItem(const DlSurface* d, const char* kind, const char* owner, const char* state)
@@ -684,9 +746,9 @@ static void ModelItem(const DlSurface* d, const char* kind, const char* owner, c
     PutInt(RdI(owner, 106));
     PutInt(RdI(owner, 110));
     PutInt(RdI(owner, 114));
-    PutInt(RdS(owner, 100));
-    PutInt(RdS(owner, 102));
-    PutInt(RdS(owner, 104));
+    PutInt(RdS(state, 24));
+    PutInt(RdS(state, 26));
+    PutInt(RdS(state, 28));
     info = (const char*)RdP(g_game + GAME_PLAYERS + RdU8(owner, 255) * PLAYER_SIZE, PLAYER_INFO);
     if (info != 0)
         colour = RdU8(info, PLAYER_INFO_COLOR);
@@ -700,7 +762,8 @@ static void ModelItem(const DlSurface* d, const char* kind, const char* owner, c
     PutHexFloat(g_lightY);
     DlPutRaw(",");
     PutHexFloat(g_lightZ);
-    PutPieces(root, 0);
+    PutDrawing(owner, state);
+    PutPieces(state);
     DlEnd();
 }
 
@@ -883,8 +946,8 @@ static void DisplayLogGaf(const char* path, void* base)
         unsigned short count = *(unsigned short*)record;
         const char* entry = (const char*)(record + 8);
         for (j = 0; j < (int)count; j++) {
-            int frame = *(int*)(record + 0x28 + j * 8);
-            DlGafFrame(entry, j, (const void*)frame);
+            const GafFrame* frame = *(const GafFrame* const*)(record + 0x28 + j * 8);
+            DlGafFrame(entry, j, frame, frame != 0 ? frame->xOffset : 0, frame != 0 ? frame->yOffset : 0);
         }
     }
     DlUnlockRegistries();
@@ -928,9 +991,10 @@ static void DisplayLogFont(void* font, const char* name)
     DlRegisterFont(font, name);
 }
 
-static void DisplayLogFeatureType(const char* name)
+static void DisplayLogFeatureType(const char* name, int spot)
 {
     s_featureType = name;
+    s_featureSpot = spot;
 }
 
 static void DisplayLogFrameEnd(void* displayArg)
@@ -1220,7 +1284,8 @@ void __cdecl DlNote(int kind, ...)
     }
     case DL_FEATURE_TYPE: {
         const char* name = va_arg(ap, const char*);
-        DisplayLogFeatureType(name);
+        int spot = va_arg(ap, int);
+        DisplayLogFeatureType(name, spot);
         break;
     }
     case DL_FRAME_END: {
@@ -1231,6 +1296,12 @@ void __cdecl DlNote(int kind, ...)
     case DL_FREE: {
         void* block = va_arg(ap, void*);
         DlFree(block);
+        break;
+    }
+    case DL_WRITTEN: {
+        void* block = va_arg(ap, void*);
+        if (block != 0)
+            DlWritten(block);
         break;
     }
     }

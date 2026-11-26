@@ -690,6 +690,8 @@ void __stdcall PlaySoundByName(char* str, int flag);
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void __stdcall ClearSelectedGadget(void* param_1);
 
+void __stdcall HarnessUiLeaveGame();
+
 // FUNCTION: 0x464de0
 void __stdcall ContinueWatchingCallback(Gadget* gadget)
 {
@@ -707,6 +709,7 @@ void __stdcall ContinueWatchingCallback(Gadget* gadget)
         ClearSelectedGadget(gadget);
         return;
     }
+    HarnessUiLeaveGame();
     g_game->endGameFlags.b.bit2 = 1;
     g_game->endGameFlags.b.bit4 = 0;
 }

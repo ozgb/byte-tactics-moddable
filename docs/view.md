@@ -605,7 +605,7 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `difficulty` | Left out: read only by the menus and setup screens, before or after play; the match setup supplies it, not the view. |
 | `endGameFlags` | `PlayerView.endFlags` for masks 0x4, 0x20 and 0x40; masks 0x1 and 0x2 are presentation state ("What is not sim"). |
 | `features` | Loaded data: the feature definition named by `ViewFeature.featureIndex`, through the files service. |
-| `field_1df2` | Left out: read only by the share dialog, when it opens and on its OK (what it reads there is #1131); the commands the dialog publishes carry the players and amounts chosen in it, not this field. |
+| `field_1df2` | `ViewPlayer.unitCount` (Score): the item is `players[1].unitCount`, which the share dialog reads with `unitsCreated`, when it opens and on its OK, to offer and accept only a player still alive. |
 | `flagsByte_3923b` | `PlayerView.endFlags` for masks 0x4, 0x20 and 0x40; masks 0x1 and 0x2 are presentation state ("What is not sim"). |
 | `flags_2a44` | Left out: network state, class platform in part: it picks the music's mood and the network lines, neither of which the display log, the sound log or a command records. |
 | `flags_38d75` | Left out: network state, class platform in part: it picks the music's mood and the network lines, neither of which the display log, the sound log or a command records. |

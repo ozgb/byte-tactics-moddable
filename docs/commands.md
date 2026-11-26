@@ -533,6 +533,7 @@ one of those, and a scenario that uses a console command or an order kind that t
 | ui-build-menu | left out | has `input` lines: it needs the presentation |
 | ui-build-place | left out | has `input` lines: it needs the presentation |
 | ui-click-select | left out | has `input` lines: it needs the presentation |
+| ui-debug-keys | left out | has `input` lines: it needs the presentation |
 | ui-dialogs | left out | has `input` lines: it needs the presentation |
 | ui-drag-select | left out | has `input` lines: it needs the presentation |
 | ui-groups | left out | has `input` lines: it needs the presentation |
@@ -561,8 +562,7 @@ at once. These are the events it publishes, besides the group commands of a clic
   only from the registry (a scenario sets it with `debug_keys 1`, docs/scenario-format.md). The key that fills every
   player's stores publishes, for each player that exists in slot order, PLAYERS_SET_STORE with `resource` 0, `add` 0 and
   `amount` the player's energy capacity, then the same with `resource` 1 and its metal capacity; the key that makes the
-  unit under the cursor forget its attacker publishes UNITS_FORGET_ATTACKER with that unit, when there is one. No
-  scenario has debug mode on yet: the frame rate it draws follows the wall clock (#1130).
+  unit under the cursor forget its attacker publishes UNITS_FORGET_ATTACKER with that unit, when there is one.
 - **The share dialog** (game type 3, the `h` key), its OK button with a player chosen in the list, when that player is
   in the game and alive: PLAYERS_TRANSFER from the local player to that player with `resource` 1 and `amount` the metal
   slider, then with `resource` 0 and the energy slider, both with `announce` 1; then, when the units button is on,
@@ -585,9 +585,9 @@ in no stored log, or a stored log holds an interface event the table does not li
 | `ORDERS_QUEUE_BUILD` | the build menu of a factory | ui-build-menu, ui-scroll-groups |
 | `PLAYERS_GIVE_UNIT` | the share dialog | ui-share-chat |
 | `PLAYERS_LEAVE_GAME` | the quit dialog, the defeated player's dialog | ui-dialogs |
-| `PLAYERS_SET_STORE` | the debug hotkey `=` | none |
+| `PLAYERS_SET_STORE` | the debug hotkey `=` | ui-debug-keys |
 | `PLAYERS_TRANSFER` | the share dialog | ui-share-chat |
-| `UNITS_FORGET_ATTACKER` | the debug hotkey `]` | none |
+| `UNITS_FORGET_ATTACKER` | the debug hotkey `]` | ui-debug-keys |
 
 The pause request (bit 0 of `otherFlags`) is the driver's: it decides whether ticks run, and the tick reads it only in
 the network's timeout check, which runs on the wall clock. The bit of `mapFlags` that the camera clears (bit 3) says

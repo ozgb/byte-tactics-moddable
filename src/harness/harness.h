@@ -32,5 +32,6 @@ void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int wid
 
 const char* HarnessMapName();
 void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY);
+unsigned int HarnessFrameClockElapsedMs();
 
 #endif

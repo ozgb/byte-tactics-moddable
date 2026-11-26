@@ -38,6 +38,11 @@ run of the battle view never draws, holds the same items as the frame before it 
 what depends on the input and the frame alone: the cursor, a scroll by the mouse or the
 keys, and the messages that expire by frame.
 
+Debug mode (F11) draws the frame rate in the info panel, as `FRATE: <n>`, the number of times
+the panel asked for it in the last second. A test-mode run counts that second on the frames it
+draws, not on the wall clock: each frame moves the counter's clock on by 33 milliseconds,
+starting from 0 when the game starts, so the rate drawn at a frame is the same on every run.
+
 ## Files
 
 A test-mode run writes `display.txt` beside `trace.txt`: the digest of every frame (below).

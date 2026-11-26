@@ -143,7 +143,7 @@ scenarios whose `input` lines drive it (the events are in [docs/commands.md](../
 | Pause and resume (the Pause key) | ui-dialogs |
 | The options menu (F2): the interface type (the option the tick reads) and the text lines, saved with OK | ui-dialogs |
 | The exit menu: Cancel, Exit Game with No and with Yes (PLAYERS_LEAVE_GAME) | ui-dialogs |
-| The debug hotkeys `=` and `]` (F11, with `debug_keys 1`) | none: debug mode draws the frame rate, which follows the wall clock (#1130) |
+| The debug hotkeys `=` and `]` (F11, with `debug_keys 1`) | ui-debug-keys |
 | The share dialog of game type 3 (`h`): metal, energy, the selected units and the map | ui-share-chat |
 | The chat line (Enter): a message | ui-share-chat |
 | The chat line: a `+` console command | none: the console scenarios cover the commands as `console` lines, and the reference hook in `CmdATM` changes the code of other functions of its file |
@@ -300,6 +300,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
 | ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
 | ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
+| ui-debug-keys | The Pass | 2 | 80 | Scripted debug mode (F11, `debug_keys 1`) and its hotkeys: `=` fills every player's stores, `]` makes the unit under the cursor forget its attacker, the frame rate in frames |
 | ui-dialogs | The Pass | 2 | 300 | Scripted pause and resume, the options menu (interface type, text lines) and the exit menu to Exit Game, which ends the run at tick 61; input while no tick runs (`input <tick>.<frame>`), the dialogs in frames |
 | ui-drag-select | The Pass | 2 | 200 | Scripted box selection with and without Shift |
 | ui-groups | The Pass | 2 | 300 | Scripted control groups |
@@ -402,6 +403,7 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | ui-build-menu | left out | has `input` lines: it needs the presentation |
 | ui-build-place | left out | has `input` lines: it needs the presentation |
 | ui-click-select | left out | has `input` lines: it needs the presentation |
+| ui-debug-keys | left out | has `input` lines: it needs the presentation |
 | ui-dialogs | left out | has `input` lines: it needs the presentation |
 | ui-drag-select | left out | has `input` lines: it needs the presentation |
 | ui-groups | left out | has `input` lines: it needs the presentation |
@@ -701,7 +703,8 @@ holds a target (one a unit, one a ground point), so they are what catches a targ
 `ui-dialogs`, `ui-scroll-groups` and `ui-share-chat` (#1055) are in it by hand, 881 ticks together: each is the only
 scenario of a path of "Interface paths" (input while no tick runs and the dialogs; the factory in a
 control group and the scrolling; the share dialog), and so of the interface events of the share dialog and the exit
-menu.
+menu. `ui-debug-keys` (#1130) is in it by hand for the same reason, 80 ticks: it is the only scenario of the debug
+hotkeys, and so of PLAYERS_SET_STORE and UNITS_FORGET_ATTACKER from the interface.
 
 `uv run tools/coverage.py --exe build/coverage/TotalA.exe --choose-tier` (`--runs DIR`, `--max-ticks N`, `--eight NAME`) plays
 nothing: it reproduces this rule from the per-scenario profiles a coverage run left in `build/coverage-run/` and prints the
@@ -752,6 +755,7 @@ upper bound. Replay parts pick their recordings from it.
 | share-all | 2 | 960 |
 | ui-build-menu | 2 | 200 |
 | ui-build-place | 2 | 200 |
+| ui-debug-keys | 2 | 80 |
 | ui-dialogs | 2 | 61 |
 | ui-groups | 2 | 300 |
 | ui-keys | 2 | 300 |

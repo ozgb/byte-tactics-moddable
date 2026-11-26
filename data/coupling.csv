@@ -2610,11 +2610,13 @@ presentation,harness,call,HarnessEventSpeech,1
 presentation,harness,call,HarnessEventSuppress,4
 presentation,harness,call,HarnessEventUnit,4
 presentation,harness,call,HarnessEventWords,3
+presentation,harness,call,HarnessFrameClockElapsedMs,1
 presentation,harness,call,HarnessFrameDrawn,1
 presentation,harness,call,HarnessGetCursorPos,2
 presentation,harness,call,HarnessKeyState,1
 presentation,harness,call,HarnessSetCursorPos,1
 presentation,harness,call,HarnessSoundEvent,6
+presentation,harness,call,HarnessTestMode,1
 presentation,harness,call,HarnessUiCancel,1
 presentation,harness,call,HarnessUiCommand,2
 presentation,harness,call,HarnessUiForgetAttacker,1

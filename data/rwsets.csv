@@ -49765,12 +49765,16 @@ address,function,file,kind,target
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,SetUpLoadedGame
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,SetUpSkirmish
+,HarnessStartSkirmish,src/harness/harness.cpp,field_read,Game::sound
 ,HarnessStartSkirmish,src/harness/harness.cpp,field_read,MissionSeam::GetGameType
 ,HarnessStartSkirmish,src/harness/harness.cpp,field_read,Seams::mission
 ,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Game::cmdlineSkipIntroMovie
 ,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Game::playMovie
 ,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Gui::hotGadgetIndex
 ,HarnessStartSkirmish,src/harness/harness.cpp,field_write,NetGameFlagBits::b3
+,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Sound::currentTrack
+,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Sound::dataTrack
+,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Sound::trackCount
 ,HarnessStartSkirmish,src/harness/harness.cpp,function,
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,g_game
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,g_seams
@@ -50081,6 +50085,7 @@ address,function,file,kind,target
 ,HeadlessMusicPosition,src/host/win32/headless.cpp,function,
 ,HeadlessMusicStop,src/host/win32/headless.cpp,function,
 ,HeadlessMusicTrackCount,src/host/win32/headless.cpp,function,
+,HeadlessMusicTrackCount,src/host/win32/headless.cpp,global_read,kGogNoCdTrackCount
 ,HeadlessMusicTrackIsAudio,src/host/win32/headless.cpp,function,
 ,HeadlessMusicTrackLength,src/host/win32/headless.cpp,function,
 ,HeadlessMusicTrackStart,src/host/win32/headless.cpp,function,

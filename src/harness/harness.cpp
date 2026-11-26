@@ -4468,7 +4468,7 @@ void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, 
         DisplayReplayRun(s_replayPath, s_frameTicks, s_frameCount);
     int list = s_displayAll;
     for (unsigned i = 0; i < s_frameCount; i++) {
-        if (s_frameTicks[i] == tick)
+        if (s_frameTicks[i] >= tick)
             list = 1;
     }
     if (s_displayTickLine != 0) {

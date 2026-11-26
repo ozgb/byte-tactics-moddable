@@ -27,8 +27,15 @@
 #include "../state/block.h"
 #include "../util/engine_services.h"
 #include "../../link/globals.h"
+#include "../weapons/explosion_types.h"
+#include "../weapons/debris.h"
+#include "../ingame/info_panel.h"
 
 void* __stdcall LoadGaf(char* name);
+class ProjectedModel;
+void __stdcall DrawModel3doProjected(void* surface, Vec3* offset, ProjectedModel* obj, short* angles);
+void* __stdcall GetGafSequenceFrame(GafRef* ref);
+void* __stdcall GetGafFrame(GafSequence* table, int index);
 void __stdcall InitGafSequence(void* ref, void* src, int index);
 void StepAllGafSequences(void);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
@@ -219,6 +226,35 @@ static Object3do* ObjectNamed(const char* escaped)
     return object;
 }
 
+static Object3do* FindPiece(Object3do* p, const char* name, int depth)
+{
+    for (; p != nullptr && depth < 64; p = p->sibling) {
+        if (p->name != nullptr && _stricmp(p->name, name) == 0)
+            return p;
+        Object3do* found = FindPiece(p->child, name, depth + 1);
+        if (found != nullptr)
+            return found;
+    }
+    return nullptr;
+}
+
+static Object3do* PieceNamed(const char* escaped)
+{
+    char model[100];
+    strncpy(model, escaped, sizeof model - 1);
+    model[sizeof model - 1] = '\0';
+    char* colon = strchr(model, ':');
+    if (colon == nullptr)
+        ReplayFail("a piece name without its model: ", escaped);
+    *colon = '\0';
+    char piece[100];
+    Unescape(colon + 1, piece, sizeof piece);
+    Object3do* found = FindPiece(ObjectNamed(model), piece, 0);
+    if (found == nullptr)
+        ReplayFail("no such piece: ", escaped);
+    return found;
+}
+
 static void Measure(char* text)
 {
     Grow("screen", 640, 480);
@@ -233,6 +269,8 @@ static void Measure(char* text)
         int n = Split(copy, words);
         if (n >= 8 && (strcmp(words[0], "model") == 0 || strcmp(words[0], "cargo") == 0))
             ObjectNamed(words[7]);
+        if (n >= 7 && (strcmp(words[0], "projectile") == 0 || strcmp(words[0], "debris") == 0))
+            PieceNamed(words[6]);
         if (n >= 6 && strcmp(words[0], "frame") != 0 && strcmp(words[0], "cursor") != 0 && strcmp(words[0], "bt-display") != 0
             && strcmp(words[0], "picture") != 0) {
             int x0 = atoi(words[2]), y0 = atoi(words[3]), x1 = atoi(words[4]), y1 = atoi(words[5]);
@@ -797,6 +835,80 @@ static void DrawPendingModel()
     g_lightZ = lz;
 }
 
+static void DrawDebris(Surface* s, Object3D* piece, int colour, int ox, int oy, int oz, short ax, short ay, short az)
+{
+    static Vec3 turned[2000];
+    static Point projected[2000];
+    if (piece->vertexCount > 2000)
+        ReplayFail("a debris piece with too many corners", piece->name);
+    short angles[3] = {ax, ay, az};
+    for (int i = piece->vertexCount - 1; i >= 0; i--)
+        RotateByAngles(&piece->verts[i], &turned[i], angles);
+    for (int i = 0; i < piece->vertexCount; i++) {
+        projected[i].x = (short)((short)((turned[i].x + ox) >> 16) + 0x80);
+        projected[i].y = (short)((short)((oz - turned[i].z) >> 16) - ((short)((turned[i].y + oy) >> 16) >> 1) + 0x20);
+    }
+    int i = piece->firstFace != -1 ? 1 : 0;
+    for (Face* face = piece->faces + i; i < piece->faceCount; i++, face++) {
+        Point poly[25];
+        for (int j = 0; j < face->nverts && j < 25; j++)
+            poly[j] = projected[face->vindex[j]];
+        if (face->flags.bits.a) {
+            FillPolygon(s, poly, face->nverts, (unsigned char)face->color);
+        } else if (face->nverts == 4) {
+            void* pic;
+            if (face->flags.bits.b)
+                pic = face->flags.bits.c ? GetGafFrame(face->tex.src, colour) : GetGafSequenceFrame(&face->tex);
+            else
+                pic = face->tex.pic;
+            DrawFrameQuad(s, (GafFrame*)pic, (FrameQuad*)poly, nullptr);
+        }
+    }
+}
+
+static void DrawShard(Surface* s, char** w)
+{
+    DebrisPiece* box = &g_game->slots[299];
+    Face* faces = box->faces.get();
+    Vec3* verts = box->verts.get();
+    FaceFlags flags;
+    flags.raw = 0;
+    int colour = 0;
+    void* pic = nullptr;
+    if (w[0][0] == '#') {
+        flags.bits.a = 1;
+        colour = atoi(w[0] + 1);
+    } else if (strcmp(w[0], "-") == 0) {
+        Skip("shard with no face");
+        return;
+    } else {
+        pic = Picture(w[0]);
+        if (pic == nullptr) {
+            Skip("shard");
+            return;
+        }
+    }
+    for (int i = 0; i < box->faceCount; i++) {
+        faces[i].flags = flags;
+        faces[i].color = colour;
+        faces[i].tex.pic = pic;
+    }
+    for (int i = 0; i < 8; i++) {
+        const char* v = w[7 + i];
+        verts[i].x = atoi(v);
+        v = strchr(v, ',');
+        verts[i].y = v != nullptr ? atoi(v + 1) : 0;
+        v = v != nullptr ? strchr(v + 1, ',') : nullptr;
+        verts[i].z = v != nullptr ? atoi(v + 1) : 0;
+    }
+    Vec3 offset;
+    offset.x = atoi(w[1]);
+    offset.y = atoi(w[2]);
+    offset.z = atoi(w[3]);
+    short angles[3] = {(short)atoi(w[4]), (short)atoi(w[5]), (short)atoi(w[6])};
+    DrawDebrisProjected(s, &offset, box, angles);
+}
+
 static void Draw(char** w, int n)
 {
     const char* kind = w[0];
@@ -935,6 +1047,22 @@ static void Draw(char** w, int n)
         d->keyColor = key;
     } else if (strcmp(kind, "model") == 0 || strcmp(kind, "cargo") == 0) {
         Skip(kind);
+    } else if (strcmp(kind, "projectile") == 0 && n >= 13) {
+        if (w[10][0] == '-') {
+            Skip("projectile with no turn");
+            return;
+        }
+        Vec3 offset;
+        offset.x = atoi(w[7]);
+        offset.y = atoi(w[8]);
+        offset.z = atoi(w[9]);
+        short angles[3] = {(short)atoi(w[10]), (short)atoi(w[11]), (short)atoi(w[12])};
+        DrawModel3doProjected(&s, &offset, (ProjectedModel*)PieceNamed(w[6]), angles);
+    } else if (strcmp(kind, "debris") == 0 && n >= 14) {
+        DrawDebris(&s, (Object3D*)PieceNamed(w[6]), atoi(w[7]), atoi(w[8]), atoi(w[9]), atoi(w[10]),
+                   (short)atoi(w[11]), (short)atoi(w[12]), (short)atoi(w[13]));
+    } else if (strcmp(kind, "shard") == 0 && n >= 21) {
+        DrawShard(&s, w + 6);
     } else if (strcmp(kind, "terrain") == 0 && n >= 9) {
         char map[200];
         Unescape(w[6], map, sizeof map);

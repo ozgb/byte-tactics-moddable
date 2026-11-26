@@ -1,6 +1,6 @@
 bt-digest 10
 trace_format bt-trace 10
-commit 9a72a58db6bf583f66bda0b10ce46d8d6f107137
+commit 31b4afc015a540f2fd8e3ee0f2096f3ae88e7353
 scenario reference/scenarios/skirmish4-long.txt
 game_seed 2
 crt_seed 2

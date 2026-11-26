@@ -1,5 +1,5 @@
 bt-display-digest 1
-log bt-display 1.1
+log bt-display 1.2
 1 0 1 fa6341a9644554aa 9c37ff1d1c42608a
 2 0 6 4281f809842043e1 1d9a06723a4a791e
 3 0 4 3976862d1e199a9a c908b43d07e1e47d

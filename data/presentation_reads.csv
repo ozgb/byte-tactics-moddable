@@ -385,7 +385,7 @@ g_emptyText,presentation,unknown,,all-players,1
 g_explodedPieces,presentation,every-frame,,per-player-filter,93
 g_lastPlaceHeight,presentation,unknown,,all-players,1
 g_lastPlaceMetalSum,map,unknown,,all-players,1
-g_missionOrderTableVec,harness,ui-action,,all-players,5
+g_missionOrderTableVec,harness,unknown,,all-players,5
 g_missionOrderTableVec,orders,ui-action,,all-players,8
 g_missionOrderTableVec,presentation,ui-action,,all-players,5
 g_missionOrderTableVec@src/orders/order_list.cpp,presentation,ui-action,,all-players,0

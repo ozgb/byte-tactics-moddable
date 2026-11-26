@@ -122,7 +122,7 @@ ai,seams,shared_write,AiSeam::UpdatePlayerAI,1
 ai,seams,shared_write,AiSeam::UpdateSquads,1
 ai,seams,shared_write,Point16::x,3
 ai,seams,shared_write,Point16::y,3
-ai,seams,shared_write,Ref<Unit>::offset,10
+ai,seams,shared_write,Ref<Unit>::offset,9
 ai,seams,shared_write,Vec3::x,1
 ai,seams,shared_write,Vec3::y,1
 ai,seams,shared_write,Vec3::z,1
@@ -260,7 +260,7 @@ economy,seams,shared_write,EconomyShare::metal,1
 economy,seams,shared_write,EconomyShare::resources,1
 economy,seams,shared_write,EconomyShare::to,1
 economy,seams,shared_write,PlayerInfo::shareMetal,1
-economy,seams,shared_write,Ref<Unit>::offset,10
+economy,seams,shared_write,Ref<Unit>::offset,9
 economy,targeting,shared_write,Ref<Unit>::offset,2
 economy,units,shared_write,Ref<Unit>::offset,2
 economy,weapons,shared_write,Player::energy,1
@@ -445,7 +445,7 @@ features,seams,shared_write,FeaturesPassMaps::x,1
 features,seams,shared_write,FeaturesPassMaps::z,1
 features,seams,shared_write,Point16::x,3
 features,seams,shared_write,Point16::y,3
-features,seams,shared_write,Ref<Unit>::offset,10
+features,seams,shared_write,Ref<Unit>::offset,9
 features,seams,shared_write,Vec3::x,1
 features,seams,shared_write,Vec3::y,1
 features,seams,shared_write,Vec3::z,1
@@ -676,8 +676,6 @@ game,harness,shared_write,Game::playerIndex,1
 game,harness,shared_write,Game::ticks,3
 game,harness,shared_write,Game::uiOptionFlags,1
 game,harness,shared_write,LoadingFlags::value,1
-game,harness,shared_write,OrdersEventHeader::kind,1
-game,harness,shared_write,OrdersEventHeader::unit,1
 game,harness,shared_write,Player::allied,1
 game,harness,shared_write,PlayerInfo::color,1
 game,harness,shared_write,PlayersEventHeader::kind,1
@@ -898,7 +896,7 @@ game,platform,call,GameAllocIgnoreTag,4
 game,platform,call,GameFreeThunk,13
 game,platform,call,GetMilliseconds,2
 game,platform,call,GetTickRate,1
-game,platform,call,GetTicks,10
+game,platform,call,GetTicks,9
 game,platform,call,GetWindowsUserName,1
 game,platform,call,HarnessTestMode,3
 game,platform,call,InitDebugSupport,1
@@ -1444,7 +1442,7 @@ game,seams,shared_write,OrdersAttachToPiece::target,1
 game,seams,shared_write,OrdersBuildDecay::ticks,1
 game,seams,shared_write,OrdersBusy::until,1
 game,seams,shared_write,OrdersClearNetDirty::mask,1
-game,seams,shared_write,OrdersEventHeader::unit,21
+game,seams,shared_write,OrdersEventHeader::unit,20
 game,seams,shared_write,OrdersFinishConstruction::builder,1
 game,seams,shared_write,OrdersQueueBuild::count,1
 game,seams,shared_write,OrdersQueueBuild::h,1
@@ -1612,7 +1610,6 @@ harness,ai,shared_write,MissionSeam::GetNameSlot,4
 harness,ai,shared_write,Player::energyCapacity,1
 harness,ai,shared_write,Player::metalCapacity,1
 harness,ai,shared_write,Player::type,8
-harness,ai,shared_write,Ref<Unit>::offset,3
 harness,ai,shared_write,Seams::economy,1
 harness,ai,shared_write,Seams::los_radar,3
 harness,ai,shared_write,Seams::mission,7
@@ -1646,7 +1643,6 @@ harness,economy,shared_write,Player::shareEnergy,2
 harness,economy,shared_write,Player::shareMetal,2
 harness,economy,shared_write,Player::type,2
 harness,economy,shared_write,PlayerInfo::shareMetal,1
-harness,economy,shared_write,Ref<Unit>::offset,1
 harness,economy,shared_write,Seams::network,3
 harness,features,shared_write,Game::playerIndex,1
 harness,features,shared_write,LosRadarSeam::GetMapCell,12
@@ -1657,7 +1653,6 @@ harness,features,shared_write,NetworkSeam::SendFeatureBurning,1
 harness,features,shared_write,NetworkSeam::SendFeatureHit,1
 harness,features,shared_write,NetworkSeam::SendFeatureKilled,1
 harness,features,shared_write,NetworkSeam::SendFeatureReclaimed,1
-harness,features,shared_write,Ref<Unit>::offset,1
 harness,features,shared_write,ScriptsSeam::ObjectStateSize,1
 harness,features,shared_write,Seams::los_radar,12
 harness,features,shared_write,Seams::map,3
@@ -1758,7 +1753,6 @@ harness,game,shared_write,PlayersSeam::UpdatePlayerBody,1
 harness,game,shared_write,PlayersSeam::UpdatePlayerHead,1
 harness,game,shared_write,PlayersSeam::UpdatePlayerTail,1
 harness,game,shared_write,PlayersSeam::UpdatePlayersFinish,1
-harness,game,shared_write,Ref<Unit>::offset,7
 harness,game,shared_write,ScriptsSeam::RunScripts,1
 harness,game,shared_write,Seams::ai,2
 harness,game,shared_write,Seams::economy,4
@@ -1792,7 +1786,6 @@ harness,los_radar,shared_write,MissionSeam::GetMissionParams,2
 harness,los_radar,shared_write,MissionSeam::GetNameSlot,1
 harness,los_radar,shared_write,NetworkSeam::BroadcastPlayerInfo,3
 harness,los_radar,shared_write,Player::type,2
-harness,los_radar,shared_write,Ref<Unit>::offset,2
 harness,los_radar,shared_write,Seams::features,2
 harness,los_radar,shared_write,Seams::los_radar,2
 harness,los_radar,shared_write,Seams::map,3
@@ -1804,7 +1797,6 @@ harness,map,shared_write,Game::playerIndex,1
 harness,map,shared_write,LosRadarSeam::GetMapCell,1
 harness,map,shared_write,LosRadarSeam::GetMapCellAtPosition,1
 harness,map,shared_write,Player::type,2
-harness,map,shared_write,Ref<Unit>::offset,2
 harness,map,shared_write,Seams::features,1
 harness,map,shared_write,Seams::los_radar,2
 harness,map,shared_write,g_quirks,1
@@ -1817,7 +1809,6 @@ harness,movement,indirect,MovementWriteState,1
 harness,movement,shared_write,MapSeam::GetGroundHeight,1
 harness,movement,shared_write,PathfindingSeam::Cancel,2
 harness,movement,shared_write,PathfindingSeam::Submit,1
-harness,movement,shared_write,Ref<Unit>::offset,3
 harness,movement,shared_write,ScriptsSeam::GetPieceAngles,1
 harness,movement,shared_write,ScriptsSeam::GetPiecePosition,2
 harness,movement,shared_write,Seams::map,1
@@ -1871,7 +1862,6 @@ harness,orders,shared_write,NetworkSeam::SendScriptCallByName,1
 harness,orders,shared_write,Player::energyCapacity,2
 harness,orders,shared_write,Player::metalCapacity,2
 harness,orders,shared_write,Player::type,3
-harness,orders,shared_write,Ref<Unit>::offset,1
 harness,orders,shared_write,ScriptsSeam::FindScript,3
 harness,orders,shared_write,ScriptsSeam::GetNanoPiecePosition,15
 harness,orders,shared_write,ScriptsSeam::GetPieceOffset,1
@@ -1980,7 +1970,6 @@ harness,players,shared_write,Player::shareMetal,1
 harness,players,shared_write,Player::type,14
 harness,players,shared_write,PlayerInfo::energy,2
 harness,players,shared_write,PlayerInfo::metal,2
-harness,players,shared_write,Ref<Unit>::offset,1
 harness,players,shared_write,Seams::ai,5
 harness,players,shared_write,Seams::features,1
 harness,players,shared_write,Seams::los_radar,3
@@ -2016,7 +2005,6 @@ harness,presentation,shared_write,Player::shareMetal,1
 harness,presentation,shared_write,Player::type,43
 harness,presentation,shared_write,PlayerInfo::energy,1
 harness,presentation,shared_write,PlayerInfo::metal,1
-harness,presentation,shared_write,Ref<Unit>::offset,3
 harness,presentation,shared_write,Seams::economy,1
 harness,presentation,shared_write,Seams::los_radar,1
 harness,presentation,shared_write,Seams::mission,50
@@ -2027,7 +2015,6 @@ harness,presentation,shared_write,g_quirks,1
 harness,scripts,shared_write,Game::playerIndex,1
 harness,scripts,shared_write,LosRadarSeam::IsUnitVisibleToPlayer,1
 harness,scripts,shared_write,MapSeam::GetGroundHeight,1
-harness,scripts,shared_write,Ref<Unit>::offset,1
 harness,scripts,shared_write,Seams::los_radar,1
 harness,scripts,shared_write,Seams::map,1
 harness,scripts,shared_write,g_quirks,1
@@ -2152,7 +2139,6 @@ harness,seams,shared_write,PlayersSeam::UpdatePlayerBody,1
 harness,seams,shared_write,PlayersSeam::UpdatePlayerHead,1
 harness,seams,shared_write,PlayersSeam::UpdatePlayerTail,1
 harness,seams,shared_write,PlayersSeam::UpdatePlayersFinish,1
-harness,seams,shared_write,Ref<Unit>::offset,10
 harness,seams,shared_write,ScriptsSeam::Apply,2
 harness,seams,shared_write,ScriptsSeam::CreateObjectState,1
 harness,seams,shared_write,ScriptsSeam::CreatePlayerObjectState,1
@@ -2217,7 +2203,6 @@ harness,seams,shared_write,WindMeteorsSeam::Apply,2
 harness,targeting,shared_write,LosRadarSeam::GetVisibleEnemiesInRadius,1
 harness,targeting,shared_write,MapSeam::GetGroundHeight,1
 harness,targeting,shared_write,Player::type,1
-harness,targeting,shared_write,Ref<Unit>::offset,2
 harness,targeting,shared_write,ScriptsSeam::GetSweetSpot,1
 harness,targeting,shared_write,Seams::los_radar,1
 harness,targeting,shared_write,Seams::map,1
@@ -2241,7 +2226,6 @@ harness,units,shared_write,NetworkSeam::SendOwnershipTransfer,1
 harness,units,shared_write,NetworkSeam::SendUnitKilled,1
 harness,units,shared_write,OrdersSeam::GetOrderFlags,1
 harness,units,shared_write,Player::type,6
-harness,units,shared_write,Ref<Unit>::offset,2
 harness,units,shared_write,ScriptsSeam::CreateObjectState,1
 harness,units,shared_write,ScriptsSeam::CreatePlayerObjectState,1
 harness,units,shared_write,ScriptsSeam::FreeObjectState,1
@@ -2276,7 +2260,6 @@ harness,weapons,shared_write,NetworkSeam::SendUnitDamage,1
 harness,weapons,shared_write,NetworkSeam::SendWeaponFire,5
 harness,weapons,shared_write,NetworkSeam::SendWeaponFireAt,2
 harness,weapons,shared_write,Player::type,4
-harness,weapons,shared_write,Ref<Unit>::offset,1
 harness,weapons,shared_write,ScriptsSeam::GetAimFromPosition,4
 harness,weapons,shared_write,ScriptsSeam::GetPieceOffset,1
 harness,weapons,shared_write,ScriptsSeam::GetPiecePosition,1
@@ -2486,7 +2469,7 @@ los_radar,seams,indirect,GetNameSlotNative,1
 los_radar,seams,shared_write,Game::visibilityMask,1
 los_radar,seams,shared_write,Point16::x,3
 los_radar,seams,shared_write,Point16::y,3
-los_radar,seams,shared_write,Ref<Unit>::offset,10
+los_radar,seams,shared_write,Ref<Unit>::offset,9
 los_radar,seams,shared_write,Unit::flags,1
 los_radar,seams,shared_write,Vec3::x,1
 los_radar,seams,shared_write,Vec3::y,1
@@ -2673,7 +2656,7 @@ map,scripts,shared_write,Vec3::z,7
 map,seams,shared_write,Cell::metal,1
 map,seams,shared_write,Point16::x,3
 map,seams,shared_write,Point16::y,3
-map,seams,shared_write,Ref<Unit>::offset,10
+map,seams,shared_write,Ref<Unit>::offset,9
 map,seams,shared_write,Unit::flags,1
 map,seams,shared_write,Vec3::x,1
 map,seams,shared_write,Vec3::y,1
@@ -2991,7 +2974,7 @@ movement,seams,shared_write,PathPoint::x,1
 movement,seams,shared_write,PathPoint::y,1
 movement,seams,shared_write,Point16::x,3
 movement,seams,shared_write,Point16::y,3
-movement,seams,shared_write,Ref<Unit>::offset,10
+movement,seams,shared_write,Ref<Unit>::offset,9
 movement,seams,shared_write,Unit::motion,3
 movement,seams,shared_write,Vec3::x,1
 movement,seams,shared_write,Vec3::y,1
@@ -3587,7 +3570,7 @@ orders,seams,indirect,GetWeaponRangeNative,2
 orders,seams,indirect,QueryScriptNative,3
 orders,seams,shared_write,Point16::x,3
 orders,seams,shared_write,Point16::y,3
-orders,seams,shared_write,Ref<Unit>::offset,10
+orders,seams,shared_write,Ref<Unit>::offset,9
 orders,seams,shared_write,Vec3::x,1
 orders,seams,shared_write,Vec3::y,1
 orders,seams,shared_write,Vec3::z,1
@@ -4393,7 +4376,7 @@ players,seams,shared_write,Player::unitsCreated,1
 players,seams,shared_write,PlayerInfo::kind,1
 players,seams,shared_write,Point16::x,3
 players,seams,shared_write,Point16::y,3
-players,seams,shared_write,Ref<Unit>::offset,10
+players,seams,shared_write,Ref<Unit>::offset,9
 players,seams,shared_write,Vec3::x,1
 players,seams,shared_write,Vec3::y,1
 players,seams,shared_write,Vec3::z,1
@@ -4634,10 +4617,7 @@ presentation,harness,call,HarnessFrameDrawn,1
 presentation,harness,call,HarnessSimEventOtherThread,1
 presentation,harness,call,HarnessSimEventPhase,1
 presentation,harness,call,HarnessSoundEvent,6
-presentation,harness,call,HarnessUiCancel,1
-presentation,harness,call,HarnessUiCommand,1
 presentation,harness,call,HarnessUiGroup,2
-presentation,harness,call,HarnessUiQueue,1
 presentation,harness,call,HarnessViewRand,19
 presentation,harness,call,ReplayImport::Answered,2
 presentation,harness,call,ReplayImport::AnsweredInt,1
@@ -4660,8 +4640,6 @@ presentation,harness,shared_write,Game::uiOptionFlags,1
 presentation,harness,shared_write,MissionType::index,1
 presentation,harness,shared_write,Object3do::child,2
 presentation,harness,shared_write,Object3do::sibling,2
-presentation,harness,shared_write,OrdersEventHeader::kind,1
-presentation,harness,shared_write,OrdersEventHeader::unit,1
 presentation,harness,shared_write,Player::allied,1
 presentation,harness,shared_write,Player::alliedBy,1
 presentation,harness,shared_write,PlayerInfo::color,1
@@ -5094,7 +5072,7 @@ presentation,seams,indirect,SelectSchemaNative,1
 presentation,seams,shared_write,Game::difficulty,1
 presentation,seams,shared_write,Game::netGameFlags,1
 presentation,seams,shared_write,Game::numPlayers,1
-presentation,seams,shared_write,OrdersEventHeader::unit,21
+presentation,seams,shared_write,OrdersEventHeader::unit,20
 presentation,seams,shared_write,Player::active,2
 presentation,seams,shared_write,Player::allied,1
 presentation,seams,shared_write,Player::index,2
@@ -5269,7 +5247,7 @@ scripts,presentation,shared_write,Vec3::x,43
 scripts,presentation,shared_write,Vec3::y,43
 scripts,presentation,shared_write,Vec3::z,42
 scripts,seams,call,ScheduleMapCanPlaceUnitFootprint,1
-scripts,seams,shared_write,Ref<Unit>::offset,10
+scripts,seams,shared_write,Ref<Unit>::offset,9
 scripts,seams,shared_write,Unit::script,2
 scripts,seams,shared_write,Vec3::x,1
 scripts,seams,shared_write,Vec3::y,1
@@ -5535,7 +5513,6 @@ seams,harness,call,HarnessPlayersEvent,1
 seams,harness,call,HarnessScriptsEvent,1
 seams,harness,call,HarnessSharing,1
 seams,harness,call,HarnessTargetingEvent,1
-seams,harness,call,HarnessUiOrder,1
 seams,harness,call,HarnessUnitsEvent,1
 seams,harness,call,HarnessWeaponsEvent,1
 seams,harness,call,HarnessWindMeteorsEvent,1
@@ -5640,7 +5617,6 @@ seams,harness,shared_write,NetworkSeam::SendUnitKilled,2
 seams,harness,shared_write,NetworkSeam::SendUnitStates,2
 seams,harness,shared_write,NetworkSeam::SendWeaponFire,2
 seams,harness,shared_write,NetworkSeam::SendWeaponFireAt,2
-seams,harness,shared_write,OrdersEventHeader::unit,1
 seams,harness,shared_write,OrdersSeam::Apply,2
 seams,harness,shared_write,OrdersSeam::GetOrderFlags,2
 seams,harness,shared_write,OrdersSeam::RunOrders,2
@@ -6216,7 +6192,7 @@ targeting,seams,call,UnitQueryBuffer::Grow,1
 targeting,seams,call,UnitQueryBuffer::Written,1
 targeting,seams,indirect,GetSweetSpotNative,1
 targeting,seams,indirect,GetWeaponRangeNative,1
-targeting,seams,shared_write,Ref<Unit>::offset,10
+targeting,seams,shared_write,Ref<Unit>::offset,9
 targeting,seams,shared_write,TargetingEventHeader::unit,1
 targeting,seams,shared_write,TargetingEventHeader::weapon,1
 targeting,seams,shared_write,Vec3::x,1
@@ -6875,7 +6851,7 @@ units,seams,shared_write,Player::unitCount,1
 units,seams,shared_write,Player::unitsCreated,1
 units,seams,shared_write,Point16::x,3
 units,seams,shared_write,Point16::y,3
-units,seams,shared_write,Ref<Unit>::offset,10
+units,seams,shared_write,Ref<Unit>::offset,9
 units,seams,shared_write,Unit::activateFlags,1
 units,seams,shared_write,Unit::buildLeft,1
 units,seams,shared_write,Unit::cloakOn,1
@@ -7206,7 +7182,7 @@ weapons,seams,indirect,GetMissionParamsNative,4
 weapons,seams,indirect,GetPieceOffsetNative,1
 weapons,seams,indirect,GetPiecePositionNative,1
 weapons,seams,indirect,QueryScriptNative,1
-weapons,seams,shared_write,Ref<Unit>::offset,10
+weapons,seams,shared_write,Ref<Unit>::offset,9
 weapons,seams,shared_write,Vec3::x,1
 weapons,seams,shared_write,Vec3::y,1
 weapons,seams,shared_write,Vec3::z,1

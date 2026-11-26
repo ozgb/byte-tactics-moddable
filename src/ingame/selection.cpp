@@ -562,7 +562,6 @@ void __stdcall SendGroupCommand(OrdersGroupCommand* command)
             FatalError("a selection has more units than a group command holds");
         command->units[i >> 5] |= 1u << (i & 31);
     }
-    HarnessUiCommand(command);
     SchedPublish(SCHED_ENGINE, command, sizeof(*command));
 }
 

@@ -2,11 +2,13 @@
 
 A test-mode run of the game can be fed raw input (key presses, characters and mouse
 events) by tick, and writes `ui.txt` beside `trace.txt`. The log lists the input it
-delivered, every group command, order and queued build the game's own interface turned that input
-into, the control groups it made and recalled, and the selection and camera after
-each tick. Two builds conform when the same input gives the same log, so a
-re-implementation of the interface is judged on its behaviour alone: nothing in the log depends on
-the window, the host or the platform.
+delivered, the control groups the game's own interface made and recalled, and the selection and
+camera after each tick: the interface's own state. What the interface sent to the simulation is
+not in it: every command it sends is a record of the command log, `commands.txt`
+(`docs/commands.md`, section 2), in the format of a scripted command. Two builds conform when the
+same input gives the same log and the same commands, so a re-implementation of the interface is
+judged on its behaviour alone: nothing in either depends on the window, the host or the
+platform.
 
 ## Scripted input
 
@@ -56,15 +58,18 @@ digit `0` to `9`. A window position is in the 640 by 480 window, `x` from 0 to 6
   gadget at `(gx, gy)` of size `(gw, gh)` in the panel's own layout is at
   `(gx, gy + 128)` on the screen. The build menu of a commander puts its first button
   (the first building) at gadget (0, 27, 64, 64) and the next at (64, 27, 64, 64).
-- **A click or a box.** The game takes a press and release within about a second and less than
-  32 world units apart for a click, and anything else for a box, judging the time by the
-  clock. A scenario releases a button on the tick after its press (a click), or moves the
-  mouse at least 32 pixels from the press position while the button is down (a box); the
-  scenario loader rejects anything between.
+- **A click or a box.** The time of a mouse event is its tick. A left press at tick `p` and its
+  release at tick `r` are a click when `r - p` is under 25 (ticks of 30 a second) and the
+  ground under the cursor in the frame before the release is less than 32 world units from the
+  ground under the press on each axis, and a box otherwise. 3.1c judges the time by the clock
+  instead, so there a hold of 2 to 24 ticks is a click or a box depending on how fast the frames
+  ran. A scenario therefore releases a button on the tick after its press (a click), or moves
+  the mouse at least 32 pixels from the press position while the button is down (a box), and
+  the scenario loader rejects anything between.
 
 ## Format
 
-The first line is `bt-ui 1`, the format version. Every other line is one record:
+The first line is `bt-ui 2`, the format version. Every other line is one record:
 
     <tick> <kind> <fields>
 
@@ -86,35 +91,23 @@ interface did with the input.
 | `scroll` | `<x> <z>` | The camera scroll, at tick 1 and at the end of any tick where it differs from the last `scroll` line. Every scenario logs it (see below). |
 | `view` | `<draws>` | The number of draws made so far from the view random stream, counted from the start of the run, at the end of any tick where it differs from the last `view` line. A draw made between two steps counts into the next tick. See below. |
 | `select` | `<units>` | The local player's selected units, at tick 1 and at the end of any tick where the selection differs from the last `select` line. The selection is view state, which no trace row hashes: this record is what a presentation is judged on. |
-| `command` | `order mode <M> kind <KIND or -> units <units> target <T or -> pos <x> <y> <z> or - param <N> amount <A> remove <0 or 1>`, or `build type <TYPE> units <units> pos <x> <y> <z> remove <0 or 1>` | One click that orders the selection, as the one group command it sends. See below. |
-| `order` | `<KIND> unit <U> target <T or -> pos <x> <y> <z> or - type <NAME or -> param <N or -> amount <A> remove <0 or 1>` | One order given to one unit. See below. |
-| `qbuild` | `<U> <TYPE> <count>` | A click in a factory's build menu changed the build queue of unit `U` by `count` (1 or 5, negative for a right click) of the unit type, or missile, named `TYPE` by the button. |
-| `cancel` | `<KIND> unit <U>` | The interface cancelled a queued order of kind `KIND` of unit `U` (the self-destruct toggle). |
 | `group` | `<n> <units>` | Control group `n` was made: the units now in it. |
 | `groupsel` | `<n> <units>` | Control group `n` was recalled: the units in it before the selection changed. |
 
-The `command` record is the click before any unit gets an order: one line for each
-order the interface gives the selection, before that order's `order` lines. `order` is
-an order click: `mode` is the cursor's order mode (0 when the order type is given
-directly), and `kind` is the order type's name when `mode` is 0 and `-` otherwise.
-`build` is a build site placed for the selected builders, with `TYPE` the unit type. `units`
-are the selected units of the local player, every one of them whether or not it takes
-the order (`-` for none); `target` is the unit under the cursor or `-`; `param` and
-`amount` are the order's number and count as the interface passed them. The orders
-module's expansion of the command gives the `order` lines that follow it.
+Format 1 also had `command`, `order`, `qbuild` and `cancel` records, for what the interface
+sent. Format 2 leaves them to `commands.txt`:
 
-The `order` record has one line for each unit that gets the order, after the game has
-spread a position over a group of selected units. `KIND` is the game's name of the
-order. `target` is the unit under the cursor, or `-`. `pos` is the world position
-`x y z` (`y` is the height) or `-` for an order with none. `type` is the unit type the
-order builds, for the building orders, otherwise `-`; `param` is the order's number
-(the standing-order state, 0 to 2, for the standing orders) and `-` for the building
-orders. `amount` is the order's count. `remove` is 1 when the player held Shift: the
-order joins the queue instead of replacing it, and repeating a queued order cancels it.
+- **The commands.** Every event the interface publishes (the group command of an order click,
+  the build site of a builder, the build menu's queue changes, the self-destruct toggle's
+  cancels) is a record of `commands.txt` with the key `interface`, and what is judged is its
+  decoded form (`docs/commands.md`, section 2).
+- **The orders of each unit.** The orders module expands a group command into one COMMAND
+  event for each unit that takes the order. Each is a record of the orders events section of a
+  dump (`docs/trace-format.md`, section 8.32), and the orders it gives are part of every unit's
+  state, which the trace rows hash.
 
-Commands and orders the scenario's own `order` lines give are not in the log, being the
-scenario's and not the interface's; a command a `console` line types (the chat line)
-is, with its orders.
+Commands the scenario's own `order` and `console` lines give are records of `commands.txt`
+too, under their own keys, and are not the interface's.
 
 ## What the check compares
 
@@ -125,9 +118,9 @@ with its number and both texts; a log that is longer or shorter than the other d
 the first line only one of them has.
 
 A scenario with no stored log is not compared, and is counted in the summary, except a
-scenario whose name starts with `ui-`: it must have one, and its log must show that the
-input did something, with at least one `order`, `qbuild`, `cancel`, `group` or
-`groupsel` record or a `select` record with units. Input that gives no order and selects
+scenario whose name starts with `ui-`: it must have one, and the run must show that the
+input did something, with at least one `group` or `groupsel` record, a `select` record with
+units, or a command of the interface in `commands.txt`. Input that sends no command and selects
 nothing is a broken scenario, not a pass. A stored log with no scenario is a failure.
 
 ## The scroll snapshot

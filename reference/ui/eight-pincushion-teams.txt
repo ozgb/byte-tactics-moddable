@@ -1,4 +1,4 @@
-bt-ui 1
+bt-ui 2
 1 scroll 672 2944
 1 view 337
 1 select -

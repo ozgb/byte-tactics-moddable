@@ -9,6 +9,7 @@ import io
 import json
 import os
 import re
+import struct
 import subprocess
 import sys
 import tempfile
@@ -20,6 +21,7 @@ from unittest import mock
 
 import displaylog
 import eventdigest
+import interfacelog
 import reference
 import tracediff
 import tracerehash
@@ -306,7 +308,7 @@ class DisplayLogTest(unittest.TestCase):
 
 
 class UiLogTest(unittest.TestCase):
-    LOG = "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n22 select 1\n"
+    LOG = "bt-ui 2\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n22 select 1\n"
 
     def report(self, files: dict[str, str], scenarios: list[str], logs: dict[str, str | None], known: set[str] | None = None):
         with tempfile.TemporaryDirectory() as tmp:
@@ -325,15 +327,15 @@ class UiLogTest(unittest.TestCase):
         self.assertEqual(reference.ui_difference(self.LOG, got), "ui line 5: stored `22 select 1`, got `22 select 2`")
 
     def test_a_longer_log_differs_at_the_extra_line(self):
-        self.assertIn("ui line 6: only the got log has it", reference.ui_difference(self.LOG, self.LOG + "23 order Stop unit 1\n"))
-        self.assertIn("ui line 5: only the stored log has it", reference.ui_difference(self.LOG, "bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
+        self.assertIn("ui line 6: only the got log has it", reference.ui_difference(self.LOG, self.LOG + "23 group 1 2,3\n"))
+        self.assertIn("ui line 5: only the stored log has it", reference.ui_difference(self.LOG, "bt-ui 2\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
 
     def test_a_log_that_orders_or_selects_nothing_gives_nothing(self):
-        self.assertTrue(reference.ui_gives_nothing("bt-ui 1\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
+        self.assertTrue(reference.ui_gives_nothing("bt-ui 2\n1 scroll 304 32\n1 select -\n20 input mouse left down 384 240\n"))
         self.assertFalse(reference.ui_gives_nothing(self.LOG))
-        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 order Stop unit 1 target - pos - type - param 0 amount 0 remove 0\n"))
-        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 qbuild 2 ARMPW 1\n"))
-        self.assertFalse(reference.ui_gives_nothing("bt-ui 1\n21 group 1 2,3\n"))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 2\n21 group 1 2,3\n"))
+        self.assertFalse(reference.ui_gives_nothing("bt-ui 2\n1 select -\n", "bt-interface 1\n23 ORDERS_CANCEL unit 1 type 38\n"))
+        self.assertTrue(reference.ui_gives_nothing("bt-ui 2\n1 select -\n", "bt-interface 1\n"))
 
     def test_report_counts_unstored_logs_and_fails_on_stored_ones(self):
         differing, lines = self.report({"same": self.LOG, "other": self.LOG}, ["same", "other", "none"],
@@ -351,10 +353,10 @@ class UiLogTest(unittest.TestCase):
         self.assertIn("has no stored UI log", lines[0])
 
     def test_a_ui_scenario_whose_input_gives_nothing_fails_though_equal(self):
-        log = "bt-ui 1\n1 select -\n20 input mouse left down 384 240\n"
+        log = "bt-ui 2\n1 select -\n20 input mouse left down 384 240\n"
         differing, lines = self.report({"ui-click": log}, ["ui-click"], {"ui-click": log})
         self.assertEqual(differing, ["ui-click"])
-        self.assertIn("the input gives no order and selects no unit", lines[0])
+        self.assertIn("the input gives no command and selects no unit", lines[0])
         self.assertEqual(self.report({"other": log}, ["other"], {"other": log})[0], [])
 
     def test_a_stored_log_with_no_scenario_fails(self):
@@ -365,6 +367,139 @@ class UiLogTest(unittest.TestCase):
     def test_a_subset_does_not_flag_logs_of_scenarios_left_out(self):
         differing, _ = self.report({"a": self.LOG, "b": self.LOG}, ["a"], {"a": self.LOG}, {"a", "b"})
         self.assertEqual(differing, [])
+
+    def test_a_ui_scenario_whose_only_effect_is_an_interface_command_passes(self):
+        log = "bt-ui 2\n1 select -\n20 input mouse left down 384 240\n"
+        interface = "bt-interface 1\n23 ORDERS_CANCEL unit 1 type 38\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "ui"
+            directory.mkdir()
+            (directory / "ui-click.txt").write_text(log)
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                differing, _ = reference.ui_report({"ui-click": Path("ui-click")}, {"ui-click": log}, directory, {"ui-click"},
+                                                   {"ui-click": interface})
+        self.assertEqual(differing, [])
+
+
+class InterfaceLogTest(unittest.TestCase):
+    SCHEMA = json.loads((Path(__file__).resolve().parent.parent / "data/trace_schema.json").read_text())
+    OFFSET, STRIDE = 3315576, 280
+    UNIT_1 = OFFSET + STRIDE
+    UNIT_252 = OFFSET + 252 * STRIDE
+
+    def group(self, target: int = 0, unit: int = UNIT_1) -> str:
+        units = struct.pack("<16I", 1, *([0] * 15))
+        payload = struct.pack("<7I", 297, unit, 3, 0, 0, target, 1) + struct.pack("<3i", 0x2860000, 0x10000, 0x1360000)
+        return (payload + bytes(8) + units).hex()
+
+    def commands(self, *lines: str) -> str:
+        return "\n".join(["bt-commands 2", f"units {self.OFFSET} {self.STRIDE}", *lines]) + "\n"
+
+    def test_group_command_without_a_target(self):
+        text = self.commands(f"23 interface - 1 ORDERS_GROUP_COMMAND {self.group()}")
+        lines = interfacelog.decode(text, self.SCHEMA).splitlines()
+        self.assertEqual(lines[0], "bt-interface 1")
+        self.assertEqual(lines[1], "23 ORDERS_GROUP_COMMAND unit 1 mode 3 type 0 queue 0 target - hasPos 1 pos "
+                         "000086020000010000003601 params 0000000000000000 units 01000000" + "00" * 60)
+
+    def test_group_command_with_a_target_unit(self):
+        text = self.commands(f"23 interface - 1 ORDERS_GROUP_COMMAND {self.group(self.UNIT_252)}")
+        self.assertIn(" target 252 ", interfacelog.decode(text, self.SCHEMA))
+
+    def test_refs_that_are_no_unit_decode_as_heap(self):
+        for value in (self.OFFSET - 4, self.OFFSET + 5, self.OFFSET + 65536 * self.STRIDE):
+            text = self.commands(f"23 interface - 1 ORDERS_GROUP_COMMAND {self.group(value)}")
+            self.assertIn(" target heap ", interfacelog.decode(text, self.SCHEMA))
+
+    def test_without_a_units_line_every_ref_is_heap(self):
+        text = f"bt-commands 2\n23 interface - 1 ORDERS_GROUP_COMMAND {self.group()}\n"
+        self.assertIn("unit heap mode 3", interfacelog.decode(text, self.SCHEMA))
+
+    def test_queue_build_and_cancel(self):
+        name = b"ARMPW".ljust(32, b"\0")
+        build = struct.pack("<3I", 289, self.UNIT_1, 2) + name
+        cancel = struct.pack("<3I", 296, self.UNIT_1, 38)
+        text = self.commands(f"30 interface - 1 ORDERS_QUEUE_BUILD {build.hex()}", f"31 interface - 1 ORDERS_CANCEL {cancel.hex()}")
+        self.assertEqual(interfacelog.decode(text, self.SCHEMA).splitlines()[1:],
+                         [f"30 ORDERS_QUEUE_BUILD unit 1 count 2 name {name.hex()}", "31 ORDERS_CANCEL unit 1 type 38"])
+
+    def test_unknown_kind_keeps_its_payload(self):
+        text = self.commands("9 interface - 1 KIND_448 c0010000aabb")
+        self.assertEqual(interfacelog.decode(text, self.SCHEMA), "bt-interface 1\n9 KIND_448 payload c0010000aabb\n")
+
+    def test_scripted_lines_are_ignored(self):
+        text = self.commands("1 spawn 12 1 UNITS_CREATE 8b010000", "2 order 14 1", "3 console 15 1")
+        self.assertEqual(interfacelog.decode(text, self.SCHEMA), "bt-interface 1\n")
+
+    def test_bad_input_raises(self):
+        with self.assertRaises(ValueError):
+            interfacelog.decode("bt-commands 1\n", self.SCHEMA)
+        with self.assertRaises(ValueError):
+            interfacelog.decode("", self.SCHEMA)
+        with self.assertRaises(ValueError):
+            interfacelog.decode(self.commands("23 interface - 1 ORDERS_CANCEL zz"), self.SCHEMA)
+        with self.assertRaises(ValueError):
+            interfacelog.decode(self.commands("23 interface"), self.SCHEMA)
+
+    def test_has_input(self):
+        self.assertTrue(interfacelog.has_input("ticks 10\ninput 20 mouse left down 1 2\n"))
+        self.assertFalse(interfacelog.has_input("ticks 10\nspawn 1 ARMCOM\n# input\ninputs\n"))
+
+    def test_a_click_moved_a_pixel_across_a_units_edge_changes_the_command(self):
+        miss = interfacelog.decode(self.commands(f"23 interface - 1 ORDERS_GROUP_COMMAND {self.group()}"), self.SCHEMA)
+        hit = interfacelog.decode(self.commands(f"23 interface - 1 ORDERS_GROUP_COMMAND {self.group(self.UNIT_252)}"), self.SCHEMA)
+        difference = reference.interface_difference(miss, hit)
+        self.assertIn("interface line 2", difference)
+        self.assertIn("target - ", difference)
+        self.assertIn("target 252 ", difference)
+
+    def report(self, files: dict[str, str], scenarios: dict[str, str], logs: dict[str, str | None], known: set[str] | None = None):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "commands"
+            directory.mkdir()
+            for name, text in files.items():
+                (directory / f"{name}.txt").write_text(text)
+            with mock.patch.object(reference, "ROOT", directory.parent):
+                return reference.interface_report({n: Path(n) for n in scenarios}, logs, directory,
+                                                  set(scenarios) if known is None else known, scenarios)
+
+    DECODED = "bt-interface 1\n23 ORDERS_CANCEL unit 1 type 38\n"
+    WITH_INPUT = "ticks 100\ninput 20 mouse left down 1 2\n"
+
+    def test_report_equal(self):
+        differing, lines = self.report({"a": self.DECODED}, {"a": self.WITH_INPUT, "b": "ticks 100\n"},
+                                       {"a": self.DECODED, "b": "bt-interface 1\n"})
+        self.assertEqual(differing, [])
+        self.assertEqual(lines, ["interface commands: 1 of 1 equal, 0 differ"])
+
+    def test_report_names_the_first_differing_line(self):
+        differing, lines = self.report({"a": self.DECODED}, {"a": self.WITH_INPUT}, {"a": self.DECODED.replace("38", "39")})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("DIFF a interface line 2: stored", lines[0])
+
+    def test_report_run_without_commands_file(self):
+        differing, lines = self.report({"a": self.DECODED}, {"a": self.WITH_INPUT}, {"a": None})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("the run wrote no commands.txt", lines[0])
+
+    def test_report_missing_stored_file_for_an_input_scenario(self):
+        differing, lines = self.report({}, {"a": self.WITH_INPUT}, {"a": self.DECODED})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("DIFF a has no stored interface commands in", lines[0])
+
+    def test_report_scenario_without_input_sending_commands(self):
+        differing, lines = self.report({}, {"b": "ticks 100\n"}, {"b": self.DECODED})
+        self.assertEqual(differing, ["b"])
+        self.assertEqual(lines[0], "DIFF b the interface sent commands without input lines: 23 ORDERS_CANCEL unit 1 type 38")
+
+    def test_report_stored_file_for_a_scenario_without_input(self):
+        differing, _ = self.report({"b": "bt-interface 1\n"}, {"b": "ticks 100\n"}, {"b": "bt-interface 1\n"})
+        self.assertEqual(differing, ["b"])
+
+    def test_report_stored_file_with_no_scenario(self):
+        differing, lines = self.report({"a": self.DECODED, "gone": self.DECODED}, {"a": self.WITH_INPUT}, {"a": self.DECODED}, {"a"})
+        self.assertEqual(differing, ["gone"])
+        self.assertIn("DIFF gone stored interface commands have no scenario of that name", lines[0])
 
 
 class FrameTest(unittest.TestCase):
@@ -568,7 +703,8 @@ class CheckRoundtripTest(unittest.TestCase):
                     mock.patch.object(reference.tracedigest, "parse_digest", lambda p: stored), \
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "sound_report", lambda *a: ([], [])), \
-                    mock.patch.object(reference, "ui_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "ui_report", lambda *a, **k: ([], [])), \
+                    mock.patch.object(reference, "interface_report", lambda *a, **k: ([], [])), \
                     mock.patch.object(reference, "events_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "display_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "display_list_report", lambda *a: ([], [])), \
@@ -1586,7 +1722,7 @@ class EndOfTickTest(unittest.TestCase):
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "report_fuel", lambda *a, **k: 0), \
                     mock.patch.multiple(reference, **{n: (lambda *a, **k: ([], [])) for n in
-                                                      ("sound_report", "ui_report", "events_report", "display_report", "display_list_report", "frame_report", "save_report")}), \
+                                                      ("sound_report", "ui_report", "interface_report", "events_report", "display_report", "display_list_report", "frame_report", "save_report")}), \
                     mock.patch.object(reference, "report_divergence", lambda *a: divergences.append(a) or (_ for _ in ()).throw(SystemExit(1))), \
                     contextlib.redirect_stdout(out):
                 try:

@@ -915,7 +915,11 @@ def recheck(found: Found, column: int = DIGEST) -> str | None:
 
 def scenario_frontend(scenario: Path) -> bool:
     """Whether the scenario has a `frontend 1` line, so that the menus set up its match and its setup log is stored."""
-    return any(line.split() == ["frontend", "1"] for line in scenario.read_text().splitlines())
+    values = [line.split()[1:] for line in scenario.read_text().splitlines() if line.split()[:1] == ["frontend"]]
+    for value in values:
+        if value not in (["0"], ["1"]):
+            sys.exit(f"{scenario}: frontend takes 0 or 1, not {' '.join(value) or 'nothing'}")
+    return ["1"] in values
 
 
 def scenario_saves(scenario: Path) -> bool:

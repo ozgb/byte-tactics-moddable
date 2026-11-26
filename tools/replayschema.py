@@ -233,6 +233,16 @@ def mark_event_weapons(ann: dict) -> None:
                     for f in ann["objects"].get(struct, {}).get("fields", []) if ann["objects"].get(struct, {}).get("generated") == "event" else []:
                         if f["name"] == member and f["kind"] == "i32":
                             f["weaponIndex"] = True
+    for spec in ann.get("subsystems", {}).values():
+        for note in spec.get("slots", {}).values():
+            for arg in note.get("args", {}).values():
+                if arg.get("mode") != "event" or not isinstance(arg.get("tables"), dict):
+                    continue
+                for key, kind in arg["tables"].items():
+                    struct, _, member = str(key).partition(".")
+                    for f in ann["objects"].get(struct, {}).get("fields", []) if ann["objects"].get(struct, {}).get("generated") == "event" else []:
+                        if f["name"] == member and f["kind"] == "i32":
+                            f["tableIndex"] = kind
 
 
 def check_event_weapons(where: str, label: str, a: dict) -> list[str]:
@@ -249,6 +259,26 @@ def check_event_weapons(where: str, label: str, a: dict) -> list[str]:
             errors.append("%s: `weapons` of %s names %s, which is no int member of a struct of interfaces/%s.h" % (where, label, key, a["events"]))
         elif weapons.count(key) > 1:
             errors.append("%s: `weapons` of %s names %s twice" % (where, label, key))
+    return errors
+
+
+def check_event_tables(where: str, label: str, a: dict, ann: dict) -> list[str]:
+    """Errors for the `tables` of an event argument: each maps an int member of a struct of the module's interface to a kind with a table, other than the first kind."""
+    tables = a.get("tables", {})
+    if not isinstance(tables, dict):
+        return ["%s: `tables` of %s maps the payload members (`Struct.member`) that hold the index of an element to its kind" % (where, label)]
+    errors = []
+    structs = interface_structs(a["events"])
+    first = next(iter(ann["objects"]))
+    for key, kind in tables.items():
+        struct, _, member = str(key).partition(".")
+        ctype = next((c for c, m, n in structs.get(struct, []) if m == member and n is None), None)
+        if ctype != "int":
+            errors.append("%s: `tables` of %s names %s, which is no int member of a struct of interfaces/%s.h" % (where, label, key, a["events"]))
+        elif "table" not in ann["objects"].get(kind, {}) or kind == first:
+            errors.append("%s: `tables` of %s maps %s to %s, which is no kind with a table (or is the first kind)" % (where, label, key, kind))
+        elif key in a.get("weapons", []):
+            errors.append("%s: `tables` of %s names %s, which `weapons` names too" % (where, label, key))
     return errors
 
 
@@ -1598,6 +1628,7 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
             if table is not None:
                 errors += check_event_extras(where, label, a, table, kinds)
                 errors += check_event_weapons(where, label, a)
+                errors += check_event_tables(where, label, a, ann)
         elif a["mode"] == "effect":
             table = ann.get("events", {}).get(a.get("events"))
             size = a.get("size")
@@ -2138,6 +2169,15 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             }
             if "playsAs" in note:
                 entry["playsAs"] = note["playsAs"]
+            for a in args:
+                if a.get("root") is not None and (a["mode"] != "scalar" or a["type"] not in INTEGER_ARGS or "table" not in ann["objects"].get(a["root"], {})):
+                    errors.append("%s.%s(%s): root %s needs an integer argument and a kind with a table" % (sub, s["name"], a["name"], a["root"]))
+            if "frees" in note:
+                freed = [a for a in args if a["name"] == note["frees"]]
+                if len(freed) != 1 or freed[0]["mode"] != "object":
+                    errors.append("%s.%s: frees names %s, which is no object argument of the slot" % (sub, s["name"], note["frees"]))
+                else:
+                    entry["frees"] = note["frees"]
             if kind_writes:
                 entry["kindWrites"] = kind_writes
             if note.get("by_id") and not skipped:
@@ -2575,6 +2615,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds", "blob") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "RL_%s" % upper(f["load"]) if f["kind"] == "load" else "0")
         if f.get("weaponIndex"):
             target = "ROK_WEAPONDEF"
+        if f.get("tableIndex"):
+            target = kind_id[f["tableIndex"]]
         extra = ", %d" % (f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec")) if f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec") else ""
         when = "{ %d, %d, %s, %du, %d }" % (f["condField"], f.get("condVia", 0), kind_id[f["condKind"]], f.get("condMask", 0xFFFFFFFF), f["condValue"]) if f.get("condField") else "{}"
         L.append('    { "%s", %s, %s, %s, RK_%s, %s, %d, %d, %s, %d, %d%s },' % (
@@ -2902,6 +2944,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
             L.append("    roots.Add(ROK_%s, %s);" % (upper(a["kind"]), ("ReplayRefPtr(a%d)" if a.get("ref") else "a%d") % i))
         elif a["mode"] == "weapon":
             L.append("    roots.Add(ROK_WEAPONDEF, a%d);" % i)
+        elif a["mode"] == "scalar" and a.get("root"):
+            L.append("    roots.Add(ROK_%s, ReplayTableElement(ROK_%s, (unsigned)a%d));" % (upper(a["root"]), upper(a["root"]), i))
         elif a["mode"] == "struct" and a.get("dir") != "out":
             L += struct_roots(a, i, objects, object_fields)
         elif a["mode"] == "event":
@@ -2991,6 +3035,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
                 L.append('        ImportOutInOutScalar(line, "%s", %s);' % (a["line"], arg_var(a, i)))
             elif is_named_out(a):
                 L.append('        ImportOutInOut(line, "%s", ROK_%s, %s);' % (a["line"], upper(a["kind"]), arg_var(a, i)))
+        if "frees" in s:
+            L.append("        ImportFreed(a%d);" % next(i for i, a in enumerate(s["args"]) if a["name"] == s["frees"]))
         L += import_roots(s)
         L.append("    }")
     if nest:

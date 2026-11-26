@@ -74,6 +74,7 @@
 #include "../weapons/debris.h"
 #include "../weapons/explosion_types.h"
 #include "../map/line_of_sight_index.h"
+#include "../units/factory_index.h"
 #include "../scripts/cob_types.h"
 #include "../scripts/unit_script.h"
 #include "../graphics/spot_state.h"
@@ -131,6 +132,8 @@
 #undef g_losTables
 #pragma push_macro("g_losUnitIndex")
 #undef g_losUnitIndex
+#pragma push_macro("g_factoryIndex")
+#undef g_factoryIndex
 #pragma push_macro("g_movementClasses")
 #undef g_movementClasses
 #pragma push_macro("g_passMaps")
@@ -341,6 +344,10 @@ enum ReplayObjectKindId {
     ROK_LITEGOAL,
     ROK_PATHREQUESTREFS,
     ROK_PLAINORDERFX,
+    ROK_FACTORYINDEX,
+    ROK_FACTORYINDEXENTRY,
+    ROK_UNITMODEL,
+    ROK_FEATUREHEAP,
     ROK_WINDMETEORSEVENTHEADER,
     ROK_WINDMETEORSPARAMS,
     ROK_WINDMETEORSLIMITS,
@@ -554,6 +561,7 @@ static const ReplayField kReplayFields[] = {
     { "Game.grid1.count", 82587, 4, RB_GAME, RK_U32 },
     { "Game.grid1.cells", 82575, 4, RB_GAME, RK_ARRAY, 2 },
     { "Game.count_1491b", 84251, 4, RB_GAME, RK_I32 },
+    { "Game.flags_37ebe", 229054, 2, RB_GAME, RK_U16 },
     { "SimGlobals.g_meteorNextStrikeTime", offsetof(SimGlobals, g_meteorNextStrikeTime), 4, RB_SIM, RK_I32 },
     { "SimGlobals.g_meteorWeaponName", offsetof(SimGlobals, g_meteorWeaponName), 32, RB_SIM, RK_STRING },
     { "SimGlobals.g_meteorSpawnMagnitude", offsetof(SimGlobals, g_meteorSpawnMagnitude), 4, RB_SIM, RK_I32 },
@@ -584,12 +592,13 @@ static const ReplayField kReplayFields[] = {
     { "SimGlobals.g_missionOrderTableVec", offsetof(SimGlobals, g_missionOrderTableVec), 16, RB_SIM, RK_VECTOR, 1 },
     { "SimGlobals.g_losTables", offsetof(SimGlobals, g_losTables), 16, RB_SIM, RK_VECTOR, 2 },
     { "SimGlobals.g_losUnitIndex", offsetof(SimGlobals, g_losUnitIndex), 4, RB_SIM, RK_REF, 0, ROK_LOSUNITINDEX },
+    { "SimGlobals.g_factoryIndex", offsetof(SimGlobals, g_factoryIndex), 4, RB_SIM, RK_REF, 0, ROK_FACTORYINDEX },
     { "rng.main", 0, 4, RB_RNG, RK_U32 },
     { "rng.load", 1, 4, RB_RNG, RK_U32 },
     { "rng.seed", 2, 4, RB_RNG, RK_U32 },
     { "region", 4, 4, RB_REGION, RK_ARRAY, 3 },
 };
-static const unsigned kReplayFieldCount = 89;
+static const unsigned kReplayFieldCount = 91;
 
 static const ReplayArraySpec kReplayArrays[] = {
     { 2, 1, 0, { { offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 1 }, { offsetof(Game, height), (unsigned char)sizeof(((Game*)nullptr)->height), 1 } } },
@@ -634,6 +643,8 @@ static const ReplayTableSpec kReplayTables[] = {
     { 0, 0, offsetof(Game, lists), { { 3, 0, 0 }, { 1, 0, 0 } }, 0 },
     { 0, 0, offsetof(Game, sideDefs), { { 5, 0, 0 }, { 1, 0, 0 } }, 0 },
     { 0, 0, offsetof(Game, sources), { { 6, 0, 0 }, { 1, 0, 0 } }, 0 },
+    { 0, 1, offsetof(Game, types), { { offsetof(Game, unitDefCount), (unsigned char)sizeof(((Game*)nullptr)->unitDefCount), 0 }, { 1, 0, 0 } }, 1024 },
+    { 0, 1, offsetof(Game, features), { { offsetof(Game, featureCount), (unsigned char)sizeof(((Game*)nullptr)->featureCount), 0 }, { 1, 0, 0 } }, 2048 },
 };
 
 static_assert(sizeof(((Game*)nullptr)->width) == 1 || sizeof(((Game*)nullptr)->width) == 2 || sizeof(((Game*)nullptr)->width) == 4, "Game::visibilityMask: width is a byte, a short or an int");
@@ -700,6 +711,10 @@ static_assert(sizeof(((Game*)nullptr)->src3) == 1 * sizeof(StringRef), "the tabl
 static_assert(sizeof(((Game*)nullptr)->lists) == 3 * sizeof(StringRef), "the table of GafLists holds 3 elements");
 static_assert(sizeof(((Game*)nullptr)->sideDefs) == 5 * sizeof(SideDef), "the table of SideDef holds 5 elements");
 static_assert(sizeof(((Game*)nullptr)->sources) == 6 * sizeof(StringRef), "the table of GafSources holds 6 elements");
+static_assert(sizeof(((Game*)nullptr)->unitDefCount) == 1 || sizeof(((Game*)nullptr)->unitDefCount) == 2 || sizeof(((Game*)nullptr)->unitDefCount) == 4, "UnitModel: unitDefCount is a byte, a short or an int");
+static_assert(sizeof(((Game*)nullptr)->types) == sizeof(unsigned), "the table of UnitModel is a Ref");
+static_assert(sizeof(((Game*)nullptr)->featureCount) == 1 || sizeof(((Game*)nullptr)->featureCount) == 2 || sizeof(((Game*)nullptr)->featureCount) == 4, "FeatureHeap: featureCount is a byte, a short or an int");
+static_assert(sizeof(((Game*)nullptr)->features) == sizeof(unsigned), "the table of FeatureHeap is a Ref");
 static_assert(sizeof(decltype(((SimGlobals*)nullptr)->g_missionOrderTableVec)) == 16, "SimGlobals.g_missionOrderTableVec is a block vector");
 static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_missionOrderTableVec)::value_type, OrderTableEntry), "SimGlobals.g_missionOrderTableVec holds OrderTableEntry");
 static_assert(sizeof(decltype(((SimGlobals*)nullptr)->g_losTables)) == 16, "SimGlobals.g_losTables is a block vector");
@@ -726,6 +741,7 @@ static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_losTables)::value_typ
 #pragma pop_macro("g_missionOrderTableVec")
 #pragma pop_macro("g_losTables")
 #pragma pop_macro("g_losUnitIndex")
+#pragma pop_macro("g_factoryIndex")
 #pragma pop_macro("g_movementClasses")
 #pragma pop_macro("g_passMaps")
 #pragma pop_macro("g_explodedPieces")
@@ -786,6 +802,7 @@ enum ReplayFieldIndex {
     RF_GAME_GRID1_COUNT,
     RF_GAME_GRID1_CELLS,
     RF_GAME_COUNT_1491B,
+    RF_GAME_FLAGS_37EBE,
     RF_SIMGLOBALS_G_METEORNEXTSTRIKETIME,
     RF_SIMGLOBALS_G_METEORWEAPONNAME,
     RF_SIMGLOBALS_G_METEORSPAWNMAGNITUDE,
@@ -816,6 +833,7 @@ enum ReplayFieldIndex {
     RF_SIMGLOBALS_G_MISSIONORDERTABLEVEC,
     RF_SIMGLOBALS_G_LOSTABLES,
     RF_SIMGLOBALS_G_LOSUNITINDEX,
+    RF_SIMGLOBALS_G_FACTORYINDEX,
     RF_RNG_MAIN,
     RF_RNG_LOAD,
     RF_RNG_SEED,
@@ -840,6 +858,7 @@ static const ReplayVectorSpec kReplayVectors[] = {
     { RV_VALUE, ROK_LOSLINE, sizeof(LosLine) },
     { RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },
     { RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },
+    { RV_OBJECT, ROK_UNIT, sizeof(Ref<Unit>) },
 };
 
 static const ReplayElemSpec kReplayElems[] = {
@@ -850,6 +869,7 @@ static const ReplayElemSpec kReplayElems[] = {
     { 16, sizeof(unsigned) },
     { 10, sizeof(unsigned) },
     { 10, sizeof(((LosUnitIndex*)nullptr)->players[0]) },
+    { 10, sizeof(((FactoryIndex*)nullptr)->players[0]) },
 };
 static_assert(sizeof(((ModelState*)nullptr)->count) == 1 || sizeof(((ModelState*)nullptr)->count) == 2 || sizeof(((ModelState*)nullptr)->count) == 4, "ModelState::pieces[]: count is a byte, a short or an int");
 
@@ -1254,8 +1274,9 @@ static const ReplayInsideSite kReplayInsideSites[] = {
     { ROK_LOSUNITINDEXENTRY, ROK_LOSUNITINDEX, offsetof(LosUnitIndex, players[0]), "players[]", sizeof(((LosUnitIndex*)nullptr)->players[0]), 10, 0 },
     { ROK_CHANNEL, ROK_COBSCRIPT, offsetof(UnitScript, channels[0]), "channels[]", sizeof(((UnitScript*)nullptr)->channels[0]), 8, 0 },
     { ROK_MODELPIECE, ROK_MODELSTATE, offsetof(ModelState, pieces[0]), "pieces[]", sizeof(((ModelState*)nullptr)->pieces[0]), 128, 0 },
+    { ROK_FACTORYINDEXENTRY, ROK_FACTORYINDEX, offsetof(FactoryIndex, players[0]), "players[]", sizeof(((FactoryIndex*)nullptr)->players[0]), 10, 0 },
 };
-static const unsigned kReplayInsideSiteCount = 16;
+static const unsigned kReplayInsideSiteCount = 17;
 
 static const ReplayObjectKind kReplayObjectKinds[] = {
     { "Player", sizeof(Player), RS_STATE, 1, 0, 0, 0, 0, 0, 0 },
@@ -1386,6 +1407,10 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "LiteGoal", sizeof(LiteGoal), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "PathRequestRefs", sizeof(PathRequest), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "PlainOrderFx", sizeof(OrderFx), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "FactoryIndex", sizeof(FactoryIndex), RS_STATE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
+    { "FactoryIndexEntry", sizeof(FactoryIndexEntry), RS_STATE, RT_ORDER, 16, 1, 0, 0, 0, 0 },
+    { "UnitModel", sizeof(StringRef), RS_STATE, 28, 0, 0, 0, 0, 0, 0 },
+    { "FeatureHeap", sizeof(Feature), RS_STATE, 29, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsEventHeader", sizeof(WindMeteorsEventHeader), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsParams", sizeof(WindMeteorsParams), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "WindMeteorsLimits", sizeof(WindMeteorsLimits), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
@@ -1541,7 +1566,7 @@ static const ReplayObjectKind kReplayObjectKinds[] = {
     { "FeaturesPassMaps", sizeof(FeaturesPassMaps), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
     { "FeaturesAreaDamage", sizeof(FeaturesAreaDamage), RS_VALUE, RT_ORDER, 0, 0, 0, 0, 0, 0 },
 };
-static const unsigned kReplayObjectKindCount = 282;
+static const unsigned kReplayObjectKindCount = 286;
 
 static const unsigned short kReplayPolyKinds[] = { ROK_APPROACHRADIUS, ROK_RINGAPPROACH, ROK_PATHORDER, ROK_POINTMARKER, ROK_AIRMANEUVERORDER, ROK_PLAINORDERFX, ROK_VICTORYKILLENEMYCOMMANDER, ROK_VICTORYDESTROYALLUNITS, ROK_VICTORYKILLALLMOBILEUNITS, ROK_VICTORYBUILDUNITTYPE, ROK_VICTORYCAPTUREUNITTYPE, ROK_VICTORYKILLALLOFTYPE, ROK_VICTORYKILLUNITTYPE, ROK_VICTORYMOVEUNITTORADIUS, ROK_VICTORYUNITTYPEPASSESX, ROK_VICTORYUNITTYPEPASSESZ, ROK_VICTORYTIMERRUNSOUT, ROK_DEFEATCOMMANDERKILLED, ROK_DEFEATALLUNITSKILLED, ROK_DEFEATALLUNITSKILLEDOFTYPE, ROK_DEFEATUNITTYPEKILLED, ROK_DEFEATDEATHTIMERRUNSOUT, ROK_DEFEATANYUNITPASSESX, ROK_DEFEATANYUNITPASSESZ, ROK_PLAINTIMER, ROK_ASSAULTTIMER, ROK_ESCORTTIMER, ROK_SQUADSCOUTTIMER, ROK_SCOUTTIMER, ROK_BUILDTIMER, ROK_SPATIALTIMER, ROK_COBSCRIPT, ROK_AISEARCHGOAL, ROK_PATROLGOAL, ROK_LITEGOAL, ROK_PACKEDPOSGOAL };
 
@@ -1623,6 +1648,12 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "ai", offsetof(Player, ai), sizeof(((Player*)nullptr)->ai), ROK_PLAYER, RK_REF, ROK_SQUADMANAGER, 0, 0, {}, 0, 0 },
     { "groups", offsetof(Player, groups), sizeof(((Player*)nullptr)->groups), ROK_PLAYER, RK_REF, ROK_SQUAD, 0, 0, {}, 0, 0 },
     { "name", offsetof(Player, name), 30, ROK_PLAYER, RK_STRING, 0, 0, 0, {}, 0, 0 },
+    { "kills", offsetof(Player, kills), sizeof(((Player*)nullptr)->kills), ROK_PLAYER, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "losses", offsetof(Player, losses), sizeof(((Player*)nullptr)->losses), ROK_PLAYER, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "commanderKills", offsetof(Player, commanderKills), sizeof(((Player*)nullptr)->commanderKills), ROK_PLAYER, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "commanderLosses", offsetof(Player, commanderLosses), sizeof(((Player*)nullptr)->commanderLosses), ROK_PLAYER, RK_I16, 0, 0, 0, {}, 0, 0 },
+    { "rank", offsetof(Player, rank), sizeof(((Player*)nullptr)->rank), ROK_PLAYER, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "shareVision", offsetof(Player, shareVision), 11, ROK_PLAYER, RK_BYTES, 0, 0, 0, {}, 0, 0 },
     { "activateFlags", offsetof(Unit, activateFlags), sizeof(((Unit*)nullptr)->activateFlags), ROK_UNIT, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "workTime", offsetof(Unit, workTime), sizeof(((Unit*)nullptr)->workTime), ROK_UNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "extraction", offsetof(Unit, extraction), sizeof(((Unit*)nullptr)->extraction), ROK_UNIT, RK_F32, 0, 0, 0, {}, 0, 0 },
@@ -1638,15 +1669,15 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "weapon0TargetX", offsetof(Unit, weapons[0].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[0].aimTargetXOrUnitId), ROK_UNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
     { "weapon0TargetZ", offsetof(Unit, weapons[0].aimTargetZOrUnitSentinel), sizeof(((Unit*)nullptr)->weapons[0].aimTargetZOrUnitSentinel), ROK_UNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
     { "weapon0Flags", offsetof(Unit, weapons[0].flags), sizeof(((Unit*)nullptr)->weapons[0].flags), ROK_UNIT, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "weapon0TargetUnit", offsetof(Unit, weapons[0].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[0].aimTargetXOrUnitId), ROK_UNIT, RK_UNITID, ROK_UNIT, 0, 0, { 53, 0, ROK_UNIT, 4294967295u, -32768 }, 0, 5 },
+    { "weapon0TargetUnit", offsetof(Unit, weapons[0].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[0].aimTargetXOrUnitId), ROK_UNIT, RK_UNITID, ROK_UNIT, 0, 0, { 59, 0, ROK_UNIT, 4294967295u, -32768 }, 0, 5 },
     { "weapon1TargetX", offsetof(Unit, weapons[1].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[1].aimTargetXOrUnitId), ROK_UNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
     { "weapon1TargetZ", offsetof(Unit, weapons[1].aimTargetZOrUnitSentinel), sizeof(((Unit*)nullptr)->weapons[1].aimTargetZOrUnitSentinel), ROK_UNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
-    { "weapon1TargetUnit", offsetof(Unit, weapons[1].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[1].aimTargetXOrUnitId), ROK_UNIT, RK_UNITID, ROK_UNIT, 0, 0, { 57, 0, ROK_UNIT, 4294967295u, -32768 }, 0, 5 },
+    { "weapon1TargetUnit", offsetof(Unit, weapons[1].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[1].aimTargetXOrUnitId), ROK_UNIT, RK_UNITID, ROK_UNIT, 0, 0, { 63, 0, ROK_UNIT, 4294967295u, -32768 }, 0, 5 },
     { "weapon2TargetX", offsetof(Unit, weapons[2].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[2].aimTargetXOrUnitId), ROK_UNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
     { "weapon2TargetZ", offsetof(Unit, weapons[2].aimTargetZOrUnitSentinel), sizeof(((Unit*)nullptr)->weapons[2].aimTargetZOrUnitSentinel), ROK_UNIT, RK_I16, 0, 0, 0, {}, 0, 0 },
     { "weapon2Def", offsetof(Unit, weapons[2].weapon), sizeof(((Unit*)nullptr)->weapons[2].weapon), ROK_UNIT, RK_WEAPON, ROK_WEAPONDEF, 0, 0, {}, 0, 0 },
     { "weapon2Flags", offsetof(Unit, weapons[2].flags), sizeof(((Unit*)nullptr)->weapons[2].flags), ROK_UNIT, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "weapon2TargetUnit", offsetof(Unit, weapons[2].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[2].aimTargetXOrUnitId), ROK_UNIT, RK_UNITID, ROK_UNIT, 0, 0, { 60, 0, ROK_UNIT, 4294967295u, -32768 }, 0, 5 },
+    { "weapon2TargetUnit", offsetof(Unit, weapons[2].aimTargetXOrUnitId), sizeof(((Unit*)nullptr)->weapons[2].aimTargetXOrUnitId), ROK_UNIT, RK_UNITID, ROK_UNIT, 0, 0, { 66, 0, ROK_UNIT, 4294967295u, -32768 }, 0, 5 },
     { "cobStateFlags", offsetof(Unit, cobStateFlags), sizeof(((Unit*)nullptr)->cobStateFlags), ROK_UNIT, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "cargo", offsetof(Unit, cargo), sizeof(((Unit*)nullptr)->cargo), ROK_UNIT, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "spatialBucket", offsetof(Unit, spatialBucket), sizeof(((Unit*)nullptr)->spatialBucket), ROK_UNIT, RK_REF, ROK_SPATIALBUCKET, 0, 0, {}, 0, 0 },
@@ -1695,6 +1726,12 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "weapon1Flags", offsetof(Unit, weapons[1].flags), sizeof(((Unit*)nullptr)->weapons[1].flags), ROK_UNIT, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "group", offsetof(Unit, group), sizeof(((Unit*)nullptr)->group), ROK_UNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "list2", offsetof(Unit, list2), sizeof(((Unit*)nullptr)->list2), ROK_UNIT, RK_REF, ROK_ORDER, 0, 0, {}, 0, 0 },
+    { "head", offsetof(Unit, head), sizeof(((Unit*)nullptr)->head), ROK_UNIT, RK_REF, ROK_PATHORDERATTACH, 0, 0, {}, 0, 0 },
+    { "hoverBobPhase", offsetof(Unit, hoverBobPhase), sizeof(((Unit*)nullptr)->hoverBobPhase), ROK_UNIT, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "unfinishedInitZero", offsetof(Unit, unfinishedInitZero), sizeof(((Unit*)nullptr)->unfinishedInitZero), ROK_UNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "zBufferFlag", offsetof(Unit, zBufferFlag), sizeof(((Unit*)nullptr)->zBufferFlag), ROK_UNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "model", offsetof(Unit, unitDefIndex), sizeof(((Unit*)nullptr)->unitDefIndex), ROK_UNIT, RK_UNITID, ROK_UNITMODEL, 0, 0, {}, 5, 1 },
+    { "sfxOccupy", offsetof(Unit, unknown_10a), sizeof(((Unit*)nullptr)->unknown_10a), ROK_UNIT, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "energymake", offsetof(UnitDef, energymake), sizeof(((UnitDef*)nullptr)->energymake), ROK_UNITDEF, RK_F32, 0, 0, 0, {}, 0, 0 },
     { "tidalgenerator", offsetof(UnitDef, tidalgenerator), sizeof(((UnitDef*)nullptr)->tidalgenerator), ROK_UNITDEF, RK_F32, 0, 0, 0, {}, 0, 0 },
     { "energyuse", offsetof(UnitDef, energyuse), sizeof(((UnitDef*)nullptr)->energyuse), ROK_UNITDEF, RK_F32, 0, 0, 0, {}, 0, 0 },
@@ -1774,6 +1811,13 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "moverate2", offsetof(UnitDef, moverate2), sizeof(((UnitDef*)nullptr)->moverate2), ROK_UNITDEF, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "turnrate", offsetof(UnitDef, turnrate), sizeof(((UnitDef*)nullptr)->turnrate), ROK_UNITDEF, RK_I16, 0, 0, 0, {}, 0, 0 },
     { "movementclass", offsetof(UnitDef, movementclass), sizeof(((UnitDef*)nullptr)->movementclass), ROK_UNITDEF, RK_REF, ROK_MOVEMENTCLASS, 0, 0, {}, 0, 0 },
+    { "maxThisUnit", offsetof(UnitDef, maxThisUnit), sizeof(((UnitDef*)nullptr)->maxThisUnit), ROK_UNITDEF, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "buildMenuPageCount", offsetof(UnitDef, buildMenuPageCount), sizeof(((UnitDef*)nullptr)->buildMenuPageCount), ROK_UNITDEF, RK_U8, 0, 0, 0, {}, 0, 0 },
+    { "buildangle", offsetof(UnitDef, buildangleUnsigned), sizeof(((UnitDef*)nullptr)->buildangleUnsigned), ROK_UNITDEF, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "corpse", offsetof(UnitDef, corpseUnsigned), sizeof(((UnitDef*)nullptr)->corpseUnsigned), ROK_UNITDEF, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "origin", offsetof(UnitDef, origin), sizeof(((UnitDef*)nullptr)->origin), ROK_UNITDEF, RK_POINT16, 0, 0, 0, {}, 0, 0 },
+    { "data", offsetof(UnitDef, data), sizeof(void*), ROK_UNITDEF, RK_LOAD, RL_COB, 0, 0, {}, 0, 0 },
+    { "corpseFeature", offsetof(UnitDef, corpseUnsigned), sizeof(((UnitDef*)nullptr)->corpseUnsigned), ROK_UNITDEF, RK_UNITID, ROK_FEATURE, 0, 0, {}, 6, 3 },
     { "flags", offsetof(WeaponDef, flags.value), sizeof(((WeaponDef*)nullptr)->flags.value), ROK_WEAPONDEF, RK_FLAGS, 0, 0, 0, {}, 0, 0 },
     { "speed", offsetof(WeaponDef, speed), sizeof(((WeaponDef*)nullptr)->speed), ROK_WEAPONDEF, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "acceleration", offsetof(WeaponDef, acceleration), sizeof(((WeaponDef*)nullptr)->acceleration), ROK_WEAPONDEF, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -1838,8 +1882,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "offsetY", offsetof(Cell, offsetY), sizeof(((Cell*)nullptr)->offsetY), ROK_CELL, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "offsetX", offsetof(Cell, offsetX), sizeof(((Cell*)nullptr)->offsetX), ROK_CELL, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "flags", offsetof(Cell, flags), sizeof(((Cell*)nullptr)->flags), ROK_CELL, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "occupant", offsetof(Cell, unit), sizeof(((Cell*)nullptr)->unit), ROK_CELL, RK_UNITID, ROK_UNIT, 0, 0, {}, 5, 6 },
-    { "occupant2", offsetof(Cell, unit2), sizeof(((Cell*)nullptr)->unit2), ROK_CELL, RK_UNITID, ROK_UNIT, 0, 0, {}, 5, 6 },
+    { "occupant", offsetof(Cell, unit), sizeof(((Cell*)nullptr)->unit), ROK_CELL, RK_UNITID, ROK_UNIT, 0, 0, {}, 9, 6 },
+    { "occupant2", offsetof(Cell, unit2), sizeof(((Cell*)nullptr)->unit2), ROK_CELL, RK_UNITID, ROK_UNIT, 0, 0, {}, 9, 6 },
     { "spot", offsetof(Cell, spot), sizeof(((Cell*)nullptr)->spot), ROK_CELL, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "scale", offsetof(UnitScript, scale), sizeof(((UnitScript*)nullptr)->scale), ROK_COBSCRIPT, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "table", offsetof(UnitScript, table), sizeof(void*), ROK_COBSCRIPT, RK_LOAD, RL_COB, 0, 0, {}, 0, 0 },
@@ -1963,10 +2007,10 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "next", offsetof(Order, next), sizeof(((Order*)nullptr)->next), ROK_ORDER, RK_REF, ROK_ORDER, 0, 0, {}, 0, 0 },
     { "kind", offsetof(Order, kind.index), sizeof(((Order*)nullptr)->kind.index), ROK_ORDER, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "ticks", offsetof(Order, ticks), sizeof(((Order*)nullptr)->ticks), ROK_ORDER, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "buildingBuildDef", offsetof(Order, type), 4, ROK_ORDER, RK_UNITID, ROK_UNITDEF, 0, 0, { 378, 0, ROK_ORDER, 4294967295u, 12 }, 11, 28 },
-    { "mobileBuildDef", offsetof(Order, type), 4, ROK_ORDER, RK_UNITID, ROK_UNITDEF, 0, 0, { 378, 0, ROK_ORDER, 4294967295u, 25 }, 11, 28 },
-    { "resurrectDef", offsetof(Order, type), 4, ROK_ORDER, RK_UNITID, ROK_UNITDEF, 0, 0, { 378, 0, ROK_ORDER, 4294967295u, 37 }, 11, 28 },
-    { "vtolMobileBuildDef", offsetof(Order, type), 4, ROK_ORDER, RK_UNITID, ROK_UNITDEF, 0, 0, { 378, 0, ROK_ORDER, 4294967295u, 54 }, 11, 28 },
+    { "buildingBuildDef", offsetof(Order, type), 4, ROK_ORDER, RK_UNITID, ROK_UNITDEF, 0, 0, { 397, 0, ROK_ORDER, 4294967295u, 12 }, 15, 28 },
+    { "mobileBuildDef", offsetof(Order, type), 4, ROK_ORDER, RK_UNITID, ROK_UNITDEF, 0, 0, { 397, 0, ROK_ORDER, 4294967295u, 25 }, 15, 28 },
+    { "resurrectDef", offsetof(Order, type), 4, ROK_ORDER, RK_UNITID, ROK_UNITDEF, 0, 0, { 397, 0, ROK_ORDER, 4294967295u, 37 }, 15, 28 },
+    { "vtolMobileBuildDef", offsetof(Order, type), 4, ROK_ORDER, RK_UNITID, ROK_UNITDEF, 0, 0, { 397, 0, ROK_ORDER, 4294967295u, 54 }, 15, 28 },
     { "flags_42", offsetof(Order, flags_42), sizeof(((Order*)nullptr)->flags_42), ROK_ORDER, RK_U32, 0, 0, 0, {}, 0, 0 },
     { "flags", offsetof(Order, flags), sizeof(((Order*)nullptr)->flags), ROK_ORDER, RK_U32, 0, 0, 0, {}, 0, 0 },
     { "wakeFrame", offsetof(Order, wakeFrame), sizeof(((Order*)nullptr)->wakeFrame), ROK_ORDER, RK_U32, 0, 0, 0, {}, 0, 0 },
@@ -2028,8 +2072,8 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "name", offsetof(Feature, name), 128, ROK_FEATURE, RK_STRING, 0, 0, 0, {}, 0, 0 },
     { "description", offsetof(Feature, description), 20, ROK_FEATURE, RK_STRING, 0, 0, 0, {}, 0, 0 },
     { "footprint", offsetof(Feature, footprint), sizeof(((Feature*)nullptr)->footprint), ROK_FEATURE, RK_POINT16, 0, 0, 0, {}, 0, 0 },
-    { "object", offsetof(Feature, object), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_OBJECT3DO, 0, 0, { 470, 0, ROK_FEATURE, 1u, 0 }, 0, 0 },
-    { "filename", offsetof(Feature, filename), 16, ROK_FEATURE, RK_STRING, 0, 0, 0, { 470, 0, ROK_FEATURE, 1u, 1 }, 0, 0 },
+    { "object", offsetof(Feature, object), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_OBJECT3DO, 0, 0, { 489, 0, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "filename", offsetof(Feature, filename), 16, ROK_FEATURE, RK_STRING, 0, 0, 0, { 489, 0, ROK_FEATURE, 1u, 1 }, 0, 0 },
     { "anims", offsetof(Feature, anims), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_GAF, 0, 0, {}, 0, 0 },
     { "seq", offsetof(Feature, seq), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
     { "seqshad", offsetof(Feature, seqshad), sizeof(void*), ROK_FEATURE, RK_PTR, ROK_FRAMETABLE, 0, 0, {}, 0, 0 },
@@ -2054,17 +2098,18 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "seedChance", offsetof(Feature, seedChance), sizeof(((Feature*)nullptr)->seedChance), ROK_FEATURE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "seedSpread", offsetof(Feature, seedSpread), sizeof(((Feature*)nullptr)->seedSpread), ROK_FEATURE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "flags16", offsetof(Feature, flags16), sizeof(((Feature*)nullptr)->flags16), ROK_FEATURE, RK_U16, 0, 0, 0, {}, 0, 0 },
+    { "deadFeature", offsetof(Feature, dead), sizeof(((Feature*)nullptr)->dead), ROK_FEATURE, RK_UNITID, ROK_FEATUREHEAP, 0, 0, {}, 8, 1 },
     { "prev", offsetof(Spot, prev), sizeof(((Spot*)nullptr)->prev), ROK_SPOT, RK_I16, 0, 0, 0, {}, 0, 0 },
     { "next", offsetof(Spot, next), sizeof(((Spot*)nullptr)->next), ROK_SPOT, RK_I16, 0, 0, 0, {}, 0, 0 },
-    { "anim", offsetof(Spot, anim), sizeof(((Spot*)nullptr)->anim), ROK_SPOT, RK_EMBED, ROK_HANDLE, 0, 0, { 470, 485, ROK_FEATURE, 1u, 1 }, 0, 0 },
-    { "shadow", offsetof(Spot, shadow), sizeof(((Spot*)nullptr)->shadow), ROK_SPOT, RK_EMBED, ROK_HANDLE, 0, 0, { 470, 485, ROK_FEATURE, 1u, 1 }, 0, 0 },
-    { "state", offsetof(Spot, state), sizeof(((Spot*)nullptr)->state), ROK_SPOT, RK_REF, ROK_MODELSTATE, 0, 0, { 470, 485, ROK_FEATURE, 1u, 0 }, 0, 0 },
-    { "posX", offsetof(Spot, pos.x), sizeof(((Spot*)nullptr)->pos.x), ROK_SPOT, RK_I32, 0, 0, 0, { 470, 485, ROK_FEATURE, 1u, 0 }, 0, 0 },
-    { "posY", offsetof(Spot, pos.y), sizeof(((Spot*)nullptr)->pos.y), ROK_SPOT, RK_I32, 0, 0, 0, { 470, 485, ROK_FEATURE, 1u, 0 }, 0, 0 },
-    { "posZ", offsetof(Spot, pos.z), sizeof(((Spot*)nullptr)->pos.z), ROK_SPOT, RK_I32, 0, 0, 0, { 470, 485, ROK_FEATURE, 1u, 0 }, 0, 0 },
-    { "velX", offsetof(Spot, vel.x), sizeof(((Spot*)nullptr)->vel.x), ROK_SPOT, RK_I32, 0, 0, 0, { 470, 485, ROK_FEATURE, 1u, 0 }, 0, 0 },
-    { "velY", offsetof(Spot, vel.y), sizeof(((Spot*)nullptr)->vel.y), ROK_SPOT, RK_I32, 0, 0, 0, { 470, 485, ROK_FEATURE, 1u, 0 }, 0, 0 },
-    { "velZ", offsetof(Spot, vel.z), sizeof(((Spot*)nullptr)->vel.z), ROK_SPOT, RK_I32, 0, 0, 0, { 470, 485, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "anim", offsetof(Spot, anim), sizeof(((Spot*)nullptr)->anim), ROK_SPOT, RK_EMBED, ROK_HANDLE, 0, 0, { 489, 505, ROK_FEATURE, 1u, 1 }, 0, 0 },
+    { "shadow", offsetof(Spot, shadow), sizeof(((Spot*)nullptr)->shadow), ROK_SPOT, RK_EMBED, ROK_HANDLE, 0, 0, { 489, 505, ROK_FEATURE, 1u, 1 }, 0, 0 },
+    { "state", offsetof(Spot, state), sizeof(((Spot*)nullptr)->state), ROK_SPOT, RK_REF, ROK_MODELSTATE, 0, 0, { 489, 505, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "posX", offsetof(Spot, pos.x), sizeof(((Spot*)nullptr)->pos.x), ROK_SPOT, RK_I32, 0, 0, 0, { 489, 505, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "posY", offsetof(Spot, pos.y), sizeof(((Spot*)nullptr)->pos.y), ROK_SPOT, RK_I32, 0, 0, 0, { 489, 505, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "posZ", offsetof(Spot, pos.z), sizeof(((Spot*)nullptr)->pos.z), ROK_SPOT, RK_I32, 0, 0, 0, { 489, 505, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "velX", offsetof(Spot, vel.x), sizeof(((Spot*)nullptr)->vel.x), ROK_SPOT, RK_I32, 0, 0, 0, { 489, 505, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "velY", offsetof(Spot, vel.y), sizeof(((Spot*)nullptr)->vel.y), ROK_SPOT, RK_I32, 0, 0, 0, { 489, 505, ROK_FEATURE, 1u, 0 }, 0, 0 },
+    { "velZ", offsetof(Spot, vel.z), sizeof(((Spot*)nullptr)->vel.z), ROK_SPOT, RK_I32, 0, 0, 0, { 489, 505, ROK_FEATURE, 1u, 0 }, 0, 0 },
     { "rot", offsetof(Spot, rot), 6, ROK_SPOT, RK_BYTES, 0, 0, 0, {}, 0, 0 },
     { "damage", offsetof(Spot, damage), sizeof(((Spot*)nullptr)->damage), ROK_SPOT, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "cell", offsetof(Spot, cell), sizeof(((Spot*)nullptr)->cell), ROK_SPOT, RK_POINT16, 0, 0, 0, {}, 0, 0 },
@@ -2085,6 +2130,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "posZ", offsetof(ModelState, pos.z), sizeof(((ModelState*)nullptr)->pos.z), ROK_MODELSTATE, RK_I16, 0, 0, 0, {}, 0, 0 },
     { "root", offsetof(ModelState, root), sizeof(((ModelState*)nullptr)->root), ROK_MODELSTATE, RK_REF, ROK_MODELPIECE, 0, 0, {}, 0, 0 },
     { "pieces", offsetof(ModelState, pieces[0]), sizeof(((ModelState*)nullptr)->pieces[0]), ROK_MODELSTATE, RK_EMBEDS, ROK_MODELPIECE, 0, 0, {}, 0, 0, 3 },
+    { "bitmap", offsetof(ModelState, bitmap), sizeof(void*), ROK_MODELSTATE, RK_PTR, ROK_GAFFRAME, 0, 0, {}, 0, 0 },
     { "type", offsetof(Mission, type), sizeof(((Mission*)nullptr)->type), ROK_MISSION, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "campaign", offsetof(Mission, campaign), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
     { "names0", offsetof(Mission, names[0]), 256, ROK_MISSION, RK_STRING, 0, 0, 0, {}, 0, 0 },
@@ -2410,15 +2456,15 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "vz", offsetof(Vec3, z), sizeof(((Vec3*)nullptr)->z), ROK_DEBRISVERTEX, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "color", offsetof(Face, color), sizeof(((Face*)nullptr)->color), ROK_DEBRISFACE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "flags", offsetof(Face, flags), sizeof(((Face*)nullptr)->flags), ROK_DEBRISFACE, RK_U32, 0, 0, 0, {}, 0, 0 },
-    { "texPic", offsetof(Face, tex.pic), sizeof(void*), ROK_DEBRISFACE, RK_PTR, ROK_GAFFRAME, 0, 0, { 826, 0, ROK_DEBRISFACE, 3u, 0 }, 0, 0 },
-    { "texIndex", offsetof(Face, tex.index), sizeof(((Face*)nullptr)->tex.index), ROK_DEBRISFACE, RK_U16, 0, 0, 0, { 826, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
-    { "texValue", offsetof(Face, tex.value), sizeof(((Face*)nullptr)->tex.value), ROK_DEBRISFACE, RK_U16, 0, 0, 0, { 826, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
+    { "texPic", offsetof(Face, tex.pic), sizeof(void*), ROK_DEBRISFACE, RK_PTR, ROK_GAFFRAME, 0, 0, { 847, 0, ROK_DEBRISFACE, 3u, 0 }, 0, 0 },
+    { "texIndex", offsetof(Face, tex.index), sizeof(((Face*)nullptr)->tex.index), ROK_DEBRISFACE, RK_U16, 0, 0, 0, { 847, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
+    { "texValue", offsetof(Face, tex.value), sizeof(((Face*)nullptr)->tex.value), ROK_DEBRISFACE, RK_U16, 0, 0, 0, { 847, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
     { "texKind", offsetof(Face, tex.kind), sizeof(((Face*)nullptr)->tex.kind), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "texKindHigh0", offsetof(Face, tex.kindHigh[0]), sizeof(((Face*)nullptr)->tex.kindHigh[0]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "texKindHigh1", offsetof(Face, tex.kindHigh[1]), sizeof(((Face*)nullptr)->tex.kindHigh[1]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
     { "texKindHigh2", offsetof(Face, tex.kindHigh[2]), sizeof(((Face*)nullptr)->tex.kindHigh[2]), ROK_DEBRISFACE, RK_U8, 0, 0, 0, {}, 0, 0 },
-    { "texSrc", offsetof(Face, tex.src), sizeof(void*), ROK_DEBRISFACE, RK_PTR, ROK_FRAMETABLE, 0, 0, { 826, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
-    { "texTeamSrc", offsetof(Face, tex.src), sizeof(void*), ROK_DEBRISFACE, RK_PTR, ROK_FRAMETABLE, 0, 0, { 826, 0, ROK_DEBRISFACE, 7u, 4 }, 0, 0 },
+    { "texSrc", offsetof(Face, tex.src), sizeof(void*), ROK_DEBRISFACE, RK_PTR, ROK_FRAMETABLE, 0, 0, { 847, 0, ROK_DEBRISFACE, 2u, 2 }, 0, 0 },
+    { "texTeamSrc", offsetof(Face, tex.src), sizeof(void*), ROK_DEBRISFACE, RK_PTR, ROK_FRAMETABLE, 0, 0, { 847, 0, ROK_DEBRISFACE, 7u, 4 }, 0, 0 },
     { "obj", offsetof(Debris, obj), sizeof(((Debris*)nullptr)->obj), ROK_DEBRIS, RK_REF, ROK_DEBRISPIECE, 0, 0, {}, 0, 0 },
     { "ref1", offsetof(Debris, ref1), sizeof(((Debris*)nullptr)->ref1), ROK_DEBRIS, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
     { "ref2", offsetof(Debris, ref2), sizeof(((Debris*)nullptr)->ref2), ROK_DEBRIS, RK_EMBED, ROK_HANDLE, 0, 0, {}, 0, 0 },
@@ -2580,6 +2626,12 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "useStart", offsetof(PathRequest, useStart), sizeof(((PathRequest*)nullptr)->useStart), ROK_PATHREQUESTREFS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "start", offsetof(PathRequest, start), sizeof(((PathRequest*)nullptr)->start), ROK_PATHREQUESTREFS, RK_POINT16, 0, 0, 0, {}, 0, 0 },
     { "source", offsetof(OrderFx, source), sizeof(((OrderFx*)nullptr)->source), ROK_PLAINORDERFX, RK_REF, ROK_ORDER, 0, 0, {}, 0, 0 },
+    { "players", offsetof(FactoryIndex, players[0]), sizeof(((FactoryIndex*)nullptr)->players[0]), ROK_FACTORYINDEX, RK_EMBEDS, ROK_FACTORYINDEXENTRY, 0, 0, {}, 0, 0, 8 },
+    { "live", offsetof(FactoryIndexEntry, live), sizeof(((FactoryIndexEntry*)nullptr)->live), ROK_FACTORYINDEXENTRY, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "lastTick", offsetof(FactoryIndexEntry, lastTick), sizeof(((FactoryIndexEntry*)nullptr)->lastTick), ROK_FACTORYINDEXENTRY, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "factories", offsetof(FactoryIndexEntry, factories), sizeof(((FactoryIndexEntry*)nullptr)->factories), ROK_FACTORYINDEXENTRY, RK_VECTOR, ROK_UNIT, 0, 0, {}, 0, 0, 18 },
+    { "model", offsetof(StringRef, ptr), sizeof(void*), ROK_UNITMODEL, RK_LOAD, RL_MODEL, 0, 0, {}, 0, 0 },
+    { "dead", offsetof(Feature, dead), sizeof(((Feature*)nullptr)->dead), ROK_FEATUREHEAP, RK_U16, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsEventHeader, kind), sizeof(((WindMeteorsEventHeader*)nullptr)->kind), ROK_WINDMETEORSEVENTHEADER, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(WindMeteorsParams, h.kind), sizeof(((WindMeteorsParams*)nullptr)->h.kind), ROK_WINDMETEORSPARAMS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "weapon", offsetof(WindMeteorsParams, params.weapon), 32, ROK_WINDMETEORSPARAMS, RK_STRING, 0, 0, 0, {}, 0, 0 },
@@ -3080,7 +3132,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "amount", offsetof(UnitsRepair, amount), sizeof(((UnitsRepair*)nullptr)->amount), ROK_UNITSREPAIR, RK_F32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(UnitsUnlink, h.kind), sizeof(((UnitsUnlink*)nullptr)->h.kind), ROK_UNITSUNLINK, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(UnitsUnlink, h.unit), sizeof(((UnitsUnlink*)nullptr)->h.unit), ROK_UNITSUNLINK, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
-    { "ref", offsetof(UnitsUnlink, ref), sizeof(((UnitsUnlink*)nullptr)->ref), ROK_UNITSUNLINK, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "ref", offsetof(UnitsUnlink, ref), sizeof(((UnitsUnlink*)nullptr)->ref), ROK_UNITSUNLINK, RK_REF, ROK_PATHORDERATTACH, 0, 0, {}, 0, 0 },
     { "kind", offsetof(UnitsSetStance, h.kind), sizeof(((UnitsSetStance*)nullptr)->h.kind), ROK_UNITSSETSTANCE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(UnitsSetStance, h.unit), sizeof(((UnitsSetStance*)nullptr)->h.unit), ROK_UNITSSETSTANCE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "fields", offsetof(UnitsSetStance, fields), sizeof(((UnitsSetStance*)nullptr)->fields), ROK_UNITSSETSTANCE, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -3152,7 +3204,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "kind", offsetof(UnitsCreate, h.kind), sizeof(((UnitsCreate*)nullptr)->h.kind), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "unit", offsetof(UnitsCreate, h.unit), sizeof(((UnitsCreate*)nullptr)->h.unit), ROK_UNITSCREATE, RK_REF, ROK_UNIT, 0, 0, {}, 0, 0 },
     { "player", offsetof(UnitsCreate, player), sizeof(((UnitsCreate*)nullptr)->player), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "type", offsetof(UnitsCreate, type), sizeof(((UnitsCreate*)nullptr)->type), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
+    { "type", offsetof(UnitsCreate, type), sizeof(((UnitsCreate*)nullptr)->type), ROK_UNITSCREATE, RK_I32, ROK_UNITDEF, 0, 0, {}, 0, 0 },
     { "pos0", offsetof(UnitsCreate, pos[0]), sizeof(((UnitsCreate*)nullptr)->pos[0]), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos1", offsetof(UnitsCreate, pos[1]), sizeof(((UnitsCreate*)nullptr)->pos[1]), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos2", offsetof(UnitsCreate, pos[2]), sizeof(((UnitsCreate*)nullptr)->pos[2]), ROK_UNITSCREATE, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -3336,10 +3388,10 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos1", offsetof(FeaturesAreaDamage, pos[1]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[1]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos2", offsetof(FeaturesAreaDamage, pos[2]), sizeof(((FeaturesAreaDamage*)nullptr)->pos[2]), ROK_FEATURESAREADAMAGE, RK_I32, 0, 0, 0, {}, 0, 0 },
 };
-static const unsigned kReplayObjectFieldCount = 1751;
-static const unsigned kReplayWalkableFieldCount = 288;
+static const unsigned kReplayObjectFieldCount = 1778;
+static const unsigned kReplayWalkableFieldCount = 295;
 
-static const unsigned short kReplayReachFields[] = { 47, 102, 268, 269, 270, 91, 100, 0, 22, 102, 271, 125, 131, 134, 138, 139, 142, 143, 147, 150, 151, 152, 157, 158, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 39, 42, 43, 44, 46, 48, 68, 91, 97, 99, 100, 101, 103, 104, 105, 106, 107, 60, 133, 138, 148, 152, 162, 176, 163, 164, 147, 165, 0, 22, 91, 99, 39, 47, 103, 105, 138 };
+static const unsigned short kReplayReachFields[] = { 53, 108, 287, 288, 289, 1021, 481, 489, 1022, 97, 106, 0, 22, 108, 290, 137, 143, 146, 150, 151, 154, 155, 159, 162, 163, 164, 169, 170, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 45, 48, 49, 50, 52, 54, 74, 97, 103, 105, 106, 107, 109, 110, 111, 112, 113, 66, 145, 150, 160, 164, 174, 188, 175, 176, 159, 177, 0, 22, 97, 105, 45, 53, 109, 111, 150 };
 
 static_assert(sizeof(((Player*)nullptr)->active) == 4, "Player::active has the size the schema says");
 static_assert(sizeof(((Player*)nullptr)->id) == 4, "Player::id has the size the schema says");
@@ -3380,6 +3432,12 @@ static_assert(sizeof(((Player*)nullptr)->index) == 1, "Player::index has the siz
 static_assert(sizeof(((Player*)nullptr)->ai) == 4, "Player::ai has the size the schema says");
 static_assert(__is_same(decltype(((Player*)nullptr)->groups), Ref<Group>), "Player::groups is a Ref<Group>");
 static_assert(sizeof(((Player*)nullptr)->groups) == 4, "Player::groups has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->kills) == 2, "Player::kills has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->losses) == 2, "Player::losses has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->commanderKills) == 2, "Player::commanderKills has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->commanderLosses) == 2, "Player::commanderLosses has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->rank) == 1, "Player::rank has the size the schema says");
+static_assert(sizeof(((Player*)nullptr)->shareVision) == 11, "Player::shareVision has the size the schema says");
 static_assert(sizeof(((Unit*)nullptr)->activateFlags) == 1, "Unit::activateFlags has the size the schema says");
 static_assert(sizeof(((Unit*)nullptr)->workTime) == 4, "Unit::workTime has the size the schema says");
 static_assert(sizeof(((Unit*)nullptr)->extraction) == 4, "Unit::extraction has the size the schema says");
@@ -3454,6 +3512,12 @@ static_assert(sizeof(((Unit*)nullptr)->weapons[1].weapon) == 4, "Unit::weapon1De
 static_assert(sizeof(((Unit*)nullptr)->weapons[1].flags) == 1, "Unit::weapon1Flags has the size the schema says");
 static_assert(sizeof(((Unit*)nullptr)->group) == 4, "Unit::group has the size the schema says");
 static_assert(sizeof(((Unit*)nullptr)->list2) == 4, "Unit::list2 has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->head) == 4, "Unit::head has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->hoverBobPhase) == 2, "Unit::hoverBobPhase has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->unfinishedInitZero) == 4, "Unit::unfinishedInitZero has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->zBufferFlag) == 4, "Unit::zBufferFlag has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->unitDefIndex) == 2, "Unit::model has the size the schema says");
+static_assert(sizeof(((Unit*)nullptr)->unknown_10a) == 4, "Unit::sfxOccupy has the size the schema says");
 static_assert(sizeof(((UnitDef*)nullptr)->energymake) == 4, "UnitDef::energymake has the size the schema says");
 static_assert(sizeof(((UnitDef*)nullptr)->tidalgenerator) == 4, "UnitDef::tidalgenerator has the size the schema says");
 static_assert(sizeof(((UnitDef*)nullptr)->energyuse) == 4, "UnitDef::energyuse has the size the schema says");
@@ -3527,6 +3591,13 @@ static_assert(sizeof(((UnitDef*)nullptr)->moverate1) == 4, "UnitDef::moverate1 h
 static_assert(sizeof(((UnitDef*)nullptr)->moverate2) == 4, "UnitDef::moverate2 has the size the schema says");
 static_assert(sizeof(((UnitDef*)nullptr)->turnrate) == 2, "UnitDef::turnrate has the size the schema says");
 static_assert(sizeof(((UnitDef*)nullptr)->movementclass) == 4, "UnitDef::movementclass has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->maxThisUnit) == 4, "UnitDef::maxThisUnit has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->buildMenuPageCount) == 1, "UnitDef::buildMenuPageCount has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->buildangleUnsigned) == 2, "UnitDef::buildangle has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->corpseUnsigned) == 2, "UnitDef::corpse has the size the schema says");
+static_assert(sizeof(((UnitDef*)nullptr)->origin) == 4, "UnitDef::origin has the size the schema says");
+static_assert(__is_pointer(decltype(((UnitDef*)nullptr)->data)), "UnitDef::data is a raw pointer");
+static_assert(sizeof(((UnitDef*)nullptr)->corpseUnsigned) == 2, "UnitDef::corpseFeature has the size the schema says");
 static_assert(sizeof(((WeaponDef*)nullptr)->flags.value) == 4, "WeaponDef::flags has the size the schema says");
 static_assert(sizeof(((WeaponDef*)nullptr)->speed) == 4, "WeaponDef::speed has the size the schema says");
 static_assert(sizeof(((WeaponDef*)nullptr)->acceleration) == 4, "WeaponDef::acceleration has the size the schema says");
@@ -3808,6 +3879,7 @@ static_assert(sizeof(((Feature*)nullptr)->spreadChance) == 1, "Feature::spreadCh
 static_assert(sizeof(((Feature*)nullptr)->seedChance) == 1, "Feature::seedChance has the size the schema says");
 static_assert(sizeof(((Feature*)nullptr)->seedSpread) == 1, "Feature::seedSpread has the size the schema says");
 static_assert(sizeof(((Feature*)nullptr)->flags16) == 2, "Feature::flags16 has the size the schema says");
+static_assert(sizeof(((Feature*)nullptr)->dead) == 2, "Feature::deadFeature has the size the schema says");
 static_assert(sizeof(((Spot*)nullptr)->prev) == 2, "Spot::prev has the size the schema says");
 static_assert(sizeof(((Spot*)nullptr)->next) == 2, "Spot::next has the size the schema says");
 static_assert(sizeof(((Spot*)nullptr)->anim) == sizeof(Handle), "Spot::anim has the size of its kind");
@@ -3840,6 +3912,7 @@ static_assert(sizeof(((ModelState*)nullptr)->pos.z) == 2, "ModelState::posZ has 
 static_assert(sizeof(((ModelState*)nullptr)->root) == 4, "ModelState::root has the size the schema says");
 static_assert(sizeof(((ModelState*)nullptr)->pieces) == sizeof(ModelPiece), "ModelState::pieces holds one element of its kind and room for the rest after it");
 static_assert(sizeof(((ModelState*)nullptr)->pieces[0]) == sizeof(ModelPiece), "ModelState::pieces has the size of its kind");
+static_assert(__is_pointer(decltype(((ModelState*)nullptr)->bitmap)), "ModelState::bitmap is a raw pointer");
 static_assert(sizeof(((Mission*)nullptr)->type) == 4, "Mission::type has the size the schema says");
 static_assert(sizeof(((Mission*)nullptr)->missionIndex) == 4, "Mission::missionIndex has the size the schema says");
 static_assert(sizeof(((Mission*)nullptr)->surfaceMetal) == 4, "Mission::surfaceMetal has the size the schema says");
@@ -4339,6 +4412,14 @@ static_assert(sizeof(((PathRequest*)nullptr)->target) == 4, "PathRequest::target
 static_assert(sizeof(((PathRequest*)nullptr)->useStart) == 4, "PathRequest::useStart has the size the schema says");
 static_assert(sizeof(((PathRequest*)nullptr)->start) == 4, "PathRequest::start has the size the schema says");
 static_assert(sizeof(((OrderFx*)nullptr)->source) == 4, "OrderFx::source has the size the schema says");
+static_assert(sizeof(((FactoryIndex*)nullptr)->players) == 10 * sizeof(((FactoryIndex*)nullptr)->players[0]), "FactoryIndex::players holds 10 elements");
+static_assert(sizeof(((FactoryIndex*)nullptr)->players[0]) == sizeof(FactoryIndexEntry), "FactoryIndex::players has the size of its kind");
+static_assert(sizeof(((FactoryIndexEntry*)nullptr)->live) == 4, "FactoryIndexEntry::live has the size the schema says");
+static_assert(sizeof(((FactoryIndexEntry*)nullptr)->lastTick) == 4, "FactoryIndexEntry::lastTick has the size the schema says");
+static_assert(sizeof(decltype(((FactoryIndexEntry*)nullptr)->factories)) == 16, "FactoryIndexEntry::factories is a block vector");
+static_assert(__is_same(decltype(((FactoryIndexEntry*)nullptr)->factories)::value_type, Ref<Unit>), "FactoryIndexEntry::factories holds Ref<Unit>");
+static_assert(__is_pointer(decltype(((StringRef*)nullptr)->ptr)), "StringRef::model is a raw pointer");
+static_assert(sizeof(((Feature*)nullptr)->dead) == 2, "Feature::dead has the size the schema says");
 static_assert(sizeof(((WindMeteorsEventHeader*)nullptr)->kind) == 4, "WindMeteorsEventHeader::kind has the size the schema says");
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->h.kind) == 4, "WindMeteorsParams::kind has the size the schema says");
 static_assert(sizeof(((WindMeteorsParams*)nullptr)->params.radius) == 4, "WindMeteorsParams::radius has the size the schema says");
@@ -5293,14 +5374,28 @@ enum ReplaySlotId {
     RSL_ORDERS_GETORDERTYPE,
     RSL_ORDERS_MISSIONTYPEFROMNAME,
     RSL_ORDERS_EXPANDGROUPCOMMAND,
+    RSL_UNITS_APPLY,
+    RSL_UNITS_KILLUNIT,
+    RSL_UNITS_CREATEUNIT,
     RSL_UNITS_FINDUNITTYPE,
     RSL_UNITS_FINDUNITTYPEID,
+    RSL_UNITS_ADDBUILDPROGRESS,
     RSL_UNITS_ADDREPAIRPROGRESS,
     RSL_UNITS_CANLOAD,
     RSL_UNITS_CANRECLAIM,
     RSL_UNITS_CANREPAIR,
+    RSL_UNITS_UNITREFUNLINK,
     RSL_UNITS_UPDATEUNITHEAD,
     RSL_UNITS_UPDATEUNITBODY,
+    RSL_UNITS_UPDATEUNITTAIL,
+    RSL_UNITS_GETFACTORIESINRADIUS,
+    RSL_UNITS_CREATEFACTORYINDEX,
+    RSL_UNITS_FREEFACTORYINDEX,
+    RSL_UNITS_REFRESHFACTORYINDEX,
+    RSL_UNITS_UNITREFINIT,
+    RSL_UNITS_UNITREFSETUNIT,
+    RSL_UNITS_UNITREFGET,
+    RSL_UNITS_UNITREFSETVALUE,
     RSL_PLAYERS_APPLY,
     RSL_PLAYERS_DEACTIVATECONDITIONS,
     RSL_PLAYERS_UPDATEPLAYERHEAD,
@@ -5440,19 +5535,12 @@ enum ReplaySlotId {
     RSL_NETWORK_BROADCASTPLAYERECONOMY,
     RSL_NETWORK_SENDUNITSTATES,
     RSL_UNITS_LOADUNIT,
-    RSL_UNITS_CREATEUNIT,
-    RSL_UNITS_ADDBUILDPROGRESS,
-    RSL_UNITS_UNITREFUNLINK,
-    RSL_UNITS_GETFACTORIESINRADIUS,
-    RSL_UNITS_UNITREFINIT,
-    RSL_UNITS_UNITREFSETUNIT,
-    RSL_UNITS_UNITREFGET,
-    RSL_UNITS_UNITREFSETVALUE,
     RSL_MAP_UNITSINRANGE,
     RSL_SCRIPTS_GETNANOPIECEPOSITION,
     RSL_SCRIPTS_GETAIMFROMPOSITION,
     RSL_SCRIPTS_GETSWEETSPOT,
     RSL_SCRIPTS_OBJECTSTATESIZE,
+    RSL_SCRIPTS_DELETESCRIPT,
     RSL_MOVEMENT_LOADTARGET,
     RSL_MOVEMENT_SAVETARGET,
     RSL_ECONWORLD_TICK,
@@ -5491,449 +5579,492 @@ enum ReplaySlotId {
     RSL_COUNT
 };
 
-static const unsigned char kReplayWindMeteorsUpdateWindReads[] = { 0, 3, 4, 8, 9, 10, 12, 13, 85, 86, 87 };
-static const unsigned char kReplayWindMeteorsUpdateWindWrites[] = { 3, 5, 7, 8, 9, 10, 11, 85, 86, 87 };
-static const unsigned char kReplayWindMeteorsUpdateMeteorsReads[] = { 0, 1, 2, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 85, 86, 87 };
-static const unsigned char kReplayWindMeteorsUpdateMeteorsWrites[] = { 55, 59, 60, 61, 65, 66, 85, 86, 87 };
-static const unsigned short kReplayWindMeteorsUpdateMeteorsObjReads[] = { 42, 43 };
-static const unsigned char kReplayWindMeteorsApplyReads[] = { 0, 1, 2, 56, 60, 62, 66, 67, 85, 86, 87 };
-static const unsigned char kReplayWindMeteorsApplyWrites[] = { 3, 4, 12, 13, 55, 56, 57, 58, 59, 60, 61, 62, 64, 65, 66, 67, 85, 86, 87 };
-static const unsigned char kReplayWindMeteorsInitMeteorsReads[] = { 58, 63 };
-static const unsigned char kReplayWindMeteorsInitMeteorsWrites[] = { 55, 59, 63 };
-static const unsigned char kReplayWindMeteorsSaveMeteorsReads[] = { 55, 59, 60, 61, 64, 65, 66 };
-static const unsigned short kReplayWindMeteorsSaveMeteorsObjReads[] = { 42, 43 };
-static const unsigned char kReplayWindMeteorsLoadMeteorsWrites[] = { 55, 59, 60, 61, 64, 65, 66 };
-static const unsigned char kReplayEconomyInitWrites[] = { 88 };
-static const unsigned char kReplayEconomyShutdownReads[] = { 88 };
+static const unsigned char kReplayWindMeteorsUpdateWindReads[] = { 0, 3, 4, 8, 9, 10, 12, 13, 87, 88, 89 };
+static const unsigned char kReplayWindMeteorsUpdateWindWrites[] = { 3, 5, 7, 8, 9, 10, 11, 87, 88, 89 };
+static const unsigned char kReplayWindMeteorsUpdateMeteorsReads[] = { 0, 1, 2, 56, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 87, 88, 89 };
+static const unsigned char kReplayWindMeteorsUpdateMeteorsWrites[] = { 56, 60, 61, 62, 66, 67, 87, 88, 89 };
+static const unsigned short kReplayWindMeteorsUpdateMeteorsObjReads[] = { 48, 49 };
+static const unsigned char kReplayWindMeteorsApplyReads[] = { 0, 1, 2, 57, 61, 63, 67, 68, 87, 88, 89 };
+static const unsigned char kReplayWindMeteorsApplyWrites[] = { 3, 4, 12, 13, 56, 57, 58, 59, 60, 61, 62, 63, 65, 66, 67, 68, 87, 88, 89 };
+static const unsigned char kReplayWindMeteorsInitMeteorsReads[] = { 59, 64 };
+static const unsigned char kReplayWindMeteorsInitMeteorsWrites[] = { 56, 60, 64 };
+static const unsigned char kReplayWindMeteorsSaveMeteorsReads[] = { 56, 60, 61, 62, 65, 66, 67 };
+static const unsigned short kReplayWindMeteorsSaveMeteorsObjReads[] = { 48, 49 };
+static const unsigned char kReplayWindMeteorsLoadMeteorsWrites[] = { 56, 60, 61, 62, 65, 66, 67 };
+static const unsigned char kReplayEconomyInitWrites[] = { 90 };
+static const unsigned char kReplayEconomyShutdownReads[] = { 90 };
 static const unsigned short kReplayEconomyApplyAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayEconomyApplyReads[] = { 88 };
-static const unsigned char kReplayEconomyApplyWrites[] = { 88 };
-static const unsigned short kReplayEconomyApplyObjReads[] = { 30, 35, 604, 605, 606, 607, 610, 611, 612, 613, 616 };
-static const unsigned short kReplayEconomyApplyObjWrites[] = { 604, 605, 606, 610, 611, 612, 616 };
-static const unsigned char kReplayEconomySpendReads[] = { 88 };
-static const unsigned char kReplayEconomySpendWrites[] = { 88 };
-static const unsigned short kReplayEconomySpendObjReads[] = { 30, 33, 34, 605, 611 };
-static const unsigned short kReplayEconomySpendObjWrites[] = { 33, 34, 605, 611 };
+static const unsigned char kReplayEconomyApplyReads[] = { 90 };
+static const unsigned char kReplayEconomyApplyWrites[] = { 90 };
+static const unsigned short kReplayEconomyApplyObjReads[] = { 30, 35, 625, 626, 627, 628, 631, 632, 633, 634, 637 };
+static const unsigned short kReplayEconomyApplyObjWrites[] = { 625, 626, 627, 631, 632, 633, 637 };
+static const unsigned char kReplayEconomySpendReads[] = { 90 };
+static const unsigned char kReplayEconomySpendWrites[] = { 90 };
+static const unsigned short kReplayEconomySpendObjReads[] = { 30, 33, 34, 626, 632 };
+static const unsigned short kReplayEconomySpendObjWrites[] = { 33, 34, 626, 632 };
 static const unsigned short kReplayEconomyUpdatePlayerEconomyAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayEconomyUpdatePlayerEconomyReads[] = { 88 };
-static const unsigned char kReplayEconomyUpdatePlayerEconomyWrites[] = { 88 };
-static const unsigned short kReplayEconomyUpdatePlayerEconomyObjReads[] = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 30, 33, 34, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615 };
-static const unsigned short kReplayEconomyUpdatePlayerEconomyObjWrites[] = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 33, 34, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615 };
-static const unsigned char kReplayEconomyUpdateMetalExtractionReads[] = { 88 };
-static const unsigned char kReplayEconomyUpdateMetalExtractionWrites[] = { 88 };
-static const unsigned short kReplayEconomyUpdateMetalExtractionObjReads[] = { 41 };
-static const unsigned short kReplayEconomyUpdateMetalExtractionObjWrites[] = { 41 };
+static const unsigned char kReplayEconomyUpdatePlayerEconomyReads[] = { 90 };
+static const unsigned char kReplayEconomyUpdatePlayerEconomyWrites[] = { 90 };
+static const unsigned short kReplayEconomyUpdatePlayerEconomyObjReads[] = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 30, 33, 34, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636 };
+static const unsigned short kReplayEconomyUpdatePlayerEconomyObjWrites[] = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 33, 34, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636 };
+static const unsigned char kReplayEconomyUpdateMetalExtractionReads[] = { 90 };
+static const unsigned char kReplayEconomyUpdateMetalExtractionWrites[] = { 90 };
+static const unsigned short kReplayEconomyUpdateMetalExtractionObjReads[] = { 47 };
+static const unsigned short kReplayEconomyUpdateMetalExtractionObjWrites[] = { 47 };
 static const unsigned short kReplayEconomyUpdateResourceSharingAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayEconomyUpdateResourceSharingReads[] = { 88 };
-static const unsigned char kReplayEconomyUpdateResourceSharingWrites[] = { 88 };
+static const unsigned char kReplayEconomyUpdateResourceSharingReads[] = { 90 };
+static const unsigned char kReplayEconomyUpdateResourceSharingWrites[] = { 90 };
 static const unsigned short kReplayEconomyUpdateResourceSharingObjReads[] = { 6, 9, 18, 19, 33, 34 };
-static const unsigned char kReplayEconomyRequestGrantedReads[] = { 88 };
-static const unsigned char kReplayEconomyRequestGrantedWrites[] = { 88 };
-static const unsigned short kReplayEconomyRequestGrantedObjReads[] = { 607, 613 };
-static const unsigned char kReplayEconomyGetEnergyUseReads[] = { 88 };
-static const unsigned char kReplayEconomyGetEnergyUseWrites[] = { 88 };
-static const unsigned char kReplayEconomyUnitAccountReads[] = { 88 };
-static const unsigned char kReplayEconomyUnitAccountWrites[] = { 88 };
+static const unsigned char kReplayEconomyRequestGrantedReads[] = { 90 };
+static const unsigned char kReplayEconomyRequestGrantedWrites[] = { 90 };
+static const unsigned short kReplayEconomyRequestGrantedObjReads[] = { 628, 634 };
+static const unsigned char kReplayEconomyGetEnergyUseReads[] = { 90 };
+static const unsigned char kReplayEconomyGetEnergyUseWrites[] = { 90 };
+static const unsigned char kReplayEconomyUnitAccountReads[] = { 90 };
+static const unsigned char kReplayEconomyUnitAccountWrites[] = { 90 };
 static const unsigned char kReplayFeaturesGetCellFeatureReads[] = { 1, 2 };
-static const unsigned short kReplayFeaturesGetCellFeatureObjReads[] = { 250, 251, 252 };
-static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 42, 43, 443 };
+static const unsigned short kReplayFeaturesGetCellFeatureObjReads[] = { 269, 270, 271 };
+static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 48, 49, 462 };
 static const unsigned short kReplayFeaturesApplyAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL, ROK_WEAPONHIT };
-static const unsigned char kReplayFeaturesApplyReads[] = { 1, 2, 18, 19, 22, 85, 86, 87 };
-static const unsigned char kReplayFeaturesApplyWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayFeaturesApplyObjReads[] = { 20, 42, 43, 101, 207, 234, 247, 250, 251, 252, 253, 256, 443, 444, 449, 450, 451, 452, 453, 454, 458, 459, 460, 461, 462, 464, 469, 470, 471, 472, 473, 474, 475, 476, 477, 481, 482, 483, 486, 487, 489, 490, 491, 698, 699 };
-static const unsigned short kReplayFeaturesApplyObjWrites[] = { 250, 251, 252, 253, 256, 470, 471, 472, 473, 474, 475, 476, 477, 481, 482, 483, 484, 485, 486, 489, 490, 491 };
+static const unsigned char kReplayFeaturesApplyReads[] = { 1, 2, 18, 19, 22, 87, 88, 89 };
+static const unsigned char kReplayFeaturesApplyWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayFeaturesApplyObjReads[] = { 20, 48, 49, 107, 226, 253, 266, 269, 270, 271, 272, 275, 462, 463, 468, 469, 470, 471, 472, 473, 477, 478, 479, 480, 481, 483, 488, 490, 491, 492, 493, 494, 495, 496, 497, 501, 502, 503, 506, 507, 509, 510, 511, 719, 720, 1022 };
+static const unsigned short kReplayFeaturesApplyObjWrites[] = { 269, 270, 271, 272, 275, 490, 491, 492, 493, 494, 495, 496, 497, 501, 502, 503, 504, 505, 506, 509, 510, 511 };
 static const unsigned short kReplayFeaturesPlaceAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL };
 static const unsigned char kReplayFeaturesPlaceReads[] = { 1, 2 };
-static const unsigned short kReplayFeaturesPlaceObjReads[] = { 42, 43, 250, 251, 252, 253, 256, 443, 444, 469, 470, 471, 474, 481, 487, 489, 490, 491 };
-static const unsigned short kReplayFeaturesPlaceObjWrites[] = { 250, 251, 252, 253, 256, 470, 471, 474, 475, 476, 477, 481, 482, 483, 484, 486, 489, 490, 491 };
+static const unsigned short kReplayFeaturesPlaceObjReads[] = { 48, 49, 269, 270, 271, 272, 275, 462, 463, 488, 490, 491, 494, 501, 507, 509, 510, 511 };
+static const unsigned short kReplayFeaturesPlaceObjWrites[] = { 269, 270, 271, 272, 275, 490, 491, 494, 495, 496, 497, 501, 502, 503, 504, 506, 509, 510, 511 };
 static const unsigned char kReplayFeaturesFeatureTypeCountReads[] = { 19 };
 static const unsigned short kReplayFeaturesAnimateFeatureTypeAllOf[] = { ROK_FEATURE };
-static const unsigned short kReplayFeaturesAnimateFeatureTypeObjReads[] = { 455, 456, 469 };
-static const unsigned short kReplayFeaturesAnimateFeatureTypeObjWrites[] = { 455, 456 };
+static const unsigned short kReplayFeaturesAnimateFeatureTypeObjReads[] = { 474, 475, 488 };
+static const unsigned short kReplayFeaturesAnimateFeatureTypeObjWrites[] = { 474, 475 };
 static const unsigned short kReplayFeaturesScanFeatureCellAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL };
-static const unsigned char kReplayFeaturesScanFeatureCellReads[] = { 1, 2, 37, 85, 86, 87 };
-static const unsigned char kReplayFeaturesScanFeatureCellWrites[] = { 37, 85, 86, 87 };
-static const unsigned short kReplayFeaturesScanFeatureCellObjReads[] = { 42, 43, 245, 250, 251, 252, 253, 256, 443, 444, 467, 468, 469, 470, 471, 474, 481, 487, 489, 490, 491 };
-static const unsigned short kReplayFeaturesScanFeatureCellObjWrites[] = { 250, 251, 252, 253, 256, 470, 471, 474, 475, 476, 477, 481, 482, 483, 484, 486, 489, 490, 491 };
+static const unsigned char kReplayFeaturesScanFeatureCellReads[] = { 1, 2, 37, 87, 88, 89 };
+static const unsigned char kReplayFeaturesScanFeatureCellWrites[] = { 37, 87, 88, 89 };
+static const unsigned short kReplayFeaturesScanFeatureCellObjReads[] = { 48, 49, 264, 269, 270, 271, 272, 275, 462, 463, 486, 487, 488, 490, 491, 494, 501, 507, 509, 510, 511 };
+static const unsigned short kReplayFeaturesScanFeatureCellObjWrites[] = { 269, 270, 271, 272, 275, 490, 491, 494, 495, 496, 497, 501, 502, 503, 504, 506, 509, 510, 511 };
 static const unsigned short kReplayFeaturesFirstFeatureSpotAllOf[] = { ROK_POOL };
-static const unsigned short kReplayFeaturesFirstFeatureSpotObjReads[] = { 489 };
+static const unsigned short kReplayFeaturesFirstFeatureSpotObjReads[] = { 509 };
 static const unsigned short kReplayFeaturesUpdateFeatureSpotAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL };
-static const unsigned char kReplayFeaturesUpdateFeatureSpotReads[] = { 0, 1, 2, 5, 7, 17, 28, 85, 86, 87 };
-static const unsigned char kReplayFeaturesUpdateFeatureSpotWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayFeaturesUpdateFeatureSpotObjReads[] = { 42, 43, 247, 250, 251, 252, 253, 256, 426, 427, 428, 429, 440, 443, 444, 449, 450, 457, 458, 462, 463, 464, 466, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 483, 484, 485, 486, 487, 489, 490, 491 };
-static const unsigned short kReplayFeaturesUpdateFeatureSpotObjWrites[] = { 250, 251, 252, 253, 256, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 489, 490, 491 };
+static const unsigned char kReplayFeaturesUpdateFeatureSpotReads[] = { 0, 1, 2, 5, 7, 17, 28, 87, 88, 89 };
+static const unsigned char kReplayFeaturesUpdateFeatureSpotWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayFeaturesUpdateFeatureSpotObjReads[] = { 48, 49, 266, 269, 270, 271, 272, 275, 445, 446, 447, 448, 459, 462, 463, 468, 469, 476, 477, 481, 482, 483, 485, 488, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 503, 504, 505, 506, 507, 509, 510, 511, 1022 };
+static const unsigned short kReplayFeaturesUpdateFeatureSpotObjWrites[] = { 269, 270, 271, 272, 275, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 502, 503, 504, 505, 506, 509, 510, 511 };
 static const unsigned short kReplayFeaturesFindFeatureAtPosAllOf[] = { ROK_CELL, ROK_FEATURE };
 static const unsigned char kReplayFeaturesFindFeatureAtPosReads[] = { 1, 2 };
-static const unsigned short kReplayFeaturesFindFeatureAtPosObjReads[] = { 42, 43, 250, 251, 252, 443 };
-static const unsigned char kReplayAiApplyReads[] = { 0, 15, 39, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 85, 86, 87 };
-static const unsigned char kReplayAiApplyWrites[] = { 71, 85, 86, 87 };
-static const unsigned short kReplayAiApplyObjReads[] = { 0, 22, 36, 37, 99, 100, 109, 142, 407, 408, 409, 410, 744 };
-static const unsigned short kReplayAiApplyObjWrites[] = { 109, 408, 744, 749 };
+static const unsigned short kReplayFeaturesFindFeatureAtPosObjReads[] = { 48, 49, 269, 270, 271, 462 };
+static const unsigned char kReplayAiApplyReads[] = { 0, 15, 39, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 87, 88, 89 };
+static const unsigned char kReplayAiApplyWrites[] = { 72, 87, 88, 89 };
+static const unsigned short kReplayAiApplyObjReads[] = { 0, 22, 36, 37, 105, 106, 115, 154, 426, 427, 428, 429, 765 };
+static const unsigned short kReplayAiApplyObjWrites[] = { 115, 427, 765, 770 };
 static const unsigned short kReplayAiDumpPlayerAIAllOf[] = { ROK_UNITDEF };
-static const unsigned char kReplayAiDumpPlayerAIReads[] = { 0, 15, 39, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81 };
-static const unsigned short kReplayAiDumpPlayerAIObjReads[] = { 22, 38, 148, 154, 406, 407, 409 };
-static const unsigned short kReplayAiDumpPlayerAIObjWrites[] = { 38, 148, 154 };
+static const unsigned char kReplayAiDumpPlayerAIReads[] = { 0, 15, 39, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82 };
+static const unsigned short kReplayAiDumpPlayerAIObjReads[] = { 22, 38, 160, 166, 425, 426, 428 };
+static const unsigned short kReplayAiDumpPlayerAIObjWrites[] = { 38, 160, 166 };
 static const unsigned short kReplayAiCreatePlayerAIAllOf[] = { ROK_UNITDEF };
-static const unsigned char kReplayAiCreatePlayerAIReads[] = { 4, 13, 39, 43, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81 };
-static const unsigned short kReplayAiCreatePlayerAIObjReads[] = { 23, 111, 115, 120, 131, 135, 136, 137, 138, 140, 142, 153, 158, 159, 161, 199, 202, 207, 404, 406, 412, 416 };
-static const unsigned short kReplayAiCreatePlayerAIObjWrites[] = { 406, 416 };
-static const unsigned char kReplayAiDestroyPlayerAIReads[] = { 72, 73, 74, 75, 76, 77, 78, 79, 80, 81 };
-static const unsigned char kReplayAiDestroyPlayerAIWrites[] = { 72, 73, 74, 75, 76, 77, 78, 79, 80, 81 };
+static const unsigned char kReplayAiCreatePlayerAIReads[] = { 4, 13, 39, 43, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82 };
+static const unsigned short kReplayAiCreatePlayerAIObjReads[] = { 23, 123, 127, 132, 143, 147, 148, 149, 150, 152, 154, 165, 170, 171, 173, 218, 221, 226, 423, 425, 431, 435 };
+static const unsigned short kReplayAiCreatePlayerAIObjWrites[] = { 425, 435 };
+static const unsigned char kReplayAiDestroyPlayerAIReads[] = { 73, 74, 75, 76, 77, 78, 79, 80, 81, 82 };
+static const unsigned char kReplayAiDestroyPlayerAIWrites[] = { 73, 74, 75, 76, 77, 78, 79, 80, 81, 82 };
 static const unsigned short kReplayAiUpdatePlayerAIAllOf[] = { ROK_UNIT, ROK_UNITDEF };
-static const unsigned char kReplayAiUpdatePlayerAIReads[] = { 0, 4, 13, 26, 39, 43, 44, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 85, 86, 87 };
-static const unsigned char kReplayAiUpdatePlayerAIWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayAiUpdatePlayerAIObjReads[] = { 23, 25, 35, 47, 91, 98, 99, 100, 111, 115, 120, 131, 135, 136, 137, 138, 140, 142, 153, 158, 159, 161, 199, 202, 207, 404, 405, 406, 411, 412, 416, 417 };
-static const unsigned short kReplayAiUpdatePlayerAIObjWrites[] = { 404, 405, 406, 411, 413, 416 };
+static const unsigned char kReplayAiUpdatePlayerAIReads[] = { 0, 4, 13, 26, 39, 43, 44, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 87, 88, 89 };
+static const unsigned char kReplayAiUpdatePlayerAIWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayAiUpdatePlayerAIObjReads[] = { 23, 25, 35, 53, 97, 104, 105, 106, 123, 127, 132, 143, 147, 148, 149, 150, 152, 154, 165, 170, 171, 173, 218, 221, 226, 423, 424, 425, 430, 431, 435, 436 };
+static const unsigned short kReplayAiUpdatePlayerAIObjWrites[] = { 423, 424, 425, 430, 432, 435 };
 static const unsigned short kReplayAiRebuildFeatureCellsAllOf[] = { ROK_CELL, ROK_FEATURE };
-static const unsigned char kReplayAiRebuildFeatureCellsReads[] = { 1, 2, 19, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81 };
-static const unsigned short kReplayAiRebuildFeatureCellsObjReads[] = { 250, 403, 461, 469 };
-static const unsigned short kReplayAiRebuildFeatureCellsObjWrites[] = { 403 };
+static const unsigned char kReplayAiRebuildFeatureCellsReads[] = { 1, 2, 19, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82 };
+static const unsigned short kReplayAiRebuildFeatureCellsObjReads[] = { 269, 422, 480, 488 };
+static const unsigned short kReplayAiRebuildFeatureCellsObjWrites[] = { 422 };
 static const unsigned short kReplayAiCreateSquadsObjReads[] = { 37 };
-static const unsigned short kReplayAiCreateSquadsObjWrites[] = { 37, 740, 741, 742, 743 };
-static const unsigned short kReplayAiFreeSquadsObjReads[] = { 37, 744 };
-static const unsigned short kReplayAiFreeSquadsObjWrites[] = { 37, 744 };
+static const unsigned short kReplayAiCreateSquadsObjWrites[] = { 37, 761, 762, 763, 764 };
+static const unsigned short kReplayAiFreeSquadsObjReads[] = { 37, 765 };
+static const unsigned short kReplayAiFreeSquadsObjWrites[] = { 37, 765 };
 static const unsigned short kReplayAiUpdateSquadsAllOf[] = { ROK_PLAYER, ROK_UNITDEF };
-static const unsigned char kReplayAiUpdateSquadsReads[] = { 0, 21, 31, 32, 39, 40, 41, 42, 69, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 85, 86, 87 };
-static const unsigned char kReplayAiUpdateSquadsWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayAiUpdateSquadsObjReads[] = { 0, 2, 3, 4, 5, 6, 7, 8, 9, 22, 25, 27, 28, 29, 33, 34, 35, 36, 37, 39, 42, 43, 47, 53, 60, 61, 73, 91, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 115, 120, 122, 123, 124, 125, 131, 138, 142, 151, 156, 157, 160, 190, 282, 383, 403, 404, 406, 407, 409, 411, 413, 414, 415, 416, 418, 419, 420, 421, 422, 423, 424, 740, 741, 744, 745, 747, 749, 750, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, 762, 763, 764, 765, 766, 767, 768, 769, 770, 771, 772, 773, 774, 775, 776, 777, 778, 779, 780, 781, 782, 783, 784, 785, 786, 787, 788, 791, 792, 793, 794, 795, 821, 822, 823, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 858, 859, 860, 901, 902, 903, 904 };
-static const unsigned short kReplayAiUpdateSquadsObjWrites[] = { 109, 403, 424, 744, 747, 751, 754, 760, 763, 768, 772, 776, 780, 782, 783, 784, 785, 786, 787, 788, 791, 794, 821, 822, 823, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 858, 859, 860 };
-static const unsigned short kReplayAiCreateSquadManagerObjReads[] = { 35, 37, 745 };
-static const unsigned short kReplayAiCreateSquadManagerObjWrites[] = { 36, 745, 746, 747, 748, 749, 750, 751 };
-static const unsigned short kReplayAiFreeSquadManagerObjReads[] = { 36, 750 };
+static const unsigned char kReplayAiUpdateSquadsReads[] = { 0, 21, 31, 32, 39, 40, 41, 42, 70, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 87, 88, 89 };
+static const unsigned char kReplayAiUpdateSquadsWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayAiUpdateSquadsObjReads[] = { 0, 2, 3, 4, 5, 6, 7, 8, 9, 22, 25, 27, 28, 29, 33, 34, 35, 36, 37, 45, 48, 49, 53, 59, 66, 67, 79, 97, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 127, 132, 134, 135, 136, 137, 143, 150, 154, 163, 168, 169, 172, 209, 301, 402, 422, 423, 425, 426, 428, 430, 432, 433, 434, 435, 437, 438, 439, 440, 441, 442, 443, 761, 762, 765, 766, 768, 770, 771, 772, 773, 774, 775, 776, 777, 778, 779, 780, 781, 782, 783, 784, 785, 786, 787, 788, 789, 790, 791, 792, 793, 794, 795, 796, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806, 807, 808, 809, 812, 813, 814, 815, 816, 842, 843, 844, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 879, 880, 881, 922, 923, 924, 925 };
+static const unsigned short kReplayAiUpdateSquadsObjWrites[] = { 115, 422, 443, 765, 768, 772, 775, 781, 784, 789, 793, 797, 801, 803, 804, 805, 806, 807, 808, 809, 812, 815, 842, 843, 844, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 879, 880, 881 };
+static const unsigned short kReplayAiCreateSquadManagerObjReads[] = { 35, 37, 766 };
+static const unsigned short kReplayAiCreateSquadManagerObjWrites[] = { 36, 766, 767, 768, 769, 770, 771, 772 };
+static const unsigned short kReplayAiFreeSquadManagerObjReads[] = { 36, 771 };
 static const unsigned short kReplayAiFreeSquadManagerObjWrites[] = { 36 };
 static const unsigned char kReplayPathfindingRegionSizeReads[] = { 1, 2 };
-static const unsigned short kReplayPathfindingRegionSizeObjReads[] = { 42, 43 };
+static const unsigned short kReplayPathfindingRegionSizeObjReads[] = { 48, 49 };
 static const unsigned char kReplayPathfindingInitReads[] = { 1, 2 };
-static const unsigned char kReplayPathfindingInitWrites[] = { 88 };
-static const unsigned short kReplayPathfindingInitObjReads[] = { 42, 43 };
-static const unsigned char kReplayPathfindingShutdownReads[] = { 1, 2, 88 };
-static const unsigned short kReplayPathfindingShutdownObjReads[] = { 42, 43 };
-static const unsigned char kReplayPathfindingSubmitReads[] = { 1, 2, 88 };
-static const unsigned char kReplayPathfindingSubmitWrites[] = { 88 };
-static const unsigned short kReplayPathfindingSubmitObjReads[] = { 42, 43 };
-static const unsigned char kReplayPathfindingCancelReads[] = { 1, 2, 88 };
-static const unsigned char kReplayPathfindingCancelWrites[] = { 88 };
-static const unsigned short kReplayPathfindingCancelObjReads[] = { 42, 43 };
-static const unsigned char kReplayPathfindingCellsChangedReads[] = { 1, 2, 88 };
-static const unsigned char kReplayPathfindingCellsChangedWrites[] = { 88 };
-static const unsigned short kReplayPathfindingCellsChangedObjReads[] = { 42, 43 };
-static const unsigned char kReplayPathfindingStepReads[] = { 1, 2, 88 };
-static const unsigned char kReplayPathfindingStepWrites[] = { 88 };
-static const unsigned short kReplayPathfindingStepObjReads[] = { 42, 43 };
-static const unsigned char kReplayPathfindingPollReads[] = { 1, 2, 88 };
-static const unsigned char kReplayPathfindingPollWrites[] = { 88 };
-static const unsigned short kReplayPathfindingPollObjReads[] = { 42, 43 };
+static const unsigned char kReplayPathfindingInitWrites[] = { 90 };
+static const unsigned short kReplayPathfindingInitObjReads[] = { 48, 49 };
+static const unsigned char kReplayPathfindingShutdownReads[] = { 1, 2, 90 };
+static const unsigned short kReplayPathfindingShutdownObjReads[] = { 48, 49 };
+static const unsigned char kReplayPathfindingSubmitReads[] = { 1, 2, 90 };
+static const unsigned char kReplayPathfindingSubmitWrites[] = { 90 };
+static const unsigned short kReplayPathfindingSubmitObjReads[] = { 48, 49 };
+static const unsigned char kReplayPathfindingCancelReads[] = { 1, 2, 90 };
+static const unsigned char kReplayPathfindingCancelWrites[] = { 90 };
+static const unsigned short kReplayPathfindingCancelObjReads[] = { 48, 49 };
+static const unsigned char kReplayPathfindingCellsChangedReads[] = { 1, 2, 90 };
+static const unsigned char kReplayPathfindingCellsChangedWrites[] = { 90 };
+static const unsigned short kReplayPathfindingCellsChangedObjReads[] = { 48, 49 };
+static const unsigned char kReplayPathfindingStepReads[] = { 1, 2, 90 };
+static const unsigned char kReplayPathfindingStepWrites[] = { 90 };
+static const unsigned short kReplayPathfindingStepObjReads[] = { 48, 49 };
+static const unsigned char kReplayPathfindingPollReads[] = { 1, 2, 90 };
+static const unsigned char kReplayPathfindingPollWrites[] = { 90 };
+static const unsigned short kReplayPathfindingPollObjReads[] = { 48, 49 };
 static const unsigned short kReplayWeaponsApplyAllOf[] = { ROK_PLAYER, ROK_CELL, ROK_PROJECTILE, ROK_FEATURE, ROK_SPOT, ROK_DEBRISPIECE, ROK_DEBRISVERTEX, ROK_DEBRISFACE, ROK_DEBRIS, ROK_EXPLODEDSLOT, ROK_GAFLISTS, ROK_GAFSOURCES };
-static const ReplayIdReach kReplayWeaponsApplyIdReach[] = { { 254, kReplayReachFields + 39, 30 }, { 255, kReplayReachFields + 39, 30 } };
-static const unsigned char kReplayWeaponsApplyReads[] = { 0, 1, 2, 16, 17, 18, 28, 29, 30, 54, 85, 86, 87 };
-static const unsigned char kReplayWeaponsApplyWrites[] = { 30, 54, 85, 86, 87 };
-static const unsigned short kReplayWeaponsApplyObjReads[] = { 0, 20, 22, 39, 42, 43, 44, 45, 46, 48, 51, 52, 53, 55, 56, 58, 59, 60, 61, 68, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 97, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 133, 135, 136, 138, 145, 146, 147, 148, 152, 153, 162, 163, 164, 165, 176, 190, 199, 203, 204, 207, 208, 211, 213, 215, 216, 218, 219, 222, 223, 224, 225, 240, 245, 246, 248, 250, 251, 252, 253, 254, 255, 256, 268, 269, 270, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 440, 475, 476, 477, 492, 500, 551, 698, 820, 821, 822, 823, 824, 825, 826, 827, 828, 829, 830, 831, 832, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 894, 898, 899, 900, 901, 902, 903, 904, 910 };
-static const unsigned short kReplayWeaponsApplyObjWrites[] = { 53, 60, 61, 74, 77, 78, 79, 82, 83, 84, 87, 88, 106, 107, 108, 148, 225, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 440, 551, 820, 821, 822, 823, 824, 825, 826, 827, 828, 829, 830, 831, 832, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872 };
+static const ReplayIdReach kReplayWeaponsApplyIdReach[] = { { 273, kReplayReachFields + 43, 30 }, { 274, kReplayReachFields + 43, 30 } };
+static const unsigned char kReplayWeaponsApplyReads[] = { 0, 1, 2, 16, 17, 18, 28, 29, 30, 54, 87, 88, 89 };
+static const unsigned char kReplayWeaponsApplyWrites[] = { 30, 54, 87, 88, 89 };
+static const unsigned short kReplayWeaponsApplyObjReads[] = { 0, 20, 22, 45, 48, 49, 50, 51, 52, 54, 57, 58, 59, 61, 62, 64, 65, 66, 67, 74, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 97, 103, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 145, 147, 148, 150, 157, 158, 159, 160, 164, 165, 174, 175, 176, 177, 188, 209, 218, 222, 223, 226, 227, 230, 232, 234, 235, 237, 238, 241, 242, 243, 244, 259, 264, 265, 267, 269, 270, 271, 272, 273, 274, 275, 287, 288, 289, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 459, 495, 496, 497, 512, 520, 572, 719, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 875, 876, 877, 878, 879, 880, 881, 882, 883, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 895, 896, 897, 915, 919, 920, 921, 922, 923, 924, 925, 931 };
+static const unsigned short kReplayWeaponsApplyObjWrites[] = { 59, 66, 67, 80, 83, 84, 85, 88, 89, 90, 93, 94, 112, 113, 114, 160, 244, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 459, 572, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880, 881, 882, 883, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893 };
 static const unsigned short kReplayWeaponsUpdateProjectilesAllOf[] = { ROK_PLAYER, ROK_CELL, ROK_PROJECTILE, ROK_FEATURE, ROK_SPOT, ROK_DEBRIS, ROK_GAFLISTS };
-static const ReplayIdReach kReplayWeaponsUpdateProjectilesIdReach[] = { { 254, kReplayReachFields + 39, 30 }, { 255, kReplayReachFields + 39, 30 } };
-static const unsigned char kReplayWeaponsUpdateProjectilesReads[] = { 0, 1, 2, 5, 6, 7, 17, 18, 19, 28, 29, 30, 54, 85, 86, 87 };
-static const unsigned char kReplayWeaponsUpdateProjectilesWrites[] = { 30, 54, 85, 86, 87 };
-static const unsigned short kReplayWeaponsUpdateProjectilesObjReads[] = { 0, 22, 39, 42, 43, 44, 46, 48, 60, 68, 91, 97, 99, 100, 101, 103, 104, 105, 106, 107, 133, 138, 147, 148, 152, 162, 163, 164, 165, 176, 190, 191, 192, 200, 204, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 245, 246, 248, 249, 250, 251, 252, 253, 254, 255, 256, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 440, 465, 475, 476, 477, 698, 835, 836, 837, 838, 839, 840, 873, 874, 875, 876, 910 };
-static const unsigned short kReplayWeaponsUpdateProjectilesObjWrites[] = { 148, 225, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 440, 821, 822, 823, 833, 834, 835, 836, 837, 838, 839, 840 };
+static const ReplayIdReach kReplayWeaponsUpdateProjectilesIdReach[] = { { 273, kReplayReachFields + 43, 30 }, { 274, kReplayReachFields + 43, 30 } };
+static const unsigned char kReplayWeaponsUpdateProjectilesReads[] = { 0, 1, 2, 5, 6, 7, 17, 18, 19, 28, 29, 30, 54, 87, 88, 89 };
+static const unsigned char kReplayWeaponsUpdateProjectilesWrites[] = { 30, 54, 87, 88, 89 };
+static const unsigned short kReplayWeaponsUpdateProjectilesObjReads[] = { 0, 22, 45, 48, 49, 50, 52, 54, 66, 74, 97, 103, 105, 106, 107, 109, 110, 111, 112, 113, 145, 150, 159, 160, 164, 174, 175, 176, 177, 188, 209, 210, 211, 219, 223, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 264, 265, 267, 268, 269, 270, 271, 272, 273, 274, 275, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 459, 484, 495, 496, 497, 719, 856, 857, 858, 859, 860, 861, 894, 895, 896, 897, 931 };
+static const unsigned short kReplayWeaponsUpdateProjectilesObjWrites[] = { 160, 244, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 459, 842, 843, 844, 854, 855, 856, 857, 858, 859, 860, 861 };
 static const unsigned short kReplayWeaponsUpdateExplosionsAllOf[] = { ROK_DEBRISPIECE, ROK_DEBRIS, ROK_EXPLODEDSLOT, ROK_GAFSRC1, ROK_GAFSRC2, ROK_GAFSRC3, ROK_GAFLISTS };
 static const unsigned char kReplayWeaponsUpdateExplosionsReads[] = { 17, 28, 54 };
 static const unsigned char kReplayWeaponsUpdateExplosionsWrites[] = { 54 };
-static const unsigned short kReplayWeaponsUpdateExplosionsObjReads[] = { 440, 820, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 863, 864, 865, 866, 867, 868, 869, 871, 872, 873, 874, 875, 876 };
-static const unsigned short kReplayWeaponsUpdateExplosionsObjWrites[] = { 440, 820, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 866, 867, 868, 869 };
+static const unsigned short kReplayWeaponsUpdateExplosionsObjReads[] = { 459, 841, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880, 881, 884, 885, 886, 887, 888, 889, 890, 892, 893, 894, 895, 896, 897 };
+static const unsigned short kReplayWeaponsUpdateExplosionsObjWrites[] = { 459, 841, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880, 881, 887, 888, 889, 890 };
 static const unsigned short kReplayWeaponsUpdateUnitWeaponsAllOf[] = { ROK_PROJECTILE, ROK_WEAPONFIRE };
-static const unsigned char kReplayWeaponsUpdateUnitWeaponsReads[] = { 0, 16, 17, 28, 30, 85, 86, 87 };
-static const unsigned char kReplayWeaponsUpdateUnitWeaponsWrites[] = { 30, 85, 86, 87 };
-static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjReads[] = { 33, 34, 44, 46, 48, 50, 51, 52, 53, 55, 56, 58, 59, 60, 61, 68, 69, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 97, 99, 101, 102, 103, 104, 105, 106, 107, 108, 134, 152, 190, 191, 192, 193, 194, 195, 196, 197, 198, 200, 201, 202, 203, 204, 205, 206, 272, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 551, 552 };
-static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjWrites[] = { 53, 61, 74, 75, 76, 77, 79, 80, 81, 82, 84, 85, 86, 87, 108, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 551, 821, 822, 823 };
+static const unsigned char kReplayWeaponsUpdateUnitWeaponsReads[] = { 0, 16, 17, 28, 30, 87, 88, 89 };
+static const unsigned char kReplayWeaponsUpdateUnitWeaponsWrites[] = { 30, 87, 88, 89 };
+static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjReads[] = { 33, 34, 50, 52, 54, 56, 57, 58, 59, 61, 62, 64, 65, 66, 67, 74, 75, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 97, 103, 105, 107, 108, 109, 110, 111, 112, 113, 114, 146, 164, 209, 210, 211, 212, 213, 214, 215, 216, 217, 219, 220, 221, 222, 223, 224, 225, 291, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 572, 573 };
+static const unsigned short kReplayWeaponsUpdateUnitWeaponsObjWrites[] = { 59, 67, 80, 81, 82, 83, 85, 86, 87, 88, 90, 91, 92, 93, 114, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 572, 842, 843, 844 };
 static const unsigned short kReplayWeaponsFindWeaponByNameAllOf[] = { ROK_WEAPONNAME };
-static const unsigned short kReplayWeaponsFindWeaponByNameObjReads[] = { 734 };
-static const unsigned short kReplayWeaponsGetWeaponRangeObjReads[] = { 60, 106, 107, 202 };
+static const unsigned short kReplayWeaponsFindWeaponByNameObjReads[] = { 755 };
+static const unsigned short kReplayWeaponsGetWeaponRangeObjReads[] = { 66, 112, 113, 221 };
 static const unsigned char kReplayWeaponsWeaponCanReachUnitReads[] = { 17, 28 };
-static const unsigned short kReplayWeaponsWeaponCanReachUnitObjReads[] = { 60, 91, 99, 103, 104, 105, 106, 107, 134, 138, 190, 191, 198, 202 };
+static const unsigned short kReplayWeaponsWeaponCanReachUnitObjReads[] = { 66, 97, 105, 109, 110, 111, 112, 113, 146, 150, 209, 210, 217, 221 };
 static const unsigned short kReplayWeaponsFindTargetableProjectileAllOf[] = { ROK_PROJECTILE };
 static const unsigned char kReplayWeaponsFindTargetableProjectileReads[] = { 30 };
-static const unsigned short kReplayWeaponsFindTargetableProjectileObjReads[] = { 60, 77, 82, 87, 101, 103, 105, 106, 107, 190, 195, 287, 288, 298, 300, 307 };
+static const unsigned short kReplayWeaponsFindTargetableProjectileObjReads[] = { 66, 83, 88, 93, 107, 109, 111, 112, 113, 209, 214, 306, 307, 317, 319, 326 };
 static const unsigned char kReplayWeaponsWeaponCanReachPosReads[] = { 17, 28 };
-static const unsigned short kReplayWeaponsWeaponCanReachPosObjReads[] = { 60, 99, 106, 107, 134, 190, 191, 198, 202 };
-static const unsigned short kReplayTargetingApplyObjReads[] = { 46, 49, 51, 52, 53, 55, 56, 58, 59, 60, 61, 106, 107, 108 };
-static const unsigned short kReplayTargetingApplyObjWrites[] = { 49, 51, 52, 55, 56, 58, 59 };
-static const unsigned short kReplayTargetingGetWeaponTargetUnitObjReads[] = { 51, 52, 53, 55, 56, 58, 59, 60, 61, 106, 107, 108 };
-static const unsigned short kReplayTargetingGetWeaponTargetUnitObjWrites[] = { 51, 52, 55, 56, 58, 59 };
+static const unsigned short kReplayWeaponsWeaponCanReachPosObjReads[] = { 66, 105, 112, 113, 146, 209, 210, 217, 221 };
+static const unsigned short kReplayTargetingApplyObjReads[] = { 52, 55, 57, 58, 59, 61, 62, 64, 65, 66, 67, 112, 113, 114 };
+static const unsigned short kReplayTargetingApplyObjWrites[] = { 55, 57, 58, 61, 62, 64, 65 };
+static const unsigned short kReplayTargetingGetWeaponTargetUnitObjReads[] = { 57, 58, 59, 61, 62, 64, 65, 66, 67, 112, 113, 114 };
+static const unsigned short kReplayTargetingGetWeaponTargetUnitObjWrites[] = { 57, 58, 61, 62, 64, 65 };
 static const unsigned char kReplayTargetingGetWeaponTargetPosReads[] = { 17 };
-static const unsigned short kReplayTargetingGetWeaponTargetPosObjReads[] = { 47, 48, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 102, 103, 104, 105, 106, 107, 108, 190, 191, 268, 269, 270 };
-static const unsigned short kReplayTargetingGetWeaponTargetPosObjWrites[] = { 51, 52, 55, 56, 58, 59 };
-static const unsigned char kReplayTargetingFindWeaponTargetReads[] = { 18, 85, 86, 87 };
-static const unsigned char kReplayTargetingFindWeaponTargetWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayTargetingFindWeaponTargetObjReads[] = { 0, 22, 39, 47, 60, 91, 99, 100, 101, 103, 104, 105, 106, 107, 121, 122, 123, 124, 138, 150, 190, 282 };
-static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillReads[] = { 18, 85, 86, 87 };
-static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayTargetingFindBestTargetIfFireAtWillObjReads[] = { 0, 22, 39, 47, 60, 91, 99, 100, 101, 103, 104, 105, 106, 107, 121, 122, 123, 124, 138, 150, 190, 282 };
-static const unsigned short kReplayTargetingChooseWeaponObjReads[] = { 53, 61, 108 };
-static const unsigned short kReplayTargetingSavedTargetPairObjReads[] = { 51, 52, 53, 55, 56, 58, 59, 60, 61, 106, 107, 108 };
-static const unsigned short kReplayTargetingSavedTargetPairObjWrites[] = { 51, 52, 55, 56, 58, 59 };
+static const unsigned short kReplayTargetingGetWeaponTargetPosObjReads[] = { 53, 54, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 108, 109, 110, 111, 112, 113, 114, 209, 210, 287, 288, 289 };
+static const unsigned short kReplayTargetingGetWeaponTargetPosObjWrites[] = { 57, 58, 61, 62, 64, 65 };
+static const unsigned char kReplayTargetingFindWeaponTargetReads[] = { 18, 87, 88, 89 };
+static const unsigned char kReplayTargetingFindWeaponTargetWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayTargetingFindWeaponTargetObjReads[] = { 0, 22, 45, 53, 66, 97, 105, 106, 107, 109, 110, 111, 112, 113, 133, 134, 135, 136, 150, 162, 209, 301 };
+static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillReads[] = { 18, 87, 88, 89 };
+static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayTargetingFindBestTargetIfFireAtWillObjReads[] = { 0, 22, 45, 53, 66, 97, 105, 106, 107, 109, 110, 111, 112, 113, 133, 134, 135, 136, 150, 162, 209, 301 };
+static const unsigned short kReplayTargetingChooseWeaponObjReads[] = { 59, 67, 114 };
+static const unsigned short kReplayTargetingSavedTargetPairObjReads[] = { 57, 58, 59, 61, 62, 64, 65, 66, 67, 112, 113, 114 };
+static const unsigned short kReplayTargetingSavedTargetPairObjWrites[] = { 57, 58, 61, 62, 64, 65 };
 static const unsigned short kReplayLosRadarApplyAllOf[] = { ROK_PLAYER, ROK_UNIT, ROK_CELL, ROK_PROJECTILE, ROK_EYE };
-static const unsigned char kReplayLosRadarApplyReads[] = { 0, 1, 2, 16, 17, 18, 20, 21, 22, 26, 30, 34, 44, 46, 48, 49, 50, 51, 52, 53, 83, 88 };
-static const unsigned char kReplayLosRadarApplyWrites[] = { 20, 21, 46, 48, 83, 88 };
-static const unsigned short kReplayLosRadarApplyObjReads[] = { 0, 20, 22, 26, 27, 28, 29, 35, 39, 42, 43, 46, 47, 51, 52, 53, 55, 56, 58, 59, 60, 61, 77, 82, 87, 91, 96, 99, 100, 101, 103, 104, 105, 106, 107, 108, 134, 138, 142, 150, 159, 161, 180, 181, 190, 195, 234, 240, 244, 247, 248, 249, 285, 287, 288, 289, 290, 291, 425, 426, 427, 428, 429, 430, 431, 432, 805, 806, 807, 808, 809, 810, 811, 812, 813, 815 };
-static const unsigned short kReplayLosRadarApplyObjWrites[] = { 27, 51, 52, 55, 56, 58, 59, 234, 248, 249, 805, 806, 807, 808, 809, 810, 811, 812, 813, 814, 815 };
+static const unsigned char kReplayLosRadarApplyReads[] = { 0, 1, 2, 16, 17, 18, 20, 21, 22, 26, 30, 34, 44, 46, 48, 49, 50, 51, 52, 53, 84, 90 };
+static const unsigned char kReplayLosRadarApplyWrites[] = { 20, 21, 46, 48, 84, 90 };
+static const unsigned short kReplayLosRadarApplyObjReads[] = { 0, 20, 22, 26, 27, 28, 29, 35, 45, 48, 49, 52, 53, 57, 58, 59, 61, 62, 64, 65, 66, 67, 83, 88, 93, 97, 102, 105, 106, 107, 109, 110, 111, 112, 113, 114, 146, 150, 154, 162, 171, 173, 192, 193, 209, 214, 253, 259, 263, 266, 267, 268, 304, 306, 307, 308, 309, 310, 444, 445, 446, 447, 448, 449, 450, 451, 826, 827, 828, 829, 830, 831, 832, 833, 834, 836 };
+static const unsigned short kReplayLosRadarApplyObjWrites[] = { 27, 57, 58, 61, 62, 64, 65, 253, 267, 268, 826, 827, 828, 829, 830, 831, 832, 833, 834, 835, 836 };
 static const unsigned short kReplayLosRadarGetMapCellAllOf[] = { ROK_CELL };
-static const unsigned char kReplayLosRadarGetMapCellReads[] = { 1, 2, 88 };
-static const unsigned char kReplayLosRadarGetMapCellWrites[] = { 88 };
-static const unsigned short kReplayLosRadarGetMapCellObjReads[] = { 244, 247, 248, 249 };
+static const unsigned char kReplayLosRadarGetMapCellReads[] = { 1, 2, 90 };
+static const unsigned char kReplayLosRadarGetMapCellWrites[] = { 90 };
+static const unsigned short kReplayLosRadarGetMapCellObjReads[] = { 263, 266, 267, 268 };
 static const unsigned short kReplayLosRadarGetMapCellAtPositionAllOf[] = { ROK_CELL };
-static const unsigned char kReplayLosRadarGetMapCellAtPositionReads[] = { 1, 2, 88 };
-static const unsigned char kReplayLosRadarGetMapCellAtPositionWrites[] = { 88 };
-static const unsigned short kReplayLosRadarGetMapCellAtPositionObjReads[] = { 244, 247, 248, 249 };
+static const unsigned char kReplayLosRadarGetMapCellAtPositionReads[] = { 1, 2, 90 };
+static const unsigned char kReplayLosRadarGetMapCellAtPositionWrites[] = { 90 };
+static const unsigned short kReplayLosRadarGetMapCellAtPositionObjReads[] = { 263, 266, 267, 268 };
 static const unsigned short kReplayLosRadarGetOriginCellAtPositionAllOf[] = { ROK_CELL };
-static const unsigned char kReplayLosRadarGetOriginCellAtPositionReads[] = { 1, 2, 88 };
-static const unsigned char kReplayLosRadarGetOriginCellAtPositionWrites[] = { 88 };
-static const unsigned short kReplayLosRadarGetOriginCellAtPositionObjReads[] = { 244, 247, 248, 249, 250, 251, 252 };
-static const unsigned char kReplayLosRadarClampWorldPosToTerrainReads[] = { 17, 31, 32, 88 };
-static const unsigned char kReplayLosRadarClampWorldPosToTerrainWrites[] = { 88 };
-static const unsigned short kReplayLosRadarClampWorldPosToTerrainObjReads[] = { 104, 812, 815 };
-static const unsigned short kReplayLosRadarClampWorldPosToTerrainObjWrites[] = { 821, 822, 823 };
-static const unsigned char kReplayLosRadarIsUnitVisibleToPlayerReads[] = { 1, 2, 17, 20, 21, 22, 88 };
-static const unsigned char kReplayLosRadarIsUnitVisibleToPlayerWrites[] = { 88 };
-static const unsigned short kReplayLosRadarIsUnitVisibleToPlayerObjReads[] = { 27, 28, 29, 39, 91, 99, 100, 147, 162, 163, 166, 177, 178 };
+static const unsigned char kReplayLosRadarGetOriginCellAtPositionReads[] = { 1, 2, 90 };
+static const unsigned char kReplayLosRadarGetOriginCellAtPositionWrites[] = { 90 };
+static const unsigned short kReplayLosRadarGetOriginCellAtPositionObjReads[] = { 263, 266, 267, 268, 269, 270, 271 };
+static const unsigned char kReplayLosRadarClampWorldPosToTerrainReads[] = { 17, 31, 32, 90 };
+static const unsigned char kReplayLosRadarClampWorldPosToTerrainWrites[] = { 90 };
+static const unsigned short kReplayLosRadarClampWorldPosToTerrainObjReads[] = { 110, 833, 836 };
+static const unsigned short kReplayLosRadarClampWorldPosToTerrainObjWrites[] = { 842, 843, 844 };
+static const unsigned char kReplayLosRadarIsUnitVisibleToPlayerReads[] = { 1, 2, 17, 20, 21, 22, 90 };
+static const unsigned char kReplayLosRadarIsUnitVisibleToPlayerWrites[] = { 90 };
+static const unsigned short kReplayLosRadarIsUnitVisibleToPlayerObjReads[] = { 27, 28, 29, 45, 97, 105, 106, 159, 174, 175, 178, 189, 190 };
 static const unsigned short kReplayLosRadarSoundHeardMaskAllOf[] = { ROK_PLAYER, ROK_CELL };
-static const unsigned char kReplayLosRadarSoundHeardMaskReads[] = { 1, 2, 20, 21, 88 };
-static const unsigned char kReplayLosRadarSoundHeardMaskWrites[] = { 88 };
-static const unsigned short kReplayLosRadarSoundHeardMaskObjReads[] = { 26, 27, 28, 29, 244, 247, 248, 249 };
-static const unsigned char kReplayLosRadarUpdateUnitLineOfSightReads[] = { 1, 2, 17, 20, 21, 22, 34, 48, 49, 50, 51, 52, 53, 83, 88 };
-static const unsigned char kReplayLosRadarUpdateUnitLineOfSightWrites[] = { 20, 21, 48, 83, 88 };
-static const unsigned short kReplayLosRadarUpdateUnitLineOfSightObjReads[] = { 26, 27, 28, 29, 35, 99, 100, 103, 104, 105, 134, 150, 425, 426, 427, 428, 429, 430, 431, 432, 805, 807, 808, 809, 811, 812, 813, 815 };
-static const unsigned short kReplayLosRadarUpdateUnitLineOfSightObjWrites[] = { 27, 815 };
+static const unsigned char kReplayLosRadarSoundHeardMaskReads[] = { 1, 2, 20, 21, 90 };
+static const unsigned char kReplayLosRadarSoundHeardMaskWrites[] = { 90 };
+static const unsigned short kReplayLosRadarSoundHeardMaskObjReads[] = { 26, 27, 28, 29, 263, 266, 267, 268 };
+static const unsigned char kReplayLosRadarUpdateUnitLineOfSightReads[] = { 1, 2, 17, 20, 21, 22, 34, 48, 49, 50, 51, 52, 53, 84, 90 };
+static const unsigned char kReplayLosRadarUpdateUnitLineOfSightWrites[] = { 20, 21, 48, 84, 90 };
+static const unsigned short kReplayLosRadarUpdateUnitLineOfSightObjReads[] = { 26, 27, 28, 29, 35, 105, 106, 109, 110, 111, 146, 162, 444, 445, 446, 447, 448, 449, 450, 451, 826, 828, 829, 830, 832, 833, 834, 836 };
+static const unsigned short kReplayLosRadarUpdateUnitLineOfSightObjWrites[] = { 27, 836 };
 static const unsigned short kReplayLosRadarRecordRadarUnitsAllOf[] = { ROK_PLAYER, ROK_UNIT, ROK_PROJECTILE };
-static const unsigned char kReplayLosRadarRecordRadarUnitsReads[] = { 1, 2, 18, 20, 21, 22, 26, 30, 44, 88 };
-static const unsigned char kReplayLosRadarRecordRadarUnitsWrites[] = { 88 };
-static const unsigned short kReplayLosRadarRecordRadarUnitsObjReads[] = { 20, 26, 27, 28, 29, 39, 46, 47, 51, 52, 53, 55, 56, 58, 59, 60, 61, 77, 82, 87, 91, 96, 99, 101, 103, 104, 105, 106, 107, 108, 138, 142, 159, 161, 180, 181, 190, 195, 240, 285, 287, 288, 289, 290, 291 };
-static const unsigned short kReplayLosRadarRecordRadarUnitsObjWrites[] = { 51, 52, 55, 56, 58, 59 };
+static const unsigned char kReplayLosRadarRecordRadarUnitsReads[] = { 1, 2, 18, 20, 21, 22, 26, 30, 44, 90 };
+static const unsigned char kReplayLosRadarRecordRadarUnitsWrites[] = { 90 };
+static const unsigned short kReplayLosRadarRecordRadarUnitsObjReads[] = { 20, 26, 27, 28, 29, 45, 52, 53, 57, 58, 59, 61, 62, 64, 65, 66, 67, 83, 88, 93, 97, 102, 105, 107, 109, 110, 111, 112, 113, 114, 150, 154, 171, 173, 192, 193, 209, 214, 259, 304, 306, 307, 308, 309, 310 };
+static const unsigned short kReplayLosRadarRecordRadarUnitsObjWrites[] = { 57, 58, 61, 62, 64, 65 };
 static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakAllOf[] = { ROK_PLAYER, ROK_UNIT };
-static const unsigned char kReplayLosRadarUpdateSensorRadarAndCloakReads[] = { 0, 1, 2, 17, 20, 21, 22, 26, 44, 47, 84, 88 };
-static const unsigned char kReplayLosRadarUpdateSensorRadarAndCloakWrites[] = { 88 };
-static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjReads[] = { 0, 2, 3, 20, 22, 25, 27, 28, 29, 35, 39, 40, 47, 91, 99, 100, 101, 103, 104, 105, 138, 142, 147, 159, 161, 179, 180, 181, 234, 236, 877, 881 };
-static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjWrites[] = { 91 };
+static const unsigned char kReplayLosRadarUpdateSensorRadarAndCloakReads[] = { 0, 1, 2, 17, 20, 21, 22, 26, 44, 47, 85, 90 };
+static const unsigned char kReplayLosRadarUpdateSensorRadarAndCloakWrites[] = { 90 };
+static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjReads[] = { 0, 2, 3, 20, 22, 25, 27, 28, 29, 35, 45, 46, 53, 97, 105, 106, 107, 109, 110, 111, 150, 154, 159, 171, 173, 191, 192, 193, 253, 255, 898, 902 };
+static const unsigned short kReplayLosRadarUpdateSensorRadarAndCloakObjWrites[] = { 97 };
 static const unsigned short kReplayLosRadarRecordRadarMappedAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayLosRadarRecordRadarMappedReads[] = { 1, 2, 20, 22, 48, 88 };
-static const unsigned char kReplayLosRadarRecordRadarMappedWrites[] = { 48, 88 };
+static const unsigned char kReplayLosRadarRecordRadarMappedReads[] = { 1, 2, 20, 22, 48, 90 };
+static const unsigned char kReplayLosRadarRecordRadarMappedWrites[] = { 48, 90 };
 static const unsigned short kReplayLosRadarRecordRadarMappedObjReads[] = { 26, 27, 28, 29 };
 static const unsigned short kReplayLosRadarExpireEyeballsAllOf[] = { ROK_EYE };
-static const unsigned char kReplayLosRadarExpireEyeballsReads[] = { 0, 1, 2, 21, 22, 34, 46, 48, 49, 50, 51, 52, 53, 83, 88 };
-static const unsigned char kReplayLosRadarExpireEyeballsWrites[] = { 21, 46, 48, 83, 88 };
-static const unsigned short kReplayLosRadarExpireEyeballsObjReads[] = { 26, 27, 28, 29, 35, 104, 426, 427, 430, 431, 432, 805, 807, 809, 812, 814, 815 };
+static const unsigned char kReplayLosRadarExpireEyeballsReads[] = { 0, 1, 2, 21, 22, 34, 46, 48, 49, 50, 51, 52, 53, 84, 90 };
+static const unsigned char kReplayLosRadarExpireEyeballsWrites[] = { 21, 46, 48, 84, 90 };
+static const unsigned short kReplayLosRadarExpireEyeballsObjReads[] = { 26, 27, 28, 29, 35, 110, 445, 446, 449, 450, 451, 826, 828, 830, 833, 835, 836 };
 static const unsigned short kReplayLosRadarExpireEyeballsObjWrites[] = { 27 };
-static const unsigned char kReplayLosRadarGetVisibleEnemiesInRadiusReads[] = { 84, 88 };
-static const unsigned char kReplayLosRadarGetVisibleEnemiesInRadiusWrites[] = { 88 };
-static const unsigned short kReplayLosRadarGetVisibleEnemiesInRadiusObjReads[] = { 91, 103, 105, 877, 880, 881, 882 };
-static const unsigned char kReplayLosRadarHasReadyUnitInRangeReads[] = { 84, 88 };
-static const unsigned char kReplayLosRadarHasReadyUnitInRangeWrites[] = { 88 };
-static const unsigned short kReplayLosRadarHasReadyUnitInRangeObjReads[] = { 91, 877, 881 };
-static const unsigned char kReplayLosRadarIsPointVisibleReads[] = { 1, 2, 20, 22, 88 };
-static const unsigned char kReplayLosRadarIsPointVisibleWrites[] = { 88 };
+static const unsigned char kReplayLosRadarGetVisibleEnemiesInRadiusReads[] = { 85, 90 };
+static const unsigned char kReplayLosRadarGetVisibleEnemiesInRadiusWrites[] = { 90 };
+static const unsigned short kReplayLosRadarGetVisibleEnemiesInRadiusObjReads[] = { 97, 109, 111, 898, 901, 902, 903 };
+static const unsigned char kReplayLosRadarHasReadyUnitInRangeReads[] = { 85, 90 };
+static const unsigned char kReplayLosRadarHasReadyUnitInRangeWrites[] = { 90 };
+static const unsigned short kReplayLosRadarHasReadyUnitInRangeObjReads[] = { 97, 898, 902 };
+static const unsigned char kReplayLosRadarIsPointVisibleReads[] = { 1, 2, 20, 22, 90 };
+static const unsigned char kReplayLosRadarIsPointVisibleWrites[] = { 90 };
 static const unsigned short kReplayLosRadarIsPointVisibleObjReads[] = { 28, 29 };
-static const unsigned char kReplayLosRadarGetSeenUnitsInRadiusReads[] = { 84, 88 };
-static const unsigned char kReplayLosRadarGetSeenUnitsInRadiusWrites[] = { 88 };
-static const unsigned short kReplayLosRadarGetSeenUnitsInRadiusObjReads[] = { 103, 105, 877, 881 };
-static const unsigned char kReplayLosRadarCreateUnitIndexReads[] = { 84, 88 };
-static const unsigned char kReplayLosRadarCreateUnitIndexWrites[] = { 84, 88 };
-static const unsigned short kReplayLosRadarCreateUnitIndexObjReads[] = { 877, 881, 882 };
-static const unsigned short kReplayLosRadarCreateUnitIndexObjWrites[] = { 878, 879, 880, 881, 882 };
-static const unsigned char kReplayLosRadarFreeUnitIndexReads[] = { 84, 88 };
-static const unsigned char kReplayLosRadarFreeUnitIndexWrites[] = { 88 };
-static const unsigned short kReplayLosRadarFreeUnitIndexObjReads[] = { 877, 881, 882 };
-static const unsigned short kReplayLosRadarFreeUnitIndexObjWrites[] = { 878 };
+static const unsigned char kReplayLosRadarGetSeenUnitsInRadiusReads[] = { 85, 90 };
+static const unsigned char kReplayLosRadarGetSeenUnitsInRadiusWrites[] = { 90 };
+static const unsigned short kReplayLosRadarGetSeenUnitsInRadiusObjReads[] = { 109, 111, 898, 902 };
+static const unsigned char kReplayLosRadarCreateUnitIndexReads[] = { 85, 90 };
+static const unsigned char kReplayLosRadarCreateUnitIndexWrites[] = { 85, 90 };
+static const unsigned short kReplayLosRadarCreateUnitIndexObjReads[] = { 898, 902, 903 };
+static const unsigned short kReplayLosRadarCreateUnitIndexObjWrites[] = { 899, 900, 901, 902, 903 };
+static const unsigned char kReplayLosRadarFreeUnitIndexReads[] = { 85, 90 };
+static const unsigned char kReplayLosRadarFreeUnitIndexWrites[] = { 90 };
+static const unsigned short kReplayLosRadarFreeUnitIndexObjReads[] = { 898, 902, 903 };
+static const unsigned short kReplayLosRadarFreeUnitIndexObjWrites[] = { 899 };
 static const unsigned short kReplayLosRadarRefreshUnitIndexAllOf[] = { ROK_PLAYER, ROK_UNIT };
-static const unsigned char kReplayLosRadarRefreshUnitIndexReads[] = { 0, 1, 2, 17, 20, 21, 22, 26, 44, 84, 88 };
-static const unsigned char kReplayLosRadarRefreshUnitIndexWrites[] = { 88 };
-static const unsigned short kReplayLosRadarRefreshUnitIndexObjReads[] = { 25, 27, 28, 29, 35, 39, 91, 98, 99, 100, 138, 147, 162, 163, 166, 177, 178, 877, 878, 879, 881, 882 };
-static const unsigned short kReplayLosRadarRefreshUnitIndexObjWrites[] = { 879, 880, 881, 882 };
-static const unsigned char kReplayLosRadarInitWrites[] = { 88 };
-static const unsigned char kReplayLosRadarShutdownReads[] = { 88 };
+static const unsigned char kReplayLosRadarRefreshUnitIndexReads[] = { 0, 1, 2, 17, 20, 21, 22, 26, 44, 85, 90 };
+static const unsigned char kReplayLosRadarRefreshUnitIndexWrites[] = { 90 };
+static const unsigned short kReplayLosRadarRefreshUnitIndexObjReads[] = { 25, 27, 28, 29, 35, 45, 97, 104, 105, 106, 150, 159, 174, 175, 178, 189, 190, 898, 899, 900, 902, 903 };
+static const unsigned short kReplayLosRadarRefreshUnitIndexObjWrites[] = { 900, 901, 902, 903 };
+static const unsigned char kReplayLosRadarInitWrites[] = { 90 };
+static const unsigned char kReplayLosRadarShutdownReads[] = { 90 };
 static const unsigned short kReplayOrdersApplyAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayOrdersApplyReads[] = { 0, 1, 2, 17, 19, 20, 22, 23, 24, 27, 29, 41, 42, 44, 45, 82, 85, 86, 87 };
-static const unsigned char kReplayOrdersApplyWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayOrdersApplyObjReads[] = { 0, 6, 9, 22, 25, 27, 28, 29, 33, 34, 35, 39, 42, 43, 44, 46, 47, 48, 51, 52, 53, 55, 56, 58, 59, 60, 61, 63, 64, 65, 68, 70, 71, 72, 73, 77, 82, 87, 90, 91, 93, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 121, 122, 123, 124, 125, 131, 134, 138, 139, 142, 143, 147, 150, 151, 152, 153, 157, 158, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 175, 176, 190, 196, 197, 202, 203, 250, 251, 252, 268, 272, 273, 301, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 399, 441, 443, 460, 461, 465, 469, 481, 796, 797, 798, 821, 822, 823, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 858, 859, 860, 901, 902, 903, 904 };
-static const unsigned short kReplayOrdersApplyObjWrites[] = { 73, 91, 110, 374, 375, 376, 377, 378, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 821, 822, 823, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 858, 859, 860 };
+static const unsigned char kReplayOrdersApplyReads[] = { 0, 1, 2, 17, 19, 20, 22, 23, 24, 27, 29, 41, 42, 44, 45, 83, 87, 88, 89 };
+static const unsigned char kReplayOrdersApplyWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayOrdersApplyObjReads[] = { 0, 6, 9, 22, 25, 27, 28, 29, 33, 34, 35, 45, 48, 49, 50, 52, 53, 54, 57, 58, 59, 61, 62, 64, 65, 66, 67, 69, 70, 71, 74, 76, 77, 78, 79, 83, 88, 93, 96, 97, 99, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 133, 134, 135, 136, 137, 143, 146, 150, 151, 154, 155, 159, 162, 163, 164, 165, 169, 170, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 187, 188, 209, 215, 216, 221, 222, 269, 270, 271, 287, 291, 292, 320, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 418, 460, 462, 479, 480, 484, 488, 501, 817, 818, 819, 842, 843, 844, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 879, 880, 881, 922, 923, 924, 925 };
+static const unsigned short kReplayOrdersApplyObjWrites[] = { 79, 97, 116, 393, 394, 395, 396, 397, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 842, 843, 844, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 879, 880, 881 };
 static const unsigned short kReplayOrdersRunOrdersAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayOrdersRunOrdersReads[] = { 0, 1, 2, 17, 19, 20, 22, 23, 24, 27, 29, 41, 42, 44, 45, 82, 85, 86, 87 };
-static const unsigned char kReplayOrdersRunOrdersWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayOrdersRunOrdersObjReads[] = { 0, 6, 9, 22, 25, 27, 28, 29, 33, 34, 35, 39, 42, 43, 44, 46, 47, 48, 49, 51, 52, 53, 55, 56, 58, 59, 60, 61, 63, 64, 65, 68, 70, 71, 72, 73, 77, 82, 87, 90, 91, 93, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 121, 122, 123, 124, 125, 131, 134, 138, 139, 142, 143, 147, 150, 151, 152, 153, 157, 158, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 190, 196, 197, 202, 203, 250, 251, 252, 268, 272, 273, 301, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 399, 441, 443, 460, 461, 465, 469, 481, 796, 797, 798, 821, 822, 823, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 858, 859, 860, 901, 902, 903, 904 };
-static const unsigned short kReplayOrdersRunOrdersObjWrites[] = { 73, 91, 110, 374, 375, 376, 377, 378, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 821, 822, 823, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 858, 859, 860 };
+static const unsigned char kReplayOrdersRunOrdersReads[] = { 0, 1, 2, 17, 19, 20, 22, 23, 24, 27, 29, 41, 42, 44, 45, 83, 87, 88, 89 };
+static const unsigned char kReplayOrdersRunOrdersWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayOrdersRunOrdersObjReads[] = { 0, 6, 9, 22, 25, 27, 28, 29, 33, 34, 35, 45, 48, 49, 50, 52, 53, 54, 55, 57, 58, 59, 61, 62, 64, 65, 66, 67, 69, 70, 71, 74, 76, 77, 78, 79, 83, 88, 93, 96, 97, 99, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 133, 134, 135, 136, 137, 143, 146, 150, 151, 154, 155, 159, 162, 163, 164, 165, 169, 170, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 209, 215, 216, 221, 222, 269, 270, 271, 287, 291, 292, 320, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 418, 460, 462, 479, 480, 484, 488, 501, 817, 818, 819, 842, 843, 844, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 879, 880, 881, 922, 923, 924, 925 };
+static const unsigned short kReplayOrdersRunOrdersObjWrites[] = { 79, 97, 116, 393, 394, 395, 396, 397, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 842, 843, 844, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 879, 880, 881 };
 static const unsigned short kReplayOrdersRunSecondaryOrdersAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayOrdersRunSecondaryOrdersReads[] = { 0, 1, 2, 17, 19, 20, 22, 23, 24, 27, 29, 41, 42, 44, 45, 82, 85, 86, 87 };
-static const unsigned char kReplayOrdersRunSecondaryOrdersWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayOrdersRunSecondaryOrdersObjReads[] = { 0, 6, 9, 22, 25, 27, 28, 29, 33, 34, 35, 39, 42, 43, 44, 46, 47, 48, 51, 52, 53, 55, 56, 58, 59, 60, 61, 63, 64, 65, 68, 70, 71, 72, 73, 77, 82, 87, 90, 91, 93, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 121, 122, 123, 124, 125, 131, 134, 138, 139, 142, 143, 147, 150, 151, 152, 153, 157, 158, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 175, 176, 190, 196, 197, 202, 203, 250, 251, 252, 268, 272, 273, 301, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 399, 441, 443, 460, 461, 465, 469, 481, 796, 797, 798, 821, 822, 823, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 858, 859, 860, 901, 902, 903, 904 };
-static const unsigned short kReplayOrdersRunSecondaryOrdersObjWrites[] = { 73, 91, 110, 374, 375, 376, 377, 378, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 821, 822, 823, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 858, 859, 860 };
-static const unsigned short kReplayOrdersGetOrderFlagsObjReads[] = { 73, 383 };
+static const unsigned char kReplayOrdersRunSecondaryOrdersReads[] = { 0, 1, 2, 17, 19, 20, 22, 23, 24, 27, 29, 41, 42, 44, 45, 83, 87, 88, 89 };
+static const unsigned char kReplayOrdersRunSecondaryOrdersWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayOrdersRunSecondaryOrdersObjReads[] = { 0, 6, 9, 22, 25, 27, 28, 29, 33, 34, 35, 45, 48, 49, 50, 52, 53, 54, 57, 58, 59, 61, 62, 64, 65, 66, 67, 69, 70, 71, 74, 76, 77, 78, 79, 83, 88, 93, 96, 97, 99, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 133, 134, 135, 136, 137, 143, 146, 150, 151, 154, 155, 159, 162, 163, 164, 165, 169, 170, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 187, 188, 209, 215, 216, 221, 222, 269, 270, 271, 287, 291, 292, 320, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 418, 460, 462, 479, 480, 484, 488, 501, 817, 818, 819, 842, 843, 844, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 879, 880, 881, 922, 923, 924, 925 };
+static const unsigned short kReplayOrdersRunSecondaryOrdersObjWrites[] = { 79, 97, 116, 393, 394, 395, 396, 397, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 842, 843, 844, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 879, 880, 881 };
+static const unsigned short kReplayOrdersGetOrderFlagsObjReads[] = { 79, 402 };
 static const unsigned char kReplayOrdersGetOrderTypeReads[] = { 1, 2, 17, 19, 20, 22, 23, 24, 29, 45 };
-static const unsigned short kReplayOrdersGetOrderTypeObjReads[] = { 25, 27, 28, 29, 35, 90, 91, 93, 97, 98, 99, 100, 101, 102, 104, 106, 107, 108, 138, 142, 147, 152, 153, 157, 190, 250, 251, 252, 469 };
-static const unsigned short kReplayOrdersGetOrderTypeObjWrites[] = { 91 };
-static const unsigned char kReplayOrdersExpandGroupCommandReads[] = { 1, 2, 17, 19, 20, 22, 23, 24, 29, 44, 45, 82 };
-static const unsigned short kReplayOrdersExpandGroupCommandObjReads[] = { 25, 27, 28, 29, 35, 90, 91, 93, 97, 98, 99, 100, 101, 102, 104, 106, 107, 108, 138, 142, 147, 152, 153, 157, 190, 250, 251, 252, 399, 469 };
-static const unsigned short kReplayOrdersExpandGroupCommandObjWrites[] = { 91 };
+static const unsigned short kReplayOrdersGetOrderTypeObjReads[] = { 25, 27, 28, 29, 35, 96, 97, 99, 103, 104, 105, 106, 107, 108, 110, 112, 113, 114, 150, 154, 159, 164, 165, 169, 209, 269, 270, 271, 488 };
+static const unsigned short kReplayOrdersGetOrderTypeObjWrites[] = { 97 };
+static const unsigned char kReplayOrdersExpandGroupCommandReads[] = { 1, 2, 17, 19, 20, 22, 23, 24, 29, 44, 45, 83 };
+static const unsigned short kReplayOrdersExpandGroupCommandObjReads[] = { 25, 27, 28, 29, 35, 96, 97, 99, 103, 104, 105, 106, 107, 108, 110, 112, 113, 114, 150, 154, 159, 164, 165, 169, 209, 269, 270, 271, 418, 488 };
+static const unsigned short kReplayOrdersExpandGroupCommandObjWrites[] = { 97 };
+static const unsigned short kReplayUnitsApplyAllOf[] = { ROK_PLAYER, ROK_CELL, ROK_SIDEDEF };
+static const unsigned char kReplayUnitsApplyReads[] = { 0, 1, 2, 17, 21, 22, 29, 33, 55, 87, 88, 89 };
+static const unsigned char kReplayUnitsApplyWrites[] = { 55, 87, 88, 89 };
+static const unsigned short kReplayUnitsApplyObjReads[] = { 0, 1, 2, 3, 20, 21, 22, 23, 24, 35, 39, 40, 41, 42, 43, 44, 45, 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 69, 70, 72, 73, 74, 75, 76, 77, 78, 83, 88, 93, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 115, 117, 118, 119, 120, 121, 122, 139, 144, 146, 150, 151, 152, 160, 162, 164, 170, 180, 202, 203, 204, 205, 206, 207, 208, 254, 255, 266, 291, 294, 320, 321, 481, 489, 515, 521, 817, 818, 819, 904, 1021, 1022 };
+static const unsigned short kReplayUnitsApplyObjWrites[] = { 21, 23, 24, 39, 40, 41, 42, 43, 45, 46, 48, 49, 50, 51, 53, 54, 55, 56, 69, 70, 72, 73, 74, 75, 76, 77, 78, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 109, 110, 111, 115, 117, 118, 119, 120, 122, 320, 321, 515, 521, 817, 818 };
+static const unsigned short kReplayUnitsKillUnitAllOf[] = { ROK_PLAYER, ROK_SIDEDEF };
+static const unsigned char kReplayUnitsKillUnitReads[] = { 1, 17, 21, 22, 29, 33 };
+static const unsigned short kReplayUnitsKillUnitObjReads[] = { 0, 1, 20, 21, 22, 23, 35, 39, 40, 41, 42, 43, 44, 48, 49, 50, 51, 52, 53, 54, 70, 72, 76, 77, 97, 98, 99, 101, 103, 104, 105, 106, 107, 108, 109, 110, 111, 117, 146, 150, 160, 162, 164, 170, 205, 208, 254, 255, 320, 321, 481, 489, 817, 818, 819, 904, 1022 };
+static const unsigned short kReplayUnitsKillUnitObjWrites[] = { 21, 23, 39, 40, 41, 42, 43, 50, 51, 53, 54, 70, 72, 76, 77, 97, 98, 99, 105, 117, 817, 818 };
+static const unsigned short kReplayUnitsCreateUnitAllOf[] = { ROK_PLAYER, ROK_CELL };
+static const unsigned char kReplayUnitsCreateUnitReads[] = { 0, 1, 2, 17, 22, 87, 88, 89 };
+static const unsigned char kReplayUnitsCreateUnitWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayUnitsCreateUnitObjReads[] = { 0, 2, 3, 22, 23, 24, 35, 45, 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 69, 72, 76, 77, 78, 96, 97, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 117, 118, 119, 120, 121, 139, 144, 150, 164, 180, 202, 203, 204, 206, 207, 266, 291, 294, 320, 321, 515, 521, 818, 819, 1021 };
+static const unsigned short kReplayUnitsCreateUnitObjWrites[] = { 23, 24, 45, 46, 48, 49, 50, 51, 53, 54, 55, 56, 69, 72, 76, 77, 78, 96, 97, 100, 101, 102, 103, 104, 105, 109, 110, 111, 118, 119, 120, 320, 321, 515, 521 };
 static const unsigned short kReplayUnitsFindUnitTypeAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayUnitsFindUnitTypeReads[] = { 39 };
-static const unsigned short kReplayUnitsFindUnitTypeObjReads[] = { 148 };
+static const unsigned short kReplayUnitsFindUnitTypeObjReads[] = { 160 };
 static const unsigned short kReplayUnitsFindUnitTypeIdAllOf[] = { ROK_UNITDEF };
 static const unsigned char kReplayUnitsFindUnitTypeIdReads[] = { 39 };
-static const unsigned short kReplayUnitsFindUnitTypeIdObjReads[] = { 148, 149 };
-static const unsigned short kReplayUnitsAddRepairProgressObjReads[] = { 97, 99, 139, 140, 152 };
+static const unsigned short kReplayUnitsFindUnitTypeIdObjReads[] = { 160, 161 };
+static const unsigned char kReplayUnitsAddBuildProgressReads[] = { 55 };
+static const unsigned char kReplayUnitsAddBuildProgressWrites[] = { 55 };
+static const unsigned short kReplayUnitsAddBuildProgressObjReads[] = { 0, 22, 45, 51, 52, 55, 70, 72, 78, 97, 98, 99, 103, 104, 105, 106, 107, 117, 150, 151, 152, 164, 170, 521, 818, 819 };
+static const unsigned short kReplayUnitsAddBuildProgressObjWrites[] = { 45, 55, 70, 72, 78, 97, 98, 99, 103, 104, 521 };
+static const unsigned short kReplayUnitsAddRepairProgressObjReads[] = { 103, 105, 151, 152, 164 };
 static const unsigned char kReplayUnitsCanLoadReads[] = { 17 };
-static const unsigned short kReplayUnitsCanLoadObjReads[] = { 64, 91, 92, 93, 98, 99, 102, 131, 138, 142, 143, 144, 147, 151 };
-static const unsigned short kReplayUnitsCanReclaimObjReads[] = { 91, 99, 142 };
+static const unsigned short kReplayUnitsCanLoadObjReads[] = { 70, 97, 98, 99, 104, 105, 108, 143, 150, 154, 155, 156, 159, 163 };
+static const unsigned short kReplayUnitsCanReclaimObjReads[] = { 97, 105, 154 };
 static const unsigned char kReplayUnitsCanRepairReads[] = { 17 };
-static const unsigned short kReplayUnitsCanRepairObjReads[] = { 91, 97, 99, 104, 130, 134, 138, 142, 152 };
+static const unsigned short kReplayUnitsCanRepairObjReads[] = { 97, 103, 105, 110, 142, 146, 150, 154, 164 };
+static const unsigned short kReplayUnitsUnitRefUnlinkObjReads[] = { 117, 817, 818 };
+static const unsigned short kReplayUnitsUnitRefUnlinkObjWrites[] = { 117, 817, 818 };
 static const unsigned char kReplayUnitsUpdateUnitHeadReads[] = { 8, 9, 11, 38 };
 static const unsigned char kReplayUnitsUpdateUnitHeadWrites[] = { 38 };
-static const unsigned short kReplayUnitsUpdateUnitHeadObjReads[] = { 99, 137 };
+static const unsigned short kReplayUnitsUpdateUnitHeadObjReads[] = { 105, 149 };
 static const unsigned char kReplayUnitsUpdateUnitBodyReads[] = { 0, 17 };
-static const unsigned short kReplayUnitsUpdateUnitBodyObjReads[] = { 0, 22, 90, 91, 93, 94, 95, 96, 97, 98, 99, 100, 104, 138, 139, 140, 141, 152 };
-static const unsigned short kReplayUnitsUpdateUnitBodyObjWrites[] = { 90, 91, 94, 95, 96 };
+static const unsigned short kReplayUnitsUpdateUnitBodyObjReads[] = { 0, 22, 96, 97, 99, 100, 101, 102, 103, 104, 105, 106, 110, 150, 151, 152, 153, 164 };
+static const unsigned short kReplayUnitsUpdateUnitBodyObjWrites[] = { 96, 97, 100, 101, 102 };
+static const unsigned short kReplayUnitsUpdateUnitTailAllOf[] = { ROK_PLAYER, ROK_CELL, ROK_SIDEDEF };
+static const unsigned char kReplayUnitsUpdateUnitTailReads[] = { 0, 1, 2, 17, 21, 22, 29, 33 };
+static const unsigned short kReplayUnitsUpdateUnitTailObjReads[] = { 0, 1, 20, 21, 22, 23, 35, 39, 40, 41, 42, 43, 44, 48, 49, 50, 51, 52, 53, 54, 70, 72, 76, 77, 78, 97, 98, 99, 101, 103, 104, 105, 106, 107, 108, 109, 110, 111, 117, 118, 121, 139, 146, 150, 160, 162, 164, 170, 180, 205, 208, 254, 255, 266, 291, 294, 320, 321, 481, 489, 817, 818, 819, 904, 1021, 1022 };
+static const unsigned short kReplayUnitsUpdateUnitTailObjWrites[] = { 21, 23, 39, 40, 41, 42, 43, 50, 51, 53, 54, 70, 72, 76, 77, 97, 98, 99, 105, 109, 110, 111, 117, 321, 817, 818 };
+static const unsigned char kReplayUnitsGetFactoriesInRadiusReads[] = { 86 };
+static const unsigned short kReplayUnitsGetFactoriesInRadiusObjReads[] = { 45, 105, 150, 1020 };
+static const unsigned char kReplayUnitsCreateFactoryIndexReads[] = { 86 };
+static const unsigned char kReplayUnitsCreateFactoryIndexWrites[] = { 86 };
+static const unsigned short kReplayUnitsCreateFactoryIndexObjReads[] = { 1017, 1020 };
+static const unsigned short kReplayUnitsCreateFactoryIndexObjWrites[] = { 1018, 1019, 1020 };
+static const unsigned char kReplayUnitsFreeFactoryIndexReads[] = { 86 };
+static const unsigned short kReplayUnitsFreeFactoryIndexObjReads[] = { 1017, 1020 };
+static const unsigned short kReplayUnitsFreeFactoryIndexObjWrites[] = { 1018, 1020 };
+static const unsigned short kReplayUnitsRefreshFactoryIndexAllOf[] = { ROK_PLAYER };
+static const unsigned char kReplayUnitsRefreshFactoryIndexReads[] = { 0, 44, 86 };
+static const unsigned short kReplayUnitsRefreshFactoryIndexObjReads[] = { 25, 35, 45, 97, 104, 105, 106, 150, 1017, 1018, 1019, 1020 };
+static const unsigned short kReplayUnitsRefreshFactoryIndexObjWrites[] = { 1019, 1020 };
+static const unsigned short kReplayUnitsUnitRefInitObjReads[] = { 53, 117, 817, 818 };
+static const unsigned short kReplayUnitsUnitRefInitObjWrites[] = { 117, 817, 818 };
+static const unsigned short kReplayUnitsUnitRefSetUnitObjReads[] = { 53, 117, 817, 818 };
+static const unsigned short kReplayUnitsUnitRefSetUnitObjWrites[] = { 117, 817, 818 };
+static const unsigned short kReplayUnitsUnitRefGetObjReads[] = { 817 };
+static const unsigned short kReplayUnitsUnitRefSetValueObjWrites[] = { 819 };
 static const unsigned short kReplayPlayersApplyAllOf[] = { ROK_PLAYER, ROK_SIDEDEF };
-static const unsigned char kReplayPlayersApplyReads[] = { 18, 34, 35, 36, 88 };
-static const unsigned char kReplayPlayersApplyWrites[] = { 18, 22, 29, 34, 35, 88 };
-static const unsigned short kReplayPlayersApplyObjReads[] = { 0, 2, 3, 20, 22, 23, 33, 34, 35, 42, 43, 47, 90, 91, 93, 98, 99, 100, 101, 102, 148, 233, 235, 617, 618, 619, 620, 622, 623, 624, 625, 626, 627, 628, 629, 630, 632, 633, 634, 635, 636, 637, 638, 639, 640, 641, 642, 643, 644, 645, 646, 652, 653, 654, 655, 656, 657, 658, 659, 660, 661, 663, 664, 665, 666, 667, 668, 669, 670, 671, 672, 673, 674, 675, 676, 677, 679, 680, 681, 682, 683, 684, 883 };
-static const unsigned short kReplayPlayersApplyObjWrites[] = { 22, 233, 622, 623, 624, 625, 626, 627, 628, 629, 630, 633, 634, 636, 637, 639, 640, 641, 642, 644, 645, 646, 652, 653, 656, 657, 660, 661, 663, 664, 665, 666, 667, 668, 670, 671, 672, 673, 675, 676, 677, 679, 680, 682, 683 };
-static const unsigned short kReplayPlayersApplyObjWrites197[] = { 22, 33, 34, 233, 622, 623, 624, 625, 626, 627, 628, 629, 630, 633, 634, 636, 637, 639, 640, 641, 642, 644, 645, 646, 652, 653, 656, 657, 660, 661, 663, 664, 665, 666, 667, 668, 670, 671, 672, 673, 675, 676, 677, 679, 680, 682, 683 };
-static const unsigned char kReplayPlayersDeactivateConditionsReads[] = { 88 };
-static const unsigned char kReplayPlayersDeactivateConditionsWrites[] = { 88 };
-static const unsigned short kReplayPlayersDeactivateConditionsObjWrites[] = { 621 };
+static const unsigned char kReplayPlayersApplyReads[] = { 18, 34, 35, 36, 90 };
+static const unsigned char kReplayPlayersApplyWrites[] = { 18, 22, 29, 34, 35, 90 };
+static const unsigned short kReplayPlayersApplyObjReads[] = { 0, 2, 3, 20, 22, 23, 33, 34, 35, 48, 49, 53, 96, 97, 99, 104, 105, 106, 107, 108, 160, 252, 254, 638, 639, 640, 641, 643, 644, 645, 646, 647, 648, 649, 650, 651, 653, 654, 655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 665, 666, 667, 673, 674, 675, 676, 677, 678, 679, 680, 681, 682, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 695, 696, 697, 698, 700, 701, 702, 703, 704, 705, 904 };
+static const unsigned short kReplayPlayersApplyObjWrites[] = { 22, 252, 643, 644, 645, 646, 647, 648, 649, 650, 651, 654, 655, 657, 658, 660, 661, 662, 663, 665, 666, 667, 673, 674, 677, 678, 681, 682, 684, 685, 686, 687, 688, 689, 691, 692, 693, 694, 696, 697, 698, 700, 701, 703, 704 };
+static const unsigned short kReplayPlayersApplyObjWrites197[] = { 22, 33, 34, 252, 643, 644, 645, 646, 647, 648, 649, 650, 651, 654, 655, 657, 658, 660, 661, 662, 663, 665, 666, 667, 673, 674, 677, 678, 681, 682, 684, 685, 686, 687, 688, 689, 691, 692, 693, 694, 696, 697, 698, 700, 701, 703, 704 };
+static const unsigned char kReplayPlayersDeactivateConditionsReads[] = { 90 };
+static const unsigned char kReplayPlayersDeactivateConditionsWrites[] = { 90 };
+static const unsigned short kReplayPlayersDeactivateConditionsObjWrites[] = { 642 };
 static const unsigned short kReplayPlayersUpdatePlayerHeadAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayPlayersUpdatePlayerHeadReads[] = { 88 };
-static const unsigned char kReplayPlayersUpdatePlayerHeadWrites[] = { 88 };
+static const unsigned char kReplayPlayersUpdatePlayerHeadReads[] = { 90 };
+static const unsigned char kReplayPlayersUpdatePlayerHeadWrites[] = { 90 };
 static const unsigned short kReplayPlayersUpdatePlayerHeadObjReads[] = { 0, 22, 35 };
 static const unsigned short kReplayPlayersUpdatePlayerBodyAllOf[] = { ROK_PLAYER, ROK_SIDEDEF };
-static const unsigned char kReplayPlayersUpdatePlayerBodyReads[] = { 0, 1, 2, 17, 21, 29, 31, 32, 33, 34, 35, 36, 85, 86, 87, 88 };
-static const unsigned char kReplayPlayersUpdatePlayerBodyWrites[] = { 21, 34, 35, 85, 86, 87, 88 };
-static const unsigned short kReplayPlayersUpdatePlayerBodyObjReads[] = { 0, 2, 3, 16, 17, 20, 21, 22, 23, 24, 25, 31, 32, 35, 42, 43, 47, 90, 91, 93, 98, 99, 101, 102, 148, 233, 234, 235, 236, 237, 238, 239, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 636, 637, 639, 640, 641, 642, 645, 646, 647, 648, 649, 650, 651, 652, 653, 654, 655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 665, 666, 667, 668, 670, 671, 672, 673, 676, 677, 678, 679, 680, 681, 682, 683, 684 };
-static const unsigned short kReplayPlayersUpdatePlayerBodyObjWrites[] = { 16, 17, 21, 236, 617, 618, 619, 620, 622, 623, 624, 625, 626, 627, 628, 629, 630, 632, 633, 634, 636, 637, 640, 641, 642, 645, 646, 648, 649, 650, 652, 653, 656, 657, 660, 661, 663, 664, 665, 666, 667, 668, 671, 672, 673, 676, 677, 679, 680, 682, 683 };
+static const unsigned char kReplayPlayersUpdatePlayerBodyReads[] = { 0, 1, 2, 17, 21, 29, 31, 32, 33, 34, 35, 36, 87, 88, 89, 90 };
+static const unsigned char kReplayPlayersUpdatePlayerBodyWrites[] = { 21, 34, 35, 87, 88, 89, 90 };
+static const unsigned short kReplayPlayersUpdatePlayerBodyObjReads[] = { 0, 2, 3, 16, 17, 20, 21, 22, 23, 24, 25, 31, 32, 35, 48, 49, 53, 96, 97, 99, 104, 105, 107, 108, 160, 252, 253, 254, 255, 256, 257, 258, 638, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 652, 653, 654, 655, 657, 658, 660, 661, 662, 663, 666, 667, 668, 669, 670, 671, 672, 673, 674, 675, 676, 677, 678, 679, 680, 681, 682, 683, 684, 685, 686, 687, 688, 689, 691, 692, 693, 694, 697, 698, 699, 700, 701, 702, 703, 704, 705 };
+static const unsigned short kReplayPlayersUpdatePlayerBodyObjWrites[] = { 16, 17, 21, 255, 638, 639, 640, 641, 643, 644, 645, 646, 647, 648, 649, 650, 651, 653, 654, 655, 657, 658, 661, 662, 663, 666, 667, 669, 670, 671, 673, 674, 677, 678, 681, 682, 684, 685, 686, 687, 688, 689, 692, 693, 694, 697, 698, 700, 701, 703, 704 };
 static const unsigned short kReplayPlayersUpdatePlayerTailAllOf[] = { ROK_PLAYER };
-static const unsigned char kReplayPlayersUpdatePlayerTailReads[] = { 22, 70, 88 };
-static const unsigned char kReplayPlayersUpdatePlayerTailWrites[] = { 70, 88 };
-static const unsigned char kReplayPlayersUpdatePlayersFinishReads[] = { 33, 34, 88 };
-static const unsigned char kReplayPlayersUpdatePlayersFinishWrites[] = { 34, 35, 88 };
-static const unsigned short kReplayPlayersUpdatePlayersFinishObjReads[] = { 0, 20, 22, 23, 24, 35, 233, 236 };
-static const unsigned char kReplayPlayersInitWrites[] = { 88 };
-static const unsigned char kReplayPlayersShutdownReads[] = { 88 };
+static const unsigned char kReplayPlayersUpdatePlayerTailReads[] = { 22, 71, 90 };
+static const unsigned char kReplayPlayersUpdatePlayerTailWrites[] = { 71, 90 };
+static const unsigned char kReplayPlayersUpdatePlayersFinishReads[] = { 33, 34, 90 };
+static const unsigned char kReplayPlayersUpdatePlayersFinishWrites[] = { 34, 35, 90 };
+static const unsigned short kReplayPlayersUpdatePlayersFinishObjReads[] = { 0, 20, 22, 23, 24, 35, 252, 255 };
+static const unsigned char kReplayPlayersInitWrites[] = { 90 };
+static const unsigned char kReplayPlayersShutdownReads[] = { 90 };
 static const unsigned short kReplayMapApplyAllOf[] = { ROK_UNIT, ROK_SPATIALBUCKET, ROK_CELL, ROK_PASSMAP, ROK_FEATURE };
 static const unsigned char kReplayMapApplyReads[] = { 0, 1, 2, 17, 19, 23, 24, 26, 27, 31, 32, 41, 42 };
 static const unsigned char kReplayMapApplyWrites[] = { 17, 41, 42 };
-static const unsigned short kReplayMapApplyObjReads[] = { 0, 22, 42, 43, 46, 63, 64, 65, 91, 92, 93, 99, 100, 102, 103, 104, 105, 126, 241, 243, 245, 246, 248, 249, 250, 251, 252, 253, 254, 255, 271, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 469 };
-static const unsigned short kReplayMapApplyObjWrites[] = { 63, 65, 91, 92, 241, 243, 245, 246, 253, 271, 335 };
+static const unsigned short kReplayMapApplyObjReads[] = { 0, 22, 48, 49, 52, 69, 70, 71, 97, 98, 99, 105, 106, 108, 109, 110, 111, 138, 260, 262, 264, 265, 267, 268, 269, 270, 271, 272, 273, 274, 290, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 488 };
+static const unsigned short kReplayMapApplyObjWrites[] = { 69, 71, 97, 98, 260, 262, 264, 265, 272, 290, 354 };
 static const unsigned short kReplayMapGetCellMeanHeightAllOf[] = { ROK_CELL };
 static const unsigned char kReplayMapGetCellMeanHeightReads[] = { 1, 2 };
-static const unsigned short kReplayMapGetCellMeanHeightObjReads[] = { 248, 249 };
+static const unsigned short kReplayMapGetCellMeanHeightObjReads[] = { 267, 268 };
 static const unsigned short kReplayMapCanBuildAtAllOf[] = { ROK_CELL, ROK_FEATURE };
-static const unsigned char kReplayMapCanBuildAtReads[] = { 1, 2, 17, 19, 20, 21, 22, 68, 69 };
-static const unsigned char kReplayMapCanBuildAtWrites[] = { 68, 69 };
-static const unsigned short kReplayMapCanBuildAtObjReads[] = { 27, 28, 29, 42, 43, 125, 126, 127, 128, 130, 131, 151, 244, 245, 247, 248, 249, 250, 251, 252, 253, 469 };
+static const unsigned char kReplayMapCanBuildAtReads[] = { 1, 2, 17, 19, 20, 21, 22, 69, 70 };
+static const unsigned char kReplayMapCanBuildAtWrites[] = { 69, 70 };
+static const unsigned short kReplayMapCanBuildAtObjReads[] = { 27, 28, 29, 48, 49, 137, 138, 139, 140, 142, 143, 163, 263, 264, 266, 267, 268, 269, 270, 271, 272, 488 };
 static const unsigned short kReplayMapCanPlaceUnitFootprintAllOf[] = { ROK_CELL, ROK_FEATURE };
-static const unsigned char kReplayMapCanPlaceUnitFootprintReads[] = { 1, 2, 17, 19, 20, 21, 22, 68, 69 };
-static const unsigned char kReplayMapCanPlaceUnitFootprintWrites[] = { 68, 69 };
-static const unsigned short kReplayMapCanPlaceUnitFootprintObjReads[] = { 27, 28, 29, 42, 43, 125, 126, 127, 128, 129, 130, 131, 132, 151, 244, 245, 247, 248, 249, 250, 251, 252, 253, 469 };
+static const unsigned char kReplayMapCanPlaceUnitFootprintReads[] = { 1, 2, 17, 19, 20, 21, 22, 69, 70 };
+static const unsigned char kReplayMapCanPlaceUnitFootprintWrites[] = { 69, 70 };
+static const unsigned short kReplayMapCanPlaceUnitFootprintObjReads[] = { 27, 28, 29, 48, 49, 137, 138, 139, 140, 141, 142, 143, 144, 163, 263, 264, 266, 267, 268, 269, 270, 271, 272, 488 };
 static const unsigned short kReplayMapBuildAllPassMapsAllOf[] = { ROK_UNIT, ROK_CELL, ROK_PASSMAP, ROK_FEATURE };
 static const unsigned char kReplayMapBuildAllPassMapsReads[] = { 1, 2, 17, 19, 26 };
 static const unsigned char kReplayMapBuildAllPassMapsWrites[] = { 25 };
-static const unsigned short kReplayMapBuildAllPassMapsObjReads[] = { 102, 245, 248, 249, 250, 251, 252, 254, 255, 271, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 469 };
-static const unsigned short kReplayMapBuildAllPassMapsObjWrites[] = { 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335 };
+static const unsigned short kReplayMapBuildAllPassMapsObjReads[] = { 108, 264, 267, 268, 269, 270, 271, 273, 274, 290, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 488 };
+static const unsigned short kReplayMapBuildAllPassMapsObjWrites[] = { 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354 };
 static const unsigned short kReplayMapSnapWorldPosToFootprintAllOf[] = { ROK_CELL };
 static const unsigned char kReplayMapSnapWorldPosToFootprintReads[] = { 1, 2, 17 };
-static const unsigned short kReplayMapSnapWorldPosToFootprintObjReads[] = { 42, 43, 125, 126, 127, 132, 151, 248, 249 };
+static const unsigned short kReplayMapSnapWorldPosToFootprintObjReads[] = { 48, 49, 137, 138, 139, 144, 163, 267, 268 };
 static const unsigned short kReplayMapCanPlaceFootprintAtAllOf[] = { ROK_UNIT, ROK_CELL, ROK_FEATURE };
 static const unsigned char kReplayMapCanPlaceFootprintAtReads[] = { 1, 2, 17, 19, 20, 26 };
-static const unsigned short kReplayMapCanPlaceFootprintAtObjReads[] = { 42, 43, 46, 99, 101, 128, 130, 131, 138, 245, 246, 248, 249, 250, 251, 252, 253, 469 };
-static const unsigned short kReplayMapIsPadSlotFreeObjReads[] = { 64, 66, 92, 93 };
+static const unsigned short kReplayMapCanPlaceFootprintAtObjReads[] = { 48, 49, 52, 105, 107, 140, 142, 143, 150, 264, 265, 267, 268, 269, 270, 271, 272, 488 };
+static const unsigned short kReplayMapIsPadSlotFreeObjReads[] = { 70, 72, 98, 99 };
 static const unsigned short kReplayMapGetGroundHeightAllOf[] = { ROK_CELL };
 static const unsigned char kReplayMapGetGroundHeightReads[] = { 1, 2 };
-static const unsigned short kReplayMapGetGroundHeightObjReads[] = { 247 };
+static const unsigned short kReplayMapGetGroundHeightObjReads[] = { 266 };
 static const unsigned short kReplayMapPassMapGetAllOf[] = { ROK_PASSMAP };
-static const unsigned short kReplayMapPassMapGetObjReads[] = { 333, 335 };
+static const unsigned short kReplayMapPassMapGetObjReads[] = { 352, 354 };
 static const unsigned short kReplayMapPassMapInBoundsAllOf[] = { ROK_PASSMAP };
-static const unsigned short kReplayMapPassMapInBoundsObjReads[] = { 333, 334 };
-static const unsigned char kReplayScriptsApplyReads[] = { 17, 22, 85, 86, 87 };
-static const unsigned char kReplayScriptsApplyWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayScriptsApplyObjReads[] = { 39, 42, 43, 44, 45, 46, 63, 64, 67, 68, 69, 91, 92, 93, 97, 98, 99, 103, 104, 105, 147, 152, 257, 258, 260, 261, 262, 263, 264, 265, 433, 434, 435, 436, 444, 492, 493, 494, 495, 496, 497, 498, 499, 500, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905, 906, 907, 908 };
-static const unsigned short kReplayScriptsApplyObjWrites[] = { 260, 261, 262, 263, 264, 265, 493, 494, 496, 497, 498, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 895, 896, 897, 898, 899, 900, 901, 902, 903, 905, 906 };
-static const unsigned char kReplayScriptsQueryScriptReads[] = { 17, 22, 85, 86, 87 };
-static const unsigned char kReplayScriptsQueryScriptWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayScriptsQueryScriptObjReads[] = { 39, 42, 43, 46, 63, 64, 68, 91, 92, 93, 97, 98, 99, 103, 104, 105, 147, 152, 257, 258, 260, 261, 262, 263, 264, 265, 492, 493, 494, 495, 500, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 895, 896, 897, 898, 899, 900, 904, 905, 906 };
-static const unsigned short kReplayScriptsQueryScriptObjWrites[] = { 260, 261, 262, 263, 264, 265, 493, 494, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 895, 896, 897, 898, 899, 900, 905, 906 };
-static const unsigned short kReplayScriptsFindScriptObjReads[] = { 258 };
-static const unsigned short kReplayScriptsGetPieceOffsetObjReads[] = { 45, 67, 68, 69, 301, 302, 492, 500, 894, 895, 896, 897, 898, 899, 900, 909 };
-static const unsigned short kReplayScriptsGetPiecePositionObjReads[] = { 45, 67, 68, 69, 103, 104, 105, 301, 302, 492, 500, 894, 895, 896, 897, 898, 899, 900, 909 };
-static const unsigned short kReplayScriptsGetPieceAnglesObjReads[] = { 45, 67, 68, 69, 301, 302, 492, 500, 898, 899, 900 };
-static const unsigned short kReplayScriptsGetPieceAnglesObjWrites[] = { 301, 302 };
-static const unsigned short kReplayScriptsCreateObjectStateObjReads[] = { 433, 492, 494, 499, 500, 894, 904, 905, 906, 907, 908, 909 };
-static const unsigned short kReplayScriptsCreateObjectStateObjWrites[] = { 492, 494, 499, 500, 894, 904, 905, 906, 907, 908, 909 };
-static const unsigned short kReplayScriptsFreeObjectStateObjReads[] = { 492, 904 };
-static const unsigned short kReplayScriptsNewUnitScriptObjReads[] = { 258, 260, 261, 264, 884 };
-static const unsigned short kReplayScriptsNewUnitScriptObjWrites[] = { 44, 257, 258, 260, 261, 264, 884 };
-static const unsigned short kReplayScriptsSetCobObjReads[] = { 258, 259, 260, 261 };
-static const unsigned short kReplayScriptsSetCobObjWrites[] = { 258, 259, 260, 261 };
-static const unsigned short kReplayScriptsCreatePlayerObjectStateObjReads[] = { 433, 492, 494, 495, 499, 500, 894, 904, 905, 906, 907, 908, 909 };
-static const unsigned short kReplayScriptsCreatePlayerObjectStateObjWrites[] = { 492, 494, 495, 499, 500, 894, 904, 905, 906, 907, 908, 909 };
-static const unsigned short kReplayScriptsSetObjectStateObjReads[] = { 265 };
-static const unsigned short kReplayScriptsSetObjectStateObjWrites[] = { 265 };
-static const unsigned char kReplayScriptsRunScriptsReads[] = { 17, 22, 85, 86, 87 };
-static const unsigned char kReplayScriptsRunScriptsWrites[] = { 85, 86, 87 };
-static const unsigned short kReplayScriptsRunScriptsObjReads[] = { 39, 42, 43, 46, 63, 64, 68, 91, 92, 93, 97, 98, 99, 103, 104, 105, 147, 152, 257, 258, 260, 261, 262, 263, 264, 265, 492, 493, 494, 495, 500, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 895, 896, 897, 898, 899, 900, 904, 905, 906 };
-static const unsigned short kReplayScriptsRunScriptsObjWrites[] = { 260, 261, 262, 263, 264, 265, 493, 494, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 895, 896, 897, 898, 899, 900, 905, 906 };
+static const unsigned short kReplayMapPassMapInBoundsObjReads[] = { 352, 353 };
+static const unsigned char kReplayScriptsApplyReads[] = { 17, 22, 87, 88, 89 };
+static const unsigned char kReplayScriptsApplyWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayScriptsApplyObjReads[] = { 45, 48, 49, 50, 51, 52, 69, 70, 73, 74, 75, 97, 98, 99, 103, 104, 105, 109, 110, 111, 159, 164, 276, 277, 279, 280, 281, 282, 283, 284, 452, 453, 454, 455, 463, 512, 513, 514, 515, 516, 517, 518, 519, 520, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921, 922, 923, 924, 925, 926, 927, 928, 929 };
+static const unsigned short kReplayScriptsApplyObjWrites[] = { 279, 280, 281, 282, 283, 284, 513, 514, 516, 517, 518, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 916, 917, 918, 919, 920, 921, 922, 923, 924, 926, 927 };
+static const unsigned char kReplayScriptsQueryScriptReads[] = { 17, 22, 87, 88, 89 };
+static const unsigned char kReplayScriptsQueryScriptWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayScriptsQueryScriptObjReads[] = { 45, 48, 49, 52, 69, 70, 74, 97, 98, 99, 103, 104, 105, 109, 110, 111, 159, 164, 276, 277, 279, 280, 281, 282, 283, 284, 512, 513, 514, 515, 520, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 916, 917, 918, 919, 920, 921, 925, 926, 927 };
+static const unsigned short kReplayScriptsQueryScriptObjWrites[] = { 279, 280, 281, 282, 283, 284, 513, 514, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 916, 917, 918, 919, 920, 921, 926, 927 };
+static const unsigned short kReplayScriptsFindScriptObjReads[] = { 277 };
+static const unsigned short kReplayScriptsGetPieceOffsetObjReads[] = { 51, 73, 74, 75, 320, 321, 512, 520, 915, 916, 917, 918, 919, 920, 921, 930 };
+static const unsigned short kReplayScriptsGetPiecePositionObjReads[] = { 51, 73, 74, 75, 109, 110, 111, 320, 321, 512, 520, 915, 916, 917, 918, 919, 920, 921, 930 };
+static const unsigned short kReplayScriptsGetPieceAnglesObjReads[] = { 51, 73, 74, 75, 320, 321, 512, 520, 919, 920, 921 };
+static const unsigned short kReplayScriptsGetPieceAnglesObjWrites[] = { 320, 321 };
+static const unsigned short kReplayScriptsCreateObjectStateObjReads[] = { 452, 512, 514, 519, 520, 915, 925, 926, 927, 928, 929, 930 };
+static const unsigned short kReplayScriptsCreateObjectStateObjWrites[] = { 512, 514, 519, 520, 915, 925, 926, 927, 928, 929, 930 };
+static const unsigned short kReplayScriptsFreeObjectStateObjReads[] = { 512, 925 };
+static const unsigned short kReplayScriptsNewUnitScriptObjReads[] = { 277, 279, 280, 283, 905 };
+static const unsigned short kReplayScriptsNewUnitScriptObjWrites[] = { 50, 276, 277, 279, 280, 283, 905 };
+static const unsigned short kReplayScriptsSetCobObjReads[] = { 277, 278, 279, 280 };
+static const unsigned short kReplayScriptsSetCobObjWrites[] = { 277, 278, 279, 280 };
+static const unsigned short kReplayScriptsCreatePlayerObjectStateObjReads[] = { 452, 512, 514, 515, 519, 520, 915, 925, 926, 927, 928, 929, 930 };
+static const unsigned short kReplayScriptsCreatePlayerObjectStateObjWrites[] = { 512, 514, 515, 519, 520, 915, 925, 926, 927, 928, 929, 930 };
+static const unsigned short kReplayScriptsSetObjectStateObjReads[] = { 284 };
+static const unsigned short kReplayScriptsSetObjectStateObjWrites[] = { 284 };
+static const unsigned char kReplayScriptsRunScriptsReads[] = { 17, 22, 87, 88, 89 };
+static const unsigned char kReplayScriptsRunScriptsWrites[] = { 87, 88, 89 };
+static const unsigned short kReplayScriptsRunScriptsObjReads[] = { 45, 48, 49, 52, 69, 70, 74, 97, 98, 99, 103, 104, 105, 109, 110, 111, 159, 164, 276, 277, 279, 280, 281, 282, 283, 284, 512, 513, 514, 515, 520, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 916, 917, 918, 919, 920, 921, 925, 926, 927 };
+static const unsigned short kReplayScriptsRunScriptsObjWrites[] = { 279, 280, 281, 282, 283, 284, 513, 514, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 916, 917, 918, 919, 920, 921, 926, 927 };
 static const unsigned char kReplayMovementApplyReads[] = { 0, 17, 23, 24, 27, 28 };
-static const unsigned short kReplayMovementApplyObjReads[] = { 0, 22, 42, 43, 65, 68, 73, 99, 100, 102, 103, 104, 105, 138, 173, 184, 185, 188, 189, 242, 266, 267, 268, 269, 270, 272, 273, 274, 276, 277, 278, 301, 352, 353, 354, 356, 357, 358, 359, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 383, 386, 796, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 949, 951, 952, 953, 955, 956, 957, 958, 959, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980, 995 };
-static const unsigned short kReplayMovementApplyObjWrites[] = { 102, 266, 267, 268, 269, 270, 272, 273, 274, 276, 277, 278, 363, 364, 365, 367, 371, 372, 373, 821, 822, 823, 945, 946, 947, 952, 953, 955, 956, 957, 958, 959, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980 };
+static const unsigned short kReplayMovementApplyObjReads[] = { 0, 22, 48, 49, 71, 74, 79, 105, 106, 108, 109, 110, 111, 150, 185, 196, 197, 200, 201, 261, 285, 286, 287, 288, 289, 291, 292, 293, 295, 296, 297, 320, 371, 372, 373, 375, 376, 377, 378, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 402, 405, 817, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 970, 972, 973, 974, 976, 977, 978, 979, 980, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991, 992, 993, 994, 995, 996, 997, 998, 999, 1000, 1001, 1016 };
+static const unsigned short kReplayMovementApplyObjWrites[] = { 108, 285, 286, 287, 288, 289, 291, 292, 293, 295, 296, 297, 382, 383, 384, 386, 390, 391, 392, 842, 843, 844, 966, 967, 968, 973, 974, 976, 977, 978, 979, 980, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991, 992, 993, 994, 995, 996, 997, 998, 999, 1000, 1001 };
 static const unsigned char kReplayMovementUpdateMotionReads[] = { 0, 17, 23, 24, 27, 28 };
-static const unsigned short kReplayMovementUpdateMotionObjReads[] = { 0, 22, 42, 43, 46, 65, 66, 68, 73, 91, 93, 99, 100, 102, 103, 104, 105, 127, 138, 168, 173, 182, 183, 184, 185, 186, 187, 188, 242, 266, 268, 269, 270, 272, 273, 274, 275, 276, 277, 278, 301, 302, 352, 353, 354, 356, 357, 358, 359, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 383, 386, 796, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 949, 951, 952, 953, 954, 955, 956, 957, 958, 959, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980, 995 };
-static const unsigned short kReplayMovementUpdateMotionObjWrites[] = { 268, 269, 270, 272, 273, 274, 275, 276, 277, 278, 371, 372, 373, 821, 822, 823, 942, 943, 944, 945, 946, 947, 952, 954, 955, 956, 957, 958, 962, 964, 965, 966, 967, 968, 969, 970, 971, 973, 974, 975, 976, 977, 978, 979, 980 };
-static const unsigned short kReplayMovementHasNetStateObjReads[] = { 102, 266, 273, 953, 957, 959, 963, 972, 980 };
-static const unsigned short kReplayMovementNewPathOrderAtObjReads[] = { 42, 43, 60, 99, 106, 107, 138, 202, 363, 367, 369, 371, 372, 373, 386, 796, 797, 798, 941, 942, 943, 944, 945, 946, 947 };
-static const unsigned short kReplayMovementNewPathOrderAtObjWrites[] = { 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371, 372, 373, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 995 };
-static const unsigned short kReplayMovementNewPathOrderToUnitObjReads[] = { 42, 43, 60, 99, 106, 107, 138, 202, 363, 367, 369, 371, 372, 373, 386, 796, 797, 798, 941, 942, 943, 944, 945, 946, 947 };
-static const unsigned short kReplayMovementNewPathOrderToUnitObjWrites[] = { 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371, 372, 373, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 995 };
-static const unsigned short kReplayMovementNewPathOrderToUnitAtObjReads[] = { 42, 43, 60, 99, 106, 107, 138, 202, 363, 367, 369, 371, 372, 373, 386, 796, 797, 798, 941, 942, 943, 944, 945, 946, 947 };
-static const unsigned short kReplayMovementNewPathOrderToUnitAtObjWrites[] = { 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371, 372, 373, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 995 };
-static const unsigned short kReplayMovementNewPathOrderToUnitAtAngleObjReads[] = { 42, 43, 60, 99, 106, 107, 138, 202, 363, 367, 369, 371, 372, 373, 386, 796, 797, 798, 941, 942, 943, 944, 945, 946, 947 };
-static const unsigned short kReplayMovementNewPathOrderToUnitAtAngleObjWrites[] = { 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371, 372, 373, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 995 };
-static const unsigned short kReplayMovementNewAirManeuverOrderObjReads[] = { 42, 43, 60, 99, 106, 107, 138, 202, 363, 367, 369, 371, 372, 373, 386, 796, 797, 798, 941, 942, 943, 944, 945, 946, 947 };
-static const unsigned short kReplayMovementNewAirManeuverOrderObjWrites[] = { 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371, 372, 373, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 995 };
-static const unsigned short kReplayMovementNewApproachRadiusObjReads[] = { 42, 43, 60, 99, 106, 107, 138, 202, 363, 367, 369, 371, 372, 373, 386, 796, 797, 798, 941, 942, 943, 944, 945, 946, 947 };
-static const unsigned short kReplayMovementNewApproachRadiusObjWrites[] = { 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371, 372, 373, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 995 };
-static const unsigned short kReplayMovementNewRingApproachObjReads[] = { 42, 43, 60, 99, 106, 107, 138, 202, 363, 367, 369, 371, 372, 373, 386, 796, 797, 798, 941, 942, 943, 944, 945, 946, 947 };
-static const unsigned short kReplayMovementNewRingApproachObjWrites[] = { 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371, 372, 373, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 995 };
-static const unsigned short kReplayMovementNewPointMarkerObjReads[] = { 42, 43, 60, 99, 106, 107, 138, 202, 363, 367, 369, 371, 372, 373, 386, 796, 797, 798, 941, 942, 943, 944, 945, 946, 947 };
-static const unsigned short kReplayMovementNewPointMarkerObjWrites[] = { 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371, 372, 373, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 995 };
-static const unsigned short kReplayMovementUnitTargetObjReads[] = { 102, 266 };
+static const unsigned short kReplayMovementUpdateMotionObjReads[] = { 0, 22, 48, 49, 52, 71, 72, 74, 79, 97, 99, 105, 106, 108, 109, 110, 111, 139, 150, 180, 185, 194, 195, 196, 197, 198, 199, 200, 261, 285, 287, 288, 289, 291, 292, 293, 294, 295, 296, 297, 320, 321, 371, 372, 373, 375, 376, 377, 378, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 402, 405, 817, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 970, 972, 973, 974, 975, 976, 977, 978, 979, 980, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991, 992, 993, 994, 995, 996, 997, 998, 999, 1000, 1001, 1016 };
+static const unsigned short kReplayMovementUpdateMotionObjWrites[] = { 287, 288, 289, 291, 292, 293, 294, 295, 296, 297, 390, 391, 392, 842, 843, 844, 963, 964, 965, 966, 967, 968, 973, 975, 976, 977, 978, 979, 983, 985, 986, 987, 988, 989, 990, 991, 992, 994, 995, 996, 997, 998, 999, 1000, 1001 };
+static const unsigned short kReplayMovementHasNetStateObjReads[] = { 108, 285, 292, 974, 978, 980, 984, 993, 1001 };
+static const unsigned short kReplayMovementNewPathOrderAtObjReads[] = { 48, 49, 66, 105, 112, 113, 150, 221, 382, 386, 388, 390, 391, 392, 405, 817, 818, 819, 962, 963, 964, 965, 966, 967, 968 };
+static const unsigned short kReplayMovementNewPathOrderAtObjWrites[] = { 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 390, 391, 392, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 1016 };
+static const unsigned short kReplayMovementNewPathOrderToUnitObjReads[] = { 48, 49, 66, 105, 112, 113, 150, 221, 382, 386, 388, 390, 391, 392, 405, 817, 818, 819, 962, 963, 964, 965, 966, 967, 968 };
+static const unsigned short kReplayMovementNewPathOrderToUnitObjWrites[] = { 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 390, 391, 392, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 1016 };
+static const unsigned short kReplayMovementNewPathOrderToUnitAtObjReads[] = { 48, 49, 66, 105, 112, 113, 150, 221, 382, 386, 388, 390, 391, 392, 405, 817, 818, 819, 962, 963, 964, 965, 966, 967, 968 };
+static const unsigned short kReplayMovementNewPathOrderToUnitAtObjWrites[] = { 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 390, 391, 392, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 1016 };
+static const unsigned short kReplayMovementNewPathOrderToUnitAtAngleObjReads[] = { 48, 49, 66, 105, 112, 113, 150, 221, 382, 386, 388, 390, 391, 392, 405, 817, 818, 819, 962, 963, 964, 965, 966, 967, 968 };
+static const unsigned short kReplayMovementNewPathOrderToUnitAtAngleObjWrites[] = { 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 390, 391, 392, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 1016 };
+static const unsigned short kReplayMovementNewAirManeuverOrderObjReads[] = { 48, 49, 66, 105, 112, 113, 150, 221, 382, 386, 388, 390, 391, 392, 405, 817, 818, 819, 962, 963, 964, 965, 966, 967, 968 };
+static const unsigned short kReplayMovementNewAirManeuverOrderObjWrites[] = { 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 390, 391, 392, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 1016 };
+static const unsigned short kReplayMovementNewApproachRadiusObjReads[] = { 48, 49, 66, 105, 112, 113, 150, 221, 382, 386, 388, 390, 391, 392, 405, 817, 818, 819, 962, 963, 964, 965, 966, 967, 968 };
+static const unsigned short kReplayMovementNewApproachRadiusObjWrites[] = { 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 390, 391, 392, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 1016 };
+static const unsigned short kReplayMovementNewRingApproachObjReads[] = { 48, 49, 66, 105, 112, 113, 150, 221, 382, 386, 388, 390, 391, 392, 405, 817, 818, 819, 962, 963, 964, 965, 966, 967, 968 };
+static const unsigned short kReplayMovementNewRingApproachObjWrites[] = { 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 390, 391, 392, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 1016 };
+static const unsigned short kReplayMovementNewPointMarkerObjReads[] = { 48, 49, 66, 105, 112, 113, 150, 221, 382, 386, 388, 390, 391, 392, 405, 817, 818, 819, 962, 963, 964, 965, 966, 967, 968 };
+static const unsigned short kReplayMovementNewPointMarkerObjWrites[] = { 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 390, 391, 392, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 1016 };
+static const unsigned short kReplayMovementUnitTargetObjReads[] = { 108, 285 };
 static const unsigned short kReplayMissionGetGameTypeAllOf[] = { ROK_MISSION };
-static const unsigned short kReplayMissionGetGameTypeObjReads[] = { 501 };
+static const unsigned short kReplayMissionGetGameTypeObjReads[] = { 522 };
 static const unsigned short kReplayMissionGetNameSlotAllOf[] = { ROK_MISSION };
-static const unsigned short kReplayMissionGetNameSlotObjReads[] = { 503, 504, 505, 506, 507, 508, 509, 510, 511 };
+static const unsigned short kReplayMissionGetNameSlotObjReads[] = { 524, 525, 526, 527, 528, 529, 530, 531, 532 };
 static const unsigned short kReplayMissionGetMissionIndexAllOf[] = { ROK_MISSION };
-static const unsigned short kReplayMissionGetMissionIndexObjReads[] = { 513 };
+static const unsigned short kReplayMissionGetMissionIndexObjReads[] = { 534 };
 static const unsigned short kReplayMissionGetMissionNameAllOf[] = { ROK_MISSION };
-static const unsigned short kReplayMissionGetMissionNameObjReads[] = { 512 };
+static const unsigned short kReplayMissionGetMissionNameObjReads[] = { 533 };
 static const unsigned short kReplayMissionGetStartPositionAllOf[] = { ROK_MISSION, ROK_MISSIONRULE };
-static const unsigned short kReplayMissionGetStartPositionObjReads[] = { 547, 548, 727, 728, 729, 730 };
+static const unsigned short kReplayMissionGetStartPositionObjReads[] = { 568, 569, 748, 749, 750, 751 };
 static const unsigned short kReplayMissionCountStartPositionsAllOf[] = { ROK_MISSION, ROK_MISSIONRULE };
-static const unsigned short kReplayMissionCountStartPositionsObjReads[] = { 547, 548, 727 };
+static const unsigned short kReplayMissionCountStartPositionsObjReads[] = { 568, 569, 748 };
 static const unsigned short kReplayMissionHasMissionNameAllOf[] = { ROK_MISSION };
-static const unsigned short kReplayMissionHasMissionNameObjReads[] = { 512 };
+static const unsigned short kReplayMissionHasMissionNameObjReads[] = { 533 };
 static const unsigned short kReplayMissionGetMissionParamsAllOf[] = { ROK_MISSION };
-static const unsigned short kReplayMissionGetMissionParamsObjReads[] = { 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544 };
+static const unsigned short kReplayMissionGetMissionParamsObjReads[] = { 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565 };
 static const unsigned short kReplayMissionCountMissionUnitsAllOf[] = { ROK_MISSION };
-static const unsigned short kReplayMissionCountMissionUnitsObjReads[] = { 545 };
+static const unsigned short kReplayMissionCountMissionUnitsObjReads[] = { 566 };
 static const unsigned short kReplayMissionGetMissionUnitAllOf[] = { ROK_MISSION, ROK_MISSIONUNIT };
-static const unsigned short kReplayMissionGetMissionUnitObjReads[] = { 545, 546, 715, 716, 717, 718, 719, 720, 721, 722, 723, 724, 725, 726 };
+static const unsigned short kReplayMissionGetMissionUnitObjReads[] = { 566, 567, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747 };
 static const unsigned short kReplayMissionCountMissionFeaturesAllOf[] = { ROK_MISSION };
-static const unsigned short kReplayMissionCountMissionFeaturesObjReads[] = { 549 };
+static const unsigned short kReplayMissionCountMissionFeaturesObjReads[] = { 570 };
 static const unsigned short kReplayMissionGetMissionFeatureAllOf[] = { ROK_MISSION, ROK_MISSIONFEATURE };
-static const unsigned short kReplayMissionGetMissionFeatureObjReads[] = { 549, 550, 731, 732, 733 };
+static const unsigned short kReplayMissionGetMissionFeatureObjReads[] = { 570, 571, 752, 753, 754 };
 static const unsigned short kReplayNetworkBroadcastPlayerInfoAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayNetworkBroadcastPlayerInfoReads[] = { 16 };
 static const unsigned short kReplayNetworkBroadcastPlayerInfoObjReads[] = { 1, 20 };
-static const unsigned short kReplayNetworkSendNewUnitObjReads[] = { 1, 46, 47, 100 };
+static const unsigned short kReplayNetworkSendNewUnitObjReads[] = { 1, 52, 53, 106 };
 static const unsigned char kReplayNetworkSendScriptCallReads[] = { 16 };
-static const unsigned short kReplayNetworkSendScriptCallObjReads[] = { 1, 46, 100 };
+static const unsigned short kReplayNetworkSendScriptCallObjReads[] = { 1, 52, 106 };
 static const unsigned char kReplayNetworkSendScriptCallByNameReads[] = { 16 };
-static const unsigned short kReplayNetworkSendScriptCallByNameObjReads[] = { 1, 44, 46, 100 };
+static const unsigned short kReplayNetworkSendScriptCallByNameObjReads[] = { 1, 50, 52, 106 };
 static const unsigned short kReplayNetworkSendShareMetalAllOf[] = { ROK_PLAYER };
 static const unsigned short kReplayNetworkSendShareEnergyAllOf[] = { ROK_PLAYER };
 static const unsigned short kReplayNetworkSendShareEnergyObjReads[] = { 0, 22, 23, 24, 35 };
@@ -5960,13 +6091,13 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "UnitAccount", SUB_ECONOMY, kReplayEconomyUnitAccountReads, 1, kReplayEconomyUnitAccountWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetCellFeature", SUB_FEATURES, kReplayFeaturesGetCellFeatureReads, 2, nullptr, 0, kReplayFeaturesGetCellFeatureObjReads, 3, nullptr, 0, nullptr, 0 },
     { "GetFootprintCentre", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesGetFootprintCentreObjReads, 3, nullptr, 0, nullptr, 0 },
-    { "Apply", SUB_FEATURES, kReplayFeaturesApplyReads, 8, kReplayFeaturesApplyWrites, 3, kReplayFeaturesApplyObjReads, 45, kReplayFeaturesApplyObjWrites, 22, kReplayFeaturesApplyAllOf, 5 },
+    { "Apply", SUB_FEATURES, kReplayFeaturesApplyReads, 8, kReplayFeaturesApplyWrites, 3, kReplayFeaturesApplyObjReads, 46, kReplayFeaturesApplyObjWrites, 22, kReplayFeaturesApplyAllOf, 5 },
     { "Place", SUB_FEATURES, kReplayFeaturesPlaceReads, 2, nullptr, 0, kReplayFeaturesPlaceObjReads, 18, kReplayFeaturesPlaceObjWrites, 19, kReplayFeaturesPlaceAllOf, 4 },
     { "FeatureTypeCount", SUB_FEATURES, kReplayFeaturesFeatureTypeCountReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "AnimateFeatureType", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesAnimateFeatureTypeObjReads, 3, kReplayFeaturesAnimateFeatureTypeObjWrites, 2, kReplayFeaturesAnimateFeatureTypeAllOf, 1 },
     { "ScanFeatureCell", SUB_FEATURES, kReplayFeaturesScanFeatureCellReads, 6, kReplayFeaturesScanFeatureCellWrites, 4, kReplayFeaturesScanFeatureCellObjReads, 21, kReplayFeaturesScanFeatureCellObjWrites, 19, kReplayFeaturesScanFeatureCellAllOf, 4 },
     { "FirstFeatureSpot", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesFirstFeatureSpotObjReads, 1, nullptr, 0, kReplayFeaturesFirstFeatureSpotAllOf, 1 },
-    { "UpdateFeatureSpot", SUB_FEATURES, kReplayFeaturesUpdateFeatureSpotReads, 10, kReplayFeaturesUpdateFeatureSpotWrites, 3, kReplayFeaturesUpdateFeatureSpotObjReads, 44, kReplayFeaturesUpdateFeatureSpotObjWrites, 25, kReplayFeaturesUpdateFeatureSpotAllOf, 4 },
+    { "UpdateFeatureSpot", SUB_FEATURES, kReplayFeaturesUpdateFeatureSpotReads, 10, kReplayFeaturesUpdateFeatureSpotWrites, 3, kReplayFeaturesUpdateFeatureSpotObjReads, 45, kReplayFeaturesUpdateFeatureSpotObjWrites, 25, kReplayFeaturesUpdateFeatureSpotAllOf, 4 },
     { "FindFeatureAtPos", SUB_FEATURES, kReplayFeaturesFindFeatureAtPosReads, 2, nullptr, 0, kReplayFeaturesFindFeatureAtPosObjReads, 6, nullptr, 0, kReplayFeaturesFindFeatureAtPosAllOf, 2 },
     { "Apply", SUB_AI, kReplayAiApplyReads, 17, kReplayAiApplyWrites, 4, kReplayAiApplyObjReads, 13, kReplayAiApplyObjWrites, 4, nullptr, 0 },
     { "DumpPlayerAI", SUB_AI, kReplayAiDumpPlayerAIReads, 13, nullptr, 0, kReplayAiDumpPlayerAIObjReads, 7, kReplayAiDumpPlayerAIObjWrites, 3, kReplayAiDumpPlayerAIAllOf, 1 },
@@ -6032,14 +6163,28 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "GetOrderType", SUB_ORDERS, kReplayOrdersGetOrderTypeReads, 10, nullptr, 0, kReplayOrdersGetOrderTypeObjReads, 29, kReplayOrdersGetOrderTypeObjWrites, 1, nullptr, 0 },
     { "MissionTypeFromName", SUB_ORDERS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "ExpandGroupCommand", SUB_ORDERS, kReplayOrdersExpandGroupCommandReads, 12, nullptr, 0, kReplayOrdersExpandGroupCommandObjReads, 30, kReplayOrdersExpandGroupCommandObjWrites, 1, nullptr, 0 },
+    { "Apply", SUB_UNITS, kReplayUnitsApplyReads, 12, kReplayUnitsApplyWrites, 4, kReplayUnitsApplyObjReads, 97, kReplayUnitsApplyObjWrites, 52, kReplayUnitsApplyAllOf, 3 },
+    { "KillUnit", SUB_UNITS, kReplayUnitsKillUnitReads, 6, nullptr, 0, kReplayUnitsKillUnitObjReads, 57, kReplayUnitsKillUnitObjWrites, 22, kReplayUnitsKillUnitAllOf, 2 },
+    { "CreateUnit", SUB_UNITS, kReplayUnitsCreateUnitReads, 8, kReplayUnitsCreateUnitWrites, 3, kReplayUnitsCreateUnitObjReads, 62, kReplayUnitsCreateUnitObjWrites, 35, kReplayUnitsCreateUnitAllOf, 2 },
     { "FindUnitType", SUB_UNITS, kReplayUnitsFindUnitTypeReads, 1, nullptr, 0, kReplayUnitsFindUnitTypeObjReads, 1, nullptr, 0, kReplayUnitsFindUnitTypeAllOf, 1 },
     { "FindUnitTypeId", SUB_UNITS, kReplayUnitsFindUnitTypeIdReads, 1, nullptr, 0, kReplayUnitsFindUnitTypeIdObjReads, 2, nullptr, 0, kReplayUnitsFindUnitTypeIdAllOf, 1 },
+    { "AddBuildProgress", SUB_UNITS, kReplayUnitsAddBuildProgressReads, 1, kReplayUnitsAddBuildProgressWrites, 1, kReplayUnitsAddBuildProgressObjReads, 26, kReplayUnitsAddBuildProgressObjWrites, 11, nullptr, 0 },
     { "AddRepairProgress", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsAddRepairProgressObjReads, 5, nullptr, 0, nullptr, 0 },
     { "CanLoad", SUB_UNITS, kReplayUnitsCanLoadReads, 1, nullptr, 0, kReplayUnitsCanLoadObjReads, 14, nullptr, 0, nullptr, 0 },
     { "CanReclaim", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsCanReclaimObjReads, 3, nullptr, 0, nullptr, 0 },
     { "CanRepair", SUB_UNITS, kReplayUnitsCanRepairReads, 1, nullptr, 0, kReplayUnitsCanRepairObjReads, 9, nullptr, 0, nullptr, 0 },
+    { "UnitRefUnlink", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsUnitRefUnlinkObjReads, 3, kReplayUnitsUnitRefUnlinkObjWrites, 3, nullptr, 0 },
     { "UpdateUnitHead", SUB_UNITS, kReplayUnitsUpdateUnitHeadReads, 4, kReplayUnitsUpdateUnitHeadWrites, 1, kReplayUnitsUpdateUnitHeadObjReads, 2, nullptr, 0, nullptr, 0 },
     { "UpdateUnitBody", SUB_UNITS, kReplayUnitsUpdateUnitBodyReads, 2, nullptr, 0, kReplayUnitsUpdateUnitBodyObjReads, 18, kReplayUnitsUpdateUnitBodyObjWrites, 5, nullptr, 0 },
+    { "UpdateUnitTail", SUB_UNITS, kReplayUnitsUpdateUnitTailReads, 8, nullptr, 0, kReplayUnitsUpdateUnitTailObjReads, 66, kReplayUnitsUpdateUnitTailObjWrites, 26, kReplayUnitsUpdateUnitTailAllOf, 3 },
+    { "GetFactoriesInRadius", SUB_UNITS, kReplayUnitsGetFactoriesInRadiusReads, 1, nullptr, 0, kReplayUnitsGetFactoriesInRadiusObjReads, 4, nullptr, 0, nullptr, 0 },
+    { "CreateFactoryIndex", SUB_UNITS, kReplayUnitsCreateFactoryIndexReads, 1, kReplayUnitsCreateFactoryIndexWrites, 1, kReplayUnitsCreateFactoryIndexObjReads, 2, kReplayUnitsCreateFactoryIndexObjWrites, 3, nullptr, 0 },
+    { "FreeFactoryIndex", SUB_UNITS, kReplayUnitsFreeFactoryIndexReads, 1, nullptr, 0, kReplayUnitsFreeFactoryIndexObjReads, 2, kReplayUnitsFreeFactoryIndexObjWrites, 2, nullptr, 0 },
+    { "RefreshFactoryIndex", SUB_UNITS, kReplayUnitsRefreshFactoryIndexReads, 3, nullptr, 0, kReplayUnitsRefreshFactoryIndexObjReads, 12, kReplayUnitsRefreshFactoryIndexObjWrites, 2, kReplayUnitsRefreshFactoryIndexAllOf, 1 },
+    { "UnitRefInit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsUnitRefInitObjReads, 4, kReplayUnitsUnitRefInitObjWrites, 3, nullptr, 0 },
+    { "UnitRefSetUnit", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsUnitRefSetUnitObjReads, 4, kReplayUnitsUnitRefSetUnitObjWrites, 3, nullptr, 0 },
+    { "UnitRefGet", SUB_UNITS, nullptr, 0, nullptr, 0, kReplayUnitsUnitRefGetObjReads, 1, nullptr, 0, nullptr, 0 },
+    { "UnitRefSetValue", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, kReplayUnitsUnitRefSetValueObjWrites, 1, nullptr, 0 },
     { "Apply", SUB_PLAYERS, kReplayPlayersApplyReads, 5, kReplayPlayersApplyWrites, 6, kReplayPlayersApplyObjReads, 83, kReplayPlayersApplyObjWrites, 45, kReplayPlayersApplyAllOf, 2 },
     { "DeactivateConditions", SUB_PLAYERS, kReplayPlayersDeactivateConditionsReads, 1, kReplayPlayersDeactivateConditionsWrites, 1, nullptr, 0, kReplayPlayersDeactivateConditionsObjWrites, 1, nullptr, 0 },
     { "UpdatePlayerHead", SUB_PLAYERS, kReplayPlayersUpdatePlayerHeadReads, 1, kReplayPlayersUpdatePlayerHeadWrites, 1, kReplayPlayersUpdatePlayerHeadObjReads, 3, nullptr, 0, kReplayPlayersUpdatePlayerHeadAllOf, 1 },
@@ -6179,19 +6324,12 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "BroadcastPlayerEconomy", SUB_NETWORK, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SendUnitStates", SUB_NETWORK, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "LoadUnit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "CreateUnit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "AddBuildProgress", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UnitRefUnlink", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "GetFactoriesInRadius", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UnitRefInit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UnitRefSetUnit", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UnitRefGet", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
-    { "UnitRefSetValue", SUB_UNITS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitsInRange", SUB_MAP, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetNanoPiecePosition", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetAimFromPosition", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "GetSweetSpot", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "ObjectStateSize", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "DeleteScript", SUB_SCRIPTS, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "LoadTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "SaveTarget", SUB_MOVEMENT, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Tick", SUB_ECONWORLD, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
@@ -6249,16 +6387,16 @@ static const ReplaySubsystem kReplaySubsystems[] = {
     { "targeting", 4, 0, 1, 57, 7, RET_TARGETING, 0, 0 },
     { "los_radar", 5, 1, 1, 64, 22, RET_LOS_RADAR, 0, 0 },
     { "orders", 6, 2, 1, 86, 7, RET_ORDERS, 1, 1 },
-    { "units", 7, 2, 1, 93, 8, RET_UNITS, 0, 0 },
-    { "players", 5, 3, 1, 101, 9, RET_PLAYERS, 0, 0 },
-    { "map", 9, 2, 1, 110, 11, RET_MAP, 0, 0 },
-    { "scripts", 3, 0, 1, 121, 13, RET_SCRIPTS, 0, 0 },
-    { "movement", 5, 0, 1, 134, 13, RET_MOVEMENT, 1, 0 },
-    { "mission", 2, 0, 1, 147, 12, RET_COUNT, 0, 0 },
-    { "files", 3, 0, 0, 159, 58, RET_COUNT, 0, 0 },
-    { "network", 2, 0, 0, 217, 22, RET_COUNT, 0, 0 },
-    { "econworld", 5, 0, 1, 239, 0, RET_COUNT, 0, 0 },
-    { "pathworld", 4, 1, 1, 239, 0, RET_COUNT, 0, 0 },
+    { "units", 7, 2, 1, 93, 22, RET_UNITS, 1, 0 },
+    { "players", 5, 3, 1, 115, 9, RET_PLAYERS, 0, 0 },
+    { "map", 9, 2, 1, 124, 11, RET_MAP, 0, 0 },
+    { "scripts", 3, 0, 1, 135, 13, RET_SCRIPTS, 0, 0 },
+    { "movement", 5, 0, 1, 148, 13, RET_MOVEMENT, 1, 0 },
+    { "mission", 2, 0, 1, 161, 12, RET_COUNT, 0, 0 },
+    { "files", 3, 0, 0, 173, 58, RET_COUNT, 0, 0 },
+    { "network", 2, 0, 0, 231, 22, RET_COUNT, 0, 0 },
+    { "econworld", 5, 0, 1, 253, 0, RET_COUNT, 0, 0 },
+    { "pathworld", 4, 1, 1, 253, 0, RET_COUNT, 0, 0 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

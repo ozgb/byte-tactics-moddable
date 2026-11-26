@@ -20,6 +20,12 @@
 #include "../src/map/features.h"
 #include "../src/game/console_commands.h"
 #include "../src/units/unit_targets.h"
+#include "../src/units/factory_index.h"
+#include "../src/units/unit_ref.h"
+#include "../src/units/path_order_attach.h"
+#include "../src/units/units.h"
+
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Vec3 pos, int finished, int mode, int id);
 #include "../src/units/units_seam.h"
 #include "../src/units/unit_position.h"
 #include "../src/units/unit_commands.h"
@@ -211,6 +217,7 @@ void __cdecl RotatePoint2D(short angle, int* xz)
 }
 
 #pragma comment(linker, "/alternatename:?AngleOfVector@@YAHHH@Z=?AngleOfVector@@YAFHH@Z")
+#pragma comment(linker, "/alternatename:?RotatePoint2D@@YAXGPAUXzPoint@@@Z=?RotatePoint2D@@YAXFPAH@Z")
 #pragma comment(linker, "/alternatename:?AddExplosionEffect@@YGXPAUVec3@@PAXHH@Z=?AddExplosionEffect@@YGXPAUVec3@@PAUGafSequence@@HH@Z")
 #pragma comment(linker, "/alternatename:?AddExplosionEffect@@YGXPAX0HH@Z=?AddExplosionEffect@@YGXPAUVec3@@PAUGafSequence@@HH@Z")
 #pragma comment(linker, "/alternatename:?GetGafFrame@@YGPAXPAUGafSequence@@H@Z=?GetGafFrame@@YGPAUGafFrame@@PAUFrameTable@@H@Z")
@@ -2631,6 +2638,7 @@ void __stdcall UnitsNative_ReloadUnitType(unsigned short id)
 
 void __stdcall UnitsNative_KillUnit(Unit* unit, int cause)
 {
+    KillUnit(unit, cause);
 }
 
 void __stdcall UnitsNative_LoadUnits(HapiBank* file)
@@ -2648,7 +2656,7 @@ Unit* __stdcall UnitsNative_LoadUnit(unsigned short id, HapiBank* file)
 
 Unit* __stdcall UnitsNative_CreateUnit(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
 {
-    return nullptr;
+    return CreateUnit(player, typeId, *pos, finished, mode, id);
 }
 
 UnitDef* __stdcall UnitsNative_FindUnitType(const char* name)
@@ -2668,7 +2676,7 @@ Unit* __stdcall UnitsNative_FindMissionUnit(const char* name, const Ref<Unit>* u
 
 int __stdcall UnitsNative_AddBuildProgress(Unit* builder, Unit* unit, float amount)
 {
-    return 0;
+    return AddBuildProgress(builder, unit, amount);
 }
 
 int __stdcall UnitsNative_AddRepairProgress(Unit* builder, Unit* unit, float amount)
@@ -2693,6 +2701,7 @@ int __stdcall UnitsNative_CanRepair(Unit* unit, Unit* target)
 
 void __stdcall UnitsNative_UnitRefUnlink(UnitRef* ref)
 {
+    ref->Unlink();
 }
 
 void __stdcall UnitsNative_UpdateUnitHead(Unit* unit)
@@ -2707,40 +2716,47 @@ int __stdcall UnitsNative_UpdateUnitBody(Unit* unit)
 
 void __stdcall UnitsNative_UpdateUnitTail(Unit* unit, int moved)
 {
+    UpdateUnitTail(unit, moved);
 }
 
 int __stdcall UnitsNative_GetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
 {
-    return 0;
+    return GetFactoriesInRadius(player, pos, radius, out, capacity);
 }
 
 void __stdcall UnitsNative_CreateFactoryIndex(int player)
 {
+    CreateFactoryIndex(player);
 }
 
 void __stdcall UnitsNative_FreeFactoryIndex(int player)
 {
+    FreeFactoryIndex(player);
 }
 
 void __stdcall UnitsNative_RefreshFactoryIndex(int player)
 {
+    RefreshFactoryIndex(player);
 }
 
 void __stdcall UnitsNative_UnitRefInit(UnitRef* ref, Unit* unit, OrderBase* value)
 {
+    ((PathOrderAttach*)ref)->PathOrderAttach::PathOrderAttach(unit, value);
 }
 
 void __stdcall UnitsNative_UnitRefSetUnit(UnitRef* ref, Unit* unit)
 {
+    ((PathOrderAttach*)ref)->SetUnit(unit);
 }
 
 Unit* __stdcall UnitsNative_UnitRefGet(UnitRef* ref)
 {
-    return nullptr;
+    return UnitRefGet(ref);
 }
 
 void __stdcall UnitsNative_UnitRefSetValue(UnitRef* ref, OrderBase* value)
 {
+    UnitRefSetValue(ref, value);
 }
 
 void __stdcall UnitsNative_WriteState(const StateWriter* writer)
@@ -2941,6 +2957,26 @@ int ReadCacheLines(const char* file, int at, int end)
     return at;
 }
 
+void StoreGameHolder(const char* file, const char* line, unsigned load, unsigned kind, unsigned index, void* base)
+{
+    const ReplayLoadKind& l = kReplayLoads[load];
+    for (unsigned n = 0; n < l.holderCount; n++) {
+        const ReplayLoadHolder& h = kReplayLoadHolders[l.firstHolder + n];
+        if (h.how != RLH_GAME || h.kind != kind)
+            continue;
+        unsigned room = kReplayTables[kReplayObjectKinds[kind].table - 1].alloc;
+        if (index >= room)
+            Fatal(file, 0, "a load line whose holder is past the room of its table", line);
+        unsigned* ref = (unsigned*)((unsigned char*)g_game + h.offset);
+        if (*ref == 0) {
+            void* array = AllocObject(room * sizeof(void*));
+            memset(array, 0, room * sizeof(void*));
+            *ref = (unsigned)((unsigned char*)array - (unsigned char*)SimBlockBase());
+        }
+        ((void**)((unsigned char*)SimBlockBase() + *ref))[index] = base;
+    }
+}
+
 void LoadInputs(const char* file, int end)
 {
     BindLoadFiles();
@@ -3021,6 +3057,7 @@ void LoadInputs(const char* file, int end)
         if (load == RL_MODEL)
             BindModelFaces(file, base, size, binds);
         ReplayLoadAdopt(load, (unsigned)kind, index, base, size);
+        StoreGameHolder(file, line, load, (unsigned)kind, index, base);
     }
 }
 

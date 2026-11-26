@@ -667,6 +667,10 @@ event of that kind alone: players' `Apply` has `{"PLAYERS_SET_STORE": ["Player.e
 writes `w Player#0.energy f32:0x44fa0000`, and every other kind of `Apply` keeps the stores out of its write set (as a write of
 every call, an import's spend of the store would be a write of the module). The schema emits per-kind variant sets of the slot, the recorder picks them by the kind of the event, and the replayer by the call's `a event.kind` line. The check
 fails for a kind that is no kind of the table, one that is also `unrecorded`, an empty list, and a field that is not among the slot's reads (no `r` line would record its value before the write).
+`"tables"` maps a struct member (`Struct.member`, an `int`) to a kind with a table, for a payload member that holds the index of an element of it: units' `Apply` has
+`{"UnitsCreate.type": "UnitDef"}`, so the recorder makes `UnitDef#68` a root of a CREATE of unit type 68 and its reads are `r` lines, as a weapon number's are (index 0 and an
+index past the table's count add no root). The line keeps the number (`a event.type 68`). The check fails for a member that is no `int` of a struct of the module's interface
+header, a kind with no table, the first kind of the schema, and a member that `weapons` names too.
 `"refs"` maps a struct member (`Struct.member`) to the state kind its block offset leads to, for a ref that is no unit:
 `{"WeaponsAimDone.callback": "WeaponAimCobCb", "WeaponsStartScript.callback": "WeaponAimCobCb"}` makes `callback` of those
 two payloads a ref to a weapon's aim callback, named by its site (`a event.callback Unit#2.weapons[0].aimCob`). Scripts' `ScriptsStart.callback` is a ref of the same kind, and `ScriptsState.state` one to a `ModelState`. The check fails
@@ -1067,7 +1071,12 @@ script or model it is, written `UnitDef#12` (the unit type is the index of the `
 
 A holder is a state kind with a table in `Game` or `SimGlobals`, and element N of its table is the holder `Kind#N`. It holds its pointer either in a `member` of the
 element (`UnitDef.data`, which holds the script), or in element N of the array that the `Game` member `game` leads to (`Game.types[N]`, which holds the model of unit
-type N). A load kind may have several holders (a later issue adds the models of feature types), and a holder needs no format change: the line names its kind. The
+type N). A load kind may have several holders (a later issue adds the models of feature types), and a holder needs no format change: the line names its kind. A
+replayer stores the address of its copy of a `game` holder's file in element N of that array, and allocates the array when the `Ref` is null, as many elements as the
+`alloc` of the holder kind's table, so the module finds the model of a unit type where the game keeps it (units reads `Game.types[N]` when it starts a unit's script, before it passes the model
+to `scripts.CreatePlayerObjectState`). A slot reads that element as the field of the state kind `UnitModel`, a table over `Game.types` whose one field `model` is
+of kind `load` (`o UnitModel#34.model UnitDef#34`). In the same way, `FeatureHeap` is a second view of `Game.features` with the one field `dead`, the word that units
+reads of a feature it reaches by its index (`r FeatureHeap#295.dead 65535`). The
 `loader` lists the functions of the source that load and prepare the data, in the order they run (the oracle kit's copy of the schema leaves it out); the replayer calls them. The type of a load kind needs no rule: a field row of the
 type (`field_read ScriptTable::code`, `Object3do::sibling`) of a complete subsystem is not an untracked target, because the replayer has the real bytes.
 
@@ -1305,6 +1314,9 @@ The line is also what the recording knows of the field, so the slot's `w` lines 
 recording unless an import changed it. The replayer stops with an error on a line of this form that it cannot place (one that names no field of a known kind, or a field the
 slot neither reads nor writes), so a recording that broke that rule fails rather than going uncompared. An object the import frees (`services.SimFree`) is not walked until `services.SimAlloc` hands its address out again; the list of freed
 addresses has no limit. The walk runs after every import, so a subsystem has the lines only when its annotation asks for them with a reason, `"import_objects": "<reason>"` (movement and orders have it); `replayschema.py --check` fails for one with no reason.
+A slot that frees the object an argument names has `"frees": "<argument>"` (scripts' `DeleteScript` and `FreeObjectState`): after the import of such a slot, the walks of the
+call skip that object until `services.SimAlloc` hands its address out again, as they skip a block of `services.SimFree`, so a unit whose `script` still holds the freed script
+until units clears it records no line of that script (its vtable is its base's once the destructor has run). `replayschema.py --check` fails for a name that is no object argument of the slot.
 A subsystem that frees an object and allocates the next at the same address also gives `"fresh_allocations": "<reason>"` (orders has it): the recorder forgets the names other
 objects held at the block's first address before it names the block of `services.SimAlloc`, and the replayer forgets them before it binds the block, so a new order is
 `Order#5`, not the name of the order freed there. Only the first address is forgotten: a `PathOrderAttach` named on its own at an offset inside the freed block (as
@@ -1402,6 +1414,7 @@ from the layout), and the export refuses a copy that names any other source name
 | `mode` | Argument | Lines |
 |---|---|---|
 | `scalar` | a number, `Point16`, `Vec3` by value | `a name value` |
+| `scalar` (`root`) | an integer that is the index of an element of a kind with a table, `{"mode": "scalar", "root": "UnitDef"}` (units' `CreateUnit`, whose `typeId` picks the unit type) | `a typeId 68`, and the element (`UnitDef#68`) is a root of the call, so its fields in the read set are `r` lines; index 0 and an index past the table's count add no root. The check fails for a non-integer argument and a kind with no table |
 | `stream` | `RandStream` | `a stream main` |
 | `text` | `char*` | `a name "text"` |
 | `handle` | `HapiBank*` and the like | `a bank bank#1` |
@@ -1684,13 +1697,12 @@ players:
 
 units:
 
-units is complete with part of its seam recorded: the slots below are `record: false` with the reason in the schema, and each has what it needs written here.
+units is complete with its whole tick seam recorded: the slots below are `record: false` with the reason in the schema, or recorded and reached by no stored window.
 
-- `Apply`, `CreateUnit`, `KillUnit` and `AddBuildProgress`: their closure holds the unit's death, the start of its script, the clearing of its references and the end of its construction, which call `scripts.NewUnitScript`, `scripts.SetCob`, `scripts.CreateObjectState`, `scripts.SetObjectState`, `scripts.DeleteScript` and `scripts.FreeObjectState` (they write `Unit.script` and the model state, and no import form restores a written pointer to an object the import made), and walk the list of `PathOrderAttach` references that starts at `Unit.head` (the references live in `Order.link` and `PathOrder.ref`, kinds of orders and movement).
-- `UnitRefUnlink`, `UnitRefInit`, `UnitRefSetUnit`, `UnitRefGet` and `UnitRefSetValue`: the reference is an embedded `PathOrderAttach` of an order, a kind that orders annotates.
-- `UpdateUnitTail`: aligning a unit to the ground reads the unit's 3D model through `Game.types` (a view of the model and a height sample of each corner), which has no form.
-- `CreateFactoryIndex`, `FreeFactoryIndex`, `RefreshFactoryIndex` and `GetFactoriesInRadius`: the factory index is a static of units outside the block (only the pointer is tracked by the block), so no field names it.
-- `FindMissionUnit`: it is called only by the unit commands of a mission when the mission starts, and no scenario reaches it.
+- `KillUnit` is recorded, but only the game's shutdown calls it through the seam, which no scenario run reaches before it ends; the death of a unit in a tick is `Apply` of UNITS_KILL, which `console-units` holds.
+- `FreeFactoryIndex` is recorded, and called only when a match is unloaded (`FreePlayers`). `GetFactoriesInRadius` and `UnitRefUnlink` are recorded, and only an aircraft that looks for a repair pad, and movement's targets of an air unit, call them: `orders-air-repair` reaches both over ticks 231 to 699 (one pad search at tick 382, an unlink every 30 ticks), which replays equal, but the stored window of that scenario is the self-repair of ticks 848 to 853.
+- `Apply` of SET_POSITION, ATTACH_TO_PIECE, FINISH_CONSTRUCTION, BUILD_DECAY, REPAIR, SET_STANCE, SET_ANGLES, SET_BUILD_STATE, CHANGE_CELL, SEND, CAPTURE and FORGET_ATTACKER is recorded, and no stored window holds it. KILL_ALL and RELOAD_TYPE are console commands that reload the unit types (`unrecorded`, `load class`).
+- `FindMissionUnit`: only units itself calls it, through the seam, while it places the units of a mission at the mission's load, which no recording holds.
 - `UpdateAllUnits` is the scheduler's loop over every unit. It calls `UpdateUnitHead`, `UpdateUnitBody` and `UpdateUnitTail` through the seam, and other subsystems' slots between them, so its recording would hold a call of another recorded subsystem inside it; the head and body slots are recorded one by one.
 - `WriteState`, `SaveUnits`, `GetMovementLimits`, `CreateFactoryIndex` and `FreeFactoryIndex` are queries or set-up outside the tick, and the load slots are load class.
 - `UpdateUnitBody`'s water damage (`mission.waterDoesDamage` with a damage and a unit at or under the sea level that does not float) and its selection reset (`selected` with `selectable` cleared): no recorded window has a mission that sets water damage, and a unit is selected only by the interface.
@@ -1919,22 +1931,25 @@ The recorder's walker holds as many fields as the schema has walkable object fie
 
 A subsystem that imports a slot of another complete subsystem (`weapons` imports `targeting.GetWeaponTargetPos`, and `targeting` and `wind_meteors` import `weapons` slots) is replayed against the import stubs of that seam, not against the other module: `BindSeams` binds the stubs of the seams a recording's subsystem imports from, after the native tables.
 
-The recordings of units (7.0), which the modern build runs as native code in every mode (it has no WASM module yet). They record the part of the seam that no pending subsystem's state is needed for (see "Not recorded"): `UpdateUnitHead` and `UpdateUnitBody` for each unit of each tick (the timers, the health percentage every 30 ticks, the self-repair through `AddRepairProgress` and `mission.GetMissionParams`, an `i` line whose result is the whole `MissionParams`), `AddRepairProgress`, `Unit::CanLoad`, `CanReclaim` and `CanRepair`, `FindUnitType` and `FindUnitTypeId`:
+The recordings of units (7.0), which the modern build runs as native code in every mode (it has no WASM module yet). They hold `UpdateUnitHead`, `UpdateUnitBody` and `UpdateUnitTail` for each unit of each tick (the timers, the health percentage every 30 ticks, the self-repair through `AddRepairProgress` and `mission.GetMissionParams`, an `i` line whose result is the whole `MissionParams`, and the tail's alignment to the ground, which reads the unit type's model through `Game.types`), `Apply` of the events units is given, `CreateUnit`, `AddBuildProgress`, `AddRepairProgress`, the `UnitRef*` slots of the `PathOrderAttach` references of orders and movement, the factory index (`CreateFactoryIndex`, `RefreshFactoryIndex`, the index a table of `SimGlobals`), `Unit::CanLoad`, `CanReclaim` and `CanRepair`, `FindUnitType` and `FindUnitTypeId`. `Apply` reaches every unit (`all-of` over the units through `Player`, `Cell` and `SideDef`), so each file starts with a first record of the unit pool, about 3 MB, and a call after that holds only what changed; the eight files are about 27 MB. A unit's script and model state are objects that scripts' imports make (`scripts.NewUnitScript`, `scripts.CreateObjectState`), recorded as `o` lines after the import (units' `import_objects`), and the model of a unit type is the `model` load of its `Game.types` holder:
 
-- `console-units` (the whole run, 170 ticks): 726 head and body calls, `FindUnitTypeId` 3 calls (2 at load, 1 at tick 140).
-- `mission-victory` (the whole run): 1828 head and body calls, and the load-time `FindUnitType` (7 calls) and `FindUnitTypeId` (6 calls) with the names of all 178 unit types (`r UnitDef#N.unitname`), the only run with `FindUnitType` that is short; a window cannot start at tick 0.
+- `console-units` (the whole run, 170 ticks): 726 calls of each update slot, 935 `Apply` (SET_STATE_BITS, SET_FLAGS, SET_NET_DIRTY, SET_WORK_TIME, UNLINK, TURN, SFX_OCCUPY, NOTIFY_REFS, ATTACKED_SPEECH, MARK_DAMAGED, DAMAGE_RECORD, SET_HEALTH, KILL and CREATE), `CreateUnit` 2 calls, `CreateFactoryIndex` 2 and `RefreshFactoryIndex` 602, the `UnitRef*` slots, and `FindUnitTypeId` 3 calls (2 at load, 1 at tick 140).
+- `mission-victory` (the whole run): 1828 calls of each update slot, 1563 `Apply`, `CreateUnit` 7 calls, and the load-time `FindUnitType` (7 calls) and `FindUnitTypeId` (6 calls) with the names of all 178 unit types (`r UnitDef#N.unitname`), the only run with `FindUnitType` that is short; a window cannot start at tick 0.
+- `orders-factory`, ticks 19 to 22 only: a factory finishes a unit, `CreateUnit` (its `typeId` a root, `UnitDef#N`) and the new unit's script and model state.
+- `orders-build-patrol`, ticks 148 to 162 only: `AddBuildProgress` 11 calls, and `Apply` of MOVE.
 - `orders-air-repair`, ticks 848 to 853 only: `AddRepairProgress` 4 calls (a unit repairing itself, with `services.ScheduleEconomyRequestGranted` and `services.SchedPublish`) and `CanRepair` 2 calls.
-- `orders-guard-reclaim`, ticks 250 to 262 only: `CanReclaim` 6 calls.
-- `units-transport`, ticks 4098 to 4101 only: `CanLoad` 1 call.
+- `orders-guard-reclaim`, ticks 250 to 262 only: `CanReclaim` 6 calls and `UnitRefGet` 18.
+- `units-transport`, ticks 4098 to 4101 only: `CanLoad` 1 call, and `Apply` of SCRIPT_VALUE.
 - `orders-guard-attacked`, ticks 28 to 32 only: the health percentage at tick 30.
 
-`replay_inject_test.exe` is also built with the percentage-scale injection of 99 (the 100 of `health * 100 / maxHealth` in `UpdateUnitBody`), and the divergence is reported at call 25 of `orders-guard-attacked` and at `Unit#1.healthPercent` (recorded 100, replayed 99):
+`replay_inject_test.exe` is also built with two injected changes. The percentage-scale injection of 99 (the 100 of `health * 100 / maxHealth` in `UpdateUnitBody`) is reported at call 62 of `orders-guard-attacked` and at `Unit#1.healthPercent` (recorded 100, replayed 99); the last attacker slot of 9 that a new unit starts with (10 in the game, set under `CreateUnit`) is reported at call 3 of `orders-factory` and at `Unit#2.lastAttackerSlot`:
 
 ```sh
-wine build/modern/replay_inject_test.exe --expect 25 Unit#1.healthPercent tests/replay/units/orders-guard-attacked.txt
+wine build/modern/replay_inject_test.exe --expect 62 Unit#1.healthPercent tests/replay/units/orders-guard-attacked.txt
+wine build/modern/replay_inject_test.exe --expect 3 Unit#2.lastAttackerSlot tests/replay/units/orders-factory.txt
 ```
 
-`services.ScheduleEconomyRequestGranted` names its unit as `Unit#N`, not as its block offset, which differs between the recording and the replay: the argument is `{"mode": "object", "kind": "Unit", "ref": true}`, as a unit of the world view is.
+`services.ScheduleEconomyRequestGranted` and `services.ScheduleMetalExtraction` name their unit as `Unit#N`, not as its block offset, which differs between the recording and the replay: the argument is `{"mode": "object", "kind": "Unit", "ref": true}`, as a unit of the world view is.
 
 The recordings of ai 6.1, which the modern build runs as native code in every mode: `console-sight` (the whole run, 200 ticks: `CreateSquads`, `CreateSquadManager` and `CreatePlayerAI` of both players at tick 0, `RebuildFeatureCells`, `Apply` of SET_SQUAD (the AI script's lines are ai's own data since ai 6.1, and `Apply` of RELOAD_PROFILES, the console `reloadaiprofiles`, is not recorded: `load class`), and 402 calls each of `UpdatePlayerAI` and `UpdateSquads`, two players over 201 ticks) and `skirmish2`, ticks 250 to 700 only (the timers of a four-player skirmish: the build timer places factories with `ScheduleMapCanBuildAt` and `ScheduleMapCanPlaceUnitFootprint`, and the scout, squad scout, spatial and assault timers fire, 902 calls each of both slots over 451 ticks). Each file starts with a first record of every unit (`UpdatePlayerAI` reaches the whole pool) and every unit type, about 1.4 MB, and a call after that holds only what changed. The injected change is a squad period of 45, the 30 ticks that the squad manager's tick waits before it assigns squads again; it is reported at call 76 of `skirmish2` and at `SquadManager#1.countdown`:
 

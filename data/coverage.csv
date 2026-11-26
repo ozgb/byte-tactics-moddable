@@ -136,7 +136,7 @@ files,SquashGetPackType,src/files/sqsh.cpp,0,0,0,0,0,0,?SquashGetPackType@@YGHPA
 files,WriteBufferToFile,src/files/files_api.h,1,0,0,0,0,0,?WriteBufferToFile@@YGHPBDPBXH@Z,0,data
 files,WriteBufferToFile,src/files/hpi.cpp,1,0,0,0,0,0,?WriteBufferToFile@@YGHPBDPBXH@Z,0,data
 files,encryptByte,src/files/sqsh.cpp,1,0,0,0,0,0,?encryptByte@@YGIIPAD@Z,0,save-load
-game,*,,417,315,6367,3877,2372,985,,25,
+game,*,,417,317,6367,3905,2372,1000,,25,
 game,??$AiFillHeader@UAiLimit@@@@YGXPAUAiLimit@@H@Z,src/game/ai_events.h,1,0,0,0,0,0,??$AiFillHeader@UAiLimit@@@@YGXPAUAiLimit@@H@Z,0,console
 game,??$AiFillHeader@UAiPlan@@@@YGXPAUAiPlan@@H@Z,src/game/ai_events.h,1,0,0,0,0,0,??$AiFillHeader@UAiPlan@@@@YGXPAUAiPlan@@H@Z,0,console
 game,??$AiFillHeader@UAiWeight@@@@YGXPAUAiWeight@@H@Z,src/game/ai_events.h,1,0,0,0,0,0,??$AiFillHeader@UAiWeight@@@@YGXPAUAiWeight@@H@Z,0,console
@@ -225,7 +225,6 @@ game,PlayersPublishLeaveGame,src/game/players_events.h,1,0,0,0,0,0,?PlayersPubli
 game,PreBattleFrame,src/game/main_loop.cpp,1,0,0,0,0,0,?PreBattleFrame@@YGXXZ,0,network
 game,QuirksFlipFirstSim,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksFlipFirstSim@@YG_NPAUQuirks@@@Z,0,test-only
 game,QuirksNormalise,src/quirks/quirks.cpp,1,0,0,0,0,0,?QuirksNormalise@@YG_NPBDPADH@Z,0,moddable-only
-game,ReadStateWord,src/state/state_fields.h,1,0,0,0,0,0,?ReadStateWord@@YGIPBEI@Z,0,test-only
 game,RecordFocusCommander,src/state/sim_effects.h,1,0,0,0,0,0,?RecordFocusCommander@@YGXH@Z,0,unset-case
 game,RecordMessage,src/state/sim_effects.h,1,0,0,0,0,0,?RecordMessage@@YGXW4SimMessageText@@H@Z,0,network
 game,RecordTeleportParticles,src/state/sim_effects.h,1,0,0,0,0,0,?RecordTeleportParticles@@YGXABUVec3@@0HF@Z,0,unset-case
@@ -263,7 +262,6 @@ game,UpdateBattleHoverMode,src/game/game_state.cpp,0,0,0,0,0,0,?UpdateBattleHove
 game,UpdateBattleRoom,src/frontend/multi.cpp,1,0,0,0,0,0,?UpdateBattleRoom@@YGXXZ,0,network
 game,WeaponsPublishRemoteDamage,src/game/weapons_events.h,1,0,0,0,0,0,?WeaponsPublishRemoteDamage@@YGXHPAUUnit@@0HHE@Z,0,network
 game,WriteGameRegistryValue,src/game/settings.cpp,1,0,0,0,0,0,?WriteGameRegistryValue@@YGXPAX0H@Z,0,shutdown
-game,WriteStateFields,src/state/state_fields.h,1,0,0,0,0,0,?WriteStateFields@@YGXPBUStateWriter@@PBEPBUStateField@@IH@Z,0,test-only
 los_radar,*,,97,90,2039,1812,1012,763,,22,
 los_radar,AssignRange,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRange@@YGXPAUStringValueElem@@00@Z,1,
 los_radar,AssignRangeBack,src/map/los_tables.cpp,0,0,0,0,0,0,?AssignRangeBack@@YGPAUStringValueElem@@PAU1@00@Z,1,
@@ -1322,7 +1320,7 @@ players,VictoryUnitTypePassesX::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?Save
 players,VictoryUnitTypePassesZ::LoadState,src/game/victory.cpp,1,0,0,0,0,0,?LoadState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,VictoryUnitTypePassesZ::SaveState,src/game/victory.cpp,1,0,0,0,0,0,?SaveState@VictoryUnitTypePassesZ@@UAEXPAVHapiBank@@@Z,0,save-load
 players,WriteCondition,src/game/players.cpp,1,0,0,0,0,0,?WriteCondition@@YGXPBUStateWriter@@PBDPAVMissionCondition@@@Z,0,test-only
-presentation,*,,1153,644,31711,13640,12084,4225,,295,
+presentation,*,,1153,644,31712,13641,12084,4223,,295,
 presentation,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,src/graphics/memory_cache.h,1,0,0,0,0,0,??$CacheSet@UCacheChunk@@@@YGXAAPAUCacheChunk@@H@Z,0,
 presentation,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,src/ingame/markers.cpp,1,0,0,0,0,0,??G@YG?AUPos@@ABU0@ABUVec3@@@Z,0,
 presentation,Activate,src/gui/gui.cpp,1,0,0,0,0,0,?Activate@@YGXPAUGui@@H@Z,0,
@@ -2356,7 +2354,7 @@ units,UnitRef::LinkToUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?LinkToUnit@Uni
 units,UnitRef::UnlinkFromUnit,src/units/unit_targets.cpp,0,0,0,0,0,0,?UnlinkFromUnit@UnitRef@@QAEXXZ,1,
 units,WriteUnitState,src/units/unit_position.cpp,1,0,0,0,0,0,?WriteUnitState@@YGXPAVBitWriter@@PAUUnit@@@Z,0,network
 units,spd,src/units/unit_targets.cpp,1,0,0,0,0,0,?spd@@YGMH@Z,0,unit-info
-weapons,*,,116,98,2641,2277,1150,823,,19,
+weapons,*,,116,104,2641,2383,1150,860,,19,
 weapons,??$WeaponsHeaderOf@URockUnitView@@@@YG?AUWeaponsEventHeader@@HPAURockUnitView@@@Z,src/game/weapons_events.h,0,0,0,0,0,0,??$WeaponsHeaderOf@URockUnitView@@@@YG?AUWeaponsEventHeader@@HPAURockUnitView@@@Z,1,
 weapons,??$WeaponsPublishStartScriptWithArgs@URockUnitView@@@@YGXPAURockUnitView@@HIHHHHHH@Z,src/game/weapons_events.h,0,0,0,0,0,0,??$WeaponsPublishStartScriptWithArgs@URockUnitView@@@@YGXPAURockUnitView@@HIHHHHHH@Z,1,
 weapons,??8@YG_NABVStringRef@@0@Z,src/weapons/weapon_types.cpp,1,0,0,0,0,0,??8@YG_NABVStringRef@@0@Z,0,unset-case
@@ -2369,7 +2367,6 @@ weapons,BuildCalcedExplosion,src/weapons/explosions.cpp,0,0,0,0,0,0,?BuildCalced
 weapons,ComputeProjectileTime,src/weapons/weapons.cpp,0,0,0,0,0,0,?ComputeProjectileTime@@YGXPAUProjectile@@@Z,1,
 weapons,ComputeVelocityFromAngles,src/weapons/weapons.cpp,0,0,0,0,0,0,?ComputeVelocityFromAngles@@YGXPAUProjectile@@@Z,1,
 weapons,CopyWeaponVelocityParam,src/weapons/weapons.cpp,0,0,0,0,0,0,?CopyWeaponVelocityParam@@YGXPAUProjectile@@PAUWeaponDef@@@Z,1,
-weapons,CountExplosionTables,src/weapons/explosions.cpp,1,0,0,0,0,0,?CountExplosionTables@@YGXPAI00@Z,0,test-only
 weapons,DebrisCache::FreeBuffer,src/weapons/debris_cache.cpp,1,0,0,0,0,0,?FreeBuffer@DebrisCache@@QAEXXZ,0,shutdown
 weapons,ExplodeUnitPieces,src/weapons/explosions.cpp,0,0,0,0,0,0,?ExplodeUnitPieces@@YGXPAUUnit@@@Z,1,
 weapons,FindRemoteProjectile,src/weapons/weapons.cpp,0,0,0,0,0,0,?FindRemoteProjectile@@YGPAUProjectile@@PAURemoteFireEventView@@@Z,1,
@@ -2389,11 +2386,6 @@ weapons,SendWeaponFirePacket,src/weapons/weapons.cpp,0,0,0,0,0,0,?SendWeaponFire
 weapons,SpawnProjectileFromUnitMotion,src/weapons/weapons.cpp,0,0,0,0,0,0,?SpawnProjectileFromUnitMotion@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@@Z,1,
 weapons,UntrackProjectile,src/weapons/weapons.cpp,0,0,0,0,0,0,?UntrackProjectile@@YGXPAUProjectile@@@Z,1,
 weapons,UpdateExplodedPieces,src/weapons/explosions.cpp,0,0,0,0,0,0,?UpdateExplodedPieces@@YGXXZ,1,
-weapons,WeaponsWriteState,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WeaponsWriteState@@YGXPBUStateWriter@@@Z,0,test-only
-weapons,WriteDebrisAndPieces,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteDebrisAndPieces@@YGXPBUStateWriter@@@Z,0,test-only
-weapons,WriteExplodedPieces,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteExplodedPieces@@YGXPBUStateWriter@@@Z,0,test-only
-weapons,WriteProjectiles,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteProjectiles@@YGXPBUStateWriter@@@Z,0,test-only
-weapons,WriteUnitSlots,src/weapons/weapons_apply.cpp,1,0,0,0,0,0,?WriteUnitSlots@@YGXPBUStateWriter@@@Z,0,test-only
 wind_meteors,*,,16,0,198,0,56,0,,0,
 wind_meteors,AddPoints,src/map/meteors.cpp,1,0,0,0,0,0,?AddPoints@@YG?AUPoint16@@U1@0@Z,0,wasm
 wind_meteors,DisableMeteors,src/map/meteors.cpp,1,0,0,0,0,0,?DisableMeteors@@YGXXZ,0,wasm

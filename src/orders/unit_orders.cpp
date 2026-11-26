@@ -403,7 +403,9 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
     case 2: {
         int piece = -1;
         g_seams.scripts->QueryScript((CobScript*)unit->script.get(), "QueryBuildInfo", &piece, 0, 0, 0);
-        g_seams.scripts->GetPiecePosition(unit, piece, &order->pos);
+        Vec3 at;
+        g_seams.scripts->GetPiecePosition(unit, piece, &at);
+        order->pos = at;
         UnitDef* ut = &g_game->defs[order->unitType];
         Point16 cell = GridCell(order->pos, *(Point16*)&ut->footprintx);
         if (!ScheduleMapCanPlaceUnitFootprint(ut, 0, cell, unit->flags & 3)) {

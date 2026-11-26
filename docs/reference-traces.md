@@ -433,17 +433,17 @@ and so on), and this page is updated to name it. The current tag is
   files' lines are `<tick> <digest> <state> <view>`. The scenarios with a `frames` line have the view of each frame tick in
   `reference/views/<scenario>/<tick>.bin` (version 1 of the file, `BTVW`). Every digest changes, and the commit line names 9a72a58db, the reference merge that records the view; no other row changes, but the dumps say `bank` for #1106's `field_64`. The event digests,
   sound logs, UI logs, interface commands, display logs, frames and saves are those of v46.
-- The next tag after the latest on origin (#1053): the 96 scenarios of v46 and four new ones, `ui-antinuke-range`,
+- The next tag after the latest on origin (#1053): the 96 scenarios of v47 and four new ones, `ui-antinuke-range`,
   `display-chat-dither`, `display-debug-overlay` and `display-tab-menu`, whose frames draw the display kinds no other
-  scenario does. The display lists hold every pixel they draw (`docs/display-log.md` 1.1): `picture` lines for the
+  scenario does. The display lists hold every pixel they draw (`docs/display-log.md` 1.2): `picture` lines for the
   pictures the game made, `pixels` items for what the game writes into a target without a drawing item, the fields of
   a `model` that choose how it is drawn, and every frame up to the last `frames` tick, stored xz compressed in
-  `reference/displaylists/<scenario>.txt.xz` (thirteen lists, `ui-dialogs` now among them). Drawn from blank targets,
-  the lists give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display digest changes; the
-  traces of the 96 are those of v46 but for their commit line, which names e2af2a457, the reference merge of #1129 and
-  the last reference commit that writes `bt-trace 9` (#1135 after it adds the view column of `bt-trace 10`). The
-  sounds, UI logs, interface commands, events and frames of the 96 are those of v46, and the saves decode equal to
-  v46's.
+  `reference/displaylists/<scenario>.txt.xz` (thirteen lists, `ui-dialogs` now among them). A surface that shares its
+  name with another live surface is named `<name>#<n>` (1.2), which `ui-dialogs` and `ui-share-chat` need. Drawn from
+  blank targets, the lists give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display
+  digest changes. The four new scenarios store the views of their frame ticks too. The traces of the 96 are those of v47 but for their commit line, which names 31b4afc01, the
+  reference merge of the display log 1.2 (#1141). The sounds, UI logs, interface commands, events, frames and views of
+  the 96 are those of v47, and the saves decode equal to v47's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

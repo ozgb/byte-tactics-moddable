@@ -426,7 +426,7 @@ No draws.
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| players | `EconomyUpdatePlayer` | 9 | 1 | `LoadBattleAssets: GameAllocIgnoreTag Economy region` | 91 |
+| players | `EconomyUpdatePlayer` | 9 | 1 | `LoadBattleAssets: GameAllocIgnoreTag Economy region` | 95 |
 | units | `EconomySpend` | 4 | 4 | `LoadBattleAssets: GameAllocIgnoreTag Economy region` | 9 |
 | units.players | `EconomySpend` | 3 | 3 | `LoadBattleAssets: GameAllocIgnoreTag Economy region` | 7 |
 | units | `EconomyApply` | 1 | 1 | `LoadBattleAssets: GameAllocIgnoreTag Economy region` | 5 |
@@ -743,13 +743,13 @@ The rows themselves are in data/phase_dependencies.csv.
 
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
-| players | `SquadManager::TickIfActive` | 9 | 2 | `unknown_1b8e` | 90 |
+| players | `SquadManager::TickIfActive` | 9 | 2 | `unknown_1b8e` | 94 |
 | players | `SquadManager::FindNearestEnemyUnit` | 7 | 5 | `Unit::activateFlags` | 6 |
-| players | `SquadManager::RetargetWeapons` | 7 | 3 | `SquadManager::cursor` | 94 |
+| players | `SquadManager::RetargetWeapons` | 7 | 3 | `SquadManager::cursor` | 98 |
 | units | `SetUnitSquad` | 6 | 4 | `Unit::group` | 16 |
 | players | `??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 5 | 2 | `Unit::flags` | 48 |
-| players | `ScoutTimer::OnTimer` | 5 | 0 | `PlayerAI::centre` | 80 |
-| players | `PlayerAI::RefreshUnitLists` | 4 | 3 | `unknown_1b8e` | 91 |
+| players | `ScoutTimer::OnTimer` | 5 | 0 | `PlayerAI::centre` | 81 |
+| players | `PlayerAI::RefreshUnitLists` | 4 | 3 | `unknown_1b8e` | 95 |
 | units | `AiApply` | 4 | 3 | `Unit::def` | 10 |
 | units.players | `SetUnitSquad` | 4 | 2 | `Unit::group` | 16 |
 | players | `AssaultTimer::RebalanceAssaultGroupByCentroid` | 3 | 0 | `SquadManager::SquadManager: new EscortTimer` | 28 |
@@ -757,7 +757,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | units.players | `AiApply` | 3 | 2 | `pad_1df4` | 4 |
 | players | `??0BuildTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 0 | `Unit::flags` | 31 |
 | players | `??0SquadScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z` | 2 | 0 | `PlayerAI::centre` | 24 |
-| players | `FindBuildPosition` | 2 | 0 | `PlayerAI::centre` | 68 |
+| players | `FindBuildPosition` | 2 | 0 | `PlayerAI::centre` | 69 |
 
 The 15 groups with the most rows are shown.
 
@@ -1029,10 +1029,10 @@ The rows themselves are in data/phase_dependencies.csv.
 |---|---|---|---|---|---|
 | projectiles | `CompactProjectiles` | 45 | 23 | `Projectile::flags` | 20 |
 | projectiles | `UpdateProjectiles` | 24 | 1 | `Projectile::flags` | 20 |
-| units | `UpdateUnitWeapons` | 24 | 11 | `Unit::f_1f` | 82 |
+| units | `UpdateUnitWeapons` | 24 | 11 | `Unit::f_1f` | 83 |
 | explosions.debris | `UpdateExplosions` | 17 | 9 | `Debris::ref1` | 38 |
 | units.players | `FireTurretWeapon` | 16 | 0 | `Unit::type` | 14 |
-| units.players | `UpdateUnitWeapons` | 16 | 2 | `Unit::f_1f` | 94 |
+| units.players | `UpdateUnitWeapons` | 16 | 2 | `Unit::f_1f` | 98 |
 | units | `ApplyAreaDamage` | 14 | 7 | `Unit::def` | 12 |
 | units | `FireTurretWeapon` | 13 | 0 | `Unit::f_1f` | 21 |
 | units | `BreakPieceIntoDebris` | 11 | 3 | `Unit::state` | 12 |
@@ -1199,7 +1199,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `FindWeaponTarget` | 7 | 3 | `Unit::def` | 8 |
 | units | `ApplyTargetingEvent` | 5 | 2 | `Unit::current` | 14 |
 | players | `ApplyTargetingEvent` | 4 | 0 | `Unit::current` | 16 |
-| players | `FindWeaponTarget` | 3 | 2 | `unknown_1b8e` | 46 |
+| players | `FindWeaponTarget` | 3 | 2 | `unknown_1b8e` | 47 |
 | players | `GetWeaponTargetUnit` | 3 | 0 | `Unit::current` | 16 |
 | units.players | `ApplyTargetingEvent` | 3 | 0 | `Unit::current` | 11 |
 | projectiles | `ApplyTargetingEvent` | 2 | 0 | `Unit::netDirtyFlags` | 2 |
@@ -1207,7 +1207,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `FindBestTargetIfFireAtWill` | 1 | 0 | `Unit::flags` | 23 |
 | units | `GetWeaponTargetUnit` | 1 | 0 | `Unit::current` | 8 |
 | units | `Unit::ChooseWeapon` | 1 | 0 | `Unit::f_1f` | 8 |
-| units.players | `FindBestTargetIfFireAtWill` | 1 | 0 | `Unit::flags` | 54 |
+| units.players | `FindBestTargetIfFireAtWill` | 1 | 0 | `Unit::flags` | 55 |
 
 The 15 groups with the most rows are shown.
 
@@ -1367,14 +1367,14 @@ No draws.
 |---|---|---|---|---|---|
 | units | `IsUnitVisibleToPlayer` | 10 | 3 | `Unit::flags` | 11 |
 | units.players | `IsUnitVisibleToPlayer` | 10 | 3 | `Unit::def` | 7 |
-| players | `IsUnitVisibleToPlayer` | 7 | 4 | `Unit::activateFlags` | 90 |
+| players | `IsUnitVisibleToPlayer` | 7 | 4 | `Unit::activateFlags` | 94 |
 | units | `RemoveLineOfSight` | 7 | 7 | `InitPlayerSlot: operator new unsigned char` | 17 |
 | units | `AddLineOfSight` | 6 | 6 | `unknown_1b8e` | 13 |
 | units | `SoundHeardMask` | 6 | 5 | `unknown_1b8e` | 10 |
 | units.players | `GetVisibleEnemiesInRadius` | 6 | 3 | `Unit::pos` | 20 |
 | units.players | `SoundHeardMask` | 6 | 5 | `unknown_1b8e` | 10 |
 | units.players | `RemoveLineOfSight` | 5 | 4 | `InitPlayerSlot: operator new unsigned char` | 13 |
-| players | `RefreshUnitIndex` | 4 | 3 | `unknown_1b8e` | 91 |
+| players | `RefreshUnitIndex` | 4 | 3 | `unknown_1b8e` | 95 |
 | players | `RemoveLineOfSight` | 4 | 3 | `LoadBattleAssets: GameAllocIgnoreTag LosRadar region` | 32 |
 | players.los | `RemoveLineOfSight` | 4 | 4 | `InitPlayerSlot: operator new unsigned char` | 21 |
 | units.players | `AddLineOfSight` | 4 | 3 | `InitPlayerSlot: operator new unsigned char` | 10 |
@@ -1590,7 +1590,7 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `RepairUnitOrder` | 20 | 6 | `Order::progress` | 4 |
 | units | `VtolMobileBuildOrder` | 17 | 3 | `Unit::carrier` | 5 |
 | units.players | `RepairUnitOrder` | 15 | 0 | `Order::progress` | 3 |
-| units.players | `RunOrders` | 15 | 4 | `Unit::list` | 94 |
+| units.players | `RunOrders` | 15 | 4 | `Unit::list` | 98 |
 | units | `FollowGroundOrder` | 14 | 3 | `Order::state` | 7 |
 | units | `GetBuiltOrder` | 14 | 6 | `Order::state` | 54 |
 | units.players | `AttackChaseOrder` | 14 | 1 | `Unit::flags` | 10 |
@@ -1807,10 +1807,10 @@ The rows themselves are in data/phase_dependencies.csv.
 | units | `ApplyUnitDeath` | 22 | 10 | `Unit::flags` | 17 |
 | units.players | `ApplyUnitDeath` | 17 | 5 | `Unit::script` | 11 |
 | units | `KillUnit` | 16 | 8 | `Unit::flags` | 17 |
-| units | `UpdateUnitBody` | 15 | 9 | `Unit::healthPercent` | 82 |
+| units | `UpdateUnitBody` | 15 | 9 | `Unit::healthPercent` | 83 |
 | units | `AlignUnitToGround` | 13 | 5 | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | 19 |
 | units.players | `KillUnit` | 12 | 5 | `Unit::attacker` | 11 |
-| units.players | `UpdateUnitBody` | 12 | 6 | `Unit::healthPercent` | 94 |
+| units.players | `UpdateUnitBody` | 12 | 6 | `Unit::healthPercent` | 98 |
 | units | `FinishConstruction` | 9 | 5 | `Unit::flags` | 5 |
 | units.players | `AlignUnitToGround` | 9 | 1 | `LoadTntMap: GameAllocIgnoreTag PLOT MEMORY` | 13 |
 | units | `ApplyAttachUnit` | 8 | 4 | `Unit::cargoNext` | 7 |
@@ -1940,10 +1940,10 @@ No draws.
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
 | units | `VictoryKillAllOfType::OnUnitDied` | 5 | 3 | `Unit::def` | 2 |
-| players | `UpdatePlayerBody` | 4 | 4 | `LoadBattleAssets: GameAllocIgnoreTag Players region` | 97 |
+| players | `UpdatePlayerBody` | 4 | 4 | `LoadBattleAssets: GameAllocIgnoreTag Players region` | 101 |
 | units | `VictoryKillAllMobileUnits::OnUnitDied` | 4 | 2 | `Unit::motion` | 1 |
 | units.players | `DefeatAllUnitsKilledOfType::OnUnitDied` | 4 | 2 | `Unit::def` | 2 |
-| players | `CountCombatPlayers` | 2 | 2 | `unknown_1b8e` | 5 |
+| players | `CountCombatPlayers` | 2 | 2 | `unknown_1b8e` | 6 |
 | units | `MissionConditions::NotifyUnitDied` | 2 | 2 | `MissionConditions::RegisterConditions: new VictoryKillAllOfType` | 1 |
 | units | `VictoryKillUnitType::OnUnitDied` | 2 | 1 | `Unit::def` | 1 |
 | units.players | `DefeatAllUnitsKilledOfType::VisitUnit` | 2 | 1 | `Unit::unitDefIndex` | 1 |
@@ -2439,7 +2439,7 @@ No draws.
 | pass | function | rows | same-record | top item | runs |
 |---|---|---|---|---|---|
 | units | `UnitMotion::UpdatePosition` | 19 | 7 | `Unit::flags` | 38 |
-| units.players | `UnitMotion::UpdatePosition` | 15 | 3 | `Unit::flags` | 72 |
+| units.players | `UnitMotion::UpdatePosition` | 15 | 3 | `Unit::flags` | 73 |
 | units | `SubmitRepath` | 14 | 0 | `ApproachRadius::pos` | 10 |
 | units.players | `SubmitRepath` | 14 | 0 | `MovementNewPointMarker: new PointMarker` | 8 |
 | units | `MovementApply` | 11 | 1 | `UnitMotion::UnitMotion: new PackedPosGoal` | 21 |
@@ -2450,7 +2450,7 @@ No draws.
 | units | `UnitMotion::SteerGroundUnit` | 9 | 2 | `UnitMotion::UnitMotion: new PackedPosGoal` | 39 |
 | units | `PathOrder::FillWorldPos` | 8 | 2 | `Unit::spatialBucket` | 13 |
 | units.players | `AiSearchGoal::SetPathOrder` | 8 | 0 | `UnitMotion::UnitMotion: new PackedPosGoal` | 29 |
-| units.players | `AiSearchGoal::TickTowardGoal` | 8 | 0 | `UnitMotion::UnitMotion: new PackedPosGoal` | 69 |
+| units.players | `AiSearchGoal::TickTowardGoal` | 8 | 0 | `UnitMotion::UnitMotion: new PackedPosGoal` | 70 |
 | units.players | `MovementApply` | 8 | 0 | `UnitMotion::UnitMotion: new PackedPosGoal` | 29 |
 | units.players | `UnitMotion::SteerAircraft` | 8 | 0 | `UnitMotion::flags` | 8 |
 

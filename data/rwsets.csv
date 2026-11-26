@@ -44730,6 +44730,17 @@ address,function,file,kind,target
 ,CheckFrames,src/harness/harness.cpp,global_read,s_frameLine@src/harness/harness.cpp
 ,CheckFrames,src/harness/harness.cpp,global_read,s_frameTicks@src/harness/harness.cpp
 ,CheckFrames,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
+,CheckFrontendScenario,src/harness/harness.cpp,call,CheckFrames
+,CheckFrontendScenario,src/harness/harness.cpp,call,CheckInputs
+,CheckFrontendScenario,src/harness/harness.cpp,call,Fail
+,CheckFrontendScenario,src/harness/harness.cpp,call,FailLine
+,CheckFrontendScenario,src/harness/harness.cpp,function,
+,CheckFrontendScenario,src/harness/harness.cpp,global_escape,s_decidedKey@src/harness/harness.cpp
+,CheckFrontendScenario,src/harness/harness.cpp,global_read,s_decidedLine@src/harness/harness.cpp
+,CheckFrontendScenario,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
+,CheckFrontendScenario,src/harness/harness.cpp,global_read,s_roundTripCount@src/harness/harness.cpp
+,CheckFrontendScenario,src/harness/harness.cpp,global_read,s_roundTrips@src/harness/harness.cpp
+,CheckFrontendScenario,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,CheckGameType,src/harness/harness.cpp,call,Fail
 ,CheckGameType,src/harness/harness.cpp,call,FailLine
 ,CheckGameType,src/harness/harness.cpp,call,RejectUnderMission
@@ -44743,6 +44754,7 @@ address,function,file,kind,target
 ,CheckGameType,src/harness/harness.cpp,global_read,s_lineOfSightLine@src/harness/harness.cpp
 ,CheckGameType,src/harness/harness.cpp,global_read,s_losTypeLine@src/harness/harness.cpp
 ,CheckGameType,src/harness/harness.cpp,global_read,s_mappingLine@src/harness/harness.cpp
+,CheckGameType,src/harness/harness.cpp,global_read,s_playerSlotsLine@src/harness/harness.cpp
 ,CheckGameType,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
 ,CheckGameType,src/harness/harness.cpp,global_read,s_startPositionsLine@src/harness/harness.cpp
 ,CheckInputs,src/harness/harness.cpp,call,FailLine
@@ -44756,6 +44768,7 @@ address,function,file,kind,target
 ,CheckInputs,src/harness/harness.cpp,field_read,ScriptedInput::y
 ,CheckInputs,src/harness/harness.cpp,function,
 ,CheckInputs,src/harness/harness.cpp,global_escape,s_inputs@src/harness/harness.cpp
+,CheckInputs,src/harness/harness.cpp,global_read,s_frontend@src/harness/harness.cpp
 ,CheckInputs,src/harness/harness.cpp,global_read,s_inputCount@src/harness/harness.cpp
 ,CheckInputs,src/harness/harness.cpp,global_read,s_inputs@src/harness/harness.cpp
 ,CheckInputs,src/harness/harness.cpp,global_read,s_stepsPerFrame@src/harness/harness.cpp
@@ -44808,6 +44821,7 @@ address,function,file,kind,target
 ,CheckRemoteSlots,src/harness/harness.cpp,global_write,s_remoteSlots@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,call,CheckConsoles
 ,CheckScenario,src/harness/harness.cpp,call,CheckFrames
+,CheckScenario,src/harness/harness.cpp,call,CheckFrontendScenario
 ,CheckScenario,src/harness/harness.cpp,call,CheckGameType
 ,CheckScenario,src/harness/harness.cpp,call,CheckInputs
 ,CheckScenario,src/harness/harness.cpp,call,CheckLoadScenario
@@ -44819,10 +44833,13 @@ address,function,file,kind,target
 ,CheckScenario,src/harness/harness.cpp,call,sprintf
 ,CheckScenario,src/harness/harness.cpp,field_read,PlayerSpec::named
 ,CheckScenario,src/harness/harness.cpp,function,
+,CheckScenario,src/harness/harness.cpp,global_read,s_frontend@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_localPlayer@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_localPlayerLine@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_map@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,global_read,s_playerSlots@src/harness/harness.cpp
+,CheckScenario,src/harness/harness.cpp,global_read,s_playerSlotsLine@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_roundTripCount@src/harness/harness.cpp
 ,CheckScenario,src/harness/harness.cpp,global_read,s_roundTrips@src/harness/harness.cpp
@@ -49572,7 +49589,9 @@ address,function,file,kind,target
 ,HarnessFrameDrawn,src/harness/harness.cpp,global_read,s_frameTicks@src/harness/harness.cpp
 ,HarnessFrameDrawn,src/harness/harness.cpp,global_write,s_frameNext@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,call,DeliverScriptedInput
+,HarnessFrameEnd,src/harness/harness.cpp,call,DlFlush
 ,HarnessFrameEnd,src/harness/harness.cpp,call,Fail
+,HarnessFrameEnd,src/harness/harness.cpp,call,fflush
 ,HarnessFrameEnd,src/harness/harness.cpp,call,sprintf
 ,HarnessFrameEnd,src/harness/harness.cpp,field_read,ScriptedInput::frame
 ,HarnessFrameEnd,src/harness/harness.cpp,field_read,ScriptedInput::tick
@@ -49581,8 +49600,10 @@ address,function,file,kind,target
 ,HarnessFrameEnd,src/harness/harness.cpp,global_escape,s_inputs@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_frameTick@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_framesAtTick@src/harness/harness.cpp
+,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_frontend@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_inputCount@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
+,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_ui@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_write,s_frameTick@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_write,s_framesAtTick@src/harness/harness.cpp
 ,HarnessGameSeed,src/harness/harness.cpp,call,HarnessTestMode
@@ -49633,8 +49654,15 @@ address,function,file,kind,target
 ,HarnessInit,src/harness/harness.cpp,global_write,g_seams
 ,HarnessInit,src/harness/harness.cpp,global_write,s_viewState@src/harness/harness.cpp
 ,HarnessLoadBegins,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessLoadBegins,src/harness/harness.cpp,call,ScenarioTable
+,HarnessLoadBegins,src/harness/harness.cpp,call,WriteSetupLog
 ,HarnessLoadBegins,src/harness/harness.cpp,call,host_event_create
+,HarnessLoadBegins,src/harness/harness.cpp,call,strcpy
+,HarnessLoadBegins,src/harness/harness.cpp,field_escape,OptionsTable::mapName
 ,HarnessLoadBegins,src/harness/harness.cpp,function,
+,HarnessLoadBegins,src/harness/harness.cpp,global_maybe_written,s_map@src/harness/harness.cpp
+,HarnessLoadBegins,src/harness/harness.cpp,global_read,s_frontend@src/harness/harness.cpp
+,HarnessLoadBegins,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
 ,HarnessLoadBegins,src/harness/harness.cpp,global_write,s_loadEnded@src/harness/harness.cpp
 ,HarnessLoadEnded,src/harness/harness.cpp,call,host_event_set
 ,HarnessLoadEnded,src/harness/harness.cpp,function,
@@ -49747,12 +49775,25 @@ address,function,file,kind,target
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,HarnessTestMode
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,SetUpLoadedGame
 ,HarnessStartSkirmish,src/harness/harness.cpp,call,SetUpSkirmish
+,HarnessStartSkirmish,src/harness/harness.cpp,field_read,MissionSeam::GetGameType
+,HarnessStartSkirmish,src/harness/harness.cpp,field_read,Seams::mission
+,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Game::cmdlineSkipIntroMovie
+,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Game::playMovie
 ,HarnessStartSkirmish,src/harness/harness.cpp,field_write,Gui::hotGadgetIndex
+,HarnessStartSkirmish,src/harness/harness.cpp,field_write,NetGameFlagBits::b3
 ,HarnessStartSkirmish,src/harness/harness.cpp,function,
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,g_game
+,HarnessStartSkirmish,src/harness/harness.cpp,global_read,g_seams
+,HarnessStartSkirmish,src/harness/harness.cpp,global_read,s_frontend@src/harness/harness.cpp
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_read,s_started@src/harness/harness.cpp
+,HarnessStartSkirmish,src/harness/harness.cpp,global_write,g_cdPlayerDialogShown
+,HarnessStartSkirmish,src/harness/harness.cpp,global_write,g_directXCheckDone
+,HarnessStartSkirmish,src/harness/harness.cpp,global_write,g_noSoundDriverShown
 ,HarnessStartSkirmish,src/harness/harness.cpp,global_write,s_started@src/harness/harness.cpp
+,HarnessStartSkirmish,src/harness/harness.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
+,HarnessStartSkirmish,src/harness/harness.cpp,mask_member,NetGameFlags::bits 0x8
+,HarnessStartSkirmish,src/harness/harness.cpp,member_write,NetGameFlags::bits
 ,HarnessStepsPerFrame,src/harness/harness.cpp,function,
 ,HarnessStepsPerFrame,src/harness/harness.cpp,global_read,s_stepsPerFrame@src/harness/harness.cpp
 ,HarnessTargetingEvent,src/harness/harness.cpp,call,RecordEvent
@@ -56960,12 +57001,15 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_read,reachFlags@ReadKey
 ,ReadKey,src/harness/harness.cpp,global_read,s_aiLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_decidedLine@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_read,s_frontendLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_gameType@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_gameTypeLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_loadAhead@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_loadLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_matchSetup@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_pathfinderLine@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_read,s_playerSlots@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_read,s_playerSlotsLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_quirkReach@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_roundTripCount@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_read,s_saveLine@src/harness/harness.cpp
@@ -56983,6 +57027,8 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_write,s_difficulty@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_fixedLocations@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_fpuControlWord@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_frontend@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_frontendLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_gameSeed@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_gameType@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_gameTypeLine@src/harness/harness.cpp
@@ -56999,6 +57045,8 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_write,s_matchSetup@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_pathfinderHpa@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_pathfinderLine@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_playerSlots@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_playerSlotsLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkReach@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkReachTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamper@src/harness/harness.cpp
@@ -64157,6 +64205,7 @@ address,function,file,kind,target
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_losType@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_mapLine@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_mapping@src/harness/harness.cpp
+,SetUpSkirmish,src/harness/harness.cpp,global_read,s_playerSlots@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_read,s_players@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,global_write,s_savedOptions@src/harness/harness.cpp
 ,SetUpSkirmish,src/harness/harness.cpp,indirect_call,indirect via const char *(*)() __attribute__((stdcall)) [MissionSeam::GetCampaignName]
@@ -64197,6 +64246,8 @@ address,function,file,kind,target
 ,Settle,src/ai/pathfind_hpa.cpp,field_read,Hdr::debt
 ,Settle,src/ai/pathfind_hpa.cpp,field_write,Hdr::debt
 ,Settle,src/ai/pathfind_hpa.cpp,function,
+,SetupKey,src/harness/harness.cpp,call,fprintf
+,SetupKey,src/harness/harness.cpp,function,
 ,ShadowIndex,src/harness/view_fill.cpp,call,R32
 ,ShadowIndex,src/harness/view_fill.cpp,function,
 ,ShadowIndex,src/harness/view_fill.cpp,global_read,s_game@src/harness/view_fill.cpp
@@ -68927,6 +68978,40 @@ address,function,file,kind,target
 ,WriteSearch,src/ai/pathfind_hpa.cpp,function,
 ,WriteSearch,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, const void *, int) __attribute__((stdcall)) [StateWriter::Bytes]"
 ,WriteSearch,src/ai/pathfind_hpa.cpp,indirect_call,"indirect via void (*const)(const char *, int, int, unsigned int) __attribute__((stdcall)) [StateWriter::Int]"
+,WriteSetupLog,src/harness/harness.cpp,call,Fail
+,WriteSetupLog,src/harness/harness.cpp,call,ScenarioTable
+,WriteSetupLog,src/harness/harness.cpp,call,SetupKey
+,WriteSetupLog,src/harness/harness.cpp,call,fclose
+,WriteSetupLog,src/harness/harness.cpp,call,fopen
+,WriteSetupLog,src/harness/harness.cpp,call,fprintf
+,WriteSetupLog,src/harness/harness.cpp,call,fputs
+,WriteSetupLog,src/harness/harness.cpp,call,sprintf
+,WriteSetupLog,src/harness/harness.cpp,field_escape,OptionsTable::players
+,WriteSetupLog,src/harness/harness.cpp,field_maybe_written,SideDef::name
+,WriteSetupLog,src/harness/harness.cpp,field_read,Game::localPlayer
+,WriteSetupLog,src/harness/harness.cpp,field_read,Game::playerCount
+,WriteSetupLog,src/harness/harness.cpp,field_read,Game::sides
+,WriteSetupLog,src/harness/harness.cpp,field_read,MissionSeam::GetCampaignName
+,WriteSetupLog,src/harness/harness.cpp,field_read,MissionSeam::GetGameType
+,WriteSetupLog,src/harness/harness.cpp,field_read,OptionsTable::difficulty
+,WriteSetupLog,src/harness/harness.cpp,field_read,OptionsTable::fixedLocations
+,WriteSetupLog,src/harness/harness.cpp,field_read,OptionsTable::mapName
+,WriteSetupLog,src/harness/harness.cpp,field_read,Seams::mission
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishOptionsTable::commanderDeath
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishOptionsTable::lineOfSight
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishOptionsTable::losType
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishOptionsTable::mapping
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishPlayer::allyGroup
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishPlayer::color
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishPlayer::controller
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishPlayer::energy
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishPlayer::metal
+,WriteSetupLog,src/harness/harness.cpp,field_read,SkirmishPlayer::side
+,WriteSetupLog,src/harness/harness.cpp,function,
+,WriteSetupLog,src/harness/harness.cpp,global_read,g_game
+,WriteSetupLog,src/harness/harness.cpp,global_read,g_seams
+,WriteSetupLog,src/harness/harness.cpp,indirect_call,indirect via const char *(*)() __attribute__((stdcall)) [MissionSeam::GetCampaignName]
+,WriteSetupLog,src/harness/harness.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
 ,WriteStateFields,src/state/state_fields.h,call,ReadStateWord
 ,WriteStateFields,src/state/state_fields.h,deref_escape,*StateField
 ,WriteStateFields,src/state/state_fields.h,field_read,StateField::kind

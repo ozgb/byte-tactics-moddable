@@ -6673,7 +6673,6 @@ address,function,file,kind,target
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_write,g_explosion2Duration@src/weapons/explosions.cpp
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_write,g_explosion2EndSize@src/weapons/explosions.cpp
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_write,g_explosion2StartSize@src/weapons/explosions.cpp
-0x420620,InitExplosions,src/weapons/explosions.cpp,mask_field,FaceFlags::raw 0x1
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_escape,Game::slots
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_read,DebrisPiece::state
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,field_write,DebrisPiece::state
@@ -50981,6 +50980,7 @@ address,function,file,kind,target
 ,InitDebrisPieces,src/weapons/explosions.cpp,global_escape,g_faceVertexIndices
 ,InitDebrisPieces,src/weapons/explosions.cpp,global_maybe_written,g_debrisMemCache
 ,InitDebrisPieces,src/weapons/explosions.cpp,global_read,g_game
+,InitDebrisPieces,src/weapons/explosions.cpp,mask_field,FaceFlags::raw 0x1
 ,InitMeteorsThunk,src/wasm/wind_meteors_glue.cpp,call,Call0
 ,InitMeteorsThunk,src/wasm/wind_meteors_glue.cpp,function,
 ,InitMotionProjectile,src/weapons/weapons.cpp,field_read,Unit::heading

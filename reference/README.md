@@ -577,7 +577,7 @@ Each line also carries the tick's `tick` row as it is, the end-of-tick state (fo
 The file:
 
 ```
-bt-digest 9
+bt-digest 10
 trace_format bt-trace 10
 commit <sha of the build that produced it>
 scenario reference/scenarios/<name>.txt

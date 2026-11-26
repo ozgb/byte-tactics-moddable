@@ -24,7 +24,7 @@ static unsigned AddRun(void* table, unsigned* count, unsigned capacity, unsigned
         *first = 0;
         return 0;
     }
-    *first = *count;
+    *first = n != 0 ? *count : 0;
     memset((unsigned char*)table + *count * stride, 0, n * stride);
     *count += n;
     return n;

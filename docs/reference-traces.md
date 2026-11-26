@@ -431,7 +431,7 @@ and so on), and this page is updated to name it. The current tag is
 - `reference-traces-v47` (#1063): the 96 scenarios of v46 in trace format `bt-trace 10`. Each tick has a
   tenth row, `view`, after `tick`: the hash of the player view of the end of the tick (`docs/view.md`, "The recorded view"), and the digest
   files' lines are `<tick> <digest> <state> <view>`. The scenarios with a `frames` line have the view of each frame tick in
-  `reference/views/<scenario>/<tick>.bin` (version 1 of the file, `BTVW`). Every digest changes; no other row does, but the dumps say `bank` for #1106's `field_64`. The event digests,
+  `reference/views/<scenario>/<tick>.bin` (version 1 of the file, `BTVW`). Every digest changes, and the commit line names 9a72a58db, the reference merge that records the view; no other row changes, but the dumps say `bank` for #1106's `field_64`. The event digests,
   sound logs, UI logs, interface commands, display logs, frames and saves are those of v46.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the

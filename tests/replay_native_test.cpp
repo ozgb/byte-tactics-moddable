@@ -6023,6 +6023,8 @@ void PolymorphicSelfTest()
     Order* second = (Order*)SimAlloc(sizeof(Order));
     memset((void*)first, 0, sizeof(Order));
     memset((void*)second, 0, sizeof(Order));
+    SetVtable(first, ReplayVtable(ROK_ORDER));
+    SetVtable(second, ReplayVtable(ROK_ORDER));
     SetVtable(&first->link, ReplayVtable(ROK_PATHORDERATTACH));
     SetVtable(&second->link, ReplayVtable(ROK_PATHORDERATTACH));
     ApproachRadius* area = (ApproachRadius*)SimAlloc(sizeof(ApproachRadius));

@@ -2,7 +2,7 @@
 #define INTERFACES_VIEW_H
 
 // Major version of the view, changed when a field moves, changes size or goes away.
-#define VIEW_VERSION_MAJOR 1
+#define VIEW_VERSION_MAJOR 2
 // Minor version of the view, changed when a field is added in space the block left unused.
 #define VIEW_VERSION_MINOR 0
 
@@ -24,6 +24,16 @@
 #define VIEW_MAX_DEBRIS 300
 // The exploded model pieces in flight, as many as the simulation keeps.
 #define VIEW_MAX_EXPLODED_PIECES 100
+// The vertices of the debris and exploded pieces: 8 a debris slot, and one per 12 bytes of the debris model cache.
+#define VIEW_MAX_DEBRIS_VERTICES 10733
+// The faces of the debris and exploded pieces; past it, VIEW_TRUNCATED_DEBRIS.
+#define VIEW_MAX_DEBRIS_FACES 16384
+// The vertex indices of those faces; past it, VIEW_TRUNCATED_DEBRIS.
+#define VIEW_MAX_DEBRIS_INDICES 65536
+// The textures those faces name; past it, VIEW_TRUNCATED_DEBRIS.
+#define VIEW_MAX_TEXTURES 1024
+// The bytes of a texture's name, the null padding included.
+#define VIEW_TEXTURE_NAME 32
 // The sim events of one tick that reach the viewer: the sim event queue's capacity.
 #define VIEW_MAX_MESSAGES 4096
 // The cells of the sight grid, at half the map's cell resolution; past it, VIEW_TRUNCATED_SIGHT.
@@ -73,6 +83,18 @@ enum ViewTruncated {
     VIEW_TRUNCATED_FEATURES = 4,
     // The sight grid has more cells than VIEW_MAX_GRID_CELLS: the cells past it, row by row, are dropped.
     VIEW_TRUNCATED_SIGHT = 8,
+    // A debris or exploded piece's geometry did not fit: it and every later one have no vertices and no faces.
+    VIEW_TRUNCATED_DEBRIS = 16,
+};
+
+// What a face of ViewDebrisFace draws.
+enum ViewFaceKind {
+    // Nothing: a textured face of other than four vertices.
+    VIEW_FACE_NONE = 0,
+    // A polygon filled with the face's colour.
+    VIEW_FACE_FILLED = 1,
+    // A quad with a frame of the face's texture.
+    VIEW_FACE_TEXTURED = 2,
 };
 
 // One player of the match, as the viewer sees it.
@@ -209,6 +231,12 @@ struct ViewUnit {
     float energyMake;
     // Energy the unit uses a tick; zero for a unit not the viewer's own.
     float energyUse;
+    // The shots its first weapon has stockpiled; zero for a unit not the viewer's own.
+    unsigned char stockpile;
+    // Unused, zero.
+    unsigned char reserved;
+    // Unused, zero.
+    unsigned short reserved2;
 };
 
 // One posed piece of a unit's model.
@@ -339,22 +367,22 @@ struct ViewProjectile {
 
 // One debris or explosion record.
 struct ViewDebris {
-    // The explosion's sprite, an index of the explosion animations; 0xffff for none.
+    // The explosion's sprite, an index of the sprite catalogue; 0xffff for none.
     unsigned short sprite;
     // The frame of the sprite.
     unsigned short frame;
-    // The shadow's sprite; 0xffff for none.
+    // The shadow's sprite, an index of the shadow catalogue; 0xffff for none.
     unsigned short shadowSprite;
     // The frame of the shadow.
     unsigned short shadowFrame;
-    // The unit definition whose model the debris broke from; 0xffff for none.
-    unsigned short unitDefIndex;
-    // The piece of that model the debris broke from.
-    unsigned short pieceIndex;
-    // The first of the piece's faces the debris is made of.
-    unsigned short firstFace;
-    // The number of those faces.
-    unsigned short faceCount;
+    // The first of the debris' vertices in PlayerView.debrisVertices; 0 when the count is 0.
+    unsigned int firstVertex;
+    // The number of those vertices, 0 for an explosion with no model.
+    unsigned int vertexCount;
+    // The first of the debris' faces in PlayerView.debrisFaces; 0 when the count is 0.
+    unsigned int firstFace;
+    // The number of those faces, in the order they are drawn.
+    unsigned int faceCount;
     // Position x, 16.16 fixed point.
     int x;
     // Position y, 16.16 fixed point.
@@ -373,16 +401,20 @@ struct ViewDebris {
 
 // One model piece blown off a unit.
 struct ViewExplodedPiece {
-    // The unit definition whose model the piece comes from.
-    unsigned short unitDefIndex;
-    // The piece's index in that model.
-    unsigned short pieceIndex;
-    // The player whose colours the piece is drawn in.
+    // The player whose colour the piece's team-coloured faces take.
     unsigned char owner;
     // 1 when it trails smoke, 2 when it trails fire, 0 for neither.
     unsigned char trail;
     // Unused, zero.
     unsigned short reserved;
+    // The first of the piece's vertices in PlayerView.debrisVertices; 0 when the count is 0.
+    unsigned int firstVertex;
+    // The number of those vertices.
+    unsigned int vertexCount;
+    // The first of the piece's faces in PlayerView.debrisFaces; 0 when the count is 0.
+    unsigned int firstFace;
+    // The number of those faces, in the order they are drawn.
+    unsigned int faceCount;
     // Position x, 16.16 fixed point.
     int x;
     // Position y, 16.16 fixed point.
@@ -397,6 +429,40 @@ struct ViewExplodedPiece {
     short rotZ;
     // Unused, zero.
     unsigned short reserved2;
+};
+
+// One vertex of a debris or exploded piece, in the piece's own frame.
+struct ViewDebrisVertex {
+    // x, 16.16 fixed point.
+    int x;
+    // y, 16.16 fixed point.
+    int y;
+    // z, 16.16 fixed point.
+    int z;
+};
+
+// One face of a debris or exploded piece.
+struct ViewDebrisFace {
+    // The first of the face's vertex indices in PlayerView.debrisIndices; 0 when the count is 0.
+    unsigned int firstIndex;
+    // The number of those indices, each an index of the piece's vertices from its firstVertex.
+    unsigned short indexCount;
+    // What the face draws, a ViewFaceKind.
+    unsigned char kind;
+    // Unused, zero.
+    unsigned char reserved;
+    // The palette index a filled face is drawn in; zero for another kind.
+    unsigned int colour;
+    // The texture of a textured face, an index of PlayerView.textures; 0xffff for none or another kind.
+    unsigned short texture;
+    // The frame of that texture.
+    unsigned short frame;
+};
+
+// One texture that a face of a debris or exploded piece names.
+struct ViewTexture {
+    // The name of its GAF entry, found as a model's texture is (docs/view.md); the bytes after the name zero.
+    char name[VIEW_TEXTURE_NAME];
 };
 
 // One sim event of the tick that reaches the viewer: a sound, a speech line, a message or a notice.
@@ -465,6 +531,14 @@ struct PlayerView {
     unsigned int debrisCount;
     // The rows of exploded pieces in use.
     unsigned int explodedPieceCount;
+    // The rows of debris vertices in use.
+    unsigned int debrisVertexCount;
+    // The rows of debris faces in use.
+    unsigned int debrisFaceCount;
+    // The rows of debris face indices in use.
+    unsigned int debrisIndexCount;
+    // The rows of textures in use.
+    unsigned int textureCount;
     // The rows of messages in use.
     unsigned int messageCount;
     // The players, by player index.
@@ -485,6 +559,14 @@ struct PlayerView {
     ViewDebris debris[VIEW_MAX_DEBRIS];
     // The exploded pieces, in the simulation's order.
     ViewExplodedPiece explodedPieces[VIEW_MAX_EXPLODED_PIECES];
+    // The vertices of the debris and exploded pieces, each piece's in one run.
+    ViewDebrisVertex debrisVertices[VIEW_MAX_DEBRIS_VERTICES];
+    // The faces of the debris and exploded pieces, each piece's in one run.
+    ViewDebrisFace debrisFaces[VIEW_MAX_DEBRIS_FACES];
+    // The vertex indices of those faces, each face's in one run.
+    unsigned short debrisIndices[VIEW_MAX_DEBRIS_INDICES];
+    // The textures the faces name, in the order the fill first meets them.
+    ViewTexture textures[VIEW_MAX_TEXTURES];
     // The tick's messages, in the order the simulation raised them.
     ViewMessage messages[VIEW_MAX_MESSAGES];
     // The viewer's sight of each grid cell, a ViewSight, row by row over gridWidth.

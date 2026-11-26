@@ -5370,6 +5370,7 @@ const ViewWeaponsReport* ViewHostWeaponsReport(void)
         e->used = 1;
         e->unit = *(unsigned*)block;
         e->index = *(int*)(block + 4);
+        e->desc = *(unsigned*)(block + 0x30);
         e->flags = *(unsigned*)(block + 40) & 0x3f;
         e->angle10 = *(short*)(block + 0x30 + 16);
         e->angle12 = *(short*)(block + 0x30 + 18);
@@ -5399,9 +5400,23 @@ const ViewWeaponsReport* ViewHostWeaponsReport(void)
         if (obj >= (unsigned)pieces && (obj - (unsigned)pieces) % PIECE_STRIDE == 0
             && (obj - (unsigned)pieces) / PIECE_STRIDE < PIECE_COUNT) {
             unsigned index = (obj - (unsigned)pieces) / PIECE_STRIDE;
-            s_viewReport.pieces[index].used = 1;
-            s_viewReport.pieces[index].faceCount = *(const int*)(obj + 8);
-            s_viewReport.pieces[index].firstFace = *(const int*)(obj + 12);
+            ViewReportPiece* r = &s_viewReport.pieces[index];
+            const unsigned char* faces = GameAt(GAME_FACES) + index * VIEW_REPORT_PIECE_FACES * 0x20;
+            unsigned k;
+            r->used = 1;
+            r->vertexCount = *(const int*)(obj + 4);
+            r->faceCount = *(const int*)(obj + 8);
+            r->firstFace = *(const int*)(obj + 12);
+            memcpy(r->vertices, GameAt(GAME_VERTICES) + index * sizeof r->vertices, sizeof r->vertices);
+            for (k = 0; k < VIEW_REPORT_PIECE_FACES; k++) {
+                const unsigned char* f = faces + k * 0x20;
+                r->faces[k].color = *(const int*)f;
+                r->faces[k].count = *(const int*)(f + 4);
+                r->faces[k].indices = *(const unsigned*)(f + 0xc);
+                r->faces[k].pic = *(const unsigned*)(f + 0x10);
+                r->faces[k].src = *(const unsigned*)(f + 0x18);
+                r->faces[k].flags = *(const unsigned*)(f + 0x1c);
+            }
         }
     }
     for (i = 0; projectiles != NULL && i < projectileCount && i < VIEW_REPORT_PROJECTILES; i++) {

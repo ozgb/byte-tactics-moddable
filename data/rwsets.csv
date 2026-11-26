@@ -44682,6 +44682,7 @@ address,function,file,kind,target
 ,CheckFrameInputsBeforeTick,src/harness/harness.cpp,function,
 ,CheckFrameInputsBeforeTick,src/harness/harness.cpp,global_escape,s_inputs@src/harness/harness.cpp
 ,CheckFrameInputsBeforeTick,src/harness/harness.cpp,global_read,s_inputCount@src/harness/harness.cpp
+,CheckFrameInputsBeforeTick,src/harness/harness.cpp,global_read,s_replay@src/harness/harness.cpp
 ,CheckFrameInputsDelivered,src/harness/harness.cpp,call,FailLine
 ,CheckFrameInputsDelivered,src/harness/harness.cpp,field_read,ScriptedInput::delivered
 ,CheckFrameInputsDelivered,src/harness/harness.cpp,field_read,ScriptedInput::frame
@@ -44689,6 +44690,7 @@ address,function,file,kind,target
 ,CheckFrameInputsDelivered,src/harness/harness.cpp,function,
 ,CheckFrameInputsDelivered,src/harness/harness.cpp,global_escape,s_inputs@src/harness/harness.cpp
 ,CheckFrameInputsDelivered,src/harness/harness.cpp,global_read,s_inputCount@src/harness/harness.cpp
+,CheckFrameInputsDelivered,src/harness/harness.cpp,global_read,s_replay@src/harness/harness.cpp
 ,CheckFrames,src/harness/harness.cpp,call,FailLine
 ,CheckFrames,src/harness/harness.cpp,call,sprintf
 ,CheckFrames,src/harness/harness.cpp,function,
@@ -49215,6 +49217,7 @@ address,function,file,kind,target
 ,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_frameTick@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_framesAtTick@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_inputCount@src/harness/harness.cpp
+,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_replay@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_read,s_ticks@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_write,s_frameTick@src/harness/harness.cpp
 ,HarnessFrameEnd,src/harness/harness.cpp,global_write,s_framesAtTick@src/harness/harness.cpp

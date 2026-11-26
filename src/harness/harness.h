@@ -23,6 +23,7 @@ void __stdcall HarnessSimEventSlot(unsigned slot);
 const char* HarnessSimEventPhase(unsigned slot);
 int HarnessSimEventOtherThread(unsigned slot);
 void HarnessEventText(const char* text);
+void HarnessViewEvent(unsigned kind, unsigned flags, const unsigned* args, unsigned count);
 void __stdcall HarnessSoundEvent(const char* kind, int index, const char* file, const int* volume, const int* position);
 void __stdcall HarnessUiGroup(const char* what, int group);
 struct tagPALETTEENTRY;

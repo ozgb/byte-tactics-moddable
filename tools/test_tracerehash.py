@@ -700,6 +700,19 @@ class ReadTextTest(unittest.TestCase):
             self.assertEqual(tr.read_text(str(packed)), tr.read_text(str(plain)))
 
 
+class ViewRowTest(unittest.TestCase):
+    def test_the_view_row_is_the_hash_of_the_view_file_of_the_tick(self):
+        import test_viewblock as tv
+        import viewblock
+        data = tv.header(tick=7) + tv.players()
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "7.bin").write_bytes(viewblock.FILE_HEADER + data)
+            self.assertEqual(tr.view_rows(Path(d), [6, 7]), [(7, "view", viewblock.view_hash(data))])
+            (Path(d) / "6.bin").write_bytes(b"BTFRxxxxxxxx")
+            with self.assertRaisesRegex(tr.Error, "6.bin: not a view file"):
+                tr.view_rows(Path(d), [6])
+
+
 def one_field_table(name):
     field = {"name": name, "offset": 0, "size": 1, "kind": "scalar", "target": None}
     return {"fields": [field], "plan": [{"name": "", "offset": 0, "size": 1, "kind": "bytes", "target": None}]}

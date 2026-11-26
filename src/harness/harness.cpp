@@ -4455,6 +4455,29 @@ void __stdcall HarnessUiCommand(int build, int mode, unsigned char kind, int rem
     fprintf(s_iface, "\n");
 }
 
+void __stdcall HarnessUiSquads(int group)
+{
+    unsigned char* u;
+    unsigned char* end;
+    if (!IfaceLive())
+        return;
+    u = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;
+    end = (unsigned char*)g_game->players[g_game->localPlayer].unitsEnd;
+    for (; u != NULL && u <= end; u += UNIT_STRIDE) {
+        int squad;
+        if (*(unsigned short*)(u + UNIT_DEF_INDEX) == 0)
+            continue;
+        if (u[UNIT_FLAGS] & UNIT_SELECTED)
+            squad = group;
+        else if (*(int*)(u + UNIT_GROUP) == group)
+            squad = 0;
+        else
+            continue;
+        IfaceStart("AI_SET_SQUAD", u);
+        fprintf(s_iface, " squad %d\n", squad);
+    }
+}
+
 static void UiListUnits(int group, int selectedOnly)
 {
     unsigned char* u = (unsigned char*)g_game->players[g_game->localPlayer].unitsBegin;

@@ -204,7 +204,7 @@ class DisplayLogTest(unittest.TestCase):
         return "".join(line + "\n" for line in [f"frame {number} {tick} 1 {self.PALETTE}", *items, "cursor - - -"])
 
     def listing(self, *frames: str) -> str:
-        return "bt-display 1.1\n" + "".join(frames)
+        return "bt-display 1.2\n" + "".join(frames)
 
     def run_report(self, report, stored: dict[str, str], scenarios: dict[str, Path], logs: dict[str, str | None], *args):
         with tempfile.TemporaryDirectory() as tmp:
@@ -309,14 +309,14 @@ class DisplayLogTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             src, root = Path(tmp) / "branch", Path(tmp) / "tree"
             (src / "reference/displaylists").mkdir(parents=True)
-            (src / "reference/displaylists/a.txt").write_text("bt-display 1.1\n")
+            (src / "reference/displaylists/a.txt").write_text("bt-display 1.2\n")
             (root / "reference/displaylists").mkdir(parents=True)
             (root / "reference/displaylists/old.txt.xz").write_bytes(displayreplay.pack_list("old\n"))
             with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "DISPLAYS", root / "reference/display"), \
                     mock.patch.object(reference, "DISPLAYLISTS", root / "reference/displaylists"), contextlib.redirect_stdout(io.StringIO()):
                 reference.copy_display(src)
             self.assertEqual(sorted(p.name for p in (root / "reference/displaylists").iterdir()), ["a.txt.xz"])
-            self.assertEqual(displayreplay.read_list(root / "reference/displaylists/a.txt.xz"), "bt-display 1.1\n")
+            self.assertEqual(displayreplay.read_list(root / "reference/displaylists/a.txt.xz"), "bt-display 1.2\n")
 
     def test_the_key_covers_the_display_files_and_tool(self):
         self.assertIn("reference/display", reference.KEY_TREES)

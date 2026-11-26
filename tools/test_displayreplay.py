@@ -82,7 +82,7 @@ class NotesTest(unittest.TestCase):
 
 
 def stored(directory: Path, name: str, *items: str) -> None:
-    text = "bt-display 1.1\nframe 1 0 0 0123456789abcdef\n" + "".join(i + "\n" for i in items) + "cursor - - -\n"
+    text = "bt-display 1.2\nframe 1 0 0 0123456789abcdef\n" + "".join(i + "\n" for i in items) + "cursor - - -\n"
     (directory / f"{name}{displayreplay.LIST_SUFFIX}").write_bytes(displayreplay.pack_list(text))
 
 
@@ -113,7 +113,7 @@ class CoverageTest(unittest.TestCase):
         self.assertIn("fill: left out (why)", lines)
 
     def test_a_stored_list_is_the_same_bytes_for_the_same_text(self):
-        text = "bt-display 1.1\n" + "x" * 1000
+        text = "bt-display 1.2\n" + "x" * 1000
         self.assertEqual(displayreplay.pack_list(text), displayreplay.pack_list(text))
         self.assertEqual(lzma.decompress(displayreplay.pack_list(text)).decode("latin-1"), text)
 

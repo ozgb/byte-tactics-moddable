@@ -7,7 +7,7 @@
     uv run tools/displaylog.py compare a.txt b.txt --end-of-tick               # items compared as sorted `<layer> <item>` lines
     uv run tools/displaylog.py against-digests a/display.txt b/display.txt     # compare two digest files
 
-A display list (`bt-display 1.1`) holds frames: a frame line, a `picture` line for each picture the game made that the list
+A display list (`bt-display 1.2`) holds frames: a frame line, a `picture` line for each picture the game made that the list
 names for the first time, one line for each item and a cursor line. An item whose area
 is empty changes no pixel and is left out when a list is read, as the game leaves it out of its log ("Draws that change no
 pixel"), so a list that holds such items has the digest of the same list without them. The layer of an item is computed
@@ -27,8 +27,8 @@ import sys
 from pathlib import Path
 
 DIGEST_HEADER = "bt-display-digest 1"
-LOG_HEADER = "bt-display 1.1"
-DIGEST_LOG_LINE = "log bt-display 1.1"
+LOG_HEADER = "bt-display 1.2"
+DIGEST_LOG_LINE = "log bt-display 1.2"
 OFFSET_BASIS = 0xCBF29CE484222325
 PRIME = 0x100000001B3
 MASK64 = (1 << 64) - 1

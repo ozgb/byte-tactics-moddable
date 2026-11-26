@@ -52,9 +52,10 @@ and end with a newline.
 
 ## The display list
 
-`displaylist.txt` starts with the line `bt-display 1.1`, the format version (1.1 added the
-`picture` lines, the `pixels` kind and the fields of a `model` that select how it is drawn;
-a reader of 1 reads 1.1 by skipping the `picture` lines). Each frame it holds is a frame
+`displaylist.txt` starts with the line `bt-display 1.2`, the format version (1.1 added the
+`picture` lines, the `pixels` kind and the fields of a `model` that select how it is drawn,
+and a reader of 1 reads 1.1 by skipping the `picture` lines; 1.2 names each live surface
+apart from the others and writes `#` in a name as `%23`). Each frame it holds is a frame
 line, a `picture` line for each picture of the frame's items that the list has not yet
 given, one line for each item in the order the presentation drew them, and a cursor line:
 
@@ -94,7 +95,7 @@ shows no cursor the line is `cursor - - -`.
 
 ### Names
 
-A **name** is written with every byte below 0x21 or above 0x7e, and every `%` and `,`,
+A **name** is written with every byte below 0x21 or above 0x7e, and every `%`, `,` and `#`,
 replaced by `%` and two uppercase hexadecimal digits (a space is `%20`). An empty name is
 `-`, and a name that is the one character `-` is written `%2D`.
 
@@ -110,7 +111,10 @@ replaced by `%` and two uppercase hexadecimal digits (a space is `%20`). An empt
   A picture whose pixels are a drawing surface (`target:` below) is `target:<target>`.
 - A picture known by neither is `?<width>x<height>:<hash>`.
 - A **target**, the surface an item draws on, is the name the game gave the surface when it
-  made it, as a name. The surface of the frame, the one the frame dump writes and the frame's
+  made it, as a name. When a surface the game has not yet freed already has that name, the
+  new one is `<name>#<n>` with the smallest `n` from 2 that no surface the game has not yet
+  freed has (two dialogs open at once each keep a `SAVE%20UNDER`, the second
+  `SAVE%20UNDER#2`). The surface of the frame, the one the frame dump writes and the frame's
   items mostly draw on, is `screen`. A surface the game made without a name is
   `?<width>x<height>`.
 - A **font** is the name the game loads it by (`comix`), in lower case, or the side's font
@@ -257,7 +261,7 @@ of what counts.
 
 ## The digest
 
-`display.txt` starts with `bt-display-digest 1`, then `log bt-display 1.1`, then one line for
+`display.txt` starts with `bt-display-digest 1`, then `log bt-display 1.2`, then one line for
 each frame the run draws:
 
     <number> <tick> <count> <ordered> <set>

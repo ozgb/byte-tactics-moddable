@@ -20,7 +20,7 @@ def frame(*items: str, number: int = 1, tick: int = 0, steps: int = 1, cursor: s
 
 
 def listing(*frames: str) -> str:
-    return "bt-display 1.1\n" + "".join(frames)
+    return "bt-display 1.2\n" + "".join(frames)
 
 
 def fill(target: str, x0: int, y0: int, x1: int, y1: int, colour: int = 1) -> str:
@@ -114,7 +114,7 @@ class DigestTest(unittest.TestCase):
         items = [A, C]
         ordered = displaylog.hash_bytes(("".join(line + "\n" for line in [f"frame 1 0 1 {PALETTE}", *items, CURSOR])).encode())
         sets = displaylog.hash_bytes(("".join(line + "\n" for line in [f"frame 1 0 1 {PALETTE}", "0 " + A, "0 " + C, CURSOR])).encode())
-        self.assertEqual(digest_text(listing(frame(*items))), f"bt-display-digest 1\nlog bt-display 1.1\n1 0 2 {ordered:016x} {sets:016x}\n")
+        self.assertEqual(digest_text(listing(frame(*items))), f"bt-display-digest 1\nlog bt-display 1.2\n1 0 2 {ordered:016x} {sets:016x}\n")
 
     def test_the_hash_is_the_word_then_byte_fnv(self):
         h = displaylog.OFFSET_BASIS
@@ -246,7 +246,7 @@ class ParseTest(unittest.TestCase):
 
     def test_a_frame_needs_its_cursor(self):
         with self.assertRaises(Error):
-            parse_layered("bt-display 1.1\n" + frame(A).rsplit("\n", 2)[0] + "\n")
+            parse_layered("bt-display 1.2\n" + frame(A).rsplit("\n", 2)[0] + "\n")
 
     def test_an_item_needs_an_area(self):
         with self.assertRaises(Error):
@@ -256,7 +256,7 @@ class ParseTest(unittest.TestCase):
 
     def test_a_line_outside_a_frame(self):
         with self.assertRaises(Error):
-            parse_layered("bt-display 1.1\n" + A + "\n")
+            parse_layered("bt-display 1.2\n" + A + "\n")
 
     def test_a_blit_needs_a_source(self):
         with self.assertRaises(Error):

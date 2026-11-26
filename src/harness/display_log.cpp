@@ -190,7 +190,7 @@ static int Escape(char* out, const char* p, int n)
     }
     for (int i = 0; i < n; i++) {
         unsigned char c = (unsigned char)p[i];
-        if (c < 0x21 || c > 0x7e || c == '%' || c == ',') {
+        if (c < 0x21 || c > 0x7e || c == '%' || c == ',' || c == '#') {
             *out++ = '%';
             *out++ = digits[c >> 4];
             *out++ = digits[c & 15];
@@ -201,11 +201,8 @@ static int Escape(char* out, const char* p, int n)
     return (int)(out - start);
 }
 
-static int Intern(const char* p, int n)
+static int InternEscaped(const char* buf, int written)
 {
-    char buf[1024];
-    int written = Escape(buf, p, n > 300 ? 300 : n);
-    buf[written] = '\0';
     unsigned h = 2166136261u;
     for (int i = 0; i < written; i++)
         h = (h ^ (unsigned char)buf[i]) * 16777619u;
@@ -228,6 +225,14 @@ static int Intern(const char* p, int n)
     s_nameHash[slot] = s_nameCount + 1;
     s_nameCount++;
     return offset;
+}
+
+static int Intern(const char* p, int n)
+{
+    char buf[1024];
+    int written = Escape(buf, p, n > 300 ? 300 : n);
+    buf[written] = '\0';
+    return InternEscaped(buf, written);
 }
 
 static int InternLower(const char* p, int n, int slashes)
@@ -361,6 +366,28 @@ static void RemoveRegion(int index)
     s_epoch++;
 }
 
+static int SurfaceNameTaken(int name, int index)
+{
+    for (int i = 0; i < s_regionCount; i++) {
+        if (i != index && s_regions[i].live != 0 && s_regions[i].surface != 0 && s_regions[i].name == name)
+            return 1;
+    }
+    return 0;
+}
+
+static int UniqueSurfaceName(int name, int index)
+{
+    if (SurfaceNameTaken(name, index) == 0)
+        return name;
+    char buf[1024];
+    for (int n = 2;; n++) {
+        int written = sprintf(buf, "%.1000s#%d", s_nameBytes + name, n);
+        int candidate = InternEscaped(buf, written);
+        if (SurfaceNameTaken(candidate, index) == 0)
+            return candidate;
+    }
+}
+
 static void AddRegion(const void* block, const unsigned char* pixels, int width, int height, int pitch, int surface, const char* name)
 {
     int old = FindByBlock(block);
@@ -389,6 +416,8 @@ static void AddRegion(const void* block, const unsigned char* pixels, int width,
     if (surface != 0 && name != nullptr && strcmp(name, "OFFSCREEN") == 0)
         name = "screen";
     r->name = Intern(name == nullptr ? "" : name, name == nullptr ? 0 : (int)strlen(name));
+    if (surface != 0)
+        r->name = UniqueSurfaceName(r->name, index);
     HashInsert(s_pixelHash, pixels, index);
     HashInsert(s_blockHash, block, index);
     s_epoch++;
@@ -1350,7 +1379,7 @@ void DlOpen(int listAll)
         return;
     }
     setvbuf(s_digest, s_digestBuffer, _IOFBF, sizeof s_digestBuffer);
-    fprintf(s_digest, "bt-display-digest 1\nlog bt-display 1.1\n");
+    fprintf(s_digest, "bt-display-digest 1\nlog bt-display 1.2\n");
     s_list = fopen("displaylist.txt", "wb");
     if (s_list == nullptr) {
         host_log("testmode: cannot write displaylist.txt\n");
@@ -1358,7 +1387,7 @@ void DlOpen(int listAll)
         return;
     }
     setvbuf(s_list, s_listBuffer, _IOFBF, sizeof s_listBuffer);
-    fprintf(s_list, "bt-display 1.1\n");
+    fprintf(s_list, "bt-display 1.2\n");
     s_listAll = listAll;
     g_dlOwner = host_thread_id();
     g_dlLock = host_mutex_create();

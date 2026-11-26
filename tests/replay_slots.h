@@ -532,6 +532,19 @@ int __stdcall Imp_los_radar_GetVisibleEnemiesInRadius(int a0, const Vec3* a1, in
     return EnterList(t, a4, a5);
 }
 
+void __stdcall Imp_los_radar_ClampWorldPosToTerrain(int a0, int a1, Vec3* a2)
+{
+    ReplayText t;
+    StartImport(t, "los_radar.ClampWorldPosToTerrain");
+    Space(t);
+    ReplayValue(t, a0);
+    Space(t);
+    ReplayValue(t, a1);
+    const char* r = Enter(t);
+    *a2 = ParseValueText<Vec3>(ROK_VEC3, r);
+    (void)r;
+}
+
 int __stdcall Imp_map_GetCellMeanHeight(Vec3* a0)
 {
     ReplayText t;
@@ -2313,6 +2326,30 @@ void Run_los_radar_ExpireEyeballs()
     g_seams.los_radar->ExpireEyeballs();
 }
 
+Ref<Unit>* g_units_los_radar_GetVisibleEnemiesInRadius_4;
+int g_units_los_radar_GetVisibleEnemiesInRadius_4_capacity;
+int g_result_los_radar_GetVisibleEnemiesInRadius;
+
+void Run_los_radar_GetVisibleEnemiesInRadius()
+{
+    int p0 = ArgScalar<int>("player");
+    Vec3 p1 = ArgScalar<Vec3>("pos");
+    int p2 = ArgScalar<int>("radius");
+    int p3 = ArgScalar<int>("flags");
+    g_units_los_radar_GetVisibleEnemiesInRadius_4_capacity = ArgScalar<int>("capacity");
+    free(g_units_los_radar_GetVisibleEnemiesInRadius_4);
+    g_units_los_radar_GetVisibleEnemiesInRadius_4 = (Ref<Unit>*)calloc(g_units_los_radar_GetVisibleEnemiesInRadius_4_capacity > 0 ? g_units_los_radar_GetVisibleEnemiesInRadius_4_capacity : 1, sizeof(Ref<Unit>));
+    int p5 = ArgScalar<int>("capacity");
+    SetClosing("out ", "result");
+    g_result_los_radar_GetVisibleEnemiesInRadius = g_seams.los_radar->GetVisibleEnemiesInRadius(p0, &p1, p2, p3, g_units_los_radar_GetVisibleEnemiesInRadius_4, p5);
+}
+
+void After_los_radar_GetVisibleEnemiesInRadius()
+{
+    CompareUnitBuffer("out", g_units_los_radar_GetVisibleEnemiesInRadius_4, (int)g_result_los_radar_GetVisibleEnemiesInRadius, g_units_los_radar_GetVisibleEnemiesInRadius_4_capacity);
+    CompareResult(g_result_los_radar_GetVisibleEnemiesInRadius);
+}
+
 int g_result_los_radar_HasReadyUnitInRange;
 
 void Run_los_radar_HasReadyUnitInRange()
@@ -2343,6 +2380,29 @@ void Run_los_radar_IsPointVisible()
 void After_los_radar_IsPointVisible()
 {
     CompareResult(g_result_los_radar_IsPointVisible);
+}
+
+Ref<Unit>* g_units_los_radar_GetSeenUnitsInRadius_3;
+int g_units_los_radar_GetSeenUnitsInRadius_3_capacity;
+int g_result_los_radar_GetSeenUnitsInRadius;
+
+void Run_los_radar_GetSeenUnitsInRadius()
+{
+    int p0 = ArgScalar<int>("player");
+    Vec3 p1 = ArgScalar<Vec3>("pos");
+    int p2 = ArgScalar<int>("radius");
+    g_units_los_radar_GetSeenUnitsInRadius_3_capacity = ArgScalar<int>("capacity");
+    free(g_units_los_radar_GetSeenUnitsInRadius_3);
+    g_units_los_radar_GetSeenUnitsInRadius_3 = (Ref<Unit>*)calloc(g_units_los_radar_GetSeenUnitsInRadius_3_capacity > 0 ? g_units_los_radar_GetSeenUnitsInRadius_3_capacity : 1, sizeof(Ref<Unit>));
+    int p4 = ArgScalar<int>("capacity");
+    SetClosing("out ", "result");
+    g_result_los_radar_GetSeenUnitsInRadius = g_seams.los_radar->GetSeenUnitsInRadius(p0, &p1, p2, g_units_los_radar_GetSeenUnitsInRadius_3, p4);
+}
+
+void After_los_radar_GetSeenUnitsInRadius()
+{
+    CompareUnitBuffer("out", g_units_los_radar_GetSeenUnitsInRadius_3, (int)g_result_los_radar_GetSeenUnitsInRadius, g_units_los_radar_GetSeenUnitsInRadius_3_capacity);
+    CompareResult(g_result_los_radar_GetSeenUnitsInRadius);
 }
 
 void Run_los_radar_CreateUnitIndex()
@@ -3503,12 +3563,20 @@ bool RunSlot(const char* subsystem, const char* slot)
         Run_los_radar_ExpireEyeballs();
         return true;
     }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetVisibleEnemiesInRadius") == 0) {
+        Run_los_radar_GetVisibleEnemiesInRadius();
+        return true;
+    }
     if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "HasReadyUnitInRange") == 0) {
         Run_los_radar_HasReadyUnitInRange();
         return true;
     }
     if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "IsPointVisible") == 0) {
         Run_los_radar_IsPointVisible();
+        return true;
+    }
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetSeenUnitsInRadius") == 0) {
+        Run_los_radar_GetSeenUnitsInRadius();
         return true;
     }
     if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "CreateUnitIndex") == 0) {
@@ -3832,10 +3900,14 @@ void RunAfter(const char* subsystem, const char* slot)
         After_los_radar_IsUnitVisibleToPlayer();
     if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "SoundHeardMask") == 0)
         After_los_radar_SoundHeardMask();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetVisibleEnemiesInRadius") == 0)
+        After_los_radar_GetVisibleEnemiesInRadius();
     if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "HasReadyUnitInRange") == 0)
         After_los_radar_HasReadyUnitInRange();
     if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "IsPointVisible") == 0)
         After_los_radar_IsPointVisible();
+    if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "GetSeenUnitsInRadius") == 0)
+        After_los_radar_GetSeenUnitsInRadius();
     if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "RegionSize") == 0)
         After_los_radar_RegionSize();
     if (strcmp(subsystem, "los_radar") == 0 && strcmp(slot, "Shutdown") == 0)
@@ -4029,6 +4101,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
@@ -4054,6 +4127,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
@@ -4076,6 +4150,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
@@ -4093,6 +4168,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_seams.weapons = &g_import_weapons;
         g_import_weapons.FindWeaponByName = Imp_weapons_FindWeaponByName;
         g_import_weapons.WeaponCanReachPos = Imp_weapons_WeaponCanReachPos;
@@ -4118,6 +4194,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_seams.map = &g_import_map;
         g_import_map.GetCellMeanHeight = Imp_map_GetCellMeanHeight;
         g_import_map.GetGroundHeight = Imp_map_GetGroundHeight;
@@ -4146,6 +4223,14 @@ void BindSeams()
         g_seams.features = &g_import_features;
         g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
         g_import_features.FindFeatureAtPos = Imp_features_FindFeatureAtPos;
+        g_seams.los_radar = &g_import_los_radar;
+        g_import_los_radar.GetMapCell = Imp_los_radar_GetMapCell;
+        g_import_los_radar.SoundHeardMask = Imp_los_radar_SoundHeardMask;
+        g_import_los_radar.GetSeenUnitsInRadius = Imp_los_radar_GetSeenUnitsInRadius;
+        g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
+        g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
+        g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
     }
     if (strcmp(g_subsystem, "map") == 0) {
         g_seams.los_radar = &g_import_los_radar;
@@ -4155,6 +4240,7 @@ void BindSeams()
         g_import_los_radar.IsPointVisible = Imp_los_radar_IsPointVisible;
         g_import_los_radar.GetMapCellAtPosition = Imp_los_radar_GetMapCellAtPosition;
         g_import_los_radar.GetVisibleEnemiesInRadius = Imp_los_radar_GetVisibleEnemiesInRadius;
+        g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_seams.pathfinding = &g_import_pathfinding;
         g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
         g_import_pathfinding.Submit = Imp_pathfinding_Submit;

@@ -174,6 +174,12 @@ struct ReplaySlotSets {
     unsigned idReachCount;
 };
 
+struct ReplayKindSets {
+    unsigned slot;
+    int kind;
+    const ReplaySlotSets* sets;
+};
+
 struct ReplaySubsystem {
     const char* name;
     unsigned major;

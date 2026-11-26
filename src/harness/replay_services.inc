@@ -466,7 +466,7 @@ void ReplayImportEnd(ReplayImport& c)
         ReplayAddObjectName(t, Table(), ROK_FRAMETABLE, a[0].v.p, true);
         AddSpace(t);
         t.AddInt(a[1].v.i);
-        ImportResultObjectReach(t, ROK_GAFFRAME, (c.result.kind == 1 ? c.result.v.p : nullptr), 5, "width", "height", "xOffset", "yOffset", "transparency");
+        ImportResultObjectReach(t, ROK_GAFFRAME, (c.result.kind == 1 ? c.result.v.p : nullptr), 7, "width", "height", "xOffset", "yOffset", "transparency", "pixelsOrLayers", "pixelsOrLayers[]");
         break;
     }
     case RI_GET_GAF_SEQUENCE_FRAME:

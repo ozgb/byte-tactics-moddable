@@ -1192,7 +1192,17 @@ void __stdcall RecLosRadarClampWorldPosToTerrain(int a0, int a1, Vec3* a2)
         ArgValue(s_call, "x", a0);
         ArgValue(s_call, "y", a1);
     }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i los_radar.ClampWorldPosToTerrain");
+        ImportValue(line, a0);
+        ImportValue(line, a1);
+    }
     s_inner_los_radar->ClampWorldPosToTerrain(a0, a1, a2);
+    if (scope.Import()) {
+        ImportResultValue(line, ROK_VEC3, a2);
+        FinishImport(line, roots);
+    }
     if (scope.Open()) {
         ArgValueStruct(s_tail, "o", "result", ROK_VEC3, a2);
     }
@@ -1295,6 +1305,37 @@ void __stdcall RecLosRadarExpireEyeballs()
     }
 }
 
+int __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUS, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgVec3(s_call, "pos", a1);
+        ArgValue(s_call, "radius", a2);
+        ArgValue(s_call, "flags", a3);
+        ArgValue(s_call, "capacity", a5);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i los_radar.GetVisibleEnemiesInRadius");
+        ImportValue(line, a0);
+        ImportVec3(line, "pos", a1);
+        ImportValue(line, a2);
+        ImportValue(line, a3);
+    }
+    int result = s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4, a5);
+    if (scope.Import()) {
+        ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 41, 7);
+        FinishImport(line, roots);
+    }
+    if (scope.Open()) {
+        ArgOutUnitBuffer(s_tail, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5);
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
 int __stdcall RecLosRadarHasReadyUnitInRange(int a0, const Vec3* a1, int a2)
 {
     ReplayRoots roots;
@@ -1332,6 +1373,35 @@ int __stdcall RecLosRadarIsPointVisible(Player* a0, Vec3* a1)
         FinishImport(line, roots);
     }
     if (scope.Open()) {
+        ArgValue(s_tail, "result", result, "o");
+    }
+    return result;
+}
+
+int __stdcall RecLosRadarGetSeenUnitsInRadius(int a0, const Vec3* a1, int a2, Ref<Unit>* a3, int a4)
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_LOS_RADAR_GETSEENUNITSINRADIUS, SUB_LOS_RADAR, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "player", a0);
+        ArgVec3(s_call, "pos", a1);
+        ArgValue(s_call, "radius", a2);
+        ArgValue(s_call, "capacity", a4);
+    }
+    ReplayText line;
+    if (scope.Import()) {
+        line.Add("  i los_radar.GetSeenUnitsInRadius");
+        ImportValue(line, a0);
+        ImportVec3(line, "pos", a1);
+        ImportValue(line, a2);
+    }
+    int result = s_inner_los_radar->GetSeenUnitsInRadius(a0, a1, a2, a3, a4);
+    if (scope.Import()) {
+        ImportOutUnitBuffer(line, "los_radar.GetSeenUnitsInRadius", "out", a3, result, a4, kReplayReachFields + 0, 1);
+        FinishImport(line, roots);
+    }
+    if (scope.Open()) {
+        ArgOutUnitBuffer(s_tail, "los_radar.GetSeenUnitsInRadius", "out", a3, result, a4);
         ArgValue(s_tail, "result", result, "o");
     }
     return result;
@@ -1709,11 +1779,9 @@ int __stdcall RecUnitsUpdateUnitBody(Unit* a0)
 
 int __stdcall RecPlayersApply(const PlayersEventHeader* a0, unsigned int a1)
 {
-    if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == PLAYERS_SET_STORE))
-        return s_inner_players->Apply(a0, a1);
     ReplayRoots roots;
     EventRoots(roots, RET_PLAYERS, a0, a1);
-    SlotScope scope(RSL_PLAYERS_APPLY, SUB_PLAYERS, roots);
+    SlotScope scope(RSL_PLAYERS_APPLY, SUB_PLAYERS, roots, true, a0 != nullptr && a1 >= sizeof(*a0) ? (int)a0->kind : -1);
     if (scope.Open()) {
         ArgEvent(s_call, "event", RET_PLAYERS, a0, a1);
         ArgValue(s_call, "size", a1);
@@ -4371,64 +4439,6 @@ void __stdcall RecNetworkSendUnitStates(Player* a0)
     }
 }
 
-int __stdcall RecLosRadarGetVisibleEnemiesInRadius(int a0, const Vec3* a1, int a2, int a3, Ref<Unit>* a4, int a5)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_GETVISIBLEENEMIESINRADIUS, SUB_LOS_RADAR, roots, false);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgVec3(s_call, "pos", a1);
-        ArgValue(s_call, "radius", a2);
-        ArgValue(s_call, "flags", a3);
-        ArgValue(s_call, "capacity", a5);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i los_radar.GetVisibleEnemiesInRadius");
-        ImportValue(line, a0);
-        ImportVec3(line, "pos", a1);
-        ImportValue(line, a2);
-        ImportValue(line, a3);
-    }
-    int result = s_inner_los_radar->GetVisibleEnemiesInRadius(a0, a1, a2, a3, a4, a5);
-    if (scope.Import()) {
-        ImportOutUnitBuffer(line, "los_radar.GetVisibleEnemiesInRadius", "out", a4, result, a5, kReplayReachFields + 41, 7);
-        FinishImport(line, roots);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
-int __stdcall RecLosRadarGetSeenUnitsInRadius(int a0, const Vec3* a1, int a2, Ref<Unit>* a3, int a4)
-{
-    ReplayRoots roots;
-    SlotScope scope(RSL_LOS_RADAR_GETSEENUNITSINRADIUS, SUB_LOS_RADAR, roots, false);
-    if (scope.Open()) {
-        ArgValue(s_call, "player", a0);
-        ArgVec3(s_call, "pos", a1);
-        ArgValue(s_call, "radius", a2);
-        ArgValue(s_call, "capacity", a4);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i los_radar.GetSeenUnitsInRadius");
-        ImportValue(line, a0);
-        ImportVec3(line, "pos", a1);
-        ImportValue(line, a2);
-    }
-    int result = s_inner_los_radar->GetSeenUnitsInRadius(a0, a1, a2, a3, a4);
-    if (scope.Import()) {
-        ImportOutUnitBuffer(line, "los_radar.GetSeenUnitsInRadius", "out", a3, result, a4, kReplayReachFields + 0, 1);
-        FinishImport(line, roots);
-    }
-    if (scope.Open()) {
-        ArgValue(s_tail, "result", result, "o");
-    }
-    return result;
-}
-
 Unit* __stdcall RecUnitsLoadUnit(unsigned short a0, HapiBank* a1)
 {
     ReplayRoots roots;
@@ -5857,6 +5867,10 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_NETWORK_SENDSHAREMETAL)
             return true;
+        if (slot == RSL_MAP_UNITSINRANGE)
+            return true;
+        if (slot == RSL_LOS_RADAR_CLAMPWORLDPOSTOTERRAIN)
+            return true;
         return false;
     case SUB_MAP:
         if (slot == RSL_LOS_RADAR_GETMAPCELL)
@@ -6081,7 +6095,7 @@ void HookSeams(const bool* on)
         s_rec_los_radar.GetMapCellAtPosition = RecLosRadarGetMapCellAtPosition;
     if (on[SUB_LOS_RADAR] || on[SUB_ORDERS])
         s_rec_los_radar.GetOriginCellAtPosition = RecLosRadarGetOriginCellAtPosition;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || on[SUB_PLAYERS])
         s_rec_los_radar.ClampWorldPosToTerrain = RecLosRadarClampWorldPosToTerrain;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.IsUnitVisibleToPlayer = RecLosRadarIsUnitVisibleToPlayer;
@@ -6097,10 +6111,14 @@ void HookSeams(const bool* on)
         s_rec_los_radar.RecordRadarMapped = RecLosRadarRecordRadarMapped;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.ExpireEyeballs = RecLosRadarExpireEyeballs;
+    if (on[SUB_LOS_RADAR] || on[SUB_TARGETING] || on[SUB_ORDERS])
+        s_rec_los_radar.GetVisibleEnemiesInRadius = RecLosRadarGetVisibleEnemiesInRadius;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.HasReadyUnitInRange = RecLosRadarHasReadyUnitInRange;
     if (on[SUB_LOS_RADAR] || on[SUB_AI] || on[SUB_WEAPONS])
         s_rec_los_radar.IsPointVisible = RecLosRadarIsPointVisible;
+    if (on[SUB_LOS_RADAR] || on[SUB_AI])
+        s_rec_los_radar.GetSeenUnitsInRadius = RecLosRadarGetSeenUnitsInRadius;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.CreateUnitIndex = RecLosRadarCreateUnitIndex;
     if (on[SUB_LOS_RADAR])
@@ -6441,10 +6459,6 @@ void HookSeams(const bool* on)
         s_rec_network.BroadcastPlayerEconomy = RecNetworkBroadcastPlayerEconomy;
     if (on[SUB_NETWORK])
         s_rec_network.SendUnitStates = RecNetworkSendUnitStates;
-    if (on[SUB_TARGETING] || on[SUB_ORDERS])
-        s_rec_los_radar.GetVisibleEnemiesInRadius = RecLosRadarGetVisibleEnemiesInRadius;
-    if (on[SUB_AI])
-        s_rec_los_radar.GetSeenUnitsInRadius = RecLosRadarGetSeenUnitsInRadius;
     if (on[SUB_ORDERS] || on[SUB_MOVEMENT])
         s_rec_units.LoadUnit = RecUnitsLoadUnit;
     if (on[SUB_ORDERS] || on[SUB_PLAYERS])
@@ -6465,7 +6479,7 @@ void HookSeams(const bool* on)
         s_rec_units.UnitRefSetValue = RecUnitsUnitRefSetValue;
     if (on[SUB_AI])
         s_rec_players.LoadDefaultAIScript = RecPlayersLoadDefaultAIScript;
-    if (on[SUB_LOS_RADAR])
+    if (on[SUB_LOS_RADAR] || on[SUB_PLAYERS])
         s_rec_map.UnitsInRange = RecMapUnitsInRange;
     if (on[SUB_ORDERS])
         s_rec_movement.LoadTarget = RecMovementLoadTarget;

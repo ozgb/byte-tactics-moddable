@@ -4,6 +4,7 @@
 #include "../util/tdf.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
+#include "../harness/display_game.h"
 
 #pragma pack(push, 1)
 #include "game.h"
@@ -108,6 +109,7 @@ Font* __stdcall LoadFontByName(const char* name)
     if (font == 0) {
         FatalError(path);
     }
+    DisplayLogFont(font, name);
     return font;
 }
 

@@ -12,6 +12,7 @@ struct PcxImage {
 #include "object3do.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
+#include "../harness/display_game.h"
 #include "piece_frame.h"
 #include "../debug/debug_lib.h"
 
@@ -464,6 +465,7 @@ void* __stdcall Load3do(char* param)
         return call.Result((void*)nullptr);
     }
     RelocateObject((int)result, (Object3do*)result);
+    DisplayLog3do(param, (Object3do*)result);
     return call.Result(result);
 }
 

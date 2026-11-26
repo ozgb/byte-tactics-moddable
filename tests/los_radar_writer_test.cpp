@@ -170,6 +170,10 @@ int __stdcall DitherRectangle(Surface*, Rect*, int)
 void __stdcall DrawFrame(void*, void*, int, int) {}
 void __stdcall DrawTile(void*, int, int, unsigned char*) {}
 void __stdcall DrawFrameOpaque(Surface*, GafFrame*, int, int) {}
+int DlWants() { return 0; }
+void DlEnter() {}
+void DlLeave() {}
+void DisplayLogTerrain(void*) {}
 void __stdcall DrawFrameGray(Surface*, GafFrame*, int, int) {}
 void __stdcall EraseFrameDithered(Surface*, GafFrame*, int, int, int) {}
 void LosTables::FreeTables() {}

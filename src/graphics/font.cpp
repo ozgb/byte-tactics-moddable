@@ -5,6 +5,7 @@
 #include "font.h"
 
 #include "display.h"
+#include "../harness/display_game.h"
 
 #include "../util/registry.h"
 int __stdcall LockScreen(Surface* out);
@@ -58,6 +59,9 @@ void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int m
     r.top = y;
     r.right = x + width;
     r.bottom = r.top + GetDisplay()->font->glyphs[0];
+    if (DisplayLogWants())
+        DisplayLogText(dst, text, x, y, width);
+    DisplayLogScope displayScope;
     if (dst == 0) {
         Surface screen;
         if (LockScreen(&screen) != 0) {

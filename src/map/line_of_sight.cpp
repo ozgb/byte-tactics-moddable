@@ -16,6 +16,7 @@
 #include "sight_query.h"
 
 #include "../graphics/rect.h"
+#include "../harness/display_game.h"
 
 #include "../map/cell.h"
 #include "../map/tnt_info.h"
@@ -933,6 +934,9 @@ void FreeMapResources()
 // FUNCTION: 0x483fa0
 void __stdcall DrawMapTiles(void* surface)
 {
+    if (DisplayLogWants())
+        DisplayLogTerrain(surface);
+    DisplayLogScope displayScope;
     int tilesX, tilesY;
     int tileX, tileY;
     int screenX, screenY;

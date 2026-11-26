@@ -20,6 +20,7 @@
 #include "../src/graphics/piece_frame.h"
 #include "../src/graphics/pcx.h"
 #include "../src/util/vec3.h"
+#include "../src/harness/display_game.h"
 #include "../src/harness/replay.h"
 #include "../src/state/sim_globals.h"
 #include "../src/game/cd_check.h"
@@ -170,6 +171,15 @@ void __cdecl BlitCompressed(unsigned char*, int, Rect*, void*, Rect*) { abort();
 void __cdecl BlitCompressedShadow(unsigned char*, int, Rect*, void*, Rect*, unsigned char*) { abort(); }
 void __cdecl BlitCompressedBlended(unsigned char*, int, Rect*, GafFrame**, Rect*, unsigned char*) { abort(); }
 void __cdecl BlitCompressedLit(unsigned char*, int, Rect*, GafFrame**, Rect*, unsigned char*) { abort(); }
+
+int DlWants() { return 0; }
+void DlEnter() {}
+void DlLeave() {}
+void DisplayLogSprite(int, Surface*, GafFrame*, int, int, int) {}
+void DisplayLogClearFrame(GafFrame*, int) {}
+void DisplayLogAllocFrame(GafFrame*, const char*) {}
+void DisplayLogGaf(const char*, void*) {}
+void DisplayLog3do(const char*, Object3do*) {}
 
 static void Emit(const char* text)
 {

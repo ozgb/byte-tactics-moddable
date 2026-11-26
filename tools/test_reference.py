@@ -18,6 +18,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import displaylog
 import eventdigest
 import reference
 import tracediff
@@ -188,6 +189,120 @@ class EventsLogTest(unittest.TestCase):
             with mock.patch.object(reference, "EVENTS", dest), mock.patch.object(reference, "ROOT", Path(tmp)):
                 reference.copy_events(src)
             self.assertEqual((dest / "a.txt").read_text(), self.DIGEST)
+
+
+class DisplayLogTest(unittest.TestCase):
+    PALETTE = "0123456789abcdef"
+    FIRST = "fill screen 0 0 10 10 1"
+    SECOND = "fill screen 5 5 15 15 2"
+    FAR = "fill screen 100 100 110 110 3"
+
+    def frame(self, number: int, tick: int, *items: str) -> str:
+        return "".join(line + "\n" for line in [f"frame {number} {tick} 1 {self.PALETTE}", *items, "cursor - - -"])
+
+    def listing(self, *frames: str) -> str:
+        return "bt-display 1\n" + "".join(frames)
+
+    def run_report(self, report, stored: dict[str, str], scenarios: dict[str, Path], logs: dict[str, str | None], *args):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp) / "reference/dir"
+            directory.mkdir(parents=True)
+            for name, text in stored.items():
+                (directory / f"{name}.txt").write_text(text)
+            with mock.patch.object(reference, "ROOT", Path(tmp)):
+                return report(scenarios, logs, directory, *args, known={"a", "b", "none"})
+
+    def digest(self, *frames: str) -> str:
+        return displaylog.digest_text(self.listing(*frames))
+
+    def test_digests_are_compared_line_by_line_and_unstored_ones_counted(self):
+        same = self.digest(self.frame(1, 0, self.FIRST))
+        other = self.digest(self.frame(1, 0, self.FIRST, self.FAR))
+        scenarios = {n: Path(n) for n in ("a", "b", "none")}
+        differing, lines = self.run_report(reference.display_report, {"a": same, "b": same}, scenarios, {"a": same, "b": other, "none": same})
+        self.assertEqual(differing, ["b"])
+        self.assertIn("(frame 1, tick 0)", lines[0])
+        self.assertIn("display digests: 1 of 3 equal, 1 differ, 1 with no stored digest", lines[-1])
+
+    def test_end_of_tick_digests_ignore_the_order_that_does_not_count(self):
+        stored = self.digest(self.frame(1, 0, self.FIRST, self.FAR))
+        got = self.digest(self.frame(1, 0, self.FAR, self.FIRST))
+        strict, _ = self.run_report(reference.display_report, {"a": stored}, {"a": Path("a")}, {"a": got})
+        loose, lines = self.run_report(reference.display_report, {"a": stored}, {"a": Path("a")}, {"a": got}, True)
+        self.assertEqual((strict, loose), (["a"], []))
+        self.assertIn("1 of 1 equal", lines[-1])
+
+    def test_a_run_with_no_display_log_or_a_stored_digest_with_no_scenario_fails(self):
+        stored = self.digest(self.frame(1, 0, self.FIRST))
+        differing, lines = self.run_report(reference.display_report, {"a": stored, "gone": stored}, {"a": Path("a")}, {"a": None})
+        self.assertEqual(differing, ["a", "gone"])
+        self.assertIn("DIFF gone stored display digest has no scenario of that name", lines)
+
+    def test_lists_are_compared_for_scenarios_with_a_frames_line_only(self):
+        stored = self.listing(self.frame(1, 4, self.FIRST), self.frame(2, 8, self.SECOND))
+        got = self.listing(self.frame(1, 4, self.FIRST), self.frame(2, 8, self.FAR))
+        with tempfile.TemporaryDirectory() as tmp:
+            framed, plain = Path(tmp) / "a.txt", Path(tmp) / "b.txt"
+            framed.write_text("ticks 8\nframes 4 8\n")
+            plain.write_text("ticks 8\n")
+            differing, lines = self.run_report(reference.display_list_report, {"a": stored, "b": stored}, {"a": framed, "b": plain}, {"a": got, "b": got})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("0 of 1 equal, 1 differ, 0 with no stored list", lines[-1])
+
+    def test_a_differing_list_names_the_frame_and_item(self):
+        stored = self.listing(self.frame(1, 4, self.FIRST), self.frame(2, 8, self.SECOND))
+        got = self.listing(self.frame(1, 4, self.FIRST), self.frame(2, 8, self.FAR))
+        with tempfile.TemporaryDirectory() as tmp:
+            framed = Path(tmp) / "a.txt"
+            framed.write_text("ticks 8\nframes 4 8\n")
+            differing, lines = self.run_report(reference.display_list_report, {"a": stored}, {"a": framed}, {"a": got})
+        self.assertEqual(differing, ["a"])
+        self.assertIn("frame 2 (tick 8)", lines[0])
+        self.assertIn("0 of 1 equal, 1 differ, 0 with no stored list", lines[-1])
+
+    def test_a_scenario_with_frames_and_no_stored_list_is_counted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            framed = Path(tmp) / "a.txt"
+            framed.write_text("frames 4\n")
+            differing, lines = self.run_report(reference.display_list_report, {}, {"a": framed}, {"a": None})
+        self.assertEqual(differing, [])
+        self.assertIn("0 of 1 equal, 0 differ, 1 with no stored list", lines[-1])
+
+    def test_a_frame_with_no_stored_list_is_named_by_its_tick(self):
+        stored = self.digest(self.frame(1, 0, self.FIRST), self.frame(2, 4, self.FIRST))
+        got = self.digest(self.frame(1, 0, self.FIRST), self.frame(2, 4, self.SECOND))
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            self.assertEqual(reference.unlisted_frame("a", {"a": got}, stored, False, directory), 4)
+            (directory / "a.txt").write_text(self.listing(self.frame(2, 4, self.FIRST)))
+            self.assertIsNone(reference.unlisted_frame("a", {"a": got}, stored, False, directory))
+
+    def test_the_display_items_report_asks_tracediff_for_the_tick(self):
+        for end_of_tick in (False, True):
+            with mock.patch.object(reference, "resolve_quiet", return_value="abc"), mock.patch.object(reference, "build_cached", return_value=Path("ref")), \
+                    mock.patch.object(reference.subprocess, "run") as run, contextlib.redirect_stdout(io.StringIO()):
+                reference.report_display_items("a", "wasm", 12, {"a": ({"commit": "abc"},)}, Path("x.exe"), {"a": Path("s.txt")}, False, None, end_of_tick)
+            cmd = run.call_args[0][0]
+            self.assertEqual(cmd[-3:], ["--display", "--display-tick", "12"])
+            self.assertEqual("--end-of-tick" in cmd, end_of_tick)
+
+    def test_copy_display_replaces_both_directories_and_leaves_one_with_no_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src, root = Path(tmp) / "branch", Path(tmp) / "tree"
+            (src / "reference/display").mkdir(parents=True)
+            (src / "reference/display/a.txt").write_text("digest\n")
+            (root / "reference/displaylists").mkdir(parents=True)
+            (root / "reference/displaylists/old.txt").write_text("old\n")
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "DISPLAYS", root / "reference/display"), \
+                    mock.patch.object(reference, "DISPLAYLISTS", root / "reference/displaylists"), contextlib.redirect_stdout(io.StringIO()):
+                reference.copy_display(src)
+            self.assertEqual((root / "reference/display/a.txt").read_text(), "digest\n")
+            self.assertEqual((root / "reference/displaylists/old.txt").read_text(), "old\n")
+
+    def test_the_key_covers_the_display_files_and_tool(self):
+        self.assertIn("reference/display", reference.KEY_TREES)
+        self.assertIn("reference/displaylists", reference.KEY_TREES)
+        self.assertIn("tools/displaylog.py", reference.KEY_TOOLS)
 
 
 class UiLogTest(unittest.TestCase):
@@ -455,6 +570,8 @@ class CheckRoundtripTest(unittest.TestCase):
                     mock.patch.object(reference, "sound_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "ui_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "events_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "display_report", lambda *a: ([], [])), \
+                    mock.patch.object(reference, "display_list_report", lambda *a: ([], [])), \
                     mock.patch.object(reference, "report_fuel", lambda *a: 0), \
                     contextlib.redirect_stdout(out):
                 reference.check_traces(Path("x.exe"), None, 1, roundtrip="auto")
@@ -715,7 +832,8 @@ class EarlyExitTest(unittest.TestCase):
             (root / "s.txt").write_text("ticks 100\n")
             with mock.patch.object(reference, "ROOT", root), \
                     mock.patch.object(reference.tracediff, "play", lambda *a, **k: run), \
-                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.UI_LOGS), mock.patch.dict(reference.FUEL):
+                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.UI_LOGS), mock.patch.dict(reference.FUEL), \
+                    mock.patch.dict(reference.DISPLAY_LOGS), mock.patch.dict(reference.DISPLAY_LISTS):
                 _, digests, _, kept = reference.play_scenario(Path("x.exe"), root / "s.txt", None, stored)
         self.assertEqual(len(digests), 3)
         self.assertIsNone(kept)
@@ -1323,16 +1441,21 @@ class BothModesTest(unittest.TestCase):
             (run / "blockptrs.txt").write_text("scan")
             (run / "sound.txt").write_text("header\n")
             (run / reference.UI_FILE).write_text("ui\n")
+            (run / reference.DISPLAY_FILE).write_text("digest\n")
+            (run / reference.DISPLAYLIST_FILE).write_text("list\n")
             scans = {}
             with mock.patch.object(reference, "scenario_frames", lambda s: []), \
                     mock.patch.object(reference, "scenario_saves", lambda s: False), \
                     mock.patch.object(reference, "scenario_ticks", lambda s: 1), \
                     mock.patch.object(reference.tracediff, "play", lambda *a, **k: run), \
-                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.UI_LOGS), mock.patch.dict(reference.FUEL):
+                    mock.patch.dict(reference.SOUND_LOGS), mock.patch.dict(reference.UI_LOGS), mock.patch.dict(reference.FUEL), \
+                    mock.patch.dict(reference.DISPLAY_LOGS), mock.patch.dict(reference.DISPLAY_LISTS):
                 reference.play_scenario(Path("x.exe"), Path("s.txt"), None, scans=scans, mode="native")
                 self.assertEqual(scans, {"s [native]": "scan"})
                 self.assertEqual(reference.SOUND_LOGS["s [native]"], "header\n")
                 self.assertEqual(reference.UI_LOGS["s [native]"], "ui\n")
+                self.assertEqual(reference.DISPLAY_LOGS["s [native]"], "digest\n")
+                self.assertEqual(reference.DISPLAY_LISTS["s [native]"], "list\n")
                 self.assertIn("s [native]", reference.FUEL)
 
     def play(self, modes, loads=None, differ=None):
@@ -1463,7 +1586,7 @@ class EndOfTickTest(unittest.TestCase):
                     mock.patch.object(reference, "play_all", fake_play_all), \
                     mock.patch.object(reference, "report_fuel", lambda *a, **k: 0), \
                     mock.patch.multiple(reference, **{n: (lambda *a, **k: ([], [])) for n in
-                                                      ("sound_report", "ui_report", "events_report", "frame_report", "save_report")}), \
+                                                      ("sound_report", "ui_report", "events_report", "display_report", "display_list_report", "frame_report", "save_report")}), \
                     mock.patch.object(reference, "report_divergence", lambda *a: divergences.append(a) or (_ for _ in ()).throw(SystemExit(1))), \
                     contextlib.redirect_stdout(out):
                 try:

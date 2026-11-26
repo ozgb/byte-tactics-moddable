@@ -394,10 +394,11 @@ and so on), and this page is updated to name it. The current tag is
   which the human Arm commander reclaims a tree that the console places. The trace format is still `bt-trace 9`; the
   92 traces are those of v40, and the new scenario adds its own trace, events, sound and UI logs. The saves are those
   of v40.
-- `reference-traces-v42`: the 93 scenarios of v41, with the selection (bit 0x10 of a unit's `flags`) masked out of the
-  `Unit` table (#1050): it is view state, judged by the UI log's `select` record. The trace format is still
-  `bt-trace 9`. The digests of the eight `ui-` scenarios that select units change; the other 85 are those of v41 (only
-  each trace's commit line changed). The event digests, sound logs, UI logs, frames and saves are those of v41.
+- `reference-traces-v42`: the 93 scenarios of v41, with the presentation's state masked out of the rows (#1050): the
+  selection (bit 0x10 of a unit's `flags`, judged by the UI log's `select` record) and the debug bits (bits 0 and 1 of
+  `endGameFlags`). The trace format is still `bt-trace 9`. A masked field is hashed as four bytes, so the `world` and
+  `tick` rows of every tick change, and so does every digest. The event digests, sound logs, UI logs and frames are
+  those of v41, and the saves decode equal to v41's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

@@ -85,8 +85,13 @@ The ten game-region rows with class `mixed`:
 
 Found during review, and re-checked against the code for #783 and #1049. Functions are cited by name, never by line.
 During play, presentation changes the simulation only through the events of `docs/commands.md` (sections 4 and 8);
-`tools/stateclasses.py --check` fails when a function of the presentation subsystem writes a field of the game or a
-global whose class is `sim`, unless `PRESENTATION_SIM_WRITES` in that tool names the write with its reason.
+`tools/stateclasses.py --check` fails when a presentation function (a function of the presentation subsystem in a
+presentation folder, or a console command handler of src/game/console_commands.cpp's command table) writes a field
+classed `sim` of the game or a global, a bit field of the game through the member that holds it, or a field of `Unit`,
+`Player`, `Order`, `Feature` or `Projectile` that a phase or a load function touches, unless `PRESENTATION_SIM_WRITES`
+in that tool names the write with its reason. It does not see a write to a field classed `mixed` (`uiOptionFlags`,
+`mapFlags`, `localPlayer`, `playerIndex`, `otherFlags`), because the classes are per field, not per bit; a direct write
+of the cheat bits or of bits 0 to 2 of `mapFlags` would pass it.
 
 Crossings left during play, each waiting on another decision:
 - `CmdControl` and `CmdView` (console_commands.cpp) write `localPlayer` and `playerIndex`, which the tick reads. They
@@ -101,7 +106,10 @@ Crossings left during play, each waiting on another decision:
   view (#1052) needs neither.
 - `HandleGameKey` (keys.cpp) and `HandleDebugHotkey` (game_dialogs.cpp) flip bits 0 and 1 of `endGameFlags`, the debug
   mode and the debug display. Only presentation reads them, but they share the word the trace hashes with the
-  simulation's end-of-game bits.
+  simulation's end-of-game bits. #1050 takes them out of the judged state.
+- `DrawScorePanel` (game_dialogs.cpp) decrements `Player.rank` of each counted player above a rank no player holds,
+  while it draws the score panel; the kill credit of `units.cpp` (the rank update when a unit dies) reads and writes the
+  same ranks. It becomes the simulation's own compaction, or an event, in a later issue.
 - The selection (`Unit.flags` bit 0x10 and the other selection fields) is written by the selection functions of
   selection.cpp; #1050 takes it out of the judged state.
 

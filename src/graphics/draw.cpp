@@ -13,6 +13,8 @@
 
 #include "gaf_frame.h"
 
+#include "../harness/display_game.h"
+
 struct ScanlineSpan {
     int x1;
     int x2;
@@ -61,6 +63,9 @@ void __cdecl BlitRect(Surface* dst, Surface* src, Rect* rect, Rect* pos);
 int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1,
                            int color)
 {
+    if (DisplayLogWants())
+        DisplayLogLine(surface, x0, y0, x1, y1, color);
+    DisplayLogScope displayScope;
     int ret;
     if (surface == 0) {
         Surface screen;
@@ -208,6 +213,9 @@ Surface* __stdcall DrawBlendedLine(Surface* surface, int x0, int y0,
 // FUNCTION: 0x4bee60
 int __stdcall DrawPixel(Surface* surface, int x, int y, int ch)
 {
+    if (DisplayLogWants())
+        DisplayLogPixel(surface, x, y, ch);
+    DisplayLogScope displayScope;
     int ret;
     if (surface == 0) {
         Surface screen;
@@ -379,6 +387,9 @@ int __stdcall DrawPolylines(Surface* surface, Point* points, int* counts,
 // FUNCTION: 0x4bf4d0
 int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
 {
+    if (DisplayLogWants())
+        DisplayLogFade(surface, rect, level);
+    DisplayLogScope displayScope;
     Display* engine = GetDisplay();
     Surface screen;
     Rect r;
@@ -464,6 +475,9 @@ int __stdcall ClipRectangle(Surface* surface, Rect* r)
 // FUNCTION: 0x4bf6f0
 int __stdcall FillRectangle(Surface* surface, Rect* rect, int color)
 {
+    if (DisplayLogWants())
+        DisplayLogFill(surface, rect, color);
+    DisplayLogScope displayScope;
     Rect r = *rect;
     int result;
     if (surface == 0) {
@@ -487,6 +501,9 @@ int __stdcall FillRectangle(Surface* surface, Rect* rect, int color)
 Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect,
                                          int color)
 {
+    if (DisplayLogWants())
+        DisplayLogOutline(surface, rect, color, 1);
+    DisplayLogScope displayScope;
     Surface* ret = 0;
     if (surface == 0) {
         Surface screen;
@@ -510,6 +527,9 @@ Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect,
 // FUNCTION: 0x4bf8c0
 int __stdcall DrawRectangle(Surface* surface, Rect* r, int color)
 {
+    if (DisplayLogWants())
+        DisplayLogOutline(surface, (const int*)r, color, 0);
+    DisplayLogScope displayScope;
 #ifdef __clang__
     int result = 0;
 #else
@@ -618,6 +638,9 @@ int __stdcall XorRectangle(Surface* surface, Rect* rect, int value)
 // FUNCTION: 0x4bfe10
 int __stdcall GrayRectangle(Surface* surface, Rect* rect)
 {
+    if (DisplayLogWants())
+        DisplayLogGray(surface, rect);
+    DisplayLogScope displayScope;
     Surface screen;
     Rect r = *rect;
     Display* g = GetDisplay();
@@ -651,6 +674,9 @@ int __stdcall GrayRectangle(Surface* surface, Rect* rect)
 // FUNCTION: 0x4bff20
 int __stdcall DitherRectangle(Surface* surface, Rect* rect, int phase)
 {
+    if (DisplayLogWants())
+        DisplayLogDither(surface, rect, phase);
+    DisplayLogScope displayScope;
     Surface screen;
     if (surface == 0) {
         if (LockScreen(&screen))
@@ -723,6 +749,9 @@ static inline void DrawClippedLine(Surface* surface, int x0, int y0,
 void __stdcall DrawCircle(Surface* surface, int xc, int yc, int radius,
                             int color)
 {
+    if (DisplayLogWants())
+        DisplayLogCircle(surface, xc, yc, radius, color);
+    DisplayLogScope displayScope;
     int x0 = xc + radius;
     int y0 = yc;
     for (int angle = 0x800; angle <= 0x10000; angle += 0x800) {
@@ -738,6 +767,9 @@ void __stdcall DrawCircle(Surface* surface, int xc, int yc, int radius,
 void __stdcall DrawDashedCircle(Surface* surface, int cx, int cy, int radius,
                             int color, int n, int start)
 {
+    if (DisplayLogWants())
+        DisplayLogDashed(surface, cx, cy, radius, color, n, start);
+    DisplayLogScope displayScope;
     Surface screen;
     int px = cx + radius;
     int py = cy;
@@ -777,6 +809,9 @@ void __stdcall DrawDashedCircle(Surface* surface, int cx, int cy, int radius,
 // FUNCTION: 0x4c0310
 void __stdcall FillPolygon(Surface* surface, Point* points, int n, unsigned char color)
 {
+    if (DisplayLogWants())
+        DisplayLogPolygon(surface, points, n, color);
+    DisplayLogScope displayScope;
     ScanFillPolygon(surface, points, n, color);
 }
 

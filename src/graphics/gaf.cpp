@@ -5,6 +5,7 @@
 #include "rect.h"
 #include "../harness/replay.h"
 #include "../harness/replay_services.h"
+#include "../harness/display_game.h"
 #include "../util/ftol.h"
 
 // FUNCTION: 0x4b7e60
@@ -140,6 +141,9 @@ void __stdcall DrawFrameBlended(Surface* dst, GafFrame* bmp, int x, int y);
 // FUNCTION: 0x4b7f90
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y)
 {
+    if (DisplayLogWants())
+        DisplayLogSprite(DISPLAY_SPRITE, dst, bmp, x, y, 0);
+    DisplayLogScope displayScope;
     Surface screen;
     if (dst == 0) {
         int ok = LockScreen(&screen);
@@ -191,6 +195,9 @@ void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y)
 // FUNCTION: 0x4b8150
 void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
 {
+    if (DisplayLogWants())
+        DisplayLogSprite(DISPLAY_SPRITE_OPAQUE, dst, bmp, x, y, 0);
+    DisplayLogScope displayScope;
     Surface screen;
     if (dst == 0) {
         int locked = LockScreen(&screen);
@@ -269,6 +276,9 @@ void __cdecl BlitCompressedBlended(unsigned char* pixels, int pitch, Rect* drect
 // FUNCTION: 0x4b8500
 void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y)
 {
+    if (DisplayLogWants())
+        DisplayLogSprite(DISPLAY_SPRITE_BLEND, surface, frame, x, y, 0);
+    DisplayLogScope displayScope;
     Display* d = GetDisplay();
     if ((d->flags.byte & 0x20) != 0) {
         ScreenSurfaceView screen;
@@ -324,6 +334,9 @@ void __stdcall ResetClipRect(int* surface);
 // FUNCTION: 0x4b86e0
 void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 {
+    if (DisplayLogWants())
+        DisplayLogSprite(DISPLAY_SPRITE_GRAY, surface, frame, x, y, 0);
+    DisplayLogScope displayScope;
     Display* d = GetDisplay();
     if ((d->flags.word & 0x100) != 0 && frame->compressed == 0) {
         Surface screen;
@@ -376,6 +389,9 @@ void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 // FUNCTION: 0x4b88d0
 void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int parity)
 {
+    if (DisplayLogWants())
+        DisplayLogSprite(DISPLAY_SPRITE_ERASE, dst, bmp, x, y, parity);
+    DisplayLogScope displayScope;
     Surface screen;
     if (bmp->compressed == 0) {
         if (dst == 0) {
@@ -601,6 +617,7 @@ void* __stdcall LoadGaf(char* name)
             } while (j < (int)p->count);
         }
     }
+    DisplayLogGaf(name, base);
     return call.Result((void*)base);
 }
 
@@ -644,6 +661,7 @@ GafFrame* __stdcall AllocFrame(const char* name, int width, int height)
     p->compressed = 0;
     p->layers = 0;
     p->blend = 0;
+    DisplayLogAllocFrame(p, name);
     return p;
 }
 // FUNCTION: 0x4b8e00 ?AllocDepthFrame@@YGPAUGafFrame@@IHH@Z
@@ -662,11 +680,15 @@ GafFrame* __stdcall AllocDepthFrame(unsigned int heap, int width, int height)
     b->compressed = 0;
     b->layers = 0;
     b->blend = 0;
+    DisplayLogAllocFrame(b, (const char*)heap);
     return b;
 }
 // FUNCTION: 0x4b8e50
 void __stdcall ClearFrame(GafFrame* b, int color)
 {
+    if (DisplayLogWants())
+        DisplayLogClearFrame(b, color);
+    DisplayLogScope displayScope;
     if (b->compressed == 0) {
         memset(b->pixelsOrLayers, color, b->width * b->height);
         if (b->scratch != 0) {
@@ -683,6 +705,9 @@ void __cdecl BlitCompressedShadow(unsigned char* pixels, int pitch, Rect* rect,
 // FUNCTION: 0x4b8ec0
 void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
 {
+    if (DisplayLogWants())
+        DisplayLogSprite(DISPLAY_SPRITE_SHADOW, dst, bmp, x, y, 0);
+    DisplayLogScope displayScope;
     Display* d = GetDisplay();
     if (d->flags.bits.has_c8 == 1) {
         Surface screen;
@@ -746,6 +771,7 @@ GafFrame* __stdcall AllocDepthFrame(const char* name, int width, int height)
     b->compressed = 0;
     b->layers = 0;
     b->blend = 0;
+    DisplayLogAllocFrame(b, name);
     return b;
 }
 
@@ -790,6 +816,9 @@ static void SwapPtr(unsigned char*& a, unsigned char*& b)
 // FUNCTION: 0x4b9360
 void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y)
 {
+    if (DisplayLogWants())
+        DisplayLogSprite(DISPLAY_LENS, (Surface*)dst, sprite, x, y, 0);
+    DisplayLogScope displayScope;
     SwapPtr(sprite->pixelsOrLayers, sprite->scratch);
 
     Surface surface;
@@ -1273,6 +1302,9 @@ void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
 // FUNCTION: 0x4b8310
 void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int paletteRow)
 {
+    if (DisplayLogWants())
+        DisplayLogSprite(DISPLAY_SPRITE_LIT, surface, frame, x, y, paletteRow);
+    DisplayLogScope displayScope;
     Display* d = GetDisplay();
     if ((d->flags.byte & 0x80) == 0x80) {
         ScreenSurfaceView screen;

@@ -44,6 +44,7 @@ void GonzoAtexitHandler(void)
 }
 
 #include "debug_lib.h"
+#include "../harness/display_log.h"
 #include <memory>
 
 class FreeBlockMap;
@@ -262,6 +263,7 @@ void __cdecl GameFreeThunk(void* p)
 // FUNCTION: 0x4d85b0
 void __cdecl GameFree(void* p)
 {
+    DlFree(p);
     if (SimOwns(p)) {
         SimFree(p);
         return;

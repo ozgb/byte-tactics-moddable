@@ -45,6 +45,7 @@
 0x457050 SendShareEnergy
 0x457d30 UpdateResourceSharing
 0x458810 CMemoryCache::DrawObjectState
+0x460160 OpenOptionsPanel
 0x4605c0 HandleSurrenderChoice
 0x464de0 ContinueWatchingCallback
 0x464f80 UpdatePlayers

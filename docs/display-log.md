@@ -109,7 +109,8 @@ replaced by `%` and two uppercase hexadecimal digits (a space is `%20`). An empt
 `x0 y0 x1 y1` is the item's **area**: the smallest rectangle of the target that holds every
 pixel the item can change, with `x0` and `y0` included and `x1` and `y1` not, in the target's
 pixels from its top left corner, cut to the target's clip rectangle at the time of the
-item. An item that can change no pixel has the area `0 0 0 0`. The area is what orders the
+item. An item whose area is empty changes no pixel and is not in the log ("Draws that change
+no pixel" below). The area is what orders the
 items (below), and it is also the clip of the item: a rasteriser that draws the item clipped
 to its area draws what the game drew.
 
@@ -142,7 +143,7 @@ The positions of an item are in the target's pixels. A colour is a palette index
 | `circle` | `<x> <y> <radius> <colour>` | A circle about `x y`. |
 | `circle_dashed` | `<x> <y> <radius> <colour> <dashes> <start>` | A circle of `dashes` dashes, the first at step `start`. |
 | `polygon` | `<colour> <p1> ... <pn>` | A filled polygon of the corners `p1` to `pn`, each `x,y`. |
-| `text` | `<font> <fore> <back> <key> <x> <y> <text>` | A string in the font with its top left corner at `x y`, glyph pixels in `fore` and their outline in `back`, and pixels of the colour `key` left out. A string the game cut to a width is the cut string. The area is the string's box; a string whose box is not inside the clip rectangle is not drawn, and has the area `0 0 0 0`. |
+| `text` | `<font> <fore> <back> <key> <x> <y> <text>` | A string in the font with its top left corner at `x y`, glyph pixels in `fore` and their outline in `back`, and pixels of the colour `key` left out. A string the game cut to a width is the cut string. The area is the string's box; a string whose box is not inside the clip rectangle is not drawn, and is not an item. |
 | `terrain` | `<map> <sx> <sy>` | The map's tiles, with the map position `sx sy` (the camera's scroll, in pixels of the map) at the top left corner of the area. `map` is the map's name, as the scenario's `map` key gives it. |
 | `model` | `<type> <model> <x> <y> <wx> <wy> <wz> <ax> <ay> <az> <colour> <build> <cloak> <light> <pieces>` | A unit or a feature drawn from its 3D model, below. |
 | `cargo` | the fields of `model` | A unit a transport carries, drawn with the transport, right after it. |
@@ -182,13 +183,42 @@ rectangle for the sprites and the `lens`, the bounding box of the corners for `q
 rectangle kinds, the copied rectangle for `blit` and `copy`, and the string's box for
 `text`, all cut to the clip rectangle.
 
+### Draws that change no pixel
+
+A draw whose area is empty (`x0` not below `x1`, or `y0` not below `y1`, once it is cut to
+the clip rectangle) changes no pixel, and the log leaves it out: it is not an item, it has no
+layer, it orders no other item, and it is not counted in the frame's `count`. This holds for
+every kind, the ones that read what is under them (`sprite_blend`, `sprite_gray`,
+`sprite_shadow`, `lens`, `fade`, `gray`) as much as the others. The area of a draw is empty when:
+
+| Kinds | The area is empty when |
+| --- | --- |
+| the sprites, `lens` | the picture's rectangle, all its layers together, lies outside the clip rectangle: the smoke, the trees and the rocks outside the view, which the game still draws |
+| `quad`, `polygon` | the bounding box of the corners lies outside the clip rectangle, or a `polygon` has no corners |
+| `blit`, `copy` | the copied rectangle lies outside the clip rectangle |
+| `fill`, `fade`, `gray`, `dither`, `outline`, `outline_lit` | the rectangle lies outside the clip rectangle, or its right edge is left of its left edge or its bottom edge above its top |
+| `line`, `pixel`, `circle`, `circle_dashed` | the bounding box of the ends, the pixel, or the circle's box lies outside the clip rectangle |
+| `text` | the string's box is not inside the clip rectangle, so the game does not draw the string |
+| `terrain` | the view of the map lies outside the clip rectangle |
+| `clear` | the target has no pixels |
+| `model`, `cargo`, `projectile`, `debris`, `shard` | the clip rectangle is empty: their area is the clip rectangle, so a model outside the view is still an item |
+
+A draw on a target that nothing reads afterwards changes no pixel of what the player sees
+either, but it stays in the log: a later item, or a later frame, may still copy that target,
+and that is not known when the draw is made.
+
+A presentation need not make a draw whose area would be empty, since a draw it leaves out and
+a draw it makes give the same list. `tools/displaylog.py` reads a list the same way: it leaves
+out every item whose area is empty, so a list that holds such items has the digest of the
+same list without them, and `compare` finds no difference between the two.
+
 ## Which orders count
 
 The list is a list, not a call sequence: two items can be drawn in either order when neither
 can change what the other draws. Two items **depend** on each other when they are on the same
 target and their areas overlap, or when one copies from a target (`blit`, `copy`, and an
 item whose picture is `target:<name>`, which read the whole of that target) and the other
-draws on that target with an area that is not empty. Two items that depend on each other
+draws on that target. Two items that depend on each other
 keep their order; any two that don't may be swapped.
 
 The **layer** of an item is 0 when it depends on no item before it in the frame, and
@@ -242,6 +272,7 @@ the first frame that differs, and compares their lists in the same way.
 Everything the game draws on a target while it draws a frame is an item, except these, which
 the log leaves out:
 
+- **Draws that change no pixel**, those whose area is empty ("Draws that change no pixel" above).
 - **The minimap's base picture.** The game writes the pixels of the minimap's map picture
   (the target `RADAR MAPPED`) one by one from the map and from what the player has seen,
   not through any drawing item. The items that draw the minimap read it whole (a `blit` from

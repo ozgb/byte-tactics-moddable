@@ -37,7 +37,7 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset, ProjectedModel
 void* __stdcall GetGafSequenceFrame(GafRef* ref);
 void* __stdcall GetGafFrame(GafSequence* table, int index);
 void __stdcall InitGafSequence(void* ref, void* src, int index);
-void StepAllGafSequences(void);
+#include "../network/net_stats.h"
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
 void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y);
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
@@ -46,7 +46,7 @@ int __stdcall DrawRectangle(Surface* surface, Rect* r, int color);
 Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect, int color);
 void __stdcall FillPolygon(Surface* surface, Point* points, int n, unsigned char color);
 void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth);
-Font* __stdcall LoadFontByName(const char* name);
+#include "../game/data_files.h"
 
 void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp, FrameQuad* dst, FrameQuad* src);
 

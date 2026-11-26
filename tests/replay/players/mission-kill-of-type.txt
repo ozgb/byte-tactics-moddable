@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem players 5.1
+subsystem players 5.2
 call 0 RegionSize
   a info (2)
   o result 84
@@ -9,6 +9,7 @@ call 0 Init
   a size 84
   w region [84] 0:ffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 call 180 Apply
+  r Game.uiOptionFlags 12
   r Game.endGameFlags 0
   r Game.endGameVictory 0
   r Game.list_391ed MissionConditions#1

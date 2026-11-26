@@ -380,6 +380,8 @@ void __stdcall DrawFrameQuad(void* surf, void* entry, FlipQuad* dst, FlipQuad* s
 #include "options.h"
 #include "frontend.h"
 #include "../game/settings.h"
+#include "../game/players_events.h"
+#include "../util/engine_services.h"
 
 // FUNCTION: 0x45b800
 void __stdcall SetDirectConnectAddress(char* param_1)
@@ -2115,7 +2117,7 @@ void __stdcall HandleSurrenderChoice(Gui* gui)
             SetGameMode(1);
             return;
         case 2:
-            g_game->flagsByte_3923b |= 4;
+            PlayersPublishLeaveGame(SCHED_ENGINE);
             ShutdownIngameAndQuit();
             return;
         }

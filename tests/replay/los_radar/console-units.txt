@@ -1,5 +1,5 @@
 bt-replay 2
-subsystem los_radar 5.0
+subsystem los_radar 5.1
 call 0 GetMapCell
   r Game.width 224
   r Game.height 102

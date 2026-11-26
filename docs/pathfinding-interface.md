@@ -1,6 +1,6 @@
 # The pathfinding interface
 
-Pathfinding sits behind a general interface, `interfaces/pathfinding.h` (version 4.0). 3.1c's search is
+Pathfinding sits behind a general interface, `interfaces/pathfinding.h` (version 4.1; 4.1 adds the event kind SET_SEARCH). 3.1c's search is
 its default implementation (`src/ai/pathfind.cpp`). This page is the inventory that interface was cut
 from (#883):
 - what 3.1c's search takes, when it runs, and what it leaves;
@@ -109,13 +109,15 @@ buffer holds (orders pass 64).
 Partial results over several ticks don't happen in 3.1c (a search reports once, at its end). The
 interface has `PATH_EVENT_PROGRESS` for implementations that do.
 
-**Payloads.** Every event starts with `PathfindingEventHeader`: `kind`, `unit`, `requester`, `target` and `tick` (the tick of the step). Each kind has the payload of `interfaces/pathfinding.h` (version 4.0) that starts with it. `Poll(out, size, points, capacity)` copies the next payload to `out`, at most `size` bytes of it, and the first min(count, capacity) waypoints to `points`; it returns the payload's size, or 0 when no event is left. The engine zeroes `out` before each `Poll` and stops polling for the step at a return smaller than the header (0, a negative number, or the 1 of an older module).
+**Payloads.** Every event starts with `PathfindingEventHeader`: `kind`, `unit`, `requester`, `target` and `tick` (the tick of the step). Each kind has the payload of `interfaces/pathfinding.h` (version 4.1) that starts with it. `Poll(out, size, points, capacity)` copies the next payload to `out`, at most `size` bytes of it, and the first min(count, capacity) waypoints to `points`; it returns the payload's size, or 0 when no event is left. The engine zeroes `out` before each `Poll` and stops polling for the step at a return smaller than the header (0, a negative number, or the 1 of an older module).
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
 | STARTED 0 | `PathfindingStarted` | `start`: how the search started, a `PathStart` |
 | PROGRESS 1 | `PathfindingProgress` | `count`: the number of waypoints of the route so far |
 | FINISHED 2 | `PathfindingFinished` | `status` (a `PathStatus`: FOUND, PARTIAL, FAILED or NEAREST), `count` (the number of waypoints; none when FAILED) |
+
+**SET_SEARCH.** Since 4.1 the engine publishes one event kind into pathfinding, SET_SEARCH (448, `PathfindingSetSearch`: `steps`, `hasScale`, `scale`), from the console's `search` through `SCHED_ENGINE`. Pathfinding has no inbox: the route's handler is the engine's (`PathfindingOnSetSearch`, `src/game/routes.cpp`), not an `Apply`. A nonzero `steps` sets the match setup's search step limit; `hasScale` nonzero, with the optional `SetSearchScale` slot present, calls `SetSearchScale(scale)` (16.16 fixed point). Its events have no trace section, so `data/commands.txt` names it `KIND_448`.
 
 The consumer applies a polled event with `ApplyPathEvent(event, size, waypoints)`, which changes nothing for an event smaller than its kind's payload. The trace's path results (section 32) record each event as `HarnessPathEvent(event, size, points, capacity)`.
 
@@ -143,7 +145,7 @@ sees, so a replacement that skips it doesn't conform even with the same waypoint
 Inside the default, and not reached by any consumer:
 - the budget (`stepsPerTick`, `baseScale`): `stepsPerTick` is the match setup's search step limit, or 0x535
   when there is none, read through `SearchStepLimit` at every `RunSearches` (the `search` console command sets
-  the limit); `baseScale` is set by the second number of that command, through the optional `SetSearchScale` slot;
+  the limit by publishing SET_SEARCH); `baseScale` is set by the second number of that command, which SET_SEARCH carries, through the optional `SetSearchScale` slot;
 - the debug overlay's per-cell flags, through the optional `DebugCell` slot;
 - the quirks of section 6.
 

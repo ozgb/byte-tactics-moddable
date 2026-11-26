@@ -192,6 +192,7 @@ PacketReceiver,spare,,0x1c,1,#615,pointer,"a receive buffer of the packet receiv
 PacketRing,buf,,0xc,1024,#615,pointer,"the ring's pending packet table (platform heap), moved out by #615"
 PieceFrame,color,CreateGameObject,0x25927+0x540*k,1,,load,"Game resource pointers: GAFs, models and files loaded at start (gui, weapons, animations)"
 PieceFrame,indices,CreateGameObject,0x2591b+0x20*k,1800,,load,"PieceFrame.indices (0xc) in Game.frames: the loaded 3DO face index list (relocated by RelocateObject), or g_faceVertexIndices (read-only table in the exe image) for the explosion debris slots"
+PieceFrame,ptr_10,CreateGameObject,0x2591f+0x20*k,1800,,load,"PieceFrame.ptr_10 (0x10) in Game.frames: the texture word the bind writes, a frame of the loaded GAF, a name inside the loaded 3DO, or a sequence number"
 PieceRec,desc,Object State,0x22+0x36*k,1,,load,"PieceRec.desc (0x0, in Object State piece records at 0x22+0x36*k): the Object3D of the loaded 3DO piece, never written after load"
 PlayerFrameInfo,frame,,0x14,1,#615,pointer,"the player's pending frame buffer (platform heap), moved out by #615"
 ScriptTable,code,LoadCobScript,0x24,1,,load,"ScriptTable.code (0x24): code words inside the same HAPI_LoadFile COB buffer, relocated by LoadCobScript"

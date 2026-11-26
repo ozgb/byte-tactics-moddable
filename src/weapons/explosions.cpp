@@ -132,20 +132,8 @@ inline Explosion* MakeExplosion(int count, int start, int end)
     return result;
 }
 
-// FUNCTION: 0x420620
-void InitExplosions()
+void InitDebrisPieces()
 {
-    g_game->count_1491b = 0;
-    g_game->explosionLensFrame = BuildLensFrame(22, 22, 8);
-    g_explosion0Duration = 24; g_explosion0StartSize = 64; g_explosion0EndSize = 8;
-    g_explosion1Duration = 30; g_explosion1StartSize = 128; g_explosion1EndSize = 16;
-    g_explosion2Duration = 30; g_explosion2StartSize = 200; g_explosion2EndSize = 32;
-    (*(Explosion * (*)[3])&g_game->lists)[0] = MakeExplosion(g_explosion0Duration / 2, g_explosion0StartSize, g_explosion0EndSize);
-    g_game->shade = 20;
-    (*(Explosion * (*)[3])&g_game->lists)[1] = MakeExplosion(g_explosion1Duration / 2, g_explosion1StartSize, g_explosion1EndSize);
-    g_game->shade = 50;
-    (*(Explosion * (*)[3])&g_game->lists)[2] = MakeExplosion(g_explosion2Duration / 2, g_explosion2StartSize, g_explosion2EndSize);
-    g_game->shade = 100;
     int i;
     for (i = 0; i < 300; ++i) {
         g_game->slots[i].state = -1;
@@ -166,6 +154,23 @@ void InitExplosions()
         }
     g_debrisMemCache.InitSimCache(100000);
     memset(g_explodedPieces, 0, sizeof(g_explodedPieces));
+}
+
+// FUNCTION: 0x420620
+void InitExplosions()
+{
+    g_game->count_1491b = 0;
+    g_game->explosionLensFrame = BuildLensFrame(22, 22, 8);
+    g_explosion0Duration = 24; g_explosion0StartSize = 64; g_explosion0EndSize = 8;
+    g_explosion1Duration = 30; g_explosion1StartSize = 128; g_explosion1EndSize = 16;
+    g_explosion2Duration = 30; g_explosion2StartSize = 200; g_explosion2EndSize = 32;
+    (*(Explosion * (*)[3])&g_game->lists)[0] = MakeExplosion(g_explosion0Duration / 2, g_explosion0StartSize, g_explosion0EndSize);
+    g_game->shade = 20;
+    (*(Explosion * (*)[3])&g_game->lists)[1] = MakeExplosion(g_explosion1Duration / 2, g_explosion1StartSize, g_explosion1EndSize);
+    g_game->shade = 50;
+    (*(Explosion * (*)[3])&g_game->lists)[2] = MakeExplosion(g_explosion2Duration / 2, g_explosion2StartSize, g_explosion2EndSize);
+    g_game->shade = 100;
+    InitDebrisPieces();
 }
 
 // FUNCTION: 0x420920

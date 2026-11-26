@@ -166,7 +166,7 @@ MEMORY`), and the spots by the raw fields of `FeatureAnimEntry` that overlay the
 
 Two rows are `deferrable`: orders reads a wreck's rotation when it resurrects it, and weapons reads a spot's position
 in the projectiles phase. Neither needs the write at once. The rows where features read a unit's or an order's
-position in the units phase (`Unit::pos`, `Unit::field_64`, `Order::pos`) are gone: the events carry the position
+position in the units phase (`Unit::pos`, `Unit::bank`, `Order::pos`) are gone: the events carry the position
 by value.
 
 ## 5. State and the trace

@@ -154,10 +154,22 @@ def check_form(text: str, subsystem: str = "wind_meteors") -> list[str]:
     if lines[-1] != "":
         problems.append("the file does not end with a newline")
     inside = False
+    loading = False
+    caching = False
     for n, line in enumerate(lines[2:-1], 3):
         if line.startswith("call "):
             inside = True
-        elif not (inside and len(line) > 4 and line.startswith("  ") and line[2] in "rabciow" and line[3] == " "):
+        elif not inside and line.startswith("load "):
+            loading = True
+            caching = False
+        elif not inside and loading and (line.startswith("  x ") or line.startswith("  bind ")):
+            pass
+        elif not inside and line.startswith("cache "):
+            loading = False
+            caching = True
+        elif not inside and caching and line.startswith("  block "):
+            pass
+        elif not (inside and len(line) > 4 and line.startswith("  ") and line[2] in "rabciowd" and line[3] == " "):
             problems.append(f"line {n} is neither a call nor a line of one: {line!r}")
     return problems
 

@@ -12,6 +12,7 @@ struct Unit;
 struct Vec3;
 
 void __stdcall InitExplosions();
+void InitDebrisPieces();
 DebrisPiece* __stdcall AllocExplodePieceObject();
 void __stdcall FreeExplosions(void);
 Explosion* __stdcall BuildCalcedExplosion(int n, int from, int to);

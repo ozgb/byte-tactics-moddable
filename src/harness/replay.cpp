@@ -40,6 +40,8 @@ struct Recording {
     ReplayText out;
     ReplayKnown known;
     ReplayObjectTable table;
+    ReplayCacheStart cache;
+    ReplayCacheStart callCache;
 };
 
 struct ReplayRoots {
@@ -545,6 +547,11 @@ void SlotEnter(unsigned slot, unsigned sub, const ReplayRoots& roots, int kind)
     s_recording = !r.windowed || RecordsAlways(slot) || (s_tick >= 0 && (unsigned)s_tick >= r.first && (unsigned)s_tick <= r.last);
     if (!s_recording)
         return;
+    if (strcmp(kReplaySubsystems[sub].name, "weapons") == 0) {
+        ReplayCaptureDebrisCache(r.callCache);
+        if (!r.cache.taken)
+            r.cache = r.callCache;
+    }
     ReplayHandles().Reset();
     s_snapshots.Reset();
     s_nested.Clear();
@@ -576,6 +583,11 @@ void SlotLeave()
     const ReplaySlotSets& sets = SetsOfKind(s_slot, s_kind);
     CaptureSet(sets.writes, sets.writeCount, 'w');
     CaptureObjectSet(sets, false);
+    if (strcmp(kReplaySubsystems[s_sub].name, "weapons") == 0) {
+        ReplayCacheStart after;
+        ReplayCaptureDebrisCache(after);
+        ReplayAddCacheChanges(r.callCache, after, s_call);
+    }
     r.out.Add("call ");
     if (s_tick >= 0)
         r.out.AddInt(s_tick);
@@ -807,6 +819,34 @@ void ArgWeapon(ReplayText& t, const char* name, const void* p)
     t.AddChar(' ');
     ReplayAddWeapon(t, p);
     t.AddChar('\n');
+}
+
+void ArgLoad(ReplayText& t, const char* name, unsigned load, const void* p)
+{
+    t.Add("  a ");
+    t.Add(name);
+    t.AddChar(' ');
+    ReplayAddLoadName(t, Table(), load, p);
+    t.AddChar('\n');
+}
+
+void ArgLoadResult(ReplayText& t, unsigned load, const void* p)
+{
+    t.Add("  o result ");
+    ReplayAddLoadName(t, Table(), load, p);
+    t.AddChar('\n');
+}
+
+void ImportLoad(ReplayText& t, unsigned load, const void* p)
+{
+    t.AddChar(' ');
+    ReplayAddLoadName(t, Table(), load, p);
+}
+
+void ImportResultLoad(ReplayText& t, unsigned load, const void* p)
+{
+    t.Add(" = ");
+    ReplayAddLoadName(t, Table(), load, p);
 }
 
 void ArgVec3(ReplayText& t, const char* name, const Vec3* v)
@@ -1312,6 +1352,13 @@ void AddResult(ReplayText& t, const ReplayArg& r)
 
 #include "replay_services.inc"
 
+static void RecordLoad(unsigned load, const char* name, const void* data)
+{
+    int size = g_seams.files->LengthByName(name);
+    if (size > 0)
+        ReplayLoadNote(load, name, data, (unsigned)size);
+}
+
 void ReplayImportBegin(ReplayImport&)
 {
     ImportBefore(nullptr);
@@ -1343,6 +1390,7 @@ int ReplayConfigure(const char* value, char* error, int size)
         return 0;
     }
     ReplayEndHook() = ReplayImportEnd;
+    ReplayLoadHook() = RecordLoad;
     ReplayBeginHook() = ReplayImportBegin;
     s_rec[sub] = new Recording();
     s_rec[sub]->windowed = fields == 3;
@@ -1383,7 +1431,12 @@ int ReplayWrite(char* error, int size)
         char head[160];
         sprintf(head, "bt-replay %d\nsubsystem %s %d.%d%s\n", REPLAY_FORMAT, kReplaySubsystems[i].name, (int)kReplaySubsystems[i].major,
                 (int)kReplaySubsystems[i].minor, kReplaySubsystems[i].complete ? "" : " incomplete");
-        bool written = fputs(head, file) >= 0 && fwrite(s_rec[i]->out.Data(), 1, s_rec[i]->out.Size(), file) == s_rec[i]->out.Size();
+        ReplayText loads;
+        ReplayAddLoadLines(s_rec[i]->table, loads);
+        ReplayAddCacheLines(s_rec[i]->cache, loads);
+        bool written = fputs(head, file) >= 0 && fwrite(loads.Data(), 1, loads.Size(), file) == loads.Size()
+            && fwrite(s_rec[i]->out.Data(), 1, s_rec[i]->out.Size(), file) == s_rec[i]->out.Size();
+        loads.Free();
         if (fclose(file) != 0 || !written)
             ok = 0;
     }

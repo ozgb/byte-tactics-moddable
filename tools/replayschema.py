@@ -75,10 +75,10 @@ FIELD_KINDS = {"i32": "I32", "u32": "U32", "u16": "U16", "i16": "I16", "f32": "F
                "weapon": "WEAPON", "ref": "REF", "flags": "FLAGS", "u8": "U8", "f64": "F64", "bytes": "BYTES", "embed": "EMBED",
                "unitid": "UNITID", "array": "ARRAY", "code": "CODE", "vector": "VECTOR", "ptr": "PTR", "refs": "REFS", "embeds": "EMBEDS",
                "self": "SELF", "selfindex": "SELFINDEX", "cbref": "CBREF", "cbptr": "CBPTR", "cstring": "CSTRING", "cstringref": "CSTRINGREF",
-               "cstrings": "CSTRINGS", "blob": "BLOB"}
+               "cstrings": "CSTRINGS", "blob": "BLOB", "load": "LOAD"}
 STRING_ELEMS = {"cstring": (1, "char*"), "cstring_ref": (2, "Ref<char>")}
 INTEGER_ARGS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char"}
-FACTOR = re.compile(r"^\(?\s*(\w+(?:\.\w+)*)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
+FACTOR = re.compile(r"^\(?\s*(\w+(?:\.\w+)*(?:->\w+)?)\s*(?:\+\s*(0[xX][0-9a-fA-F]+|\d+))?\s*\)?\s*(?:>>\s*(\d+))?\s*\)?$")
 SCALARS = {"int", "unsigned", "unsigned int", "long", "unsigned long", "short", "unsigned short", "char", "unsigned char",
            "bool", "float", "double", "Point16", "Vec3", "RandStream", "EconUnit", "EconType", "PathUnit", "PathClass", "PathHandle"}
 VALUE_POINTER_TYPES = {"Point16", "Vec3", "Angles16", "EconMapInfo", "PlayersMapInfo", "LosRadarMapInfo", "PathMapInfo", "EconomySpend"}
@@ -117,6 +117,8 @@ def merge_fixtures(ann: dict, fixtures: dict) -> dict:
     merged["fixture_sim"] = list(fixtures.get("sim_fields", {}))
     merged["objects"].update(copy.deepcopy(fixtures.get("objects", {})))
     merged["fixtures"] = copy.deepcopy(fixtures.get("fixtures", {}))
+    merged["fixture_loads"] = list(fixtures.get("loads", {}))
+    merged["loads"] = {**merged.get("loads", {}), **copy.deepcopy(fixtures.get("loads", {}))}
     for kind, sites in fixtures.get("inside", {}).items():
         have = merged["objects"][kind].setdefault("inside", [])
         have += [x for x in sites if x not in have]
@@ -349,7 +351,7 @@ def parse_addend(text: str | None) -> int:
     return int(text, 16) if text.lower().startswith("0x") else int(text)
 
 
-def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
+def parse_length(expr, where: str, errors: list[str], via_ok: bool = False) -> list[dict]:
     """The two factors of a length expression: an integer, or `member`, `member>>k`, `member+a` or `member+a>>k` (the addend before the shift), once or twice, joined by `*`."""
     parts = [str(expr)] if isinstance(expr, int) else [p.strip() for p in str(expr).split("*")]
     if not 1 <= len(parts) <= 2:
@@ -361,7 +363,11 @@ def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
         if p.isdigit():
             out.append({"const": int(p)})
         elif m:
-            out.append({"member": m.group(1), "shift": int(m.group(3) or 0), **({"add": parse_addend(m.group(2))} if m.group(2) else {})})
+            member, _, via = m.group(1).partition("->")
+            if via and not via_ok:
+                errors.append("%s: the factor `%s` follows a pointer, which only the length of an array of an object may do" % (where, p))
+                via = ""
+            out.append({"member": member, "shift": int(m.group(3) or 0), **({"via": via} if via else {}), **({"add": parse_addend(m.group(2))} if m.group(2) else {})})
         else:
             errors.append("%s: the factor `%s` of the length is no integer, member, member>>k, member+a or member+a>>k" % (where, p))
             out.append({"const": 1})
@@ -370,9 +376,26 @@ def parse_length(expr, where: str, errors: list[str]) -> list[dict]:
     return out
 
 
+def resolve_vias(length: list[dict], spec: dict, ann: dict, where: str, errors: list[str]) -> None:
+    """Gives each factor that follows a load field (`table->pieceCount`) the type of the data the field points to."""
+    for f in length:
+        if "via" not in f:
+            continue
+        field = next((x for x in spec["fields"] if x["name"] == f["member"] and x["kind"] == "load"), None)
+        load = ann.get("loads", {}).get(field["load"]) if field else None
+        if load is None:
+            errors.append("%s: the length follows `%s`, which is no field of kind load of the kind" % (where, f["member"]))
+            f["via_type"] = "int"
+        else:
+            f["via_type"] = load["type"]
+
+
 def render_factor(f: dict, owner: str) -> str:
     if "const" in f:
         return "{ %d, 0, 0 }" % f["const"]
+    if "via" in f:
+        return "{ offsetof(%s, %s), (unsigned char)sizeof(((%s*)nullptr)->%s), %d, %du, 1, offsetof(%s, %s) }" % (
+            f["via_type"], f["via"], f["via_type"], f["via"], f["shift"], f.get("add", 0), owner, f["member"])
     add = ", %du" % f["add"] if f.get("add") else ""
     return "{ offsetof(%s, %s), (unsigned char)sizeof(((%s*)nullptr)->%s), %d%s }" % (owner, f["member"], owner, f["member"], f["shift"], add)
 
@@ -382,8 +405,16 @@ def render_length(length: list[dict], owner: str) -> str:
 
 
 def factor_asserts(length: list[dict], owner: str, where: str) -> list[str]:
-    return ['static_assert(sizeof(((%s*)nullptr)->%s) == 1 || sizeof(((%s*)nullptr)->%s) == 2 || sizeof(((%s*)nullptr)->%s) == 4, "%s: %s is a byte, a short or an int");'
-            % (owner, f["member"], owner, f["member"], owner, f["member"], where, f["member"]) for f in length if "member" in f]
+    out = []
+    for f in length:
+        if "member" not in f:
+            continue
+        o, m = (f["via_type"], f["via"]) if "via" in f else (owner, f["member"])
+        out.append('static_assert(sizeof(((%s*)nullptr)->%s) == 1 || sizeof(((%s*)nullptr)->%s) == 2 || sizeof(((%s*)nullptr)->%s) == 4, "%s: %s is a byte, a short or an int");'
+                   % (o, m, o, m, o, m, where, m))
+        if "via" in f:
+            out.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s: %s is a pointer");' % (owner, f["member"], where, f["member"]))
+    return out
 
 
 def check_array(where: str, spec: dict, owner: str, errors: list[str], object_field: bool = False) -> dict:
@@ -402,7 +433,7 @@ def check_array(where: str, spec: dict, owner: str, errors: list[str], object_fi
     if "raw" in spec and (not strings or spec["raw"] is not True or spec.get("ref")):
         errors.append("%s: `raw` is true on an array of strings that has no `ref`, and says the field is a plain pointer to the elements" % where)
     return {"elem": 4 if strings else SIZES[elem], "ref": bool(spec.get("ref", False)), "raw": raw, "strings": strings,
-            "length": parse_length(spec.get("length", 0), where, errors), "owner": owner}
+            "length": parse_length(spec.get("length", 0), where, errors, object_field), "owner": owner}
 
 
 VECTOR_SCALARS = {"char": 1, "unsigned char": 1, "short": 2, "unsigned short": 2, "int": 4, "unsigned": 4, "unsigned int": 4, "long": 4,
@@ -658,7 +689,14 @@ def check_elements(ann: dict) -> list[str]:
             target = kinds.get(f.get("target"))
             if spec["scope"] != "state":
                 errors.append("%s: only the fields of a state kind are arrays of refs or embeds" % where)
-            if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+            if f["kind"] == "embeds" and isinstance(count, str):
+                capacity = f.get("capacity")
+                if isinstance(capacity, bool) or not isinstance(capacity, int) or capacity < 1:
+                    errors.append("%s: an array of embeds with a counted length has a `capacity`, a positive integer: the room the replayer allocates" % where)
+                parse_length(count, where, errors)
+            elif "capacity" in f:
+                errors.append("%s: only an array of embeds whose `count` is a length expression has a `capacity`" % where)
+            elif isinstance(count, bool) or not isinstance(count, int) or count < 1:
                 errors.append("%s: `count` is a positive integer" % where)
             if target is None or target["scope"] != "state":
                 errors.append("%s: the target %s is no state kind of the schema" % (where, f.get("target")))
@@ -672,6 +710,89 @@ def check_elements(ann: dict) -> list[str]:
             if "poly" in f:
                 errors.append("%s: an array of embeds names one kind, and has no `poly`" % where)
     return errors
+
+
+def check_load_fields(ann: dict) -> list[str]:
+    """Errors for the fields of kind `load`, which hold a pointer to load-time data: `load` names a load kind, and the kind is a state or value kind."""
+    errors = []
+    loads = ann.get("loads", {})
+    for name, spec in ann["objects"].items():
+        for f in spec["fields"]:
+            where = "%s.%s" % (name, f["name"])
+            if f["kind"] != "load":
+                if "load" in f:
+                    errors.append("%s: only a field of kind load has a `load`" % where)
+                continue
+            if f.get("load") not in loads:
+                errors.append("%s: the `load` %s is no entry of `loads`" % (where, f.get("load")))
+            if spec["scope"] not in ("state", "value"):
+                errors.append("%s: only the fields of a state or value kind are load pointers" % where)
+            extra = set(f) - {"name", "kind", "load", "member", "aliases"}
+            if extra:
+                errors.append("%s: a load field is {\"name\", \"kind\", \"load\"} with an optional \"member\" and \"aliases\", and has no %s" % (where, ", ".join(sorted(extra))))
+    return errors
+
+
+LOAD_KEYS = {"type", "loader", "holders"}
+IDENTIFIER = re.compile(r"^[A-Za-z_]\w*$")
+
+
+@functools.lru_cache(maxsize=None)
+def game_functions() -> frozenset[str]:
+    """The names of the functions of data/game_logic.csv, the ones a loader of `loads` may name."""
+    with (ROOT / "data/game_logic.csv").open(newline="") as f:
+        return frozenset(r["function"] for r in csv.DictReader(f))
+
+
+def check_loads(ann: dict, known_functions) -> tuple[list[dict], list[str]]:
+    """The load kinds of `loads` (load-time data a recording carries as the inputs of its load) as a table, and the errors for it.
+
+    A load kind names the type of the data, the functions that load it and its holders: each is a table kind whose element N holds the pointer, either in a
+    `member` of the element or in element N of the array that the `game` member of Game leads to."""
+    errors: list[str] = []
+    out: list[dict] = []
+    loads = ann.get("loads", {})
+    kinds = ann["objects"]
+    if not isinstance(loads, dict):
+        return out, ["`loads` maps the name of a load kind to its type, loader and holders"]
+    layout = {l["name"]: l for l in traceschema.Schema().layout("Game")[0]}
+    for name, spec in loads.items():
+        where = "load %s" % name
+        if not re.match(r"^[a-z][a-z0-9_]*$", name):
+            errors.append("%s: the name of a load kind is lower case letters, digits and underscores" % where)
+        if not isinstance(spec, dict) or set(spec) != LOAD_KEYS:
+            errors.append("%s: a load kind is {\"type\", \"loader\", \"holders\"}" % where)
+            continue
+        if not isinstance(spec["type"], str) or not IDENTIFIER.match(spec["type"]):
+            errors.append("%s: the `type` is the name of the type of the data" % where)
+        loader = spec["loader"]
+        if not isinstance(loader, list) or not loader or not all(isinstance(f, str) for f in loader):
+            errors.append("%s: `loader` is the list of the functions that load the data" % where)
+        else:
+            errors += ["%s: the loader %s is no function" % (where, f) for f in loader if f not in known_functions]
+        holders = spec["holders"]
+        entry = {"name": name, "type": spec["type"], "holders": []}
+        if not isinstance(holders, list) or not holders:
+            errors.append("%s: `holders` lists at least one holder of the data" % where)
+            holders = []
+        for h in holders:
+            if not isinstance(h, dict) or set(h) not in ({"kind", "member"}, {"kind", "game"}):
+                errors.append("%s: a holder is {\"kind\", \"member\"} or {\"kind\", \"game\"}" % where)
+                continue
+            holder = kinds.get(h["kind"])
+            if holder is None or holder["scope"] != "state" or not is_global_table(holder):
+                errors.append("%s: the holder kind %s is no state kind with a table in Game or SimGlobals" % (where, h["kind"]))
+                continue
+            how = "member" if "member" in h else "game"
+            if not isinstance(h[how], str) or not IDENTIFIER.match(h[how]):
+                errors.append("%s: the %s of a holder is a name" % (where, how))
+                continue
+            if how == "game" and (layout.get(h["game"]) is None or layout[h["game"]]["size"] != 4):
+                errors.append("%s: the holder's `game` %s is no Ref member of Game" % (where, h["game"]))
+                continue
+            entry["holders"].append({"kind": h["kind"], "how": how, "member": h[how], "offset": layout[h["game"]]["offset"] if how == "game" else 0, "type": holder["type"]})
+        out.append(entry)
+    return out, errors
 
 
 MEMBER_PATH = re.compile(r"^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$")
@@ -812,7 +933,7 @@ def check_inside(ann: dict) -> tuple[dict, list[str]]:
                 errors.append("%s: the site %s.%s is no %s field of %s that leads to %s" % (where, key[0], key[1], "embeds" if array else "embed", key[0], name))
                 continue
             sites.setdefault(name, []).append({"kind": name, "container": site["kind"], "member": member, "offset": member.replace("[]", "[0]"),
-                                               "array": member[:member.index("[]")] if array else None, "count": leads[0]["count"] if array else 1, "ref": False})
+                                               "array": member[:member.index("[]")] if array else None, "count": leads[0].get("capacity", 1) if array and isinstance(leads[0]["count"], str) else leads[0]["count"] if array else 1, "ref": False})
     return sites, errors
 
 
@@ -1181,6 +1302,12 @@ def functions_of(slot: dict, subsystem: str, assignment: dict[str, list[str]], n
     return []
 
 
+def object_types(ann: dict) -> set[str]:
+    """The types a pointer argument or result names an object of: a state kind's, but not a delta table's whose type is also a value kind (DebrisVertex is a table of Vec3, which arguments pass by value)."""
+    values = {s["type"] for s in ann["objects"].values() if s["scope"] == "value"}
+    return {s["type"] for s in ann["objects"].values() if s["scope"] == "state" and not (s.get("delta") and s["type"] in values)}
+
+
 def classify_arg(param: dict, note: dict | None, ann: dict) -> dict:
     """How one parameter is recorded: mode and its details, or mode 'pending'."""
     ctype = normalise(param["type"])
@@ -1194,7 +1321,7 @@ def classify_arg(param: dict, note: dict | None, ann: dict) -> dict:
         out["mode"] = "text"
     elif ctype == "HapiBank*":
         out.update({"mode": "handle", "kind": "bank"})
-    elif ctype.endswith("*") and ctype[:-1] in {s["type"] for s in ann["objects"].values() if s["scope"] == "state"}:
+    elif ctype.endswith("*") and ctype[:-1] in object_types(ann):
         kind = [k for k, s in ann["objects"].items() if s["type"] == ctype[:-1]][0]
         out.update({"mode": "object", "kind": kind})
         if "kinds" in ann["objects"][kind]:
@@ -1219,7 +1346,7 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
         return out
     if ctype in SCALARS:
         out["mode"] = "scalar"
-    elif ctype.endswith("*") and ctype[:-1] in {s["type"] for s in ann["objects"].values() if s["scope"] == "state"}:
+    elif ctype.endswith("*") and ctype[:-1] in object_types(ann):
         kind = [k for k, s in ann["objects"].items() if s["type"] == ctype[:-1]][0]
         out.update({"mode": "object", "kind": kind})
         if "kinds" in ann["objects"][kind]:
@@ -1231,7 +1358,7 @@ def classify_result(ret: str, note: dict | None, ann: dict) -> dict | None:
     return out
 
 
-ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "event", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "region", "world", "effect", "scratch", "pending"}
+ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "event", "value", "argv", "bytes-in", "bytes-out", "weapon", "vec3", "units", "units-buffer", "vector", "callback", "region", "world", "effect", "load", "scratch", "pending"}
 STATE_PATH = re.compile(r"^Game(\.[A-Za-z_]\w*)+$")
 
 
@@ -1262,7 +1389,7 @@ def length_parts(a: dict, i: int) -> tuple[list[str], str]:
     last = len(steps) - 1
     lines.append("int len%d = l%d_%d != nullptr ? (int)l%d_%d->%s : 0;" % (i, i, last, i, last, steps[-1]))
     return lines, "len%d" % i if scale == 1 else "(len%d * %d)" % (i, scale)
-RESULT_MODES = {"scalar", "object", "text", "weapon", "value", "region", "pending"}
+RESULT_MODES = {"scalar", "object", "text", "weapon", "value", "region", "load", "pending"}
 
 
 CAST_MODES = {"object", "struct", "structs", "vec3"}
@@ -1396,6 +1523,18 @@ def check_event_extras(where: str, label: str, a: dict, table: dict, kinds: dict
     return errors
 
 
+def check_load_arg(where: str, label: str, a: dict, ann: dict) -> list[str]:
+    """Errors for an argument or result of mode load, a pointer to load-time data: `load` names a load kind, and the C type is a pointer."""
+    errors = []
+    if a.get("load") not in ann.get("loads", {}):
+        errors.append("%s: %s names the load %s, which is no entry of `loads`" % (where, label, a.get("load")))
+    if not arg_type(a).endswith("*"):
+        errors.append("%s: %s is %s, and a load is a pointer" % (where, label, arg_type(a)))
+    if "cast" in a:
+        errors.append("%s: %s is a load, which takes no `cast`" % (where, label))
+    return errors
+
+
 def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) -> list[str]:
     """Errors for the struct forms of a slot: the kind must be a value kind of the argument's type, a count must name an integer argument."""
     errors = []
@@ -1511,6 +1650,8 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
             if a.get("dir") == "out" and result is not None and not a.get("named"):
                 errors.append("%s: %s is a value out, which is the result of the slot, and the slot has a result" % (where, label))
             value_kind(a, label, bool(a.get("byPointer")) or a.get("dir") == "out")
+        elif a["mode"] == "load":
+            errors += check_load_arg(where, label, a, ann)
         elif a["mode"] == "callback":
             entry = ann.get("callbacks", {}).get(a.get("callback"))
             if entry is None:
@@ -1526,6 +1667,11 @@ def check_forms(where: str, args: list[dict], result: dict | None, ann: dict) ->
             errors.append("%s: the result has the unknown mode %s" % (where, result["mode"]))
         elif result["mode"] == "value":
             value_kind(result, "the result", False)
+        elif result["mode"] == "load":
+            errors += check_load_arg(where, "the result", result, ann)
+    for a in args + ([result] if result is not None else []):
+        if "load" in a and a["mode"] != "load":
+            errors.append("%s: %s has the mode %s and a `load` key, which only the mode load takes" % (where, "the result" if a is result else "the argument %s" % a["name"], a["mode"]))
     return errors
 
 
@@ -1705,11 +1851,14 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     errors.append("%s: only the fields of a state kind can be arrays" % where)
                 array = check_array(where, f, spec["type"], errors, True)
                 array["member"] = f.get("member", f["name"])
+                resolve_vias(array["length"], spec, ann, where, errors)
                 arrays.append(array)
                 entry["array"] = len(arrays)
             if f["kind"] in ("refs", "embeds"):
-                elems.append({"kind": f["kind"], "count": f["count"] if isinstance(f.get("count"), int) and f["count"] > 0 else 1, "owner": spec["type"],
-                              "member": embeds_member(f) if f["kind"] == "embeds" else f.get("member", f["name"])})
+                counted = f["kind"] == "embeds" and isinstance(f.get("count"), str)
+                elems.append({"kind": f["kind"], "count": f["capacity"] if counted and isinstance(f.get("capacity"), int) else f["count"] if isinstance(f.get("count"), int) and f["count"] > 0 else 1,
+                              "owner": spec["type"], "member": embeds_member(f) if f["kind"] == "embeds" else f.get("member", f["name"]),
+                              "live": parse_length(f["count"], "%s.%s" % (kind, f["name"]), []) if counted else None})
                 entry["elems"] = len(elems)
             if f["kind"] == "self":
                 selfs.append(check_self(kind, spec, f, ann["objects"], errors))
@@ -1766,6 +1915,13 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     by_function: dict[str, list[dict]] = {}
     for r in rows:
         by_function.setdefault(r["function"], []).append(r)
+    loads, load_errors = check_loads(ann, game_functions())
+    errors += load_errors + check_load_fields(ann)
+    load_ids = {l["name"]: i for i, l in enumerate(loads)}
+    for f in object_fields:
+        if f["kind"] == "load":
+            f["loadId"] = load_ids.get(f.get("load"), 0)
+    load_types = {l["type"] for l in loads}
     used_rules = set()
     rules_of: dict[tuple[str, str], list[int]] = {}
     for i, r in enumerate(ann["rules"]):
@@ -1870,7 +2026,9 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                             if "w" in OBJECT_KINDS[kind]:
                                 obj_writes.add(i)
                         owner_type = target.split("::")[0]
-                        if not hits and owner_type in state_types and (kind, target) not in rules_of and target not in ann["exempt"]:
+                        if not hits and owner_type in load_types:
+                            pass
+                        elif not hits and owner_type in state_types and (kind, target) not in rules_of and target not in ann["exempt"]:
                             pending["untracked"].add(target)
                         elif (not hits and "::" in target and owner_type not in kind_types and owner_type not in exempt_types
                               and owner_type not in seam_types and not any(n == owner_type or n.startswith(owner_type + "_") for n in spec.get("services", []))
@@ -2038,7 +2196,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 errors.append("%s imports %s, which is no slot of the %s interface" % (sub, imp, seam))
     return {"fields": fields, "objects": objects, "object_fields": object_fields, "subsystems": subsystems, "slot_list": slot_list, "reach_table": reach_table,
             "arrays": arrays, "tables": tables, "vectors": vectors, "elems": elems, "selfs": selfs, "sites": sites, "code_tables": code_tables, "callbacks": callbacks,
-            "alloc_tags": ann.get("alloc_tags", {}),
+            "alloc_tags": ann.get("alloc_tags", {}), "loads": loads,
             "kind_types": {k: v["type"] for k, v in ann["objects"].items()}}, errors
 
 
@@ -2176,6 +2334,40 @@ def render_fixture_schema(ann: dict, model: dict) -> str:
     return re.sub(r'^#include "([^"]+)"$', lambda m: '#include "%s"' % fixture_include(m.group(1)), text, flags=re.M)
 
 
+def render_loads(ann: dict, model: dict) -> list[str]:
+    """The load kinds and their holders. The ids of the real load kinds are those of replay_services.h; a load kind only the tests have comes after them."""
+    loads = model["loads"]
+    L = []
+    fixture = [l["name"] for l in loads if l["name"] in ann.get("fixture_loads", [])]
+    if fixture:
+        first = len(loads) - len(fixture)
+        L += ["enum {"] + ["    RL_%s = %d," % (upper(n), first + i) for i, n in enumerate(fixture)] + ["};", ""]
+    L.append("static const ReplayLoadHolder kReplayLoadHolders[] = {")
+    count = 0
+    firsts = []
+    for l in loads:
+        firsts.append(count)
+        for h in l["holders"]:
+            offset = "offsetof(%s, %s)" % (h["type"], h["member"]) if h["how"] == "member" else str(h["offset"])
+            L.append("    { RL_%s, ROK_%s, %s, %s }," % (upper(l["name"]), upper(h["kind"]), "RLH_MEMBER" if h["how"] == "member" else "RLH_GAME", offset))
+            count += 1
+    if not count:
+        L.append("    { 0, 0, 0, 0 },")
+    L += ["};", "", "static const ReplayLoadKind kReplayLoads[] = {"]
+    for l, first in zip(loads, firsts):
+        L.append('    { "%s", %d, %d },' % (l["name"], first, len(l["holders"])))
+    if not loads:
+        L.append('    { "", 0, 0 },')
+    L += ["};", "static const unsigned kReplayLoadCount = %d;" % len(loads), ""]
+    for l in loads:
+        for h in l["holders"]:
+            if h["how"] == "member":
+                L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s holds the pointer of a %s load");' % (h["type"], h["member"], h["type"], h["member"], l["name"]))
+    if any(h["how"] == "member" for l in loads for h in l["holders"]):
+        L.append("")
+    return L
+
+
 def schema_body(ann: dict, model: dict, guard: str) -> str:
     fields, objects, ofields, subsystems = model["fields"], model["objects"], model["object_fields"], model["subsystems"]
     sim = ann["sim_fields"]
@@ -2186,7 +2378,7 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L += ["#pragma pack(push, 1)", '#include "%s"' % inc[6:], "#pragma pack(pop)"]
         else:
             L.append('#include "%s"' % inc)
-    L += ['#include "../state/sim_globals.h"', '#include "../state/block.h"', '#include "replay_types.h"', "",
+    L += ['#include "../state/sim_globals.h"', '#include "../state/block.h"', '#include "replay_types.h"', '#include "replay_services.h"', "",
           "#define REPLAY_FORMAT %d" % FORMAT, ""]
     arrays, tables, vectors = model["arrays"], model["tables"], model["vectors"]
     macros = list(sim)
@@ -2276,12 +2468,16 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     if not vectors:
         L.append("    { RV_OBJECT, 0, 1 },")
     L += ["};", "", "static const ReplayElemSpec kReplayElems[] = {"]
+    elem_asserts: list[str] = []
     for e in model["elems"]:
         stride = "sizeof(unsigned)" if e["kind"] == "refs" else "sizeof(((%s*)nullptr)->%s[0])" % (e["owner"], e["member"].split("[]")[0])
-        L.append("    { %d, %s }," % (e["count"], stride))
+        used = ", 1, %s" % render_length(e["live"], e["owner"]) if e["live"] else ""
+        L.append("    { %d, %s%s }," % (e["count"], stride, used))
+        if e["live"]:
+            elem_asserts += factor_asserts(e["live"], e["owner"], "%s::%s" % (e["owner"], e["member"]))
     if not model["elems"]:
         L.append("    { 1, 1 },")
-    L += ["};", "", "static const ReplaySelfSpec kReplaySelfs[] = {"]
+    L += ["};"] + elem_asserts + ["", "static const ReplaySelfSpec kReplaySelfs[] = {"]
     for x in model["selfs"]:
         stride = "sizeof(%s)" % kind_type[x["target"]] if x["index"] and x["target"] in kind_type else "0"
         L.append("    { offsetof(%s, %s), %s }," % (x["owner"], x["member"], stride))
@@ -2332,7 +2528,11 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
     for o in objects:
         first, count = poly_at.get(o["name"], (0, 0))
         inside_first, inside_count = site_at[o["name"]]
-        L.append('    { "%s", sizeof(%s), %s, %s, %d, %d, %d, %d, %d, %d },' % (o["name"], o["type"], scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True), int(bool(o.get("vptr_unset")))))
+        room = [f for f in model["object_fields"] if f["object"] == o["name"] and f["kind"] == "embeds" and isinstance(f.get("count"), str)]
+        size = "sizeof(%s)" % o["type"]
+        for f in room:
+            size = "REPLAY_MAX_SIZE(%s, offsetof(%s, %s) + %d * sizeof(((%s*)nullptr)->%s[0]))" % (size, o["type"], embeds_member(f).replace("[]", "[0]"), f.get("capacity", 1), o["type"], embeds_member(f).split("[]")[0])
+        L.append('    { "%s", %s, %s, %s, %d, %d, %d, %d, %d, %d },' % (o["name"], size, scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True), int(bool(o.get("vptr_unset")))))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned short kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
           "enum ReplayCallbackId {"]
@@ -2356,8 +2556,9 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         L.append('    { "%s", ROK_%s, %d },' % (tag, upper(spec["kind"]), spec["size"]))
     if not model["alloc_tags"]:
         L.append('    { "", 0, 0 },')
-    L += ["};", "static const unsigned kReplayAllocTagCount = %d;" % len(model["alloc_tags"]), "",
-          "static const ReplayObjectField kReplayObjectFields[] = {"]
+    L += ["};", "static const unsigned kReplayAllocTagCount = %d;" % len(model["alloc_tags"]), ""]
+    L += render_loads(ann, model)
+    L += ["static const ReplayObjectField kReplayObjectFields[] = {"]
     position = {(f["object"], f["name"]): i for i, f in enumerate(ofields)}
     range_end, range_begin = {}, {}
     for f in ofields:
@@ -2370,8 +2571,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         t = types[f["object"]]
         size = f.get("size")
         derived = f["kind"] == "vector" and f.get("base") is True
-        size_text = str(size) if size else "sizeof(%s)" % t if derived else "sizeof(void*)" if f["kind"] in ("ptr", "blob") else "sizeof(((%s*)nullptr)->%s)" % (t, member)
-        target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds", "blob") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "0")
+        size_text = str(size) if size else "sizeof(%s)" % t if derived else "sizeof(void*)" if f["kind"] in ("ptr", "blob", "load") else "sizeof(((%s*)nullptr)->%s)" % (t, member)
+        target = "RCB_%s" % upper(f["callback"]) if field_kind(f) in ("cbref", "cbptr") else kind_id[f["target"]] if f["kind"] in ("ref", "embed", "unitid", "ptr", "refs", "embeds", "blob") or (f["kind"] == "vector" and f.get("target")) else kind_id.get(f.get("target"), "0") if field_kind(f) == "selfindex" else ("ROK_WEAPONDEF" if f["kind"] == "weapon" else str(f.get("codeTable", 0)) if f["kind"] == "code" else "RL_%s" % upper(f["load"]) if f["kind"] == "load" else "0")
         if f.get("weaponIndex"):
             target = "ROK_WEAPONDEF"
         extra = ", %d" % (f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec")) if f.get("array") or f.get("vector") or f.get("elems") or f.get("selfspec") else ""
@@ -2404,7 +2605,10 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         if f["kind"] == "embeds":
             mem = embeds_member(f)
             array = mem.split("[]")[0]
-            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %s * sizeof(((%s*)nullptr)->%s[0]), "%s::%s holds %s elements");' % (t, array, f["count"], t, array, t, f["name"], f["count"]))
+            if isinstance(f["count"], int):
+                L.append('static_assert(sizeof(((%s*)nullptr)->%s) == %s * sizeof(((%s*)nullptr)->%s[0]), "%s::%s holds %s elements");' % (t, array, f["count"], t, array, t, f["name"], f["count"]))
+            else:
+                L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s holds one element of its kind and room for the rest after it");' % (t, array, types[f["target"]], t, f["name"]))
             L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(%s), "%s::%s has the size of its kind");' % (t, mem.replace("[]", "[0]"), types[f["target"]], t, f["name"]))
             continue
         if f["kind"] == "embed":
@@ -2419,8 +2623,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
             L.append('static_assert(sizeof(%s) == 16, "%s::%s is a block vector");' % (access, t, f["name"]))
             L.append('static_assert(__is_same(%s::value_type, %s), "%s::%s holds %s");' % (access, v["ctype"], t, f["name"], v["ctype"]))
         elif f["kind"] == "code":
-            L.append('static_assert(sizeof(((%s*)nullptr)->%s) == sizeof(void*), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
-        elif f["kind"] == "ptr":
+            L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s is a code pointer");' % (t, member, t, f["name"]))
+        elif f["kind"] in ("ptr", "load"):
             L.append('static_assert(__is_pointer(decltype(((%s*)nullptr)->%s)), "%s::%s is a raw pointer");' % (t, member, t, f["name"]))
         elif f["kind"] == "cstring":
             at = "decltype(((%s*)nullptr)->%s)" % (t, member)
@@ -2804,7 +3008,7 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
         L += ["        " + x for x in arg_out(a, i, "o", objects)]
         if a["mode"] == "units-buffer" and own is not None and not unrecorded:
             L.append('        ArgOutUnitBuffer(s_tail, "%s.%s", "%s", a%d, result, a%d);' % (sub, slot, a["line"], i, own[1]))
-    if res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon", "load"):
         L += ["        " + x for x in result_out(res, objects, "o")]
     L.append("    }")
     if ret != "void":
@@ -2918,6 +3122,11 @@ def arg_out(a: dict, i: int, phase: str, objects: dict) -> list[str]:
             return ['ArgWeapon(s_call, "%s", %s);' % (line, var)]
         if phase == "i":
             return ["ImportWeapon(line, %s);" % var]
+    elif mode == "load":
+        if phase == "a":
+            return ['ArgLoad(s_call, "%s", RL_%s, %s);' % (line, upper(a["load"]), var)]
+        if phase == "i":
+            return ["ImportLoad(line, RL_%s, %s);" % (upper(a["load"]), var)]
     elif mode == "vec3":
         if a.get("dir") == "out":
             return []
@@ -2975,6 +3184,8 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
         if mode == "weapon":
             reach = "".join(', "%s"' % f for f in res.get("reach", []))
             return ["ArgWeaponResult(s_tail, result, %d%s);" % (len(res.get("reach", [])), reach)]
+        if mode == "load":
+            return ["ArgLoadResult(s_tail, RL_%s, result);" % upper(res["load"])]
         return []
     lines = []
     if mode == "scalar":
@@ -2991,6 +3202,8 @@ def result_out(res: dict, objects: dict, phase: str) -> list[str]:
     elif mode == "weapon":
         reach = ", ".join('"%s"' % f for f in res.get("reach", []))
         lines.append("ImportResultWeapon(line, result, %d%s);" % (len(res.get("reach", [])), (", " + reach) if reach else ""))
+    elif mode == "load":
+        lines.append("ImportResultLoad(line, RL_%s, result);" % upper(res["load"]))
     else:
         lines.append("ImportResultPending(line);")
     return lines
@@ -3041,7 +3254,7 @@ def render_slots(ann: dict, model: dict) -> str:
     for sub, spec in ready.items():
         for slot, s in spec["slots"].items():
             res = s["result"]
-            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or a["mode"] == "bytes-out" or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon")):
+            if any(a["mode"] == "struct" and a.get("dir", "in") in ("out", "inout") or a["mode"] == "bytes-out" or is_scalar_inout(a) or is_value_out(a) for a in s["args"]) or (res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon", "load")):
                 L.append('    if (strcmp(subsystem, "%s") == 0 && strcmp(slot, "%s") == 0)' % (sub, slot))
                 L.append("        After_%s_%s();" % (sub, slot))
     L += ["}", ""]
@@ -3148,6 +3361,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
             L.append("    Space(t);\n    AddObject(t, %s, %s);" % (handle_id(a["kind"]), v))
         elif m == "weapon":
             L.append("    Space(t);\n    ReplayAddWeapon(t, %s);" % v)
+        elif m == "load":
+            L.append("    Space(t);\n    ReplayAddLoadName(t, g_objects, RL_%s, %s, false);" % (upper(a["load"]), v))
         elif m == "vec3" and a.get("dir") == "out":
             pass
         elif is_vec3_out(a) or is_struct_out_import(a):
@@ -3215,6 +3430,8 @@ def import_stub(seam: str, slot: str, s: dict) -> list[str]:
         for f in res.get("reach", []):
             L.append('    ApplyReach(o, ROK_%s, ".%s");' % (upper(res["kind"]), f))
         L.append("    return o;")
+    elif res["mode"] == "load":
+        L.append("    return (%s)ParseLoadResult(RL_%s, r);" % (s["ret"], upper(res["load"])))
     elif res["mode"] == "weapon":
         L.append("    %s w = (%s)ReplayParseWeapon(r);" % (s["ret"], s["ret"]))
         for f in res.get("reach", []):
@@ -3357,6 +3574,9 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
         elif m == "weapon":
             L.append('    WeaponDef* %s = (WeaponDef*)ArgWeapon("%s");' % (v, line))
             call.append(v)
+        elif m == "load":
+            L.append('    %s %s = (%s)ArgLoad("%s", RL_%s);' % (t, v, t, line, upper(a["load"])))
+            call.append(v)
         elif m == "argv":
             L.append("    ArgvHolder %s;\n    ParseArgv(%s);" % (v, v))
             call.append("&%s.args" % v)
@@ -3375,7 +3595,7 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             L.append("    ArgPending();")
             call.append("0")
     res = s["result"]
-    if res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon"):
+    if res is not None and res["mode"] in ("scalar", "object", "value", "region", "text", "weapon", "load"):
         closing.append("result")
     L.append("    SetClosing(%s);" % (", ".join('"%s"' % c for c in closing) if closing else "nullptr"))
     expr = "%s(%s)" % (target or "g_seams.%s->%s" % (sub, slot), ", ".join(call))
@@ -3395,6 +3615,8 @@ def runner(sub: str, slot: str, s: dict, target: str | None = None) -> list[str]
             after.append("    CompareResult((const char*)%s);" % g)
         elif res["mode"] == "weapon":
             after.append("    CompareWeaponResult(%s);" % g)
+        elif res["mode"] == "load":
+            after.append("    CompareLoadResult(RL_%s, %s);" % (upper(res["load"]), g))
         elif res["mode"] == "value":
             after.append("    CompareValueResult(ROK_%s, &%s);" % (upper(res["kind"]), g))
         elif res["mode"] == "region":
@@ -3518,12 +3740,14 @@ def check_service_snapshots(services: list[dict]) -> list[str]:
     return errors
 
 
-def render_service_ids(services: list[dict]) -> str:
+def render_service_ids(services: list[dict], loads: dict | None = None) -> str:
     L = [GENERATED, "#ifndef HARNESS_REPLAY_SERVICES_H", "#define HARNESS_REPLAY_SERVICES_H", "", "enum ReplayImportId {"]
     L += ["    %s," % s["id"] for s in services]
     L += ["    RI_COUNT", "};", "", "static const char* const kReplayImportNames[RI_COUNT] = {"]
     L += ['    "services.%s",' % s["name"] for s in services]
-    L += ["};", "", "#endif", ""]
+    L += ["};", "", "enum ReplayLoadId {"]
+    L += ["    RL_%s," % upper(n) for n in (loads or {})]
+    L += ["    RL_COUNT", "};", "", "#endif", ""]
     return "\n".join(L)
 
 
@@ -4122,12 +4346,12 @@ def shape_slots(ann: dict) -> tuple[list[dict], list[str]]:
     return out, errors
 
 
-RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback", "weapon", "bytes-out", "scratch", "units-buffer"}
+RUNNER_ARG_MODES = {"scalar", "stream", "text", "handle", "object", "struct", "structs", "value", "argv", "callback", "weapon", "load", "bytes-out", "scratch", "units-buffer"}
 
 
 def runnable(s: dict) -> bool:
     """The replayer's runner can pass every argument of the slot and compare its result."""
-    return all(a["mode"] in RUNNER_ARG_MODES and not is_scalar_out(a) and not (a["mode"] == "bytes-out" and STATE_PATH.match(str(a["length"]))) for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value", "text", "weapon"))
+    return all(a["mode"] in RUNNER_ARG_MODES and not is_scalar_out(a) and not (a["mode"] == "bytes-out" and STATE_PATH.match(str(a["length"]))) for a in s["args"]) and (s["result"] is None or s["result"]["mode"] in ("scalar", "object", "value", "text", "weapon", "load"))
 
 
 def native_name(slot: str) -> str:
@@ -4191,7 +4415,7 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         FIXTURE_VTABLES_CPP: render_vtables(fixture_model, True),
         HOOKS_H: render_hooks(ann, model),
         SLOTS_H: render_slots(ann, model),
-        SERVICES_H: render_service_ids(services),
+        SERVICES_H: render_service_ids(services, ann.get("loads", {})),
         SERVICES_INC: render_service_end(services),
         SERVICES_SLOTS: render_service_answers(services, linked_services(services)),
         VTABLES_CPP: render_vtables(model),

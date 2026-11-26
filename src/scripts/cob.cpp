@@ -30,6 +30,10 @@ struct SavedScript {
 int __stdcall GetCobChecksum(void* param);
 #include "../util/math.h"
 
+#ifndef BT_REPLAY_INJECT_TURN_SCALE
+#define BT_REPLAY_INJECT_TURN_SCALE 1
+#endif
+
 // FUNCTION: 0x4b0610
 CobScript::CobScript()
 {
@@ -93,7 +97,7 @@ void CobScript::SetCob(ScriptTable* data)
 {
     table = data;
     if (data != 0) {
-        unknown_c = GetCobChecksum(data);
+        checksum = GetCobChecksum(data);
         pieces = (Piece*)SimRealloc(pieces, data->pieceCount * 0x4c);
         statics = (int*)SimRealloc(statics, data->staticCount * 4);
         memset(pieces, 0, data->pieceCount * 0x4c);
@@ -830,7 +834,7 @@ void CobScript::AnimatePieces(int elapsed)
                 if (pieces[i].e[3][j] != 0) {
                     int r = GetPieceRotation(i, j);
                     int cur = r;
-                    int step = elapsed * pieces[i].e[3][j];
+                    int step = elapsed * pieces[i].e[3][j] * BT_REPLAY_INJECT_TURN_SCALE;
                     r += step;
                     int want = pieces[i].e[2][j];
                     if (want != -1) {
@@ -897,7 +901,7 @@ void CobScript::SaveScriptState(HapiBank* file)
     file->SeekBox(0);
 
     SavedScript big;
-    big.checksum = unknown_c;
+    big.checksum = checksum;
     for (int n = 0; n < 8; n++) {
         big.channels[n] = channels[n];
         big.channels[n].callback = 0;
@@ -953,7 +957,7 @@ int CobScript::LoadScriptState(HapiBank* file)
     if (file->ReadBox(&big, 0x528) != 0x528) {
         return 0;
     }
-    if (unknown_c != big.checksum) {
+    if (checksum != big.checksum) {
         return 0;
     }
     for (int n = 0; n < 8; n++) {

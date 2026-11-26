@@ -1,0 +1,11 @@
+bt-sound 1
+0 stop_all - - - - -
+17 play CREATESQUAD -585 - - -
+22 play ADDBUILD -585 - - -
+33 play_file kcarmsel.WAV -585 - - -
+87 play_file plabwork.WAV -585 - - -
+172 play SELECTSQUAD -585 - - -
+198 play_file kcarmstp.WAV -585 - - -
+201 play SELECTSQUAD -585 - - -
+652 play SELECTSQUAD -585 - - -
+662 play_file servtny2.WAV -585 - - -

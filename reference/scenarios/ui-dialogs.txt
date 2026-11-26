@@ -1,0 +1,70 @@
+# Pause and resume, the options panel's interface type (left click to right click) and text lines, and the exit menu: Cancel, then Exit Game with No, then with Yes, which leaves the game and ends the run.
+game_seed 319
+crt_seed 1319
+view_seed 2319
+map The Pass
+start_positions fixed
+ticks 300
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 0
+spawn 2 1 CORAK 470 300
+input 5 mouse move 384 240
+input 6 mouse left down 384 240
+input 7 mouse left up 384 240
+input 10 key down 0x13
+input 11.1 key up 0x13
+input 11.5 key down 0x13
+input 12 key up 0x13
+input 20 key down f2
+input 21 key up f2
+input 21.2 mouse move 61 248
+input 21.3 mouse left down 61 248
+input 21.4 mouse left up 61 248
+input 21.6 mouse move 61 249
+input 21.7 mouse left down 61 249
+input 21.8 mouse left up 61 249
+input 21.10 mouse move 201 356
+input 21.11 mouse left down 201 356
+input 21.12 mouse left up 201 356
+input 21.14 mouse move 230 277
+input 21.15 mouse left down 230 277
+input 21.16 mouse left up 230 277
+input 21.18 mouse move 61 392
+input 21.19 mouse left down 61 392
+input 21.20 mouse left up 61 392
+input 21.22 mouse move 62 434
+input 21.23 mouse left down 62 434
+input 21.24 mouse left up 62 434
+input 30 mouse move 464 330
+input 31 mouse right down 464 330
+input 32 mouse right up 464 330
+input 60 key down f2
+input 61 key up f2
+input 61.2 mouse move 61 374
+input 61.3 mouse left down 61 374
+input 61.4 mouse left up 61 374
+input 61.6 mouse move 384 295
+input 61.7 mouse left down 384 295
+input 61.8 mouse left up 384 295
+input 61.10 mouse move 61 374
+input 61.11 mouse left down 61 374
+input 61.12 mouse left up 61 374
+input 61.14 mouse move 385 222
+input 61.15 mouse left down 385 222
+input 61.16 mouse left up 385 222
+input 61.18 mouse move 457 255
+input 61.19 mouse left down 457 255
+input 61.20 mouse left up 457 255
+input 61.22 mouse move 61 374
+input 61.23 mouse left down 61 374
+input 61.24 mouse left up 61 374
+input 61.26 mouse move 385 222
+input 61.27 mouse left down 385 222
+input 61.28 mouse left up 385 222
+input 61.30 mouse move 312 255
+input 61.31 mouse left down 312 255
+input 61.32 mouse left up 312 255
+frames 11 21 61

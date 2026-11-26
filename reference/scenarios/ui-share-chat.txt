@@ -1,0 +1,49 @@
+# Game type 3: the share dialog gives metal, energy, a Peewee and the map to the remote ally, then the chat line sends a message.
+game_seed 320
+crt_seed 1320
+view_seed 2320
+game_type 3
+map The Pass
+start_positions fixed
+ticks 120
+player0.controller human
+player0.side Arm
+player0.team 0
+player1.controller human
+player1.side Core
+player1.team 0
+player1.remote 1
+player2.controller ai
+player2.side Core
+console 1 +iface 1
+spawn 2 0 ARMPW 620 280
+input 10 mouse move 444 278
+input 11 mouse left down 444 278
+input 12 mouse left up 444 278
+input 15 char h
+input 20 mouse move 384 115
+input 21 mouse left down 384 115
+input 22 mouse left up 384 115
+input 25 mouse move 470 247
+input 26 mouse left down 470 247
+input 27 mouse left up 470 247
+input 30 mouse move 470 281
+input 31 mouse left down 470 281
+input 32 mouse left up 470 281
+input 35 mouse move 437 307
+input 36 mouse left down 437 307
+input 37 mouse left up 437 307
+input 40 mouse move 437 332
+input 41 mouse left down 437 332
+input 42 mouse left up 437 332
+input 45 mouse move 437 378
+input 46 mouse left down 437 378
+input 47 mouse left up 437 378
+input 50 char 13
+input 53 char h
+input 54 char e
+input 55 char l
+input 56 char l
+input 57 char o
+input 58 char 13
+frames 22 55

@@ -1972,7 +1972,7 @@ harness,platform,call,AllocHandle,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,18
+harness,platform,call,HarnessTestMode,19
 harness,platform,call,IsMemSet,1
 harness,platform,call,LoadFontByName,1
 harness,platform,call,LoadObject3d,1

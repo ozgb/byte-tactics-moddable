@@ -1,0 +1,86 @@
+# A lab in control group 1 builds a Peewee that joins the group; Shift right-click queues two moves; the view scrolls by the right edge, the arrow keys and a minimap drag, is saved and restored (Ctrl+F5, F5), and follows units (n, t); Ctrl with C, Z, A, S and V selects.
+game_seed 321
+crt_seed 1321
+view_seed 2321
+map The Pass
+start_positions fixed
+ticks 700
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+console 1 +iface 1
+spawn 2 0 ARMLAB 600 300
+input 10 mouse move 424 300
+input 11 mouse left down 424 300
+input 12 mouse left up 424 300
+input 15 key down ctrl
+input 16 key down 1
+input 17 key up 1
+input 18 key up ctrl
+input 20 mouse move 96 187
+input 21 mouse left down 96 187
+input 22 mouse left up 96 187
+input 30 mouse move 384 240
+input 31 mouse left down 384 240
+input 32 mouse left up 384 240
+input 40 key down shift
+input 41 mouse move 300 360
+input 42 mouse right down 300 360
+input 43 mouse right up 300 360
+input 44 mouse move 250 400
+input 45 mouse right down 250 400
+input 46 mouse right up 250 400
+input 47 key up shift
+input 60 mouse move 639 300
+input 80 mouse move 400 300
+input 90 key down 0x28
+input 110 key up 0x28
+input 120 key down 0x25
+input 135 key up 0x25
+input 150 mouse move 40 40
+input 151 mouse left down 40 40
+input 152 mouse move 60 50
+input 153 mouse move 80 70
+input 154 mouse move 100 90
+input 155 mouse left up 100 90
+input 170 key down ctrl
+input 171 key down f5
+input 172 key up f5
+input 173 key up ctrl
+input 180 key down 0x27
+input 195 key up 0x27
+input 200 key down f5
+input 201 key up f5
+input 210 char n
+input 220 char t
+input 240 char t
+input 260 char t
+input 280 key down ctrl
+input 281 key down c
+input 282 key up c
+input 283 key up ctrl
+input 290 key down ctrl
+input 291 key down z
+input 292 key up z
+input 293 key up ctrl
+input 300 key down ctrl
+input 301 key down a
+input 302 key up a
+input 303 key up ctrl
+input 310 key down ctrl
+input 311 key down s
+input 312 key up s
+input 313 key up ctrl
+input 320 key down ctrl
+input 321 key down v
+input 322 key up v
+input 323 key up ctrl
+input 650 key down alt
+input 651 key down 1
+input 652 key up 1
+input 653 key up alt
+input 660 mouse move 300 300
+input 661 mouse right down 300 300
+input 662 mouse right up 300 300
+frames 22 70 100 154 205 285 655

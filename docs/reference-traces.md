@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v46`**.
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 97 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 100 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest and one 64-bit end-of-tick state per tick
   for each scenario.
@@ -415,21 +415,33 @@ and so on), and this page is updated to name it. The current tag is
   change, and no stored item has an empty area. The traces are those of v44 but for their commit line, which names
   cc2b4f772, the reference commit that holds the interface log and the rule. The sounds, UI logs, interface
   commands, events and frames are those of v44, and the saves decode equal to v44's.
-- `reference-traces-v46`: the 93 scenarios of v45 and four new ones, `ui-antinuke-range`, `display-chat-dither`,
-  `display-debug-overlay` and `display-tab-menu`, whose frames draw the display kinds no other scenario does. The display
-  lists hold every pixel they draw (#1053, `docs/display-log.md` 1.1): `picture` lines for the pictures the game
-  made, `pixels` items for what the game writes into a target without a drawing item, the fields of a `model` that
-  choose how it is drawn, and every frame up to the last `frames` tick, stored xz compressed in
-  `reference/displaylists/<scenario>.txt.xz` (ten lists). Drawn from blank targets, the lists give the stored frames
-  byte for byte (`tools/displayreplay.py --check`). Every display digest changes; the traces of the 93 are those of
-  v45 but for their commit line, which names 80fc5d17e, the reference merge of #1126 that writes the 1.1 log. The sounds, UI
-  logs, interface commands, events and frames of the 93 are those of v45, and the saves decode equal to v45's.
+- `reference-traces-v46`: the 93 scenarios of v45 and three new `ui-*` scenarios (#1055): `ui-dialogs`, `ui-share-chat`
+  and `ui-scroll-groups`, each with its trace, sound, UI, interface command and event logs and frames, and display logs
+  and lists but for `ui-dialogs`. `ui-dialogs` ends at tick 61, when its exit menu leaves the game. The trace format is still `bt-trace 9`; the
+  other traces are those of v45 but for their commit line, which names 0974c9c89, the reference commit that takes
+  `input <tick>.<frame>` and writes the interface records of the dialogs. The display logs and lists of
+  `ui-share-chat` and `ui-scroll-groups` are from 4d1f84819, the same change on cc2b4f772, since the reference tip writes
+  the display log 1.1 of #1053 that `moddable` does not yet store. `ui-dialogs` has none yet: 4d1f84819 names one of its
+  exit menu's surfaces by a freed surface that had the same address, and 0974c9c89 names it as `moddable` does but in
+  the display log 1.1. The sounds, UI logs, interface logs, events, display logs, frames and saves of the
+  other scenarios are those of v45.
+- The next tag after the latest on origin (#1053): the 96 scenarios of v46 and four new ones, `ui-antinuke-range`,
+  `display-chat-dither`, `display-debug-overlay` and `display-tab-menu`, whose frames draw the display kinds no other
+  scenario does. The display lists hold every pixel they draw (`docs/display-log.md` 1.1): `picture` lines for the
+  pictures the game made, `pixels` items for what the game writes into a target without a drawing item, the fields of
+  a `model` that choose how it is drawn, and every frame up to the last `frames` tick, stored xz compressed in
+  `reference/displaylists/<scenario>.txt.xz` (thirteen lists, `ui-dialogs` now among them). Drawn from blank targets,
+  the lists give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display digest changes; the
+  traces of the 96 are those of v46 but for their commit line, which names e2af2a457, the reference merge of #1129 and
+  the last reference commit that writes `bt-trace 9` (#1135 after it adds the view column of `bt-trace 10`). The
+  sounds, UI logs, interface commands, events and frames of the 96 are those of v46, and the saves decode equal to
+  v46's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v44 are `bt-trace 9`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

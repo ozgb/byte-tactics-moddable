@@ -1,6 +1,6 @@
 bt-digest 9
 trace_format bt-trace 9
-commit 80fc5d17ebee898c3a81a04fc9426f9f29fa82d3
+commit e2af2a457738aaa81d15b4acc432345e55b1a76f
 scenario reference/scenarios/mission-defeat-passes-x.txt
 game_seed 469
 crt_seed 1469

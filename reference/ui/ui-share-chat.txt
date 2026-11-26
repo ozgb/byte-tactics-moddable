@@ -1,0 +1,36 @@
+bt-ui 2
+1 scroll 304 32
+1 view 1
+1 select -
+10 input mouse move 444 278
+11 input mouse left down 444 278
+12 input mouse left up 444 278
+13 select 2
+14 view 2
+15 input char 104
+20 input mouse move 384 115
+21 input mouse left down 384 115
+22 input mouse left up 384 115
+25 input mouse move 470 247
+26 input mouse left down 470 247
+27 input mouse left up 470 247
+30 input mouse move 470 281
+31 input mouse left down 470 281
+32 input mouse left up 470 281
+35 input mouse move 437 307
+36 input mouse left down 437 307
+37 input mouse left up 437 307
+40 input mouse move 437 332
+41 input mouse left down 437 332
+42 input mouse left up 437 332
+45 input mouse move 437 378
+46 input mouse left down 437 378
+47 input mouse left up 437 378
+48 select -
+50 input char 13
+53 input char 104
+54 input char 101
+55 input char 108
+56 input char 108
+57 input char 111
+58 input char 13

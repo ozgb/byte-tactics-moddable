@@ -92,6 +92,7 @@ describes, plays it tick by tick, writes the outputs of section 7 and exits.
 | `load` | a scenario's file name | none | Starts from a saved game instead of from a map and players (section 5). One line only. |
 | `frames` | ticks | none | Ticks at which the run dumps the frame drawn at the end of that tick's loop pass (`docs/frame-dump.md`). One line only. |
 | `quirks` | a quirk spec | `3.1c` | The quirk flags of the run (section 6). |
+| `debug_keys` | 0 or 1 | 0 | 1: sets bit 1 of `uiOptionFlags` at tick 1, which 3.1c sets only from the registry, so that F11 turns on debug mode and its hotkeys (`docs/commands.md`, section 8). |
 | `pathfinder` | `default` or `hpa` | `default` | Test only: `hpa` installs the demo pathfinder (a hierarchical search) in place of 3.1c's search before the match starts. A run with it does not conform to the reference traces. One line only. |
 | `ai` | `default` or `idle` | `default` | Test only: `idle` installs the demo ai that gives no orders (its `UpdatePlayerAI` and `UpdateSquads` do nothing, so the computer players' squads, targets and builds do nothing, and its `Apply` rejects REACT_TO_ATTACK for a unit of a computer player, so they do not react to attacks; it passes SET_SQUAD, PLAN, WEIGHT and LIMIT to 3.1c's; every player's visible-enemy and factory lists are still refreshed every 30 ticks by los_radar and units, and a human player's guard, weapon search, pad search and return fire are not ai's, so all work as with the standard ai; set-up, save and load are 3.1c's) in place of 3.1c's before the match starts. It makes no `RandomInt(0x1e)` draws, so the game logic stream differs from the standard ai's after the first 30 ticks. A run with it does not conform to the reference traces. One line only. |
 | `block_bytes` | 0, or a multiple of 65536 from 33554432 to 268435456 | 0 | The size of the state block, in bytes (`docs/state.md`). 0 sizes it from what the loaded modules need, which is 32 MiB with 3.1c's pathfinding. The traces equal at any size. A save keeps it. One line only. |
@@ -264,13 +265,17 @@ sound, debugger and host commands, `compression`, `netstats`, `sharemapping`, `s
 ### 4.4 `input`
 
     input <tick> <event>
+    input <tick>.<frame> <event>
     input 20 mouse left down 384 240
     input 30 key down ctrl
     input 40 char a
+    input 11.5 key down 0x13
 
 Sends the game raw input, below the interface, so that the game's own code turns it into selections and
 orders. The event is queued at the start of `<tick>`, and the interface handles it in the next frame, before the
-phases of tick + 1. The events, the keys, the characters and the rules the lines must keep (one mouse event and
+phases of tick + 1. `<tick>.<frame>` is for the frames the game draws while it runs no tick (paused, or a dialog
+open): the event is queued at the end of the `<frame>`-th frame after tick `<tick>`; the rules are in
+`docs/ui-log.md`, "While no tick runs". The events, the keys, the characters and the rules the lines must keep (one mouse event and
 one key or `char` event per tick, a button released at most 1 tick after its press unless the mouse moved at
 least 32 units in between, a position inside the 640 by 480 window, `steps_per_frame` 1) are in
 `docs/ui-log.md`, "Scripted input". A breach is an error. A right-click gives an order only with interface type

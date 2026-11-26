@@ -16,7 +16,7 @@ class UnitTypeSet;
 // Major version of the units interface, changed when a slot is removed or its signature changes.
 #define UNITS_VERSION_MAJOR 7
 // Minor version of the units interface, changed when a slot is added.
-#define UNITS_VERSION_MINOR 1
+#define UNITS_VERSION_MINOR 2
 
 // The fields every units event starts with.
 struct UnitsEventHeader {
@@ -26,7 +26,7 @@ struct UnitsEventHeader {
     unsigned int unit;
 };
 
-// The kinds of event other modules publish to units' inbox, in two blocks (352 to 367 and 384 to 397); each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but UNLINK, which names a reference, and CREATE, KILL_ALL and RELOAD_TYPE, which name none), names a player outside 0 to 9 (SEND, CAPTURE), or its kind is unknown.
+// The kinds of event other modules publish to units' inbox, in two blocks (352 to 367 and 384 to 398); each is an intent, validated when Apply consumes it, and applied in the order it was published. Apply rejects one, which then changes nothing and has outcome 0, when it is smaller than its payload, names a null unit (but UNLINK, which names a reference, and CREATE, KILL_ALL and RELOAD_TYPE, which name none), names a player outside 0 to 9 (SEND, CAPTURE), or its kind is unknown.
 enum UnitsEventKind {
     // unit's state bits under a mask are set or cleared, which starts the scripts that announce the change (UnitsSetStateBits); outcome 1.
     UNITS_SET_STATE_BITS = 352,
@@ -87,7 +87,9 @@ enum UnitsEventKind {
     // Every unit that exists is killed, one by one in the order of the unit table; the header alone; outcome 1.
     UNITS_KILL_ALL = 396,
     // Every unit of a type is killed and the definition of the type is loaded again (UnitsReloadType); outcome 1.
-    UNITS_RELOAD_TYPE = 397
+    UNITS_RELOAD_TYPE = 397,
+    // unit forgets who attacked it last: its last attacker slot is reset, its panel is flagged to refresh and its attacker is cleared; the header alone; outcome 1.
+    UNITS_FORGET_ATTACKER = 398
 };
 
 // The payload of SET_STATE_BITS.

@@ -744,7 +744,7 @@ class GlueManifestTests(unittest.TestCase):
     def test_only_the_modules_whose_recordings_emit_publish_through_emit_from(self):
         emit_from = [m for m in self.glue.MODULES if f'{{"{m}", ' in self.tables
                      and re.search(r'k\w+Def = \{"%s",[^;]*, 0\};' % m, self.tables)]
-        self.assertEqual(emit_from, ["wind_meteors", "targeting"])
+        self.assertEqual(emit_from, ["wind_meteors", "features", "targeting"])
 
     def test_the_scheduled_imports_call_the_wrappers(self):
         self.assertIn("ScheduleEconomyRequestGranted(unit, resources)", self.tables)

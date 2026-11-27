@@ -511,6 +511,7 @@
           "GameRand": [["int"], "int"],
           "RandomInt": [["int"], "int"],
           "SimAllocTagged": [["linear", "int"], "linear"],
+          "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
           "InitGafSequence": [["linear", "linear", "int"], "void"],
           "StepGafSequence": [["linear"], "int"],
           "Emit": [["linear", "int"], "void"]

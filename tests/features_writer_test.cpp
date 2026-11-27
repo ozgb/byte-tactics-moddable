@@ -67,7 +67,7 @@ SimGlobals& __stdcall SimCreate()
     return *(SimGlobals*)storage;
 }
 void __stdcall HarnessFeaturesEvent(const FeaturesEventHeader*, unsigned int, int) {}
-void __stdcall SchedPublish(int, const void*, unsigned int)
+void __stdcall EmitFrom(int, const void*, unsigned int)
 {
     s_effects++;
 }

@@ -52,6 +52,9 @@ svg text { font-family: var(--mono); }
 .detail ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
 .detail a { color: var(--metal); text-decoration: none; }
 .detail a:hover, .detail a:focus-visible { text-decoration: underline; }
+.xlink { color: inherit; text-decoration: none; }
+.xlink:hover, .xlink:focus-visible { text-decoration: underline; }
+svg a.xlink:hover text, svg a.xlink:focus-visible text { text-decoration: underline; }
 .detail .live { color: var(--energy); }
 .tag { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-right: 6px; }
 footer { position: fixed; z-index: 15; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--ground) 92%, transparent); backdrop-filter: blur(6px); border-top: 1px solid var(--rule); align-items: center; display: flex; flex-wrap: wrap; gap: 10px 22px; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--muted); }
@@ -101,6 +104,10 @@ const SPEC_WORD = { done: "written", stale: "stale", active: "being written", dr
 const IMPL_WORD = { built: "equal on the gate", building: "built, being extended", active: "being implemented", draft: "port drafted", none: "empty" };
 const KIT_WORD = { ready: "ready", partial: "recordings only", none: "none" };
 
+const ISSUES = "https://github.com/ozgb/byte-tactics-moddable/issues/";
+const ghLink = (parent, repo) => el("a", { href: `https://github.com/${repo}`, target: "_blank", rel: "noopener", class: "xlink" }, parent);
+const issueLink = (n) => `<a class="xlink" href="${ISSUES}${n}" target="_blank" rel="noopener">#${n}</a>`;
+
 function rowY(i, rows) {
   const firstSub = rows.findIndex(r => r.group === "subsystem");
   return TOP + i * ROW + (i >= firstSub ? GAP : 0);
@@ -126,9 +133,9 @@ function draw(data) {
   const yEnd = H - 14;
   el("rect", { x: 10, y: 14, width: X.plateR - X.plateL + 28, height: yEnd - 14, fill: "none", stroke: rule }, svg);
   el("rect", { x: X.sockL - 14, y: 14, width: X.sockR - X.sockL + 28, height: yEnd - 14, fill: "none", stroke: rule, "stroke-dasharray": "4 4" }, svg);
-  el("text", { x: X.plateL, y: 40, fill: text, "font-size": 15, "font-weight": 500 }, svg, "byte-tactics-moddable");
+  el("text", { x: X.plateL, y: 40, fill: text, "font-size": 15, "font-weight": 500 }, ghLink(svg, "ozgb/byte-tactics-moddable"), "byte-tactics-moddable");
   el("text", { x: X.plateL, y: 58, fill: muted, "font-size": 10.5, "letter-spacing": ".08em" }, svg, "3.1C · THE REFERENCE");
-  el("text", { x: X.sockL, y: 40, fill: text, "font-size": 15, "font-weight": 500 }, svg, "ozgb/btm");
+  el("text", { x: X.sockL, y: 40, fill: text, "font-size": 15, "font-weight": 500 }, ghLink(svg, "ozgb/btm"), "ozgb/btm");
   el("text", { x: X.sockL, y: 58, fill: muted, "font-size": 10.5, "letter-spacing": ".08em" }, svg, "RUST · CLEAN ROOM");
   for (const [x, label] of [[X.kit, "ORACLE KIT"], [X.spec, "SPEC"]]) {
     el("text", { x, y: 58, fill: muted, "font-size": 10.5, "letter-spacing": ".14em", "text-anchor": "middle" }, svg, label);
@@ -231,7 +238,7 @@ function gauges(d) {
   const built = d.rows.filter(r => r.impl === "built").length;
   const lit = d.rows.filter(r => r.active).length;
   const items = [
-    ["Milestone 1 · #2", d.milestones["2"].done, d.milestones["2"].total, "issues"],
+    [`Milestone 1 · ${issueLink(2)}`, d.milestones["2"].done, d.milestones["2"].total, "issues"],
     ["Conduits open", carried, d.rows.length, `${lit} lit`],
     ["btm modules equal", built, d.rows.length, ""],
   ];
@@ -273,8 +280,8 @@ async function load() {
   draw(DATA);
   gauges(DATA);
   legend();
-  const stamp = () => document.getElementById("stamp").textContent =
-    `Updated ${ago(DATA.generated)} · interfaces-v${DATA.interfaces} · Milestone 2 (#180) ${DATA.milestones["180"].done}/${DATA.milestones["180"].total}`;
+  const stamp = () => document.getElementById("stamp").innerHTML =
+    `Updated ${ago(DATA.generated)} · interfaces-v${DATA.interfaces} · Milestone 2 (${issueLink(180)}) ${DATA.milestones["180"].done}/${DATA.milestones["180"].total}`;
   stamp();
   setInterval(stamp, 60000);
 }

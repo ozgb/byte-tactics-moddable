@@ -88,8 +88,11 @@ any module is loaded. Modules do not create or grow them.
 
 ### 2.2 A module's window
 
-A **window** is the `window` bytes (65536 in the game manifest) starting at the module's
-`data_base`. A module's data, bss and stack must lie entirely inside its window:
+A **window** is the `window` bytes (32768 in the game manifest) starting at the module's
+`data_base`. The game manifest has an entry for each of the 15 modules, wind_meteors first and then the
+14 subsystems in the order of `tools/wasm_glue.py`: entry *i* has its window at `0x30000 + i * 0x8000`
+and its table range at `48 + i * 32`, so the windows fill `0x30000..0xA8000`, below the scratch area, and the
+ranges fill the table. A module's data, bss and stack must lie entirely inside its window:
 
 - `data_base` is the address wasm-ld is told to start the module's data at (`--global-base`, section 3).
   Data comes first, then bss.
@@ -105,7 +108,7 @@ A **window** is the `window` bytes (65536 in the game manifest) starting at the 
 ### 2.3 The table
 
 - The module imports it as `env.__indirect_function_table`. Its size is `table_size` of the manifest
-  (80 entries in the game manifest, 64 in the fixture manifest), minimum equal to maximum, every entry
+  (528 entries in the game manifest, 64 in the fixture manifest), minimum equal to maximum, every entry
   empty (null) when the first module loads. A module declares a minimum of at most `table_size` and no
   maximum.
 - Each module owns the range `[table_base, table_base + table_slots)` (`table_slots` is 32 in the
@@ -283,20 +286,30 @@ valid JSON to the loader, so the whole manifest is refused as not valid JSON. A 
 | --- | --- | --- |
 | `name` | a non-empty string, unique in the manifest | loader, required |
 | `data_base`, `table_base` | the module's window and table range (section 2) | loader, required |
-| `exports` | the slot names, in the interface's slot order | loader; checks |
-| `data` | the loader data words (section 8.2) | loader; checks |
+| `exports` | the slot names, in the interface's slot order, without the engine slots | loader; checks |
+| `engine` | `{slot: reason}`, the slots of the interface that stay in the engine (section 6): the host calls the native default for them, and the module does not export them | host; checks |
+| `blocked` | the reason the subsystem's default does not build to WASM yet; an entry with it has no `.wasm`, no budgets, and the host runs the native default for every slot | build and checks; host |
+| `data` | the loader data words (section 8.2), in order: the four every module has, then `g_region` for a module whose slots take its region | loader; checks |
 | `interface` | the interface whose slots the module implements | loader (majors) |
 | `majors` | the major of each interface it uses, section 10 | loader |
 | `slots` | `{slot: [[argument kinds], result kind]}` | loader (adapters); checks |
-| `imports` | `{group: {import: [[argument kinds], result kind]}}` | loader (adapters); checks |
+| `imports` | `{group: {import: [[argument kinds], result kind]}}`; a group is `services`, an interface (section 9.2), or a world view of an interface header (`econworld`, the `EconomyWorldView` of `economy.h`; `pathworld`, the `PathWorldView` of `pathfinding.h`), whose major is its header's | loader (adapters); checks |
 | `publishes` | `{kind: payload size}`, the kinds the module may publish through `Emit` (the kind as a decimal string, the size in bytes; wind_meteors': `{"80": 36}`); each is a kind the route table (`data/routes.csv`, `docs/schedule.md`, "Routes") takes from the entry's outbox, its `interface` (its own effect kinds and the routed inbox kinds of other modules), with that kind's payload size | host (the `Emit` import); checks |
-| `fuel_budget` | fuel per tick, section 11 | host; checks |
-| `size_budget` | the most bytes the `.wasm` may be | checks |
+| `fuel_budget` | fuel per tick, section 11; required unless `blocked` | host; checks |
+| `size_budget` | the most bytes the `.wasm` may be; required unless `blocked` | checks |
 | `cxx`, `c` | source files of the module in the reference repository | the reference build only; the kit's manifest leaves them out |
 
 A kind is one of `int`, `f32`, `f64`, `void` (a result only), `linear`, `block`, `scratch`, `handle`
 (section 7). A signature has at most 16 arguments and at most one result. `exports` and `data`
 must be lists of names.
+
+`tools/wasm_glue.py` writes every entry but wind_meteors' budgets and sources from the subsystem's interface header (the
+slots in its order and their kinds), the replay schema (`data/replay_schema.json`: the argument modes, the services, the
+header's imports and the engine slots, `record: false` with a load, save, network, presentation or query reason) and the
+subsystem's recordings (the services they import; an import of another subsystem's load- or save-class engine slot is
+left out, since only engine slots make it), and `uv run tools/wasm_glue.py --check` fails when the manifest is
+not what it writes. `uv run tools/wasm_modules.py check-module FILE.wasm --name <subsystem>` checks a file against any
+entry.
 
 The fixture manifest's entries also have `slot_arg`, `slot_result` and `data_word`, the values its
 check uses (section 14).
@@ -367,8 +380,14 @@ exits 0 when the file passes, 1 when it prints problems, and 2 when the check co
 
 A slot is a function export of the module's wasm instance, named exactly like the interface's slot
 (`UpdateWind`, `Apply`). The module's `exports` lists them, in the interface's slot order.
-`Apply` takes a `linear` address of a `WindMeteorsEventHeader` record, the event of the `wind_meteors`
-module's inbox, and the size in bytes of the event's payload (6.1).
+`Apply` takes a `linear` address of the module's `<Module>EventHeader` record, the event of its inbox, and the size
+in bytes of the event's payload (6.1). The in-repo host copies at most the largest payload of the module's inbox kinds
+(the header's size when no kind has a payload struct) and passes the smaller of that and the size it was given.
+
+**Engine slots.** A slot named in the entry's `engine` stays in the engine: loading and saving a game, the network, the
+presentation, and the queries only the dump, a saved game or the campaign makes. The module does not export it, and
+the host calls the engine's native slot instead, with the module's state in the block as the native slot reads it. A
+re-implementation leaves these out of its module; they are the engine's until a later issue moves them.
 
 ### 6.1 Event payloads
 
@@ -416,7 +435,8 @@ generated from the engine and checked in CI, so the two do not drift; it is also
   (section 11), and nothing else.
 - **Nested calls.** The host supports a slot call made while another slot call of the same module
   is running (an import that calls back into the engine). The handle table and the fuel counter treat
-  only the outermost call as the boundary (sections 8 and 11).
+  only the outermost call as the boundary (sections 8 and 11). A slot call of any module made while an
+  import runs is refused (section 13), so one module's import cannot reach another WASM module's slot yet.
 
 - **Hook points.** Every slot's doc comment ends with a `Hooks:` line: the synced mod hooks of
   [#1](https://github.com/ozgb/byte-tactics-moddable/issues/1) that attach to that call, or
@@ -492,6 +512,20 @@ behaviour is the contract the existing module was built against.
   size below 1. An import that takes a buffer without a size does not look at how many bytes the callee
   will use, so the module is responsible for passing a buffer big enough.
 - A `block` result that is not inside the block is a trap.
+- **The glue is generated.** One generic glue (`src/wasm/module_glue.cpp`) holds the loader, the services and the
+  checks above; `tools/wasm_glue.py` writes each module's slot table, slot calls and interface imports
+  (`src/wasm/glue_tables.cpp`) from its manifest entry, the replay schema's argument modes and the interface header. A
+  slot argument of mode `handle` becomes a handle, `text` a copy in scratch, an object in the block (`object`, `weapon`,
+  `load`, `pending`, or a pointer with no mode) its address, `region` its address and the `g_region` word (8.2),
+  `world` nothing (the host keeps the world view and a module reaches it through the view's imports), an `event` a
+  scratch copy of at most the inbox's largest payload, a buffer with its length a scratch copy of that many elements,
+  and a pointer to a record a scratch copy of the record, copied back unless it is only read. An interface import's
+  pointer argument is checked to lie in the memory, a `handle` one to be live, and an argument the callee writes a pointer
+  through has that pointer turned back into an address.
+- **Publishing.** The host hands an `Emit` to the scheduler as the subsystem's native default publishes the same kind:
+  wind_meteors and targeting as an effect (their recordings' `services.Emit` lines), every other module as a publish of
+  its outbox (their recordings' `services.SchedPublish` lines, with the outbox and the size), so a replay compares a
+  module's `Emit` with the line its recording has.
 
 ### 7.3 A buffer the caller supplies
 
@@ -518,7 +552,14 @@ a TDF record, a bank of saved-game items (`HapiBank`).
   handle kept in the block, in a static or in a `TdfFile` that outlives the call is garbage later,
   and a later call may give the same number to something else.
 - Within one outermost call, the same engine object always has the same handle. The table holds 32
-  handles; more than 32 distinct objects in one call is a fatal error.
+  handles; more than 32 live at once in one call is a fatal error. `TdfFile_Destruct` releases the
+  handles of the file's records, and the host gives a released handle's number to the next new object,
+  so a slot may load and destroy any number of files one after another. A walk over more than 32
+  records of one file in one call still runs out, since every record it selects keeps its handle until the
+  file is destroyed. Mission's `CountMissions` and `MissionExists`, which make such a walk on a campaign of
+  more than 31 missions, are engine slots (campaign queries), so no module makes it yet; a module that takes them needs an
+  ABI change first (a larger table, or a record handle that lasts only while it is its file's current record). A released
+  handle is an unknown handle to every import.
 - A module must **never read through a handle**: it is not an address. It only passes it back to an
   import whose parameter kind is `handle`. An unknown handle (above the number issued) and a null
   handle where an object is required are traps naming the import.
@@ -528,7 +569,7 @@ a TDF record, a bank of saved-game items (`HapiBank`).
 
 ### 8.2 The loader data words
 
-A module exports four **data words**. Each is an exported i32 global whose value is the address, in
+A module exports four **data words**, five for economy, pathfinding, players and los_radar. Each is an exported i32 global whose value is the address, in
 the module's window, of a 4-byte location (`g_extTdf`: a 4-byte area). The name list is `data` of the
 module's manifest entry. The loader reads each global once, when the module is loaded. **The host
 writes the words before every slot call, so a module may assume they are set whenever a slot runs**,
@@ -540,6 +581,7 @@ and not in the start function.
 | `g_simGlobals` | the linear address of the simulation globals record, in the block | the module's pointer to the globals record |
 | `g_extTdf` | the 4 bytes `tdf` plus a terminating 0, the extension of TDF data files | building a data path |
 | `g_blockBase` | the linear address of the block's first byte (`block_base`, 1048576 today) | adding to a block offset, section 7.1 |
+| `g_region` | the linear address of the module's state region in the block, the record the last slot that takes a `region` argument was given (0 before one has); the host refuses a region outside the block | the module's pointer to its own state |
 
 The `MeteorShowerParams` record and the event payloads (6.1) are not data words: they reach a module as the `linear` argument of a slot (section 6).
 
@@ -650,6 +692,23 @@ the dump as section "Who records the dump's events" states.
 | `services.ScheduleMetalExtraction` | `economy.UpdateMetalExtraction` | sets a metal extractor's rate |
 
 The kinds each module's outbox carries are the rows of `data/routes.csv` with that publisher; a spec names a publish by its kind and cites that file.
+
+`economy.RequestGranted` reaches the engine's `ScheduleEconomyRequestGranted`, so a module's call gets the same check a
+native caller's does: a call made while economy's inbox has events not yet delivered is a fatal error. Two recorded
+calls have no import. `services.ScheduleUnitsDeliver` (deliver units' inbox now) is made only by units'
+`ReceiveUnitStates`, a network slot that stays in the engine, so no module makes it and no slot matches it. The GAF
+services are open (#1217).
+
+**What stays in the engine.** A slot of an entry's `engine` (section 6) is not a module's, and nothing a module imports
+reaches its state. `WriteState`, the dump's writer of a subsystem's state, is one: it is called by the test harness
+only, outside the tick, and writes through the engine's `StateWriter`, which is not in the shared memory; the engine
+writes a module's state from the block as it does a native one's, so a module writes nothing for the dump.
+`mission.GetCampaignMissionName` is one too: it serves the menus and the map list, and the localised key it builds
+needs the language prefix of the translation table, which no import gives. Map's plot-map slots (`LoadMetalPlotmap`,
+`SaveMetalPlotmap`, `LoadPlayerFeaturesPlotmap`, `SavePlayerFeaturesPlotmap`) are save-class slots: their buffers of
+`width x height` bytes (65536 on a 256 x 256 map) are the engine's, in its own memory, and never cross the boundary, so
+no window or scratch area has to hold one. Map's entry imports no `files.Bank*` service for the same reason: the
+saved-game bank is used only by those slots.
 
 `tools/speclint.py` reads the first two columns of this table from the kit's copy of this page: a spec may name a
 recorded call of the first column (to say which recorded line an import makes) as well as its import.
@@ -832,8 +891,11 @@ Every error or trap ends the game, in this version. There is no recovery and no 
 - **An import's refusal** is a trap whose text begins `import <name>: ` and names the cause:
   `pointer argument <n> is outside the module memory`, `the buffer size is below 1`,
   `the buffer runs past the module memory`, `unknown handle <n>`, `null handle`,
-  `returned a buffer other than the one it was given`, `returned a weapon outside the sim block`; `Emit` adds `the size is outside an effect`, `the effect runs past the module memory`, `the kind is not in the module's publishes table` and `the size is not the payload's size of its kind`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is outside the table of weapons`).
-- **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`,
+  `returned a buffer other than the one it was given`, `returned a weapon outside the sim block` (or an `object`, a
+  `region` or a `pointer`, by the result's mode), `returned a pointer outside the module memory`, `the world view is not
+  set`; `SimFree` adds `the pointer is outside the sim block`; `Emit` adds `the size is outside an effect`, `the effect runs past the module memory`, `the kind is not in the module's publishes table`, `the size is not the payload's size of its kind` and `the kind is not routed from the module's outbox`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is outside the table of weapons`).
+- **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`, `slot <name>: the region is not in the
+  sim block`, `slot <name>: an object argument is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the
   scratch area`, `slot <name>: called inside an import` (a slot call made while an import runs; the
   call does nothing and the game ends once the outer call returns), and `<module>: the handle table

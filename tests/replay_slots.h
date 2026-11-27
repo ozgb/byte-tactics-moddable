@@ -2164,6 +2164,12 @@ void After_economy_UnitAccount()
     CompareStruct("out", ROK_ECONACCOUNT, &g_out_economy_UnitAccount_1);
 }
 
+void Run_features_UpdateFeatures()
+{
+    SetClosing(nullptr);
+    g_seams.features->UpdateFeatures();
+}
+
 unsigned short g_result_features_GetCellFeature;
 
 void Run_features_GetCellFeature()
@@ -4294,6 +4300,10 @@ bool RunSlot(const char* subsystem, const char* slot)
     }
     if (strcmp(subsystem, "economy") == 0 && strcmp(slot, "UnitAccount") == 0) {
         Run_economy_UnitAccount();
+        return true;
+    }
+    if (strcmp(subsystem, "features") == 0 && strcmp(slot, "UpdateFeatures") == 0) {
+        Run_features_UpdateFeatures();
         return true;
     }
     if (strcmp(subsystem, "features") == 0 && strcmp(slot, "GetCellFeature") == 0) {

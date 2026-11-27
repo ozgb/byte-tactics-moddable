@@ -32,9 +32,10 @@ enum HandleKind { OBJ_FILE, OBJ_RECORD, OBJ_BANK, OBJ_CALLBACK };
 static_assert(OBJ_CALLBACK == REPLAY_HANDLE_CALLBACK, "the callback handles are numbered as the object fields number them");
 
 struct Recording {
-    Recording() : on(true), windowed(false), first(0), last(0) {}
+    Recording() : on(true), windowed(false), phase(false), first(0), last(0) {}
     bool on;
     bool windowed;
+    bool phase;
     unsigned first;
     unsigned last;
     ReplayText out;
@@ -642,6 +643,12 @@ void SlotLeave()
 
 bool IsImportOf(unsigned owner, unsigned slot);
 bool IsNestedSlot(unsigned slot);
+bool HasPhaseSlot(unsigned sub);
+
+static bool RecordsPhase(unsigned sub)
+{
+    return s_rec[sub] != nullptr && s_rec[sub]->phase;
+}
 
 class SlotScope {
 public:
@@ -1411,11 +1418,22 @@ void ReplayImportBegin(ReplayImport&)
 int ReplayConfigure(const char* value, char* error, int size)
 {
     char subsystem[32];
+    char tail[16];
     unsigned first = 0;
     unsigned last = 0;
-    int fields = sscanf(value, "%31s %u %u", subsystem, &first, &last);
+    bool phase = false;
+    int fields = sscanf(value, "%31s %u %u %15s", subsystem, &first, &last, tail);
+    if (fields == 4 && strcmp(tail, "phase") == 0) {
+        phase = true;
+        fields = 3;
+    } else if (fields == 1 && sscanf(value, "%31s %15s", subsystem, tail) == 2) {
+        fields = strcmp(tail, "phase") == 0 && sscanf(value, "%*s %*s %15s", tail) != 1 ? 1 : 0;
+        phase = fields == 1;
+    } else if (fields == 3 && sscanf(value, "%*s %*u %*u %15s", tail) == 1) {
+        fields = 0;
+    }
     if (fields != 1 && fields != 3) {
-        _snprintf(error, size, ": needs <subsystem> or <subsystem> <first tick> <last tick>");
+        _snprintf(error, size, ": needs <subsystem> [<first tick> <last tick>] [phase]");
         return 0;
     }
     unsigned sub = 0;
@@ -1429,8 +1447,12 @@ int ReplayConfigure(const char* value, char* error, int size)
         _snprintf(error, size, ": %s is recorded by an earlier record line", subsystem);
         return 0;
     }
-    if (fields == 3 && (first == 0 || last < first)) {
-        _snprintf(error, size, ": needs a first tick of at least 1 and a last tick not before it");
+    if (fields == 3 && last < first) {
+        _snprintf(error, size, ": needs a last tick not before the first");
+        return 0;
+    }
+    if (phase && !HasPhaseSlot(sub)) {
+        _snprintf(error, size, ": %s has no phase driver to record", subsystem);
         return 0;
     }
     ReplayEndHook() = ReplayImportEnd;
@@ -1438,6 +1460,7 @@ int ReplayConfigure(const char* value, char* error, int size)
     ReplayBeginHook() = ReplayImportBegin;
     s_rec[sub] = new Recording();
     s_rec[sub]->windowed = fields == 3;
+    s_rec[sub]->phase = phase;
     s_rec[sub]->first = first;
     s_rec[sub]->last = last;
     return 1;

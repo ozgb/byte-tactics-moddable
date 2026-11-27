@@ -27,6 +27,16 @@ class Scenario(unittest.TestCase):
         self.assertEqual(replay.with_record("ticks 5\n", ["targeting", "wind_meteors"], {"targeting": (3, 9)}),
                          "ticks 5\nrecord targeting 3 9\nrecord wind_meteors\n")
 
+    def test_a_phase_subsystem_records_its_driver(self):
+        self.assertEqual(replay.with_record("ticks 5\n", ["features", "map"], (3, 9), {"features"}),
+                         "ticks 5\nrecord features 3 9 phase\nrecord map 3 9\n")
+        self.assertEqual(replay.with_record("ticks 5\n", "features", None, {"features"}), "ticks 5\nrecord features phase\n")
+
+    def test_the_stored_phases_name_a_recording_that_exists(self):
+        for key in replay.stored_phases():
+            subsystem, scenario = key.split("/")
+            self.assertTrue((replay.RECORDINGS / subsystem / (scenario + ".txt")).is_file(), key)
+
     def test_the_stored_windows_name_a_recording_that_exists(self):
         for key, window in replay.stored_windows().items():
             subsystem, scenario = key.split("/")

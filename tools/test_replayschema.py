@@ -911,6 +911,41 @@ class Tables(unittest.TestCase):
         self.assertTrue(any("settings.nothing, which is no member of Game" in e for e in errors), errors)
 
 
+class Phase(unittest.TestCase):
+    """A phase driver is recorded as one call over the slots it names, and only in a run that asks for it."""
+
+    def test_the_driver_records_the_union_of_its_slots(self):
+        files, errors, model = generate()
+        self.assertEqual(errors, [])
+        slots = model["subsystems"]["features"]["slots"]
+        driver = slots["UpdateFeatures"]
+        self.assertEqual(driver["phase"], ["FeatureTypeCount", "AnimateFeatureType", "ScanFeatureCell", "FirstFeatureSpot", "UpdateFeatureSpot"])
+        for name in driver["phase"]:
+            self.assertLessEqual(set(slots[name]["functions"]), set(driver["functions"]), name)
+            self.assertLessEqual(set(slots[name]["reads"]), set(driver["reads"]), name)
+        self.assertNotIn("UpdateFeatures", model["subsystems"]["features"]["unrecorded"])
+        hooks = files[rs.HOOKS_H]
+        self.assertIn("SlotScope scope(RSL_FEATURES_UPDATEFEATURES, SUB_FEATURES, roots, RecordsPhase(SUB_FEATURES));", hooks)
+        self.assertIn("bool HasPhaseSlot(unsigned sub)\n{\n    return sub == SUB_FEATURES;\n}", hooks)
+
+    def test_a_phase_names_other_recorded_slots(self):
+        ann = annotations()
+        slots = ann["subsystems"]["features"]["slots"]
+        slots["UpdateFeatures"]["phase"] = ["UpdateFeatures", "NoSuchSlot", "SaveFeatures"]
+        model, errors = build(read_rows(), ann)
+        self.assertIn("features.UpdateFeatures: `phase` names UpdateFeatures, which is no other slot of the interface", errors)
+        self.assertIn("features.UpdateFeatures: `phase` names NoSuchSlot, which is no other slot of the interface", errors)
+        self.assertIn("features.UpdateFeatures: `phase` names SaveFeatures, which is no recorded slot", errors)
+        slots["UpdateFeatures"]["phase"] = []
+        _, errors = build(read_rows(), ann)
+        self.assertIn("features.UpdateFeatures: `phase` lists the slots the phase driver calls", errors)
+
+    def test_a_phase_driver_takes_no_argument(self):
+        slot = {"name": "Apply", "params": [{"name": "event"}], "ret": "int"}
+        self.assertEqual(rs.check_phase("x.Apply", ["Update"], slot, ["Apply", "Update"], {}),
+                         ["x.Apply: a phase driver takes no argument and returns nothing"])
+
+
 class ProductCounts(unittest.TestCase):
     """A table counted by a product of block fields needs those fields in the read set of every slot that reaches it."""
 

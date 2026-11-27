@@ -468,7 +468,7 @@
       },
       "data_base": 262144,
       "table_base": 112,
-      "blocked": "map/features.cpp mixes the load code (std::vector of TdfFile*, insert and std::copy) with the kept slots",
+      "blocked": "map/features.cpp mixes the load code (std::vector of TdfFile*, insert and std::copy) with the kept slots, and the GAF services, which the glue does not give until the frame tables are in the shared memory",
       "exports": ["UpdateFeatures", "GetCellFeature", "GetFootprintCentre", "Apply", "Place", "FeatureTypeCount",
                   "AnimateFeatureType", "ScanFeatureCell", "FirstFeatureSpot", "UpdateFeatureSpot", "FindFeatureAtPos"],
       "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
@@ -675,8 +675,7 @@
         "los_radar": {
           "GetMapCell": [["int", "int"], "block"],
           "GetMapCellAtPosition": [["linear"], "block"],
-          "SoundHeardMask": [["linear"], "int"],
-          "IsPointVisible": [["block", "linear"], "int"]
+          "SoundHeardMask": [["linear"], "int"]
         },
         "map": {
           "GetCellMeanHeight": [["linear"], "int"],
@@ -774,7 +773,7 @@
       },
       "data_base": 425984,
       "table_base": 272,
-      "blocked": "operator new in line_of_sight.cpp and the std::allocator internals of los_tables.cpp",
+      "blocked": "operator new in line_of_sight.cpp, the std::allocator internals of los_tables.cpp and the GAF services, which the glue does not give until the frame tables are in the shared memory",
       "exports": ["Apply", "GetMapCell", "GetMapCellAtPosition", "GetOriginCellAtPosition", "ClampWorldPosToTerrain",
                   "IsUnitVisibleToPlayer", "SoundHeardMask", "UpdateUnitLineOfSight", "RecordRadarUnits",
                   "UpdateSensorRadarAndCloak", "RecordRadarMapped", "ExpireEyeballs", "GetVisibleEnemiesInRadius",
@@ -866,7 +865,6 @@
           "NewApproachRadius": [["int", "int", "int", "int"], "int"],
           "NewRingApproach": [["int", "int", "int", "int", "int"], "int"],
           "NewPointMarker": [["int", "linear", "linear"], "int"],
-          "TargetType": [["int"], "int"],
           "UnitTarget": [["block"], "int"]
         },
         "units": {
@@ -892,8 +890,7 @@
         },
         "weapons": {
           "GetWeaponRange": [["block", "int"], "int"],
-          "WeaponCanReachUnit": [["block", "block", "int"], "int"],
-          "WeaponCanReachPos": [["block", "linear", "linear", "int"], "int"]
+          "WeaponCanReachUnit": [["block", "block", "int"], "int"]
         },
         "map": {
           "UnitsInRange": [["linear", "int", "int", "linear", "int"], "int"],

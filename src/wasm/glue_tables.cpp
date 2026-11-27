@@ -5448,14 +5448,6 @@ const char* __cdecl GlueImportMovementNewRingApproach(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl GlueImportMovementTargetType(wasmtime_val_raw_t* a)
-{
-    unsigned int target = (unsigned int)a[0].i32;
-    int result = g_seams.movement->TargetType(target);
-    a[0].i32 = (int)result;
-    return nullptr;
-}
-
 const char* __cdecl GlueImportMovementUnitTarget(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("movement.UnitTarget", 0);
@@ -6378,7 +6370,6 @@ const GlueImport kGlueInterfaceImports[] = {
     {"movement", "NewPathOrderToUnitAtAngle", "iii>i", GlueImportMovementNewPathOrderToUnitAtAngle},
     {"movement", "NewPointMarker", "iii>i", GlueImportMovementNewPointMarker},
     {"movement", "NewRingApproach", "iiiii>i", GlueImportMovementNewRingApproach},
-    {"movement", "TargetType", "i>i", GlueImportMovementTargetType},
     {"movement", "UnitTarget", "i>i", GlueImportMovementUnitTarget},
     {"network", "BroadcastPlayerEconomy", "i>", GlueImportNetworkBroadcastPlayerEconomy},
     {"network", "BroadcastPlayerInfo", ">", GlueImportNetworkBroadcastPlayerInfo},

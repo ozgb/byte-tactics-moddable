@@ -1365,16 +1365,6 @@ unsigned int __stdcall Imp_movement_UnitTarget(Unit* a0)
     return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
 }
 
-int __stdcall Imp_movement_TargetType(unsigned int a0)
-{
-    ReplayText t;
-    StartImport(t, "movement.TargetType");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_ORDERFX, ReplayRefPtr(a0), true);
-    const char* r = Enter(t);
-    return ParseResult<int>(r);
-}
-
 unsigned int __stdcall Imp_movement_LoadTarget(int a0, unsigned int a1, HapiBank* a2, const char* a3)
 {
     ReplayText t;
@@ -1389,22 +1379,6 @@ unsigned int __stdcall Imp_movement_LoadTarget(int a0, unsigned int a1, HapiBank
     t.AddString((const char*)a3);
     const char* r = Enter(t);
     return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
-}
-
-void __stdcall Imp_movement_SaveTarget(unsigned int a0, unsigned int a1, HapiBank* a2, const char* a3)
-{
-    ReplayText t;
-    StartImport(t, "movement.SaveTarget");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_ORDERFX, ReplayRefPtr(a0), true);
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_ORDER, ReplayRefPtr(a1), true);
-    Space(t);
-    AddObject(t, OBJ_BANK, a2);
-    Space(t);
-    t.AddString((const char*)a3);
-    const char* r = Enter(t);
-    (void)r;
 }
 
 int __stdcall Imp_units_CanRepair(Unit* a0, Unit* a1)
@@ -5424,9 +5398,7 @@ void BindSeams()
         g_import_movement.NewRingApproach = Imp_movement_NewRingApproach;
         g_import_movement.NewPointMarker = Imp_movement_NewPointMarker;
         g_import_movement.UnitTarget = Imp_movement_UnitTarget;
-        g_import_movement.TargetType = Imp_movement_TargetType;
         g_import_movement.LoadTarget = Imp_movement_LoadTarget;
-        g_import_movement.SaveTarget = Imp_movement_SaveTarget;
         g_seams.units = &g_import_units;
         g_import_units.CanRepair = Imp_units_CanRepair;
         g_import_units.CanReclaim = Imp_units_CanReclaim;

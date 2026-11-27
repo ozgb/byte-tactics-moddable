@@ -38,14 +38,16 @@ WORLD_VIEWS = {"econworld": ("economy", "EconomyWorldView"), "pathworld": ("path
 
 BLOCKED = {
     "economy": "a static object with a destructor (ConstructedElement) needs __cxa_atexit, and SimBlockTrack has no import",
-    "features": "map/features.cpp mixes the load code (std::vector of TdfFile*, insert and std::copy) with the kept slots",
+    "features": "map/features.cpp mixes the load code (std::vector of TdfFile*, insert and std::copy) with the kept slots, "
+                "and the GAF services, which the glue does not give until the frame tables are in the shared memory",
     "ai": "std::vector in ai_player.cpp and squads.cpp, file output (FilePrintf, sprintf) and the command parser",
     "pathfinding": "the direction and turn tables (g_dirDeltaX, g_dirDeltaZ, g_turnCosts) live in another file, and "
                    "PathGoalDistance, PathGoalCells and PathGoalContains are direct calls with no import",
     "weapons": "about 20 engine calls with no import (AngleOfVector, SolveLaunchAngle, InitProjectile, CalcAimAngles, "
                "AddExplosionEffect and others), the GAF services, which the glue does not give until the frame tables are in the shared memory, and the aim-script vtable data",
     "targeting": "unit_query_buffer.h is a std::vector<Ref<Unit>> on the heap",
-    "los_radar": "operator new in line_of_sight.cpp and the std::allocator internals of los_tables.cpp",
+    "los_radar": "operator new in line_of_sight.cpp, the std::allocator internals of los_tables.cpp and the GAF services, "
+                 "which the glue does not give until the frame tables are in the shared memory",
     "orders": "std::list in vtol_orders.cpp, the MSVC STL internals of order_list.cpp and new of sim objects",
     "units": "std::vector, std::list and std::string in units.cpp, unit_commands.cpp, unit_types.cpp and control_panel.cpp, "
              "and UI code in its files",

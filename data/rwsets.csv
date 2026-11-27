@@ -50803,13 +50803,6 @@ address,function,file,kind,target
 ,GlueImportMovementNewRingApproach,src/wasm/glue_tables.cpp,function,
 ,GlueImportMovementNewRingApproach,src/wasm/glue_tables.cpp,global_read,g_seams
 ,GlueImportMovementNewRingApproach,src/wasm/glue_tables.cpp,indirect_call,"indirect via unsigned int (*)(unsigned int, int, int, int, int) __attribute__((stdcall)) [MovementSeam::NewRingApproach]"
-,GlueImportMovementTargetType,src/wasm/glue_tables.cpp,field_read,MovementSeam::TargetType
-,GlueImportMovementTargetType,src/wasm/glue_tables.cpp,field_read,Seams::movement
-,GlueImportMovementTargetType,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
-,GlueImportMovementTargetType,src/wasm/glue_tables.cpp,field_write,wasmtime_val_raw::i32
-,GlueImportMovementTargetType,src/wasm/glue_tables.cpp,function,
-,GlueImportMovementTargetType,src/wasm/glue_tables.cpp,global_read,g_seams
-,GlueImportMovementTargetType,src/wasm/glue_tables.cpp,indirect_call,indirect via int (*)(unsigned int) __attribute__((stdcall)) [MovementSeam::TargetType]
 ,GlueImportMovementUnitTarget,src/wasm/glue_tables.cpp,call,GlueImportError
 ,GlueImportMovementUnitTarget,src/wasm/glue_tables.cpp,call,GlueInMemory
 ,GlueImportMovementUnitTarget,src/wasm/glue_tables.cpp,call,GlueLinear
@@ -55498,7 +55491,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::NewPathOrderToUnitAtAngle
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::NewPointMarker
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::NewRingApproach
-,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::SaveTarget
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::TargetType
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::UnitTarget
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MovementSeam::UpdateMotion
@@ -55778,7 +55770,6 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementNewPathOrderToUnitAtAngle
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementNewPointMarker
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementNewRingApproach
-,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementSaveTarget
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementTargetType
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementUnitTarget
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMovementUpdateMotion
@@ -64880,33 +64871,10 @@ address,function,file,kind,target
 ,RecMovementNewRingApproach,src/harness/replay_hooks.inc,global_read,s_inner_movement
 ,RecMovementNewRingApproach,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMovementNewRingApproach,src/harness/replay_hooks.inc,indirect_call,"indirect via unsigned int (*const)(unsigned int, int, int, int, int) __attribute__((stdcall)) [MovementSeam::NewRingApproach]"
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,Add
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ArgHandle
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ArgObject
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ArgValue
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,FinishImport
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ImportHandle
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ImportObject
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ImportValue
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ReplayRefPtr
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,SlotScope::Import
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,SlotScope::Open
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,field_read,MovementSeam::SaveTarget
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,function,
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,global_read,s_call
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,global_read,s_inner_movement
-,RecMovementSaveTarget,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(unsigned int, unsigned int, HapiBank *, const char *) __attribute__((stdcall)) [MovementSeam::SaveTarget]"
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,Add
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,ArgObject
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,ArgValue
-,RecMovementTargetType,src/harness/replay_hooks.inc,call,FinishImport
-,RecMovementTargetType,src/harness/replay_hooks.inc,call,ImportObject
-,RecMovementTargetType,src/harness/replay_hooks.inc,call,ImportResult
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,ReplayRefPtr
-,RecMovementTargetType,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecMovementTargetType,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecMovementTargetType,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecMovementTargetType,src/harness/replay_hooks.inc,field_read,MovementSeam::TargetType

@@ -2167,7 +2167,7 @@ harness,platform,shared_write,Seams::features,5
 harness,platform,shared_write,Seams::los_radar,11
 harness,platform,shared_write,Seams::map,8
 harness,platform,shared_write,Seams::mission,5
-harness,platform,shared_write,Seams::movement,12
+harness,platform,shared_write,Seams::movement,11
 harness,platform,shared_write,Seams::network,21
 harness,platform,shared_write,Seams::orders,4
 harness,platform,shared_write,Seams::pathfinding,4
@@ -6933,7 +6933,7 @@ seams,platform,shared_write,Seams::features,5
 seams,platform,shared_write,Seams::los_radar,11
 seams,platform,shared_write,Seams::map,8
 seams,platform,shared_write,Seams::mission,5
-seams,platform,shared_write,Seams::movement,12
+seams,platform,shared_write,Seams::movement,11
 seams,platform,shared_write,Seams::network,21
 seams,platform,shared_write,Seams::orders,4
 seams,platform,shared_write,Seams::pathfinding,4

@@ -305,7 +305,7 @@ class DisplayLogTest(unittest.TestCase):
             self.assertEqual((root / "reference/display/a.txt").read_text(), "digest\n")
             self.assertEqual((root / "reference/displaylists/old.txt").read_text(), "old\n")
 
-    def test_copy_display_stores_a_frontend_scenarios_digest(self):
+    def test_copy_display_leaves_out_a_frontend_scenarios_digest(self):
         with tempfile.TemporaryDirectory() as tmp:
             src, root = Path(tmp) / "branch", Path(tmp) / "tree"
             (src / "reference/display").mkdir(parents=True)
@@ -317,8 +317,8 @@ class DisplayLogTest(unittest.TestCase):
                     mock.patch.object(reference, "DISPLAYLISTS", root / "reference/displaylists"), \
                     mock.patch.object(reference, "SCENARIOS", root / "reference/scenarios"), contextlib.redirect_stdout(io.StringIO()) as out:
                 reference.copy_display(src)
-            self.assertEqual(sorted(p.name for p in (root / "reference/display").iterdir()), ["battle.txt", "menu.txt"])
-            self.assertIn("2 display files copied", out.getvalue())
+            self.assertEqual(sorted(p.name for p in (root / "reference/display").iterdir()), ["battle.txt"])
+            self.assertIn("1 display files copied", out.getvalue())
 
     def test_copy_display_stores_the_lists_as_xz(self):
         with tempfile.TemporaryDirectory() as tmp:

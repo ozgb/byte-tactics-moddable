@@ -2349,6 +2349,9 @@ def copy_display(directory: Path) -> None:
             old.unlink()
         copied = 0
         for path in logs:
+            # TODO(#1231): store the display digest of a frontend scenario once the loading frame's radar pixels land where the reference's do
+            if dest == DISPLAYS and (SCENARIOS / path.name).exists() and scenario_frontend(SCENARIOS / path.name):
+                continue
             if dest == DISPLAYLISTS:
                 (dest / f"{path.stem}{displayreplay.LIST_SUFFIX}").write_bytes(displayreplay.pack_list(path.read_text(encoding="latin-1")))
             else:

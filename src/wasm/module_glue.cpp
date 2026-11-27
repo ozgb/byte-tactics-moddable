@@ -343,11 +343,11 @@ IMPORT(EmitImport)
         return GlueImportError("Emit", "the effect runs past the module memory");
     int effect[kEffectCapacity / sizeof(int)];
     memcpy(effect, GlueLinear(a[0].i32), size);
-    if (glue == nullptr || !Routed(glue->def->outbox, effect[0]))
-        return GlueImportError("Emit", "the kind is not routed from the module's outbox");
     long expected;
-    if (!wl_module_publishes(glue->loader, glue->def->name, effect[0], &expected))
+    if (glue == nullptr || !wl_module_publishes(glue->loader, glue->def->name, effect[0], &expected))
         return GlueImportError("Emit", "the kind is not in the module's publishes table");
+    if (!Routed(glue->def->outbox, effect[0]))
+        return GlueImportError("Emit", "the kind is not routed from the module's outbox");
     if ((long)size != expected)
         return GlueImportError("Emit", "the size is not the payload's size of its kind");
     unsigned hookCount;

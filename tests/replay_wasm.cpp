@@ -125,11 +125,13 @@ void ReplayWasmSelect(const char* wasmPath, const char* subsystem)
     s_directory[length] = '\0';
     const char* stem = s_wasmPath + length;
     s_glue = nullptr;
-    for (unsigned i = 0; i < g_glueModuleCount; i++) {
-        const char* name = g_glueModules[i]->def->name;
+    unsigned count;
+    GlueModule* const* modules = GlueModules(&count);
+    for (unsigned i = 0; i < count; i++) {
+        const char* name = modules[i]->def->name;
         size_t n = strlen(name);
         if (subsystem != nullptr ? strcmp(subsystem, name) == 0 : strncmp(stem, name, n) == 0 && (stem[n] == '.' || stem[n] == '_'))
-            s_glue = g_glueModules[i];
+            s_glue = modules[i];
     }
     if (s_glue == nullptr)
         Stop("no WASM glue entry for the subsystem this module file is named after");

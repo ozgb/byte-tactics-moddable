@@ -365,7 +365,7 @@ class Writer:
         self.lines.append(line)
 
     def text(self):
-        return "\n".join(self.lines) + "\n"
+        return "\n".join(self.lines).rstrip("\n") + "\n"
 
 
 EVENT_CAPS = None
@@ -388,7 +388,7 @@ def event_cap(events, header_type):
 
 def slot_thunk(w, subsystem, index, slot, glue):
     """The native function the seam holds in WASM mode for one module slot."""
-    w(f"{slot.decl(f'{pascal(subsystem)}_{slot.name}')}")
+    w(f"{slot.decl(f'Glue{pascal(subsystem)}{slot.name}')}")
     w("{")
     w(f"    GlueModule* glue = &{glue};")
     w("    unsigned mark = GlueScratchMark();")
@@ -467,7 +467,7 @@ def slot_thunk(w, subsystem, index, slot, glue):
 
 
 def timed_native(w, subsystem, index, slot, glue, native):
-    w(f"{slot.decl(f'{pascal(subsystem)}_Timed{slot.name}')}")
+    w(f"{slot.decl(f'Glue{pascal(subsystem)}Timed{slot.name}')}")
     w("{")
     w("    unsigned long long start = host_time_counter();")
     call = f"{native}->{slot.name}({', '.join(n for _, n in slot.params)})"
@@ -562,12 +562,13 @@ def tables(manifest, all_seams):
 
     w = Writer()
     w("#include <wasmtime.h>")
-    w("#include \"wasmloader.h\"")
     w("#include \"../units/unit_def.h\"")
     w("#include \"../../interfaces/host.h\"")
     w("#include \"../util/vec3.h\"")
     w("#include \"../util/angles.h\"")
-    w("#include \"../../interfaces/seams.h\"")
+    for header in ("wind_meteors", "economy", "features", "ai", "pathfinding", "weapons", "targeting", "los_radar", "orders",
+                   "units", "players", "map", "scripts", "movement", "mission", "network", "ref", "rand_stream", "services", "seams"):
+        w(f"#include \"../../interfaces/{header}.h\"")
     w("#include \"../util/engine_services.h\"")
     w("#include \"module_glue.h\"")
     w()
@@ -611,7 +612,7 @@ def tables(manifest, all_seams):
         w(f"    {native} = g_seams.{field};")
         w(f"    s_{camel(subsystem)}Seam = *{native};")
         for name in exports:
-            w(f"    s_{camel(subsystem)}Seam.{name} = {p}_{name};")
+            w(f"    s_{camel(subsystem)}Seam.{name} = Glue{p}{name};")
         w(f"    g_seams.{field} = &s_{camel(subsystem)}Seam;")
         w("}")
         w()
@@ -620,7 +621,7 @@ def tables(manifest, all_seams):
         w(f"    {native} = g_seams.{field};")
         w(f"    s_{camel(subsystem)}Timed = *{native};")
         for name in exports:
-            w(f"    s_{camel(subsystem)}Timed.{name} = {p}_Timed{name};")
+            w(f"    s_{camel(subsystem)}Timed.{name} = Glue{p}Timed{name};")
         w(f"    g_seams.{field} = &s_{camel(subsystem)}Timed;")
         w("}")
         w()
@@ -641,30 +642,37 @@ def tables(manifest, all_seams):
     functions = []
     for (group, name), signature in sorted(imports.items()):
         slot = next(s for s in all_seams[group] if s.name == name)
-        function = f"Import_{group}_{name}"
+        function = f"GlueImport{pascal(group)}{name}"
         import_thunk(w, group, slot, function)
         functions.append((group, name, letters(signature), function))
-    w("}")
-    w()
-    w("GlueModule* const g_glueModules[] = {")
+    w("GlueModule* const kGlueModules[] = {")
     for glue in defs:
         w(f"    &{glue},")
     w("};")
-    w("const unsigned g_glueModuleCount = sizeof g_glueModules / sizeof g_glueModules[0];")
     w()
-    w("const GlueImport g_glueInterfaceImports[] = {")
+    w("const GlueImport kGlueInterfaceImports[] = {")
     for group, name, sig, function in functions:
         w(f"    {{\"{group}\", \"{name}\", \"{sig}\", {function}}},")
     w("};")
-    w("const unsigned g_glueInterfaceImportCount = sizeof g_glueInterfaceImports / sizeof g_glueInterfaceImports[0];")
     w()
     rows = sorted({(publisher, int(value)) for publisher, _kind, value, _sub, _how in routes.rows()},
                   key=lambda r: (MODULES.index(r[0]) if r[0] in MODULES else -1, r[1]))
-    w("const GlueRoute g_glueRoutes[] = {")
+    w("const GlueRoute kGlueRoutes[] = {")
     for publisher, value in rows:
         w(f"    {{SCHED_{publisher.upper()}, {value}}},")
     w("};")
-    w("const unsigned g_glueRouteCount = sizeof g_glueRoutes / sizeof g_glueRoutes[0];")
+    w()
+    w("}")
+    w()
+    for function, kind, table in (("GlueModules", "GlueModule* const", "kGlueModules"),
+                                  ("GlueInterfaceImports", "const GlueImport", "kGlueInterfaceImports"),
+                                  ("GlueRoutes", "const GlueRoute", "kGlueRoutes")):
+        w(f"{kind}* {function}(unsigned* count)")
+        w("{")
+        w(f"    *count = sizeof {table} / sizeof {table}[0];")
+        w(f"    return {table};")
+        w("}")
+        w()
     return w.text()
 
 

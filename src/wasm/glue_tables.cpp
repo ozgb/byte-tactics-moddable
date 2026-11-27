@@ -1,9 +1,27 @@
 #include <wasmtime.h>
-#include "wasmloader.h"
 #include "../units/unit_def.h"
 #include "../../interfaces/host.h"
 #include "../util/vec3.h"
 #include "../util/angles.h"
+#include "../../interfaces/wind_meteors.h"
+#include "../../interfaces/economy.h"
+#include "../../interfaces/features.h"
+#include "../../interfaces/ai.h"
+#include "../../interfaces/pathfinding.h"
+#include "../../interfaces/weapons.h"
+#include "../../interfaces/targeting.h"
+#include "../../interfaces/los_radar.h"
+#include "../../interfaces/orders.h"
+#include "../../interfaces/units.h"
+#include "../../interfaces/players.h"
+#include "../../interfaces/map.h"
+#include "../../interfaces/scripts.h"
+#include "../../interfaces/movement.h"
+#include "../../interfaces/mission.h"
+#include "../../interfaces/network.h"
+#include "../../interfaces/ref.h"
+#include "../../interfaces/rand_stream.h"
+#include "../../interfaces/services.h"
 #include "../../interfaces/seams.h"
 #include "../util/engine_services.h"
 #include "module_glue.h"
@@ -32,7 +50,7 @@ const WindMeteorsSeam* s_windMeteorsNative;
 WindMeteorsSeam s_windMeteorsSeam;
 WindMeteorsSeam s_windMeteorsTimed;
 
-void __cdecl WindMeteors_UpdateWind(RandStream stream)
+void __cdecl GlueWindMeteorsUpdateWind(RandStream stream)
 {
     GlueModule* glue = &s_windMeteorsGlue;
     unsigned mark = GlueScratchMark();
@@ -43,7 +61,7 @@ void __cdecl WindMeteors_UpdateWind(RandStream stream)
     GlueScratchRelease(mark);
 }
 
-void __stdcall WindMeteors_UpdateMeteors()
+void __stdcall GlueWindMeteorsUpdateMeteors()
 {
     GlueModule* glue = &s_windMeteorsGlue;
     unsigned mark = GlueScratchMark();
@@ -53,7 +71,7 @@ void __stdcall WindMeteors_UpdateMeteors()
     GlueScratchRelease(mark);
 }
 
-void __stdcall WindMeteors_Apply(const WindMeteorsEventHeader* event, unsigned int size)
+void __stdcall GlueWindMeteorsApply(const WindMeteorsEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_windMeteorsGlue;
     unsigned mark = GlueScratchMark();
@@ -66,7 +84,7 @@ void __stdcall WindMeteors_Apply(const WindMeteorsEventHeader* event, unsigned i
     GlueScratchRelease(mark);
 }
 
-void __stdcall WindMeteors_InitMeteors()
+void __stdcall GlueWindMeteorsInitMeteors()
 {
     GlueModule* glue = &s_windMeteorsGlue;
     unsigned mark = GlueScratchMark();
@@ -76,7 +94,7 @@ void __stdcall WindMeteors_InitMeteors()
     GlueScratchRelease(mark);
 }
 
-void __stdcall WindMeteors_EmptyShutdownPreCleanup()
+void __stdcall GlueWindMeteorsEmptyShutdownPreCleanup()
 {
     GlueModule* glue = &s_windMeteorsGlue;
     unsigned mark = GlueScratchMark();
@@ -86,7 +104,7 @@ void __stdcall WindMeteors_EmptyShutdownPreCleanup()
     GlueScratchRelease(mark);
 }
 
-void __stdcall WindMeteors_LoadMeteorDefaults(MeteorShowerParams* params)
+void __stdcall GlueWindMeteorsLoadMeteorDefaults(MeteorShowerParams* params)
 {
     GlueModule* glue = &s_windMeteorsGlue;
     unsigned mark = GlueScratchMark();
@@ -99,7 +117,7 @@ void __stdcall WindMeteors_LoadMeteorDefaults(MeteorShowerParams* params)
     GlueScratchRelease(mark);
 }
 
-void __stdcall WindMeteors_SaveMeteors(HapiBank* file)
+void __stdcall GlueWindMeteorsSaveMeteors(HapiBank* file)
 {
     GlueModule* glue = &s_windMeteorsGlue;
     unsigned mark = GlueScratchMark();
@@ -110,7 +128,7 @@ void __stdcall WindMeteors_SaveMeteors(HapiBank* file)
     GlueScratchRelease(mark);
 }
 
-void __stdcall WindMeteors_LoadMeteors(HapiBank* file)
+void __stdcall GlueWindMeteorsLoadMeteors(HapiBank* file)
 {
     GlueModule* glue = &s_windMeteorsGlue;
     unsigned mark = GlueScratchMark();
@@ -121,56 +139,56 @@ void __stdcall WindMeteors_LoadMeteors(HapiBank* file)
     GlueScratchRelease(mark);
 }
 
-void __cdecl WindMeteors_TimedUpdateWind(RandStream stream)
+void __cdecl GlueWindMeteorsTimedUpdateWind(RandStream stream)
 {
     unsigned long long start = host_time_counter();
     s_windMeteorsNative->UpdateWind(stream);
     GlueTimed(&s_windMeteorsGlue, 0, start);
 }
 
-void __stdcall WindMeteors_TimedUpdateMeteors()
+void __stdcall GlueWindMeteorsTimedUpdateMeteors()
 {
     unsigned long long start = host_time_counter();
     s_windMeteorsNative->UpdateMeteors();
     GlueTimed(&s_windMeteorsGlue, 1, start);
 }
 
-void __stdcall WindMeteors_TimedApply(const WindMeteorsEventHeader* event, unsigned int size)
+void __stdcall GlueWindMeteorsTimedApply(const WindMeteorsEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     s_windMeteorsNative->Apply(event, size);
     GlueTimed(&s_windMeteorsGlue, 2, start);
 }
 
-void __stdcall WindMeteors_TimedInitMeteors()
+void __stdcall GlueWindMeteorsTimedInitMeteors()
 {
     unsigned long long start = host_time_counter();
     s_windMeteorsNative->InitMeteors();
     GlueTimed(&s_windMeteorsGlue, 3, start);
 }
 
-void __stdcall WindMeteors_TimedEmptyShutdownPreCleanup()
+void __stdcall GlueWindMeteorsTimedEmptyShutdownPreCleanup()
 {
     unsigned long long start = host_time_counter();
     s_windMeteorsNative->EmptyShutdownPreCleanup();
     GlueTimed(&s_windMeteorsGlue, 4, start);
 }
 
-void __stdcall WindMeteors_TimedLoadMeteorDefaults(MeteorShowerParams* params)
+void __stdcall GlueWindMeteorsTimedLoadMeteorDefaults(MeteorShowerParams* params)
 {
     unsigned long long start = host_time_counter();
     s_windMeteorsNative->LoadMeteorDefaults(params);
     GlueTimed(&s_windMeteorsGlue, 5, start);
 }
 
-void __stdcall WindMeteors_TimedSaveMeteors(HapiBank* file)
+void __stdcall GlueWindMeteorsTimedSaveMeteors(HapiBank* file)
 {
     unsigned long long start = host_time_counter();
     s_windMeteorsNative->SaveMeteors(file);
     GlueTimed(&s_windMeteorsGlue, 6, start);
 }
 
-void __stdcall WindMeteors_TimedLoadMeteors(HapiBank* file)
+void __stdcall GlueWindMeteorsTimedLoadMeteors(HapiBank* file)
 {
     unsigned long long start = host_time_counter();
     s_windMeteorsNative->LoadMeteors(file);
@@ -184,14 +202,14 @@ void WindMeteorsUseSeam(GlueModule* glue)
         return;
     s_windMeteorsNative = g_seams.wind_meteors;
     s_windMeteorsSeam = *s_windMeteorsNative;
-    s_windMeteorsSeam.UpdateWind = WindMeteors_UpdateWind;
-    s_windMeteorsSeam.UpdateMeteors = WindMeteors_UpdateMeteors;
-    s_windMeteorsSeam.Apply = WindMeteors_Apply;
-    s_windMeteorsSeam.InitMeteors = WindMeteors_InitMeteors;
-    s_windMeteorsSeam.EmptyShutdownPreCleanup = WindMeteors_EmptyShutdownPreCleanup;
-    s_windMeteorsSeam.LoadMeteorDefaults = WindMeteors_LoadMeteorDefaults;
-    s_windMeteorsSeam.SaveMeteors = WindMeteors_SaveMeteors;
-    s_windMeteorsSeam.LoadMeteors = WindMeteors_LoadMeteors;
+    s_windMeteorsSeam.UpdateWind = GlueWindMeteorsUpdateWind;
+    s_windMeteorsSeam.UpdateMeteors = GlueWindMeteorsUpdateMeteors;
+    s_windMeteorsSeam.Apply = GlueWindMeteorsApply;
+    s_windMeteorsSeam.InitMeteors = GlueWindMeteorsInitMeteors;
+    s_windMeteorsSeam.EmptyShutdownPreCleanup = GlueWindMeteorsEmptyShutdownPreCleanup;
+    s_windMeteorsSeam.LoadMeteorDefaults = GlueWindMeteorsLoadMeteorDefaults;
+    s_windMeteorsSeam.SaveMeteors = GlueWindMeteorsSaveMeteors;
+    s_windMeteorsSeam.LoadMeteors = GlueWindMeteorsLoadMeteors;
     g_seams.wind_meteors = &s_windMeteorsSeam;
 }
 
@@ -199,14 +217,14 @@ void WindMeteorsTimeNative()
 {
     s_windMeteorsNative = g_seams.wind_meteors;
     s_windMeteorsTimed = *s_windMeteorsNative;
-    s_windMeteorsTimed.UpdateWind = WindMeteors_TimedUpdateWind;
-    s_windMeteorsTimed.UpdateMeteors = WindMeteors_TimedUpdateMeteors;
-    s_windMeteorsTimed.Apply = WindMeteors_TimedApply;
-    s_windMeteorsTimed.InitMeteors = WindMeteors_TimedInitMeteors;
-    s_windMeteorsTimed.EmptyShutdownPreCleanup = WindMeteors_TimedEmptyShutdownPreCleanup;
-    s_windMeteorsTimed.LoadMeteorDefaults = WindMeteors_TimedLoadMeteorDefaults;
-    s_windMeteorsTimed.SaveMeteors = WindMeteors_TimedSaveMeteors;
-    s_windMeteorsTimed.LoadMeteors = WindMeteors_TimedLoadMeteors;
+    s_windMeteorsTimed.UpdateWind = GlueWindMeteorsTimedUpdateWind;
+    s_windMeteorsTimed.UpdateMeteors = GlueWindMeteorsTimedUpdateMeteors;
+    s_windMeteorsTimed.Apply = GlueWindMeteorsTimedApply;
+    s_windMeteorsTimed.InitMeteors = GlueWindMeteorsTimedInitMeteors;
+    s_windMeteorsTimed.EmptyShutdownPreCleanup = GlueWindMeteorsTimedEmptyShutdownPreCleanup;
+    s_windMeteorsTimed.LoadMeteorDefaults = GlueWindMeteorsTimedLoadMeteorDefaults;
+    s_windMeteorsTimed.SaveMeteors = GlueWindMeteorsTimedSaveMeteors;
+    s_windMeteorsTimed.LoadMeteors = GlueWindMeteorsTimedLoadMeteors;
     g_seams.wind_meteors = &s_windMeteorsTimed;
 }
 
@@ -233,7 +251,7 @@ const EconomySeam* s_economyNative;
 EconomySeam s_economySeam;
 EconomySeam s_economyTimed;
 
-unsigned int __stdcall Economy_RegionSize(const EconMapInfo* map)
+unsigned int __stdcall GlueEconomyRegionSize(const EconMapInfo* map)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -246,7 +264,7 @@ unsigned int __stdcall Economy_RegionSize(const EconMapInfo* map)
     return (unsigned int)slotArgs[0].i32;
 }
 
-void __stdcall Economy_Init(const EconMapInfo* map, const EconomyWorldView* world, void* region, unsigned int size)
+void __stdcall GlueEconomyInit(const EconMapInfo* map, const EconomyWorldView* world, void* region, unsigned int size)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -263,7 +281,7 @@ void __stdcall Economy_Init(const EconMapInfo* map, const EconomyWorldView* worl
     GlueScratchRelease(mark);
 }
 
-void* __stdcall Economy_Shutdown()
+void* __stdcall GlueEconomyShutdown()
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -274,7 +292,7 @@ void* __stdcall Economy_Shutdown()
     return (void*)GlueResult(glue, 2, (unsigned)slotArgs[0].i32, 1);
 }
 
-int __stdcall Economy_Apply(const EconomyEventHeader* event, unsigned int size)
+int __stdcall GlueEconomyApply(const EconomyEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -288,7 +306,7 @@ int __stdcall Economy_Apply(const EconomyEventHeader* event, unsigned int size)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Economy_Spend(const EconomySpend* spend)
+int __stdcall GlueEconomySpend(const EconomySpend* spend)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -301,7 +319,7 @@ int __stdcall Economy_Spend(const EconomySpend* spend)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Economy_UpdatePlayerEconomy(int player)
+void __stdcall GlueEconomyUpdatePlayerEconomy(int player)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -312,7 +330,7 @@ void __stdcall Economy_UpdatePlayerEconomy(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Economy_UpdateMetalExtraction(EconUnit unit)
+void __stdcall GlueEconomyUpdateMetalExtraction(EconUnit unit)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -323,7 +341,7 @@ void __stdcall Economy_UpdateMetalExtraction(EconUnit unit)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Economy_UpdateResourceSharing(int player)
+void __stdcall GlueEconomyUpdateResourceSharing(int player)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -334,7 +352,7 @@ void __stdcall Economy_UpdateResourceSharing(int player)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Economy_RequestGranted(EconUnit unit, unsigned int resources)
+int __stdcall GlueEconomyRequestGranted(EconUnit unit, unsigned int resources)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -347,7 +365,7 @@ int __stdcall Economy_RequestGranted(EconUnit unit, unsigned int resources)
     return (int)slotArgs[0].i32;
 }
 
-double __stdcall Economy_GetEnergyUse(EconType type)
+double __stdcall GlueEconomyGetEnergyUse(EconType type)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -359,7 +377,7 @@ double __stdcall Economy_GetEnergyUse(EconType type)
     return (double)slotArgs[0].f64;
 }
 
-void __stdcall Economy_UnitAccount(EconUnit unit, EconAccount* out)
+void __stdcall GlueEconomyUnitAccount(EconUnit unit, EconAccount* out)
 {
     GlueModule* glue = &s_economyGlue;
     unsigned mark = GlueScratchMark();
@@ -373,7 +391,7 @@ void __stdcall Economy_UnitAccount(EconUnit unit, EconAccount* out)
     GlueScratchRelease(mark);
 }
 
-unsigned int __stdcall Economy_TimedRegionSize(const EconMapInfo* map)
+unsigned int __stdcall GlueEconomyTimedRegionSize(const EconMapInfo* map)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_economyNative->RegionSize(map);
@@ -381,14 +399,14 @@ unsigned int __stdcall Economy_TimedRegionSize(const EconMapInfo* map)
     return result;
 }
 
-void __stdcall Economy_TimedInit(const EconMapInfo* map, const EconomyWorldView* world, void* region, unsigned int size)
+void __stdcall GlueEconomyTimedInit(const EconMapInfo* map, const EconomyWorldView* world, void* region, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     s_economyNative->Init(map, world, region, size);
     GlueTimed(&s_economyGlue, 1, start);
 }
 
-void* __stdcall Economy_TimedShutdown()
+void* __stdcall GlueEconomyTimedShutdown()
 {
     unsigned long long start = host_time_counter();
     void* result = s_economyNative->Shutdown();
@@ -396,7 +414,7 @@ void* __stdcall Economy_TimedShutdown()
     return result;
 }
 
-int __stdcall Economy_TimedApply(const EconomyEventHeader* event, unsigned int size)
+int __stdcall GlueEconomyTimedApply(const EconomyEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_economyNative->Apply(event, size);
@@ -404,7 +422,7 @@ int __stdcall Economy_TimedApply(const EconomyEventHeader* event, unsigned int s
     return result;
 }
 
-int __stdcall Economy_TimedSpend(const EconomySpend* spend)
+int __stdcall GlueEconomyTimedSpend(const EconomySpend* spend)
 {
     unsigned long long start = host_time_counter();
     int result = s_economyNative->Spend(spend);
@@ -412,28 +430,28 @@ int __stdcall Economy_TimedSpend(const EconomySpend* spend)
     return result;
 }
 
-void __stdcall Economy_TimedUpdatePlayerEconomy(int player)
+void __stdcall GlueEconomyTimedUpdatePlayerEconomy(int player)
 {
     unsigned long long start = host_time_counter();
     s_economyNative->UpdatePlayerEconomy(player);
     GlueTimed(&s_economyGlue, 5, start);
 }
 
-void __stdcall Economy_TimedUpdateMetalExtraction(EconUnit unit)
+void __stdcall GlueEconomyTimedUpdateMetalExtraction(EconUnit unit)
 {
     unsigned long long start = host_time_counter();
     s_economyNative->UpdateMetalExtraction(unit);
     GlueTimed(&s_economyGlue, 6, start);
 }
 
-void __stdcall Economy_TimedUpdateResourceSharing(int player)
+void __stdcall GlueEconomyTimedUpdateResourceSharing(int player)
 {
     unsigned long long start = host_time_counter();
     s_economyNative->UpdateResourceSharing(player);
     GlueTimed(&s_economyGlue, 7, start);
 }
 
-int __stdcall Economy_TimedRequestGranted(EconUnit unit, unsigned int resources)
+int __stdcall GlueEconomyTimedRequestGranted(EconUnit unit, unsigned int resources)
 {
     unsigned long long start = host_time_counter();
     int result = s_economyNative->RequestGranted(unit, resources);
@@ -441,7 +459,7 @@ int __stdcall Economy_TimedRequestGranted(EconUnit unit, unsigned int resources)
     return result;
 }
 
-double __stdcall Economy_TimedGetEnergyUse(EconType type)
+double __stdcall GlueEconomyTimedGetEnergyUse(EconType type)
 {
     unsigned long long start = host_time_counter();
     double result = s_economyNative->GetEnergyUse(type);
@@ -449,7 +467,7 @@ double __stdcall Economy_TimedGetEnergyUse(EconType type)
     return result;
 }
 
-void __stdcall Economy_TimedUnitAccount(EconUnit unit, EconAccount* out)
+void __stdcall GlueEconomyTimedUnitAccount(EconUnit unit, EconAccount* out)
 {
     unsigned long long start = host_time_counter();
     s_economyNative->UnitAccount(unit, out);
@@ -463,17 +481,17 @@ void EconomyUseSeam(GlueModule* glue)
         return;
     s_economyNative = g_seams.economy;
     s_economySeam = *s_economyNative;
-    s_economySeam.RegionSize = Economy_RegionSize;
-    s_economySeam.Init = Economy_Init;
-    s_economySeam.Shutdown = Economy_Shutdown;
-    s_economySeam.Apply = Economy_Apply;
-    s_economySeam.Spend = Economy_Spend;
-    s_economySeam.UpdatePlayerEconomy = Economy_UpdatePlayerEconomy;
-    s_economySeam.UpdateMetalExtraction = Economy_UpdateMetalExtraction;
-    s_economySeam.UpdateResourceSharing = Economy_UpdateResourceSharing;
-    s_economySeam.RequestGranted = Economy_RequestGranted;
-    s_economySeam.GetEnergyUse = Economy_GetEnergyUse;
-    s_economySeam.UnitAccount = Economy_UnitAccount;
+    s_economySeam.RegionSize = GlueEconomyRegionSize;
+    s_economySeam.Init = GlueEconomyInit;
+    s_economySeam.Shutdown = GlueEconomyShutdown;
+    s_economySeam.Apply = GlueEconomyApply;
+    s_economySeam.Spend = GlueEconomySpend;
+    s_economySeam.UpdatePlayerEconomy = GlueEconomyUpdatePlayerEconomy;
+    s_economySeam.UpdateMetalExtraction = GlueEconomyUpdateMetalExtraction;
+    s_economySeam.UpdateResourceSharing = GlueEconomyUpdateResourceSharing;
+    s_economySeam.RequestGranted = GlueEconomyRequestGranted;
+    s_economySeam.GetEnergyUse = GlueEconomyGetEnergyUse;
+    s_economySeam.UnitAccount = GlueEconomyUnitAccount;
     g_seams.economy = &s_economySeam;
 }
 
@@ -481,17 +499,17 @@ void EconomyTimeNative()
 {
     s_economyNative = g_seams.economy;
     s_economyTimed = *s_economyNative;
-    s_economyTimed.RegionSize = Economy_TimedRegionSize;
-    s_economyTimed.Init = Economy_TimedInit;
-    s_economyTimed.Shutdown = Economy_TimedShutdown;
-    s_economyTimed.Apply = Economy_TimedApply;
-    s_economyTimed.Spend = Economy_TimedSpend;
-    s_economyTimed.UpdatePlayerEconomy = Economy_TimedUpdatePlayerEconomy;
-    s_economyTimed.UpdateMetalExtraction = Economy_TimedUpdateMetalExtraction;
-    s_economyTimed.UpdateResourceSharing = Economy_TimedUpdateResourceSharing;
-    s_economyTimed.RequestGranted = Economy_TimedRequestGranted;
-    s_economyTimed.GetEnergyUse = Economy_TimedGetEnergyUse;
-    s_economyTimed.UnitAccount = Economy_TimedUnitAccount;
+    s_economyTimed.RegionSize = GlueEconomyTimedRegionSize;
+    s_economyTimed.Init = GlueEconomyTimedInit;
+    s_economyTimed.Shutdown = GlueEconomyTimedShutdown;
+    s_economyTimed.Apply = GlueEconomyTimedApply;
+    s_economyTimed.Spend = GlueEconomyTimedSpend;
+    s_economyTimed.UpdatePlayerEconomy = GlueEconomyTimedUpdatePlayerEconomy;
+    s_economyTimed.UpdateMetalExtraction = GlueEconomyTimedUpdateMetalExtraction;
+    s_economyTimed.UpdateResourceSharing = GlueEconomyTimedUpdateResourceSharing;
+    s_economyTimed.RequestGranted = GlueEconomyTimedRequestGranted;
+    s_economyTimed.GetEnergyUse = GlueEconomyTimedGetEnergyUse;
+    s_economyTimed.UnitAccount = GlueEconomyTimedUnitAccount;
     g_seams.economy = &s_economyTimed;
 }
 
@@ -518,7 +536,7 @@ const FeaturesSeam* s_featuresNative;
 FeaturesSeam s_featuresSeam;
 FeaturesSeam s_featuresTimed;
 
-void __stdcall Features_UpdateFeatures()
+void __stdcall GlueFeaturesUpdateFeatures()
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -528,7 +546,7 @@ void __stdcall Features_UpdateFeatures()
     GlueScratchRelease(mark);
 }
 
-unsigned short __stdcall Features_GetCellFeature(Cell* cell)
+unsigned short __stdcall GlueFeaturesGetCellFeature(Cell* cell)
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -540,7 +558,7 @@ unsigned short __stdcall Features_GetCellFeature(Cell* cell)
     return (unsigned short)slotArgs[0].i32;
 }
 
-void __stdcall Features_GetFootprintCentre(const Point16* cell, Feature* def, Vec3* out)
+void __stdcall GlueFeaturesGetFootprintCentre(const Point16* cell, Feature* def, Vec3* out)
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -556,7 +574,7 @@ void __stdcall Features_GetFootprintCentre(const Point16* cell, Feature* def, Ve
     GlueScratchRelease(mark);
 }
 
-int __stdcall Features_Apply(const FeaturesEventHeader* event, unsigned int size)
+int __stdcall GlueFeaturesApply(const FeaturesEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -570,7 +588,7 @@ int __stdcall Features_Apply(const FeaturesEventHeader* event, unsigned int size
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Features_Place(const FeaturesPlace* place)
+int __stdcall GlueFeaturesPlace(const FeaturesPlace* place)
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -583,7 +601,7 @@ int __stdcall Features_Place(const FeaturesPlace* place)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Features_FeatureTypeCount()
+int __stdcall GlueFeaturesFeatureTypeCount()
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -594,7 +612,7 @@ int __stdcall Features_FeatureTypeCount()
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Features_AnimateFeatureType(int type)
+void __stdcall GlueFeaturesAnimateFeatureType(int type)
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -605,7 +623,7 @@ void __stdcall Features_AnimateFeatureType(int type)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Features_ScanFeatureCell()
+void __stdcall GlueFeaturesScanFeatureCell()
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -615,7 +633,7 @@ void __stdcall Features_ScanFeatureCell()
     GlueScratchRelease(mark);
 }
 
-int __stdcall Features_FirstFeatureSpot()
+int __stdcall GlueFeaturesFirstFeatureSpot()
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -626,7 +644,7 @@ int __stdcall Features_FirstFeatureSpot()
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Features_UpdateFeatureSpot(int spot)
+int __stdcall GlueFeaturesUpdateFeatureSpot(int spot)
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -638,7 +656,7 @@ int __stdcall Features_UpdateFeatureSpot(int spot)
     return (int)slotArgs[0].i32;
 }
 
-unsigned short __stdcall Features_FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size)
+unsigned short __stdcall GlueFeaturesFindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size)
 {
     GlueModule* glue = &s_featuresGlue;
     unsigned mark = GlueScratchMark();
@@ -657,14 +675,14 @@ unsigned short __stdcall Features_FindFeatureAtPos(Vec3* pos, Point16* cell, Poi
     return (unsigned short)slotArgs[0].i32;
 }
 
-void __stdcall Features_TimedUpdateFeatures()
+void __stdcall GlueFeaturesTimedUpdateFeatures()
 {
     unsigned long long start = host_time_counter();
     s_featuresNative->UpdateFeatures();
     GlueTimed(&s_featuresGlue, 0, start);
 }
 
-unsigned short __stdcall Features_TimedGetCellFeature(Cell* cell)
+unsigned short __stdcall GlueFeaturesTimedGetCellFeature(Cell* cell)
 {
     unsigned long long start = host_time_counter();
     unsigned short result = s_featuresNative->GetCellFeature(cell);
@@ -672,14 +690,14 @@ unsigned short __stdcall Features_TimedGetCellFeature(Cell* cell)
     return result;
 }
 
-void __stdcall Features_TimedGetFootprintCentre(const Point16* cell, Feature* def, Vec3* out)
+void __stdcall GlueFeaturesTimedGetFootprintCentre(const Point16* cell, Feature* def, Vec3* out)
 {
     unsigned long long start = host_time_counter();
     s_featuresNative->GetFootprintCentre(cell, def, out);
     GlueTimed(&s_featuresGlue, 2, start);
 }
 
-int __stdcall Features_TimedApply(const FeaturesEventHeader* event, unsigned int size)
+int __stdcall GlueFeaturesTimedApply(const FeaturesEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_featuresNative->Apply(event, size);
@@ -687,7 +705,7 @@ int __stdcall Features_TimedApply(const FeaturesEventHeader* event, unsigned int
     return result;
 }
 
-int __stdcall Features_TimedPlace(const FeaturesPlace* place)
+int __stdcall GlueFeaturesTimedPlace(const FeaturesPlace* place)
 {
     unsigned long long start = host_time_counter();
     int result = s_featuresNative->Place(place);
@@ -695,7 +713,7 @@ int __stdcall Features_TimedPlace(const FeaturesPlace* place)
     return result;
 }
 
-int __stdcall Features_TimedFeatureTypeCount()
+int __stdcall GlueFeaturesTimedFeatureTypeCount()
 {
     unsigned long long start = host_time_counter();
     int result = s_featuresNative->FeatureTypeCount();
@@ -703,21 +721,21 @@ int __stdcall Features_TimedFeatureTypeCount()
     return result;
 }
 
-void __stdcall Features_TimedAnimateFeatureType(int type)
+void __stdcall GlueFeaturesTimedAnimateFeatureType(int type)
 {
     unsigned long long start = host_time_counter();
     s_featuresNative->AnimateFeatureType(type);
     GlueTimed(&s_featuresGlue, 6, start);
 }
 
-void __stdcall Features_TimedScanFeatureCell()
+void __stdcall GlueFeaturesTimedScanFeatureCell()
 {
     unsigned long long start = host_time_counter();
     s_featuresNative->ScanFeatureCell();
     GlueTimed(&s_featuresGlue, 7, start);
 }
 
-int __stdcall Features_TimedFirstFeatureSpot()
+int __stdcall GlueFeaturesTimedFirstFeatureSpot()
 {
     unsigned long long start = host_time_counter();
     int result = s_featuresNative->FirstFeatureSpot();
@@ -725,7 +743,7 @@ int __stdcall Features_TimedFirstFeatureSpot()
     return result;
 }
 
-int __stdcall Features_TimedUpdateFeatureSpot(int spot)
+int __stdcall GlueFeaturesTimedUpdateFeatureSpot(int spot)
 {
     unsigned long long start = host_time_counter();
     int result = s_featuresNative->UpdateFeatureSpot(spot);
@@ -733,7 +751,7 @@ int __stdcall Features_TimedUpdateFeatureSpot(int spot)
     return result;
 }
 
-unsigned short __stdcall Features_TimedFindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size)
+unsigned short __stdcall GlueFeaturesTimedFindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size)
 {
     unsigned long long start = host_time_counter();
     unsigned short result = s_featuresNative->FindFeatureAtPos(pos, cell, size);
@@ -748,17 +766,17 @@ void FeaturesUseSeam(GlueModule* glue)
         return;
     s_featuresNative = g_seams.features;
     s_featuresSeam = *s_featuresNative;
-    s_featuresSeam.UpdateFeatures = Features_UpdateFeatures;
-    s_featuresSeam.GetCellFeature = Features_GetCellFeature;
-    s_featuresSeam.GetFootprintCentre = Features_GetFootprintCentre;
-    s_featuresSeam.Apply = Features_Apply;
-    s_featuresSeam.Place = Features_Place;
-    s_featuresSeam.FeatureTypeCount = Features_FeatureTypeCount;
-    s_featuresSeam.AnimateFeatureType = Features_AnimateFeatureType;
-    s_featuresSeam.ScanFeatureCell = Features_ScanFeatureCell;
-    s_featuresSeam.FirstFeatureSpot = Features_FirstFeatureSpot;
-    s_featuresSeam.UpdateFeatureSpot = Features_UpdateFeatureSpot;
-    s_featuresSeam.FindFeatureAtPos = Features_FindFeatureAtPos;
+    s_featuresSeam.UpdateFeatures = GlueFeaturesUpdateFeatures;
+    s_featuresSeam.GetCellFeature = GlueFeaturesGetCellFeature;
+    s_featuresSeam.GetFootprintCentre = GlueFeaturesGetFootprintCentre;
+    s_featuresSeam.Apply = GlueFeaturesApply;
+    s_featuresSeam.Place = GlueFeaturesPlace;
+    s_featuresSeam.FeatureTypeCount = GlueFeaturesFeatureTypeCount;
+    s_featuresSeam.AnimateFeatureType = GlueFeaturesAnimateFeatureType;
+    s_featuresSeam.ScanFeatureCell = GlueFeaturesScanFeatureCell;
+    s_featuresSeam.FirstFeatureSpot = GlueFeaturesFirstFeatureSpot;
+    s_featuresSeam.UpdateFeatureSpot = GlueFeaturesUpdateFeatureSpot;
+    s_featuresSeam.FindFeatureAtPos = GlueFeaturesFindFeatureAtPos;
     g_seams.features = &s_featuresSeam;
 }
 
@@ -766,17 +784,17 @@ void FeaturesTimeNative()
 {
     s_featuresNative = g_seams.features;
     s_featuresTimed = *s_featuresNative;
-    s_featuresTimed.UpdateFeatures = Features_TimedUpdateFeatures;
-    s_featuresTimed.GetCellFeature = Features_TimedGetCellFeature;
-    s_featuresTimed.GetFootprintCentre = Features_TimedGetFootprintCentre;
-    s_featuresTimed.Apply = Features_TimedApply;
-    s_featuresTimed.Place = Features_TimedPlace;
-    s_featuresTimed.FeatureTypeCount = Features_TimedFeatureTypeCount;
-    s_featuresTimed.AnimateFeatureType = Features_TimedAnimateFeatureType;
-    s_featuresTimed.ScanFeatureCell = Features_TimedScanFeatureCell;
-    s_featuresTimed.FirstFeatureSpot = Features_TimedFirstFeatureSpot;
-    s_featuresTimed.UpdateFeatureSpot = Features_TimedUpdateFeatureSpot;
-    s_featuresTimed.FindFeatureAtPos = Features_TimedFindFeatureAtPos;
+    s_featuresTimed.UpdateFeatures = GlueFeaturesTimedUpdateFeatures;
+    s_featuresTimed.GetCellFeature = GlueFeaturesTimedGetCellFeature;
+    s_featuresTimed.GetFootprintCentre = GlueFeaturesTimedGetFootprintCentre;
+    s_featuresTimed.Apply = GlueFeaturesTimedApply;
+    s_featuresTimed.Place = GlueFeaturesTimedPlace;
+    s_featuresTimed.FeatureTypeCount = GlueFeaturesTimedFeatureTypeCount;
+    s_featuresTimed.AnimateFeatureType = GlueFeaturesTimedAnimateFeatureType;
+    s_featuresTimed.ScanFeatureCell = GlueFeaturesTimedScanFeatureCell;
+    s_featuresTimed.FirstFeatureSpot = GlueFeaturesTimedFirstFeatureSpot;
+    s_featuresTimed.UpdateFeatureSpot = GlueFeaturesTimedUpdateFeatureSpot;
+    s_featuresTimed.FindFeatureAtPos = GlueFeaturesTimedFindFeatureAtPos;
     g_seams.features = &s_featuresTimed;
 }
 
@@ -803,7 +821,7 @@ const AiSeam* s_aiNative;
 AiSeam s_aiSeam;
 AiSeam s_aiTimed;
 
-int __stdcall Ai_Apply(const AiEventHeader* event, unsigned int size)
+int __stdcall GlueAiApply(const AiEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -817,7 +835,7 @@ int __stdcall Ai_Apply(const AiEventHeader* event, unsigned int size)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Ai_DumpPlayerAI(int player, void* file)
+void __stdcall GlueAiDumpPlayerAI(int player, void* file)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -829,7 +847,7 @@ void __stdcall Ai_DumpPlayerAI(int player, void* file)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_CreatePlayerAI(int player)
+void __stdcall GlueAiCreatePlayerAI(int player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -840,7 +858,7 @@ void __stdcall Ai_CreatePlayerAI(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_DestroyPlayerAI(int player)
+void __stdcall GlueAiDestroyPlayerAI(int player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -851,7 +869,7 @@ void __stdcall Ai_DestroyPlayerAI(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_UpdatePlayerAI(int player)
+void __stdcall GlueAiUpdatePlayerAI(int player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -862,7 +880,7 @@ void __stdcall Ai_UpdatePlayerAI(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_RebuildFeatureCells(int player)
+void __stdcall GlueAiRebuildFeatureCells(int player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -873,7 +891,7 @@ void __stdcall Ai_RebuildFeatureCells(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_CreateSquads(Player* player)
+void __stdcall GlueAiCreateSquads(Player* player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -884,7 +902,7 @@ void __stdcall Ai_CreateSquads(Player* player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_FreeSquads(Player* player)
+void __stdcall GlueAiFreeSquads(Player* player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -895,7 +913,7 @@ void __stdcall Ai_FreeSquads(Player* player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_UpdateSquads(int player)
+void __stdcall GlueAiUpdateSquads(int player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -906,7 +924,7 @@ void __stdcall Ai_UpdateSquads(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_CreateSquadManager(Player* player)
+void __stdcall GlueAiCreateSquadManager(Player* player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -917,7 +935,7 @@ void __stdcall Ai_CreateSquadManager(Player* player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Ai_FreeSquadManager(Player* player)
+void __stdcall GlueAiFreeSquadManager(Player* player)
 {
     GlueModule* glue = &s_aiGlue;
     unsigned mark = GlueScratchMark();
@@ -928,7 +946,7 @@ void __stdcall Ai_FreeSquadManager(Player* player)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Ai_TimedApply(const AiEventHeader* event, unsigned int size)
+int __stdcall GlueAiTimedApply(const AiEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_aiNative->Apply(event, size);
@@ -936,70 +954,70 @@ int __stdcall Ai_TimedApply(const AiEventHeader* event, unsigned int size)
     return result;
 }
 
-void __stdcall Ai_TimedDumpPlayerAI(int player, void* file)
+void __stdcall GlueAiTimedDumpPlayerAI(int player, void* file)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->DumpPlayerAI(player, file);
     GlueTimed(&s_aiGlue, 1, start);
 }
 
-void __stdcall Ai_TimedCreatePlayerAI(int player)
+void __stdcall GlueAiTimedCreatePlayerAI(int player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->CreatePlayerAI(player);
     GlueTimed(&s_aiGlue, 2, start);
 }
 
-void __stdcall Ai_TimedDestroyPlayerAI(int player)
+void __stdcall GlueAiTimedDestroyPlayerAI(int player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->DestroyPlayerAI(player);
     GlueTimed(&s_aiGlue, 3, start);
 }
 
-void __stdcall Ai_TimedUpdatePlayerAI(int player)
+void __stdcall GlueAiTimedUpdatePlayerAI(int player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->UpdatePlayerAI(player);
     GlueTimed(&s_aiGlue, 4, start);
 }
 
-void __stdcall Ai_TimedRebuildFeatureCells(int player)
+void __stdcall GlueAiTimedRebuildFeatureCells(int player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->RebuildFeatureCells(player);
     GlueTimed(&s_aiGlue, 5, start);
 }
 
-void __stdcall Ai_TimedCreateSquads(Player* player)
+void __stdcall GlueAiTimedCreateSquads(Player* player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->CreateSquads(player);
     GlueTimed(&s_aiGlue, 6, start);
 }
 
-void __stdcall Ai_TimedFreeSquads(Player* player)
+void __stdcall GlueAiTimedFreeSquads(Player* player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->FreeSquads(player);
     GlueTimed(&s_aiGlue, 7, start);
 }
 
-void __stdcall Ai_TimedUpdateSquads(int player)
+void __stdcall GlueAiTimedUpdateSquads(int player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->UpdateSquads(player);
     GlueTimed(&s_aiGlue, 8, start);
 }
 
-void __stdcall Ai_TimedCreateSquadManager(Player* player)
+void __stdcall GlueAiTimedCreateSquadManager(Player* player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->CreateSquadManager(player);
     GlueTimed(&s_aiGlue, 9, start);
 }
 
-void __stdcall Ai_TimedFreeSquadManager(Player* player)
+void __stdcall GlueAiTimedFreeSquadManager(Player* player)
 {
     unsigned long long start = host_time_counter();
     s_aiNative->FreeSquadManager(player);
@@ -1013,17 +1031,17 @@ void AiUseSeam(GlueModule* glue)
         return;
     s_aiNative = g_seams.ai;
     s_aiSeam = *s_aiNative;
-    s_aiSeam.Apply = Ai_Apply;
-    s_aiSeam.DumpPlayerAI = Ai_DumpPlayerAI;
-    s_aiSeam.CreatePlayerAI = Ai_CreatePlayerAI;
-    s_aiSeam.DestroyPlayerAI = Ai_DestroyPlayerAI;
-    s_aiSeam.UpdatePlayerAI = Ai_UpdatePlayerAI;
-    s_aiSeam.RebuildFeatureCells = Ai_RebuildFeatureCells;
-    s_aiSeam.CreateSquads = Ai_CreateSquads;
-    s_aiSeam.FreeSquads = Ai_FreeSquads;
-    s_aiSeam.UpdateSquads = Ai_UpdateSquads;
-    s_aiSeam.CreateSquadManager = Ai_CreateSquadManager;
-    s_aiSeam.FreeSquadManager = Ai_FreeSquadManager;
+    s_aiSeam.Apply = GlueAiApply;
+    s_aiSeam.DumpPlayerAI = GlueAiDumpPlayerAI;
+    s_aiSeam.CreatePlayerAI = GlueAiCreatePlayerAI;
+    s_aiSeam.DestroyPlayerAI = GlueAiDestroyPlayerAI;
+    s_aiSeam.UpdatePlayerAI = GlueAiUpdatePlayerAI;
+    s_aiSeam.RebuildFeatureCells = GlueAiRebuildFeatureCells;
+    s_aiSeam.CreateSquads = GlueAiCreateSquads;
+    s_aiSeam.FreeSquads = GlueAiFreeSquads;
+    s_aiSeam.UpdateSquads = GlueAiUpdateSquads;
+    s_aiSeam.CreateSquadManager = GlueAiCreateSquadManager;
+    s_aiSeam.FreeSquadManager = GlueAiFreeSquadManager;
     g_seams.ai = &s_aiSeam;
 }
 
@@ -1031,17 +1049,17 @@ void AiTimeNative()
 {
     s_aiNative = g_seams.ai;
     s_aiTimed = *s_aiNative;
-    s_aiTimed.Apply = Ai_TimedApply;
-    s_aiTimed.DumpPlayerAI = Ai_TimedDumpPlayerAI;
-    s_aiTimed.CreatePlayerAI = Ai_TimedCreatePlayerAI;
-    s_aiTimed.DestroyPlayerAI = Ai_TimedDestroyPlayerAI;
-    s_aiTimed.UpdatePlayerAI = Ai_TimedUpdatePlayerAI;
-    s_aiTimed.RebuildFeatureCells = Ai_TimedRebuildFeatureCells;
-    s_aiTimed.CreateSquads = Ai_TimedCreateSquads;
-    s_aiTimed.FreeSquads = Ai_TimedFreeSquads;
-    s_aiTimed.UpdateSquads = Ai_TimedUpdateSquads;
-    s_aiTimed.CreateSquadManager = Ai_TimedCreateSquadManager;
-    s_aiTimed.FreeSquadManager = Ai_TimedFreeSquadManager;
+    s_aiTimed.Apply = GlueAiTimedApply;
+    s_aiTimed.DumpPlayerAI = GlueAiTimedDumpPlayerAI;
+    s_aiTimed.CreatePlayerAI = GlueAiTimedCreatePlayerAI;
+    s_aiTimed.DestroyPlayerAI = GlueAiTimedDestroyPlayerAI;
+    s_aiTimed.UpdatePlayerAI = GlueAiTimedUpdatePlayerAI;
+    s_aiTimed.RebuildFeatureCells = GlueAiTimedRebuildFeatureCells;
+    s_aiTimed.CreateSquads = GlueAiTimedCreateSquads;
+    s_aiTimed.FreeSquads = GlueAiTimedFreeSquads;
+    s_aiTimed.UpdateSquads = GlueAiTimedUpdateSquads;
+    s_aiTimed.CreateSquadManager = GlueAiTimedCreateSquadManager;
+    s_aiTimed.FreeSquadManager = GlueAiTimedFreeSquadManager;
     g_seams.ai = &s_aiTimed;
 }
 
@@ -1065,7 +1083,7 @@ const PathfindingSeam* s_pathfindingNative;
 PathfindingSeam s_pathfindingSeam;
 PathfindingSeam s_pathfindingTimed;
 
-unsigned int __stdcall Pathfinding_RegionSize(const PathMapInfo* map)
+unsigned int __stdcall GluePathfindingRegionSize(const PathMapInfo* map)
 {
     GlueModule* glue = &s_pathfindingGlue;
     unsigned mark = GlueScratchMark();
@@ -1078,7 +1096,7 @@ unsigned int __stdcall Pathfinding_RegionSize(const PathMapInfo* map)
     return (unsigned int)slotArgs[0].i32;
 }
 
-void __stdcall Pathfinding_Init(const PathMapInfo* map, void* region, unsigned int size)
+void __stdcall GluePathfindingInit(const PathMapInfo* map, void* region, unsigned int size)
 {
     GlueModule* glue = &s_pathfindingGlue;
     unsigned mark = GlueScratchMark();
@@ -1093,7 +1111,7 @@ void __stdcall Pathfinding_Init(const PathMapInfo* map, void* region, unsigned i
     GlueScratchRelease(mark);
 }
 
-void* __stdcall Pathfinding_Shutdown()
+void* __stdcall GluePathfindingShutdown()
 {
     GlueModule* glue = &s_pathfindingGlue;
     unsigned mark = GlueScratchMark();
@@ -1104,7 +1122,7 @@ void* __stdcall Pathfinding_Shutdown()
     return (void*)GlueResult(glue, 2, (unsigned)slotArgs[0].i32, 1);
 }
 
-void __stdcall Pathfinding_Submit(const PathRequest* request)
+void __stdcall GluePathfindingSubmit(const PathRequest* request)
 {
     GlueModule* glue = &s_pathfindingGlue;
     unsigned mark = GlueScratchMark();
@@ -1116,7 +1134,7 @@ void __stdcall Pathfinding_Submit(const PathRequest* request)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Pathfinding_Cancel(PathHandle requester)
+void __stdcall GluePathfindingCancel(PathHandle requester)
 {
     GlueModule* glue = &s_pathfindingGlue;
     unsigned mark = GlueScratchMark();
@@ -1127,7 +1145,7 @@ void __stdcall Pathfinding_Cancel(PathHandle requester)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Pathfinding_CellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause)
+void __stdcall GluePathfindingCellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause)
 {
     GlueModule* glue = &s_pathfindingGlue;
     unsigned mark = GlueScratchMark();
@@ -1143,7 +1161,7 @@ void __stdcall Pathfinding_CellsChanged(int left, int top, int right, int bottom
     GlueScratchRelease(mark);
 }
 
-void __stdcall Pathfinding_Step()
+void __stdcall GluePathfindingStep()
 {
     GlueModule* glue = &s_pathfindingGlue;
     unsigned mark = GlueScratchMark();
@@ -1153,7 +1171,7 @@ void __stdcall Pathfinding_Step()
     GlueScratchRelease(mark);
 }
 
-int __stdcall Pathfinding_Poll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity)
+int __stdcall GluePathfindingPoll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity)
 {
     GlueModule* glue = &s_pathfindingGlue;
     unsigned mark = GlueScratchMark();
@@ -1172,7 +1190,7 @@ int __stdcall Pathfinding_Poll(PathfindingEventHeader* out, unsigned int size, P
     return (int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Pathfinding_TimedRegionSize(const PathMapInfo* map)
+unsigned int __stdcall GluePathfindingTimedRegionSize(const PathMapInfo* map)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_pathfindingNative->RegionSize(map);
@@ -1180,14 +1198,14 @@ unsigned int __stdcall Pathfinding_TimedRegionSize(const PathMapInfo* map)
     return result;
 }
 
-void __stdcall Pathfinding_TimedInit(const PathMapInfo* map, void* region, unsigned int size)
+void __stdcall GluePathfindingTimedInit(const PathMapInfo* map, void* region, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     s_pathfindingNative->Init(map, region, size);
     GlueTimed(&s_pathfindingGlue, 1, start);
 }
 
-void* __stdcall Pathfinding_TimedShutdown()
+void* __stdcall GluePathfindingTimedShutdown()
 {
     unsigned long long start = host_time_counter();
     void* result = s_pathfindingNative->Shutdown();
@@ -1195,35 +1213,35 @@ void* __stdcall Pathfinding_TimedShutdown()
     return result;
 }
 
-void __stdcall Pathfinding_TimedSubmit(const PathRequest* request)
+void __stdcall GluePathfindingTimedSubmit(const PathRequest* request)
 {
     unsigned long long start = host_time_counter();
     s_pathfindingNative->Submit(request);
     GlueTimed(&s_pathfindingGlue, 3, start);
 }
 
-void __stdcall Pathfinding_TimedCancel(PathHandle requester)
+void __stdcall GluePathfindingTimedCancel(PathHandle requester)
 {
     unsigned long long start = host_time_counter();
     s_pathfindingNative->Cancel(requester);
     GlueTimed(&s_pathfindingGlue, 4, start);
 }
 
-void __stdcall Pathfinding_TimedCellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause)
+void __stdcall GluePathfindingTimedCellsChanged(int left, int top, int right, int bottom, unsigned int classes, int cause)
 {
     unsigned long long start = host_time_counter();
     s_pathfindingNative->CellsChanged(left, top, right, bottom, classes, cause);
     GlueTimed(&s_pathfindingGlue, 5, start);
 }
 
-void __stdcall Pathfinding_TimedStep()
+void __stdcall GluePathfindingTimedStep()
 {
     unsigned long long start = host_time_counter();
     s_pathfindingNative->Step();
     GlueTimed(&s_pathfindingGlue, 6, start);
 }
 
-int __stdcall Pathfinding_TimedPoll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity)
+int __stdcall GluePathfindingTimedPoll(PathfindingEventHeader* out, unsigned int size, PathPoint* points, int capacity)
 {
     unsigned long long start = host_time_counter();
     int result = s_pathfindingNative->Poll(out, size, points, capacity);
@@ -1238,14 +1256,14 @@ void PathfindingUseSeam(GlueModule* glue)
         return;
     s_pathfindingNative = g_seams.pathfinding;
     s_pathfindingSeam = *s_pathfindingNative;
-    s_pathfindingSeam.RegionSize = Pathfinding_RegionSize;
-    s_pathfindingSeam.Init = Pathfinding_Init;
-    s_pathfindingSeam.Shutdown = Pathfinding_Shutdown;
-    s_pathfindingSeam.Submit = Pathfinding_Submit;
-    s_pathfindingSeam.Cancel = Pathfinding_Cancel;
-    s_pathfindingSeam.CellsChanged = Pathfinding_CellsChanged;
-    s_pathfindingSeam.Step = Pathfinding_Step;
-    s_pathfindingSeam.Poll = Pathfinding_Poll;
+    s_pathfindingSeam.RegionSize = GluePathfindingRegionSize;
+    s_pathfindingSeam.Init = GluePathfindingInit;
+    s_pathfindingSeam.Shutdown = GluePathfindingShutdown;
+    s_pathfindingSeam.Submit = GluePathfindingSubmit;
+    s_pathfindingSeam.Cancel = GluePathfindingCancel;
+    s_pathfindingSeam.CellsChanged = GluePathfindingCellsChanged;
+    s_pathfindingSeam.Step = GluePathfindingStep;
+    s_pathfindingSeam.Poll = GluePathfindingPoll;
     g_seams.pathfinding = &s_pathfindingSeam;
 }
 
@@ -1253,14 +1271,14 @@ void PathfindingTimeNative()
 {
     s_pathfindingNative = g_seams.pathfinding;
     s_pathfindingTimed = *s_pathfindingNative;
-    s_pathfindingTimed.RegionSize = Pathfinding_TimedRegionSize;
-    s_pathfindingTimed.Init = Pathfinding_TimedInit;
-    s_pathfindingTimed.Shutdown = Pathfinding_TimedShutdown;
-    s_pathfindingTimed.Submit = Pathfinding_TimedSubmit;
-    s_pathfindingTimed.Cancel = Pathfinding_TimedCancel;
-    s_pathfindingTimed.CellsChanged = Pathfinding_TimedCellsChanged;
-    s_pathfindingTimed.Step = Pathfinding_TimedStep;
-    s_pathfindingTimed.Poll = Pathfinding_TimedPoll;
+    s_pathfindingTimed.RegionSize = GluePathfindingTimedRegionSize;
+    s_pathfindingTimed.Init = GluePathfindingTimedInit;
+    s_pathfindingTimed.Shutdown = GluePathfindingTimedShutdown;
+    s_pathfindingTimed.Submit = GluePathfindingTimedSubmit;
+    s_pathfindingTimed.Cancel = GluePathfindingTimedCancel;
+    s_pathfindingTimed.CellsChanged = GluePathfindingTimedCellsChanged;
+    s_pathfindingTimed.Step = GluePathfindingTimedStep;
+    s_pathfindingTimed.Poll = GluePathfindingTimedPoll;
     g_seams.pathfinding = &s_pathfindingTimed;
 }
 
@@ -1285,7 +1303,7 @@ const WeaponsSeam* s_weaponsNative;
 WeaponsSeam s_weaponsSeam;
 WeaponsSeam s_weaponsTimed;
 
-int __stdcall Weapons_Apply(const WeaponsEventHeader* event, unsigned int size)
+int __stdcall GlueWeaponsApply(const WeaponsEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1299,7 +1317,7 @@ int __stdcall Weapons_Apply(const WeaponsEventHeader* event, unsigned int size)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Weapons_UpdateProjectiles()
+void __stdcall GlueWeaponsUpdateProjectiles()
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1309,7 +1327,7 @@ void __stdcall Weapons_UpdateProjectiles()
     GlueScratchRelease(mark);
 }
 
-void __stdcall Weapons_UpdateExplosions()
+void __stdcall GlueWeaponsUpdateExplosions()
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1319,7 +1337,7 @@ void __stdcall Weapons_UpdateExplosions()
     GlueScratchRelease(mark);
 }
 
-void __stdcall Weapons_UpdateUnitWeapons(Unit* unit)
+void __stdcall GlueWeaponsUpdateUnitWeapons(Unit* unit)
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1330,7 +1348,7 @@ void __stdcall Weapons_UpdateUnitWeapons(Unit* unit)
     GlueScratchRelease(mark);
 }
 
-WeaponDef* __stdcall Weapons_FindWeaponByName(const char* name)
+WeaponDef* __stdcall GlueWeaponsFindWeaponByName(const char* name)
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1342,7 +1360,7 @@ WeaponDef* __stdcall Weapons_FindWeaponByName(const char* name)
     return (WeaponDef*)GlueResult(glue, 4, (unsigned)slotArgs[0].i32, 1);
 }
 
-int __stdcall Weapons_GetWeaponRange(Unit* unit, unsigned int weapon)
+int __stdcall GlueWeaponsGetWeaponRange(Unit* unit, unsigned int weapon)
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1355,7 +1373,7 @@ int __stdcall Weapons_GetWeaponRange(Unit* unit, unsigned int weapon)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Weapons_WeaponCanReachUnit(Unit* shooter, Unit* target, unsigned char weapon)
+int __stdcall GlueWeaponsWeaponCanReachUnit(Unit* shooter, Unit* target, unsigned char weapon)
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1369,7 +1387,7 @@ int __stdcall Weapons_WeaponCanReachUnit(Unit* shooter, Unit* target, unsigned c
     return (int)slotArgs[0].i32;
 }
 
-Projectile* __stdcall Weapons_FindTargetableProjectile(Unit* unit, unsigned int weapon)
+Projectile* __stdcall GlueWeaponsFindTargetableProjectile(Unit* unit, unsigned int weapon)
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1382,7 +1400,7 @@ Projectile* __stdcall Weapons_FindTargetableProjectile(Unit* unit, unsigned int 
     return (Projectile*)GlueResult(glue, 7, (unsigned)slotArgs[0].i32, 1);
 }
 
-int __stdcall Weapons_WeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags)
+int __stdcall GlueWeaponsWeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags)
 {
     GlueModule* glue = &s_weaponsGlue;
     unsigned mark = GlueScratchMark();
@@ -1399,7 +1417,7 @@ int __stdcall Weapons_WeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int fl
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Weapons_TimedApply(const WeaponsEventHeader* event, unsigned int size)
+int __stdcall GlueWeaponsTimedApply(const WeaponsEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_weaponsNative->Apply(event, size);
@@ -1407,28 +1425,28 @@ int __stdcall Weapons_TimedApply(const WeaponsEventHeader* event, unsigned int s
     return result;
 }
 
-void __stdcall Weapons_TimedUpdateProjectiles()
+void __stdcall GlueWeaponsTimedUpdateProjectiles()
 {
     unsigned long long start = host_time_counter();
     s_weaponsNative->UpdateProjectiles();
     GlueTimed(&s_weaponsGlue, 1, start);
 }
 
-void __stdcall Weapons_TimedUpdateExplosions()
+void __stdcall GlueWeaponsTimedUpdateExplosions()
 {
     unsigned long long start = host_time_counter();
     s_weaponsNative->UpdateExplosions();
     GlueTimed(&s_weaponsGlue, 2, start);
 }
 
-void __stdcall Weapons_TimedUpdateUnitWeapons(Unit* unit)
+void __stdcall GlueWeaponsTimedUpdateUnitWeapons(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_weaponsNative->UpdateUnitWeapons(unit);
     GlueTimed(&s_weaponsGlue, 3, start);
 }
 
-WeaponDef* __stdcall Weapons_TimedFindWeaponByName(const char* name)
+WeaponDef* __stdcall GlueWeaponsTimedFindWeaponByName(const char* name)
 {
     unsigned long long start = host_time_counter();
     WeaponDef* result = s_weaponsNative->FindWeaponByName(name);
@@ -1436,7 +1454,7 @@ WeaponDef* __stdcall Weapons_TimedFindWeaponByName(const char* name)
     return result;
 }
 
-int __stdcall Weapons_TimedGetWeaponRange(Unit* unit, unsigned int weapon)
+int __stdcall GlueWeaponsTimedGetWeaponRange(Unit* unit, unsigned int weapon)
 {
     unsigned long long start = host_time_counter();
     int result = s_weaponsNative->GetWeaponRange(unit, weapon);
@@ -1444,7 +1462,7 @@ int __stdcall Weapons_TimedGetWeaponRange(Unit* unit, unsigned int weapon)
     return result;
 }
 
-int __stdcall Weapons_TimedWeaponCanReachUnit(Unit* shooter, Unit* target, unsigned char weapon)
+int __stdcall GlueWeaponsTimedWeaponCanReachUnit(Unit* shooter, Unit* target, unsigned char weapon)
 {
     unsigned long long start = host_time_counter();
     int result = s_weaponsNative->WeaponCanReachUnit(shooter, target, weapon);
@@ -1452,7 +1470,7 @@ int __stdcall Weapons_TimedWeaponCanReachUnit(Unit* shooter, Unit* target, unsig
     return result;
 }
 
-Projectile* __stdcall Weapons_TimedFindTargetableProjectile(Unit* unit, unsigned int weapon)
+Projectile* __stdcall GlueWeaponsTimedFindTargetableProjectile(Unit* unit, unsigned int weapon)
 {
     unsigned long long start = host_time_counter();
     Projectile* result = s_weaponsNative->FindTargetableProjectile(unit, weapon);
@@ -1460,7 +1478,7 @@ Projectile* __stdcall Weapons_TimedFindTargetableProjectile(Unit* unit, unsigned
     return result;
 }
 
-int __stdcall Weapons_TimedWeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags)
+int __stdcall GlueWeaponsTimedWeaponCanReachPos(Unit* unit, Vec3* from, Vec3* to, int flags)
 {
     unsigned long long start = host_time_counter();
     int result = s_weaponsNative->WeaponCanReachPos(unit, from, to, flags);
@@ -1475,15 +1493,15 @@ void WeaponsUseSeam(GlueModule* glue)
         return;
     s_weaponsNative = g_seams.weapons;
     s_weaponsSeam = *s_weaponsNative;
-    s_weaponsSeam.Apply = Weapons_Apply;
-    s_weaponsSeam.UpdateProjectiles = Weapons_UpdateProjectiles;
-    s_weaponsSeam.UpdateExplosions = Weapons_UpdateExplosions;
-    s_weaponsSeam.UpdateUnitWeapons = Weapons_UpdateUnitWeapons;
-    s_weaponsSeam.FindWeaponByName = Weapons_FindWeaponByName;
-    s_weaponsSeam.GetWeaponRange = Weapons_GetWeaponRange;
-    s_weaponsSeam.WeaponCanReachUnit = Weapons_WeaponCanReachUnit;
-    s_weaponsSeam.FindTargetableProjectile = Weapons_FindTargetableProjectile;
-    s_weaponsSeam.WeaponCanReachPos = Weapons_WeaponCanReachPos;
+    s_weaponsSeam.Apply = GlueWeaponsApply;
+    s_weaponsSeam.UpdateProjectiles = GlueWeaponsUpdateProjectiles;
+    s_weaponsSeam.UpdateExplosions = GlueWeaponsUpdateExplosions;
+    s_weaponsSeam.UpdateUnitWeapons = GlueWeaponsUpdateUnitWeapons;
+    s_weaponsSeam.FindWeaponByName = GlueWeaponsFindWeaponByName;
+    s_weaponsSeam.GetWeaponRange = GlueWeaponsGetWeaponRange;
+    s_weaponsSeam.WeaponCanReachUnit = GlueWeaponsWeaponCanReachUnit;
+    s_weaponsSeam.FindTargetableProjectile = GlueWeaponsFindTargetableProjectile;
+    s_weaponsSeam.WeaponCanReachPos = GlueWeaponsWeaponCanReachPos;
     g_seams.weapons = &s_weaponsSeam;
 }
 
@@ -1491,15 +1509,15 @@ void WeaponsTimeNative()
 {
     s_weaponsNative = g_seams.weapons;
     s_weaponsTimed = *s_weaponsNative;
-    s_weaponsTimed.Apply = Weapons_TimedApply;
-    s_weaponsTimed.UpdateProjectiles = Weapons_TimedUpdateProjectiles;
-    s_weaponsTimed.UpdateExplosions = Weapons_TimedUpdateExplosions;
-    s_weaponsTimed.UpdateUnitWeapons = Weapons_TimedUpdateUnitWeapons;
-    s_weaponsTimed.FindWeaponByName = Weapons_TimedFindWeaponByName;
-    s_weaponsTimed.GetWeaponRange = Weapons_TimedGetWeaponRange;
-    s_weaponsTimed.WeaponCanReachUnit = Weapons_TimedWeaponCanReachUnit;
-    s_weaponsTimed.FindTargetableProjectile = Weapons_TimedFindTargetableProjectile;
-    s_weaponsTimed.WeaponCanReachPos = Weapons_TimedWeaponCanReachPos;
+    s_weaponsTimed.Apply = GlueWeaponsTimedApply;
+    s_weaponsTimed.UpdateProjectiles = GlueWeaponsTimedUpdateProjectiles;
+    s_weaponsTimed.UpdateExplosions = GlueWeaponsTimedUpdateExplosions;
+    s_weaponsTimed.UpdateUnitWeapons = GlueWeaponsTimedUpdateUnitWeapons;
+    s_weaponsTimed.FindWeaponByName = GlueWeaponsTimedFindWeaponByName;
+    s_weaponsTimed.GetWeaponRange = GlueWeaponsTimedGetWeaponRange;
+    s_weaponsTimed.WeaponCanReachUnit = GlueWeaponsTimedWeaponCanReachUnit;
+    s_weaponsTimed.FindTargetableProjectile = GlueWeaponsTimedFindTargetableProjectile;
+    s_weaponsTimed.WeaponCanReachPos = GlueWeaponsTimedWeaponCanReachPos;
     g_seams.weapons = &s_weaponsTimed;
 }
 
@@ -1522,7 +1540,7 @@ const TargetingSeam* s_targetingNative;
 TargetingSeam s_targetingSeam;
 TargetingSeam s_targetingTimed;
 
-int __stdcall Targeting_Apply(const TargetingEventHeader* event, unsigned int size)
+int __stdcall GlueTargetingApply(const TargetingEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_targetingGlue;
     unsigned mark = GlueScratchMark();
@@ -1536,7 +1554,7 @@ int __stdcall Targeting_Apply(const TargetingEventHeader* event, unsigned int si
     return (int)slotArgs[0].i32;
 }
 
-Unit* __stdcall Targeting_GetWeaponTargetUnit(Unit* unit, int weapon)
+Unit* __stdcall GlueTargetingGetWeaponTargetUnit(Unit* unit, int weapon)
 {
     GlueModule* glue = &s_targetingGlue;
     unsigned mark = GlueScratchMark();
@@ -1549,7 +1567,7 @@ Unit* __stdcall Targeting_GetWeaponTargetUnit(Unit* unit, int weapon)
     return (Unit*)GlueResult(glue, 1, (unsigned)slotArgs[0].i32, 1);
 }
 
-int __stdcall Targeting_GetWeaponTargetPos(Unit* unit, Vec3* pos, int weapon)
+int __stdcall GlueTargetingGetWeaponTargetPos(Unit* unit, Vec3* pos, int weapon)
 {
     GlueModule* glue = &s_targetingGlue;
     unsigned mark = GlueScratchMark();
@@ -1565,7 +1583,7 @@ int __stdcall Targeting_GetWeaponTargetPos(Unit* unit, Vec3* pos, int weapon)
     return (int)slotArgs[0].i32;
 }
 
-Unit* __stdcall Targeting_FindWeaponTarget(Unit* unit, unsigned char weapon, int useRange)
+Unit* __stdcall GlueTargetingFindWeaponTarget(Unit* unit, unsigned char weapon, int useRange)
 {
     GlueModule* glue = &s_targetingGlue;
     unsigned mark = GlueScratchMark();
@@ -1579,7 +1597,7 @@ Unit* __stdcall Targeting_FindWeaponTarget(Unit* unit, unsigned char weapon, int
     return (Unit*)GlueResult(glue, 3, (unsigned)slotArgs[0].i32, 1);
 }
 
-Unit* __stdcall Targeting_FindBestTargetIfFireAtWill(Unit* unit)
+Unit* __stdcall GlueTargetingFindBestTargetIfFireAtWill(Unit* unit)
 {
     GlueModule* glue = &s_targetingGlue;
     unsigned mark = GlueScratchMark();
@@ -1591,7 +1609,7 @@ Unit* __stdcall Targeting_FindBestTargetIfFireAtWill(Unit* unit)
     return (Unit*)GlueResult(glue, 4, (unsigned)slotArgs[0].i32, 1);
 }
 
-unsigned char __stdcall Targeting_ChooseWeapon(Unit* unit)
+unsigned char __stdcall GlueTargetingChooseWeapon(Unit* unit)
 {
     GlueModule* glue = &s_targetingGlue;
     unsigned mark = GlueScratchMark();
@@ -1603,7 +1621,7 @@ unsigned char __stdcall Targeting_ChooseWeapon(Unit* unit)
     return (unsigned char)slotArgs[0].i32;
 }
 
-int __stdcall Targeting_SavedTargetPair(Unit* unit, int weapon)
+int __stdcall GlueTargetingSavedTargetPair(Unit* unit, int weapon)
 {
     GlueModule* glue = &s_targetingGlue;
     unsigned mark = GlueScratchMark();
@@ -1616,7 +1634,7 @@ int __stdcall Targeting_SavedTargetPair(Unit* unit, int weapon)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Targeting_TimedApply(const TargetingEventHeader* event, unsigned int size)
+int __stdcall GlueTargetingTimedApply(const TargetingEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_targetingNative->Apply(event, size);
@@ -1624,7 +1642,7 @@ int __stdcall Targeting_TimedApply(const TargetingEventHeader* event, unsigned i
     return result;
 }
 
-Unit* __stdcall Targeting_TimedGetWeaponTargetUnit(Unit* unit, int weapon)
+Unit* __stdcall GlueTargetingTimedGetWeaponTargetUnit(Unit* unit, int weapon)
 {
     unsigned long long start = host_time_counter();
     Unit* result = s_targetingNative->GetWeaponTargetUnit(unit, weapon);
@@ -1632,7 +1650,7 @@ Unit* __stdcall Targeting_TimedGetWeaponTargetUnit(Unit* unit, int weapon)
     return result;
 }
 
-int __stdcall Targeting_TimedGetWeaponTargetPos(Unit* unit, Vec3* pos, int weapon)
+int __stdcall GlueTargetingTimedGetWeaponTargetPos(Unit* unit, Vec3* pos, int weapon)
 {
     unsigned long long start = host_time_counter();
     int result = s_targetingNative->GetWeaponTargetPos(unit, pos, weapon);
@@ -1640,7 +1658,7 @@ int __stdcall Targeting_TimedGetWeaponTargetPos(Unit* unit, Vec3* pos, int weapo
     return result;
 }
 
-Unit* __stdcall Targeting_TimedFindWeaponTarget(Unit* unit, unsigned char weapon, int useRange)
+Unit* __stdcall GlueTargetingTimedFindWeaponTarget(Unit* unit, unsigned char weapon, int useRange)
 {
     unsigned long long start = host_time_counter();
     Unit* result = s_targetingNative->FindWeaponTarget(unit, weapon, useRange);
@@ -1648,7 +1666,7 @@ Unit* __stdcall Targeting_TimedFindWeaponTarget(Unit* unit, unsigned char weapon
     return result;
 }
 
-Unit* __stdcall Targeting_TimedFindBestTargetIfFireAtWill(Unit* unit)
+Unit* __stdcall GlueTargetingTimedFindBestTargetIfFireAtWill(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     Unit* result = s_targetingNative->FindBestTargetIfFireAtWill(unit);
@@ -1656,7 +1674,7 @@ Unit* __stdcall Targeting_TimedFindBestTargetIfFireAtWill(Unit* unit)
     return result;
 }
 
-unsigned char __stdcall Targeting_TimedChooseWeapon(Unit* unit)
+unsigned char __stdcall GlueTargetingTimedChooseWeapon(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     unsigned char result = s_targetingNative->ChooseWeapon(unit);
@@ -1664,7 +1682,7 @@ unsigned char __stdcall Targeting_TimedChooseWeapon(Unit* unit)
     return result;
 }
 
-int __stdcall Targeting_TimedSavedTargetPair(Unit* unit, int weapon)
+int __stdcall GlueTargetingTimedSavedTargetPair(Unit* unit, int weapon)
 {
     unsigned long long start = host_time_counter();
     int result = s_targetingNative->SavedTargetPair(unit, weapon);
@@ -1679,13 +1697,13 @@ void TargetingUseSeam(GlueModule* glue)
         return;
     s_targetingNative = g_seams.targeting;
     s_targetingSeam = *s_targetingNative;
-    s_targetingSeam.Apply = Targeting_Apply;
-    s_targetingSeam.GetWeaponTargetUnit = Targeting_GetWeaponTargetUnit;
-    s_targetingSeam.GetWeaponTargetPos = Targeting_GetWeaponTargetPos;
-    s_targetingSeam.FindWeaponTarget = Targeting_FindWeaponTarget;
-    s_targetingSeam.FindBestTargetIfFireAtWill = Targeting_FindBestTargetIfFireAtWill;
-    s_targetingSeam.ChooseWeapon = Targeting_ChooseWeapon;
-    s_targetingSeam.SavedTargetPair = Targeting_SavedTargetPair;
+    s_targetingSeam.Apply = GlueTargetingApply;
+    s_targetingSeam.GetWeaponTargetUnit = GlueTargetingGetWeaponTargetUnit;
+    s_targetingSeam.GetWeaponTargetPos = GlueTargetingGetWeaponTargetPos;
+    s_targetingSeam.FindWeaponTarget = GlueTargetingFindWeaponTarget;
+    s_targetingSeam.FindBestTargetIfFireAtWill = GlueTargetingFindBestTargetIfFireAtWill;
+    s_targetingSeam.ChooseWeapon = GlueTargetingChooseWeapon;
+    s_targetingSeam.SavedTargetPair = GlueTargetingSavedTargetPair;
     g_seams.targeting = &s_targetingSeam;
 }
 
@@ -1693,13 +1711,13 @@ void TargetingTimeNative()
 {
     s_targetingNative = g_seams.targeting;
     s_targetingTimed = *s_targetingNative;
-    s_targetingTimed.Apply = Targeting_TimedApply;
-    s_targetingTimed.GetWeaponTargetUnit = Targeting_TimedGetWeaponTargetUnit;
-    s_targetingTimed.GetWeaponTargetPos = Targeting_TimedGetWeaponTargetPos;
-    s_targetingTimed.FindWeaponTarget = Targeting_TimedFindWeaponTarget;
-    s_targetingTimed.FindBestTargetIfFireAtWill = Targeting_TimedFindBestTargetIfFireAtWill;
-    s_targetingTimed.ChooseWeapon = Targeting_TimedChooseWeapon;
-    s_targetingTimed.SavedTargetPair = Targeting_TimedSavedTargetPair;
+    s_targetingTimed.Apply = GlueTargetingTimedApply;
+    s_targetingTimed.GetWeaponTargetUnit = GlueTargetingTimedGetWeaponTargetUnit;
+    s_targetingTimed.GetWeaponTargetPos = GlueTargetingTimedGetWeaponTargetPos;
+    s_targetingTimed.FindWeaponTarget = GlueTargetingTimedFindWeaponTarget;
+    s_targetingTimed.FindBestTargetIfFireAtWill = GlueTargetingTimedFindBestTargetIfFireAtWill;
+    s_targetingTimed.ChooseWeapon = GlueTargetingTimedChooseWeapon;
+    s_targetingTimed.SavedTargetPair = GlueTargetingTimedSavedTargetPair;
     g_seams.targeting = &s_targetingTimed;
 }
 
@@ -1737,7 +1755,7 @@ const LosRadarSeam* s_losRadarNative;
 LosRadarSeam s_losRadarSeam;
 LosRadarSeam s_losRadarTimed;
 
-int __stdcall LosRadar_Apply(const LosRadarEventHeader* event, unsigned int size)
+int __stdcall GlueLosRadarApply(const LosRadarEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1751,7 +1769,7 @@ int __stdcall LosRadar_Apply(const LosRadarEventHeader* event, unsigned int size
     return (int)slotArgs[0].i32;
 }
 
-Cell* __stdcall LosRadar_GetMapCell(int x, int y)
+Cell* __stdcall GlueLosRadarGetMapCell(int x, int y)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1764,7 +1782,7 @@ Cell* __stdcall LosRadar_GetMapCell(int x, int y)
     return (Cell*)GlueResult(glue, 1, (unsigned)slotArgs[0].i32, 1);
 }
 
-Cell* __stdcall LosRadar_GetMapCellAtPosition(Vec3* pos)
+Cell* __stdcall GlueLosRadarGetMapCellAtPosition(Vec3* pos)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1777,7 +1795,7 @@ Cell* __stdcall LosRadar_GetMapCellAtPosition(Vec3* pos)
     return (Cell*)GlueResult(glue, 2, (unsigned)slotArgs[0].i32, 1);
 }
 
-Cell* __stdcall LosRadar_GetOriginCellAtPosition(Vec3* pos)
+Cell* __stdcall GlueLosRadarGetOriginCellAtPosition(Vec3* pos)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1790,7 +1808,7 @@ Cell* __stdcall LosRadar_GetOriginCellAtPosition(Vec3* pos)
     return (Cell*)GlueResult(glue, 3, (unsigned)slotArgs[0].i32, 1);
 }
 
-void __stdcall LosRadar_ClampWorldPosToTerrain(int x, int y, Vec3* out)
+void __stdcall GlueLosRadarClampWorldPosToTerrain(int x, int y, Vec3* out)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1805,7 +1823,7 @@ void __stdcall LosRadar_ClampWorldPosToTerrain(int x, int y, Vec3* out)
     GlueScratchRelease(mark);
 }
 
-int __stdcall LosRadar_IsUnitVisibleToPlayer(Player* player, Unit* unit)
+int __stdcall GlueLosRadarIsUnitVisibleToPlayer(Player* player, Unit* unit)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1818,7 +1836,7 @@ int __stdcall LosRadar_IsUnitVisibleToPlayer(Player* player, Unit* unit)
     return (int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall LosRadar_SoundHeardMask(const Vec3* at)
+unsigned int __stdcall GlueLosRadarSoundHeardMask(const Vec3* at)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1831,7 +1849,7 @@ unsigned int __stdcall LosRadar_SoundHeardMask(const Vec3* at)
     return (unsigned int)slotArgs[0].i32;
 }
 
-void __stdcall LosRadar_UpdateUnitLineOfSight(Unit* unit)
+void __stdcall GlueLosRadarUpdateUnitLineOfSight(Unit* unit)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1842,7 +1860,7 @@ void __stdcall LosRadar_UpdateUnitLineOfSight(Unit* unit)
     GlueScratchRelease(mark);
 }
 
-void __stdcall LosRadar_RecordRadarUnits()
+void __stdcall GlueLosRadarRecordRadarUnits()
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1852,7 +1870,7 @@ void __stdcall LosRadar_RecordRadarUnits()
     GlueScratchRelease(mark);
 }
 
-void __stdcall LosRadar_UpdateSensorRadarAndCloak()
+void __stdcall GlueLosRadarUpdateSensorRadarAndCloak()
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1862,7 +1880,7 @@ void __stdcall LosRadar_UpdateSensorRadarAndCloak()
     GlueScratchRelease(mark);
 }
 
-void __stdcall LosRadar_RecordRadarMapped()
+void __stdcall GlueLosRadarRecordRadarMapped()
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1872,7 +1890,7 @@ void __stdcall LosRadar_RecordRadarMapped()
     GlueScratchRelease(mark);
 }
 
-void __stdcall LosRadar_ExpireEyeballs()
+void __stdcall GlueLosRadarExpireEyeballs()
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1882,7 +1900,7 @@ void __stdcall LosRadar_ExpireEyeballs()
     GlueScratchRelease(mark);
 }
 
-int __stdcall LosRadar_GetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity)
+int __stdcall GlueLosRadarGetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1902,7 +1920,7 @@ int __stdcall LosRadar_GetVisibleEnemiesInRadius(int player, const Vec3* pos, in
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall LosRadar_HasReadyUnitInRange(int player, const Vec3* pos, int range)
+int __stdcall GlueLosRadarHasReadyUnitInRange(int player, const Vec3* pos, int range)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1917,7 +1935,7 @@ int __stdcall LosRadar_HasReadyUnitInRange(int player, const Vec3* pos, int rang
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall LosRadar_IsPointVisible(Player* player, Vec3* pos)
+int __stdcall GlueLosRadarIsPointVisible(Player* player, Vec3* pos)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1931,7 +1949,7 @@ int __stdcall LosRadar_IsPointVisible(Player* player, Vec3* pos)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall LosRadar_GetSeenUnitsInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
+int __stdcall GlueLosRadarGetSeenUnitsInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1950,7 +1968,7 @@ int __stdcall LosRadar_GetSeenUnitsInRadius(int player, const Vec3* pos, int rad
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall LosRadar_CreateUnitIndex(int player)
+void __stdcall GlueLosRadarCreateUnitIndex(int player)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1961,7 +1979,7 @@ void __stdcall LosRadar_CreateUnitIndex(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall LosRadar_FreeUnitIndex(int player)
+void __stdcall GlueLosRadarFreeUnitIndex(int player)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1972,7 +1990,7 @@ void __stdcall LosRadar_FreeUnitIndex(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall LosRadar_RefreshUnitIndex(int player)
+void __stdcall GlueLosRadarRefreshUnitIndex(int player)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1983,7 +2001,7 @@ void __stdcall LosRadar_RefreshUnitIndex(int player)
     GlueScratchRelease(mark);
 }
 
-unsigned int __stdcall LosRadar_RegionSize(const LosRadarMapInfo* map)
+unsigned int __stdcall GlueLosRadarRegionSize(const LosRadarMapInfo* map)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -1996,7 +2014,7 @@ unsigned int __stdcall LosRadar_RegionSize(const LosRadarMapInfo* map)
     return (unsigned int)slotArgs[0].i32;
 }
 
-void __stdcall LosRadar_Init(const LosRadarMapInfo* map, void* region, unsigned int size)
+void __stdcall GlueLosRadarInit(const LosRadarMapInfo* map, void* region, unsigned int size)
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -2011,7 +2029,7 @@ void __stdcall LosRadar_Init(const LosRadarMapInfo* map, void* region, unsigned 
     GlueScratchRelease(mark);
 }
 
-void* __stdcall LosRadar_Shutdown()
+void* __stdcall GlueLosRadarShutdown()
 {
     GlueModule* glue = &s_losRadarGlue;
     unsigned mark = GlueScratchMark();
@@ -2022,7 +2040,7 @@ void* __stdcall LosRadar_Shutdown()
     return (void*)GlueResult(glue, 21, (unsigned)slotArgs[0].i32, 1);
 }
 
-int __stdcall LosRadar_TimedApply(const LosRadarEventHeader* event, unsigned int size)
+int __stdcall GlueLosRadarTimedApply(const LosRadarEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_losRadarNative->Apply(event, size);
@@ -2030,7 +2048,7 @@ int __stdcall LosRadar_TimedApply(const LosRadarEventHeader* event, unsigned int
     return result;
 }
 
-Cell* __stdcall LosRadar_TimedGetMapCell(int x, int y)
+Cell* __stdcall GlueLosRadarTimedGetMapCell(int x, int y)
 {
     unsigned long long start = host_time_counter();
     Cell* result = s_losRadarNative->GetMapCell(x, y);
@@ -2038,7 +2056,7 @@ Cell* __stdcall LosRadar_TimedGetMapCell(int x, int y)
     return result;
 }
 
-Cell* __stdcall LosRadar_TimedGetMapCellAtPosition(Vec3* pos)
+Cell* __stdcall GlueLosRadarTimedGetMapCellAtPosition(Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     Cell* result = s_losRadarNative->GetMapCellAtPosition(pos);
@@ -2046,7 +2064,7 @@ Cell* __stdcall LosRadar_TimedGetMapCellAtPosition(Vec3* pos)
     return result;
 }
 
-Cell* __stdcall LosRadar_TimedGetOriginCellAtPosition(Vec3* pos)
+Cell* __stdcall GlueLosRadarTimedGetOriginCellAtPosition(Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     Cell* result = s_losRadarNative->GetOriginCellAtPosition(pos);
@@ -2054,14 +2072,14 @@ Cell* __stdcall LosRadar_TimedGetOriginCellAtPosition(Vec3* pos)
     return result;
 }
 
-void __stdcall LosRadar_TimedClampWorldPosToTerrain(int x, int y, Vec3* out)
+void __stdcall GlueLosRadarTimedClampWorldPosToTerrain(int x, int y, Vec3* out)
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->ClampWorldPosToTerrain(x, y, out);
     GlueTimed(&s_losRadarGlue, 4, start);
 }
 
-int __stdcall LosRadar_TimedIsUnitVisibleToPlayer(Player* player, Unit* unit)
+int __stdcall GlueLosRadarTimedIsUnitVisibleToPlayer(Player* player, Unit* unit)
 {
     unsigned long long start = host_time_counter();
     int result = s_losRadarNative->IsUnitVisibleToPlayer(player, unit);
@@ -2069,7 +2087,7 @@ int __stdcall LosRadar_TimedIsUnitVisibleToPlayer(Player* player, Unit* unit)
     return result;
 }
 
-unsigned int __stdcall LosRadar_TimedSoundHeardMask(const Vec3* at)
+unsigned int __stdcall GlueLosRadarTimedSoundHeardMask(const Vec3* at)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_losRadarNative->SoundHeardMask(at);
@@ -2077,42 +2095,42 @@ unsigned int __stdcall LosRadar_TimedSoundHeardMask(const Vec3* at)
     return result;
 }
 
-void __stdcall LosRadar_TimedUpdateUnitLineOfSight(Unit* unit)
+void __stdcall GlueLosRadarTimedUpdateUnitLineOfSight(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->UpdateUnitLineOfSight(unit);
     GlueTimed(&s_losRadarGlue, 7, start);
 }
 
-void __stdcall LosRadar_TimedRecordRadarUnits()
+void __stdcall GlueLosRadarTimedRecordRadarUnits()
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->RecordRadarUnits();
     GlueTimed(&s_losRadarGlue, 8, start);
 }
 
-void __stdcall LosRadar_TimedUpdateSensorRadarAndCloak()
+void __stdcall GlueLosRadarTimedUpdateSensorRadarAndCloak()
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->UpdateSensorRadarAndCloak();
     GlueTimed(&s_losRadarGlue, 9, start);
 }
 
-void __stdcall LosRadar_TimedRecordRadarMapped()
+void __stdcall GlueLosRadarTimedRecordRadarMapped()
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->RecordRadarMapped();
     GlueTimed(&s_losRadarGlue, 10, start);
 }
 
-void __stdcall LosRadar_TimedExpireEyeballs()
+void __stdcall GlueLosRadarTimedExpireEyeballs()
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->ExpireEyeballs();
     GlueTimed(&s_losRadarGlue, 11, start);
 }
 
-int __stdcall LosRadar_TimedGetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity)
+int __stdcall GlueLosRadarTimedGetVisibleEnemiesInRadius(int player, const Vec3* pos, int radius, int flags, Ref<Unit>* out, int capacity)
 {
     unsigned long long start = host_time_counter();
     int result = s_losRadarNative->GetVisibleEnemiesInRadius(player, pos, radius, flags, out, capacity);
@@ -2120,7 +2138,7 @@ int __stdcall LosRadar_TimedGetVisibleEnemiesInRadius(int player, const Vec3* po
     return result;
 }
 
-int __stdcall LosRadar_TimedHasReadyUnitInRange(int player, const Vec3* pos, int range)
+int __stdcall GlueLosRadarTimedHasReadyUnitInRange(int player, const Vec3* pos, int range)
 {
     unsigned long long start = host_time_counter();
     int result = s_losRadarNative->HasReadyUnitInRange(player, pos, range);
@@ -2128,7 +2146,7 @@ int __stdcall LosRadar_TimedHasReadyUnitInRange(int player, const Vec3* pos, int
     return result;
 }
 
-int __stdcall LosRadar_TimedIsPointVisible(Player* player, Vec3* pos)
+int __stdcall GlueLosRadarTimedIsPointVisible(Player* player, Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     int result = s_losRadarNative->IsPointVisible(player, pos);
@@ -2136,7 +2154,7 @@ int __stdcall LosRadar_TimedIsPointVisible(Player* player, Vec3* pos)
     return result;
 }
 
-int __stdcall LosRadar_TimedGetSeenUnitsInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
+int __stdcall GlueLosRadarTimedGetSeenUnitsInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
 {
     unsigned long long start = host_time_counter();
     int result = s_losRadarNative->GetSeenUnitsInRadius(player, pos, radius, out, capacity);
@@ -2144,28 +2162,28 @@ int __stdcall LosRadar_TimedGetSeenUnitsInRadius(int player, const Vec3* pos, in
     return result;
 }
 
-void __stdcall LosRadar_TimedCreateUnitIndex(int player)
+void __stdcall GlueLosRadarTimedCreateUnitIndex(int player)
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->CreateUnitIndex(player);
     GlueTimed(&s_losRadarGlue, 16, start);
 }
 
-void __stdcall LosRadar_TimedFreeUnitIndex(int player)
+void __stdcall GlueLosRadarTimedFreeUnitIndex(int player)
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->FreeUnitIndex(player);
     GlueTimed(&s_losRadarGlue, 17, start);
 }
 
-void __stdcall LosRadar_TimedRefreshUnitIndex(int player)
+void __stdcall GlueLosRadarTimedRefreshUnitIndex(int player)
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->RefreshUnitIndex(player);
     GlueTimed(&s_losRadarGlue, 18, start);
 }
 
-unsigned int __stdcall LosRadar_TimedRegionSize(const LosRadarMapInfo* map)
+unsigned int __stdcall GlueLosRadarTimedRegionSize(const LosRadarMapInfo* map)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_losRadarNative->RegionSize(map);
@@ -2173,14 +2191,14 @@ unsigned int __stdcall LosRadar_TimedRegionSize(const LosRadarMapInfo* map)
     return result;
 }
 
-void __stdcall LosRadar_TimedInit(const LosRadarMapInfo* map, void* region, unsigned int size)
+void __stdcall GlueLosRadarTimedInit(const LosRadarMapInfo* map, void* region, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     s_losRadarNative->Init(map, region, size);
     GlueTimed(&s_losRadarGlue, 20, start);
 }
 
-void* __stdcall LosRadar_TimedShutdown()
+void* __stdcall GlueLosRadarTimedShutdown()
 {
     unsigned long long start = host_time_counter();
     void* result = s_losRadarNative->Shutdown();
@@ -2195,28 +2213,28 @@ void LosRadarUseSeam(GlueModule* glue)
         return;
     s_losRadarNative = g_seams.los_radar;
     s_losRadarSeam = *s_losRadarNative;
-    s_losRadarSeam.Apply = LosRadar_Apply;
-    s_losRadarSeam.GetMapCell = LosRadar_GetMapCell;
-    s_losRadarSeam.GetMapCellAtPosition = LosRadar_GetMapCellAtPosition;
-    s_losRadarSeam.GetOriginCellAtPosition = LosRadar_GetOriginCellAtPosition;
-    s_losRadarSeam.ClampWorldPosToTerrain = LosRadar_ClampWorldPosToTerrain;
-    s_losRadarSeam.IsUnitVisibleToPlayer = LosRadar_IsUnitVisibleToPlayer;
-    s_losRadarSeam.SoundHeardMask = LosRadar_SoundHeardMask;
-    s_losRadarSeam.UpdateUnitLineOfSight = LosRadar_UpdateUnitLineOfSight;
-    s_losRadarSeam.RecordRadarUnits = LosRadar_RecordRadarUnits;
-    s_losRadarSeam.UpdateSensorRadarAndCloak = LosRadar_UpdateSensorRadarAndCloak;
-    s_losRadarSeam.RecordRadarMapped = LosRadar_RecordRadarMapped;
-    s_losRadarSeam.ExpireEyeballs = LosRadar_ExpireEyeballs;
-    s_losRadarSeam.GetVisibleEnemiesInRadius = LosRadar_GetVisibleEnemiesInRadius;
-    s_losRadarSeam.HasReadyUnitInRange = LosRadar_HasReadyUnitInRange;
-    s_losRadarSeam.IsPointVisible = LosRadar_IsPointVisible;
-    s_losRadarSeam.GetSeenUnitsInRadius = LosRadar_GetSeenUnitsInRadius;
-    s_losRadarSeam.CreateUnitIndex = LosRadar_CreateUnitIndex;
-    s_losRadarSeam.FreeUnitIndex = LosRadar_FreeUnitIndex;
-    s_losRadarSeam.RefreshUnitIndex = LosRadar_RefreshUnitIndex;
-    s_losRadarSeam.RegionSize = LosRadar_RegionSize;
-    s_losRadarSeam.Init = LosRadar_Init;
-    s_losRadarSeam.Shutdown = LosRadar_Shutdown;
+    s_losRadarSeam.Apply = GlueLosRadarApply;
+    s_losRadarSeam.GetMapCell = GlueLosRadarGetMapCell;
+    s_losRadarSeam.GetMapCellAtPosition = GlueLosRadarGetMapCellAtPosition;
+    s_losRadarSeam.GetOriginCellAtPosition = GlueLosRadarGetOriginCellAtPosition;
+    s_losRadarSeam.ClampWorldPosToTerrain = GlueLosRadarClampWorldPosToTerrain;
+    s_losRadarSeam.IsUnitVisibleToPlayer = GlueLosRadarIsUnitVisibleToPlayer;
+    s_losRadarSeam.SoundHeardMask = GlueLosRadarSoundHeardMask;
+    s_losRadarSeam.UpdateUnitLineOfSight = GlueLosRadarUpdateUnitLineOfSight;
+    s_losRadarSeam.RecordRadarUnits = GlueLosRadarRecordRadarUnits;
+    s_losRadarSeam.UpdateSensorRadarAndCloak = GlueLosRadarUpdateSensorRadarAndCloak;
+    s_losRadarSeam.RecordRadarMapped = GlueLosRadarRecordRadarMapped;
+    s_losRadarSeam.ExpireEyeballs = GlueLosRadarExpireEyeballs;
+    s_losRadarSeam.GetVisibleEnemiesInRadius = GlueLosRadarGetVisibleEnemiesInRadius;
+    s_losRadarSeam.HasReadyUnitInRange = GlueLosRadarHasReadyUnitInRange;
+    s_losRadarSeam.IsPointVisible = GlueLosRadarIsPointVisible;
+    s_losRadarSeam.GetSeenUnitsInRadius = GlueLosRadarGetSeenUnitsInRadius;
+    s_losRadarSeam.CreateUnitIndex = GlueLosRadarCreateUnitIndex;
+    s_losRadarSeam.FreeUnitIndex = GlueLosRadarFreeUnitIndex;
+    s_losRadarSeam.RefreshUnitIndex = GlueLosRadarRefreshUnitIndex;
+    s_losRadarSeam.RegionSize = GlueLosRadarRegionSize;
+    s_losRadarSeam.Init = GlueLosRadarInit;
+    s_losRadarSeam.Shutdown = GlueLosRadarShutdown;
     g_seams.los_radar = &s_losRadarSeam;
 }
 
@@ -2224,28 +2242,28 @@ void LosRadarTimeNative()
 {
     s_losRadarNative = g_seams.los_radar;
     s_losRadarTimed = *s_losRadarNative;
-    s_losRadarTimed.Apply = LosRadar_TimedApply;
-    s_losRadarTimed.GetMapCell = LosRadar_TimedGetMapCell;
-    s_losRadarTimed.GetMapCellAtPosition = LosRadar_TimedGetMapCellAtPosition;
-    s_losRadarTimed.GetOriginCellAtPosition = LosRadar_TimedGetOriginCellAtPosition;
-    s_losRadarTimed.ClampWorldPosToTerrain = LosRadar_TimedClampWorldPosToTerrain;
-    s_losRadarTimed.IsUnitVisibleToPlayer = LosRadar_TimedIsUnitVisibleToPlayer;
-    s_losRadarTimed.SoundHeardMask = LosRadar_TimedSoundHeardMask;
-    s_losRadarTimed.UpdateUnitLineOfSight = LosRadar_TimedUpdateUnitLineOfSight;
-    s_losRadarTimed.RecordRadarUnits = LosRadar_TimedRecordRadarUnits;
-    s_losRadarTimed.UpdateSensorRadarAndCloak = LosRadar_TimedUpdateSensorRadarAndCloak;
-    s_losRadarTimed.RecordRadarMapped = LosRadar_TimedRecordRadarMapped;
-    s_losRadarTimed.ExpireEyeballs = LosRadar_TimedExpireEyeballs;
-    s_losRadarTimed.GetVisibleEnemiesInRadius = LosRadar_TimedGetVisibleEnemiesInRadius;
-    s_losRadarTimed.HasReadyUnitInRange = LosRadar_TimedHasReadyUnitInRange;
-    s_losRadarTimed.IsPointVisible = LosRadar_TimedIsPointVisible;
-    s_losRadarTimed.GetSeenUnitsInRadius = LosRadar_TimedGetSeenUnitsInRadius;
-    s_losRadarTimed.CreateUnitIndex = LosRadar_TimedCreateUnitIndex;
-    s_losRadarTimed.FreeUnitIndex = LosRadar_TimedFreeUnitIndex;
-    s_losRadarTimed.RefreshUnitIndex = LosRadar_TimedRefreshUnitIndex;
-    s_losRadarTimed.RegionSize = LosRadar_TimedRegionSize;
-    s_losRadarTimed.Init = LosRadar_TimedInit;
-    s_losRadarTimed.Shutdown = LosRadar_TimedShutdown;
+    s_losRadarTimed.Apply = GlueLosRadarTimedApply;
+    s_losRadarTimed.GetMapCell = GlueLosRadarTimedGetMapCell;
+    s_losRadarTimed.GetMapCellAtPosition = GlueLosRadarTimedGetMapCellAtPosition;
+    s_losRadarTimed.GetOriginCellAtPosition = GlueLosRadarTimedGetOriginCellAtPosition;
+    s_losRadarTimed.ClampWorldPosToTerrain = GlueLosRadarTimedClampWorldPosToTerrain;
+    s_losRadarTimed.IsUnitVisibleToPlayer = GlueLosRadarTimedIsUnitVisibleToPlayer;
+    s_losRadarTimed.SoundHeardMask = GlueLosRadarTimedSoundHeardMask;
+    s_losRadarTimed.UpdateUnitLineOfSight = GlueLosRadarTimedUpdateUnitLineOfSight;
+    s_losRadarTimed.RecordRadarUnits = GlueLosRadarTimedRecordRadarUnits;
+    s_losRadarTimed.UpdateSensorRadarAndCloak = GlueLosRadarTimedUpdateSensorRadarAndCloak;
+    s_losRadarTimed.RecordRadarMapped = GlueLosRadarTimedRecordRadarMapped;
+    s_losRadarTimed.ExpireEyeballs = GlueLosRadarTimedExpireEyeballs;
+    s_losRadarTimed.GetVisibleEnemiesInRadius = GlueLosRadarTimedGetVisibleEnemiesInRadius;
+    s_losRadarTimed.HasReadyUnitInRange = GlueLosRadarTimedHasReadyUnitInRange;
+    s_losRadarTimed.IsPointVisible = GlueLosRadarTimedIsPointVisible;
+    s_losRadarTimed.GetSeenUnitsInRadius = GlueLosRadarTimedGetSeenUnitsInRadius;
+    s_losRadarTimed.CreateUnitIndex = GlueLosRadarTimedCreateUnitIndex;
+    s_losRadarTimed.FreeUnitIndex = GlueLosRadarTimedFreeUnitIndex;
+    s_losRadarTimed.RefreshUnitIndex = GlueLosRadarTimedRefreshUnitIndex;
+    s_losRadarTimed.RegionSize = GlueLosRadarTimedRegionSize;
+    s_losRadarTimed.Init = GlueLosRadarTimedInit;
+    s_losRadarTimed.Shutdown = GlueLosRadarTimedShutdown;
     g_seams.los_radar = &s_losRadarTimed;
 }
 
@@ -2268,7 +2286,7 @@ const OrdersSeam* s_ordersNative;
 OrdersSeam s_ordersSeam;
 OrdersSeam s_ordersTimed;
 
-int __stdcall Orders_Apply(const OrdersEventHeader* event, unsigned int size)
+int __stdcall GlueOrdersApply(const OrdersEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_ordersGlue;
     unsigned mark = GlueScratchMark();
@@ -2282,7 +2300,7 @@ int __stdcall Orders_Apply(const OrdersEventHeader* event, unsigned int size)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Orders_RunOrders(Unit* unit)
+void __stdcall GlueOrdersRunOrders(Unit* unit)
 {
     GlueModule* glue = &s_ordersGlue;
     unsigned mark = GlueScratchMark();
@@ -2293,7 +2311,7 @@ void __stdcall Orders_RunOrders(Unit* unit)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Orders_RunSecondaryOrders(Unit* unit)
+void __stdcall GlueOrdersRunSecondaryOrders(Unit* unit)
 {
     GlueModule* glue = &s_ordersGlue;
     unsigned mark = GlueScratchMark();
@@ -2304,7 +2322,7 @@ void __stdcall Orders_RunSecondaryOrders(Unit* unit)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Orders_GetOrderFlags(Unit* unit)
+int __stdcall GlueOrdersGetOrderFlags(Unit* unit)
 {
     GlueModule* glue = &s_ordersGlue;
     unsigned mark = GlueScratchMark();
@@ -2316,7 +2334,7 @@ int __stdcall Orders_GetOrderFlags(Unit* unit)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Orders_GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos)
+int __stdcall GlueOrdersGetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos)
 {
     GlueModule* glue = &s_ordersGlue;
     unsigned mark = GlueScratchMark();
@@ -2332,7 +2350,7 @@ int __stdcall Orders_GetOrderType(unsigned char mode, Unit* unit, Unit* target, 
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Orders_MissionTypeFromName(const char* name)
+int __stdcall GlueOrdersMissionTypeFromName(const char* name)
 {
     GlueModule* glue = &s_ordersGlue;
     unsigned mark = GlueScratchMark();
@@ -2344,7 +2362,7 @@ int __stdcall Orders_MissionTypeFromName(const char* name)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Orders_ExpandGroupCommand(const OrdersGroupCommand* command, unsigned int size)
+int __stdcall GlueOrdersExpandGroupCommand(const OrdersGroupCommand* command, unsigned int size)
 {
     GlueModule* glue = &s_ordersGlue;
     unsigned mark = GlueScratchMark();
@@ -2358,7 +2376,7 @@ int __stdcall Orders_ExpandGroupCommand(const OrdersGroupCommand* command, unsig
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Orders_TimedApply(const OrdersEventHeader* event, unsigned int size)
+int __stdcall GlueOrdersTimedApply(const OrdersEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_ordersNative->Apply(event, size);
@@ -2366,21 +2384,21 @@ int __stdcall Orders_TimedApply(const OrdersEventHeader* event, unsigned int siz
     return result;
 }
 
-void __stdcall Orders_TimedRunOrders(Unit* unit)
+void __stdcall GlueOrdersTimedRunOrders(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_ordersNative->RunOrders(unit);
     GlueTimed(&s_ordersGlue, 1, start);
 }
 
-void __stdcall Orders_TimedRunSecondaryOrders(Unit* unit)
+void __stdcall GlueOrdersTimedRunSecondaryOrders(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_ordersNative->RunSecondaryOrders(unit);
     GlueTimed(&s_ordersGlue, 2, start);
 }
 
-int __stdcall Orders_TimedGetOrderFlags(Unit* unit)
+int __stdcall GlueOrdersTimedGetOrderFlags(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     int result = s_ordersNative->GetOrderFlags(unit);
@@ -2388,7 +2406,7 @@ int __stdcall Orders_TimedGetOrderFlags(Unit* unit)
     return result;
 }
 
-int __stdcall Orders_TimedGetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos)
+int __stdcall GlueOrdersTimedGetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     int result = s_ordersNative->GetOrderType(mode, unit, target, pos);
@@ -2396,7 +2414,7 @@ int __stdcall Orders_TimedGetOrderType(unsigned char mode, Unit* unit, Unit* tar
     return result;
 }
 
-int __stdcall Orders_TimedMissionTypeFromName(const char* name)
+int __stdcall GlueOrdersTimedMissionTypeFromName(const char* name)
 {
     unsigned long long start = host_time_counter();
     int result = s_ordersNative->MissionTypeFromName(name);
@@ -2404,7 +2422,7 @@ int __stdcall Orders_TimedMissionTypeFromName(const char* name)
     return result;
 }
 
-int __stdcall Orders_TimedExpandGroupCommand(const OrdersGroupCommand* command, unsigned int size)
+int __stdcall GlueOrdersTimedExpandGroupCommand(const OrdersGroupCommand* command, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_ordersNative->ExpandGroupCommand(command, size);
@@ -2419,13 +2437,13 @@ void OrdersUseSeam(GlueModule* glue)
         return;
     s_ordersNative = g_seams.orders;
     s_ordersSeam = *s_ordersNative;
-    s_ordersSeam.Apply = Orders_Apply;
-    s_ordersSeam.RunOrders = Orders_RunOrders;
-    s_ordersSeam.RunSecondaryOrders = Orders_RunSecondaryOrders;
-    s_ordersSeam.GetOrderFlags = Orders_GetOrderFlags;
-    s_ordersSeam.GetOrderType = Orders_GetOrderType;
-    s_ordersSeam.MissionTypeFromName = Orders_MissionTypeFromName;
-    s_ordersSeam.ExpandGroupCommand = Orders_ExpandGroupCommand;
+    s_ordersSeam.Apply = GlueOrdersApply;
+    s_ordersSeam.RunOrders = GlueOrdersRunOrders;
+    s_ordersSeam.RunSecondaryOrders = GlueOrdersRunSecondaryOrders;
+    s_ordersSeam.GetOrderFlags = GlueOrdersGetOrderFlags;
+    s_ordersSeam.GetOrderType = GlueOrdersGetOrderType;
+    s_ordersSeam.MissionTypeFromName = GlueOrdersMissionTypeFromName;
+    s_ordersSeam.ExpandGroupCommand = GlueOrdersExpandGroupCommand;
     g_seams.orders = &s_ordersSeam;
 }
 
@@ -2433,13 +2451,13 @@ void OrdersTimeNative()
 {
     s_ordersNative = g_seams.orders;
     s_ordersTimed = *s_ordersNative;
-    s_ordersTimed.Apply = Orders_TimedApply;
-    s_ordersTimed.RunOrders = Orders_TimedRunOrders;
-    s_ordersTimed.RunSecondaryOrders = Orders_TimedRunSecondaryOrders;
-    s_ordersTimed.GetOrderFlags = Orders_TimedGetOrderFlags;
-    s_ordersTimed.GetOrderType = Orders_TimedGetOrderType;
-    s_ordersTimed.MissionTypeFromName = Orders_TimedMissionTypeFromName;
-    s_ordersTimed.ExpandGroupCommand = Orders_TimedExpandGroupCommand;
+    s_ordersTimed.Apply = GlueOrdersTimedApply;
+    s_ordersTimed.RunOrders = GlueOrdersTimedRunOrders;
+    s_ordersTimed.RunSecondaryOrders = GlueOrdersTimedRunSecondaryOrders;
+    s_ordersTimed.GetOrderFlags = GlueOrdersTimedGetOrderFlags;
+    s_ordersTimed.GetOrderType = GlueOrdersTimedGetOrderType;
+    s_ordersTimed.MissionTypeFromName = GlueOrdersTimedMissionTypeFromName;
+    s_ordersTimed.ExpandGroupCommand = GlueOrdersTimedExpandGroupCommand;
     g_seams.orders = &s_ordersTimed;
 }
 
@@ -2478,7 +2496,7 @@ const UnitsSeam* s_unitsNative;
 UnitsSeam s_unitsSeam;
 UnitsSeam s_unitsTimed;
 
-int __stdcall Units_Apply(const UnitsEventHeader* event, unsigned int size)
+int __stdcall GlueUnitsApply(const UnitsEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2492,7 +2510,7 @@ int __stdcall Units_Apply(const UnitsEventHeader* event, unsigned int size)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Units_UpdateAllUnits()
+void __stdcall GlueUnitsUpdateAllUnits()
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2502,7 +2520,7 @@ void __stdcall Units_UpdateAllUnits()
     GlueScratchRelease(mark);
 }
 
-void __stdcall Units_KillUnit(Unit* unit, int cause)
+void __stdcall GlueUnitsKillUnit(Unit* unit, int cause)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2514,7 +2532,7 @@ void __stdcall Units_KillUnit(Unit* unit, int cause)
     GlueScratchRelease(mark);
 }
 
-Unit* __stdcall Units_CreateUnit(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
+Unit* __stdcall GlueUnitsCreateUnit(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2532,7 +2550,7 @@ Unit* __stdcall Units_CreateUnit(unsigned char player, unsigned short typeId, co
     return (Unit*)GlueResult(glue, 3, (unsigned)slotArgs[0].i32, 1);
 }
 
-UnitDef* __stdcall Units_FindUnitType(const char* name)
+UnitDef* __stdcall GlueUnitsFindUnitType(const char* name)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2544,7 +2562,7 @@ UnitDef* __stdcall Units_FindUnitType(const char* name)
     return (UnitDef*)GlueResult(glue, 4, (unsigned)slotArgs[0].i32, 1);
 }
 
-unsigned short __stdcall Units_FindUnitTypeId(const char* name)
+unsigned short __stdcall GlueUnitsFindUnitTypeId(const char* name)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2556,7 +2574,7 @@ unsigned short __stdcall Units_FindUnitTypeId(const char* name)
     return (unsigned short)slotArgs[0].i32;
 }
 
-int __stdcall Units_AddBuildProgress(Unit* builder, Unit* unit, float amount)
+int __stdcall GlueUnitsAddBuildProgress(Unit* builder, Unit* unit, float amount)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2570,7 +2588,7 @@ int __stdcall Units_AddBuildProgress(Unit* builder, Unit* unit, float amount)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Units_AddRepairProgress(Unit* builder, Unit* unit, float amount)
+int __stdcall GlueUnitsAddRepairProgress(Unit* builder, Unit* unit, float amount)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2584,7 +2602,7 @@ int __stdcall Units_AddRepairProgress(Unit* builder, Unit* unit, float amount)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Units_CanLoad(Unit* unit, Unit* target)
+int __stdcall GlueUnitsCanLoad(Unit* unit, Unit* target)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2597,7 +2615,7 @@ int __stdcall Units_CanLoad(Unit* unit, Unit* target)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Units_CanReclaim(Unit* unit, Unit* target)
+int __stdcall GlueUnitsCanReclaim(Unit* unit, Unit* target)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2610,7 +2628,7 @@ int __stdcall Units_CanReclaim(Unit* unit, Unit* target)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Units_CanRepair(Unit* unit, Unit* target)
+int __stdcall GlueUnitsCanRepair(Unit* unit, Unit* target)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2623,7 +2641,7 @@ int __stdcall Units_CanRepair(Unit* unit, Unit* target)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Units_UnitRefUnlink(UnitRef* ref)
+void __stdcall GlueUnitsUnitRefUnlink(UnitRef* ref)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2634,7 +2652,7 @@ void __stdcall Units_UnitRefUnlink(UnitRef* ref)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Units_UpdateUnitHead(Unit* unit)
+void __stdcall GlueUnitsUpdateUnitHead(Unit* unit)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2645,7 +2663,7 @@ void __stdcall Units_UpdateUnitHead(Unit* unit)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Units_UpdateUnitBody(Unit* unit)
+int __stdcall GlueUnitsUpdateUnitBody(Unit* unit)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2657,7 +2675,7 @@ int __stdcall Units_UpdateUnitBody(Unit* unit)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Units_UpdateUnitTail(Unit* unit, int moved)
+void __stdcall GlueUnitsUpdateUnitTail(Unit* unit, int moved)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2669,7 +2687,7 @@ void __stdcall Units_UpdateUnitTail(Unit* unit, int moved)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Units_GetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
+int __stdcall GlueUnitsGetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2688,7 +2706,7 @@ int __stdcall Units_GetFactoriesInRadius(int player, const Vec3* pos, int radius
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Units_CreateFactoryIndex(int player)
+void __stdcall GlueUnitsCreateFactoryIndex(int player)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2699,7 +2717,7 @@ void __stdcall Units_CreateFactoryIndex(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Units_FreeFactoryIndex(int player)
+void __stdcall GlueUnitsFreeFactoryIndex(int player)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2710,7 +2728,7 @@ void __stdcall Units_FreeFactoryIndex(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Units_RefreshFactoryIndex(int player)
+void __stdcall GlueUnitsRefreshFactoryIndex(int player)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2721,7 +2739,7 @@ void __stdcall Units_RefreshFactoryIndex(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Units_UnitRefInit(UnitRef* ref, Unit* unit, OrderBase* value)
+void __stdcall GlueUnitsUnitRefInit(UnitRef* ref, Unit* unit, OrderBase* value)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2734,7 +2752,7 @@ void __stdcall Units_UnitRefInit(UnitRef* ref, Unit* unit, OrderBase* value)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Units_UnitRefSetUnit(UnitRef* ref, Unit* unit)
+void __stdcall GlueUnitsUnitRefSetUnit(UnitRef* ref, Unit* unit)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2746,7 +2764,7 @@ void __stdcall Units_UnitRefSetUnit(UnitRef* ref, Unit* unit)
     GlueScratchRelease(mark);
 }
 
-Unit* __stdcall Units_UnitRefGet(UnitRef* ref)
+Unit* __stdcall GlueUnitsUnitRefGet(UnitRef* ref)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2758,7 +2776,7 @@ Unit* __stdcall Units_UnitRefGet(UnitRef* ref)
     return (Unit*)GlueResult(glue, 21, (unsigned)slotArgs[0].i32, 1);
 }
 
-void __stdcall Units_UnitRefSetValue(UnitRef* ref, OrderBase* value)
+void __stdcall GlueUnitsUnitRefSetValue(UnitRef* ref, OrderBase* value)
 {
     GlueModule* glue = &s_unitsGlue;
     unsigned mark = GlueScratchMark();
@@ -2770,7 +2788,7 @@ void __stdcall Units_UnitRefSetValue(UnitRef* ref, OrderBase* value)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Units_TimedApply(const UnitsEventHeader* event, unsigned int size)
+int __stdcall GlueUnitsTimedApply(const UnitsEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_unitsNative->Apply(event, size);
@@ -2778,21 +2796,21 @@ int __stdcall Units_TimedApply(const UnitsEventHeader* event, unsigned int size)
     return result;
 }
 
-void __stdcall Units_TimedUpdateAllUnits()
+void __stdcall GlueUnitsTimedUpdateAllUnits()
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->UpdateAllUnits();
     GlueTimed(&s_unitsGlue, 1, start);
 }
 
-void __stdcall Units_TimedKillUnit(Unit* unit, int cause)
+void __stdcall GlueUnitsTimedKillUnit(Unit* unit, int cause)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->KillUnit(unit, cause);
     GlueTimed(&s_unitsGlue, 2, start);
 }
 
-Unit* __stdcall Units_TimedCreateUnit(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
+Unit* __stdcall GlueUnitsTimedCreateUnit(unsigned char player, unsigned short typeId, const Vec3* pos, int finished, int mode, int id)
 {
     unsigned long long start = host_time_counter();
     Unit* result = s_unitsNative->CreateUnit(player, typeId, pos, finished, mode, id);
@@ -2800,7 +2818,7 @@ Unit* __stdcall Units_TimedCreateUnit(unsigned char player, unsigned short typeI
     return result;
 }
 
-UnitDef* __stdcall Units_TimedFindUnitType(const char* name)
+UnitDef* __stdcall GlueUnitsTimedFindUnitType(const char* name)
 {
     unsigned long long start = host_time_counter();
     UnitDef* result = s_unitsNative->FindUnitType(name);
@@ -2808,7 +2826,7 @@ UnitDef* __stdcall Units_TimedFindUnitType(const char* name)
     return result;
 }
 
-unsigned short __stdcall Units_TimedFindUnitTypeId(const char* name)
+unsigned short __stdcall GlueUnitsTimedFindUnitTypeId(const char* name)
 {
     unsigned long long start = host_time_counter();
     unsigned short result = s_unitsNative->FindUnitTypeId(name);
@@ -2816,7 +2834,7 @@ unsigned short __stdcall Units_TimedFindUnitTypeId(const char* name)
     return result;
 }
 
-int __stdcall Units_TimedAddBuildProgress(Unit* builder, Unit* unit, float amount)
+int __stdcall GlueUnitsTimedAddBuildProgress(Unit* builder, Unit* unit, float amount)
 {
     unsigned long long start = host_time_counter();
     int result = s_unitsNative->AddBuildProgress(builder, unit, amount);
@@ -2824,7 +2842,7 @@ int __stdcall Units_TimedAddBuildProgress(Unit* builder, Unit* unit, float amoun
     return result;
 }
 
-int __stdcall Units_TimedAddRepairProgress(Unit* builder, Unit* unit, float amount)
+int __stdcall GlueUnitsTimedAddRepairProgress(Unit* builder, Unit* unit, float amount)
 {
     unsigned long long start = host_time_counter();
     int result = s_unitsNative->AddRepairProgress(builder, unit, amount);
@@ -2832,7 +2850,7 @@ int __stdcall Units_TimedAddRepairProgress(Unit* builder, Unit* unit, float amou
     return result;
 }
 
-int __stdcall Units_TimedCanLoad(Unit* unit, Unit* target)
+int __stdcall GlueUnitsTimedCanLoad(Unit* unit, Unit* target)
 {
     unsigned long long start = host_time_counter();
     int result = s_unitsNative->CanLoad(unit, target);
@@ -2840,7 +2858,7 @@ int __stdcall Units_TimedCanLoad(Unit* unit, Unit* target)
     return result;
 }
 
-int __stdcall Units_TimedCanReclaim(Unit* unit, Unit* target)
+int __stdcall GlueUnitsTimedCanReclaim(Unit* unit, Unit* target)
 {
     unsigned long long start = host_time_counter();
     int result = s_unitsNative->CanReclaim(unit, target);
@@ -2848,7 +2866,7 @@ int __stdcall Units_TimedCanReclaim(Unit* unit, Unit* target)
     return result;
 }
 
-int __stdcall Units_TimedCanRepair(Unit* unit, Unit* target)
+int __stdcall GlueUnitsTimedCanRepair(Unit* unit, Unit* target)
 {
     unsigned long long start = host_time_counter();
     int result = s_unitsNative->CanRepair(unit, target);
@@ -2856,21 +2874,21 @@ int __stdcall Units_TimedCanRepair(Unit* unit, Unit* target)
     return result;
 }
 
-void __stdcall Units_TimedUnitRefUnlink(UnitRef* ref)
+void __stdcall GlueUnitsTimedUnitRefUnlink(UnitRef* ref)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->UnitRefUnlink(ref);
     GlueTimed(&s_unitsGlue, 11, start);
 }
 
-void __stdcall Units_TimedUpdateUnitHead(Unit* unit)
+void __stdcall GlueUnitsTimedUpdateUnitHead(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->UpdateUnitHead(unit);
     GlueTimed(&s_unitsGlue, 12, start);
 }
 
-int __stdcall Units_TimedUpdateUnitBody(Unit* unit)
+int __stdcall GlueUnitsTimedUpdateUnitBody(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     int result = s_unitsNative->UpdateUnitBody(unit);
@@ -2878,14 +2896,14 @@ int __stdcall Units_TimedUpdateUnitBody(Unit* unit)
     return result;
 }
 
-void __stdcall Units_TimedUpdateUnitTail(Unit* unit, int moved)
+void __stdcall GlueUnitsTimedUpdateUnitTail(Unit* unit, int moved)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->UpdateUnitTail(unit, moved);
     GlueTimed(&s_unitsGlue, 14, start);
 }
 
-int __stdcall Units_TimedGetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
+int __stdcall GlueUnitsTimedGetFactoriesInRadius(int player, const Vec3* pos, int radius, Ref<Unit>* out, int capacity)
 {
     unsigned long long start = host_time_counter();
     int result = s_unitsNative->GetFactoriesInRadius(player, pos, radius, out, capacity);
@@ -2893,42 +2911,42 @@ int __stdcall Units_TimedGetFactoriesInRadius(int player, const Vec3* pos, int r
     return result;
 }
 
-void __stdcall Units_TimedCreateFactoryIndex(int player)
+void __stdcall GlueUnitsTimedCreateFactoryIndex(int player)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->CreateFactoryIndex(player);
     GlueTimed(&s_unitsGlue, 16, start);
 }
 
-void __stdcall Units_TimedFreeFactoryIndex(int player)
+void __stdcall GlueUnitsTimedFreeFactoryIndex(int player)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->FreeFactoryIndex(player);
     GlueTimed(&s_unitsGlue, 17, start);
 }
 
-void __stdcall Units_TimedRefreshFactoryIndex(int player)
+void __stdcall GlueUnitsTimedRefreshFactoryIndex(int player)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->RefreshFactoryIndex(player);
     GlueTimed(&s_unitsGlue, 18, start);
 }
 
-void __stdcall Units_TimedUnitRefInit(UnitRef* ref, Unit* unit, OrderBase* value)
+void __stdcall GlueUnitsTimedUnitRefInit(UnitRef* ref, Unit* unit, OrderBase* value)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->UnitRefInit(ref, unit, value);
     GlueTimed(&s_unitsGlue, 19, start);
 }
 
-void __stdcall Units_TimedUnitRefSetUnit(UnitRef* ref, Unit* unit)
+void __stdcall GlueUnitsTimedUnitRefSetUnit(UnitRef* ref, Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->UnitRefSetUnit(ref, unit);
     GlueTimed(&s_unitsGlue, 20, start);
 }
 
-Unit* __stdcall Units_TimedUnitRefGet(UnitRef* ref)
+Unit* __stdcall GlueUnitsTimedUnitRefGet(UnitRef* ref)
 {
     unsigned long long start = host_time_counter();
     Unit* result = s_unitsNative->UnitRefGet(ref);
@@ -2936,7 +2954,7 @@ Unit* __stdcall Units_TimedUnitRefGet(UnitRef* ref)
     return result;
 }
 
-void __stdcall Units_TimedUnitRefSetValue(UnitRef* ref, OrderBase* value)
+void __stdcall GlueUnitsTimedUnitRefSetValue(UnitRef* ref, OrderBase* value)
 {
     unsigned long long start = host_time_counter();
     s_unitsNative->UnitRefSetValue(ref, value);
@@ -2950,29 +2968,29 @@ void UnitsUseSeam(GlueModule* glue)
         return;
     s_unitsNative = g_seams.units;
     s_unitsSeam = *s_unitsNative;
-    s_unitsSeam.Apply = Units_Apply;
-    s_unitsSeam.UpdateAllUnits = Units_UpdateAllUnits;
-    s_unitsSeam.KillUnit = Units_KillUnit;
-    s_unitsSeam.CreateUnit = Units_CreateUnit;
-    s_unitsSeam.FindUnitType = Units_FindUnitType;
-    s_unitsSeam.FindUnitTypeId = Units_FindUnitTypeId;
-    s_unitsSeam.AddBuildProgress = Units_AddBuildProgress;
-    s_unitsSeam.AddRepairProgress = Units_AddRepairProgress;
-    s_unitsSeam.CanLoad = Units_CanLoad;
-    s_unitsSeam.CanReclaim = Units_CanReclaim;
-    s_unitsSeam.CanRepair = Units_CanRepair;
-    s_unitsSeam.UnitRefUnlink = Units_UnitRefUnlink;
-    s_unitsSeam.UpdateUnitHead = Units_UpdateUnitHead;
-    s_unitsSeam.UpdateUnitBody = Units_UpdateUnitBody;
-    s_unitsSeam.UpdateUnitTail = Units_UpdateUnitTail;
-    s_unitsSeam.GetFactoriesInRadius = Units_GetFactoriesInRadius;
-    s_unitsSeam.CreateFactoryIndex = Units_CreateFactoryIndex;
-    s_unitsSeam.FreeFactoryIndex = Units_FreeFactoryIndex;
-    s_unitsSeam.RefreshFactoryIndex = Units_RefreshFactoryIndex;
-    s_unitsSeam.UnitRefInit = Units_UnitRefInit;
-    s_unitsSeam.UnitRefSetUnit = Units_UnitRefSetUnit;
-    s_unitsSeam.UnitRefGet = Units_UnitRefGet;
-    s_unitsSeam.UnitRefSetValue = Units_UnitRefSetValue;
+    s_unitsSeam.Apply = GlueUnitsApply;
+    s_unitsSeam.UpdateAllUnits = GlueUnitsUpdateAllUnits;
+    s_unitsSeam.KillUnit = GlueUnitsKillUnit;
+    s_unitsSeam.CreateUnit = GlueUnitsCreateUnit;
+    s_unitsSeam.FindUnitType = GlueUnitsFindUnitType;
+    s_unitsSeam.FindUnitTypeId = GlueUnitsFindUnitTypeId;
+    s_unitsSeam.AddBuildProgress = GlueUnitsAddBuildProgress;
+    s_unitsSeam.AddRepairProgress = GlueUnitsAddRepairProgress;
+    s_unitsSeam.CanLoad = GlueUnitsCanLoad;
+    s_unitsSeam.CanReclaim = GlueUnitsCanReclaim;
+    s_unitsSeam.CanRepair = GlueUnitsCanRepair;
+    s_unitsSeam.UnitRefUnlink = GlueUnitsUnitRefUnlink;
+    s_unitsSeam.UpdateUnitHead = GlueUnitsUpdateUnitHead;
+    s_unitsSeam.UpdateUnitBody = GlueUnitsUpdateUnitBody;
+    s_unitsSeam.UpdateUnitTail = GlueUnitsUpdateUnitTail;
+    s_unitsSeam.GetFactoriesInRadius = GlueUnitsGetFactoriesInRadius;
+    s_unitsSeam.CreateFactoryIndex = GlueUnitsCreateFactoryIndex;
+    s_unitsSeam.FreeFactoryIndex = GlueUnitsFreeFactoryIndex;
+    s_unitsSeam.RefreshFactoryIndex = GlueUnitsRefreshFactoryIndex;
+    s_unitsSeam.UnitRefInit = GlueUnitsUnitRefInit;
+    s_unitsSeam.UnitRefSetUnit = GlueUnitsUnitRefSetUnit;
+    s_unitsSeam.UnitRefGet = GlueUnitsUnitRefGet;
+    s_unitsSeam.UnitRefSetValue = GlueUnitsUnitRefSetValue;
     g_seams.units = &s_unitsSeam;
 }
 
@@ -2980,29 +2998,29 @@ void UnitsTimeNative()
 {
     s_unitsNative = g_seams.units;
     s_unitsTimed = *s_unitsNative;
-    s_unitsTimed.Apply = Units_TimedApply;
-    s_unitsTimed.UpdateAllUnits = Units_TimedUpdateAllUnits;
-    s_unitsTimed.KillUnit = Units_TimedKillUnit;
-    s_unitsTimed.CreateUnit = Units_TimedCreateUnit;
-    s_unitsTimed.FindUnitType = Units_TimedFindUnitType;
-    s_unitsTimed.FindUnitTypeId = Units_TimedFindUnitTypeId;
-    s_unitsTimed.AddBuildProgress = Units_TimedAddBuildProgress;
-    s_unitsTimed.AddRepairProgress = Units_TimedAddRepairProgress;
-    s_unitsTimed.CanLoad = Units_TimedCanLoad;
-    s_unitsTimed.CanReclaim = Units_TimedCanReclaim;
-    s_unitsTimed.CanRepair = Units_TimedCanRepair;
-    s_unitsTimed.UnitRefUnlink = Units_TimedUnitRefUnlink;
-    s_unitsTimed.UpdateUnitHead = Units_TimedUpdateUnitHead;
-    s_unitsTimed.UpdateUnitBody = Units_TimedUpdateUnitBody;
-    s_unitsTimed.UpdateUnitTail = Units_TimedUpdateUnitTail;
-    s_unitsTimed.GetFactoriesInRadius = Units_TimedGetFactoriesInRadius;
-    s_unitsTimed.CreateFactoryIndex = Units_TimedCreateFactoryIndex;
-    s_unitsTimed.FreeFactoryIndex = Units_TimedFreeFactoryIndex;
-    s_unitsTimed.RefreshFactoryIndex = Units_TimedRefreshFactoryIndex;
-    s_unitsTimed.UnitRefInit = Units_TimedUnitRefInit;
-    s_unitsTimed.UnitRefSetUnit = Units_TimedUnitRefSetUnit;
-    s_unitsTimed.UnitRefGet = Units_TimedUnitRefGet;
-    s_unitsTimed.UnitRefSetValue = Units_TimedUnitRefSetValue;
+    s_unitsTimed.Apply = GlueUnitsTimedApply;
+    s_unitsTimed.UpdateAllUnits = GlueUnitsTimedUpdateAllUnits;
+    s_unitsTimed.KillUnit = GlueUnitsTimedKillUnit;
+    s_unitsTimed.CreateUnit = GlueUnitsTimedCreateUnit;
+    s_unitsTimed.FindUnitType = GlueUnitsTimedFindUnitType;
+    s_unitsTimed.FindUnitTypeId = GlueUnitsTimedFindUnitTypeId;
+    s_unitsTimed.AddBuildProgress = GlueUnitsTimedAddBuildProgress;
+    s_unitsTimed.AddRepairProgress = GlueUnitsTimedAddRepairProgress;
+    s_unitsTimed.CanLoad = GlueUnitsTimedCanLoad;
+    s_unitsTimed.CanReclaim = GlueUnitsTimedCanReclaim;
+    s_unitsTimed.CanRepair = GlueUnitsTimedCanRepair;
+    s_unitsTimed.UnitRefUnlink = GlueUnitsTimedUnitRefUnlink;
+    s_unitsTimed.UpdateUnitHead = GlueUnitsTimedUpdateUnitHead;
+    s_unitsTimed.UpdateUnitBody = GlueUnitsTimedUpdateUnitBody;
+    s_unitsTimed.UpdateUnitTail = GlueUnitsTimedUpdateUnitTail;
+    s_unitsTimed.GetFactoriesInRadius = GlueUnitsTimedGetFactoriesInRadius;
+    s_unitsTimed.CreateFactoryIndex = GlueUnitsTimedCreateFactoryIndex;
+    s_unitsTimed.FreeFactoryIndex = GlueUnitsTimedFreeFactoryIndex;
+    s_unitsTimed.RefreshFactoryIndex = GlueUnitsTimedRefreshFactoryIndex;
+    s_unitsTimed.UnitRefInit = GlueUnitsTimedUnitRefInit;
+    s_unitsTimed.UnitRefSetUnit = GlueUnitsTimedUnitRefSetUnit;
+    s_unitsTimed.UnitRefGet = GlueUnitsTimedUnitRefGet;
+    s_unitsTimed.UnitRefSetValue = GlueUnitsTimedUnitRefSetValue;
     g_seams.units = &s_unitsTimed;
 }
 
@@ -3029,7 +3047,7 @@ const PlayersSeam* s_playersNative;
 PlayersSeam s_playersSeam;
 PlayersSeam s_playersTimed;
 
-int __stdcall Players_Apply(const PlayersEventHeader* event, unsigned int size)
+int __stdcall GluePlayersApply(const PlayersEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3043,7 +3061,7 @@ int __stdcall Players_Apply(const PlayersEventHeader* event, unsigned int size)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Players_UpdatePlayers()
+void __stdcall GluePlayersUpdatePlayers()
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3053,7 +3071,7 @@ void __stdcall Players_UpdatePlayers()
     GlueScratchRelease(mark);
 }
 
-void __stdcall Players_DeactivateConditions(MissionConditions* conditions)
+void __stdcall GluePlayersDeactivateConditions(MissionConditions* conditions)
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3064,7 +3082,7 @@ void __stdcall Players_DeactivateConditions(MissionConditions* conditions)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Players_UpdatePlayersOnStream(RandStream stream)
+void __stdcall GluePlayersUpdatePlayersOnStream(RandStream stream)
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3075,7 +3093,7 @@ void __stdcall Players_UpdatePlayersOnStream(RandStream stream)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Players_UpdatePlayerHead(int player)
+int __stdcall GluePlayersUpdatePlayerHead(int player)
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3087,7 +3105,7 @@ int __stdcall Players_UpdatePlayerHead(int player)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Players_UpdatePlayerBody(int player, RandStream stream)
+int __stdcall GluePlayersUpdatePlayerBody(int player, RandStream stream)
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3100,7 +3118,7 @@ int __stdcall Players_UpdatePlayerBody(int player, RandStream stream)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Players_UpdatePlayerTail(int player)
+void __stdcall GluePlayersUpdatePlayerTail(int player)
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3111,7 +3129,7 @@ void __stdcall Players_UpdatePlayerTail(int player)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Players_UpdatePlayersFinish()
+void __stdcall GluePlayersUpdatePlayersFinish()
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3121,7 +3139,7 @@ void __stdcall Players_UpdatePlayersFinish()
     GlueScratchRelease(mark);
 }
 
-unsigned int __stdcall Players_RegionSize(const PlayersMapInfo* info)
+unsigned int __stdcall GluePlayersRegionSize(const PlayersMapInfo* info)
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3134,7 +3152,7 @@ unsigned int __stdcall Players_RegionSize(const PlayersMapInfo* info)
     return (unsigned int)slotArgs[0].i32;
 }
 
-void __stdcall Players_Init(const PlayersMapInfo* info, void* region, unsigned int size)
+void __stdcall GluePlayersInit(const PlayersMapInfo* info, void* region, unsigned int size)
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3149,7 +3167,7 @@ void __stdcall Players_Init(const PlayersMapInfo* info, void* region, unsigned i
     GlueScratchRelease(mark);
 }
 
-void* __stdcall Players_Shutdown()
+void* __stdcall GluePlayersShutdown()
 {
     GlueModule* glue = &s_playersGlue;
     unsigned mark = GlueScratchMark();
@@ -3160,7 +3178,7 @@ void* __stdcall Players_Shutdown()
     return (void*)GlueResult(glue, 10, (unsigned)slotArgs[0].i32, 1);
 }
 
-int __stdcall Players_TimedApply(const PlayersEventHeader* event, unsigned int size)
+int __stdcall GluePlayersTimedApply(const PlayersEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_playersNative->Apply(event, size);
@@ -3168,28 +3186,28 @@ int __stdcall Players_TimedApply(const PlayersEventHeader* event, unsigned int s
     return result;
 }
 
-void __stdcall Players_TimedUpdatePlayers()
+void __stdcall GluePlayersTimedUpdatePlayers()
 {
     unsigned long long start = host_time_counter();
     s_playersNative->UpdatePlayers();
     GlueTimed(&s_playersGlue, 1, start);
 }
 
-void __stdcall Players_TimedDeactivateConditions(MissionConditions* conditions)
+void __stdcall GluePlayersTimedDeactivateConditions(MissionConditions* conditions)
 {
     unsigned long long start = host_time_counter();
     s_playersNative->DeactivateConditions(conditions);
     GlueTimed(&s_playersGlue, 2, start);
 }
 
-void __stdcall Players_TimedUpdatePlayersOnStream(RandStream stream)
+void __stdcall GluePlayersTimedUpdatePlayersOnStream(RandStream stream)
 {
     unsigned long long start = host_time_counter();
     s_playersNative->UpdatePlayersOnStream(stream);
     GlueTimed(&s_playersGlue, 3, start);
 }
 
-int __stdcall Players_TimedUpdatePlayerHead(int player)
+int __stdcall GluePlayersTimedUpdatePlayerHead(int player)
 {
     unsigned long long start = host_time_counter();
     int result = s_playersNative->UpdatePlayerHead(player);
@@ -3197,7 +3215,7 @@ int __stdcall Players_TimedUpdatePlayerHead(int player)
     return result;
 }
 
-int __stdcall Players_TimedUpdatePlayerBody(int player, RandStream stream)
+int __stdcall GluePlayersTimedUpdatePlayerBody(int player, RandStream stream)
 {
     unsigned long long start = host_time_counter();
     int result = s_playersNative->UpdatePlayerBody(player, stream);
@@ -3205,21 +3223,21 @@ int __stdcall Players_TimedUpdatePlayerBody(int player, RandStream stream)
     return result;
 }
 
-void __stdcall Players_TimedUpdatePlayerTail(int player)
+void __stdcall GluePlayersTimedUpdatePlayerTail(int player)
 {
     unsigned long long start = host_time_counter();
     s_playersNative->UpdatePlayerTail(player);
     GlueTimed(&s_playersGlue, 6, start);
 }
 
-void __stdcall Players_TimedUpdatePlayersFinish()
+void __stdcall GluePlayersTimedUpdatePlayersFinish()
 {
     unsigned long long start = host_time_counter();
     s_playersNative->UpdatePlayersFinish();
     GlueTimed(&s_playersGlue, 7, start);
 }
 
-unsigned int __stdcall Players_TimedRegionSize(const PlayersMapInfo* info)
+unsigned int __stdcall GluePlayersTimedRegionSize(const PlayersMapInfo* info)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_playersNative->RegionSize(info);
@@ -3227,14 +3245,14 @@ unsigned int __stdcall Players_TimedRegionSize(const PlayersMapInfo* info)
     return result;
 }
 
-void __stdcall Players_TimedInit(const PlayersMapInfo* info, void* region, unsigned int size)
+void __stdcall GluePlayersTimedInit(const PlayersMapInfo* info, void* region, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     s_playersNative->Init(info, region, size);
     GlueTimed(&s_playersGlue, 9, start);
 }
 
-void* __stdcall Players_TimedShutdown()
+void* __stdcall GluePlayersTimedShutdown()
 {
     unsigned long long start = host_time_counter();
     void* result = s_playersNative->Shutdown();
@@ -3249,17 +3267,17 @@ void PlayersUseSeam(GlueModule* glue)
         return;
     s_playersNative = g_seams.players;
     s_playersSeam = *s_playersNative;
-    s_playersSeam.Apply = Players_Apply;
-    s_playersSeam.UpdatePlayers = Players_UpdatePlayers;
-    s_playersSeam.DeactivateConditions = Players_DeactivateConditions;
-    s_playersSeam.UpdatePlayersOnStream = Players_UpdatePlayersOnStream;
-    s_playersSeam.UpdatePlayerHead = Players_UpdatePlayerHead;
-    s_playersSeam.UpdatePlayerBody = Players_UpdatePlayerBody;
-    s_playersSeam.UpdatePlayerTail = Players_UpdatePlayerTail;
-    s_playersSeam.UpdatePlayersFinish = Players_UpdatePlayersFinish;
-    s_playersSeam.RegionSize = Players_RegionSize;
-    s_playersSeam.Init = Players_Init;
-    s_playersSeam.Shutdown = Players_Shutdown;
+    s_playersSeam.Apply = GluePlayersApply;
+    s_playersSeam.UpdatePlayers = GluePlayersUpdatePlayers;
+    s_playersSeam.DeactivateConditions = GluePlayersDeactivateConditions;
+    s_playersSeam.UpdatePlayersOnStream = GluePlayersUpdatePlayersOnStream;
+    s_playersSeam.UpdatePlayerHead = GluePlayersUpdatePlayerHead;
+    s_playersSeam.UpdatePlayerBody = GluePlayersUpdatePlayerBody;
+    s_playersSeam.UpdatePlayerTail = GluePlayersUpdatePlayerTail;
+    s_playersSeam.UpdatePlayersFinish = GluePlayersUpdatePlayersFinish;
+    s_playersSeam.RegionSize = GluePlayersRegionSize;
+    s_playersSeam.Init = GluePlayersInit;
+    s_playersSeam.Shutdown = GluePlayersShutdown;
     g_seams.players = &s_playersSeam;
 }
 
@@ -3267,17 +3285,17 @@ void PlayersTimeNative()
 {
     s_playersNative = g_seams.players;
     s_playersTimed = *s_playersNative;
-    s_playersTimed.Apply = Players_TimedApply;
-    s_playersTimed.UpdatePlayers = Players_TimedUpdatePlayers;
-    s_playersTimed.DeactivateConditions = Players_TimedDeactivateConditions;
-    s_playersTimed.UpdatePlayersOnStream = Players_TimedUpdatePlayersOnStream;
-    s_playersTimed.UpdatePlayerHead = Players_TimedUpdatePlayerHead;
-    s_playersTimed.UpdatePlayerBody = Players_TimedUpdatePlayerBody;
-    s_playersTimed.UpdatePlayerTail = Players_TimedUpdatePlayerTail;
-    s_playersTimed.UpdatePlayersFinish = Players_TimedUpdatePlayersFinish;
-    s_playersTimed.RegionSize = Players_TimedRegionSize;
-    s_playersTimed.Init = Players_TimedInit;
-    s_playersTimed.Shutdown = Players_TimedShutdown;
+    s_playersTimed.Apply = GluePlayersTimedApply;
+    s_playersTimed.UpdatePlayers = GluePlayersTimedUpdatePlayers;
+    s_playersTimed.DeactivateConditions = GluePlayersTimedDeactivateConditions;
+    s_playersTimed.UpdatePlayersOnStream = GluePlayersTimedUpdatePlayersOnStream;
+    s_playersTimed.UpdatePlayerHead = GluePlayersTimedUpdatePlayerHead;
+    s_playersTimed.UpdatePlayerBody = GluePlayersTimedUpdatePlayerBody;
+    s_playersTimed.UpdatePlayerTail = GluePlayersTimedUpdatePlayerTail;
+    s_playersTimed.UpdatePlayersFinish = GluePlayersTimedUpdatePlayersFinish;
+    s_playersTimed.RegionSize = GluePlayersTimedRegionSize;
+    s_playersTimed.Init = GluePlayersTimedInit;
+    s_playersTimed.Shutdown = GluePlayersTimedShutdown;
     g_seams.players = &s_playersTimed;
 }
 
@@ -3308,7 +3326,7 @@ const MapSeam* s_mapNative;
 MapSeam s_mapSeam;
 MapSeam s_mapTimed;
 
-int __stdcall Map_Apply(const MapEventHeader* event, unsigned int size)
+int __stdcall GlueMapApply(const MapEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3322,7 +3340,7 @@ int __stdcall Map_Apply(const MapEventHeader* event, unsigned int size)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_UnitsInRange(const Vec3* pos, int range, int skip, unsigned short* ids, int capacity)
+int __stdcall GlueMapUnitsInRange(const Vec3* pos, int range, int skip, unsigned short* ids, int capacity)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3340,7 +3358,7 @@ int __stdcall Map_UnitsInRange(const Vec3* pos, int range, int skip, unsigned sh
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_GetCellMeanHeight(Vec3* pos)
+int __stdcall GlueMapGetCellMeanHeight(Vec3* pos)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3353,7 +3371,7 @@ int __stdcall Map_GetCellMeanHeight(Vec3* pos)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_CanBuildAt(UnitDef* unit, const Point16* cell, short type, Player* player)
+int __stdcall GlueMapCanBuildAt(UnitDef* unit, const Point16* cell, short type, Player* player)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3369,7 +3387,7 @@ int __stdcall Map_CanBuildAt(UnitDef* unit, const Point16* cell, short type, Pla
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags)
+int __stdcall GlueMapCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3385,7 +3403,7 @@ int __stdcall Map_CanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeI
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Map_BuildAllPassMaps(const MapMoveLimits* limits, int count)
+void __stdcall GlueMapBuildAllPassMaps(const MapMoveLimits* limits, int count)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3398,7 +3416,7 @@ void __stdcall Map_BuildAllPassMaps(const MapMoveLimits* limits, int count)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Map_SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
+void __stdcall GlueMapSnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3412,7 +3430,7 @@ void __stdcall Map_SnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Map_CanPlaceFootprintAt(Unit* unit, Vec3* pos)
+int __stdcall GlueMapCanPlaceFootprintAt(Unit* unit, Vec3* pos)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3426,7 +3444,7 @@ int __stdcall Map_CanPlaceFootprintAt(Unit* unit, Vec3* pos)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_IsPadSlotFree(Unit* pad, int id)
+int __stdcall GlueMapIsPadSlotFree(Unit* pad, int id)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3439,7 +3457,7 @@ int __stdcall Map_IsPadSlotFree(Unit* pad, int id)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount)
+int __stdcall GlueMapPickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3456,7 +3474,7 @@ int __stdcall Map_PickRandomReclaimableResourcesInRadius(Vec3* pos, int range, V
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_GetGroundHeight(Vec3* pos)
+int __stdcall GlueMapGetGroundHeight(Vec3* pos)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3469,7 +3487,7 @@ int __stdcall Map_GetGroundHeight(Vec3* pos)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_PassMapGet(int moveClass, int x, int y)
+int __stdcall GlueMapPassMapGet(int moveClass, int x, int y)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3483,7 +3501,7 @@ int __stdcall Map_PassMapGet(int moveClass, int x, int y)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Map_PassMapInBounds(int moveClass, unsigned int x, unsigned int y)
+int __stdcall GlueMapPassMapInBounds(int moveClass, unsigned int x, unsigned int y)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3497,7 +3515,7 @@ int __stdcall Map_PassMapInBounds(int moveClass, unsigned int x, unsigned int y)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Map_RefreshMovedUnits(int moveClass, Unit* unit)
+void __stdcall GlueMapRefreshMovedUnits(int moveClass, Unit* unit)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3509,7 +3527,7 @@ void __stdcall Map_RefreshMovedUnits(int moveClass, Unit* unit)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Map_RefreshUnitIfStale(int moveClass, Unit* unit)
+void __stdcall GlueMapRefreshUnitIfStale(int moveClass, Unit* unit)
 {
     GlueModule* glue = &s_mapGlue;
     unsigned mark = GlueScratchMark();
@@ -3521,7 +3539,7 @@ void __stdcall Map_RefreshUnitIfStale(int moveClass, Unit* unit)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Map_TimedApply(const MapEventHeader* event, unsigned int size)
+int __stdcall GlueMapTimedApply(const MapEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->Apply(event, size);
@@ -3529,7 +3547,7 @@ int __stdcall Map_TimedApply(const MapEventHeader* event, unsigned int size)
     return result;
 }
 
-int __stdcall Map_TimedUnitsInRange(const Vec3* pos, int range, int skip, unsigned short* ids, int capacity)
+int __stdcall GlueMapTimedUnitsInRange(const Vec3* pos, int range, int skip, unsigned short* ids, int capacity)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->UnitsInRange(pos, range, skip, ids, capacity);
@@ -3537,7 +3555,7 @@ int __stdcall Map_TimedUnitsInRange(const Vec3* pos, int range, int skip, unsign
     return result;
 }
 
-int __stdcall Map_TimedGetCellMeanHeight(Vec3* pos)
+int __stdcall GlueMapTimedGetCellMeanHeight(Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->GetCellMeanHeight(pos);
@@ -3545,7 +3563,7 @@ int __stdcall Map_TimedGetCellMeanHeight(Vec3* pos)
     return result;
 }
 
-int __stdcall Map_TimedCanBuildAt(UnitDef* unit, const Point16* cell, short type, Player* player)
+int __stdcall GlueMapTimedCanBuildAt(UnitDef* unit, const Point16* cell, short type, Player* player)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->CanBuildAt(unit, cell, type, player);
@@ -3553,7 +3571,7 @@ int __stdcall Map_TimedCanBuildAt(UnitDef* unit, const Point16* cell, short type
     return result;
 }
 
-int __stdcall Map_TimedCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags)
+int __stdcall GlueMapTimedCanPlaceUnitFootprint(UnitDef* unit, unsigned short otherTypeId, const Point16* cell, int flags)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->CanPlaceUnitFootprint(unit, otherTypeId, cell, flags);
@@ -3561,21 +3579,21 @@ int __stdcall Map_TimedCanPlaceUnitFootprint(UnitDef* unit, unsigned short other
     return result;
 }
 
-void __stdcall Map_TimedBuildAllPassMaps(const MapMoveLimits* limits, int count)
+void __stdcall GlueMapTimedBuildAllPassMaps(const MapMoveLimits* limits, int count)
 {
     unsigned long long start = host_time_counter();
     s_mapNative->BuildAllPassMaps(limits, count);
     GlueTimed(&s_mapGlue, 5, start);
 }
 
-void __stdcall Map_TimedSnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
+void __stdcall GlueMapTimedSnapWorldPosToFootprint(UnitDef* unit, Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     s_mapNative->SnapWorldPosToFootprint(unit, pos);
     GlueTimed(&s_mapGlue, 6, start);
 }
 
-int __stdcall Map_TimedCanPlaceFootprintAt(Unit* unit, Vec3* pos)
+int __stdcall GlueMapTimedCanPlaceFootprintAt(Unit* unit, Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->CanPlaceFootprintAt(unit, pos);
@@ -3583,7 +3601,7 @@ int __stdcall Map_TimedCanPlaceFootprintAt(Unit* unit, Vec3* pos)
     return result;
 }
 
-int __stdcall Map_TimedIsPadSlotFree(Unit* pad, int id)
+int __stdcall GlueMapTimedIsPadSlotFree(Unit* pad, int id)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->IsPadSlotFree(pad, id);
@@ -3591,7 +3609,7 @@ int __stdcall Map_TimedIsPadSlotFree(Unit* pad, int id)
     return result;
 }
 
-int __stdcall Map_TimedPickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount)
+int __stdcall GlueMapTimedPickRandomReclaimableResourcesInRadius(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->PickRandomReclaimableResourcesInRadius(pos, range, energy, energyAmount, metal, metalAmount);
@@ -3599,7 +3617,7 @@ int __stdcall Map_TimedPickRandomReclaimableResourcesInRadius(Vec3* pos, int ran
     return result;
 }
 
-int __stdcall Map_TimedGetGroundHeight(Vec3* pos)
+int __stdcall GlueMapTimedGetGroundHeight(Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->GetGroundHeight(pos);
@@ -3607,7 +3625,7 @@ int __stdcall Map_TimedGetGroundHeight(Vec3* pos)
     return result;
 }
 
-int __stdcall Map_TimedPassMapGet(int moveClass, int x, int y)
+int __stdcall GlueMapTimedPassMapGet(int moveClass, int x, int y)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->PassMapGet(moveClass, x, y);
@@ -3615,7 +3633,7 @@ int __stdcall Map_TimedPassMapGet(int moveClass, int x, int y)
     return result;
 }
 
-int __stdcall Map_TimedPassMapInBounds(int moveClass, unsigned int x, unsigned int y)
+int __stdcall GlueMapTimedPassMapInBounds(int moveClass, unsigned int x, unsigned int y)
 {
     unsigned long long start = host_time_counter();
     int result = s_mapNative->PassMapInBounds(moveClass, x, y);
@@ -3623,14 +3641,14 @@ int __stdcall Map_TimedPassMapInBounds(int moveClass, unsigned int x, unsigned i
     return result;
 }
 
-void __stdcall Map_TimedRefreshMovedUnits(int moveClass, Unit* unit)
+void __stdcall GlueMapTimedRefreshMovedUnits(int moveClass, Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_mapNative->RefreshMovedUnits(moveClass, unit);
     GlueTimed(&s_mapGlue, 13, start);
 }
 
-void __stdcall Map_TimedRefreshUnitIfStale(int moveClass, Unit* unit)
+void __stdcall GlueMapTimedRefreshUnitIfStale(int moveClass, Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_mapNative->RefreshUnitIfStale(moveClass, unit);
@@ -3644,21 +3662,21 @@ void MapUseSeam(GlueModule* glue)
         return;
     s_mapNative = g_seams.map;
     s_mapSeam = *s_mapNative;
-    s_mapSeam.Apply = Map_Apply;
-    s_mapSeam.UnitsInRange = Map_UnitsInRange;
-    s_mapSeam.GetCellMeanHeight = Map_GetCellMeanHeight;
-    s_mapSeam.CanBuildAt = Map_CanBuildAt;
-    s_mapSeam.CanPlaceUnitFootprint = Map_CanPlaceUnitFootprint;
-    s_mapSeam.BuildAllPassMaps = Map_BuildAllPassMaps;
-    s_mapSeam.SnapWorldPosToFootprint = Map_SnapWorldPosToFootprint;
-    s_mapSeam.CanPlaceFootprintAt = Map_CanPlaceFootprintAt;
-    s_mapSeam.IsPadSlotFree = Map_IsPadSlotFree;
-    s_mapSeam.PickRandomReclaimableResourcesInRadius = Map_PickRandomReclaimableResourcesInRadius;
-    s_mapSeam.GetGroundHeight = Map_GetGroundHeight;
-    s_mapSeam.PassMapGet = Map_PassMapGet;
-    s_mapSeam.PassMapInBounds = Map_PassMapInBounds;
-    s_mapSeam.RefreshMovedUnits = Map_RefreshMovedUnits;
-    s_mapSeam.RefreshUnitIfStale = Map_RefreshUnitIfStale;
+    s_mapSeam.Apply = GlueMapApply;
+    s_mapSeam.UnitsInRange = GlueMapUnitsInRange;
+    s_mapSeam.GetCellMeanHeight = GlueMapGetCellMeanHeight;
+    s_mapSeam.CanBuildAt = GlueMapCanBuildAt;
+    s_mapSeam.CanPlaceUnitFootprint = GlueMapCanPlaceUnitFootprint;
+    s_mapSeam.BuildAllPassMaps = GlueMapBuildAllPassMaps;
+    s_mapSeam.SnapWorldPosToFootprint = GlueMapSnapWorldPosToFootprint;
+    s_mapSeam.CanPlaceFootprintAt = GlueMapCanPlaceFootprintAt;
+    s_mapSeam.IsPadSlotFree = GlueMapIsPadSlotFree;
+    s_mapSeam.PickRandomReclaimableResourcesInRadius = GlueMapPickRandomReclaimableResourcesInRadius;
+    s_mapSeam.GetGroundHeight = GlueMapGetGroundHeight;
+    s_mapSeam.PassMapGet = GlueMapPassMapGet;
+    s_mapSeam.PassMapInBounds = GlueMapPassMapInBounds;
+    s_mapSeam.RefreshMovedUnits = GlueMapRefreshMovedUnits;
+    s_mapSeam.RefreshUnitIfStale = GlueMapRefreshUnitIfStale;
     g_seams.map = &s_mapSeam;
 }
 
@@ -3666,21 +3684,21 @@ void MapTimeNative()
 {
     s_mapNative = g_seams.map;
     s_mapTimed = *s_mapNative;
-    s_mapTimed.Apply = Map_TimedApply;
-    s_mapTimed.UnitsInRange = Map_TimedUnitsInRange;
-    s_mapTimed.GetCellMeanHeight = Map_TimedGetCellMeanHeight;
-    s_mapTimed.CanBuildAt = Map_TimedCanBuildAt;
-    s_mapTimed.CanPlaceUnitFootprint = Map_TimedCanPlaceUnitFootprint;
-    s_mapTimed.BuildAllPassMaps = Map_TimedBuildAllPassMaps;
-    s_mapTimed.SnapWorldPosToFootprint = Map_TimedSnapWorldPosToFootprint;
-    s_mapTimed.CanPlaceFootprintAt = Map_TimedCanPlaceFootprintAt;
-    s_mapTimed.IsPadSlotFree = Map_TimedIsPadSlotFree;
-    s_mapTimed.PickRandomReclaimableResourcesInRadius = Map_TimedPickRandomReclaimableResourcesInRadius;
-    s_mapTimed.GetGroundHeight = Map_TimedGetGroundHeight;
-    s_mapTimed.PassMapGet = Map_TimedPassMapGet;
-    s_mapTimed.PassMapInBounds = Map_TimedPassMapInBounds;
-    s_mapTimed.RefreshMovedUnits = Map_TimedRefreshMovedUnits;
-    s_mapTimed.RefreshUnitIfStale = Map_TimedRefreshUnitIfStale;
+    s_mapTimed.Apply = GlueMapTimedApply;
+    s_mapTimed.UnitsInRange = GlueMapTimedUnitsInRange;
+    s_mapTimed.GetCellMeanHeight = GlueMapTimedGetCellMeanHeight;
+    s_mapTimed.CanBuildAt = GlueMapTimedCanBuildAt;
+    s_mapTimed.CanPlaceUnitFootprint = GlueMapTimedCanPlaceUnitFootprint;
+    s_mapTimed.BuildAllPassMaps = GlueMapTimedBuildAllPassMaps;
+    s_mapTimed.SnapWorldPosToFootprint = GlueMapTimedSnapWorldPosToFootprint;
+    s_mapTimed.CanPlaceFootprintAt = GlueMapTimedCanPlaceFootprintAt;
+    s_mapTimed.IsPadSlotFree = GlueMapTimedIsPadSlotFree;
+    s_mapTimed.PickRandomReclaimableResourcesInRadius = GlueMapTimedPickRandomReclaimableResourcesInRadius;
+    s_mapTimed.GetGroundHeight = GlueMapTimedGetGroundHeight;
+    s_mapTimed.PassMapGet = GlueMapTimedPassMapGet;
+    s_mapTimed.PassMapInBounds = GlueMapTimedPassMapInBounds;
+    s_mapTimed.RefreshMovedUnits = GlueMapTimedRefreshMovedUnits;
+    s_mapTimed.RefreshUnitIfStale = GlueMapTimedRefreshUnitIfStale;
     g_seams.map = &s_mapTimed;
 }
 
@@ -3717,7 +3735,7 @@ const ScriptsSeam* s_scriptsNative;
 ScriptsSeam s_scriptsSeam;
 ScriptsSeam s_scriptsTimed;
 
-int __stdcall Scripts_Apply(const ScriptsEventHeader* event, unsigned int size)
+int __stdcall GlueScriptsApply(const ScriptsEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3731,7 +3749,7 @@ int __stdcall Scripts_Apply(const ScriptsEventHeader* event, unsigned int size)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Scripts_StartScriptWithArgsByIndex(CobScript* script, int index, Callback* callback, int update, int count, int a, int b, int c, int d)
+int __stdcall GlueScriptsStartScriptWithArgsByIndex(CobScript* script, int index, Callback* callback, int update, int count, int a, int b, int c, int d)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3751,7 +3769,7 @@ int __stdcall Scripts_StartScriptWithArgsByIndex(CobScript* script, int index, C
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Scripts_QueryScript(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3)
+int __stdcall GlueScriptsQueryScript(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3776,7 +3794,7 @@ int __stdcall Scripts_QueryScript(CobScript* script, const char* name, int* arg0
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Scripts_FindScript(CobScript* script, const char* name)
+int __stdcall GlueScriptsFindScript(CobScript* script, const char* name)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3789,7 +3807,7 @@ int __stdcall Scripts_FindScript(CobScript* script, const char* name)
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Scripts_GetPieceOffset(Unit* unit, int piece, Vec3* out)
+void __stdcall GlueScriptsGetPieceOffset(Unit* unit, int piece, Vec3* out)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3804,7 +3822,7 @@ void __stdcall Scripts_GetPieceOffset(Unit* unit, int piece, Vec3* out)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_GetPiecePosition(Unit* unit, int piece, Vec3* out)
+void __stdcall GlueScriptsGetPiecePosition(Unit* unit, int piece, Vec3* out)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3819,7 +3837,7 @@ void __stdcall Scripts_GetPiecePosition(Unit* unit, int piece, Vec3* out)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_GetPieceAngles(Unit* unit, int piece, Angles16* out)
+void __stdcall GlueScriptsGetPieceAngles(Unit* unit, int piece, Angles16* out)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3834,7 +3852,7 @@ void __stdcall Scripts_GetPieceAngles(Unit* unit, int piece, Angles16* out)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_GetNanoPiecePosition(Unit* unit, Vec3* out)
+void __stdcall GlueScriptsGetNanoPiecePosition(Unit* unit, Vec3* out)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3848,7 +3866,7 @@ void __stdcall Scripts_GetNanoPiecePosition(Unit* unit, Vec3* out)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_GetAimFromPosition(Unit* unit, Vec3* out, unsigned char weapon)
+void __stdcall GlueScriptsGetAimFromPosition(Unit* unit, Vec3* out, unsigned char weapon)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3863,7 +3881,7 @@ void __stdcall Scripts_GetAimFromPosition(Unit* unit, Vec3* out, unsigned char w
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_GetSweetSpot(Unit* unit, Vec3* out)
+void __stdcall GlueScriptsGetSweetSpot(Unit* unit, Vec3* out)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3877,7 +3895,7 @@ void __stdcall Scripts_GetSweetSpot(Unit* unit, Vec3* out)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_PoseUnitModel(Unit* unit)
+void __stdcall GlueScriptsPoseUnitModel(Unit* unit)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3888,7 +3906,7 @@ void __stdcall Scripts_PoseUnitModel(Unit* unit)
     GlueScratchRelease(mark);
 }
 
-ModelState* __stdcall Scripts_CreateObjectState(Object3do* model)
+ModelState* __stdcall GlueScriptsCreateObjectState(Object3do* model)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3900,7 +3918,7 @@ ModelState* __stdcall Scripts_CreateObjectState(Object3do* model)
     return (ModelState*)GlueResult(glue, 11, (unsigned)slotArgs[0].i32, 1);
 }
 
-void __stdcall Scripts_FreeObjectState(ModelState* state)
+void __stdcall GlueScriptsFreeObjectState(ModelState* state)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3911,7 +3929,7 @@ void __stdcall Scripts_FreeObjectState(ModelState* state)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_UpdateObjectState(UnitDrawView* unit)
+void __stdcall GlueScriptsUpdateObjectState(UnitDrawView* unit)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3922,7 +3940,7 @@ void __stdcall Scripts_UpdateObjectState(UnitDrawView* unit)
     GlueScratchRelease(mark);
 }
 
-unsigned int __stdcall Scripts_ObjectStateSize(Object3do* model)
+unsigned int __stdcall GlueScriptsObjectStateSize(Object3do* model)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3934,7 +3952,7 @@ unsigned int __stdcall Scripts_ObjectStateSize(Object3do* model)
     return (unsigned int)slotArgs[0].i32;
 }
 
-void __stdcall Scripts_NewUnitScript(Unit* unit)
+void __stdcall GlueScriptsNewUnitScript(Unit* unit)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3945,7 +3963,7 @@ void __stdcall Scripts_NewUnitScript(Unit* unit)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_SetCob(CobScript* script, ScriptTable* data)
+void __stdcall GlueScriptsSetCob(CobScript* script, ScriptTable* data)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3957,7 +3975,7 @@ void __stdcall Scripts_SetCob(CobScript* script, ScriptTable* data)
     GlueScratchRelease(mark);
 }
 
-ModelState* __stdcall Scripts_CreatePlayerObjectState(Object3do* model, ScriptTable* data, Unit* owner)
+ModelState* __stdcall GlueScriptsCreatePlayerObjectState(Object3do* model, ScriptTable* data, Unit* owner)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3971,7 +3989,7 @@ ModelState* __stdcall Scripts_CreatePlayerObjectState(Object3do* model, ScriptTa
     return (ModelState*)GlueResult(glue, 17, (unsigned)slotArgs[0].i32, 1);
 }
 
-void __stdcall Scripts_SetObjectState(UnitScript* script, ModelState* state)
+void __stdcall GlueScriptsSetObjectState(UnitScript* script, ModelState* state)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3983,7 +4001,7 @@ void __stdcall Scripts_SetObjectState(UnitScript* script, ModelState* state)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_RunScripts(CobScript* script, int elapsed)
+void __stdcall GlueScriptsRunScripts(CobScript* script, int elapsed)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -3995,7 +4013,7 @@ void __stdcall Scripts_RunScripts(CobScript* script, int elapsed)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Scripts_DeleteScript(CobScript* script)
+void __stdcall GlueScriptsDeleteScript(CobScript* script)
 {
     GlueModule* glue = &s_scriptsGlue;
     unsigned mark = GlueScratchMark();
@@ -4006,7 +4024,7 @@ void __stdcall Scripts_DeleteScript(CobScript* script)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Scripts_TimedApply(const ScriptsEventHeader* event, unsigned int size)
+int __stdcall GlueScriptsTimedApply(const ScriptsEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_scriptsNative->Apply(event, size);
@@ -4014,7 +4032,7 @@ int __stdcall Scripts_TimedApply(const ScriptsEventHeader* event, unsigned int s
     return result;
 }
 
-int __stdcall Scripts_TimedStartScriptWithArgsByIndex(CobScript* script, int index, Callback* callback, int update, int count, int a, int b, int c, int d)
+int __stdcall GlueScriptsTimedStartScriptWithArgsByIndex(CobScript* script, int index, Callback* callback, int update, int count, int a, int b, int c, int d)
 {
     unsigned long long start = host_time_counter();
     int result = s_scriptsNative->StartScriptWithArgsByIndex(script, index, callback, update, count, a, b, c, d);
@@ -4022,7 +4040,7 @@ int __stdcall Scripts_TimedStartScriptWithArgsByIndex(CobScript* script, int ind
     return result;
 }
 
-int __stdcall Scripts_TimedQueryScript(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3)
+int __stdcall GlueScriptsTimedQueryScript(CobScript* script, const char* name, int* arg0, int* arg1, int* arg2, int* arg3)
 {
     unsigned long long start = host_time_counter();
     int result = s_scriptsNative->QueryScript(script, name, arg0, arg1, arg2, arg3);
@@ -4030,7 +4048,7 @@ int __stdcall Scripts_TimedQueryScript(CobScript* script, const char* name, int*
     return result;
 }
 
-int __stdcall Scripts_TimedFindScript(CobScript* script, const char* name)
+int __stdcall GlueScriptsTimedFindScript(CobScript* script, const char* name)
 {
     unsigned long long start = host_time_counter();
     int result = s_scriptsNative->FindScript(script, name);
@@ -4038,56 +4056,56 @@ int __stdcall Scripts_TimedFindScript(CobScript* script, const char* name)
     return result;
 }
 
-void __stdcall Scripts_TimedGetPieceOffset(Unit* unit, int piece, Vec3* out)
+void __stdcall GlueScriptsTimedGetPieceOffset(Unit* unit, int piece, Vec3* out)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->GetPieceOffset(unit, piece, out);
     GlueTimed(&s_scriptsGlue, 4, start);
 }
 
-void __stdcall Scripts_TimedGetPiecePosition(Unit* unit, int piece, Vec3* out)
+void __stdcall GlueScriptsTimedGetPiecePosition(Unit* unit, int piece, Vec3* out)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->GetPiecePosition(unit, piece, out);
     GlueTimed(&s_scriptsGlue, 5, start);
 }
 
-void __stdcall Scripts_TimedGetPieceAngles(Unit* unit, int piece, Angles16* out)
+void __stdcall GlueScriptsTimedGetPieceAngles(Unit* unit, int piece, Angles16* out)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->GetPieceAngles(unit, piece, out);
     GlueTimed(&s_scriptsGlue, 6, start);
 }
 
-void __stdcall Scripts_TimedGetNanoPiecePosition(Unit* unit, Vec3* out)
+void __stdcall GlueScriptsTimedGetNanoPiecePosition(Unit* unit, Vec3* out)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->GetNanoPiecePosition(unit, out);
     GlueTimed(&s_scriptsGlue, 7, start);
 }
 
-void __stdcall Scripts_TimedGetAimFromPosition(Unit* unit, Vec3* out, unsigned char weapon)
+void __stdcall GlueScriptsTimedGetAimFromPosition(Unit* unit, Vec3* out, unsigned char weapon)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->GetAimFromPosition(unit, out, weapon);
     GlueTimed(&s_scriptsGlue, 8, start);
 }
 
-void __stdcall Scripts_TimedGetSweetSpot(Unit* unit, Vec3* out)
+void __stdcall GlueScriptsTimedGetSweetSpot(Unit* unit, Vec3* out)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->GetSweetSpot(unit, out);
     GlueTimed(&s_scriptsGlue, 9, start);
 }
 
-void __stdcall Scripts_TimedPoseUnitModel(Unit* unit)
+void __stdcall GlueScriptsTimedPoseUnitModel(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->PoseUnitModel(unit);
     GlueTimed(&s_scriptsGlue, 10, start);
 }
 
-ModelState* __stdcall Scripts_TimedCreateObjectState(Object3do* model)
+ModelState* __stdcall GlueScriptsTimedCreateObjectState(Object3do* model)
 {
     unsigned long long start = host_time_counter();
     ModelState* result = s_scriptsNative->CreateObjectState(model);
@@ -4095,21 +4113,21 @@ ModelState* __stdcall Scripts_TimedCreateObjectState(Object3do* model)
     return result;
 }
 
-void __stdcall Scripts_TimedFreeObjectState(ModelState* state)
+void __stdcall GlueScriptsTimedFreeObjectState(ModelState* state)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->FreeObjectState(state);
     GlueTimed(&s_scriptsGlue, 12, start);
 }
 
-void __stdcall Scripts_TimedUpdateObjectState(UnitDrawView* unit)
+void __stdcall GlueScriptsTimedUpdateObjectState(UnitDrawView* unit)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->UpdateObjectState(unit);
     GlueTimed(&s_scriptsGlue, 13, start);
 }
 
-unsigned int __stdcall Scripts_TimedObjectStateSize(Object3do* model)
+unsigned int __stdcall GlueScriptsTimedObjectStateSize(Object3do* model)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_scriptsNative->ObjectStateSize(model);
@@ -4117,21 +4135,21 @@ unsigned int __stdcall Scripts_TimedObjectStateSize(Object3do* model)
     return result;
 }
 
-void __stdcall Scripts_TimedNewUnitScript(Unit* unit)
+void __stdcall GlueScriptsTimedNewUnitScript(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->NewUnitScript(unit);
     GlueTimed(&s_scriptsGlue, 15, start);
 }
 
-void __stdcall Scripts_TimedSetCob(CobScript* script, ScriptTable* data)
+void __stdcall GlueScriptsTimedSetCob(CobScript* script, ScriptTable* data)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->SetCob(script, data);
     GlueTimed(&s_scriptsGlue, 16, start);
 }
 
-ModelState* __stdcall Scripts_TimedCreatePlayerObjectState(Object3do* model, ScriptTable* data, Unit* owner)
+ModelState* __stdcall GlueScriptsTimedCreatePlayerObjectState(Object3do* model, ScriptTable* data, Unit* owner)
 {
     unsigned long long start = host_time_counter();
     ModelState* result = s_scriptsNative->CreatePlayerObjectState(model, data, owner);
@@ -4139,21 +4157,21 @@ ModelState* __stdcall Scripts_TimedCreatePlayerObjectState(Object3do* model, Scr
     return result;
 }
 
-void __stdcall Scripts_TimedSetObjectState(UnitScript* script, ModelState* state)
+void __stdcall GlueScriptsTimedSetObjectState(UnitScript* script, ModelState* state)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->SetObjectState(script, state);
     GlueTimed(&s_scriptsGlue, 18, start);
 }
 
-void __stdcall Scripts_TimedRunScripts(CobScript* script, int elapsed)
+void __stdcall GlueScriptsTimedRunScripts(CobScript* script, int elapsed)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->RunScripts(script, elapsed);
     GlueTimed(&s_scriptsGlue, 19, start);
 }
 
-void __stdcall Scripts_TimedDeleteScript(CobScript* script)
+void __stdcall GlueScriptsTimedDeleteScript(CobScript* script)
 {
     unsigned long long start = host_time_counter();
     s_scriptsNative->DeleteScript(script);
@@ -4167,27 +4185,27 @@ void ScriptsUseSeam(GlueModule* glue)
         return;
     s_scriptsNative = g_seams.scripts;
     s_scriptsSeam = *s_scriptsNative;
-    s_scriptsSeam.Apply = Scripts_Apply;
-    s_scriptsSeam.StartScriptWithArgsByIndex = Scripts_StartScriptWithArgsByIndex;
-    s_scriptsSeam.QueryScript = Scripts_QueryScript;
-    s_scriptsSeam.FindScript = Scripts_FindScript;
-    s_scriptsSeam.GetPieceOffset = Scripts_GetPieceOffset;
-    s_scriptsSeam.GetPiecePosition = Scripts_GetPiecePosition;
-    s_scriptsSeam.GetPieceAngles = Scripts_GetPieceAngles;
-    s_scriptsSeam.GetNanoPiecePosition = Scripts_GetNanoPiecePosition;
-    s_scriptsSeam.GetAimFromPosition = Scripts_GetAimFromPosition;
-    s_scriptsSeam.GetSweetSpot = Scripts_GetSweetSpot;
-    s_scriptsSeam.PoseUnitModel = Scripts_PoseUnitModel;
-    s_scriptsSeam.CreateObjectState = Scripts_CreateObjectState;
-    s_scriptsSeam.FreeObjectState = Scripts_FreeObjectState;
-    s_scriptsSeam.UpdateObjectState = Scripts_UpdateObjectState;
-    s_scriptsSeam.ObjectStateSize = Scripts_ObjectStateSize;
-    s_scriptsSeam.NewUnitScript = Scripts_NewUnitScript;
-    s_scriptsSeam.SetCob = Scripts_SetCob;
-    s_scriptsSeam.CreatePlayerObjectState = Scripts_CreatePlayerObjectState;
-    s_scriptsSeam.SetObjectState = Scripts_SetObjectState;
-    s_scriptsSeam.RunScripts = Scripts_RunScripts;
-    s_scriptsSeam.DeleteScript = Scripts_DeleteScript;
+    s_scriptsSeam.Apply = GlueScriptsApply;
+    s_scriptsSeam.StartScriptWithArgsByIndex = GlueScriptsStartScriptWithArgsByIndex;
+    s_scriptsSeam.QueryScript = GlueScriptsQueryScript;
+    s_scriptsSeam.FindScript = GlueScriptsFindScript;
+    s_scriptsSeam.GetPieceOffset = GlueScriptsGetPieceOffset;
+    s_scriptsSeam.GetPiecePosition = GlueScriptsGetPiecePosition;
+    s_scriptsSeam.GetPieceAngles = GlueScriptsGetPieceAngles;
+    s_scriptsSeam.GetNanoPiecePosition = GlueScriptsGetNanoPiecePosition;
+    s_scriptsSeam.GetAimFromPosition = GlueScriptsGetAimFromPosition;
+    s_scriptsSeam.GetSweetSpot = GlueScriptsGetSweetSpot;
+    s_scriptsSeam.PoseUnitModel = GlueScriptsPoseUnitModel;
+    s_scriptsSeam.CreateObjectState = GlueScriptsCreateObjectState;
+    s_scriptsSeam.FreeObjectState = GlueScriptsFreeObjectState;
+    s_scriptsSeam.UpdateObjectState = GlueScriptsUpdateObjectState;
+    s_scriptsSeam.ObjectStateSize = GlueScriptsObjectStateSize;
+    s_scriptsSeam.NewUnitScript = GlueScriptsNewUnitScript;
+    s_scriptsSeam.SetCob = GlueScriptsSetCob;
+    s_scriptsSeam.CreatePlayerObjectState = GlueScriptsCreatePlayerObjectState;
+    s_scriptsSeam.SetObjectState = GlueScriptsSetObjectState;
+    s_scriptsSeam.RunScripts = GlueScriptsRunScripts;
+    s_scriptsSeam.DeleteScript = GlueScriptsDeleteScript;
     g_seams.scripts = &s_scriptsSeam;
 }
 
@@ -4195,27 +4213,27 @@ void ScriptsTimeNative()
 {
     s_scriptsNative = g_seams.scripts;
     s_scriptsTimed = *s_scriptsNative;
-    s_scriptsTimed.Apply = Scripts_TimedApply;
-    s_scriptsTimed.StartScriptWithArgsByIndex = Scripts_TimedStartScriptWithArgsByIndex;
-    s_scriptsTimed.QueryScript = Scripts_TimedQueryScript;
-    s_scriptsTimed.FindScript = Scripts_TimedFindScript;
-    s_scriptsTimed.GetPieceOffset = Scripts_TimedGetPieceOffset;
-    s_scriptsTimed.GetPiecePosition = Scripts_TimedGetPiecePosition;
-    s_scriptsTimed.GetPieceAngles = Scripts_TimedGetPieceAngles;
-    s_scriptsTimed.GetNanoPiecePosition = Scripts_TimedGetNanoPiecePosition;
-    s_scriptsTimed.GetAimFromPosition = Scripts_TimedGetAimFromPosition;
-    s_scriptsTimed.GetSweetSpot = Scripts_TimedGetSweetSpot;
-    s_scriptsTimed.PoseUnitModel = Scripts_TimedPoseUnitModel;
-    s_scriptsTimed.CreateObjectState = Scripts_TimedCreateObjectState;
-    s_scriptsTimed.FreeObjectState = Scripts_TimedFreeObjectState;
-    s_scriptsTimed.UpdateObjectState = Scripts_TimedUpdateObjectState;
-    s_scriptsTimed.ObjectStateSize = Scripts_TimedObjectStateSize;
-    s_scriptsTimed.NewUnitScript = Scripts_TimedNewUnitScript;
-    s_scriptsTimed.SetCob = Scripts_TimedSetCob;
-    s_scriptsTimed.CreatePlayerObjectState = Scripts_TimedCreatePlayerObjectState;
-    s_scriptsTimed.SetObjectState = Scripts_TimedSetObjectState;
-    s_scriptsTimed.RunScripts = Scripts_TimedRunScripts;
-    s_scriptsTimed.DeleteScript = Scripts_TimedDeleteScript;
+    s_scriptsTimed.Apply = GlueScriptsTimedApply;
+    s_scriptsTimed.StartScriptWithArgsByIndex = GlueScriptsTimedStartScriptWithArgsByIndex;
+    s_scriptsTimed.QueryScript = GlueScriptsTimedQueryScript;
+    s_scriptsTimed.FindScript = GlueScriptsTimedFindScript;
+    s_scriptsTimed.GetPieceOffset = GlueScriptsTimedGetPieceOffset;
+    s_scriptsTimed.GetPiecePosition = GlueScriptsTimedGetPiecePosition;
+    s_scriptsTimed.GetPieceAngles = GlueScriptsTimedGetPieceAngles;
+    s_scriptsTimed.GetNanoPiecePosition = GlueScriptsTimedGetNanoPiecePosition;
+    s_scriptsTimed.GetAimFromPosition = GlueScriptsTimedGetAimFromPosition;
+    s_scriptsTimed.GetSweetSpot = GlueScriptsTimedGetSweetSpot;
+    s_scriptsTimed.PoseUnitModel = GlueScriptsTimedPoseUnitModel;
+    s_scriptsTimed.CreateObjectState = GlueScriptsTimedCreateObjectState;
+    s_scriptsTimed.FreeObjectState = GlueScriptsTimedFreeObjectState;
+    s_scriptsTimed.UpdateObjectState = GlueScriptsTimedUpdateObjectState;
+    s_scriptsTimed.ObjectStateSize = GlueScriptsTimedObjectStateSize;
+    s_scriptsTimed.NewUnitScript = GlueScriptsTimedNewUnitScript;
+    s_scriptsTimed.SetCob = GlueScriptsTimedSetCob;
+    s_scriptsTimed.CreatePlayerObjectState = GlueScriptsTimedCreatePlayerObjectState;
+    s_scriptsTimed.SetObjectState = GlueScriptsTimedSetObjectState;
+    s_scriptsTimed.RunScripts = GlueScriptsTimedRunScripts;
+    s_scriptsTimed.DeleteScript = GlueScriptsTimedDeleteScript;
     g_seams.scripts = &s_scriptsTimed;
 }
 
@@ -4245,7 +4263,7 @@ const MovementSeam* s_movementNative;
 MovementSeam s_movementSeam;
 MovementSeam s_movementTimed;
 
-int __stdcall Movement_Apply(const MovementEventHeader* event, unsigned int size)
+int __stdcall GlueMovementApply(const MovementEventHeader* event, unsigned int size)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4259,7 +4277,7 @@ int __stdcall Movement_Apply(const MovementEventHeader* event, unsigned int size
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Movement_UpdateMotion(Unit* unit)
+void __stdcall GlueMovementUpdateMotion(Unit* unit)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4270,7 +4288,7 @@ void __stdcall Movement_UpdateMotion(Unit* unit)
     GlueScratchRelease(mark);
 }
 
-void __stdcall Movement_ApplyPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints)
+void __stdcall GlueMovementApplyPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4283,7 +4301,7 @@ void __stdcall Movement_ApplyPathEvent(const PathfindingEventHeader* event, unsi
     GlueScratchRelease(mark);
 }
 
-int __stdcall Movement_HasNetState(Unit* unit)
+int __stdcall GlueMovementHasNetState(Unit* unit)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4295,7 +4313,7 @@ int __stdcall Movement_HasNetState(Unit* unit)
     return (int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_NewPathOrderAt(unsigned int order, const Vec3* pos)
+unsigned int __stdcall GlueMovementNewPathOrderAt(unsigned int order, const Vec3* pos)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4309,7 +4327,7 @@ unsigned int __stdcall Movement_NewPathOrderAt(unsigned int order, const Vec3* p
     return (unsigned int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_NewPathOrderToUnit(unsigned int order, Unit* unit)
+unsigned int __stdcall GlueMovementNewPathOrderToUnit(unsigned int order, Unit* unit)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4322,7 +4340,7 @@ unsigned int __stdcall Movement_NewPathOrderToUnit(unsigned int order, Unit* uni
     return (unsigned int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_NewPathOrderToUnitAt(unsigned int order, Unit* unit, const Vec3* pos)
+unsigned int __stdcall GlueMovementNewPathOrderToUnitAt(unsigned int order, Unit* unit, const Vec3* pos)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4337,7 +4355,7 @@ unsigned int __stdcall Movement_NewPathOrderToUnitAt(unsigned int order, Unit* u
     return (unsigned int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_NewPathOrderToUnitAtAngle(unsigned int order, Unit* unit, short angle)
+unsigned int __stdcall GlueMovementNewPathOrderToUnitAtAngle(unsigned int order, Unit* unit, short angle)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4351,7 +4369,7 @@ unsigned int __stdcall Movement_NewPathOrderToUnitAtAngle(unsigned int order, Un
     return (unsigned int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_NewAirManeuverOrder(unsigned int order, const Vec3* from, const Vec3* to)
+unsigned int __stdcall GlueMovementNewAirManeuverOrder(unsigned int order, const Vec3* from, const Vec3* to)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4367,7 +4385,7 @@ unsigned int __stdcall Movement_NewAirManeuverOrder(unsigned int order, const Ve
     return (unsigned int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_NewApproachRadius(unsigned int order, int x, int y, int radius)
+unsigned int __stdcall GlueMovementNewApproachRadius(unsigned int order, int x, int y, int radius)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4382,7 +4400,7 @@ unsigned int __stdcall Movement_NewApproachRadius(unsigned int order, int x, int
     return (unsigned int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_NewRingApproach(unsigned int order, int x, int y, int inner, int outer)
+unsigned int __stdcall GlueMovementNewRingApproach(unsigned int order, int x, int y, int inner, int outer)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4398,7 +4416,7 @@ unsigned int __stdcall Movement_NewRingApproach(unsigned int order, int x, int y
     return (unsigned int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_NewPointMarker(unsigned int order, const Point16* pos, const Point16* size)
+unsigned int __stdcall GlueMovementNewPointMarker(unsigned int order, const Point16* pos, const Point16* size)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4414,7 +4432,7 @@ unsigned int __stdcall Movement_NewPointMarker(unsigned int order, const Point16
     return (unsigned int)slotArgs[0].i32;
 }
 
-int __stdcall Movement_TargetType(unsigned int target)
+int __stdcall GlueMovementTargetType(unsigned int target)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4426,7 +4444,7 @@ int __stdcall Movement_TargetType(unsigned int target)
     return (int)slotArgs[0].i32;
 }
 
-unsigned int __stdcall Movement_UnitTarget(Unit* unit)
+unsigned int __stdcall GlueMovementUnitTarget(Unit* unit)
 {
     GlueModule* glue = &s_movementGlue;
     unsigned mark = GlueScratchMark();
@@ -4438,7 +4456,7 @@ unsigned int __stdcall Movement_UnitTarget(Unit* unit)
     return (unsigned int)slotArgs[0].i32;
 }
 
-int __stdcall Movement_TimedApply(const MovementEventHeader* event, unsigned int size)
+int __stdcall GlueMovementTimedApply(const MovementEventHeader* event, unsigned int size)
 {
     unsigned long long start = host_time_counter();
     int result = s_movementNative->Apply(event, size);
@@ -4446,21 +4464,21 @@ int __stdcall Movement_TimedApply(const MovementEventHeader* event, unsigned int
     return result;
 }
 
-void __stdcall Movement_TimedUpdateMotion(Unit* unit)
+void __stdcall GlueMovementTimedUpdateMotion(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     s_movementNative->UpdateMotion(unit);
     GlueTimed(&s_movementGlue, 1, start);
 }
 
-void __stdcall Movement_TimedApplyPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints)
+void __stdcall GlueMovementTimedApplyPathEvent(const PathfindingEventHeader* event, unsigned int size, const PathPoint* waypoints)
 {
     unsigned long long start = host_time_counter();
     s_movementNative->ApplyPathEvent(event, size, waypoints);
     GlueTimed(&s_movementGlue, 2, start);
 }
 
-int __stdcall Movement_TimedHasNetState(Unit* unit)
+int __stdcall GlueMovementTimedHasNetState(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     int result = s_movementNative->HasNetState(unit);
@@ -4468,7 +4486,7 @@ int __stdcall Movement_TimedHasNetState(Unit* unit)
     return result;
 }
 
-unsigned int __stdcall Movement_TimedNewPathOrderAt(unsigned int order, const Vec3* pos)
+unsigned int __stdcall GlueMovementTimedNewPathOrderAt(unsigned int order, const Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->NewPathOrderAt(order, pos);
@@ -4476,7 +4494,7 @@ unsigned int __stdcall Movement_TimedNewPathOrderAt(unsigned int order, const Ve
     return result;
 }
 
-unsigned int __stdcall Movement_TimedNewPathOrderToUnit(unsigned int order, Unit* unit)
+unsigned int __stdcall GlueMovementTimedNewPathOrderToUnit(unsigned int order, Unit* unit)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->NewPathOrderToUnit(order, unit);
@@ -4484,7 +4502,7 @@ unsigned int __stdcall Movement_TimedNewPathOrderToUnit(unsigned int order, Unit
     return result;
 }
 
-unsigned int __stdcall Movement_TimedNewPathOrderToUnitAt(unsigned int order, Unit* unit, const Vec3* pos)
+unsigned int __stdcall GlueMovementTimedNewPathOrderToUnitAt(unsigned int order, Unit* unit, const Vec3* pos)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->NewPathOrderToUnitAt(order, unit, pos);
@@ -4492,7 +4510,7 @@ unsigned int __stdcall Movement_TimedNewPathOrderToUnitAt(unsigned int order, Un
     return result;
 }
 
-unsigned int __stdcall Movement_TimedNewPathOrderToUnitAtAngle(unsigned int order, Unit* unit, short angle)
+unsigned int __stdcall GlueMovementTimedNewPathOrderToUnitAtAngle(unsigned int order, Unit* unit, short angle)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->NewPathOrderToUnitAtAngle(order, unit, angle);
@@ -4500,7 +4518,7 @@ unsigned int __stdcall Movement_TimedNewPathOrderToUnitAtAngle(unsigned int orde
     return result;
 }
 
-unsigned int __stdcall Movement_TimedNewAirManeuverOrder(unsigned int order, const Vec3* from, const Vec3* to)
+unsigned int __stdcall GlueMovementTimedNewAirManeuverOrder(unsigned int order, const Vec3* from, const Vec3* to)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->NewAirManeuverOrder(order, from, to);
@@ -4508,7 +4526,7 @@ unsigned int __stdcall Movement_TimedNewAirManeuverOrder(unsigned int order, con
     return result;
 }
 
-unsigned int __stdcall Movement_TimedNewApproachRadius(unsigned int order, int x, int y, int radius)
+unsigned int __stdcall GlueMovementTimedNewApproachRadius(unsigned int order, int x, int y, int radius)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->NewApproachRadius(order, x, y, radius);
@@ -4516,7 +4534,7 @@ unsigned int __stdcall Movement_TimedNewApproachRadius(unsigned int order, int x
     return result;
 }
 
-unsigned int __stdcall Movement_TimedNewRingApproach(unsigned int order, int x, int y, int inner, int outer)
+unsigned int __stdcall GlueMovementTimedNewRingApproach(unsigned int order, int x, int y, int inner, int outer)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->NewRingApproach(order, x, y, inner, outer);
@@ -4524,7 +4542,7 @@ unsigned int __stdcall Movement_TimedNewRingApproach(unsigned int order, int x, 
     return result;
 }
 
-unsigned int __stdcall Movement_TimedNewPointMarker(unsigned int order, const Point16* pos, const Point16* size)
+unsigned int __stdcall GlueMovementTimedNewPointMarker(unsigned int order, const Point16* pos, const Point16* size)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->NewPointMarker(order, pos, size);
@@ -4532,7 +4550,7 @@ unsigned int __stdcall Movement_TimedNewPointMarker(unsigned int order, const Po
     return result;
 }
 
-int __stdcall Movement_TimedTargetType(unsigned int target)
+int __stdcall GlueMovementTimedTargetType(unsigned int target)
 {
     unsigned long long start = host_time_counter();
     int result = s_movementNative->TargetType(target);
@@ -4540,7 +4558,7 @@ int __stdcall Movement_TimedTargetType(unsigned int target)
     return result;
 }
 
-unsigned int __stdcall Movement_TimedUnitTarget(Unit* unit)
+unsigned int __stdcall GlueMovementTimedUnitTarget(Unit* unit)
 {
     unsigned long long start = host_time_counter();
     unsigned int result = s_movementNative->UnitTarget(unit);
@@ -4555,20 +4573,20 @@ void MovementUseSeam(GlueModule* glue)
         return;
     s_movementNative = g_seams.movement;
     s_movementSeam = *s_movementNative;
-    s_movementSeam.Apply = Movement_Apply;
-    s_movementSeam.UpdateMotion = Movement_UpdateMotion;
-    s_movementSeam.ApplyPathEvent = Movement_ApplyPathEvent;
-    s_movementSeam.HasNetState = Movement_HasNetState;
-    s_movementSeam.NewPathOrderAt = Movement_NewPathOrderAt;
-    s_movementSeam.NewPathOrderToUnit = Movement_NewPathOrderToUnit;
-    s_movementSeam.NewPathOrderToUnitAt = Movement_NewPathOrderToUnitAt;
-    s_movementSeam.NewPathOrderToUnitAtAngle = Movement_NewPathOrderToUnitAtAngle;
-    s_movementSeam.NewAirManeuverOrder = Movement_NewAirManeuverOrder;
-    s_movementSeam.NewApproachRadius = Movement_NewApproachRadius;
-    s_movementSeam.NewRingApproach = Movement_NewRingApproach;
-    s_movementSeam.NewPointMarker = Movement_NewPointMarker;
-    s_movementSeam.TargetType = Movement_TargetType;
-    s_movementSeam.UnitTarget = Movement_UnitTarget;
+    s_movementSeam.Apply = GlueMovementApply;
+    s_movementSeam.UpdateMotion = GlueMovementUpdateMotion;
+    s_movementSeam.ApplyPathEvent = GlueMovementApplyPathEvent;
+    s_movementSeam.HasNetState = GlueMovementHasNetState;
+    s_movementSeam.NewPathOrderAt = GlueMovementNewPathOrderAt;
+    s_movementSeam.NewPathOrderToUnit = GlueMovementNewPathOrderToUnit;
+    s_movementSeam.NewPathOrderToUnitAt = GlueMovementNewPathOrderToUnitAt;
+    s_movementSeam.NewPathOrderToUnitAtAngle = GlueMovementNewPathOrderToUnitAtAngle;
+    s_movementSeam.NewAirManeuverOrder = GlueMovementNewAirManeuverOrder;
+    s_movementSeam.NewApproachRadius = GlueMovementNewApproachRadius;
+    s_movementSeam.NewRingApproach = GlueMovementNewRingApproach;
+    s_movementSeam.NewPointMarker = GlueMovementNewPointMarker;
+    s_movementSeam.TargetType = GlueMovementTargetType;
+    s_movementSeam.UnitTarget = GlueMovementUnitTarget;
     g_seams.movement = &s_movementSeam;
 }
 
@@ -4576,20 +4594,20 @@ void MovementTimeNative()
 {
     s_movementNative = g_seams.movement;
     s_movementTimed = *s_movementNative;
-    s_movementTimed.Apply = Movement_TimedApply;
-    s_movementTimed.UpdateMotion = Movement_TimedUpdateMotion;
-    s_movementTimed.ApplyPathEvent = Movement_TimedApplyPathEvent;
-    s_movementTimed.HasNetState = Movement_TimedHasNetState;
-    s_movementTimed.NewPathOrderAt = Movement_TimedNewPathOrderAt;
-    s_movementTimed.NewPathOrderToUnit = Movement_TimedNewPathOrderToUnit;
-    s_movementTimed.NewPathOrderToUnitAt = Movement_TimedNewPathOrderToUnitAt;
-    s_movementTimed.NewPathOrderToUnitAtAngle = Movement_TimedNewPathOrderToUnitAtAngle;
-    s_movementTimed.NewAirManeuverOrder = Movement_TimedNewAirManeuverOrder;
-    s_movementTimed.NewApproachRadius = Movement_TimedNewApproachRadius;
-    s_movementTimed.NewRingApproach = Movement_TimedNewRingApproach;
-    s_movementTimed.NewPointMarker = Movement_TimedNewPointMarker;
-    s_movementTimed.TargetType = Movement_TimedTargetType;
-    s_movementTimed.UnitTarget = Movement_TimedUnitTarget;
+    s_movementTimed.Apply = GlueMovementTimedApply;
+    s_movementTimed.UpdateMotion = GlueMovementTimedUpdateMotion;
+    s_movementTimed.ApplyPathEvent = GlueMovementTimedApplyPathEvent;
+    s_movementTimed.HasNetState = GlueMovementTimedHasNetState;
+    s_movementTimed.NewPathOrderAt = GlueMovementTimedNewPathOrderAt;
+    s_movementTimed.NewPathOrderToUnit = GlueMovementTimedNewPathOrderToUnit;
+    s_movementTimed.NewPathOrderToUnitAt = GlueMovementTimedNewPathOrderToUnitAt;
+    s_movementTimed.NewPathOrderToUnitAtAngle = GlueMovementTimedNewPathOrderToUnitAtAngle;
+    s_movementTimed.NewAirManeuverOrder = GlueMovementTimedNewAirManeuverOrder;
+    s_movementTimed.NewApproachRadius = GlueMovementTimedNewApproachRadius;
+    s_movementTimed.NewRingApproach = GlueMovementTimedNewRingApproach;
+    s_movementTimed.NewPointMarker = GlueMovementTimedNewPointMarker;
+    s_movementTimed.TargetType = GlueMovementTimedTargetType;
+    s_movementTimed.UnitTarget = GlueMovementTimedUnitTarget;
     g_seams.movement = &s_movementTimed;
 }
 
@@ -4617,7 +4635,7 @@ const MissionSeam* s_missionNative;
 MissionSeam s_missionSeam;
 MissionSeam s_missionTimed;
 
-int __stdcall Mission_GetGameType()
+int __stdcall GlueMissionGetGameType()
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4628,7 +4646,7 @@ int __stdcall Mission_GetGameType()
     return (int)slotArgs[0].i32;
 }
 
-const char* __stdcall Mission_GetNameSlot(int index)
+const char* __stdcall GlueMissionGetNameSlot(int index)
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4640,7 +4658,7 @@ const char* __stdcall Mission_GetNameSlot(int index)
     return (const char*)GlueResult(glue, 1, (unsigned)slotArgs[0].i32, 0);
 }
 
-int __stdcall Mission_GetMissionIndex()
+int __stdcall GlueMissionGetMissionIndex()
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4651,7 +4669,7 @@ int __stdcall Mission_GetMissionIndex()
     return (int)slotArgs[0].i32;
 }
 
-const char* __stdcall Mission_GetMissionName()
+const char* __stdcall GlueMissionGetMissionName()
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4662,7 +4680,7 @@ const char* __stdcall Mission_GetMissionName()
     return (const char*)GlueResult(glue, 3, (unsigned)slotArgs[0].i32, 0);
 }
 
-int __stdcall Mission_GetStartPosition(Vec3* out, int id)
+int __stdcall GlueMissionGetStartPosition(Vec3* out, int id)
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4677,7 +4695,7 @@ int __stdcall Mission_GetStartPosition(Vec3* out, int id)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Mission_CountStartPositions()
+int __stdcall GlueMissionCountStartPositions()
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4688,7 +4706,7 @@ int __stdcall Mission_CountStartPositions()
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Mission_HasMissionName()
+int __stdcall GlueMissionHasMissionName()
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4699,7 +4717,7 @@ int __stdcall Mission_HasMissionName()
     return (int)slotArgs[0].i32;
 }
 
-void __stdcall Mission_GetMissionParams(MissionParams* out)
+void __stdcall GlueMissionGetMissionParams(MissionParams* out)
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4712,7 +4730,7 @@ void __stdcall Mission_GetMissionParams(MissionParams* out)
     GlueScratchRelease(mark);
 }
 
-int __stdcall Mission_CountMissionUnits()
+int __stdcall GlueMissionCountMissionUnits()
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4723,7 +4741,7 @@ int __stdcall Mission_CountMissionUnits()
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Mission_GetMissionUnit(int index, MissionUnitInfo* out)
+int __stdcall GlueMissionGetMissionUnit(int index, MissionUnitInfo* out)
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4738,7 +4756,7 @@ int __stdcall Mission_GetMissionUnit(int index, MissionUnitInfo* out)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Mission_CountMissionFeatures()
+int __stdcall GlueMissionCountMissionFeatures()
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4749,7 +4767,7 @@ int __stdcall Mission_CountMissionFeatures()
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Mission_GetMissionFeature(int index, MissionFeatureInfo* out)
+int __stdcall GlueMissionGetMissionFeature(int index, MissionFeatureInfo* out)
 {
     GlueModule* glue = &s_missionGlue;
     unsigned mark = GlueScratchMark();
@@ -4764,7 +4782,7 @@ int __stdcall Mission_GetMissionFeature(int index, MissionFeatureInfo* out)
     return (int)slotArgs[0].i32;
 }
 
-int __stdcall Mission_TimedGetGameType()
+int __stdcall GlueMissionTimedGetGameType()
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->GetGameType();
@@ -4772,7 +4790,7 @@ int __stdcall Mission_TimedGetGameType()
     return result;
 }
 
-const char* __stdcall Mission_TimedGetNameSlot(int index)
+const char* __stdcall GlueMissionTimedGetNameSlot(int index)
 {
     unsigned long long start = host_time_counter();
     const char* result = s_missionNative->GetNameSlot(index);
@@ -4780,7 +4798,7 @@ const char* __stdcall Mission_TimedGetNameSlot(int index)
     return result;
 }
 
-int __stdcall Mission_TimedGetMissionIndex()
+int __stdcall GlueMissionTimedGetMissionIndex()
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->GetMissionIndex();
@@ -4788,7 +4806,7 @@ int __stdcall Mission_TimedGetMissionIndex()
     return result;
 }
 
-const char* __stdcall Mission_TimedGetMissionName()
+const char* __stdcall GlueMissionTimedGetMissionName()
 {
     unsigned long long start = host_time_counter();
     const char* result = s_missionNative->GetMissionName();
@@ -4796,7 +4814,7 @@ const char* __stdcall Mission_TimedGetMissionName()
     return result;
 }
 
-int __stdcall Mission_TimedGetStartPosition(Vec3* out, int id)
+int __stdcall GlueMissionTimedGetStartPosition(Vec3* out, int id)
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->GetStartPosition(out, id);
@@ -4804,7 +4822,7 @@ int __stdcall Mission_TimedGetStartPosition(Vec3* out, int id)
     return result;
 }
 
-int __stdcall Mission_TimedCountStartPositions()
+int __stdcall GlueMissionTimedCountStartPositions()
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->CountStartPositions();
@@ -4812,7 +4830,7 @@ int __stdcall Mission_TimedCountStartPositions()
     return result;
 }
 
-int __stdcall Mission_TimedHasMissionName()
+int __stdcall GlueMissionTimedHasMissionName()
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->HasMissionName();
@@ -4820,14 +4838,14 @@ int __stdcall Mission_TimedHasMissionName()
     return result;
 }
 
-void __stdcall Mission_TimedGetMissionParams(MissionParams* out)
+void __stdcall GlueMissionTimedGetMissionParams(MissionParams* out)
 {
     unsigned long long start = host_time_counter();
     s_missionNative->GetMissionParams(out);
     GlueTimed(&s_missionGlue, 7, start);
 }
 
-int __stdcall Mission_TimedCountMissionUnits()
+int __stdcall GlueMissionTimedCountMissionUnits()
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->CountMissionUnits();
@@ -4835,7 +4853,7 @@ int __stdcall Mission_TimedCountMissionUnits()
     return result;
 }
 
-int __stdcall Mission_TimedGetMissionUnit(int index, MissionUnitInfo* out)
+int __stdcall GlueMissionTimedGetMissionUnit(int index, MissionUnitInfo* out)
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->GetMissionUnit(index, out);
@@ -4843,7 +4861,7 @@ int __stdcall Mission_TimedGetMissionUnit(int index, MissionUnitInfo* out)
     return result;
 }
 
-int __stdcall Mission_TimedCountMissionFeatures()
+int __stdcall GlueMissionTimedCountMissionFeatures()
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->CountMissionFeatures();
@@ -4851,7 +4869,7 @@ int __stdcall Mission_TimedCountMissionFeatures()
     return result;
 }
 
-int __stdcall Mission_TimedGetMissionFeature(int index, MissionFeatureInfo* out)
+int __stdcall GlueMissionTimedGetMissionFeature(int index, MissionFeatureInfo* out)
 {
     unsigned long long start = host_time_counter();
     int result = s_missionNative->GetMissionFeature(index, out);
@@ -4866,18 +4884,18 @@ void MissionUseSeam(GlueModule* glue)
         return;
     s_missionNative = g_seams.mission;
     s_missionSeam = *s_missionNative;
-    s_missionSeam.GetGameType = Mission_GetGameType;
-    s_missionSeam.GetNameSlot = Mission_GetNameSlot;
-    s_missionSeam.GetMissionIndex = Mission_GetMissionIndex;
-    s_missionSeam.GetMissionName = Mission_GetMissionName;
-    s_missionSeam.GetStartPosition = Mission_GetStartPosition;
-    s_missionSeam.CountStartPositions = Mission_CountStartPositions;
-    s_missionSeam.HasMissionName = Mission_HasMissionName;
-    s_missionSeam.GetMissionParams = Mission_GetMissionParams;
-    s_missionSeam.CountMissionUnits = Mission_CountMissionUnits;
-    s_missionSeam.GetMissionUnit = Mission_GetMissionUnit;
-    s_missionSeam.CountMissionFeatures = Mission_CountMissionFeatures;
-    s_missionSeam.GetMissionFeature = Mission_GetMissionFeature;
+    s_missionSeam.GetGameType = GlueMissionGetGameType;
+    s_missionSeam.GetNameSlot = GlueMissionGetNameSlot;
+    s_missionSeam.GetMissionIndex = GlueMissionGetMissionIndex;
+    s_missionSeam.GetMissionName = GlueMissionGetMissionName;
+    s_missionSeam.GetStartPosition = GlueMissionGetStartPosition;
+    s_missionSeam.CountStartPositions = GlueMissionCountStartPositions;
+    s_missionSeam.HasMissionName = GlueMissionHasMissionName;
+    s_missionSeam.GetMissionParams = GlueMissionGetMissionParams;
+    s_missionSeam.CountMissionUnits = GlueMissionCountMissionUnits;
+    s_missionSeam.GetMissionUnit = GlueMissionGetMissionUnit;
+    s_missionSeam.CountMissionFeatures = GlueMissionCountMissionFeatures;
+    s_missionSeam.GetMissionFeature = GlueMissionGetMissionFeature;
     g_seams.mission = &s_missionSeam;
 }
 
@@ -4885,25 +4903,25 @@ void MissionTimeNative()
 {
     s_missionNative = g_seams.mission;
     s_missionTimed = *s_missionNative;
-    s_missionTimed.GetGameType = Mission_TimedGetGameType;
-    s_missionTimed.GetNameSlot = Mission_TimedGetNameSlot;
-    s_missionTimed.GetMissionIndex = Mission_TimedGetMissionIndex;
-    s_missionTimed.GetMissionName = Mission_TimedGetMissionName;
-    s_missionTimed.GetStartPosition = Mission_TimedGetStartPosition;
-    s_missionTimed.CountStartPositions = Mission_TimedCountStartPositions;
-    s_missionTimed.HasMissionName = Mission_TimedHasMissionName;
-    s_missionTimed.GetMissionParams = Mission_TimedGetMissionParams;
-    s_missionTimed.CountMissionUnits = Mission_TimedCountMissionUnits;
-    s_missionTimed.GetMissionUnit = Mission_TimedGetMissionUnit;
-    s_missionTimed.CountMissionFeatures = Mission_TimedCountMissionFeatures;
-    s_missionTimed.GetMissionFeature = Mission_TimedGetMissionFeature;
+    s_missionTimed.GetGameType = GlueMissionTimedGetGameType;
+    s_missionTimed.GetNameSlot = GlueMissionTimedGetNameSlot;
+    s_missionTimed.GetMissionIndex = GlueMissionTimedGetMissionIndex;
+    s_missionTimed.GetMissionName = GlueMissionTimedGetMissionName;
+    s_missionTimed.GetStartPosition = GlueMissionTimedGetStartPosition;
+    s_missionTimed.CountStartPositions = GlueMissionTimedCountStartPositions;
+    s_missionTimed.HasMissionName = GlueMissionTimedHasMissionName;
+    s_missionTimed.GetMissionParams = GlueMissionTimedGetMissionParams;
+    s_missionTimed.CountMissionUnits = GlueMissionTimedCountMissionUnits;
+    s_missionTimed.GetMissionUnit = GlueMissionTimedGetMissionUnit;
+    s_missionTimed.CountMissionFeatures = GlueMissionTimedCountMissionFeatures;
+    s_missionTimed.GetMissionFeature = GlueMissionTimedGetMissionFeature;
     g_seams.mission = &s_missionTimed;
 }
 
 const GlueModuleDef kMissionDef = {"mission", -1, kMissionSlots, 12, s_missionFuncs, s_missionTiming, MissionUseSeam, MissionTimeNative, 1, 1};
 GlueModule s_missionGlue = {&kMissionDef};
 
-const char* __cdecl Import_economy_GetEnergyUse(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconomyGetEnergyUse(wasmtime_val_raw_t* a)
 {
     EconType type = (EconType)a[0].i32;
     double result = g_seams.economy->GetEnergyUse(type);
@@ -4911,7 +4929,7 @@ const char* __cdecl Import_economy_GetEnergyUse(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_economy_RequestGranted(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconomyRequestGranted(wasmtime_val_raw_t* a)
 {
     EconUnit unit = (EconUnit)a[0].i32;
     unsigned int resources = (unsigned int)a[1].i32;
@@ -4920,7 +4938,7 @@ const char* __cdecl Import_economy_RequestGranted(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_economy_Spend(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconomySpend(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("economy.Spend", 0);
     const EconomySpend* spend = (const EconomySpend*)GlueLinear((unsigned)a[0].i32);
@@ -4929,14 +4947,14 @@ const char* __cdecl Import_economy_Spend(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_economy_UpdateMetalExtraction(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconomyUpdateMetalExtraction(wasmtime_val_raw_t* a)
 {
     EconUnit unit = (EconUnit)a[0].i32;
     ScheduleMetalExtraction(unit);
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_Allied(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldAllied(wasmtime_val_raw_t* a)
 {
     int from = (int)a[0].i32;
     int to = (int)a[1].i32;
@@ -4947,7 +4965,7 @@ const char* __cdecl Import_econworld_Allied(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_CellMetal(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldCellMetal(wasmtime_val_raw_t* a)
 {
     int x = (int)a[0].i32;
     int y = (int)a[1].i32;
@@ -4958,7 +4976,7 @@ const char* __cdecl Import_econworld_CellMetal(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_Difficulty(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldDifficulty(wasmtime_val_raw_t* a)
 {
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
         return GlueImportError("econworld.Difficulty", "the world view is not set");
@@ -4967,7 +4985,7 @@ const char* __cdecl Import_econworld_Difficulty(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_Emit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldEmit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("econworld.Emit", 0);
     const EconomyEventHeader* effect = (const EconomyEventHeader*)GlueLinear((unsigned)a[0].i32);
@@ -4978,7 +4996,7 @@ const char* __cdecl Import_econworld_Emit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_FirstUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldFirstUnit(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
@@ -4988,7 +5006,7 @@ const char* __cdecl Import_econworld_FirstUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_LastUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldLastUnit(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
@@ -4998,7 +5016,7 @@ const char* __cdecl Import_econworld_LastUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_NextUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldNextUnit(wasmtime_val_raw_t* a)
 {
     EconUnit unit = (EconUnit)a[0].i32;
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
@@ -5008,7 +5026,7 @@ const char* __cdecl Import_econworld_NextUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_PlayerInfo(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldPlayerInfo(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     GLUE_NEED("econworld.PlayerInfo", 1);
@@ -5019,7 +5037,7 @@ const char* __cdecl Import_econworld_PlayerInfo(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_SharingEnabled(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldSharingEnabled(wasmtime_val_raw_t* a)
 {
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
         return GlueImportError("econworld.SharingEnabled", "the world view is not set");
@@ -5028,7 +5046,7 @@ const char* __cdecl Import_econworld_SharingEnabled(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_Tick(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldTick(wasmtime_val_raw_t* a)
 {
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
         return GlueImportError("econworld.Tick", "the world view is not set");
@@ -5037,7 +5055,7 @@ const char* __cdecl Import_econworld_Tick(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_Tide(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldTide(wasmtime_val_raw_t* a)
 {
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
         return GlueImportError("econworld.Tide", "the world view is not set");
@@ -5046,7 +5064,7 @@ const char* __cdecl Import_econworld_Tide(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_TypeInfo(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldTypeInfo(wasmtime_val_raw_t* a)
 {
     EconType type = (EconType)a[0].i32;
     GLUE_NEED("econworld.TypeInfo", 1);
@@ -5057,7 +5075,7 @@ const char* __cdecl Import_econworld_TypeInfo(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_UnitInfo(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldUnitInfo(wasmtime_val_raw_t* a)
 {
     EconUnit unit = (EconUnit)a[0].i32;
     GLUE_NEED("econworld.UnitInfo", 1);
@@ -5069,7 +5087,7 @@ const char* __cdecl Import_econworld_UnitInfo(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_UnitSlot(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldUnitSlot(wasmtime_val_raw_t* a)
 {
     EconUnit unit = (EconUnit)a[0].i32;
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
@@ -5079,7 +5097,7 @@ const char* __cdecl Import_econworld_UnitSlot(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_econworld_Wind(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportEconworldWind(wasmtime_val_raw_t* a)
 {
     if (GlueActive() == nullptr || GlueActive()->world == nullptr)
         return GlueImportError("econworld.Wind", "the world view is not set");
@@ -5088,7 +5106,7 @@ const char* __cdecl Import_econworld_Wind(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_features_FindFeatureAtPos(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportFeaturesFindFeatureAtPos(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("features.FindFeatureAtPos", 0);
     Vec3* pos = (Vec3*)GlueLinear((unsigned)a[0].i32);
@@ -5101,7 +5119,7 @@ const char* __cdecl Import_features_FindFeatureAtPos(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_features_GetCellFeature(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportFeaturesGetCellFeature(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("features.GetCellFeature", 0);
     Cell* cell = (Cell*)GlueLinear((unsigned)a[0].i32);
@@ -5110,7 +5128,7 @@ const char* __cdecl Import_features_GetCellFeature(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_features_GetFootprintCentre(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportFeaturesGetFootprintCentre(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("features.GetFootprintCentre", 0);
     const Point16* cell = (const Point16*)GlueLinear((unsigned)a[0].i32);
@@ -5122,7 +5140,7 @@ const char* __cdecl Import_features_GetFootprintCentre(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_los_radar_ClampWorldPosToTerrain(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarClampWorldPosToTerrain(wasmtime_val_raw_t* a)
 {
     int x = (int)a[0].i32;
     int y = (int)a[1].i32;
@@ -5132,7 +5150,7 @@ const char* __cdecl Import_los_radar_ClampWorldPosToTerrain(wasmtime_val_raw_t* 
     return nullptr;
 }
 
-const char* __cdecl Import_los_radar_GetMapCell(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarGetMapCell(wasmtime_val_raw_t* a)
 {
     int x = (int)a[0].i32;
     int y = (int)a[1].i32;
@@ -5143,7 +5161,7 @@ const char* __cdecl Import_los_radar_GetMapCell(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_los_radar_GetMapCellAtPosition(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarGetMapCellAtPosition(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("los_radar.GetMapCellAtPosition", 0);
     Vec3* pos = (Vec3*)GlueLinear((unsigned)a[0].i32);
@@ -5154,7 +5172,7 @@ const char* __cdecl Import_los_radar_GetMapCellAtPosition(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_los_radar_GetOriginCellAtPosition(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarGetOriginCellAtPosition(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("los_radar.GetOriginCellAtPosition", 0);
     Vec3* pos = (Vec3*)GlueLinear((unsigned)a[0].i32);
@@ -5165,7 +5183,7 @@ const char* __cdecl Import_los_radar_GetOriginCellAtPosition(wasmtime_val_raw_t*
     return error;
 }
 
-const char* __cdecl Import_los_radar_GetSeenUnitsInRadius(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarGetSeenUnitsInRadius(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     GLUE_NEED("los_radar.GetSeenUnitsInRadius", 1);
@@ -5179,7 +5197,7 @@ const char* __cdecl Import_los_radar_GetSeenUnitsInRadius(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_los_radar_GetVisibleEnemiesInRadius(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarGetVisibleEnemiesInRadius(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     GLUE_NEED("los_radar.GetVisibleEnemiesInRadius", 1);
@@ -5194,7 +5212,7 @@ const char* __cdecl Import_los_radar_GetVisibleEnemiesInRadius(wasmtime_val_raw_
     return nullptr;
 }
 
-const char* __cdecl Import_los_radar_IsPointVisible(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarIsPointVisible(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("los_radar.IsPointVisible", 0);
     Player* player = (Player*)GlueLinear((unsigned)a[0].i32);
@@ -5205,7 +5223,7 @@ const char* __cdecl Import_los_radar_IsPointVisible(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_los_radar_IsUnitVisibleToPlayer(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarIsUnitVisibleToPlayer(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("los_radar.IsUnitVisibleToPlayer", 0);
     Player* player = (Player*)GlueLinear((unsigned)a[0].i32);
@@ -5216,7 +5234,7 @@ const char* __cdecl Import_los_radar_IsUnitVisibleToPlayer(wasmtime_val_raw_t* a
     return nullptr;
 }
 
-const char* __cdecl Import_los_radar_SoundHeardMask(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportLosRadarSoundHeardMask(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("los_radar.SoundHeardMask", 0);
     const Vec3* at = (const Vec3*)GlueLinear((unsigned)a[0].i32);
@@ -5225,7 +5243,7 @@ const char* __cdecl Import_los_radar_SoundHeardMask(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_map_CanBuildAt(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMapCanBuildAt(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("map.CanBuildAt", 0);
     UnitDef* unit = (UnitDef*)GlueLinear((unsigned)a[0].i32);
@@ -5239,7 +5257,7 @@ const char* __cdecl Import_map_CanBuildAt(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_map_CanPlaceFootprintAt(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMapCanPlaceFootprintAt(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("map.CanPlaceFootprintAt", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5250,7 +5268,7 @@ const char* __cdecl Import_map_CanPlaceFootprintAt(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_map_CanPlaceUnitFootprint(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMapCanPlaceUnitFootprint(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("map.CanPlaceUnitFootprint", 0);
     UnitDef* unit = (UnitDef*)GlueLinear((unsigned)a[0].i32);
@@ -5263,7 +5281,7 @@ const char* __cdecl Import_map_CanPlaceUnitFootprint(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_map_GetCellMeanHeight(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMapGetCellMeanHeight(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("map.GetCellMeanHeight", 0);
     Vec3* pos = (Vec3*)GlueLinear((unsigned)a[0].i32);
@@ -5272,7 +5290,7 @@ const char* __cdecl Import_map_GetCellMeanHeight(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_map_GetGroundHeight(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMapGetGroundHeight(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("map.GetGroundHeight", 0);
     Vec3* pos = (Vec3*)GlueLinear((unsigned)a[0].i32);
@@ -5281,7 +5299,7 @@ const char* __cdecl Import_map_GetGroundHeight(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_map_IsPadSlotFree(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMapIsPadSlotFree(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("map.IsPadSlotFree", 0);
     Unit* pad = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5291,7 +5309,7 @@ const char* __cdecl Import_map_IsPadSlotFree(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_map_SnapWorldPosToFootprint(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMapSnapWorldPosToFootprint(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("map.SnapWorldPosToFootprint", 0);
     UnitDef* unit = (UnitDef*)GlueLinear((unsigned)a[0].i32);
@@ -5301,7 +5319,7 @@ const char* __cdecl Import_map_SnapWorldPosToFootprint(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_map_UnitsInRange(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMapUnitsInRange(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("map.UnitsInRange", 0);
     const Vec3* pos = (const Vec3*)GlueLinear((unsigned)a[0].i32);
@@ -5315,14 +5333,14 @@ const char* __cdecl Import_map_UnitsInRange(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_mission_GetGameType(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMissionGetGameType(wasmtime_val_raw_t* a)
 {
     int result = g_seams.mission->GetGameType();
     a[0].i32 = (int)result;
     return nullptr;
 }
 
-const char* __cdecl Import_mission_GetMissionParams(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMissionGetMissionParams(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("mission.GetMissionParams", 0);
     MissionParams* out = (MissionParams*)GlueLinear((unsigned)a[0].i32);
@@ -5330,7 +5348,7 @@ const char* __cdecl Import_mission_GetMissionParams(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_mission_GetNameSlot(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMissionGetNameSlot(wasmtime_val_raw_t* a)
 {
     int index = (int)a[0].i32;
     const char* result = g_seams.mission->GetNameSlot(index);
@@ -5340,7 +5358,7 @@ const char* __cdecl Import_mission_GetNameSlot(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_movement_NewAirManeuverOrder(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementNewAirManeuverOrder(wasmtime_val_raw_t* a)
 {
     unsigned int order = (unsigned int)a[0].i32;
     GLUE_NEED("movement.NewAirManeuverOrder", 1);
@@ -5352,7 +5370,7 @@ const char* __cdecl Import_movement_NewAirManeuverOrder(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_movement_NewApproachRadius(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementNewApproachRadius(wasmtime_val_raw_t* a)
 {
     unsigned int order = (unsigned int)a[0].i32;
     int x = (int)a[1].i32;
@@ -5363,7 +5381,7 @@ const char* __cdecl Import_movement_NewApproachRadius(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_movement_NewPathOrderAt(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementNewPathOrderAt(wasmtime_val_raw_t* a)
 {
     unsigned int order = (unsigned int)a[0].i32;
     GLUE_NEED("movement.NewPathOrderAt", 1);
@@ -5373,7 +5391,7 @@ const char* __cdecl Import_movement_NewPathOrderAt(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_movement_NewPathOrderToUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementNewPathOrderToUnit(wasmtime_val_raw_t* a)
 {
     unsigned int order = (unsigned int)a[0].i32;
     GLUE_NEED("movement.NewPathOrderToUnit", 1);
@@ -5383,7 +5401,7 @@ const char* __cdecl Import_movement_NewPathOrderToUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_movement_NewPathOrderToUnitAt(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementNewPathOrderToUnitAt(wasmtime_val_raw_t* a)
 {
     unsigned int order = (unsigned int)a[0].i32;
     GLUE_NEED("movement.NewPathOrderToUnitAt", 1);
@@ -5395,7 +5413,7 @@ const char* __cdecl Import_movement_NewPathOrderToUnitAt(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_movement_NewPathOrderToUnitAtAngle(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementNewPathOrderToUnitAtAngle(wasmtime_val_raw_t* a)
 {
     unsigned int order = (unsigned int)a[0].i32;
     GLUE_NEED("movement.NewPathOrderToUnitAtAngle", 1);
@@ -5406,7 +5424,7 @@ const char* __cdecl Import_movement_NewPathOrderToUnitAtAngle(wasmtime_val_raw_t
     return nullptr;
 }
 
-const char* __cdecl Import_movement_NewPointMarker(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementNewPointMarker(wasmtime_val_raw_t* a)
 {
     unsigned int order = (unsigned int)a[0].i32;
     GLUE_NEED("movement.NewPointMarker", 1);
@@ -5418,7 +5436,7 @@ const char* __cdecl Import_movement_NewPointMarker(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_movement_NewRingApproach(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementNewRingApproach(wasmtime_val_raw_t* a)
 {
     unsigned int order = (unsigned int)a[0].i32;
     int x = (int)a[1].i32;
@@ -5430,7 +5448,7 @@ const char* __cdecl Import_movement_NewRingApproach(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_movement_TargetType(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementTargetType(wasmtime_val_raw_t* a)
 {
     unsigned int target = (unsigned int)a[0].i32;
     int result = g_seams.movement->TargetType(target);
@@ -5438,7 +5456,7 @@ const char* __cdecl Import_movement_TargetType(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_movement_UnitTarget(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportMovementUnitTarget(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("movement.UnitTarget", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5447,7 +5465,7 @@ const char* __cdecl Import_movement_UnitTarget(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_BroadcastPlayerEconomy(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkBroadcastPlayerEconomy(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.BroadcastPlayerEconomy", 0);
     Player* player = (Player*)GlueLinear((unsigned)a[0].i32);
@@ -5455,13 +5473,13 @@ const char* __cdecl Import_network_BroadcastPlayerEconomy(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_BroadcastPlayerInfo(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkBroadcastPlayerInfo(wasmtime_val_raw_t* a)
 {
     g_seams.network->BroadcastPlayerInfo();
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendActivateFlags(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendActivateFlags(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendActivateFlags", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5469,7 +5487,7 @@ const char* __cdecl Import_network_SendActivateFlags(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendAttach(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendAttach(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendAttach", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5481,7 +5499,7 @@ const char* __cdecl Import_network_SendAttach(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendBuilderLink(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendBuilderLink(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendBuilderLink", 0);
     Unit* builder = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5491,7 +5509,7 @@ const char* __cdecl Import_network_SendBuilderLink(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendFeatureBurning(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendFeatureBurning(wasmtime_val_raw_t* a)
 {
     int x = (int)a[0].i32;
     int z = (int)a[1].i32;
@@ -5499,7 +5517,7 @@ const char* __cdecl Import_network_SendFeatureBurning(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendFeatureHit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendFeatureHit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendFeatureHit", 0);
     WeaponDef* weapon = (WeaponDef*)GlueLinear((unsigned)a[0].i32);
@@ -5509,7 +5527,7 @@ const char* __cdecl Import_network_SendFeatureHit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendFeatureKilled(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendFeatureKilled(wasmtime_val_raw_t* a)
 {
     int x = (int)a[0].i32;
     int z = (int)a[1].i32;
@@ -5517,7 +5535,7 @@ const char* __cdecl Import_network_SendFeatureKilled(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendFeatureReclaimed(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendFeatureReclaimed(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendFeatureReclaimed", 0);
     Unit* reclaimer = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5527,7 +5545,7 @@ const char* __cdecl Import_network_SendFeatureReclaimed(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendNewUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendNewUnit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendNewUnit", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5535,7 +5553,7 @@ const char* __cdecl Import_network_SendNewUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendOwnershipTransfer(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendOwnershipTransfer(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendOwnershipTransfer", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5545,7 +5563,7 @@ const char* __cdecl Import_network_SendOwnershipTransfer(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendProjectileDetonated(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendProjectileDetonated(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendProjectileDetonated", 0);
     Unit* attacker = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5555,7 +5573,7 @@ const char* __cdecl Import_network_SendProjectileDetonated(wasmtime_val_raw_t* a
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendScriptCall(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendScriptCall(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendScriptCall", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5570,7 +5588,7 @@ const char* __cdecl Import_network_SendScriptCall(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendScriptCallByName(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendScriptCallByName(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendScriptCallByName", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5586,7 +5604,7 @@ const char* __cdecl Import_network_SendScriptCallByName(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendShareEnergy(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendShareEnergy(wasmtime_val_raw_t* a)
 {
     unsigned char from = (unsigned char)a[0].i32;
     unsigned char to = (unsigned char)a[1].i32;
@@ -5595,7 +5613,7 @@ const char* __cdecl Import_network_SendShareEnergy(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendShareMapInfo(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendShareMapInfo(wasmtime_val_raw_t* a)
 {
     unsigned char from = (unsigned char)a[0].i32;
     unsigned char to = (unsigned char)a[1].i32;
@@ -5603,7 +5621,7 @@ const char* __cdecl Import_network_SendShareMapInfo(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendShareMetal(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendShareMetal(wasmtime_val_raw_t* a)
 {
     unsigned char from = (unsigned char)a[0].i32;
     unsigned char to = (unsigned char)a[1].i32;
@@ -5612,7 +5630,7 @@ const char* __cdecl Import_network_SendShareMetal(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendUnitDamage(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendUnitDamage(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendUnitDamage", 0);
     Unit* source = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5625,7 +5643,7 @@ const char* __cdecl Import_network_SendUnitDamage(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendUnitKilled(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendUnitKilled(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendUnitKilled", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5636,7 +5654,7 @@ const char* __cdecl Import_network_SendUnitKilled(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendWeaponFire(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendWeaponFire(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("network.SendWeaponFire", 0);
     Unit* shooter = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5652,7 +5670,7 @@ const char* __cdecl Import_network_SendWeaponFire(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_network_SendWeaponFireAt(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportNetworkSendWeaponFireAt(wasmtime_val_raw_t* a)
 {
     unsigned char weaponIndex = (unsigned char)a[0].i32;
     GLUE_NEED("network.SendWeaponFireAt", 1);
@@ -5663,7 +5681,7 @@ const char* __cdecl Import_network_SendWeaponFireAt(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_orders_GetOrderFlags(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportOrdersGetOrderFlags(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("orders.GetOrderFlags", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5672,7 +5690,7 @@ const char* __cdecl Import_orders_GetOrderFlags(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_orders_GetOrderType(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportOrdersGetOrderType(wasmtime_val_raw_t* a)
 {
     unsigned char mode = (unsigned char)a[0].i32;
     GLUE_NEED("orders.GetOrderType", 1);
@@ -5686,14 +5704,14 @@ const char* __cdecl Import_orders_GetOrderType(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathfinding_Cancel(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathfindingCancel(wasmtime_val_raw_t* a)
 {
     PathHandle requester = (PathHandle)a[0].i32;
     g_seams.pathfinding->Cancel(requester);
     return nullptr;
 }
 
-const char* __cdecl Import_pathfinding_CellsChanged(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathfindingCellsChanged(wasmtime_val_raw_t* a)
 {
     int left = (int)a[0].i32;
     int top = (int)a[1].i32;
@@ -5705,7 +5723,7 @@ const char* __cdecl Import_pathfinding_CellsChanged(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathfinding_Submit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathfindingSubmit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("pathfinding.Submit", 0);
     const PathRequest* request = (const PathRequest*)GlueLinear((unsigned)a[0].i32);
@@ -5713,21 +5731,21 @@ const char* __cdecl Import_pathfinding_Submit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_BeginSearch(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldBeginSearch(wasmtime_val_raw_t* a)
 {
     PathUnit unit = (PathUnit)a[0].i32;
     g_seams.pathworld->BeginSearch(unit);
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_EndSearch(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldEndSearch(wasmtime_val_raw_t* a)
 {
     PathUnit unit = (PathUnit)a[0].i32;
     g_seams.pathworld->EndSearch(unit);
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_FirstUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldFirstUnit(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     PathUnit result = g_seams.pathworld->FirstUnit(player);
@@ -5735,7 +5753,7 @@ const char* __cdecl Import_pathworld_FirstUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_InBounds(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldInBounds(wasmtime_val_raw_t* a)
 {
     PathClass moveClass = (PathClass)a[0].i32;
     int x = (int)a[1].i32;
@@ -5745,7 +5763,7 @@ const char* __cdecl Import_pathworld_InBounds(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_IsPlaying(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldIsPlaying(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     int result = g_seams.pathworld->IsPlaying(player);
@@ -5753,7 +5771,7 @@ const char* __cdecl Import_pathworld_IsPlaying(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_LastUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldLastUnit(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     PathUnit result = g_seams.pathworld->LastUnit(player);
@@ -5761,7 +5779,7 @@ const char* __cdecl Import_pathworld_LastUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_LineOfSight(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldLineOfSight(wasmtime_val_raw_t* a)
 {
     PathClass moveClass = (PathClass)a[0].i32;
     int x0 = (int)a[1].i32;
@@ -5773,7 +5791,7 @@ const char* __cdecl Import_pathworld_LineOfSight(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_MoveClass(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldMoveClass(wasmtime_val_raw_t* a)
 {
     int index = (int)a[0].i32;
     PathClass result = g_seams.pathworld->MoveClass(index);
@@ -5781,7 +5799,7 @@ const char* __cdecl Import_pathworld_MoveClass(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_NextUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldNextUnit(wasmtime_val_raw_t* a)
 {
     PathUnit unit = (PathUnit)a[0].i32;
     PathUnit result = g_seams.pathworld->NextUnit(unit);
@@ -5789,7 +5807,7 @@ const char* __cdecl Import_pathworld_NextUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_Pass(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldPass(wasmtime_val_raw_t* a)
 {
     PathClass moveClass = (PathClass)a[0].i32;
     int x = (int)a[1].i32;
@@ -5799,21 +5817,21 @@ const char* __cdecl Import_pathworld_Pass(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_PlayerCount(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldPlayerCount(wasmtime_val_raw_t* a)
 {
     int result = g_seams.pathworld->PlayerCount();
     a[0].i32 = (int)result;
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_SearchStepLimit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldSearchStepLimit(wasmtime_val_raw_t* a)
 {
     unsigned int result = g_seams.pathworld->SearchStepLimit();
     a[0].i32 = (int)result;
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_Seen(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldSeen(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     int x = (int)a[1].i32;
@@ -5823,7 +5841,7 @@ const char* __cdecl Import_pathworld_Seen(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_SeenSize(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldSeenSize(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("pathworld.SeenSize", 0);
     int* width = (int*)GlueLinear((unsigned)a[0].i32);
@@ -5833,7 +5851,7 @@ const char* __cdecl Import_pathworld_SeenSize(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_TerrainPass(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldTerrainPass(wasmtime_val_raw_t* a)
 {
     PathClass moveClass = (PathClass)a[0].i32;
     int x = (int)a[1].i32;
@@ -5843,14 +5861,14 @@ const char* __cdecl Import_pathworld_TerrainPass(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_Tick(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldTick(wasmtime_val_raw_t* a)
 {
     unsigned int result = g_seams.pathworld->Tick();
     a[0].i32 = (int)result;
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_UnitState(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldUnitState(wasmtime_val_raw_t* a)
 {
     PathUnit unit = (PathUnit)a[0].i32;
     GLUE_NEED("pathworld.UnitState", 1);
@@ -5860,14 +5878,14 @@ const char* __cdecl Import_pathworld_UnitState(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_pathworld_UnitsPerPlayer(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportPathworldUnitsPerPlayer(wasmtime_val_raw_t* a)
 {
     int result = g_seams.pathworld->UnitsPerPlayer();
     a[0].i32 = (int)result;
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_CreateObjectState(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsCreateObjectState(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.CreateObjectState", 0);
     Object3do* model = (Object3do*)GlueLinear((unsigned)a[0].i32);
@@ -5878,7 +5896,7 @@ const char* __cdecl Import_scripts_CreateObjectState(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_scripts_CreatePlayerObjectState(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsCreatePlayerObjectState(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.CreatePlayerObjectState", 0);
     Object3do* model = (Object3do*)GlueLinear((unsigned)a[0].i32);
@@ -5893,7 +5911,7 @@ const char* __cdecl Import_scripts_CreatePlayerObjectState(wasmtime_val_raw_t* a
     return error;
 }
 
-const char* __cdecl Import_scripts_DeleteScript(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsDeleteScript(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.DeleteScript", 0);
     CobScript* script = (CobScript*)GlueLinear((unsigned)a[0].i32);
@@ -5901,7 +5919,7 @@ const char* __cdecl Import_scripts_DeleteScript(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_FindScript(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsFindScript(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.FindScript", 0);
     CobScript* script = (CobScript*)GlueLinear((unsigned)a[0].i32);
@@ -5912,7 +5930,7 @@ const char* __cdecl Import_scripts_FindScript(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_FreeObjectState(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsFreeObjectState(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.FreeObjectState", 0);
     ModelState* state = (ModelState*)GlueLinear((unsigned)a[0].i32);
@@ -5920,7 +5938,7 @@ const char* __cdecl Import_scripts_FreeObjectState(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_GetAimFromPosition(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsGetAimFromPosition(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.GetAimFromPosition", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5931,7 +5949,7 @@ const char* __cdecl Import_scripts_GetAimFromPosition(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_GetNanoPiecePosition(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsGetNanoPiecePosition(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.GetNanoPiecePosition", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5941,7 +5959,7 @@ const char* __cdecl Import_scripts_GetNanoPiecePosition(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_GetPieceAngles(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsGetPieceAngles(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.GetPieceAngles", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5952,7 +5970,7 @@ const char* __cdecl Import_scripts_GetPieceAngles(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_GetPieceOffset(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsGetPieceOffset(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.GetPieceOffset", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5963,7 +5981,7 @@ const char* __cdecl Import_scripts_GetPieceOffset(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_GetPiecePosition(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsGetPiecePosition(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.GetPiecePosition", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5974,7 +5992,7 @@ const char* __cdecl Import_scripts_GetPiecePosition(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_GetSweetSpot(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsGetSweetSpot(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.GetSweetSpot", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5984,7 +6002,7 @@ const char* __cdecl Import_scripts_GetSweetSpot(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_NewUnitScript(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsNewUnitScript(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.NewUnitScript", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -5992,7 +6010,7 @@ const char* __cdecl Import_scripts_NewUnitScript(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_ObjectStateSize(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsObjectStateSize(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.ObjectStateSize", 0);
     Object3do* model = (Object3do*)GlueLinear((unsigned)a[0].i32);
@@ -6001,7 +6019,7 @@ const char* __cdecl Import_scripts_ObjectStateSize(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_QueryScript(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsQueryScript(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.QueryScript", 0);
     CobScript* script = (CobScript*)GlueLinear((unsigned)a[0].i32);
@@ -6020,7 +6038,7 @@ const char* __cdecl Import_scripts_QueryScript(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_SetCob(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsSetCob(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.SetCob", 0);
     CobScript* script = (CobScript*)GlueLinear((unsigned)a[0].i32);
@@ -6030,7 +6048,7 @@ const char* __cdecl Import_scripts_SetCob(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_scripts_SetObjectState(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportScriptsSetObjectState(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("scripts.SetObjectState", 0);
     UnitScript* script = (UnitScript*)GlueLinear((unsigned)a[0].i32);
@@ -6040,7 +6058,7 @@ const char* __cdecl Import_scripts_SetObjectState(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_targeting_ChooseWeapon(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportTargetingChooseWeapon(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("targeting.ChooseWeapon", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6049,7 +6067,7 @@ const char* __cdecl Import_targeting_ChooseWeapon(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_targeting_FindBestTargetIfFireAtWill(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportTargetingFindBestTargetIfFireAtWill(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("targeting.FindBestTargetIfFireAtWill", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6060,7 +6078,7 @@ const char* __cdecl Import_targeting_FindBestTargetIfFireAtWill(wasmtime_val_raw
     return error;
 }
 
-const char* __cdecl Import_targeting_FindWeaponTarget(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportTargetingFindWeaponTarget(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("targeting.FindWeaponTarget", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6073,7 +6091,7 @@ const char* __cdecl Import_targeting_FindWeaponTarget(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_targeting_GetWeaponTargetPos(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportTargetingGetWeaponTargetPos(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("targeting.GetWeaponTargetPos", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6085,7 +6103,7 @@ const char* __cdecl Import_targeting_GetWeaponTargetPos(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_targeting_GetWeaponTargetUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportTargetingGetWeaponTargetUnit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("targeting.GetWeaponTargetUnit", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6097,7 +6115,7 @@ const char* __cdecl Import_targeting_GetWeaponTargetUnit(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_units_AddBuildProgress(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsAddBuildProgress(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.AddBuildProgress", 0);
     Unit* builder = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6109,7 +6127,7 @@ const char* __cdecl Import_units_AddBuildProgress(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_AddRepairProgress(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsAddRepairProgress(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.AddRepairProgress", 0);
     Unit* builder = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6121,7 +6139,7 @@ const char* __cdecl Import_units_AddRepairProgress(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_CanLoad(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsCanLoad(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.CanLoad", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6132,7 +6150,7 @@ const char* __cdecl Import_units_CanLoad(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_CanReclaim(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsCanReclaim(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.CanReclaim", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6143,7 +6161,7 @@ const char* __cdecl Import_units_CanReclaim(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_CanRepair(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsCanRepair(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.CanRepair", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6154,7 +6172,7 @@ const char* __cdecl Import_units_CanRepair(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_CreateUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsCreateUnit(wasmtime_val_raw_t* a)
 {
     unsigned char player = (unsigned char)a[0].i32;
     unsigned short typeId = (unsigned short)a[1].i32;
@@ -6170,7 +6188,7 @@ const char* __cdecl Import_units_CreateUnit(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_units_FindUnitTypeId(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsFindUnitTypeId(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.FindUnitTypeId", 0);
     const char* name = (const char*)GlueLinear((unsigned)a[0].i32);
@@ -6179,7 +6197,7 @@ const char* __cdecl Import_units_FindUnitTypeId(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_GetFactoriesInRadius(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsGetFactoriesInRadius(wasmtime_val_raw_t* a)
 {
     int player = (int)a[0].i32;
     GLUE_NEED("units.GetFactoriesInRadius", 1);
@@ -6193,7 +6211,7 @@ const char* __cdecl Import_units_GetFactoriesInRadius(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_UnitRefGet(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsUnitRefGet(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.UnitRefGet", 0);
     UnitRef* ref = (UnitRef*)GlueLinear((unsigned)a[0].i32);
@@ -6204,7 +6222,7 @@ const char* __cdecl Import_units_UnitRefGet(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_units_UnitRefInit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsUnitRefInit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.UnitRefInit", 0);
     UnitRef* ref = (UnitRef*)GlueLinear((unsigned)a[0].i32);
@@ -6216,7 +6234,7 @@ const char* __cdecl Import_units_UnitRefInit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_UnitRefSetUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsUnitRefSetUnit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.UnitRefSetUnit", 0);
     UnitRef* ref = (UnitRef*)GlueLinear((unsigned)a[0].i32);
@@ -6226,7 +6244,7 @@ const char* __cdecl Import_units_UnitRefSetUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_UnitRefSetValue(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsUnitRefSetValue(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.UnitRefSetValue", 0);
     UnitRef* ref = (UnitRef*)GlueLinear((unsigned)a[0].i32);
@@ -6236,7 +6254,7 @@ const char* __cdecl Import_units_UnitRefSetValue(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_units_UnitRefUnlink(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportUnitsUnitRefUnlink(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("units.UnitRefUnlink", 0);
     UnitRef* ref = (UnitRef*)GlueLinear((unsigned)a[0].i32);
@@ -6244,7 +6262,7 @@ const char* __cdecl Import_units_UnitRefUnlink(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_weapons_FindTargetableProjectile(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportWeaponsFindTargetableProjectile(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("weapons.FindTargetableProjectile", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6256,7 +6274,7 @@ const char* __cdecl Import_weapons_FindTargetableProjectile(wasmtime_val_raw_t* 
     return error;
 }
 
-const char* __cdecl Import_weapons_FindWeaponByName(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportWeaponsFindWeaponByName(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("weapons.FindWeaponByName", 0);
     const char* name = (const char*)GlueLinear((unsigned)a[0].i32);
@@ -6267,7 +6285,7 @@ const char* __cdecl Import_weapons_FindWeaponByName(wasmtime_val_raw_t* a)
     return error;
 }
 
-const char* __cdecl Import_weapons_GetWeaponRange(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportWeaponsGetWeaponRange(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("weapons.GetWeaponRange", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6277,7 +6295,7 @@ const char* __cdecl Import_weapons_GetWeaponRange(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_weapons_WeaponCanReachPos(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportWeaponsWeaponCanReachPos(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("weapons.WeaponCanReachPos", 0);
     Unit* unit = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6291,7 +6309,7 @@ const char* __cdecl Import_weapons_WeaponCanReachPos(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl Import_weapons_WeaponCanReachUnit(wasmtime_val_raw_t* a)
+const char* __cdecl GlueImportWeaponsWeaponCanReachUnit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("weapons.WeaponCanReachUnit", 0);
     Unit* shooter = (Unit*)GlueLinear((unsigned)a[0].i32);
@@ -6303,9 +6321,7 @@ const char* __cdecl Import_weapons_WeaponCanReachUnit(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-}
-
-GlueModule* const g_glueModules[] = {
+GlueModule* const kGlueModules[] = {
     &s_windMeteorsGlue,
     &s_economyGlue,
     &s_featuresGlue,
@@ -6322,148 +6338,146 @@ GlueModule* const g_glueModules[] = {
     &s_movementGlue,
     &s_missionGlue,
 };
-const unsigned g_glueModuleCount = sizeof g_glueModules / sizeof g_glueModules[0];
 
-const GlueImport g_glueInterfaceImports[] = {
-    {"economy", "GetEnergyUse", "i>d", Import_economy_GetEnergyUse},
-    {"economy", "RequestGranted", "ii>i", Import_economy_RequestGranted},
-    {"economy", "Spend", "i>i", Import_economy_Spend},
-    {"economy", "UpdateMetalExtraction", "i>", Import_economy_UpdateMetalExtraction},
-    {"econworld", "Allied", "ii>i", Import_econworld_Allied},
-    {"econworld", "CellMetal", "ii>i", Import_econworld_CellMetal},
-    {"econworld", "Difficulty", ">i", Import_econworld_Difficulty},
-    {"econworld", "Emit", "ii>", Import_econworld_Emit},
-    {"econworld", "FirstUnit", "i>i", Import_econworld_FirstUnit},
-    {"econworld", "LastUnit", "i>i", Import_econworld_LastUnit},
-    {"econworld", "NextUnit", "i>i", Import_econworld_NextUnit},
-    {"econworld", "PlayerInfo", "ii>", Import_econworld_PlayerInfo},
-    {"econworld", "SharingEnabled", ">i", Import_econworld_SharingEnabled},
-    {"econworld", "Tick", ">i", Import_econworld_Tick},
-    {"econworld", "Tide", ">f", Import_econworld_Tide},
-    {"econworld", "TypeInfo", "ii>", Import_econworld_TypeInfo},
-    {"econworld", "UnitInfo", "ii>i", Import_econworld_UnitInfo},
-    {"econworld", "UnitSlot", "i>i", Import_econworld_UnitSlot},
-    {"econworld", "Wind", ">f", Import_econworld_Wind},
-    {"features", "FindFeatureAtPos", "iii>i", Import_features_FindFeatureAtPos},
-    {"features", "GetCellFeature", "i>i", Import_features_GetCellFeature},
-    {"features", "GetFootprintCentre", "iii>", Import_features_GetFootprintCentre},
-    {"los_radar", "ClampWorldPosToTerrain", "iii>", Import_los_radar_ClampWorldPosToTerrain},
-    {"los_radar", "GetMapCell", "ii>i", Import_los_radar_GetMapCell},
-    {"los_radar", "GetMapCellAtPosition", "i>i", Import_los_radar_GetMapCellAtPosition},
-    {"los_radar", "GetOriginCellAtPosition", "i>i", Import_los_radar_GetOriginCellAtPosition},
-    {"los_radar", "GetSeenUnitsInRadius", "iiiii>i", Import_los_radar_GetSeenUnitsInRadius},
-    {"los_radar", "GetVisibleEnemiesInRadius", "iiiiii>i", Import_los_radar_GetVisibleEnemiesInRadius},
-    {"los_radar", "IsPointVisible", "ii>i", Import_los_radar_IsPointVisible},
-    {"los_radar", "IsUnitVisibleToPlayer", "ii>i", Import_los_radar_IsUnitVisibleToPlayer},
-    {"los_radar", "SoundHeardMask", "i>i", Import_los_radar_SoundHeardMask},
-    {"map", "CanBuildAt", "iiii>i", Import_map_CanBuildAt},
-    {"map", "CanPlaceFootprintAt", "ii>i", Import_map_CanPlaceFootprintAt},
-    {"map", "CanPlaceUnitFootprint", "iiii>i", Import_map_CanPlaceUnitFootprint},
-    {"map", "GetCellMeanHeight", "i>i", Import_map_GetCellMeanHeight},
-    {"map", "GetGroundHeight", "i>i", Import_map_GetGroundHeight},
-    {"map", "IsPadSlotFree", "ii>i", Import_map_IsPadSlotFree},
-    {"map", "SnapWorldPosToFootprint", "ii>", Import_map_SnapWorldPosToFootprint},
-    {"map", "UnitsInRange", "iiiii>i", Import_map_UnitsInRange},
-    {"mission", "GetGameType", ">i", Import_mission_GetGameType},
-    {"mission", "GetMissionParams", "i>", Import_mission_GetMissionParams},
-    {"mission", "GetNameSlot", "i>i", Import_mission_GetNameSlot},
-    {"movement", "NewAirManeuverOrder", "iii>i", Import_movement_NewAirManeuverOrder},
-    {"movement", "NewApproachRadius", "iiii>i", Import_movement_NewApproachRadius},
-    {"movement", "NewPathOrderAt", "ii>i", Import_movement_NewPathOrderAt},
-    {"movement", "NewPathOrderToUnit", "ii>i", Import_movement_NewPathOrderToUnit},
-    {"movement", "NewPathOrderToUnitAt", "iii>i", Import_movement_NewPathOrderToUnitAt},
-    {"movement", "NewPathOrderToUnitAtAngle", "iii>i", Import_movement_NewPathOrderToUnitAtAngle},
-    {"movement", "NewPointMarker", "iii>i", Import_movement_NewPointMarker},
-    {"movement", "NewRingApproach", "iiiii>i", Import_movement_NewRingApproach},
-    {"movement", "TargetType", "i>i", Import_movement_TargetType},
-    {"movement", "UnitTarget", "i>i", Import_movement_UnitTarget},
-    {"network", "BroadcastPlayerEconomy", "i>", Import_network_BroadcastPlayerEconomy},
-    {"network", "BroadcastPlayerInfo", ">", Import_network_BroadcastPlayerInfo},
-    {"network", "SendActivateFlags", "i>", Import_network_SendActivateFlags},
-    {"network", "SendAttach", "iiii>", Import_network_SendAttach},
-    {"network", "SendBuilderLink", "ii>", Import_network_SendBuilderLink},
-    {"network", "SendFeatureBurning", "ii>", Import_network_SendFeatureBurning},
-    {"network", "SendFeatureHit", "iii>", Import_network_SendFeatureHit},
-    {"network", "SendFeatureKilled", "ii>", Import_network_SendFeatureKilled},
-    {"network", "SendFeatureReclaimed", "iii>", Import_network_SendFeatureReclaimed},
-    {"network", "SendNewUnit", "i>", Import_network_SendNewUnit},
-    {"network", "SendOwnershipTransfer", "ii>", Import_network_SendOwnershipTransfer},
-    {"network", "SendProjectileDetonated", "ii>", Import_network_SendProjectileDetonated},
-    {"network", "SendScriptCall", "iiiiiii>i", Import_network_SendScriptCall},
-    {"network", "SendScriptCallByName", "iiiiiii>i", Import_network_SendScriptCallByName},
-    {"network", "SendShareEnergy", "iif>", Import_network_SendShareEnergy},
-    {"network", "SendShareMapInfo", "ii>", Import_network_SendShareMapInfo},
-    {"network", "SendShareMetal", "iif>", Import_network_SendShareMetal},
-    {"network", "SendUnitDamage", "iiiii>", Import_network_SendUnitDamage},
-    {"network", "SendUnitKilled", "iiii>", Import_network_SendUnitKilled},
-    {"network", "SendWeaponFire", "iiiii>", Import_network_SendWeaponFire},
-    {"network", "SendWeaponFireAt", "iii>", Import_network_SendWeaponFireAt},
-    {"orders", "GetOrderFlags", "i>i", Import_orders_GetOrderFlags},
-    {"orders", "GetOrderType", "iiii>i", Import_orders_GetOrderType},
-    {"pathfinding", "Cancel", "i>", Import_pathfinding_Cancel},
-    {"pathfinding", "CellsChanged", "iiiiii>", Import_pathfinding_CellsChanged},
-    {"pathfinding", "Submit", "i>", Import_pathfinding_Submit},
-    {"pathworld", "BeginSearch", "i>", Import_pathworld_BeginSearch},
-    {"pathworld", "EndSearch", "i>", Import_pathworld_EndSearch},
-    {"pathworld", "FirstUnit", "i>i", Import_pathworld_FirstUnit},
-    {"pathworld", "InBounds", "iii>i", Import_pathworld_InBounds},
-    {"pathworld", "IsPlaying", "i>i", Import_pathworld_IsPlaying},
-    {"pathworld", "LastUnit", "i>i", Import_pathworld_LastUnit},
-    {"pathworld", "LineOfSight", "iiiii>i", Import_pathworld_LineOfSight},
-    {"pathworld", "MoveClass", "i>i", Import_pathworld_MoveClass},
-    {"pathworld", "NextUnit", "i>i", Import_pathworld_NextUnit},
-    {"pathworld", "Pass", "iii>i", Import_pathworld_Pass},
-    {"pathworld", "PlayerCount", ">i", Import_pathworld_PlayerCount},
-    {"pathworld", "SearchStepLimit", ">i", Import_pathworld_SearchStepLimit},
-    {"pathworld", "Seen", "iii>i", Import_pathworld_Seen},
-    {"pathworld", "SeenSize", "ii>", Import_pathworld_SeenSize},
-    {"pathworld", "TerrainPass", "iii>i", Import_pathworld_TerrainPass},
-    {"pathworld", "Tick", ">i", Import_pathworld_Tick},
-    {"pathworld", "UnitState", "ii>i", Import_pathworld_UnitState},
-    {"pathworld", "UnitsPerPlayer", ">i", Import_pathworld_UnitsPerPlayer},
-    {"scripts", "CreateObjectState", "i>i", Import_scripts_CreateObjectState},
-    {"scripts", "CreatePlayerObjectState", "iii>i", Import_scripts_CreatePlayerObjectState},
-    {"scripts", "DeleteScript", "i>", Import_scripts_DeleteScript},
-    {"scripts", "FindScript", "ii>i", Import_scripts_FindScript},
-    {"scripts", "FreeObjectState", "i>", Import_scripts_FreeObjectState},
-    {"scripts", "GetAimFromPosition", "iii>", Import_scripts_GetAimFromPosition},
-    {"scripts", "GetNanoPiecePosition", "ii>", Import_scripts_GetNanoPiecePosition},
-    {"scripts", "GetPieceAngles", "iii>", Import_scripts_GetPieceAngles},
-    {"scripts", "GetPieceOffset", "iii>", Import_scripts_GetPieceOffset},
-    {"scripts", "GetPiecePosition", "iii>", Import_scripts_GetPiecePosition},
-    {"scripts", "GetSweetSpot", "ii>", Import_scripts_GetSweetSpot},
-    {"scripts", "NewUnitScript", "i>", Import_scripts_NewUnitScript},
-    {"scripts", "ObjectStateSize", "i>i", Import_scripts_ObjectStateSize},
-    {"scripts", "QueryScript", "iiiiii>i", Import_scripts_QueryScript},
-    {"scripts", "SetCob", "ii>", Import_scripts_SetCob},
-    {"scripts", "SetObjectState", "ii>", Import_scripts_SetObjectState},
-    {"targeting", "ChooseWeapon", "i>i", Import_targeting_ChooseWeapon},
-    {"targeting", "FindBestTargetIfFireAtWill", "i>i", Import_targeting_FindBestTargetIfFireAtWill},
-    {"targeting", "FindWeaponTarget", "iii>i", Import_targeting_FindWeaponTarget},
-    {"targeting", "GetWeaponTargetPos", "iii>i", Import_targeting_GetWeaponTargetPos},
-    {"targeting", "GetWeaponTargetUnit", "ii>i", Import_targeting_GetWeaponTargetUnit},
-    {"units", "AddBuildProgress", "iif>i", Import_units_AddBuildProgress},
-    {"units", "AddRepairProgress", "iif>i", Import_units_AddRepairProgress},
-    {"units", "CanLoad", "ii>i", Import_units_CanLoad},
-    {"units", "CanReclaim", "ii>i", Import_units_CanReclaim},
-    {"units", "CanRepair", "ii>i", Import_units_CanRepair},
-    {"units", "CreateUnit", "iiiiii>i", Import_units_CreateUnit},
-    {"units", "FindUnitTypeId", "i>i", Import_units_FindUnitTypeId},
-    {"units", "GetFactoriesInRadius", "iiiii>i", Import_units_GetFactoriesInRadius},
-    {"units", "UnitRefGet", "i>i", Import_units_UnitRefGet},
-    {"units", "UnitRefInit", "iii>", Import_units_UnitRefInit},
-    {"units", "UnitRefSetUnit", "ii>", Import_units_UnitRefSetUnit},
-    {"units", "UnitRefSetValue", "ii>", Import_units_UnitRefSetValue},
-    {"units", "UnitRefUnlink", "i>", Import_units_UnitRefUnlink},
-    {"weapons", "FindTargetableProjectile", "ii>i", Import_weapons_FindTargetableProjectile},
-    {"weapons", "FindWeaponByName", "i>i", Import_weapons_FindWeaponByName},
-    {"weapons", "GetWeaponRange", "ii>i", Import_weapons_GetWeaponRange},
-    {"weapons", "WeaponCanReachPos", "iiii>i", Import_weapons_WeaponCanReachPos},
-    {"weapons", "WeaponCanReachUnit", "iii>i", Import_weapons_WeaponCanReachUnit},
+const GlueImport kGlueInterfaceImports[] = {
+    {"economy", "GetEnergyUse", "i>d", GlueImportEconomyGetEnergyUse},
+    {"economy", "RequestGranted", "ii>i", GlueImportEconomyRequestGranted},
+    {"economy", "Spend", "i>i", GlueImportEconomySpend},
+    {"economy", "UpdateMetalExtraction", "i>", GlueImportEconomyUpdateMetalExtraction},
+    {"econworld", "Allied", "ii>i", GlueImportEconworldAllied},
+    {"econworld", "CellMetal", "ii>i", GlueImportEconworldCellMetal},
+    {"econworld", "Difficulty", ">i", GlueImportEconworldDifficulty},
+    {"econworld", "Emit", "ii>", GlueImportEconworldEmit},
+    {"econworld", "FirstUnit", "i>i", GlueImportEconworldFirstUnit},
+    {"econworld", "LastUnit", "i>i", GlueImportEconworldLastUnit},
+    {"econworld", "NextUnit", "i>i", GlueImportEconworldNextUnit},
+    {"econworld", "PlayerInfo", "ii>", GlueImportEconworldPlayerInfo},
+    {"econworld", "SharingEnabled", ">i", GlueImportEconworldSharingEnabled},
+    {"econworld", "Tick", ">i", GlueImportEconworldTick},
+    {"econworld", "Tide", ">f", GlueImportEconworldTide},
+    {"econworld", "TypeInfo", "ii>", GlueImportEconworldTypeInfo},
+    {"econworld", "UnitInfo", "ii>i", GlueImportEconworldUnitInfo},
+    {"econworld", "UnitSlot", "i>i", GlueImportEconworldUnitSlot},
+    {"econworld", "Wind", ">f", GlueImportEconworldWind},
+    {"features", "FindFeatureAtPos", "iii>i", GlueImportFeaturesFindFeatureAtPos},
+    {"features", "GetCellFeature", "i>i", GlueImportFeaturesGetCellFeature},
+    {"features", "GetFootprintCentre", "iii>", GlueImportFeaturesGetFootprintCentre},
+    {"los_radar", "ClampWorldPosToTerrain", "iii>", GlueImportLosRadarClampWorldPosToTerrain},
+    {"los_radar", "GetMapCell", "ii>i", GlueImportLosRadarGetMapCell},
+    {"los_radar", "GetMapCellAtPosition", "i>i", GlueImportLosRadarGetMapCellAtPosition},
+    {"los_radar", "GetOriginCellAtPosition", "i>i", GlueImportLosRadarGetOriginCellAtPosition},
+    {"los_radar", "GetSeenUnitsInRadius", "iiiii>i", GlueImportLosRadarGetSeenUnitsInRadius},
+    {"los_radar", "GetVisibleEnemiesInRadius", "iiiiii>i", GlueImportLosRadarGetVisibleEnemiesInRadius},
+    {"los_radar", "IsPointVisible", "ii>i", GlueImportLosRadarIsPointVisible},
+    {"los_radar", "IsUnitVisibleToPlayer", "ii>i", GlueImportLosRadarIsUnitVisibleToPlayer},
+    {"los_radar", "SoundHeardMask", "i>i", GlueImportLosRadarSoundHeardMask},
+    {"map", "CanBuildAt", "iiii>i", GlueImportMapCanBuildAt},
+    {"map", "CanPlaceFootprintAt", "ii>i", GlueImportMapCanPlaceFootprintAt},
+    {"map", "CanPlaceUnitFootprint", "iiii>i", GlueImportMapCanPlaceUnitFootprint},
+    {"map", "GetCellMeanHeight", "i>i", GlueImportMapGetCellMeanHeight},
+    {"map", "GetGroundHeight", "i>i", GlueImportMapGetGroundHeight},
+    {"map", "IsPadSlotFree", "ii>i", GlueImportMapIsPadSlotFree},
+    {"map", "SnapWorldPosToFootprint", "ii>", GlueImportMapSnapWorldPosToFootprint},
+    {"map", "UnitsInRange", "iiiii>i", GlueImportMapUnitsInRange},
+    {"mission", "GetGameType", ">i", GlueImportMissionGetGameType},
+    {"mission", "GetMissionParams", "i>", GlueImportMissionGetMissionParams},
+    {"mission", "GetNameSlot", "i>i", GlueImportMissionGetNameSlot},
+    {"movement", "NewAirManeuverOrder", "iii>i", GlueImportMovementNewAirManeuverOrder},
+    {"movement", "NewApproachRadius", "iiii>i", GlueImportMovementNewApproachRadius},
+    {"movement", "NewPathOrderAt", "ii>i", GlueImportMovementNewPathOrderAt},
+    {"movement", "NewPathOrderToUnit", "ii>i", GlueImportMovementNewPathOrderToUnit},
+    {"movement", "NewPathOrderToUnitAt", "iii>i", GlueImportMovementNewPathOrderToUnitAt},
+    {"movement", "NewPathOrderToUnitAtAngle", "iii>i", GlueImportMovementNewPathOrderToUnitAtAngle},
+    {"movement", "NewPointMarker", "iii>i", GlueImportMovementNewPointMarker},
+    {"movement", "NewRingApproach", "iiiii>i", GlueImportMovementNewRingApproach},
+    {"movement", "TargetType", "i>i", GlueImportMovementTargetType},
+    {"movement", "UnitTarget", "i>i", GlueImportMovementUnitTarget},
+    {"network", "BroadcastPlayerEconomy", "i>", GlueImportNetworkBroadcastPlayerEconomy},
+    {"network", "BroadcastPlayerInfo", ">", GlueImportNetworkBroadcastPlayerInfo},
+    {"network", "SendActivateFlags", "i>", GlueImportNetworkSendActivateFlags},
+    {"network", "SendAttach", "iiii>", GlueImportNetworkSendAttach},
+    {"network", "SendBuilderLink", "ii>", GlueImportNetworkSendBuilderLink},
+    {"network", "SendFeatureBurning", "ii>", GlueImportNetworkSendFeatureBurning},
+    {"network", "SendFeatureHit", "iii>", GlueImportNetworkSendFeatureHit},
+    {"network", "SendFeatureKilled", "ii>", GlueImportNetworkSendFeatureKilled},
+    {"network", "SendFeatureReclaimed", "iii>", GlueImportNetworkSendFeatureReclaimed},
+    {"network", "SendNewUnit", "i>", GlueImportNetworkSendNewUnit},
+    {"network", "SendOwnershipTransfer", "ii>", GlueImportNetworkSendOwnershipTransfer},
+    {"network", "SendProjectileDetonated", "ii>", GlueImportNetworkSendProjectileDetonated},
+    {"network", "SendScriptCall", "iiiiiii>i", GlueImportNetworkSendScriptCall},
+    {"network", "SendScriptCallByName", "iiiiiii>i", GlueImportNetworkSendScriptCallByName},
+    {"network", "SendShareEnergy", "iif>", GlueImportNetworkSendShareEnergy},
+    {"network", "SendShareMapInfo", "ii>", GlueImportNetworkSendShareMapInfo},
+    {"network", "SendShareMetal", "iif>", GlueImportNetworkSendShareMetal},
+    {"network", "SendUnitDamage", "iiiii>", GlueImportNetworkSendUnitDamage},
+    {"network", "SendUnitKilled", "iiii>", GlueImportNetworkSendUnitKilled},
+    {"network", "SendWeaponFire", "iiiii>", GlueImportNetworkSendWeaponFire},
+    {"network", "SendWeaponFireAt", "iii>", GlueImportNetworkSendWeaponFireAt},
+    {"orders", "GetOrderFlags", "i>i", GlueImportOrdersGetOrderFlags},
+    {"orders", "GetOrderType", "iiii>i", GlueImportOrdersGetOrderType},
+    {"pathfinding", "Cancel", "i>", GlueImportPathfindingCancel},
+    {"pathfinding", "CellsChanged", "iiiiii>", GlueImportPathfindingCellsChanged},
+    {"pathfinding", "Submit", "i>", GlueImportPathfindingSubmit},
+    {"pathworld", "BeginSearch", "i>", GlueImportPathworldBeginSearch},
+    {"pathworld", "EndSearch", "i>", GlueImportPathworldEndSearch},
+    {"pathworld", "FirstUnit", "i>i", GlueImportPathworldFirstUnit},
+    {"pathworld", "InBounds", "iii>i", GlueImportPathworldInBounds},
+    {"pathworld", "IsPlaying", "i>i", GlueImportPathworldIsPlaying},
+    {"pathworld", "LastUnit", "i>i", GlueImportPathworldLastUnit},
+    {"pathworld", "LineOfSight", "iiiii>i", GlueImportPathworldLineOfSight},
+    {"pathworld", "MoveClass", "i>i", GlueImportPathworldMoveClass},
+    {"pathworld", "NextUnit", "i>i", GlueImportPathworldNextUnit},
+    {"pathworld", "Pass", "iii>i", GlueImportPathworldPass},
+    {"pathworld", "PlayerCount", ">i", GlueImportPathworldPlayerCount},
+    {"pathworld", "SearchStepLimit", ">i", GlueImportPathworldSearchStepLimit},
+    {"pathworld", "Seen", "iii>i", GlueImportPathworldSeen},
+    {"pathworld", "SeenSize", "ii>", GlueImportPathworldSeenSize},
+    {"pathworld", "TerrainPass", "iii>i", GlueImportPathworldTerrainPass},
+    {"pathworld", "Tick", ">i", GlueImportPathworldTick},
+    {"pathworld", "UnitState", "ii>i", GlueImportPathworldUnitState},
+    {"pathworld", "UnitsPerPlayer", ">i", GlueImportPathworldUnitsPerPlayer},
+    {"scripts", "CreateObjectState", "i>i", GlueImportScriptsCreateObjectState},
+    {"scripts", "CreatePlayerObjectState", "iii>i", GlueImportScriptsCreatePlayerObjectState},
+    {"scripts", "DeleteScript", "i>", GlueImportScriptsDeleteScript},
+    {"scripts", "FindScript", "ii>i", GlueImportScriptsFindScript},
+    {"scripts", "FreeObjectState", "i>", GlueImportScriptsFreeObjectState},
+    {"scripts", "GetAimFromPosition", "iii>", GlueImportScriptsGetAimFromPosition},
+    {"scripts", "GetNanoPiecePosition", "ii>", GlueImportScriptsGetNanoPiecePosition},
+    {"scripts", "GetPieceAngles", "iii>", GlueImportScriptsGetPieceAngles},
+    {"scripts", "GetPieceOffset", "iii>", GlueImportScriptsGetPieceOffset},
+    {"scripts", "GetPiecePosition", "iii>", GlueImportScriptsGetPiecePosition},
+    {"scripts", "GetSweetSpot", "ii>", GlueImportScriptsGetSweetSpot},
+    {"scripts", "NewUnitScript", "i>", GlueImportScriptsNewUnitScript},
+    {"scripts", "ObjectStateSize", "i>i", GlueImportScriptsObjectStateSize},
+    {"scripts", "QueryScript", "iiiiii>i", GlueImportScriptsQueryScript},
+    {"scripts", "SetCob", "ii>", GlueImportScriptsSetCob},
+    {"scripts", "SetObjectState", "ii>", GlueImportScriptsSetObjectState},
+    {"targeting", "ChooseWeapon", "i>i", GlueImportTargetingChooseWeapon},
+    {"targeting", "FindBestTargetIfFireAtWill", "i>i", GlueImportTargetingFindBestTargetIfFireAtWill},
+    {"targeting", "FindWeaponTarget", "iii>i", GlueImportTargetingFindWeaponTarget},
+    {"targeting", "GetWeaponTargetPos", "iii>i", GlueImportTargetingGetWeaponTargetPos},
+    {"targeting", "GetWeaponTargetUnit", "ii>i", GlueImportTargetingGetWeaponTargetUnit},
+    {"units", "AddBuildProgress", "iif>i", GlueImportUnitsAddBuildProgress},
+    {"units", "AddRepairProgress", "iif>i", GlueImportUnitsAddRepairProgress},
+    {"units", "CanLoad", "ii>i", GlueImportUnitsCanLoad},
+    {"units", "CanReclaim", "ii>i", GlueImportUnitsCanReclaim},
+    {"units", "CanRepair", "ii>i", GlueImportUnitsCanRepair},
+    {"units", "CreateUnit", "iiiiii>i", GlueImportUnitsCreateUnit},
+    {"units", "FindUnitTypeId", "i>i", GlueImportUnitsFindUnitTypeId},
+    {"units", "GetFactoriesInRadius", "iiiii>i", GlueImportUnitsGetFactoriesInRadius},
+    {"units", "UnitRefGet", "i>i", GlueImportUnitsUnitRefGet},
+    {"units", "UnitRefInit", "iii>", GlueImportUnitsUnitRefInit},
+    {"units", "UnitRefSetUnit", "ii>", GlueImportUnitsUnitRefSetUnit},
+    {"units", "UnitRefSetValue", "ii>", GlueImportUnitsUnitRefSetValue},
+    {"units", "UnitRefUnlink", "i>", GlueImportUnitsUnitRefUnlink},
+    {"weapons", "FindTargetableProjectile", "ii>i", GlueImportWeaponsFindTargetableProjectile},
+    {"weapons", "FindWeaponByName", "i>i", GlueImportWeaponsFindWeaponByName},
+    {"weapons", "GetWeaponRange", "ii>i", GlueImportWeaponsGetWeaponRange},
+    {"weapons", "WeaponCanReachPos", "iiii>i", GlueImportWeaponsWeaponCanReachPos},
+    {"weapons", "WeaponCanReachUnit", "iii>i", GlueImportWeaponsWeaponCanReachUnit},
 };
-const unsigned g_glueInterfaceImportCount = sizeof g_glueInterfaceImports / sizeof g_glueInterfaceImports[0];
 
-const GlueRoute g_glueRoutes[] = {
+const GlueRoute kGlueRoutes[] = {
     {SCHED_ENGINE, 32},
     {SCHED_ENGINE, 33},
     {SCHED_ENGINE, 36},
@@ -6648,4 +6662,23 @@ const GlueRoute g_glueRoutes[] = {
     {SCHED_MOVEMENT, 346},
     {SCHED_MOVEMENT, 347},
 };
-const unsigned g_glueRouteCount = sizeof g_glueRoutes / sizeof g_glueRoutes[0];
+
+}
+
+GlueModule* const* GlueModules(unsigned* count)
+{
+    *count = sizeof kGlueModules / sizeof kGlueModules[0];
+    return kGlueModules;
+}
+
+const GlueImport* GlueInterfaceImports(unsigned* count)
+{
+    *count = sizeof kGlueInterfaceImports / sizeof kGlueInterfaceImports[0];
+    return kGlueInterfaceImports;
+}
+
+const GlueRoute* GlueRoutes(unsigned* count)
+{
+    *count = sizeof kGlueRoutes / sizeof kGlueRoutes[0];
+    return kGlueRoutes;
+}

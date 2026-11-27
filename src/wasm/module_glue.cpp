@@ -3,7 +3,8 @@
 #include <string.h>
 #include <excpt.h>
 #include <new>
-#include "../state/game_rand.h"
+#include <wasmtime.h>
+#include "wasmloader.h"
 
 #pragma pack(push, 1)
 #include "../game/game.h"
@@ -12,7 +13,8 @@
 #include "../files/files_bank.h"
 #include "../../interfaces/host.h"
 #include "../util/engine_services.h"
-#include "../../interfaces/seams.h"
+#include "../../interfaces/services.h"
+#include "../../interfaces/sim_events.h"
 #include "../state/sim_globals.h"
 #include "../game/los_helpers.h"
 #include "../state/block.h"
@@ -322,8 +324,10 @@ const unsigned kEffectCapacity = 128;
 
 int Routed(int outbox, int kind)
 {
-    for (unsigned i = 0; i < g_glueRouteCount; i++)
-        if (g_glueRoutes[i].outbox == outbox && g_glueRoutes[i].kind == kind)
+    unsigned count;
+    const GlueRoute* routes = GlueRoutes(&count);
+    for (unsigned i = 0; i < count; i++)
+        if (routes[i].outbox == outbox && routes[i].kind == kind)
             return 1;
     return 0;
 }
@@ -346,10 +350,12 @@ IMPORT(EmitImport)
         return GlueImportError("Emit", "the size is not the payload's size of its kind");
     if (!Routed(glue->def->outbox, effect[0]))
         return GlueImportError("Emit", "the kind is not routed from the module's outbox");
-    for (unsigned i = 0; i < g_glueEffectHookCount; i++) {
-        if (g_glueEffectHooks[i].kind != effect[0])
+    unsigned hookCount;
+    const GlueEffectHook* hooks = GlueEffectHooks(&hookCount);
+    for (unsigned i = 0; i < hookCount; i++) {
+        if (hooks[i].kind != effect[0])
             continue;
-        const char* error = g_glueEffectHooks[i].check(effect);
+        const char* error = hooks[i].check(effect);
         if (error != nullptr)
             return error;
     }
@@ -394,9 +400,18 @@ unsigned s_emptyCalls;
 unsigned long long s_warmTime;
 unsigned s_warmCalls;
 
+unsigned ImportCount()
+{
+    unsigned count;
+    GlueInterfaceImports(&count);
+    return kServiceImportCount + count;
+}
+
 const GlueImport* ImportAt(unsigned index)
 {
-    return index < kServiceImportCount ? &kServiceImports[index] : &g_glueInterfaceImports[index - kServiceImportCount];
+    unsigned count;
+    const GlueImport* imports = GlueInterfaceImports(&count);
+    return index < kServiceImportCount ? &kServiceImports[index] : &imports[index - kServiceImportCount];
 }
 
 const char* RunImport(const GlueImport* def, wasmtime_val_raw_t* a)
@@ -464,7 +479,7 @@ void FuelBegin(GlueModule* glue)
 
 const char* const kWordNames[GLUE_WORD_COUNT] = {"g_game", "g_simGlobals", "g_extTdf", "g_blockBase", "g_region"};
 
-unsigned Offset(const void* native)
+unsigned LinearOffset(const void* native)
 {
     return (unsigned)((const unsigned char*)native - ModulesMemory()->base);
 }
@@ -475,28 +490,28 @@ void WriteWord(GlueModule* glue, GlueWord word, const void* value)
         memcpy(ModulesMemory()->base + glue->words[word], value, 4);
 }
 
-void Prepare(GlueModule* glue, unsigned slot)
+void PrepareCall(GlueModule* glue, unsigned slot)
 {
     if (glue->words[GLUE_WORD_GAME] != 0) {
         if (!SimOwns(g_game))
             GlueStop(glue, slot, "g_game is not in the sim block");
-        unsigned game = Offset(g_game);
+        unsigned game = LinearOffset(g_game);
         WriteWord(glue, GLUE_WORD_GAME, &game);
     }
     if (glue->words[GLUE_WORD_SIM] != 0) {
         void* sim = &Sim();
         if (!SimOwns(sim))
             GlueStop(glue, slot, "g_simGlobals is not in the sim block");
-        unsigned sims = Offset(sim);
+        unsigned sims = LinearOffset(sim);
         WriteWord(glue, GLUE_WORD_SIM, &sims);
     }
     WriteWord(glue, GLUE_WORD_EXT_TDF, g_extTdf);
-    unsigned blockBase = Offset(SimBlockBase());
+    unsigned blockBase = LinearOffset(SimBlockBase());
     WriteWord(glue, GLUE_WORD_BLOCK_BASE, &blockBase);
     if (glue->words[GLUE_WORD_REGION] != 0) {
         if (glue->region != nullptr && !SimOwns(glue->region))
             GlueStop(glue, slot, "the region is not in the sim block");
-        unsigned region = glue->region == nullptr ? 0 : Offset(glue->region);
+        unsigned region = glue->region == nullptr ? 0 : LinearOffset(glue->region);
         WriteWord(glue, GLUE_WORD_REGION, &region);
     }
 }
@@ -575,11 +590,11 @@ const char* GlueAddressOf(const char* import, const void* native, int inBlock, u
     *address = 0;
     if (native == nullptr)
         return nullptr;
-    if (inBlock ? !SimOwns(native) : (const unsigned char*)native < ModulesMemory()->base || Offset(native) >= ModulesMemory()->size) {
+    if (inBlock ? !SimOwns(native) : (const unsigned char*)native < ModulesMemory()->base || LinearOffset(native) >= ModulesMemory()->size) {
         sprintf(s_error, "import %s: returned a%s %s outside the %s", import, noun[0] == 'a' || noun[0] == 'o' ? "n" : "", noun, inBlock ? "sim block" : "module memory");
         return s_error;
     }
-    *address = Offset(native);
+    *address = LinearOffset(native);
     return nullptr;
 }
 
@@ -605,7 +620,7 @@ unsigned GlueIn(GlueModule* glue, unsigned slot, const void* native, unsigned si
     if (native == nullptr)
         return 0;
     if (SimOwns(native))
-        return Offset(native);
+        return LinearOffset(native);
     const ModuleMemory* memory = ModulesMemory();
     unsigned at = (s_scratchUsed + 7) & ~7u;
     if (size > memory->scratchSize || at > memory->scratchSize - size)
@@ -628,7 +643,7 @@ unsigned GlueObject(GlueModule* glue, unsigned slot, const void* native)
         return 0;
     if (!SimOwns(native))
         GlueStop(glue, slot, "an object argument is not in the sim block");
-    return Offset(native);
+    return LinearOffset(native);
 }
 
 unsigned GlueText(GlueModule* glue, unsigned slot, const char* native)
@@ -664,7 +679,7 @@ void GlueCall(GlueModule* glue, unsigned slot, wasmtime_val_raw_t* a, size_t cou
     unsigned thread = host_thread_id();
     if (s_slotDepth != 0 && thread != s_slotOwner)
         GlueStop(glue, slot, "called from a second thread while another thread's call is active");
-    Prepare(glue, slot);
+    PrepareCall(glue, slot);
     if (s_slotDepth == 0)
         s_slotOwner = thread;
     FuelBegin(glue);
@@ -701,9 +716,11 @@ void GlueCall(GlueModule* glue, unsigned slot, wasmtime_val_raw_t* a, size_t cou
 
 GlueModule* __stdcall GlueFind(const char* name)
 {
-    for (unsigned i = 0; i < g_glueModuleCount; i++)
-        if (strcmp(g_glueModules[i]->def->name, name) == 0)
-            return g_glueModules[i];
+    unsigned count;
+    GlueModule* const* modules = GlueModules(&count);
+    for (unsigned i = 0; i < count; i++)
+        if (strcmp(modules[i]->def->name, name) == 0)
+            return modules[i];
     return nullptr;
 }
 
@@ -713,9 +730,9 @@ int __stdcall GlueInstall(wl_loader* loader, int timing)
     s_timing = timing;
     s_active = nullptr;
     s_scratchUsed = 0;
-    if (kServiceImportCount + g_glueInterfaceImportCount > kImportLimit)
+    if (ImportCount() > kImportLimit)
         return 0;
-    for (unsigned i = 0; i < kServiceImportCount + g_glueInterfaceImportCount; i++) {
+    for (unsigned i = 0; i < ImportCount(); i++) {
         const GlueImport* def = ImportAt(i);
         if (!wl_define_import(loader, def->module, def->name, def->signature, GuardedImport, (void*)(size_t)i))
             return 0;
@@ -794,8 +811,10 @@ int __stdcall GlueFuelClose(GlueModule* glue, unsigned* used)
 
 int __stdcall GlueOutOfFuel(unsigned* budget, const char** module)
 {
-    for (unsigned i = 0; i < g_glueModuleCount; i++) {
-        GlueModule* glue = g_glueModules[i];
+    unsigned count;
+    GlueModule* const* modules = GlueModules(&count);
+    for (unsigned i = 0; i < count; i++) {
+        GlueModule* glue = modules[i];
         if (glue->bound && glue->fuelOpen && FuelLeft(glue) < 0) {
             *budget = (unsigned)glue->fuelBudget;
             *module = glue->def->name;
@@ -813,13 +832,15 @@ void __stdcall GlueTimeNative(GlueModule* glue)
 void __stdcall GlueTimingReport(char* text)
 {
     text[0] = '\0';
-    for (unsigned m = 0; m < g_glueModuleCount; m++) {
-        const GlueModuleDef* def = g_glueModules[m]->def;
+    unsigned count;
+    GlueModule* const* modules = GlueModules(&count);
+    for (unsigned m = 0; m < count; m++) {
+        const GlueModuleDef* def = modules[m]->def;
         for (unsigned i = 0; i < def->slotCount; i++)
             if (def->timing[i].calls != 0)
                 sprintf(text + strlen(text), "slot\t%s.%s\t%u\t%I64u\t%I64u\n", def->name, def->slots[i], def->timing[i].calls, def->timing[i].slotTime, def->timing[i].callTime);
     }
-    for (unsigned i = 0; i < kServiceImportCount + g_glueInterfaceImportCount; i++)
+    for (unsigned i = 0; i < ImportCount(); i++)
         if (s_importCalls[i] != 0)
             sprintf(text + strlen(text), "import\t%s.%s\t%u\t%I64u\n", ImportAt(i)->module, ImportAt(i)->name, s_importCalls[i], s_importTime[i]);
     sprintf(text + strlen(text), "empty\t%u\t%I64u\n", s_emptyCalls, s_emptyTime);

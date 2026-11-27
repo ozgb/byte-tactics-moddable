@@ -263,8 +263,10 @@ void Start()
 
     if (!GlueInstall(s_loader, s_timing))
         LoaderFatal("modules", wl_error(s_loader));
-    for (unsigned i = 0; i < g_glueModuleCount; i++) {
-        GlueModule* glue = g_glueModules[i];
+    unsigned moduleCount;
+    GlueModule* const* modules = GlueModules(&moduleCount);
+    for (unsigned i = 0; i < moduleCount; i++) {
+        GlueModule* glue = modules[i];
         int blocked = wl_module_text(s_loader, glue->def->name, "blocked") != nullptr;
         if (blocked != glue->def->blocked)
             LoaderFatal(glue->def->name, "the manifest and the glue tables disagree on whether the module builds");
@@ -359,10 +361,13 @@ void TimingTick(unsigned tick)
         s_timingFirstTick = tick;
         s_timingMs = host_time_ms();
         s_timingCounter = host_time_counter();
-        if (!s_wasm)
-            for (unsigned i = 0; i < g_glueModuleCount; i++)
-                if (!g_glueModules[i]->def->blocked)
-                    GlueTimeNative(g_glueModules[i]);
+        if (!s_wasm) {
+            unsigned count;
+            GlueModule* const* modules = GlueModules(&count);
+            for (unsigned i = 0; i < count; i++)
+                if (!modules[i]->def->blocked)
+                    GlueTimeNative(modules[i]);
+        }
     }
     if (tick % 600 == 0)
         WriteTiming(tick);
@@ -424,13 +429,15 @@ void __stdcall ModulesCheckStatics(unsigned tick)
     }
     if (fuelChanged) {
         FILE* file = fopen("fuel.txt", "wb");
-        if (file == nullptr)
+        if (file != nullptr) {
+            fprintf(file, "bt-fuel 1\n");
+            for (unsigned i = 0; i < s_loadedCount; i++)
+                if (s_loaded[i].haveFuel)
+                    fprintf(file, "%s\t%u\t%u\n", s_loaded[i].glue->def->name, s_loaded[i].fuelMax, s_loaded[i].fuelMaxTick);
+            fclose(file);
+        } else {
             ModulesFatal("testmode: cannot write fuel.txt");
-        fprintf(file, "bt-fuel 1\n");
-        for (unsigned i = 0; i < s_loadedCount; i++)
-            if (s_loaded[i].haveFuel)
-                fprintf(file, "%s\t%u\t%u\n", s_loaded[i].glue->def->name, s_loaded[i].fuelMax, s_loaded[i].fuelMaxTick);
-        fclose(file);
+        }
     }
     for (unsigned i = 0; i < s_loadedCount; i++)
         CheckStatics(s_loaded[i], tick);

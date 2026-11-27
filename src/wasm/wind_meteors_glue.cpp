@@ -16,9 +16,14 @@ const char* CheckSpawn(const void* effect)
     return nullptr;
 }
 
-}
-
-const GlueEffectHook g_glueEffectHooks[] = {
+const GlueEffectHook kGlueEffectHooks[] = {
     {WIND_METEORS_EFFECT_SPAWN, CheckSpawn},
 };
-const unsigned g_glueEffectHookCount = sizeof g_glueEffectHooks / sizeof g_glueEffectHooks[0];
+
+}
+
+const GlueEffectHook* GlueEffectHooks(unsigned* count)
+{
+    *count = sizeof kGlueEffectHooks / sizeof kGlueEffectHooks[0];
+    return kGlueEffectHooks;
+}

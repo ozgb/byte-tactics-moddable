@@ -90,7 +90,7 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 pathfinding's world (src/seams/pathfinding_world.cpp) runs at the start and end of a search; players' are Apply and the runs, UpdatePlayers, UpdatePlayersOnStream, UpdatePlayerHead, UpdatePlayerBody,
                 UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots); ai's are Apply, UpdateSquads and UpdatePlayerAI, which the scheduler runs; weapons' are Apply, UpdateProjectiles, UpdateExplosions and UpdateUnitWeapons, which the scheduler runs (engine functions: none); orders' are Apply, RunOrders and RunSecondaryOrders, which the scheduler runs, and ExpandGroupCommand, which the route of a group command runs (engine functions: none); movement's are Apply, UpdateMotion and ApplyPathEvent, which the scheduler runs, ReadNetState, which ReceiveUnitStates runs (#392), and the synchronous New* slots (NewPathOrderAt, NewPathOrderToUnit, NewPathOrderToUnitAt, NewPathOrderToUnitAtAngle, NewAirManeuverOrder, NewApproachRadius, NewRingApproach, NewPointMarker), which build a target in the block and which the functions of orders call (the slot_callers of the pilot: the orders that hold the target). units' writing slots are Apply, UpdateUnitHead, UpdateUnitBody, UpdateUnitTail, RefreshFactoryIndex and UpdateAllUnits, which the scheduler runs, and the synchronous CreateUnit, LoadUnit, AddBuildProgress, AddRepairProgress, UnitRefInit, UnitRefSetUnit, UnitRefSetValue and UnitRefUnlink, which orders, movement and players call (UNITS_SLOT_CALLERS), with the game functions that spawn units listed as its engine functions; scripts' are Apply and RunScripts, which the scheduler runs, and the synchronous slots that orders, weapons, units and the network call (SCRIPTS_SLOT_CALLERS). A presentation or unowned function fails like any other.
   set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
-                recorders of src/harness/replay_hooks.inc, a WASM glue's timed native slots (`<Module>_Timed<Slot>`, which
+                recorders of src/harness/replay_hooks.inc, a WASM glue's timed native slots (`Glue<Module>Timed<Slot>`, which
                 forward a call to the native slot they replaced) and the listed callers (function, file). Features' set-up slots
                 write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
                 FreeFeatureFileList, NopAfterFeatureEnum, ResolveFeatureLinks, InitFeatureAnimPool, FreeFeaturePool,
@@ -1049,7 +1049,7 @@ def query_problems(pilot: Pilot, functions: dict, owners: dict, slot: str, fille
 
 def timed_native(function: str, file: str) -> bool:
     """Whether a function is a WASM glue's timed native slot, which forwards a call to the native slot it replaced."""
-    return file in WASM_GLUE_FILES and re.fullmatch(r"[A-Z]\w*_Timed\w+", function) is not None
+    return file in WASM_GLUE_FILES and re.fullmatch(r"Glue[A-Z][A-Za-z0-9]*Timed[A-Z]\w*", function) is not None
 
 
 def pilot_seams(root: Path, pilot: Pilot = ECONOMY) -> list:

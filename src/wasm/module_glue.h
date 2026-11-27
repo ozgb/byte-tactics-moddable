@@ -68,14 +68,10 @@ struct GlueModule {
     int bound;
 };
 
-extern GlueModule* const g_glueModules[];
-extern const unsigned g_glueModuleCount;
-extern const GlueImport g_glueInterfaceImports[];
-extern const unsigned g_glueInterfaceImportCount;
-extern const GlueRoute g_glueRoutes[];
-extern const unsigned g_glueRouteCount;
-extern const GlueEffectHook g_glueEffectHooks[];
-extern const unsigned g_glueEffectHookCount;
+GlueModule* const* GlueModules(unsigned* count);
+const GlueImport* GlueInterfaceImports(unsigned* count);
+const GlueRoute* GlueRoutes(unsigned* count);
+const GlueEffectHook* GlueEffectHooks(unsigned* count);
 
 GlueModule* __stdcall GlueFind(const char* name);
 int __stdcall GlueInstall(wl_loader* loader, int timing);

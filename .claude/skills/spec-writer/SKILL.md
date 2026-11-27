@@ -85,6 +85,8 @@ The engine core (#1207) runs the same way, with these differences:
 - **The hosted module** must be at the kit's interface: before a session, check that `specs/wind_meteors.md` on the tree's branch is pinned at the core specs' kit (its section 8), or the loader refuses the module and `host` can't be `equal` whatever the core does (#1207's first session: the module was at `wind_meteors` 1.2, the kit at 3.1).
 - **The request** is `outbox/ID/core` (a static musl x86_64 executable) and `outbox/ID/module.wasm`, with no `subsystem` file. `launch.py` gives the broker the session's image as `--core-image`, and `tools/coregate.py` runs the core in a second microVM of that image, one run per vector.
 - **The verdict** is per group (`docs/core-gate.md`, "The verdict"). The broker runs every group, so a group the session leaves out (`files` until the Nanolathe port merges) still appears; judge the session on the others, and say which you left out and why on the issue before the first session.
+- **The review** (step 7) uses the core prompt of [`code-reviewer-prompt.md`](code-reviewer-prompt.md), and its diff is limited to `core/`. A core's report is long: the ABI's refusals, the hash reader's leniency and the panics of malformed calls are code no vector reaches.
+- **A new hosted module** on btm `main` reaches the core as a spec change does: fetch `main` into `tree/` without touching the implementer's branch, and the implementer merges it (its prompt says so).
 - **Time:** a full core gate runs every vector in its own VM exec, and a core is far more code than a module, so a session runs for hours. Poll the inbox and `broker.log` in the foreground.
 
 ## 7. Code review in the sandbox

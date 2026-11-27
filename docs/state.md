@@ -57,12 +57,12 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2619 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
+As of the last read of `data/state_classes.csv` (2620 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
-| static | 7 | 28 | 693 | 0 | 71 | 799 |
+| static | 7 | 28 | 694 | 0 | 71 | 800 |
 | game-region | 112 | 491 | 130 | 49 | 0 | 782 |
 | heap | 154 | 48 | 88 | 0 | 0 | 290 |
 
@@ -121,15 +121,15 @@ Crossings left during play, each waiting on another decision:
   `Unit.flags`: bit 0x400000, the build menu rather than the orders, and the page number. Only presentation reads
   them, but the trace still hashes them, since the mask covers only the selection bit 0x10. #1115 finds and masks
   the presentation writes that remain hashed.
-- `DrawScorePanel` (game_dialogs.cpp) decrements `Player.rank` of each counted player above a rank no player holds,
-  while it draws the score panel; the kill credit of `units.cpp` (the rank update when a unit dies) reads and writes the
-  same ranks. It becomes the simulation's own compaction, or an event, in a later issue.
 - The selection (`Unit.flags` bit 0x10 and the other selection fields) is written by the selection functions of
   selection.cpp; #1050 takes it out of the judged state.
 
 Not crossings:
 - `HandleGameKey` (keys.cpp), the debug key, toggles bits 0 and 1 of `endGameFlags` (the debug display and debug mode)
   through `endGameFlags_3923b`. Those two bits are its view bits, so the write passes by its mask.
+- `DrawScorePanel` (game_dialogs.cpp) compacts the ranks of the score panel on a copy it reads from `Player.rank`, and
+  draws from the copy. When the copy changed, it publishes `PLAYERS_COMPACT_RANKS`, whose apply runs the same pass on
+  `Player.rank`, where 3.1c's draw wrote it; the kill credit of `units.cpp` reads and writes those ranks (#1113).
 - `DrawWeaponCoverage` (markers.cpp) writes `Order.cached` and bit 0x200000 of `Order.flags_42`, its own cache of the
   last place it saw a target: nothing in the tick reads them, and the trace leaves both out (tools/traceschema.py).
 - The pause request, bit 0 of `otherFlags`, written by the options screens and the keys: it is the driver's, which

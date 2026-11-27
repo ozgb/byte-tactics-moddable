@@ -53,6 +53,7 @@
 #include "../state/block_vector.h"
 #include "../game/match_setup.h"
 #include "../game/scheduler.h"
+#include "../sound/sound.h"
 #include "../game/units_events.h"
 #include "../game/orders_events.h"
 #include "share_packets.h"
@@ -1993,6 +1994,10 @@ void HarnessStartSkirmish()
     if (g_seams.mission->GetGameType() != 3)
         g_game->netGameFlags_2a44.bits.b3 = 1;
     g_game->gui.hotGadgetIndex = -1;
+    Sound* sound = (Sound*)g_game->sound;
+    sound->trackCount = 0;
+    sound->currentTrack = 0;
+    sound->dataTrack = 1;
 }
 
 static void UiEndOfTick();

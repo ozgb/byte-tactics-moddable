@@ -278,7 +278,6 @@ PRESENTATION_SIM_WRITES = [
     ("BlitFeatureGaf", "Unit::angles", "stages the scratch unit g_game->unit for drawing"),
     ("BlitFeatureGaf", "Unit::pos", "stages the scratch unit g_game->unit for drawing"),
     ("BlitFeatureGaf", "Unit::state", "stages the scratch unit g_game->unit for drawing"),
-    ("DrawScorePanel", "Player::rank", "a crossing left: compacts the ranks while drawing, and the kill credit reads them (docs/state.md)"),
     ("DrawWeaponCoverage", "Order::flags_42", "presentation's coverage cache, out of the trace"),
     ("OpenSelectGameDialog", "Player::rejectReason", "join screen, outside a match"),
     ("CyclePlayerAlliance", "Player::alliance", BATTLE_ROOM),

@@ -550,7 +550,7 @@ works with `--tier`, `--steps-per-frame` and `--parallel`, and not with `--poiso
 The gate of a pull request is the tier (`--tier`), for every change the gate applies to, the state block
 layout, the host interface and platform code included. The full `--check` stays the gate only of a pull
 request that regenerates the stored reference data: `reference/` traces, sounds, UI logs, frames, views,
-saves or display logs, or the trace format (`data/trace_schema.json`, `tools/traceschema.py`), since that data is
+saves, display logs or setup logs, or the trace format (`data/trace_schema.json`, `tools/traceschema.py`), since that data is
 produced for every scenario anyway. The body says which tier it ran.
 
 The play-tests (`tools/playtest.py` smoke, full, mp and music) are not part of a pull request's gate.

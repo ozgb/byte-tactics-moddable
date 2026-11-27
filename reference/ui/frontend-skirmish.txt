@@ -1,0 +1,26 @@
+bt-ui 2
+0 input mouse move 188 402
+0 input mouse left down 188 402
+0 input mouse left up 188 402
+0 input mouse move 506 187
+0 input mouse left down 506 187
+0 input mouse left up 506 187
+0 input mouse move 322 388
+0 input mouse left down 322 388
+0 input mouse left up 322 388
+0 input mouse move 190 167
+0 input mouse left down 190 167
+0 input mouse left up 190 167
+0 input mouse move 485 346
+0 input mouse left down 485 346
+0 input mouse left up 485 346
+0 input mouse move 500 276
+0 input mouse left down 500 276
+0 input mouse left up 500 276
+0 input mouse move 550 445
+0 input mouse left down 550 445
+0 input mouse left up 550 445
+1 scroll 2512 0
+1 view 943
+1 select -
+2 view 945

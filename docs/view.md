@@ -178,7 +178,7 @@ ally's unit not at all. Radar does not put a unit in `units`; it makes a blip.
 | `id`, `unitDefIndex`, `owner` | `units[i].id`, `unitDefIndex`, `playerIndex` | every unit in the table |
 | `relation` | the owner against `viewer`, `controller` and `players[viewer].allied`; `VIEW_RELATION_SELECTABLE` when bit 0x20 of `units[i].flags` is set, `buildLeft` is 0, `postTransferHoldoff` is 0 and the unit is carried by none or by a carrier with bit 0x40000000 set | every unit |
 | `x`, `y`, `z`, `heading`, `pitch` | `units[i].pos.x`, `pos.y`, `pos.z`, `heading`, `pitch` | every unit |
-| `flags` | `units[i].flags` with bit 0x10 (the selection) and the build menu's page bits cleared; for a unit not own, only bits 0x200 (sonar has it) and 0x10000000 (alive) | as said |
+| `flags` | `units[i].flags` with bit 0x10 (the selection), bits 6 and 7 (`selectState`, its visit mark) and the build menu's page bits cleared; for a unit not own, only bits 0x200 (sonar has it) and 0x10000000 (alive) | as said |
 | `activateFlags`, `immobile` | `units[i].activateFlags`, and the unit's mobility | every unit |
 | `ground` | 1 when the unit's mode is 1: it draws in the first pass, under projectiles | every unit |
 | `health` | `units[i].health` | every unit; the bar of a unit not the viewer's is drawn only when its definition allows it |
@@ -381,7 +381,7 @@ presentation state.
 Presentation reads these and owns them; they are presentation state, not facts of the view:
 
 - the selection: bit 0x10 of `Unit.flags`, taken out of the judged state by #1050, and the selection state bits 6 and
-  7 (`selectState`), taken out by #1132;
+  7 (`selectState`), taken out by #1132; the view clears all three from `ViewUnit.flags` (version 2.1);
 - the build menu's page bits of `Unit.flags`, still hashed: unit creation sets them too, and no run from the command
   log differs on them (`docs/state.md`);
 - the camera, its position and the screen shake's offset;
@@ -566,7 +566,7 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `Unit::f_3b` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
 | `Unit::f_57` | `ViewUnit.weaponBuild` (Units), with the weapon definitions as loaded data. |
 | `Unit::fireOrder` | `ViewUnit.fireOrder` (Units). |
-| `Unit::flags` | `ViewUnit.flags` (Units), cut by its rule; bit 0x10 and the build menu's page bits are presentation state. |
+| `Unit::flags` | `ViewUnit.flags` (Units), cut by its rule; bit 0x10, bits 6 and 7 (`selectState`) and the build menu's page bits are presentation state. |
 | `Unit::group` | `ViewUnit.group` (Units). |
 | `Unit::health` | `ViewUnit.health` (Units). |
 | `Unit::id` | `ViewUnit.id` (Units). |
@@ -582,7 +582,7 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `Unit::pos` | `ViewUnit.x`, `y`, `z` (Units). |
 | `Unit::postTransferHoldoff` | `ViewUnit.relation`, bit `VIEW_RELATION_SELECTABLE` (Units). |
 | `Unit::script` | `PlayerView.pieces` through `ViewUnit.firstPiece` and `pieceCount` (Units): the pose the model is drawn in. |
-| `Unit::selectState` | `ViewUnit.relation`, bit `VIEW_RELATION_SELECTABLE` (Units). |
+| `Unit::selectState` | Presentation state: the selection's visit mark ("What is not sim"). |
 | `Unit::selectable` | `ViewUnit.relation`, bit `VIEW_RELATION_SELECTABLE` (Units). |
 | `Unit::selected` | Presentation state: the selection ("What is not sim"). |
 | `Unit::speed` | `ViewUnit.buildLeft` (Units): the same four bytes, read as the build progress. |

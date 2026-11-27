@@ -227,8 +227,9 @@ mask, each `ui-` scenario played from its command log (`docs/commands.md`, secti
 them alone: the run from the log replays the commands, not the clicks that set the mark.
 
 Who touches the visit mark:
-- Presentation sets, clears and reads it: `MarkLocalVisibleUnits`, `FindNextUnmarkedLocalUnit`, `FocusNextLocalUnit` and
-  `FocusCommander` (selection.cpp).
+- Presentation sets, clears and reads it: `MarkLocalVisibleUnits`, `SelectUnitsInBox`, `PickUnit`,
+  `FindNextUnmarkedLocalUnit`, `FocusNextLocalUnit` and `FocusCommander` (selection.cpp). The view leaves it out of
+  `ViewUnit.flags` (`docs/view.md`, view 2.1).
 - Game logic writes it once, and reads it nowhere: `LoadUnit` (unit_save.cpp) restores it from the save.
 
 ## The debug bits of endGameFlags

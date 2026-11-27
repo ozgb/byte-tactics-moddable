@@ -341,6 +341,14 @@ jobs:
           cmake --build build/access --target game data accesslog
           rm -rf build/access
 
+      - name: Compile the game with coverage and check its link keeps no new initialiser
+        if: steps.changed.outputs.run == 'true'
+        run: |
+          tools/coverage_runtime.sh
+          cmake -S . -B build/coverage -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake -DBT_COMPILE_ONLY=ON -DBT_COVERAGE=ON
+          ninja -C build/coverage aliases.obj
+          rm -rf build/coverage
+
       - name: Check no CPU-dependent x87 instruction is reachable, and game logic converts through bx_ftol
         if: steps.changed.outputs.run == 'true'
         run: |

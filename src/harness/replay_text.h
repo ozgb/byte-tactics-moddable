@@ -29,7 +29,7 @@ private:
 
 class ReplayKnown {
 public:
-    ReplayKnown() : count(0), slotCount(0), entries(nullptr), slots(nullptr), capacity(0) {}
+    constexpr ReplayKnown() : count(0), slotCount(0), entries(nullptr), slots(nullptr), capacity(0) {}
     void Reset();
     bool Changed(const char* name, const char* value);
     void Set(const char* name, const char* value);

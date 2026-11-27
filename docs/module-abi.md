@@ -90,7 +90,7 @@ any module is loaded. Modules do not create or grow them.
 
 A **window** is the `window` bytes (32768 in the game manifest) starting at the module's
 `data_base`. The game manifest has an entry for each of the 15 modules, wind_meteors first and then the
-14 subsystems in the order of `tools/wasm_glue.py`: entry *i* has its window at `0x30000 + i * 0x8000`
+14 subsystems in the manifest's order: entry *i* has its window at `0x30000 + i * 0x8000`
 and its table range at `48 + i * 32`, so the windows fill `0x30000..0xA8000`, below the scratch area, and the
 ranges fill the table. A module's data, bss and stack must lie entirely inside its window:
 
@@ -541,9 +541,9 @@ behaviour is the contract the existing module was built against.
   size below 1. An import that takes a buffer without a size does not look at how many bytes the callee
   will use, so the module is responsible for passing a buffer big enough.
 - A `block` result that is not inside the block is a trap.
-- **The glue is generated.** One generic glue (`src/wasm/module_glue.cpp`) holds the loader, the services and the
-  checks above; `tools/wasm_glue.py` writes each module's slot table, slot calls and interface imports
-  (`src/wasm/glue_tables.cpp`) from its manifest entry, the replay schema's argument modes and the interface header. A
+- **The glue is generated.** One generic glue holds the loader, the services and the checks above, and a generated
+  table gives each module's slot table, slot calls and interface imports, from its manifest entry, the replay schema's
+  argument modes and the interface header. A
   slot argument of mode `handle` becomes a handle, `text` a copy in scratch, an object in the block (`object`, `weapon`,
   `load`, `pending`, or a pointer with no mode) its address, `region` its address and the `g_region` word (8.2),
   `world` nothing (the host keeps the world view and a module reaches it through the view's imports), an `event` a
@@ -727,9 +727,15 @@ the dump as section "Who records the dump's events" states.
 The kinds each module's outbox carries are the rows of `data/routes.csv` with that publisher; a spec names a publish by its kind and cites that file.
 
 `economy.RequestGranted` reaches the engine's `ScheduleEconomyRequestGranted`, so a module's call gets the same check a
-native caller's does: a call made while economy's inbox has events not yet delivered is a fatal error. Two recorded
-calls have no import. `services.ScheduleUnitsDeliver` (deliver units' inbox now) is made only by units'
-`ReceiveUnitStates`, a network slot that stays in the engine, so no module makes it and no slot matches it.
+native caller's does: a call made while economy's inbox has events not yet delivered is a fatal error. The engine's
+call that delivers units' inbox at once has no import: only units' handling of the unit states the network receives
+makes it, and that stays in the engine, so no module makes it and no slot matches it.
+
+**A call into another module during an import is refused.** A slot call of any WASM module made while an import runs,
+such as an import of the table above whose callee is another WASM module, does nothing: the glue refuses it with
+`slot <name>: called inside an import` (section 13), and the game ends once the outer call returns. A core refuses it
+the same way. A synchronous call between two modules waits on a nesting rule for the fuel and handle boundaries of
+both, which comes with the first two modules that call each other and both build.
 
 **What stays in the engine.** A slot of an entry's `engine` (section 6) is not a module's, and nothing a module imports
 reaches its state. `WriteState`, the dump's writer of a subsystem's state, is one: it is called by the test harness
@@ -925,7 +931,7 @@ Every error or trap ends the game, in this version. There is no recovery and no 
   `the buffer runs past the module memory`, `unknown handle <n>`, `null handle`,
   `returned a buffer other than the one it was given`, `returned a weapon outside the sim block` (or an `object`, a
   `region` or a `pointer`, by the result's mode), `returned a pointer outside the module memory`, `the world view is not
-  set`; `SimFree` adds `the pointer is outside the sim block`; `Emit` adds `the size is outside an effect`, `the effect runs past the module memory`, `the kind is not in the module's publishes table`, `the size is not the payload's size of its kind` and `the kind is not routed from the module's outbox`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is outside the table of weapons`).
+  set`; `SimFree` adds `the pointer is outside the sim block`; `Emit` adds `the size is outside an effect`, `the effect runs past the module memory`, `the kind is not routed from the module's outbox`, `the kind is not in the module's publishes table` and `the size is not the payload's size of its kind`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is outside the table of weapons`).
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`, `slot <name>: the region is not in the
   sim block`, `slot <name>: an object argument is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the
@@ -1035,8 +1041,8 @@ The values below are read from the files named; they are copied here for orienta
 | Name | Game manifest | Fixture manifest |
 | --- | --- | --- |
 | `memory_pages` | 4112 | 4 |
-| `table_size` | 80 | 64 |
-| `window` | 65536 | 65536 |
+| `table_size` | 528 | 64 |
+| `window` | 32768 | 65536 |
 | `table_slots` | 32 | 16 |
 | `stack_size` | 4096 | 4096 |
 | `block_base`, `block_size`, `block_max` | 1048576 (0x100000), 33554432, 268435456 | none |
@@ -1045,5 +1051,6 @@ The values below are read from the files named; they are copied here for orienta
 | `fuel` | version 1 | none |
 | `majors` | one per interface header, as `wasm/modules.json` records them; they move with the headers | none |
 | module `wind_meteors` | `data_base` 196608 (0x30000), `table_base` 48, `fuel_budget` 250, `size_budget` 13100 | |
+| the 14 subsystems | entry *i* (1 to 14, section 2.1): `data_base` 0x30000 + *i* * 0x8000, `table_base` 48 + *i* * 32 | |
 | module `rust` | | `data_base` 65536, `table_base` 16 |
 | module `c` | | `data_base` 131072, `table_base` 32 |

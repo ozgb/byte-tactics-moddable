@@ -1983,7 +1983,7 @@ not hash input (sections 8.21, 8.22, 8.24, 8.25, 8.26, 8.27, 8.28, 8.29, 8.30, 8
 sections 16 and 17, and the `economyState.*`, `aiState.*`, `weaponsState.*`, `ordersState.*`, `movementState.*`, `mapState.*`, `playersState.*` and `scriptsState.*` lines of the own reports of economy, ai, weapons, orders, movement, map, players and scripts that follow them, sit between those of
 sections 14 and 18 but are not hash input (sections 8.7, 8.22, 8.30, 8.31, 8.36, 8.37, 8.28, 8.17 and 8.39), the `losRadarState.*` lines sit before those of section 24 (section 8.6), and the `unitsState.*` lines sit after those of section 25 (section 8.38). Every
 other line comes in exactly the order the hash consumes it, so reading the lines of one (phase, part)
-block in order, skipping the `pathfinder.*`, `economyState.*`, `aiState.*`, `mapState.*`, `playersState.*`, `weaponsState.*`, `ordersState.*`, `movementState.*`, `unitsState.*`, `scriptsState.*`, `losRadarState.*`, `results.*`, `economy.*`, `windMeteors.*`, `features.*` and `packets.*` lines, and
+block in order, skipping the lines that step 1 of "To recompute a hash from the dump" (below) names, at the places it names them, and
 applying the rules of sections 6 to 8 reproduces its hash.
 
 The `meteors` block is one sequence: the phase-row lines come first and the world-row lines follow.
@@ -2031,11 +2031,24 @@ not print excluded fields.
 
 To recompute a hash from the dump:
 
-1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*`, `aiState.*`, `weaponsState.*`, `ordersState.*`, `movementState.*`, `unitsState.*` and `scriptsState.*` lines that follow them (sections 8.22, 8.30, 8.31 and 8.36 to 8.39)
-   and the `results.*`, `economy.*`, `windMeteors.*`, `features.*`, `targeting.*`, `los_radar.*`, `map.*`, `playersEvents.*`, `aiEvents.*`, `weaponsEvents.*`, `ordersEvents.*`, `movementEvents.*` and `packets.*` lines that end the block (sections 8.21 to 8.33), and parse the
-   paths into the structure of sections 6 to 8. The skipped `scriptsState.*` lines are not parsed into tables, but they
-   still give section 23's presence byte: a unit's is 1 exactly when the block has its `scriptsState.units[i].scale` line
-   (section 8.12).
+1. Read the lines of the block in order. The phase-row lines, from `gameTick` to the last `meteors.<name>` line, are
+   all read: none is skipped there, so a `features[i].*` line of section 7 is hash input although it shares its first
+   name with the `features.*` events (section 8.25). Lines are skipped only in the world part, from the first `game.<name>` line on, and
+   only at four places, a line being skipped when its path is one of the listed names followed by `.` (or, in the last
+   list, by `.` or `[`, so `economy[0].kind` is skipped and `economyState.x` is not an `economy` line):
+   - after the `pathfinder.*` lines of sections 16 and 17 (read for their shape, not hashed; section 8.7), the lines of
+     `economyState`, `aiState`, `mapState`, `playersState`, `weaponsState`, `ordersState`, `movementState` and
+     `scriptsState` (sections 8.22, 8.30, 8.28, 8.17, 8.31, 8.36, 8.37 and 8.39);
+   - before the first line of section 24, the lines of `losRadarState` (section 8.6);
+   - after the last line of section 25, the lines of `unitsState` (section 8.38);
+   - after the last world section (27, or 31 at tick 1), every line to the end of the block whose path starts with
+     `results`, `economy`, `features`, `packets`, `windMeteors`, `targeting`, `los_radar`, `map`, `playersEvents`,
+     `aiEvents`, `weaponsEvents`, `ordersEvents`, `movementEvents`, `unitsEvents` or `scriptsEvents` (sections 8.21 to
+     8.35); a line left after them is an error.
+
+   `tools/tracerehash.py` reads the block this way. Parse the rest of the paths into the structure of sections 6 to
+   8. The skipped `scriptsState.*` lines are not parsed into tables, but they still give section 23's presence byte:
+   a unit's is 1 exactly when the block has its `scriptsState.units[i].scale` line (section 8.12).
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
    run into its bytes; a pointer into its ID.

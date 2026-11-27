@@ -287,7 +287,8 @@ and then its random ones:
 | --- | --- | --- |
 | the entry's name | the record's inputs, as one JSON array | the record's outputs, as a JSON array |
 
-The fields of both are in the order and of the types of `layouts.txt`: an `i32` is a signed integer, a `u32` an unsigned
+The fields of both are in the order of the entry's `inputs` and `outputs` in `vectors.json`, which names each field
+(the `README.md` entry of `apply_rotation` spells its order out), and of the types of `layouts.txt`: an `i32` is a signed integer, a `u32` an unsigned
 one (a float stored as a `u32` stays its 32-bit pattern), an `f64` its 64-bit pattern as an unsigned integer, and a `str`
 or `bytes<N>` its bytes as lowercase hex (a `str` without its length). The gate gives the core only the inputs and
 compares what it writes with the record's outputs. A vector that differs names the entry, and its `line` is the first

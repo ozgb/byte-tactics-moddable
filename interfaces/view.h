@@ -3,8 +3,8 @@
 
 // Major version of the view, changed when a field moves, changes size or goes away.
 #define VIEW_VERSION_MAJOR 2
-// Minor version of the view, changed when a field is added in space the block left unused.
-#define VIEW_VERSION_MINOR 0
+// Minor version of the view, changed when a field is added in space the block left unused or a field drops bits.
+#define VIEW_VERSION_MINOR 1
 
 // The players a match can have; index 10, no player, never has a row.
 #define VIEW_MAX_PLAYERS 10

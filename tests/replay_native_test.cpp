@@ -9265,7 +9265,7 @@ void CoreError(const char* errorClass, const char* text)
     const char* subsystem = ReplayWasmSubsystem();
     if (subsystem == nullptr)
         subsystem = "";
-    if (strcmp(errorClass, "import") == 0 || strcmp(errorClass, "glue") == 0) {
+    if (strcmp(errorClass, "import") == 0 || strcmp(errorClass, "glue") == 0 || strcmp(errorClass, "fatal") == 0) {
         if (strcmp(errorClass, "import") == 0)
             text = ReplayWasmRefusal(text);
         fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"%s\"], \"message\": \"", errorClass, subsystem);

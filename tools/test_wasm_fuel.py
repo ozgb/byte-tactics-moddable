@@ -123,6 +123,14 @@ IMPORTS_COUNTER = """
   (func (export "__fuel_get") (result i64) i64.const 0))
 """
 
+WRONG_FUEL_TYPES = """
+(module
+  (global $c (mut i64) (i64.const 0))
+  (func $f global.get $c i64.const 1 i64.sub global.set $c)
+  (func (export "__fuel_set") (param i32))
+  (global (export "__fuel_get") i32 (i32.const 0)))
+"""
+
 LOOP_WITH_PARAM = """
 (module
   (func (export "run") (result i32)
@@ -289,6 +297,11 @@ class Meter(unittest.TestCase):
         problems = wf.check_unmetered_surface(assemble(IMPORTS_COUNTER), wasm_tools())
         self.assertTrue(any("imports the global" in p for p in problems), problems)
         self.assertTrue(wf.check_unmetered_surface(self.original, wasm_tools()))
+
+    def test_the_fuel_exports_have_their_types(self):
+        problems = wf.check_unmetered_surface(assemble(WRONG_FUEL_TYPES), wasm_tools())
+        self.assertIn("exports __fuel_set as (func (param i32)), not (func (param i64))", problems)
+        self.assertIn("exports __fuel_get as something other than a function, not (func (result i64))", problems)
 
     def test_the_manifest_records_the_rule(self):
         with open(os.path.join(ROOT, "wasm", "modules.json")) as f:

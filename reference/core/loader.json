@@ -1099,5 +1099,59 @@
    ["manifest", null],
    ["memory", null],
    ["load", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "nan_bitwise",
+  "calls": [
+   ["manifest", "loader/nan_bits.json"],
+   ["memory"],
+   ["load", "a", "loader/nan_bits.wasm"],
+   ["call", "a", "neg32", "2141192193"],
+   ["call", "a", "neg32", "-4194013"],
+   ["call", "a", "abs32", "2141192193"],
+   ["call", "a", "abs32", "-4194013"],
+   ["call", "a", "copysign32", "2141192193", "-1082130432"],
+   ["call", "a", "copysign32", "-4194013", "1065353216"],
+   ["call", "a", "neg64", "4200", "1", "2146697216"],
+   ["word", "4200"],
+   ["word", "4204"],
+   ["call", "a", "abs64", "4208", "1", "-786432"],
+   ["word", "4208"],
+   ["word", "4212"],
+   ["call", "a", "copysign64", "4216", "1", "2146697216", "-1074790400"],
+   ["word", "4216"],
+   ["word", "4220"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"result": -6291455}],
+   ["call", {"result": 2143289635}],
+   ["call", {"result": 2141192193}],
+   ["call", {"result": 2143289635}],
+   ["call", {"result": -6291455}],
+   ["call", {"result": 2143289635}],
+   ["call", {"result": null}],
+   ["word", 1],
+   ["word", -786432],
+   ["call", {"result": null}],
+   ["word", 1],
+   ["word", 2146697216],
+   ["call", {"result": null}],
+   ["word", 1],
+   ["word", -786432]
+  ]},
+ {"name": "fuel_set_trap",
+  "calls": [
+   ["manifest", "loader/fuel_set_trap.json"],
+   ["memory"],
+   ["load", "a", "loader/fuel_set_trap.wasm"],
+   ["call", "a", "noop"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["call", {"error": "unreachable", "modules": ["a"]}]
   ]}
 ]}

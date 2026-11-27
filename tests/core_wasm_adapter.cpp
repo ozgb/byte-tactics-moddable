@@ -345,16 +345,31 @@ long long Fuel(Loaded* m)
     return raw[0].i64;
 }
 
-void SetFuel(Loaded* m)
+bool SetFuel(Loaded* m)
 {
     long budget = 0;
     if (!wl_module_int(s_loader, m->name, "fuel_budget", &budget) || !HasExport(m, "__fuel_set"))
-        return;
+        return true;
     wasmtime_val_raw_t raw[kMaxArgs];
     memset(raw, 0, sizeof raw);
     raw[0].i64 = (long long)budget + (Fault("fuel_budget") ? 1 : 0);
-    if (!Invoke(m, "__fuel_set", raw))
-        Fail("__fuel_set trapped");
+    return Invoke(m, "__fuel_set", raw);
+}
+
+void TrapLine(Loaded* m)
+{
+    const char* text = wl_error(s_loader);
+    const char* klass = ClassOfTrap(text);
+    Names names;
+    names.count = 0;
+    CopyName(names.text[names.count++], m->name, strlen(m->name));
+    if (!klass) {
+        Names none;
+        klass = ClassOfLoaderError(text, &none);
+    }
+    if (HasExport(m, "__fuel_get") && Fuel(m) < 0)
+        klass = "out_of_fuel";
+    ErrorLine("call", klass, names);
 }
 
 void DoCall(int argc, char** argv)
@@ -365,7 +380,8 @@ void DoCall(int argc, char** argv)
     if (!m)
         Fail("call: module is not loaded");
     if (!m->fueled) {
-        SetFuel(m);
+        if (!SetFuel(m))
+            TrapLine(m);
         m->fueled = true;
     }
     wasmtime_val_raw_t raw[kMaxArgs];
@@ -386,18 +402,7 @@ void DoCall(int argc, char** argv)
         Line("call", json);
         return;
     }
-    const char* text = wl_error(s_loader);
-    const char* klass = ClassOfTrap(text);
-    Names names;
-    names.count = 0;
-    CopyName(names.text[names.count++], m->name, strlen(m->name));
-    if (!klass) {
-        Names none;
-        klass = ClassOfLoaderError(text, &none);
-    }
-    if (HasExport(m, "__fuel_get") && Fuel(m) < 0)
-        klass = "out_of_fuel";
-    ErrorLine("call", klass, names);
+    TrapLine(m);
 }
 
 void DoLoad(int argc, char** argv)

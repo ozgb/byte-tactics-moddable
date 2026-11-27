@@ -119,8 +119,12 @@ const ModuleMemory* __stdcall ModulesMemory()
 
 void __stdcall ModulesFatal(const char* text)
 {
-    if (s_trapHook != nullptr)
-        s_trapHook(TrapClass(text, false), text);
+    if (s_trapHook != nullptr) {
+        const char* errorClass = TrapClass(text, false);
+        if (strcmp(errorClass, "glue") != 0)
+            errorClass = strncmp(text, "slot ", 5) == 0 ? "glue" : "fatal";
+        s_trapHook(errorClass, text);
+    }
     printf("FAIL: %s: %s\n", s_wasmPath, text);
     exit(2);
 }

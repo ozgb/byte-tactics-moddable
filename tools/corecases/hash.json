@@ -48,5 +48,45 @@
     "trace_schema.json"
    ]
   ]
+ },
+ {
+  "name": "blocks-reordered",
+  "calls": [
+   [
+    "rows",
+    "hash/blocks-reordered.txt",
+    "trace_schema.json"
+   ]
+  ]
+ },
+ {
+  "name": "order-effect-class-6",
+  "calls": [
+   [
+    "rows",
+    "hash/order-effect-class-6.txt",
+    "trace_schema.json"
+   ]
+  ]
+ },
+ {
+  "name": "condition-class-0",
+  "calls": [
+   [
+    "rows",
+    "hash/condition-class-0.txt",
+    "trace_schema.json"
+   ]
+  ]
+ },
+ {
+  "name": "pathfinder-no-section-17",
+  "calls": [
+   [
+    "rows",
+    "hash/pathfinder-no-section-17.txt",
+    "trace_schema.json"
+   ]
+  ]
  }
 ]

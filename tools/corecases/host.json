@@ -178,5 +178,15 @@
     "host/wind_meteors_emit_weapon.wasm"
    ]
   ]
+ },
+ {
+  "name": "fatal_error",
+  "calls": [
+   [
+    "replay",
+    "host/fatal_error.txt",
+    "host/wind_meteors_fatal_error.wasm"
+   ]
+  ]
  }
 ]

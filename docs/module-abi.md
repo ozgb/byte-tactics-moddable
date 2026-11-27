@@ -236,8 +236,10 @@ attributes:
 - **Statics are hashed.** A module's statics must not change between ticks (section 12).
 - **No clock, no random, no files, no network, no WASI.** The only way to the outside is an import in
   the module's manifest entry (section 9).
-- **NaN bit patterns.** The engine canonicalises NaNs. A browser does not. A module must not let a
-  result depend on a NaN's bit pattern.
+- **NaN bit patterns.** The engine canonicalises the NaN an arithmetic instruction computes. A browser does not. A
+  module must not let a result depend on a NaN's bit pattern. `neg`, `abs` and `copysign` are not arithmetic: as
+  WebAssembly defines them, they change only the sign bit, and a NaN's payload survives them, in the engine as in a
+  browser.
 - **Freestanding.** The reference compiles C and C++ with `-nostdinc`, against its own small
   headers (`wasm/include`) and a small C runtime (`wasm/crt`: `memcpy`, `memmove`, `memset`,
   `memcmp`, `strcpy`, `strlen`, `strcmp`, `strncpy`, `_strcmpi`). There is no host libc and no
@@ -873,7 +875,8 @@ An implementation applies it to the finished module, after linking:
   implementation may run it or write its own pass from the rule above: the gate accepts a module by the surface
   (the exports, the counter not exported, no imported global) and by the fuel the module burns against its budget, never
   by how the pass was made. The reference's `build` runs the pass as the last step of building a game module, and
-  `check` and `imports` verify the surface (the two exports present, no counter exported, no imported global).
+  `check` and `imports` verify the surface (the two exports present, `__fuel_set` of type `(param i64)` and
+  `__fuel_get` of type `(result i64)`, no counter exported, no imported global). The loader does not (section 5.2).
 
 Fuel counts the function entries and loop iterations of a module's own code, so it depends on the
 final code: a different compiler, an inlining decision or a different optimisation level changes it.
@@ -883,7 +886,8 @@ A module's budget belongs to that build.
 
 - Before the first outermost slot call of each tick, the host calls `__fuel_set(fuel_budget)`, with
   `fuel_budget` from the module's manifest entry. It does not reset the counter again that tick, so
-  the budget covers all the slot calls of the tick together. The tick is the game's tick counter.
+  the budget covers all the slot calls of the tick together. The tick is the game's tick counter. A trap in
+  `__fuel_set` is a trap of that slot call (section 13), and the slot does not run.
 - In test mode the host reads `__fuel_get` after the tick; the fuel used is the budget minus the
   value read.
 - Running out: a trap with the counter below zero is out of fuel. The game ends with a message that

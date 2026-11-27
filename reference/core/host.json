@@ -124,5 +124,12 @@
   ],
   "results": [
    ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the weapon slot is outside the table of weapons"}]
+  ]},
+ {"name": "fatal_error",
+  "calls": [
+   ["replay", "host/fatal_error.txt", "host/wind_meteors_fatal_error.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "fatal", "modules": ["wind_meteors"], "message": "meteor stop"}]
   ]}
 ]}

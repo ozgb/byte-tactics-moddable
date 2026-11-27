@@ -54,8 +54,19 @@ def rows(dump: str, schema: str) -> list:
     if fault() == "hash_step":
         tracerehash.PRIME = 0x100000001B5
     sch = tracerehash.Schema(json.loads(Path(schema).read_text()))
-    found = tracerehash.rehash(sch, tracerehash.parse_dump(tracerehash.read_text(dump), sch.data["trace_format"]))
+    try:
+        found = tracerehash.rehash(sch, tracerehash.parse_blocks(tracerehash.read_text(dump), sch.data["trace_format"]))
+    except tracerehash.Error:
+        raise EndsRun({"error": "dump"})
     return [[tick, phase, "%016x" % value] for tick, phase, value in found]
+
+
+class EndsRun(Exception):
+    """An error that ends the run (docs/core-gate.md): its value is the call's last line."""
+
+    def __init__(self, value) -> None:
+        super().__init__(value)
+        self.value = value
 
 
 def deliver(script: str) -> list[str]:
@@ -85,7 +96,12 @@ def answer_python(group: str, calls_path: str, out_path: str) -> int:
             if handler is None:
                 print("coreadapter: no call %s in group %s" % (call[0], group), file=sys.stderr)
                 return 2
-            out.write("%s\t%s\n" % (call[0], json.dumps(handler(*call[1:]))))
+            try:
+                value = handler(*call[1:])
+            except EndsRun as e:
+                out.write("%s\t%s\n" % (call[0], json.dumps(e.value)))
+                return 0
+            out.write("%s\t%s\n" % (call[0], json.dumps(value)))
     return 0
 
 

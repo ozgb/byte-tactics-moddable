@@ -217,8 +217,8 @@ and so on), and this page is updated to name it. The current tag is
 exported from and pairs it with the highest `reference-traces-v*` tag merged into that commit, so the two need not be on
 the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `reference-traces-v51`, and the kit at
 `interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it, the kits at `interfaces-v58` to
-`interfaces-v63` pair with `reference-traces-v53`, and the kits at `interfaces-v64` and `interfaces-v65` pair with
-`reference-traces-v54`.
+`interfaces-v63` pair with `reference-traces-v53`, the kits at `interfaces-v64` and `interfaces-v65` pair with
+`reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -500,6 +500,11 @@ the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `re
   `size_budget`, a major that is not a number), the adapters of section 10.2, the host's `fixture.mix` import and the
   canonical NaNs; the fuel group gains `budget_max`. The traces, event digests, sound logs, UI logs, interface
   commands, display logs, frames, views and saves are those of v53.
+- `reference-traces-v55` (#1229): the digests, sounds, UI logs, events, frames, views and saves of v54, and the core
+  gate's vectors of v54 with new ones added and none changed (`docs/core-gate.md`): in `hash`, dumps whose blocks are
+  out of order or repeated, a dump with an order effect of class 6 and one with a mission condition of class 0 (each
+  `{"error": "dump"}`), and one with no section 17; in `loader`, `nan_bitwise` and `fuel_set_trap`; in `host`,
+  `fatal_error`. Its kit is `interfaces-v66`.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

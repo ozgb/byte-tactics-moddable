@@ -4800,7 +4800,7 @@ presentation,harness,call,DisplayLogShard,1
 presentation,harness,call,DisplayLogSprite,8
 presentation,harness,call,DisplayLogTerrain,1
 presentation,harness,call,DisplayLogText,1
-presentation,harness,call,DisplayLogWants,32
+presentation,harness,call,DisplayLogWants,33
 presentation,harness,call,DisplayLogWritten,2
 presentation,harness,call,HarnessEventLogOpen,1
 presentation,harness,call,HarnessEventText,1

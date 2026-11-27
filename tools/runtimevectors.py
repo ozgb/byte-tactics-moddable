@@ -271,15 +271,55 @@ width, a `*` or a size letter, and white space and `,` between them.
 - `%d` reads an optional sign and decimal digits; `%x` an optional sign, an optional `0x` or `0X` and hex digits; `%i`
   reads hex after a `0x` or `0X`, octal after any other leading 0, and decimal otherwise. The value is accumulated
   modulo 2^32 and negated after a `-`: 2147483648 at `%d` stores -2147483648, and 4294967296 stores 0. A first byte
-  that cannot start the number stores nothing and ends the scan.
-- `%s` stores the bytes up to the next white space and a 0; `%[...]` stores the bytes in the set, at least one, and a
-  0.
+  that cannot start the number stores nothing and ends the scan, and so does a sign or a `0x` followed by a byte that
+  is not a digit of the number (`-ff` at `%d`, `0xg` at `%x`). A digit is `0` to `9`, and for hex also `a` to `f` and
+  `A` to `F`; the number ends at the first byte that is not one, a byte above 127 included.
+- `%s` stores the bytes up to the next white space and a 0, so a byte above 127 belongs to the word; `%[...]` stores
+  the bytes in the set, at least one, and a 0. A range `a-z` in a set holds the bytes from `a` to `z` by their
+  unsigned value, and no byte above 127 is in the sets of the records.
+- Where each value goes: every format has at most one `%s` or `%[...]`, and it writes its bytes and the 0 at the start
+  of the string buffer, leaving the rest of the buffer 0xAA. The four ints take the integer conversions in order: each
+  `%d`, `%i`, `%x` and `%n` that stores takes the next int, the first one first, so `%n` takes an int too
+  (` %s %n` stores its count in the first int, and `%[a-zA-Z],%i,%i,%i` its three numbers in the first three). The
+  string conversion takes no int. A conversion that stores nothing ends the scan, so no int is skipped, and every int
+  after the last one stored stays 0x5a5a5a5a.
 - The return value counts the values stored, `%n` not among them. It is -1 instead when the input ends before the
   first value is stored: an empty text, white space alone before a conversion that skips it, or a text that ends in a
   sign or a `0x` (`-` at `%d`, `0x` at `%x`).
 - `%n` stores the number of bytes read so far, except when the conversion before it ended at the end of the input:
   ` %s %n` stores 3 on `12 34` and 9 on `   abc   ` (the input ends in the white space, and `%n` still stores), but
   nothing on `0`, where `%s` read up to the end of the input.
+
+### itoa
+
+`_itoa` writes the value's digits, the most significant first, with no leading zeros (0 is `0`) and a 0 after them.
+The digits above 9 are the lower case letters, `a` for 10 to `f` for 15. In radix 10 a negative value is written as
+`-` and the digits of its magnitude (-2147483648 is `-2147483648`). In every other radix the value's 32 bits are
+written as an unsigned number, with no sign: -1 is `ffffffff` in radix 16, `37777777777` in radix 8 and thirty-two
+`1`s in radix 2. The records use the radices 2, 8, 10 and 16.
+
+### Bytes above 127
+
+Every string and character entry reads a byte as unsigned, 0 to 255, and the C runtime's classes hold ASCII alone: the
+letters are `A` to `Z` (upper case) and `a` to `z` (lower case), the digits `0` to `9`, and the white space the bytes 9
+to 13 and 32. A byte from 128 to 255 is none of these. A string ends at its first 0 byte; every byte from 1 to 255
+belongs to it.
+
+- `isalnum`, `isdigit` and `isspace`: an int from 128 to 255 gives 0, as -1 does.
+- `tolower` and `toupper` change only `A` to `Z` (to 97 to 122) and `a` to `z` (to 65 to 90): every other int from
+  -128 to 255 is returned as it is, so 0xC9 and 0xE9 are not a case pair and -23 stays -23.
+- `_strlwr` changes only the bytes `A` to `Z`; every other byte, those above 127 included, stays.
+- `strncmp` compares the bytes as unsigned numbers, so a byte above 127 sorts after every ASCII byte, and the end of
+  the shorter string is a 0 that sorts before every byte. The result is the sign of the first difference (-1, 0 or 1),
+  and 0 when the strings agree up to the count or up to a 0 they share.
+- `_strcmpi` and `_strnicmp` do the same after turning each `A` to `Z` into its lower case letter, and nothing else:
+  `_` (95) sorts before `A`, which compares as `a` (97), and a byte above 127 still sorts after every ASCII byte.
+- `strchr` and `strrchr` look for the int's low byte, as unsigned: -23 finds 0xE9, and 0 or 256 finds the string's
+  closing 0, at the offset of the string's length. `strcspn`, `strstr` and `strtok` match bytes by exact value, and a
+  byte above 127 in a set or a needle matches only itself.
+- `atoi` skips only the white space above (not 0xA0), then one `+` or `-`, then reads digits `0` to `9` until any other
+  byte, the value accumulated modulo 2^32 and negated after a `-`; no digit gives 0.
+- `%s` and `%d`, `%i` and `%x` of `sscanf` treat these bytes as "sscanf" says: part of a word, and not a digit.
 """
 
 HEADER = """# Runtime vectors

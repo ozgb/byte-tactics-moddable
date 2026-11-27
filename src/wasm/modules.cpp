@@ -9,6 +9,7 @@
 
 #include "../../interfaces/host.h"
 #include "../state/block.h"
+#include "../state/load_data.h"
 #include "../game/los_helpers.h"
 #include "wasmloader.h"
 #include "modules.h"
@@ -262,6 +263,9 @@ void Start(const char* only)
     s_memory.scratch = layout->scratch_base;
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
+    if (!layout->has_load_data)
+        LoaderFatal("modules", "the manifest has no load_data region");
+    LoadDataAttach(s_memory.base + layout->load_data_base, layout->load_data_base, layout->load_data_size, ModulesFatal);
 
     if (!GlueInstall(s_loader, s_timing))
         LoaderFatal("modules", wl_error(s_loader));
@@ -460,6 +464,7 @@ void __stdcall ModulesCheckStatics(unsigned tick)
 {
     if (s_timing)
         TimingTick(tick);
+    LoadDataCheck(tick);
     if (!s_wasm)
         return;
     int fuelChanged = 0;

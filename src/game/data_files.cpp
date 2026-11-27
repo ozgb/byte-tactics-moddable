@@ -10,6 +10,7 @@
 #include "game.h"
 #include "anim_file_entry.h"
 #include "../state/sim_globals.h"
+#include "../state/load_data.h"
 #pragma pack(pop)
 
 #include "../../link/globals.h"
@@ -293,28 +294,29 @@ void LoadGameResources()
     g_game->radlogo = (void*)((int)FindGafEntry(gaf, "radlogo"));
     g_game->radlogohigh = (void*)((int)FindGafEntry(gaf, "radlogohigh"));
     g_game->nuclogo = (void*)((int)FindGafEntry(gaf, "nuclogo"));
-    g_game->src1 = (void*)((int)FindGafEntry(gaf, "h2oboom2"));
-    FLAG(((int)g_game->src1));
-    g_game->src2 = (void*)((int)FindGafEntry(gaf, "lavasplash"));
-    FLAG(((int)g_game->src2));
+    void* src1 = FindGafEntry(gaf, "h2oboom2");
+    FLAG(src1);
+    void* src2 = FindGafEntry(gaf, "lavasplash");
+    FLAG(src2);
     g_game->gaf_147bb = (void*)((int)FindGafEntry(gaf, "cannonshell"));
     g_game->gaf_147bf = (void*)((int)FindGafEntry(gaf, "plasmasm"));
     g_game->gaf_147c3 = (void*)((int)FindGafEntry(gaf, "plasmamd"));
     g_game->gaf_147c7 = (void*)((int)FindGafEntry(gaf, "ultrashell"));
     g_game->gaf_147cb = (void*)((int)FindGafEntry(gaf, "plasmasm"));
     g_game->flamestreamGaf = (void*)((int)FindGafEntry(gaf, "flamestream"));
-    g_game->src3 = (void*)((int)FindGafEntry(gaf, "explosion"));
-    FLAG(((int)g_game->src3));
-    g_game->explode2 = FindGafEntry(gaf, "explode2");
-    FLAG(g_game->explode2);
-    g_game->explode3 = FindGafEntry(gaf, "explode3");
-    FLAG(g_game->explode3);
-    g_game->explode4 = FindGafEntry(gaf, "explode4");
-    FLAG(g_game->explode4);
-    g_game->explode5 = FindGafEntry(gaf, "explode5");
-    FLAG(g_game->explode5);
-    g_game->nuke1 = FindGafEntry(gaf, "nuke1");
-    FLAG(g_game->nuke1);
+    void* sources[6];
+    sources[0] = FindGafEntry(gaf, "explosion");
+    sources[1] = FindGafEntry(gaf, "explode2");
+    sources[2] = FindGafEntry(gaf, "explode3");
+    sources[3] = FindGafEntry(gaf, "explode4");
+    sources[4] = FindGafEntry(gaf, "explode5");
+    sources[5] = FindGafEntry(gaf, "nuke1");
+    for (int i = 0; i < 6; i++)
+        FLAG(sources[i]);
+    g_game->src1 = (void*)LoadAddress(src1);
+    g_game->src2 = (void*)LoadAddress(src2);
+    for (int i = 0; i < 6; i++)
+        g_game->sources[i] = (void*)LoadAddress(sources[i]);
     g_game->gaf_1480f = (void*)((int)FindGafEntry(gaf, "shadow"));
 
     g_game->igTitles = LoadAnimGaf("igtitles");
@@ -325,7 +327,7 @@ void LoadGameResources()
 
     g_game->vismasks = LoadAnimGaf("vismasks");
     gaf = (char*)g_game->vismasks;
-    g_game->losTable = (FrameTable*)((int)FindGafEntry(gaf, "vismask"));
+    g_game->losTable = (FrameTable*)LoadAddress(FindGafEntry(gaf, "vismask"));
 
     g_game->fog = LoadAnimGaf("fog");
     gaf = (char*)g_game->fog;

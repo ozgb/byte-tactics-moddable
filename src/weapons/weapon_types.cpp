@@ -1,4 +1,5 @@
 #include <string.h>
+#include "../state/load_data.h"
 #include "../state/block.h"
 #include <vector>
 
@@ -201,8 +202,8 @@ model_done:
         parser->GetFieldString(model, "explosionart", 0x100, g_emptyText) != 0) {
         void* a = LoadAnimGaf(gaf);
         void* r = FindGafEntry(a, model);
-        *(unsigned char*)((char*)r + 2) = 0;
-        w->explosionSeq = r;
+        LoadDataStoreByte((unsigned char*)r + 2, 0);
+        w->explosionSeq = (void*)LoadAddress(r);
     }
     w->splash = 0;
     MissionParams mission;
@@ -212,16 +213,16 @@ model_done:
             parser->GetFieldString(model, "lavaexplosionart", 0x100, g_emptyText) != 0) {
             void* a = LoadAnimGaf(gaf);
             void* r = FindGafEntry(a, model);
-            *(unsigned char*)((char*)r + 2) = 0;
-            w->splash = r;
+            LoadDataStoreByte((unsigned char*)r + 2, 0);
+            w->splash = (void*)LoadAddress(r);
         }
     } else {
         if (parser->GetFieldString(gaf, "waterexplosiongaf", 0x100, g_emptyText) != 0 &&
             parser->GetFieldString(model, "waterexplosionart", 0x100, g_emptyText) != 0) {
             void* a = LoadAnimGaf(gaf);
             void* r = FindGafEntry(a, model);
-            *(unsigned char*)((char*)r + 2) = 0;
-            w->splash = r;
+            LoadDataStoreByte((unsigned char*)r + 2, 0);
+            w->splash = (void*)LoadAddress(r);
         }
     }
     if (parser->GetFieldString(model, "soundstart", 0x100, g_emptyText) != 0) {

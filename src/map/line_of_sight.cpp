@@ -117,12 +117,18 @@ int ScanDirectory(char*, char*, char*, int, int, int);
 
 #include "../mission/mission.h"
 #include "../state/sim_globals.h"
+#include "../state/load_data.h"
 
 #include "../debug/debug_lib.h"
 #include "../graphics/object_pool.h"
 #include "../graphics/display.h"
 #include "../game/data_files.h"
 GafFrame* __stdcall GetGafFrame(void* table, int index);
+
+static inline FrameTable* LosTableNative()
+{
+    return (FrameTable*)LoadNative((unsigned)g_game->losTable);
+}
 #include "../graphics/gaf.h"
 void __stdcall DrawFrame(void* surface, void* header, int x, int y);
 void __stdcall DrawTile(void* dst, int x, int y, unsigned char* pix);
@@ -336,12 +342,12 @@ void __stdcall UpdateLineOfSight(SightQuery* params)
         int i = (short)params->sightDistance / 32 - 5;
         if (i < 0) {
             i = 0;
-        } else if (i >= g_game->losTable->count) {
-            i = g_game->losTable->count - 1;
+        } else if (i >= LosTableNative()->count) {
+            i = LosTableNative()->count - 1;
         }
         int cx = params->pos.x / 0x200000;
         int cy = params->pos.z / 0x200000 - ((short*)&params->pos.y)[1] / 64;
-        GafFrame* e = GetGafFrame(g_game->losTable, i);
+        GafFrame* e = GetGafFrame(LosTableNative(), i);
         cx -= e->xOffset;
         cy -= e->yOffset;
         if (params->cacheCell[0] != cx || params->cacheCell[1] != cy || *params->frameIdx != i) {
@@ -395,13 +401,13 @@ void __stdcall InitUnitSightCircleReveal(SightQuery* params)
     if (lod < 0) {
         lod = 0;
     } else {
-        if (lod >= g_game->losTable->count) {
-            lod = g_game->losTable->count - 1;
+        if (lod >= LosTableNative()->count) {
+            lod = LosTableNative()->count - 1;
         }
     }
     int x = params->pos.x / 0x200000;
     int y = params->pos.z / 0x200000 - ((short*)&params->pos.y)[1] / 64;
-    GafFrame* entry = GetGafFrame(g_game->losTable, lod);
+    GafFrame* entry = GetGafFrame(LosTableNative(), lod);
     x -= entry->xOffset;
     y -= entry->yOffset;
     params->cacheCell[0] = (short)x;
@@ -1162,12 +1168,12 @@ void __stdcall RecalculateLineOfSight(int arg)
                 int i = params.sightDistance / 32 - 5;
                 if (i < 0)
                     i = 0;
-                else if (i >= g_game->losTable->count)
-                    i = g_game->losTable->count - 1;
+                else if (i >= LosTableNative()->count)
+                    i = LosTableNative()->count - 1;
                 int y = ((short*)&params.pos.y)[1] / 64;
                 int cx = params.pos.x / 0x200000;
                 int cy = params.pos.z / 0x200000 - y;
-                GafFrame* e = GetGafFrame(g_game->losTable, i);
+                GafFrame* e = GetGafFrame(LosTableNative(), i);
                 int vx = cx - e->xOffset;
                 int vz = cy - e->yOffset;
                 params.cacheCell[0] = (short)vx;
@@ -1268,9 +1274,9 @@ void __stdcall RevealAroundUnit(SightQuery* params)
         int lod = LodRaw(params) - 5;
         if (lod < 0)
             lod = 0;
-        else if (lod >= g_game->losTable->count)
-            lod = g_game->losTable->count - 1;
-        frame = GetGafFrame(g_game->losTable, lod);
+        else if (lod >= LosTableNative()->count)
+            lod = LosTableNative()->count - 1;
+        frame = GetGafFrame(LosTableNative(), lod);
         limitX = (x + frame->width < halfW) ? frame->width : halfW - x;
         limitY = (y + frame->height >= halfH) ? halfH - y : frame->height;
         nx = x < 0 ? -x : 0;
@@ -1330,12 +1336,12 @@ int __stdcall AddEyeball(Vec3* src, int sightDistance, int eyeHeight, int lifeti
                 int lod = e->x / 32 - 5;
                 if (lod < 0) {
                     lod = 0;
-                } else if (lod >= g_game->losTable->count) {
-                    lod = g_game->losTable->count - 1;
+                } else if (lod >= LosTableNative()->count) {
+                    lod = LosTableNative()->count - 1;
                 }
                 int cell_x = e->pos.x / 0x200000;
                 int cell_y = e->pos.z / 0x200000 - ((short*)&e->pos.y)[1] / 64;
-                GafFrame* ce = GetGafFrame(g_game->losTable, lod);
+                GafFrame* ce = GetGafFrame(LosTableNative(), lod);
                 cell_x -= ce->xOffset;
                 cell_y -= ce->yOffset;
                 e->screen->x = (short)cell_x;
@@ -1373,12 +1379,12 @@ void __stdcall RevealNewUnit(Unit* unit)
             int i = p.sightDistance / 32 - 5;
             if (i < 0) {
                 i = 0;
-            } else if (i >= g_game->losTable->count) {
-                i = g_game->losTable->count - 1;
+            } else if (i >= LosTableNative()->count) {
+                i = LosTableNative()->count - 1;
             }
             int cell_x = p.pos.x / 0x200000;
             int cell_y = p.pos.z / 0x200000 - ((short*)&p.pos.y)[1] / 64;
-            GafFrame* e = GetGafFrame(g_game->losTable, i);
+            GafFrame* e = GetGafFrame(LosTableNative(), i);
             cell_x -= e->xOffset;
             cell_y -= e->yOffset;
             p.cacheCell[0] = (short)cell_x;
@@ -1456,7 +1462,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
         }
     } else {
         int ref = *params->frameIdx;
-        GafFrame* frame = GetGafFrame(g_game->losTable, ref);
+        GafFrame* frame = GetGafFrame(LosTableNative(), ref);
         int limitX;
         if (x + frame->width >= halfW)
             limitX = halfW - x;
@@ -1547,7 +1553,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
         }
     } else {
         int ref = *params->frameIdx;
-        GafFrame* frame = GetGafFrame(g_game->losTable, ref);
+        GafFrame* frame = GetGafFrame(LosTableNative(), ref);
         int limitX;
         if (x + frame->width >= halfW)
             limitX = halfW - x;

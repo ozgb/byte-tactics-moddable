@@ -226,6 +226,7 @@ void __stdcall PlaySoundByName(char* name, int param_2);
 #include "../graphics/pcx.h"
 
 #include "info_panel.h"
+#include "../state/load_data.h"
 
 int __stdcall GetGafSequenceFrame(GafFrameCursor* h);
 void __stdcall FillPolygon(Surface* surface, Point* points, int n, unsigned char color);
@@ -1393,11 +1394,11 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
         FeatureSpot* spot = &g_game->spots[cell->spot];
         if (f->drawn) {
             if ((spot->spotFlags & 4) && (DrawFlags() & 0x10)) {
-                short* frame = (short*)GetGafSequenceFrame((GafFrameCursor*)&spot->shadow);
+                short* frame = (short*)LoadGetGafSequenceFrame(&spot->shadow);
                 DrawFrame((Surface*)dest, (GafFrame*)frame, x, y);
             }
             {
-                short* frame = (short*)GetGafSequenceFrame((GafFrameCursor*)&spot->anim);
+                short* frame = (short*)LoadGetGafSequenceFrame(&spot->anim);
                 DrawFrame((Surface*)dest, (GafFrame*)frame, x, y);
             }
         } else {
@@ -1414,20 +1415,20 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
     } else {
         if (f->over) {
             if (f->shadowTable && (DrawFlags() & 0x10)) {
-                short* frame = (short*)GetGafSequenceFrame((GafFrameCursor*)&f->shadowAnim);
+                short* frame = (short*)LoadGetGafSequenceFrame(&f->shadowAnim);
                 DrawFlip(f->flipShadow, dest, frame, x, y);
             }
             if (f->animTable) {
-                short* frame = (short*)GetGafSequenceFrame((GafFrameCursor*)&f->anim);
+                short* frame = (short*)LoadGetGafSequenceFrame(&f->anim);
                 DrawFlip(f->flipAnim, dest, frame, x, y);
             }
         } else {
             if (f->shadowTable && (DrawFlags() & 0x10)) {
-                short* frame = (short*)GetGafFrame(f->shadowTable, 0);
+                short* frame = (short*)LoadGetGafFrameNative((unsigned)f->shadowTable, 0);
                 DrawFlip(f->flipShadow, dest, frame, x, y);
             }
             if (f->animTable) {
-                short* frame = (short*)GetGafFrame(f->animTable, 0);
+                short* frame = (short*)LoadGetGafFrameNative((unsigned)f->animTable, 0);
                 DrawFlip(f->flipAnim, dest, frame, x, y);
             }
         }
@@ -1800,9 +1801,10 @@ struct ProjectedFaceView {
     bool texIndexed;
     GafFrameCursor* cursor;
     void* pic;
+    bool loadData;
 };
 
-static ProjectedFaceView ViewFace(ProjectedPrimitive* e)
+static ProjectedFaceView ViewFace(ProjectedPrimitive* e, bool)
 {
     ProjectedFaceView v;
     v.count = e->count;
@@ -1812,10 +1814,11 @@ static ProjectedFaceView ViewFace(ProjectedPrimitive* e)
     v.texIndexed = e->texIndexed;
     v.cursor = (GafFrameCursor*)((short*)((char*)e + 0x10));
     v.pic = (void*)e->pic;
+    v.loadData = false;
     return v;
 }
 
-static ProjectedFaceView ViewFace(Face* f)
+static ProjectedFaceView ViewFace(Face* f, bool loadData)
 {
     ProjectedFaceView v;
     v.count = f->nverts;
@@ -1825,12 +1828,13 @@ static ProjectedFaceView ViewFace(Face* f)
     v.texIndexed = f->flags.bits.b;
     v.cursor = (GafFrameCursor*)&f->tex;
     v.pic = f->tex.pic;
+    v.loadData = loadData;
     return v;
 }
 
 template <class Prim>
 static void DrawProjectedFaces(void* surface, Vec3* offset, short* angles, Vec3* v, int vertexCount,
-                               Prim* e, int faceCount, int firstFace)
+                               Prim* e, int faceCount, int firstFace, bool loadData)
 {
     Vec3* scratch = (Vec3 *)g_game->xform;
     Point* points = (Point *)g_game->projected;
@@ -1852,7 +1856,7 @@ static void DrawProjectedFaces(void* surface, Vec3* offset, short* angles, Vec3*
         j = 0;
     }
     for (; j < faceCount; j++, e++) {
-        ProjectedFaceView f = ViewFace(e);
+        ProjectedFaceView f = ViewFace(e, loadData);
         unsigned short* idx = f.indices;
         Point* dst = (Point *)g_game->assemPoints;
         for (int k = 0; k < f.count; k++, idx++, dst++) {
@@ -1862,9 +1866,9 @@ static void DrawProjectedFaces(void* surface, Vec3* offset, short* angles, Vec3*
             if (f.count == 4) {
                 void* tex;
                 if (f.texIndexed)
-                    tex = (void*)GetGafSequenceFrame(f.cursor);
+                    tex = f.loadData ? LoadGetGafSequenceFrame(f.cursor) : (void*)GetGafSequenceFrame(f.cursor);
                 else
-                    tex = f.pic;
+                    tex = f.loadData ? LoadNative((unsigned)f.pic) : f.pic;
                 DrawFrameQuad(surface, (GafFrame*)tex, (FrameQuad*)((Point *)g_game->assemPoints), 0);
             }
         } else {
@@ -1880,7 +1884,7 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     if (DisplayLogWants())
         DisplayLogProjectile(surface, offset, obj, angles);
     DisplayLogScope displayScope;
-    DrawProjectedFaces(surface, offset, angles, obj->verts, obj->count, obj->prims, obj->faceCount, obj->firstFace);
+    DrawProjectedFaces(surface, offset, angles, obj->verts, obj->count, obj->prims, obj->faceCount, obj->firstFace, false);
 }
 
 void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
@@ -1893,7 +1897,17 @@ void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
     Face* faces = piece->faces.get();
     if (verts == nullptr || faces == nullptr)
         return;
-    DrawProjectedFaces(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace);
+    DrawProjectedFaces(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace, true);
+}
+
+void __stdcall DrawDebrisProjectedNative(void* surface, Vec3* offset,
+                            DebrisPiece* piece, short* angles)
+{
+    Vec3* verts = piece->verts.get();
+    Face* faces = piece->faces.get();
+    if (verts == nullptr || faces == nullptr)
+        return;
+    DrawProjectedFaces(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace, false);
 }
 
 // FUNCTION: 0x46bc60

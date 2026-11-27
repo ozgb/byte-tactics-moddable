@@ -635,6 +635,11 @@ class TailWriteTest(unittest.TestCase):
             self.assertEqual(got[phase], self.trace[(24, phase)])
         self.assertNotEqual(got["tick"], self.trace[(24, "tick")])
 
+    def test_the_rows_keep_the_row_order_whatever_the_block_order(self):
+        reversed_blocks = dict(reversed(list(self.blocks.items())))
+        self.assertEqual([phase for _, phase, _ in tr.rehash(self.schema, reversed_blocks)],
+                         ["units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world", "tick"])
+
     def test_the_unchanged_dump_gives_the_stored_tick_row(self):
         self.assertEqual(self.rows_with_tick_block(lambda path, value: (path, value))["tick"], self.trace[(24, "tick")])
 

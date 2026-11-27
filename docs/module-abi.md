@@ -638,7 +638,7 @@ the dump as section "Who records the dump's events" states.
 
 | Recorded call | Import | What the module does |
 | --- | --- | --- |
-| `services.SchedPublish` | `services.Emit` | publishes an effect of its own interface's effect kinds (an `<Interface>EffectKind` of its header, which its entry's `publishes` table lists) to its own outbox; the recorded outbox (the first argument) is always the module's own, the interface of its entry, and the recorded size is `Emit`'s second argument; a recorded publish of any other kind has no import yet ("Publishes `Emit` does not carry" below) |
+| `services.SchedPublish` | `services.Emit` | publishes an effect of its own interface's effect kinds (an `<Interface>EffectKind` of its header, which its entry's `publishes` table lists) to its own outbox; the recorded outbox (the first argument) is always the module's own, the interface of its entry, and the recorded size is `Emit`'s second argument; a recorded publish of another routed kind waits on #1206 ("Publishes `Emit` does not carry" below) |
 | `services.ScheduleTargetingTargetUnit` | `targeting.GetWeaponTargetUnit` | asks for the unit a weapon aims at |
 | `services.ScheduleTargetingTargetPos` | `targeting.GetWeaponTargetPos` | asks for the position a weapon aims at, into a `Vec3` of its own; the recording's `x`, `y` and `z` outputs are the three words the callee wrote |
 | `services.ScheduleTargetingFind` | `targeting.FindWeaponTarget` | picks the best enemy for a weapon |
@@ -651,9 +651,10 @@ the dump as section "Who records the dump's events" states.
 
 **Publishes `Emit` does not carry.** Most of the recorded `SchedPublish` calls of a module are not of its own effect
 kinds: the module publishes, to its own outbox, an event of another module's inbox (or of its own), and the route of
-`docs/schedule.md`, "Routes", delivers it there. `Emit` refuses these kinds, as an import error, and widening it (or the
-`publishes` table) to them changes the module ABI, so it waits on #1206. Until then a module cannot make these publishes,
-and a spec names them by their kind and their route, not as an import. By the routes, they are:
+`docs/schedule.md`, "Routes", delivers it there. `Emit` refuses these kinds today, as an import error. It is decided
+that `Emit` will publish any kind the routes carry from the module's outbox, the same kinds the engine delivers for the
+native subsystem, and these publishes wait only on #1206, which implements that. Until it lands, a module cannot make
+them, and a spec names them by their kind and their route. By the routes, they are:
 
 | Publisher | Inbox | Kinds |
 | --- | --- | --- |

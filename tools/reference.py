@@ -114,6 +114,9 @@ COMMANDS = ROOT / "reference/commands"
 COMMANDS_FILE = "commands.txt"
 EVENTS = ROOT / "reference/events"
 EVENTS_FILE = "events.txt"
+SETUPS = ROOT / "reference/setup"
+SETUP_FILE = "setup.txt"
+READBACK_SUFFIX = "-readback"
 DISPLAYS = ROOT / "reference/display"
 DISPLAY_FILE = "display.txt"
 DISPLAYLISTS = ROOT / "reference/displaylists"
@@ -203,6 +206,7 @@ REPLAY_LEFT_OUT = {
     "ui-share-chat": SELECT_STATE,
 }
 EVENT_LOGS: dict[str, str | None] = {}
+SETUP_LOGS: dict[str, str | None] = {}
 DISPLAY_LOGS: dict[str, str | None] = {}
 DISPLAY_LISTS: dict[str, str | None] = {}
 FRAME_DUMPS: dict[str, dict[int, bytes]] = {}
@@ -214,7 +218,7 @@ KEY_LOCK_FILE = "bt-gate-key-{}.lock"
 SLOTS_ENV = "BT_GATE_SLOTS"
 SLOT_POLL_SECONDS = 0.25
 CACHE_ENV = "BT_GATE_CACHE"
-KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/commands", "reference/events", "reference/display", "reference/displaylists", "reference/frames", "reference/views", "reference/saves",
+KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/commands", "reference/events", "reference/display", "reference/displaylists", "reference/frames", "reference/views", "reference/saves", "reference/setup",
             "tools/playtest")
 KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py", "tools/savefile.py",
              "tools/blockpointers.py", "tools/eventdigest.py", "tools/displaylog.py", "tools/tracerehash.py", "tools/interfacelog.py")
@@ -944,6 +948,15 @@ def recheck(found: Found, column: int = DIGEST) -> str | None:
     return None
 
 
+def scenario_frontend(scenario: Path) -> bool:
+    """Whether the scenario has a `frontend 1` line, so that the menus set up its match and its setup log is stored."""
+    values = [line.split()[1:] for line in scenario.read_text().splitlines() if line.split()[:1] == ["frontend"]]
+    for value in values:
+        if value not in (["0"], ["1"]):
+            sys.exit(f"{scenario}: frontend takes 0 or 1, not {' '.join(value) or 'nothing'}")
+    return ["1"] in values
+
+
 def scenario_saves(scenario: Path) -> bool:
     """Whether the scenario has a `save` line, so that its run writes harness.sav."""
     return any(line.split()[:1] == ["save"] for line in scenario.read_text().splitlines())
@@ -997,7 +1010,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
         try:
             frame_files = tuple(f"frames/{tick}.bin" for tick in scenario_frames(scenario))
             view_files = tuple(f"{VIEWS_DIR}/{tick}.bin" for tick in scenario_frames(scenario))
-            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, COMMANDS_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAYLIST_FILE, *frame_files, *view_files, *dict.fromkeys(
+            extra: dict = {"collect": (FUEL_FILE, SOUND_FILE, UI_FILE, COMMANDS_FILE, EVENTS_FILE, DISPLAY_FILE, DISPLAYLIST_FILE, SETUP_FILE, *frame_files, *view_files, *dict.fromkeys(
                 (*(tracediff.SAVE_FILES if save_to is not None else ()), *((SAVE_FILE,) if scenario_saves(scenario) else ()))))}
             if watch is not None:
                 extra["started"] = watch.started(key)
@@ -1039,6 +1052,8 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
             COMMAND_TEXTS[key] = commands_log.read_text() if commands_log.is_file() else None
         events_log = run / EVENTS_FILE
         EVENT_LOGS[key] = event_digest(events_log)
+        setup_log = run / SETUP_FILE
+        SETUP_LOGS[key] = setup_log.read_text() if setup_log.is_file() else None
         display_log = run / DISPLAY_FILE
         DISPLAY_LOGS[key] = display_log.read_text() if display_log.is_file() else None
         display_list = run / DISPLAYLIST_FILE
@@ -1754,6 +1769,68 @@ def save_report(scenarios: dict[str, Path], saves: dict[str, bytes | None], dire
     return differing, lines
 
 
+def setup_report(scenarios: dict[str, Path], logs: dict[str, str | None], directory: Path) -> tuple[list[str], list[str]]:
+    """(the frontend scenarios whose setup log differs from reference/setup/ or has none stored, the report lines)."""
+    differing: list[str] = []
+    lines: list[str] = []
+    frontend = [n for n, path in scenarios.items() if scenario_frontend(path)]
+    for name in frontend:
+        stored = directory / f"{name}.txt"
+        got = logs.get(name)
+        if not stored.is_file():
+            diff = f"has no stored setup log in {directory.relative_to(ROOT)}"
+        elif got is None:
+            diff = f"the run wrote no {SETUP_FILE}"
+        elif got != stored.read_text():
+            diff = "the setup log differs from the stored one"
+        else:
+            continue
+        differing.append(name)
+        lines.append(f"DIFF {name} {diff}")
+    lines.append(f"setup logs: {len(frontend) - len(differing)} of {len(frontend)} equal")
+    return differing, lines
+
+
+def readback_scenario(scenario: Path, setup: str) -> str:
+    """The scenario that plays the stored setup log `setup` of the frontend scenario for one tick, with the scenario's seeds."""
+    seeds = [line for line in scenario.read_text().splitlines() if line.split()[:1] in (["game_seed"], ["crt_seed"], ["view_seed"])]
+    return setup + "".join(f"{line}\n" for line in seeds) + "ticks 1\n"
+
+
+def check_readbacks(exe: Path, game_dir: str | None, parallel: int, scenarios: dict[str, Path],
+                    expected: dict[str, tuple], modes: tuple[str | None, ...], directory: Path) -> int:
+    """Play each frontend scenario's stored setup log (reference/setup/) as a scenario for one tick, in each of `modes`, and
+    print whether its first tick equals the stored trace's; the number that differ or fail to run."""
+    played: dict[str, Path] = {}
+    want: dict[str, tuple] = {}
+    directory.mkdir(parents=True, exist_ok=True)
+    for name, path in scenarios.items():
+        stored = SETUPS / f"{name}.txt"
+        if not scenario_frontend(path) or not stored.is_file() or not expected[name][1]:
+            continue
+        readback = directory / f"{name}{READBACK_SUFFIX}.txt"
+        readback.write_text(readback_scenario(path, stored.read_text()))
+        played[readback.stem] = readback
+        want[readback.stem] = (expected[name][0], expected[name][1][:1])
+    if not played:
+        return 0
+    failed: dict[str, str] = {}
+    results = play_all(exe, played, game_dir, parallel, want, failed=failed, **({"modes": modes} if modes != (None,) else {}))
+    bad = 0
+    for mode in modes:
+        for name in played:
+            key = tag(name, mode)
+            if key in failed:
+                diff = f"failed to run: {failed[key]}"
+            else:
+                diff = difference(want[name], *results[key][:2])
+            print(f"{'DIFF' if diff else 'ok':4} {key} (the stored setup log, tick 1)" + (f" {diff}" if diff else ""))
+            bad += bool(diff)
+    total = len(played) * len(modes)
+    print(f"setup readbacks: {total - bad} of {total} equal the first tick of the stored trace")
+    return bad
+
+
 def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = False, poison: bool = False,
                  steps_per_frame: int | None = None, quirks: str | None = None,
                  save_blockptrs: Path | None = None, roundtrip: str | None = None, both_modes: bool = False,
@@ -1865,7 +1942,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         print(replay_lines[-1])
     if end_of_tick:
         print(every_row_line(every_row, total))
-    sound_bad = ui_bad = events_bad = display_bad = frame_bad = view_bad = save_bad = 0
+    sound_bad = ui_bad = events_bad = display_bad = frame_bad = view_bad = save_bad = setup_bad = 0
     pointers = 0
     first_events: tuple[str, str] | None = None
     first_display: tuple[str, str, int] | None = None
@@ -1896,6 +1973,9 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         print("\n".join(label + line for line in view_lines))
         save_names, save_lines = save_report(scenarios, mode_view(SAVE_BYTES, scenarios, mode), SAVES)
         print("\n".join(label + line for line in save_lines))
+        setup_names, setup_lines = setup_report(scenarios, mode_view(SETUP_LOGS, scenarios, mode), SETUPS)
+        print("\n".join(label + line for line in setup_lines))
+        setup_bad += len(setup_names)
         sound_bad += len(sound_names)
         ui_bad += len(ui_names) + len(interface_names)
         events_bad += len(events_names)
@@ -1922,11 +2002,13 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
     if not bad and replay_stale:
         sys.exit(1)
     if not bad:
+        setup_bad += check_readbacks(exe, game_dir, parallel, scenarios, expected, modes, scratch / "readback")
+        shutil.rmtree(scratch, ignore_errors=True)
         if first_events is not None:
             report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir, end_of_tick)
         if first_display is not None:
             report_display_items(*first_display, expected, exe, scenarios, poison, game_dir, end_of_tick)
-        if pointers or sound_bad or ui_bad or events_bad or display_bad or frame_bad or view_bad or save_bad:
+        if pointers or sound_bad or ui_bad or events_bad or display_bad or frame_bad or view_bad or save_bad or setup_bad:
             sys.exit(1)
         if tier:
             print(tier_message(len(scenarios), head_commit()))
@@ -2258,6 +2340,19 @@ def copy_display(directory: Path) -> None:
         print(f"{len(logs)} display files copied to {dest.relative_to(ROOT)}")
 
 
+def copy_setup(directory: Path) -> None:
+    """Replace reference/setup/ by the setup logs the reference branch checkout `directory` wrote (none written leaves it as it is)."""
+    logs = sorted((directory / "reference/setup").glob("*.txt"))
+    if not logs:
+        print("the reference branch wrote no setup logs; reference/setup/ is untouched")
+        return
+    shutil.rmtree(SETUPS, ignore_errors=True)
+    SETUPS.mkdir(parents=True)
+    for path in logs:
+        shutil.copyfile(path, SETUPS / path.name)
+    print(f"{len(logs)} setup logs copied to {SETUPS.relative_to(ROOT)}")
+
+
 def write_traces(game_dir: str | None, parallel: int) -> None:
     directory = reference_branch()
     branch_scenarios = directory / "reference/scenarios"
@@ -2287,6 +2382,7 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     copy_commands(directory)
     copy_events(directory)
     copy_display(directory)
+    copy_setup(directory)
     sounds = sorted((directory / "reference/sounds").glob("*.txt"))
     if not sounds:
         print("the reference branch wrote no sound logs; reference/sounds/ is untouched")

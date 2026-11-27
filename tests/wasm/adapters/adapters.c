@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "json.h"
 #include "wasmloader.h"
 
 static int failures;
@@ -335,6 +336,32 @@ static void run_refusals(const char* dll, const char* wasm_dir)
            1, "import calc_host.Neg is adapted from major 2 to 3, but the host defines it with another signature than the manifest's");
 }
 
+static void number(const char* text, int accepted, long want)
+{
+    char error[256] = "";
+    wl_json* node = wl_json_parse(text, strlen(text), "number", error, sizeof error);
+    if (!node != !accepted || (node && (node->kind != WL_JSON_NUMBER || node->number != want))) {
+        fprintf(stderr, "FAIL: number %s: %s, error \"%s\"\n", text, node ? "accepted" : "refused", error);
+        failures++;
+    }
+    wl_json_free(node);
+}
+
+static void run_numbers(void)
+{
+    number("0", 1, 0);
+    number("2147483639", 1, 2147483639L);
+    number("2147483640", 1, 2147483640L);
+    number("2147483647", 1, 2147483647L);
+    number("-2147483647", 1, -2147483647L);
+    number("2147483648", 0, 0);
+    number("2147483650", 0, 0);
+    number("21474836470", 0, 0);
+    number("4096.5", 0, 0);
+    number("4096.0", 0, 0);
+    number("1e3", 0, 0);
+}
+
 int main(int argc, char** argv)
 {
     if (argc != 4) {
@@ -343,10 +370,11 @@ int main(int argc, char** argv)
     }
     run_modules(argv[1], argv[2], argv[3]);
     run_refusals(argv[1], argv[3]);
+    run_numbers();
     if (failures) {
         fprintf(stderr, "%d checks failed\n", failures);
         return 1;
     }
-    printf("ok: adapters and refusals\n");
+    printf("ok: adapters, refusals and numbers\n");
     return 0;
 }

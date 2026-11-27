@@ -15,10 +15,11 @@ The layout is published as `struct Quirks` in
 order of `quirks.def`. A new flag needs a member appended there too, and the
 build fails when the two disagree. A flag never moves or goes away, so a
 module built against an older version finds every flag where it was:
-`tools/abidiff.py` refuses any moved member. Appending a flag is a minor bump
-of the quirks interface. Retiring one is a major bump: the flag keeps its line
-in `quirks.def` and its slot in `Quirks`, renamed `retired<Name>`, and is
-always off.
+`tools/abidiff.py` refuses a moved member under a minor bump, and under a major
+one when a module in `wasm/modules.json` is built against the old major.
+Appending a flag is a minor bump of the quirks interface. Retiring one is a
+major bump: the flag keeps its line in `quirks.def` and its slot in `Quirks`,
+renamed `retired<Name>`, and is always off.
 
 ## Choosing flags
 
@@ -154,6 +155,27 @@ machine and isn't deterministic.
 - **On:** the phase comes from the wall clock, through the host interface.
 - **Added in:** [#76](https://github.com/ozgb/byte-tactics-moddable/issues/76)
   (PR [#282](https://github.com/ozgb/byte-tactics-moddable/pull/282)).
+
+## Behaviour that follows the drawn frames
+
+In this place, 3.1c's game state changes with what presentation draws. The fork's default (flag off) keeps 3.1c's
+behaviour, carried from presentation to the simulation by an event, so traces match the reference. Turning the flag
+**on** makes the state follow the ticks alone.
+
+### `players.rank-compaction-per-tick`
+
+- **Scope:** sim.
+- **Where:** `UpdatePlayersFinish` (`src/game/players.cpp`) runs `CompactPlayerRanks`
+  (`src/game/players_events.cpp`), and `PlayersApply` ignores `PLAYERS_COMPACT_RANKS`.
+- **3.1c:** the score panel (`DrawScorePanel`, 0x4948e0) closes the gaps that defeated players leave in the players'
+  ranks, one pass per frame on which it draws, and the kill credit reads those ranks. So the ranks, and when a kill
+  raises "took the lead", depend on whether the panel is shown (F4 or Space) and on how many frames are drawn.
+- **Off (default):** the panel runs the pass on its own copy and publishes `PLAYERS_COMPACT_RANKS`, which applies the
+  same pass to the ranks (`docs/players-interface.md`, section 2, "The ranks").
+- **On:** the players phase of every tick runs the pass once, after the last player, whether or not a frame is drawn,
+  and the event changes nothing. A defeat in the units phase is closed in the same tick, one after the players phase in
+  the next tick, at any number of steps per frame.
+- **Added in:** [#1113](https://github.com/ozgb/byte-tactics-moddable/issues/1113).
 
 ## Audits
 

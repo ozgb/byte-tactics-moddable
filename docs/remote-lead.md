@@ -22,6 +22,21 @@ tools/setup_toolchain.sh            # MSVC 5 headers into toolchain/, TotalA.exe
 clang-cl --version                  # must report 22.1.8
 ```
 
+Commit as your own account, never with another person's name or email. Set the identity in every clone the lead commits from, ozgb/btm's included (worktrees share their clone's setting):
+
+```sh
+git config user.name "<your name>"
+git config user.email "<id>+<account>@users.noreply.github.com"   # your noreply address, from GitHub's Settings, Emails
+```
+
+After the lead's first commit, and before its first push, check that the author is your account:
+
+```sh
+git log -1 --format='%an <%ae>'
+```
+
+The attribution line stays as `AGENTS.md`, "Writing style", says: each commit message ends with `Assisted-by: <agent>:<model>`, and the author is your account.
+
 ## 2. Save the notes credentials
 
 Paste the two lines you were sent:
@@ -37,7 +52,14 @@ uv run tools/notes.py PING          # prints PONG
 
 ## 3. Check that the gate runs
 
-The lead's subagents run this before every pull request, so it has to pass on your machine first:
+The lead's subagents run this before every pull request, so it has to pass on your machine first. Wine runs the game as a 32-bit program, which needs these i386 libraries; without them every run ends at the `dialog-directx` error (confirmed on WSL Ubuntu 24.04):
+
+```sh
+sudo dpkg --add-architecture i386 && sudo apt update
+sudo apt install libgl1:i386 libgl1-mesa-dri:i386 libxrandr2:i386 libxinerama1:i386 libxcursor1:i386 libxi6:i386
+```
+
+On WSL without sudo, `wsl -d <distro> -u root` from Windows gives a root shell for the install.
 
 ```sh
 export WINEARCH=win64

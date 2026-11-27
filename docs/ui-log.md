@@ -50,6 +50,13 @@ digit `0` to `9`. A window position is in the 640 by 480 window, `x` from 0 to 6
   line. Pause pressed with `input 10` takes effect in the frame that runs tick 11, so the
   stopped frames are `11.1`, `11.2` and on; a key pressed at `11.5` is handled in frame 6,
   which runs no tick yet, and frame 7 runs tick 12.
+- **Before tick 1.** A scenario with `frontend 1` starts at the main menu
+  (`docs/scenario-format.md`, section 3.5), and `0.<frame>` addresses the frames the menus
+  draw before tick 1, counted from the first frame of the run. The rules above hold for
+  them, with the battle's start in place of the next tick: a run that draws 300 frames after
+  its last `0.<frame>` line without starting tick 1 is an error, and so is a `0.<frame>`
+  line that the run never delivers. A scenario without `frontend 1` cannot name tick 0. The
+  log's lines for those frames carry tick 0.
 - **State.** A key is held from its `key down` to its `key up`, a mouse button from its
   `down` to its `up`, and the cursor is where the last mouse event put it. While Alt is
   held, key events reach the game as system key events, as on Windows. The time of an

@@ -14,17 +14,8 @@ namespace {
 #ifdef __clang__
 void SeedTrackReplies(char* count, char* trackType)
 {
-    int files = 0;
-    struct host_dir_entry found;
-    void* h = host_dir_first("music\\*.mp3", &found);
-    if (h != NULL) {
-        do {
-            files++;
-        } while (host_dir_next(h, &found));
-        host_dir_close(h);
-    }
     if (count != NULL) {
-        wsprintfA(count, "%d", files);
+        wsprintfA(count, "%d", HeadlessMusicTrackCount());
     }
     if (trackType != NULL) {
         strcpy(trackType, "other");

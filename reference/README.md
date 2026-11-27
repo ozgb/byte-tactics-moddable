@@ -158,7 +158,7 @@ scenarios whose `input` lines drive it (the events are in [docs/commands.md](../
 | The chat line (Enter): a message | ui-share-chat |
 | The chat line: a `+` console command | none: the console scenarios cover the commands as `console` lines, and the reference hook in `CmdATM` changes the code of other functions of its file |
 | The defeated player's dialog: stop watching (PLAYERS_LEAVE_GAME) | none: a scenario needs the local commander to die and the game to go on |
-| The menus before the battle | none: #1122 |
+| The menus before the battle: the main menu to a skirmish, the map from the list, an option changed | frontend-skirmish |
 
 ## Event logs
 
@@ -348,6 +348,7 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | eight-full-moon | judged | - |
 | eight-greenhaven | judged | - |
 | eight-pincushion-teams | judged | - |
+| frontend-skirmish | left out | has `input` lines: it needs the presentation, and the menus set up its match |
 | hailstorm-los-off | judged | - |
 | load-midgame | left out | saves or loads a game: save and load are not in the core spec |
 | load-targets | left out | saves or loads a game: save and load are not in the core spec |
@@ -557,7 +558,7 @@ works with `--tier`, `--steps-per-frame` and `--parallel`, and not with `--poiso
 The gate of a pull request is the tier (`--tier`), for every change the gate applies to, the state block
 layout, the host interface and platform code included. The full `--check` stays the gate only of a pull
 request that regenerates the stored reference data: `reference/` traces, sounds, UI logs, frames, views,
-saves or display logs, or the trace format (`data/trace_schema.json`, `tools/traceschema.py`), since that data is
+saves, display logs or setup logs, or the trace format (`data/trace_schema.json`, `tools/traceschema.py`), since that data is
 produced for every scenario anyway. The body says which tier it ran.
 
 The play-tests (`tools/playtest.py` smoke, full, mp and music) are not part of a pull request's gate.

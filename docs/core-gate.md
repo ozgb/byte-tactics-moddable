@@ -78,7 +78,8 @@ between them they reach:
 | `meteors-earthquake-102` | many live features (the earthquake's) and a projectile |
 
 No vector reaches a `link:` value of 2^31 or more (a link into a path order, `docs/trace-format.md`): no dump of the
-scenarios that was searched holds one (Known limits).
+scenarios that was searched holds one (Known limits). No vector's dump holds a string that contains a newline byte
+(0x0a), which the dump cannot carry (`docs/trace-format.md`, section 8.19), so the gate never judges one.
 
 ### rand
 
@@ -149,14 +150,25 @@ The two groups share their calls. A vector's manifest and modules are files of `
 | `fuel` | name | the module's counter, as its `__fuel_get` returns it; the call sets no fuel, so before the module's first `call` it is the counter's initial value |
 | `word` | address | the i32 at that address of the shared memory |
 
-An error is `{"error": CLASS, "modules": [names]}`: its class, below, and the modules the message names (both, for an
-overlap; the module whose entry is wrong for a `module_entry` error that has one; none for an error of the manifest
-itself). Every error ends the run (section 13), so it is the last line. Only a module whose manifest entry has a
+An error is `{"error": CLASS, "modules": [names]}`: its class, below, and the modules it names, by class:
+
+- `manifest` and `layout` name none.
+- `module_entry` names the entry's name when the entry has one (`manifest_no_data_base`: `["a"]`). It names none when
+  the entry has no name, or when the fault is in `modules` itself (`manifest_no_name`, `manifest_no_modules`,
+  `manifest_modules_missing`: `[]`). A name listed twice is named once (`manifest_duplicate`: `["a"]`).
+- `window` and `window_reaches` name the module at fault (`manifest_window_memory`, `manifest_window_table`,
+  `manifest_reaches_block`, `manifest_reaches_scratch`: `["b"]`).
+- `overlap` names both modules, the earlier in the manifest first (`manifest_overlap`, `manifest_overlap_table`:
+  `["a", "b"]`).
+- The classes of `load` and `call` name the module loaded or called (`not_in_manifest`: `["zz"]`), except the
+  interface-major refusal at `load`, a `manifest` error, which names none (`load_major_newer`).
+
+Every error ends the run (section 13), so it is the last line. Only a module whose manifest entry has a
 `fuel_budget` gets its fuel set; a `tick` before its first call is not needed for that.
 
 | Class | Section | When |
 | --- | --- | --- |
-| `manifest` | 5.2, 10 | the manifest is not valid JSON or not an object, a required number of section 4.1 (`memory_pages`, `table_size`, `window`, `table_slots`) is missing, a number is not a non-negative integer (a negative or fractional `data_base` or `table_base` of a module entry included), `memory_pages` or `window` is 0 or `memory_pages` above 65536, `block_base` comes without `block_size`, `scratch` is not `[base, size]`; and at `load`, a refusal of the interface majors (section 10.2: a module built against a major the manifest's does not match, with no adapter), whose `modules` is empty |
+| `manifest` | 5.2, 10 | the manifest is not valid JSON or not an object (a number anywhere in it that has a fraction or an exponent, as `4096.5`, `4096.0` or `1e3`, or is above 2147483647, makes it invalid JSON: `manifest_data_base_fraction`), a required number of section 4.1 (`memory_pages`, `table_size`, `window`, `table_slots`) is missing, a value is not a non-negative integer (a negative `data_base` or `table_base` of a module entry included), `memory_pages` or `window` is 0 or `memory_pages` above 65536, `block_base` comes without `block_size`, `scratch` is not `[base, size]`; and at `load`, a refusal of the interface majors (section 10.2: a module built against a major the manifest's does not match, with no adapter), whose `modules` is empty |
 | `layout` | 5.2 | the block or the scratch area does not fit the memory, the scratch area passes the block base, or `block_max` is below `block_size` |
 | `module_entry` | 5.2 | `modules` missing, not a list or empty, an entry that is not an object or has no name, a name listed twice, a missing `data_base` or `table_base`, `exports` or `data` present and not a list of names |
 | `window` | 5.2 | a module's window does not fit the memory, or its table range does not fit the table |
@@ -171,7 +183,7 @@ itself). Every error ends the run (section 13), so it is the last line. Only a m
 | `unreachable` | 13 | a trap at `unreachable` |
 | `memory_access` | 13 | an access outside the memory |
 | `divide` | 13 | an integer division by zero, an integer overflow trap, or a float-to-integer conversion of a value out of range or a NaN |
-| `table` | 13 | a call through an empty table entry or one of the wrong type |
+| `table` | 13 | a call through an empty table entry, one of the wrong type, or an index at or past `table_size` (`trap_table_range`: index 100 of a 16-entry table) |
 | `stack` | 13 | the engine's stack overflows |
 | `out_of_fuel` | 13 | the module's counter went below zero (section 11) |
 
@@ -185,25 +197,30 @@ counter's initial value, 9223372036854775807, which its calls lower as they burn
 
 **Which error comes first.** When a manifest holds more than one fault, the error is the first fault in this order:
 
-1. the manifest as a whole: valid JSON and an object, then the required numbers in the order `memory_pages`,
-   `table_size`, `window`, `table_slots`, then their ranges (`manifest`);
+1. the manifest as a whole: valid JSON (so a number with a fraction or an exponent, wherever it is, is a fault of this
+   step, before any `layout` fault) and an object, then the required numbers in the order `memory_pages`, `table_size`,
+   `window`, `table_slots`, then their ranges (`manifest`);
 2. the block, when `block_base` is present: `block_base` and `block_size` (`manifest`), then `block_max`, then whether
    the block fits the memory (`layout`);
 3. `scratch`: its form (`manifest`), then whether it fits the memory and lies below the block base (`layout`);
 4. `modules` (`module_entry`), then each entry in the manifest's order, each one whole before the next: an object with
-   a name, `data_base` and then `table_base` (missing: `module_entry`; negative or fractional: `manifest`), `exports`
-   and then `data`, then a name an earlier entry has (`module_entry`);
+   a name, `data_base` and then `table_base` (missing: `module_entry`; negative: `manifest`), `exports` and then
+   `data`, then a name an earlier entry has (`module_entry`);
 5. once every entry is read, each module in the manifest's order: its window and table range (`window`), its window
-   against the block base and then the scratch base (`window_reaches`), then its overlap with each later module, the
-   memory before the table (`overlap`). So a `window` or `window_reaches` fault of a module comes before its overlap
-   with a later one, and an overlap of two modules comes before a `window` fault of a third, later module;
+   against the block base and then the scratch base (`window_reaches`), then its overlap with each later module in
+   turn, each pair checked memory first and then table before the next pair (`overlap`). So a `window` or
+   `window_reaches` fault of a module comes before its overlap with a later one, and an overlap of two modules comes
+   before a `window` fault of a third, later module;
 6. at `load`: a module not in the manifest (`not_in_manifest`), no memory (`no_memory`), a module loaded already
    (`loaded_twice`), the interface majors (`manifest`), then `compile`, `instantiate` and `export`.
 
 A vector `pair_<a>_<b>` holds a fault of class `a` and one of class `b` in one manifest, and expects `a`, for each pair
 of the classes `manifest`, `layout`, `module_entry`, `window`, `window_reaches` and `overlap` (in the pairs of `window`,
-`window_reaches` and `overlap`, both faults are of the first module). `manifest_entry` in a name is a `manifest` fault
-of an entry (a negative `data_base` or `table_base`), which comes in step 4, after `layout`.
+`window_reaches` and `overlap`, both faults are of the first module). The `manifest` fault of each `pair_manifest_<b>`
+vector is a step 1 fault (`window` 0), so the order list above, not this sentence, decides between a `manifest` fault of
+a later step and a fault of an earlier one: a `scratch` that is not `[base, size]` (step 3, `manifest`) against a block
+that does not fit the memory (step 2, `layout`) gives `layout`. `manifest_entry` in a name is a `manifest` fault of an
+entry (a negative `data_base` or `table_base`), which comes in step 4, after `layout`.
 
 The gate makes no `call` or `fuel` call that names a module not loaded, and no `fuel` call on a module without
 `__fuel_get`: they are not part of the call text, and a core may answer them as it likes.

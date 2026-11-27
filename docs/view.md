@@ -74,7 +74,9 @@ Each table of the block has a fixed capacity (`VIEW_MAX_*` in `interfaces/view.h
 | `explodedPieces` | 100 | the simulation's table of exploded pieces |
 | `messages` | 4096 | the sim event queue of one tick (`docs/sim-events.md`, "The queue") |
 
-The game sets no bound on the others: a model's pieces, a unit's queued orders, a map's features and its size. Their
+The game sets no bound on the others: a model's pieces, a unit's queued orders, a map's features and its size, and the faces
+and textures of the models debris is drawn from. `debrisVertices` holds 8 vertices for each of the 300 debris slots and one for
+each 12 bytes of the 100000-byte cache the exploded pieces are kept in, more than the game's debris can have at once. Their
 capacities are larger than any map and model of the game data, and a fill past one drops entries by a fixed rule and
 sets a bit of `PlayerView.truncated`, so that a dropped entry is never silent:
 
@@ -83,6 +85,7 @@ sets a bit of `PlayerView.truncated`, so that a dropped entry is never silent:
 | `pieces` | 131072 | the first unit in `units` whose pieces do not all fit, and every unit after it, has `pieceCount` 0 and no pieces; `VIEW_TRUNCATED_PIECES` |
 | `orders` | 65536 | the same for orders, with `orderCount`; `VIEW_TRUNCATED_ORDERS` |
 | `features` | 65536 | the features after the first 65536, in the order of their anchor cells (row by row), are dropped; `VIEW_TRUNCATED_FEATURES` |
+| `debrisVertices`, `debrisFaces`, `debrisIndices`, `textures` | 10733, 16384, 65536, 1024 | the first debris row, in `debris` then `explodedPieces` order, whose geometry does not all fit any of the four tables, and every row after it, has no vertices and no faces (`firstVertex`, `vertexCount`, `firstFace` and `faceCount` 0), and nothing it would have added stays in the tables; `VIEW_TRUNCATED_DEBRIS` |
 | `sight` | 1048576 cells (a grid of 1024 by 1024, a map of 32768 pixels a side) | `gridWidth` and `gridHeight` stay the grid's; the cells past the first 1048576, row by row, are dropped, and a draw reads them as `VIEW_SIGHT_HIDDEN`; `VIEW_TRUNCATED_SIGHT` |
 
 ## The recorded view
@@ -95,10 +98,11 @@ string, the serialisation S. This section defines S, the row and the file exactl
 **The layout.** The structs are those of `interfaces/view.h` with the layout of a 32-bit Visual C++ build for x86: every member
 at an offset that is a multiple of its size (a `double` at a multiple of 8), a struct as aligned as its most aligned member
 and its size rounded up to that alignment, little-endian, `float` and `double` as IEEE 754 binary32 and binary64. The padding bytes
-between members and at the end of a struct are zero. The sizes in bytes: `ViewPlayer` 104, `ViewUnit` 80, `ViewPiece` 20,
-`ViewOrder` 24, `ViewBlip` 16, `ViewFeature` 32, `ViewProjectile` 48, `ViewDebris` 36, `ViewExplodedPiece` 28, `ViewMessage` 28.
-The fields of `PlayerView` before `players`, its header, take 88 bytes (`versionMajor` at 0, `tick` at 4, `mapWidth` at 20,
-`unitCount` at 52, `messageCount` at 84). `tools/viewblock.py` reads the layout from the header file and decodes any block.
+between members and at the end of a struct are zero. The sizes in bytes: `ViewPlayer` 104, `ViewUnit` 84, `ViewPiece` 20,
+`ViewOrder` 24, `ViewBlip` 16, `ViewFeature` 32, `ViewProjectile` 48, `ViewDebris` 44, `ViewExplodedPiece` 40,
+`ViewDebrisVertex` 12, `ViewDebrisFace` 16, `ViewTexture` 32, `ViewMessage` 28; a debris index is 2 bytes.
+The fields of `PlayerView` before `players`, its header, take 104 bytes (`versionMajor` at 0, `tick` at 4, `mapWidth` at 20,
+`unitCount` at 52, `debrisVertexCount` at 84, `textureCount` at 96, `messageCount` at 100). `tools/viewblock.py` reads the layout from the header file and decodes any block.
 
 **S.** The serialisation of a filled block is the concatenation of
 
@@ -106,12 +110,13 @@ The fields of `PlayerView` before `players`, its header, take 88 bytes (`version
 2. `players[0]` to `players[9]`, all ten, in use or not;
 3. the used rows of each table, in this order: `units[0..unitCount)`, `pieces[0..pieceCount)`, `orders[0..orderCount)`,
    `blips[0..blipCount)`, `features[0..featureCount)`, `projectiles[0..projectileCount)`, `debris[0..debrisCount)`,
-   `explodedPieces[0..explodedPieceCount)`, `messages[0..messageCount)`;
+   `explodedPieces[0..explodedPieceCount)`, `debrisVertices[0..debrisVertexCount)`, `debrisFaces[0..debrisFaceCount)`,
+   `debrisIndices[0..debrisIndexCount)`, `textures[0..textureCount)`, `messages[0..messageCount)`;
 4. `sight[0..n)` with `n` the smaller of `gridWidth * gridHeight` and `VIEW_MAX_GRID_CELLS` (a grid cut at its capacity is
    written cut, "Capacities").
 
 A count is never above its table's capacity ("Capacities"). The tables are written whole, each element as its struct: a field
-that is `reserved` is zero and is part of S. S is 1128 bytes (88 and ten players) when no table has a row and the grid is empty, and under 8 million at the capacities.
+that is `reserved` is zero and is part of S. S is 1144 bytes (104 and ten players) when no table has a row and the grid is empty, and under 9 million at the capacities.
 
 **The `view` row.** `<tick> view <16 hex>` follows the `tick` row of the same tick, and is the trace hash
 (`docs/trace-format.md`, section 3) from the offset basis of S taken as one run: 8-byte little-endian words with the word step
@@ -181,6 +186,7 @@ ally's unit not at all. Radar does not put a unit in `units`; it makes a blip.
 | `carrier` | the unit's carrier; a carried unit is drawn with it | every unit |
 | `recentlyDamaged` | `units[i].recentlyDamagedTimer` | every unit |
 | `group` | `units[i].group`, the control group, drawn as a digit under the unit | the viewer's own units; 0 for the rest |
+| `stockpile` | `units[i].weapons[0]`'s stockpiled shots (the byte 0x1e into the unit), which the build menu draws beside a stockpiled weapon | the viewer's own units; 0 for the rest |
 | `killCount`, `weaponBuild`, `orderKind`, `orderTarget`, `moveOrder`, `fireOrder`, `cloakOrder`, `metalMake`, `metalUse`, `energyMake`, `energyUse` | `units[i].killCount`; the stockpile progress of its weapon slots, `progress * 100 / reload` of the first weapon-build order, clamped to 0 to 255, and 0 when no such order names a slot 0 to 2 with a weapon, a reload of 0 or a progress of 0 or less; its first order (section 8.9) and its target, the target only when bit 0x8 of the order's flags is set, as 3.1c's presentation reads it, and 0 otherwise; its standing orders; its resources (section 8.16) | the viewer's own units; 0 for the rest |
 | `firstOrder`, `orderCount` | its orders (section 8.9); `firstOrder` is 0 when the count is 0 | the controller's units; 0 for the rest |
 | `firstPiece`, `pieceCount` | the posed pieces of its model, from the scripts' state (section 8.12); `firstPiece` is 0 when the count is 0 | every unit |
@@ -254,8 +260,8 @@ not exempt, in the battle view; on the radar picture it is (`SIM_EVENT_RADAR_UNI
 
 `debris` holds the debris and explosion records and `explodedPieces` the pieces blown off units, from weapons' report
 (record 48, section 8.31: `weaponsState.debris[d]`, `weaponsState.explodedPieces[slot]`, `weaponsState.pieces[i]`).
-3.1c tests no sight for them: each is drawn anywhere on screen, and only the fog over its cell hides it. The faces a
-piece is drawn from are those of the unit's model, loaded data.
+3.1c tests no sight for them: each is drawn anywhere on screen, and only the fog over its cell hides it. Their shapes are
+in the geometry tables `debrisVertices`, `debrisFaces`, `debrisIndices` and `textures`, which both tables point into.
 
 `debris` has a row for each entry `d` of the debris table, in the table's order, an explosion with no model included.
 The fields of a row come from `weaponsState.debris[d]`:
@@ -264,25 +270,69 @@ The fields of a row come from `weaponsState.debris[d]`:
 - `x`, `y`, `z` are `pos`, and `rotX`, `rotY`, `rotZ` are `angle_x`, `angle_y`, `angle_z`.
 - `sprite` is the index, in the sprite catalogue below, of the animation `ref1.src` names: the first entry equal to it,
   and 0xffff when `ref1.src` is null or equals no entry.
-- `shadowSprite` is the index of the first of the three animation pointers that start 0x1ab8f bytes into the game record
-  equal to `ref2.src`, and 0xffff when `ref2.src` is null or equals none.
-- `firstFace` and `faceCount` are those of the piece record that `obj` names (`weaponsState.pieces[i]`), and 0 when `obj`
-  is null.
-- `unitDefIndex` is 0xffff and `pieceIndex` 0 in every row: a debris keeps no record of the unit or piece it broke from.
-  A debris with a model is made of faces copied from the broken piece, with their own vertices and textures, which the
-  view does not hold; carrying them, and naming the sprites by a table of their own, is #1123.
-
-The sprite catalogue lists the explosion animations in this order:
-
-- indexes 0 to 8: the nine animation pointers that start 0x147eb bytes into the game record, in their order (the sea
-  splash, the lava splash, the flame stream, then `src3`, `explode2`, `explode3`, `explode4`, `explode5` and `nuke1`);
-- then, for each weapon definition `w` in order, index 9 + 2w is its `splash` animation and index 10 + 2w its
-  `explosionSeq` animation.
+- `shadowSprite` is the index, in the shadow catalogue below, of the first of its three animations equal to `ref2.src`,
+  and 0xffff when `ref2.src` is null or equals none.
+- The geometry is that of the debris slot `obj` names (`weaponsState.pieces[i]`, one of the 300 slots that start 0x1ab9f
+  bytes into the game record, 0x34 bytes each), and none when `obj` is null or names no slot: its `vertexCount`
+  vertices (`vertices`, at most 8) and its faces `faces[k]` for `k` from 0 to `faceCount` (at most 6), from 1 when the
+  slot's `firstFace` is not -1. A slot's faces are a copy of the broken face, taken when the piece breaks, with a
+  team-coloured texture already turned into the owner's frame.
 
 `explodedPieces` has a row for each slot of the exploded-piece table that holds a block, in slot order, from
-`weaponsState.explodedPieces[slot]`: `unitDefIndex` and `owner` are the current values of the unit slot `unit` names (0 for a dead unit's definition, the new unit's for a reused slot; #1123 gives them a source that outlives the unit), `pieceIndex` is
-`index`, `x`, `y`, `z` are the piece record's `pos` and `rotX`, `rotY`, `rotZ` its angles `angle_10`, `angle_12` and
-`angle_14`. `trail` is 1 when bit 0x2 of `flags` is set, else 2 when bit 0x1 is set, else 0.
+`weaponsState.explodedPieces[slot]`:
+
+- `owner` is the current owner of the unit slot `unit` names, as 3.1c's draw reads it each frame: the dead unit's
+  owner until the slot is reused, then the new unit's. `owner` is 0 when `unit` names no slot.
+- `x`, `y`, `z` are the piece record's `pos` and `rotX`, `rotY`, `rotZ` its angles `angle_10`, `angle_12` and `angle_14`.
+- `trail` is 1 when bit 0x2 of `flags` is set, else 2 when bit 0x1 is set, else 0.
+- The geometry is that of the model piece `rec.desc` names, loaded data that the piece keeps for its flight: the
+  piece's vertices as the model file gives them, unrotated (3.1c rotates a copy of them on every frame it draws), and
+  its faces from 0, or from 1 when the piece's first face is set, as for a debris slot. A null `rec.desc` gives none.
+
+**The geometry.** A row's vertices are `debrisVertices[firstVertex..firstVertex + vertexCount)`, 16.16 fixed point in
+the piece's own frame, which the row's position and rotation place. Its faces are `debrisFaces[firstFace..firstFace +
+faceCount)`, in the order 3.1c visits them. A face's vertices are `debrisIndices[firstIndex..firstIndex + indexCount)`,
+each an index of the row's vertices counted from `firstVertex`, in the order the model gives them. The rows are filled
+in `debris` order, then `explodedPieces` order, each appending its vertices, faces and indices; a row's runs are
+contiguous.
+
+A face's `kind` and its texture follow the face's flags, as 3.1c's draw does:
+
+- bit 0x1 set: `VIEW_FACE_FILLED`, a polygon of the face's vertices filled with `colour`, the low byte of the face's
+  colour word, a palette index;
+- else, a face with other than 4 vertices: `VIEW_FACE_NONE`, which 3.1c does not draw;
+- else `VIEW_FACE_TEXTURED`, a quad drawn with frame `frame` of texture `texture`:
+  - with bit 0x2 set, the texture is the animation the face's source names. Its frame is the owner's colour index
+    (`players[owner]`'s colour) when bit 0x4 is set too and the row is an exploded piece; otherwise it is the low 16 bits
+    of the face's frame word.
+  - with bit 0x2 clear, the face names a frame by itself. The texture is the first animation that holds that frame,
+    searching the model textures' animation files in load order and then the side logos' file, and `frame` is its index
+    there. That is the search the game makes when it binds a model's textures.
+  - when no texture is found, `texture` is 0xffff.
+
+`textures` names each texture once, in the order of first use: `name` is the animation's name in its GAF file, 32
+bytes with zero padding. A presentation finds it the same way, in the model textures and then the logos.
+
+**The sprite catalogue** lists the explosion animations in this order:
+
+| Index | Animation |
+| --- | --- |
+| 0 | `h2oboom2` of `fx.gaf`, the sea splash |
+| 1 | `lavasplash` of `fx.gaf` |
+| 2 | `flamestream` of `fx.gaf` |
+| 3 | `explosion` of `fx.gaf` |
+| 4 to 7 | `explode2`, `explode3`, `explode4` and `explode5` of `fx.gaf` |
+| 8 | `nuke1` of `fx.gaf` |
+| 9 + 2w | the splash of weapon definition `w`: its `lavaexplosionart` entry of `lavaexplosiongaf` on a lava world, else its `waterexplosionart` of `waterexplosiongaf` |
+| 10 + 2w | the explosion of weapon definition `w`: its `explosionart` entry of `explosiongaf` |
+
+These are the nine animation pointers that start 0x147eb bytes into the game record, then each weapon definition's
+`splash` and `explosionSeq`. A weapon whose definition has no such entry has a null pointer there, which no debris names.
+
+**The shadow catalogue** holds three animations that the game makes at load rather than loads: round explosion shadows
+drawn from the load stream's noise, 12 frames from 64 to 8 pixels across (index 0), 15 frames from 128 to 16 (index 1)
+and 15 frames from 200 to 32 (index 2). They are the three animation pointers that start 0x1ab8f bytes into the game
+record.
 
 ## Players, economy and score
 
@@ -300,8 +350,12 @@ The sprite catalogue lists the explosion animations in this order:
 The score panel shows only in skirmish and multiplayer, and counts commanders' kills when `commanderDeath` is 2. 3.1c
 shows no ally's resources: the share dialog lists the players to give to, by name only.
 
-`players[i].rank` is compacted while the score panel draws: a quirk of 3.1c that is the simulation's to fix, not the
-view's (#1113).
+On each frame it draws the score panel, 3.1c closes the gaps that defeated players leave in `players[i].rank`: for
+each place from 0 below the number of players, when no counted player holds it, every counted player above it moves
+down one. A counted player is one the panel lists: active, a human or a computer, not defeated (no units left after
+making one) and not only watching. A presentation runs that pass on its own copy of `rank` and draws from the copy;
+when the pass changed a place, it publishes `PLAYERS_COMPACT_RANKS` (`docs/players-interface.md`), and the simulation
+runs the same pass on its ranks.
 
 ## Messages
 
@@ -374,12 +428,12 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `Debris::pos` | `PlayerView.debris` (Explosions and debris). |
 | `Debris::ref1` | `PlayerView.debris` (Explosions and debris). |
 | `Debris::ref2` | `PlayerView.debris` (Explosions and debris). |
-| `the debris model cache` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `DebrisPiece::faceCount` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `DebrisPiece::faces` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `DebrisPiece::firstFace` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `DebrisPiece::vertexCount` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `DebrisPiece::verts` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
+| `the debris model cache` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `DebrisPiece::faceCount` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `DebrisPiece::faces` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `DebrisPiece::firstFace` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `DebrisPiece::vertexCount` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `DebrisPiece::verts` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
 | `Feature::anim` | Loaded data: the feature definition named by `ViewFeature.featureIndex`, through the files service. |
 | `Feature::animTable` | Loaded data: the feature definition named by `ViewFeature.featureIndex`, through the files service. |
 | `Feature::drawn` | Loaded data: the feature definition named by `ViewFeature.featureIndex`, through the files service. |
@@ -414,6 +468,7 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `the player slot block` | `PlayerView.sight` (Sight). |
 | `the mapped memory` | `PlayerView.sight` (Sight). |
 | `the plot memory` | `PlayerView.features` (the features of the cells) and `mapWidth`, `mapHeight`; a cell's height is shown only by the debug strip. |
+| `the unit model table` | Loaded data: the model of each unit type, which the battle frame draws a unit with and the cursor hit-tests it against, through the files service. |
 | `MapViewFlags::bit0` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
 | `MapViewFlags::bit1` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
 | `MapViewFlags::bit2` | `PlayerView.sightOptions` (Sight); mask 0x8, the fog tiles' cache, is presentation state. |
@@ -434,12 +489,12 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `Order::target` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
 | `Order::type` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
 | `Order::unit` | `PlayerView.orders` and `ViewUnit.orderKind`, `orderTarget` (Orders); the table of order kinds is loaded data. |
-| `PieceFrame::always0` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `PieceFrame::count` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `PieceFrame::flags` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `PieceFrame::indices` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `PieceFrame::ptr_10` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
-| `PieceFrame::fillColor` | `ViewDebris.firstFace`, `faceCount` and `ViewExplodedPiece`: the model faces a debris or exploded piece is drawn from; the faces themselves are loaded data (the unit's model, through the files service). |
+| `PieceFrame::always0` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `PieceFrame::count` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `PieceFrame::flags` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `PieceFrame::indices` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `PieceFrame::ptr_10` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
+| `PieceFrame::fillColor` | `PlayerView.debrisVertices`, `debrisFaces`, `debrisIndices` and `textures` (Explosions and debris): the geometry a debris or exploded piece is drawn from. |
 | `Player::active` | `ViewPlayer.active`, `type` (Players). |
 | `Player::alliance` | `ViewPlayer.allied` (Players). |
 | `Player::allied` | `ViewPlayer.allied` (Players). |

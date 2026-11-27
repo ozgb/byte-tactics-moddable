@@ -1,0 +1,9 @@
+bt-sound 1
+0 loop BGM -585 - - -
+0 play BIGBUTTON -585 - - -
+0 play SKIRMISH -585 - - -
+0 play SKIRMISH -585 - - -
+0 play SMALLBUTTON -585 - - -
+0 play SKIRMISH -585 - - -
+0 play BIGBUTTON -585 - - -
+0 stop_all - - - - -

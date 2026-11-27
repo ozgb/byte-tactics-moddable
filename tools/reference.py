@@ -26,7 +26,8 @@ On the first difference it builds the reference from the commit the trace
 records, prints tools/tracediff.py's report for that scenario and exits 1. A
 missing or extra trace or scenario exits 1. `--exe` checks a given exe instead
 of building the ref. `--quick` restricts `--check` to the scenarios named in QUICK.
-Set WINEARCH=win64 for Wine; `--game-dir` names the game's
+A run times out after RUN_SECONDS_BASE seconds plus its ticks at 25 a second (`--ticks-per-second N` sets
+the rate for a slower machine) and is tried once more. Set WINEARCH=win64 for Wine; `--game-dir` names the game's
 install.
 """
 
@@ -80,7 +81,8 @@ VIEW_DUMPS: dict[str, dict[int, bytes | None]] = {}
 MAX_PARALLEL = 6
 QUICK = ("eight-full-moon", "eight-greenhaven", "duel-coast-to-coast", "duel-great-divide", "orders-move-attack")
 RUN_SECONDS_BASE = 120
-RUN_TICKS_PER_SECOND = 25
+DEFAULT_TICKS_PER_SECOND = 25
+RUN_TICKS_PER_SECOND = DEFAULT_TICKS_PER_SECOND
 RUN_ATTEMPTS = 2
 RETRY_DIALOG = "dialog-directx"
 REF_ENV = {k: v for k, v in os.environ.items() if k != "VIRTUAL_ENV"}
@@ -253,13 +255,11 @@ def keep_run(run: Path, scenario: str) -> Path:
 
 
 def should_retry(message: str) -> bool:
-    """Whether a failed run is tried again: an exe crash or the DirectX init dialog, not a hang or another dialog.
+    """Whether a failed run is tried again: an exe crash, a hang (a slow machine) or the DirectX init dialog, not another dialog.
 
     playtest.py names an error dialog's kind (dialog-directx, dialog-crt, ...) in the failure. The DirectX
     box is only classified so before the first tick; the runtime error (R6025) is a real fault.
     """
-    if "still runs after" in message:
-        return False
     if "dialog-" in message:
         return RETRY_DIALOG in message
     return True
@@ -275,6 +275,11 @@ def scenario_saves(scenario: Path) -> bool:
     return any(line.split()[:1] == ["save"] for line in scenario.read_text().splitlines())
 
 
+def run_timeout(ticks: int) -> float:
+    """The seconds a run of `ticks` ticks may take before it counts as a hang."""
+    return RUN_SECONDS_BASE + ticks / RUN_TICKS_PER_SECOND
+
+
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   want: tuple[dict[str, str], list[tuple[int, str]]] | None = None, poison: bool = False,
                   save_to: Path | None = None, load_from: Path | None = None,
@@ -286,15 +291,16 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
 
     A run whose exe crashes (a nonzero exit) is tried once more, since an exe fault at startup
     was seen in 1 of 300 runs, and so is one that stopped on the DirectX initialisation dialog before
-    tick 1 (startup under load). A run that is still going at the timeout is a hang, and a run that
-    stopped on any other error dialog (R6025 and the like) is a game fault: both fail at once.
+    tick 1 (startup under load), and so is one still going at the timeout (RUN_SECONDS_BASE plus its ticks at
+    RUN_TICKS_PER_SECOND, set by --ticks-per-second), which a loaded or slow machine reaches. A run that
+    stopped on any other error dialog (R6025 and the like) is a game fault and fails at once.
 
     With `save_to` (a directory), each of tracediff.SAVE_FILES the run wrote in its game copy is copied there by its
     file name before the run's directory is removed (nothing is copied for a file the run wrote none of). With
     `load_from` (a directory), its files are placed in the run's game copy at those paths before the exe starts.
     """
     ticks = scenario_ticks(scenario)
-    timeout = RUN_SECONDS_BASE + ticks / RUN_TICKS_PER_SECOND
+    timeout = run_timeout(ticks)
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
         try:
@@ -641,9 +647,16 @@ def main() -> None:
     ap.add_argument("--game-dir", help="--traces, --check: the game's install (default: Steam's)")
     ap.add_argument("--parallel", type=int, default=default_parallel(), metavar="N",
                     help="--traces, --check: scenarios played at once (default: half the CPUs, at most 6)")
+    ap.add_argument("--ticks-per-second", type=float, default=None, metavar="N",
+                    help=f"--traces, --check: the slowest game speed that is not a hang, in the run timeout (default {DEFAULT_TICKS_PER_SECOND})")
     args = ap.parse_args()
     if args.parallel < 1:
         ap.error("--parallel takes 1 or more")
+    if args.ticks_per_second is not None and args.ticks_per_second <= 0:
+        ap.error("--ticks-per-second takes a number above 0")
+    if args.ticks_per_second is not None:
+        global RUN_TICKS_PER_SECOND
+        RUN_TICKS_PER_SECOND = args.ticks_per_second
     ref = args.ref
     if args.traces == args.check and (args.traces or args.exe):
         ap.error("give one of --traces and --check")

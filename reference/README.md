@@ -645,8 +645,10 @@ divergence can be diagnosed later with the file mode of `tools/tracediff.py` aga
 kind in the reason, `result.json` and `failed.png`: `dialog-directx` (a dialog-sized window before
 tick 1: "Environment Initialization Failed"), `dialog-crt` (the "Microsoft Visual C++ Runtime
 Library" box, as for R6025) or `dialog-cavedog` (the fatal error box). `reference.py` tries a run
-once more after a nonzero exit or `dialog-directx`; any other dialog, a hang and a failure after
-tick 1 are reported as they are.
+once more after a nonzero exit, `dialog-directx` or a timeout; any other dialog and a failure after
+tick 1 are reported as they are. A run times out after 120 seconds plus its ticks at 25 ticks a second.
+A slower machine gives `--ticks-per-second N` (a reference game runs at about 12 ticks a second on an
+i7-13700H under Xvfb, #1240). A timeout changes no output, only whether a slow run fails.
 
 The full `--check` is what a pull request's gate needs.
 

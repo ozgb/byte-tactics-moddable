@@ -37,7 +37,48 @@ def test_retry() -> None:
     assert reference.should_retry("the game shows an error dialog (dialog-directx, window title \"x\")")
     assert not reference.should_retry("the game shows an error dialog (dialog-crt, window title \"x\")")
     assert not reference.should_retry("the game shows an error dialog (dialog-cavedog, window title \"x\")")
-    assert not reference.should_retry("the game still runs after 1470s")
+    assert reference.should_retry("the game still runs after 1470s")
+
+
+def test_ticks_per_second_reaches_the_timeout() -> None:
+    import contextlib
+    import io
+    import sys
+    from unittest import mock
+    assert reference.run_timeout(600) == reference.RUN_SECONDS_BASE + 600 / 25
+    seen = []
+    with mock.patch.object(reference, "check_traces", lambda *a: seen.append(reference.run_timeout(600))), \
+            mock.patch.object(sys, "argv", ["reference.py", "--check", "--exe", __file__, "--ticks-per-second", "10"]), \
+            mock.patch.object(reference, "RUN_TICKS_PER_SECOND", reference.RUN_TICKS_PER_SECOND):
+        reference.main()
+    assert seen == [reference.RUN_SECONDS_BASE + 600 / 10], seen
+    with mock.patch.object(sys, "argv", ["reference.py", "--check", "--exe", __file__, "--ticks-per-second", "0"]), \
+            contextlib.redirect_stderr(io.StringIO()):
+        try:
+            reference.main()
+        except SystemExit as e:
+            assert e.code == 2
+        else:
+            raise AssertionError("--ticks-per-second 0 was accepted")
+
+
+def test_a_timed_out_run_is_tried_once_more() -> None:
+    from unittest import mock
+    timeouts = []
+
+    def fake_play(exe, scenario, game_dir, dump, timeout, poison, collect=()):
+        timeouts.append(timeout)
+        raise tracediff.Error("the game still runs after 144s")
+
+    with mock.patch.object(reference, "scenario_ticks", lambda s: 600), \
+            mock.patch.object(reference, "scenario_frames", lambda s: []), \
+            mock.patch.object(reference, "scenario_saves", lambda s: False), \
+            mock.patch.object(reference.tracediff, "play", fake_play):
+        try:
+            reference.play_scenario(Path("x.exe"), Path("s.txt"), None)
+        except tracediff.Error:
+            pass
+    assert timeouts == [reference.run_timeout(600)] * reference.RUN_ATTEMPTS, timeouts
 
 
 

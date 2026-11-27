@@ -353,7 +353,7 @@ load model UnitDef#71 "objects3d\\ARMLLT.3DO" [5119]
 cache debris 100000 0
   block 0 100000 null
 call 850 UpdateUnitWeapons
-  r Game.flags_2a44 4
+  r Game.flags_2a44 12
   r Game.seaLevel 0
   r Game.gravity 8155
   r Game.projectileCount 0

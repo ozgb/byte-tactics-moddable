@@ -18,7 +18,7 @@ The nightly run comes before everything else: from when it fires until its comme
 When it fires:
 
 1. Run `uv run tools/fullgate.py due`. When it exits 0, no merge since the last run needed the gate: stop.
-2. Hand the run to a Sonnet subagent. It works in `tools/worktree.sh --tip` (which prints the path and moves the worktree to `moddable`'s tip), builds there as `AGENTS.md` step 4 does, on a fresh prefix, and runs `uv run tools/fullgate.py run`, then the play-tests (`tools/playtest.py` smoke, full, mp and music). It returns the comment text and each play-test's result verbatim, and posts nothing. Wait for it; start no other work meanwhile.
+2. Hand the run to a Sonnet subagent. It works in `tools/worktree.sh --tip` (which prints the path and moves the worktree to `moddable`'s tip), builds there as `AGENTS.md` step 4 does, on a fresh prefix, and runs `uv run tools/fullgate.py run --replay`, then the play-tests (`tools/playtest.py` smoke, full, mp and music). It returns the comment text and each play-test's result verbatim, and posts nothing. Wait for it; start no other work meanwhile.
 3. Post the comment on #632 yourself, signed `Maintainer:`, with the play-test results.
 4. When anything failed, file an issue at once: never `parked`, with the failing scenario or play-test and the merges since the last pass, and put it first in #2's "Priority now". Merges carry on meanwhile. Name it in your report.
 

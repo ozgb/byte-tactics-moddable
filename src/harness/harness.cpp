@@ -616,6 +616,7 @@ static int s_altHeld = 0;
 static unsigned s_frameTick = 0;
 static unsigned s_framesAtTick = 0;
 static int s_debugKeys = 0;
+static FILE* s_replay = nullptr;
 enum { STOPPED_FRAME_LIMIT = 300 };
 
 static unsigned ParseKeyName(int lineNo, const char* text)
@@ -803,6 +804,8 @@ static void DeliverScriptedInput(const ScriptedInput* in)
 
 static void CheckFrameInputsBeforeTick(unsigned tick)
 {
+    if (s_replay != nullptr)
+        return;
     for (int i = 0; i < s_inputCount; i++) {
         const ScriptedInput* in = &s_inputs[i];
         if (in->frame == 0 || in->delivered || in->tick >= tick)
@@ -815,6 +818,8 @@ static void CheckFrameInputsBeforeTick(unsigned tick)
 
 static void CheckFrameInputsDelivered()
 {
+    if (s_replay != nullptr)
+        return;
     for (int i = 0; i < s_inputCount; i++) {
         const ScriptedInput* in = &s_inputs[i];
         if (in->frame != 0 && !in->delivered)
@@ -832,7 +837,8 @@ static void HarnessFrameEnd(unsigned tick)
     }
     s_framesAtTick++;
     unsigned last = 0;
-    for (int i = 0; i < s_inputCount; i++) {
+    int scripted = s_replay != nullptr ? 0 : s_inputCount;
+    for (int i = 0; i < scripted; i++) {
         ScriptedInput* in = &s_inputs[i];
         if (in->frame == 0 || in->tick != tick)
             continue;
@@ -1663,6 +1669,77 @@ static void ParseTestReplay(char* cmdLine)
     }
 }
 
+enum { REPLAY_LINE_BYTES = 1 << 22 };
+static char s_replayLine[REPLAY_LINE_BYTES];
+static int s_replayLineNo = 0;
+static bool s_replayPending = false;
+static bool s_replayUnitsChecked = false;
+static unsigned s_replayUnitsOffset = 0;
+static unsigned s_replayUnitsStride = 0;
+static unsigned s_replayEvent[1024];
+
+static void FailReplay(const char* what)
+{
+    char msg[160];
+    sprintf(msg, "testmode: -testcommands line %d: %s\n", s_replayLineNo, what);
+    Fail(msg);
+}
+
+static bool ReadReplayLine()
+{
+    if (fgets(s_replayLine, sizeof s_replayLine, s_replay) == nullptr)
+        return false;
+    s_replayLineNo++;
+    size_t n = strlen(s_replayLine);
+    if (n + 1 == sizeof s_replayLine && s_replayLine[n - 1] != '\n')
+        FailReplay("is too long");
+    while (n > 0 && (s_replayLine[n - 1] == '\n' || s_replayLine[n - 1] == '\r'))
+        s_replayLine[--n] = '\0';
+    return true;
+}
+
+static void OpenTestCommands(const char* path)
+{
+    s_replay = fopen(path, "rb");
+    if (s_replay == nullptr) {
+        char msg[600];
+        sprintf(msg, "testmode: cannot read -testcommands file %s\n", path);
+        Fail(msg);
+        return;
+    }
+    if (!ReadReplayLine() || strcmp(s_replayLine, "bt-commands 2") != 0)
+        FailReplay("must be bt-commands 2");
+    int used = 0;
+    if (!ReadReplayLine() || sscanf(s_replayLine, "units %u %u%n", &s_replayUnitsOffset, &s_replayUnitsStride, &used) != 2
+        || s_replayLine[used] != '\0')
+        FailReplay("must be units <offset> <stride>");
+}
+
+static void ParseTestCommands(char* cmdLine)
+{
+    for (char* p = cmdLine; *p != '\0'; p++) {
+        if ((p[0] == '-' || p[0] == '/') && _strnicmp(p + 1, "testcommands", 12) == 0
+            && (p[13] == '\0' || isspace((unsigned char)p[13])) && (p == cmdLine || isspace((unsigned char)p[-1]))) {
+            char* q = p + 13;
+            while (*q == ' ' || *q == '\t')
+                q++;
+            char* start = q;
+            while (*q != '\0' && !isspace((unsigned char)*q))
+                q++;
+            char path[512];
+            if (q == start || q - start >= (int)sizeof path) {
+                Fail("testmode: -testcommands needs a file\n");
+                return;
+            }
+            memcpy(path, start, q - start);
+            path[q - start] = '\0';
+            memset(p, ' ', q - p);
+            OpenTestCommands(path);
+            return;
+        }
+    }
+}
+
 static void ParseBlockScan(char* cmdLine)
 {
     for (char* p = cmdLine; *p != '\0'; p++) {
@@ -1845,6 +1922,7 @@ void HarnessInit(char* cmdLine)
     ParseTestDump(cmdLine);
     ParseTestDisplay(cmdLine);
     ParseTestReplay(cmdLine);
+    ParseTestCommands(cmdLine);
 
     char* q = flag + 9;
     while (*q == ' ' || *q == '\t')
@@ -4396,10 +4474,108 @@ static void CommandBegin()
     s_commandOpen = true;
 }
 
-static void CommandEnd(unsigned tick, const char* key, int lineNo)
+static void CommandEndAs(unsigned tick, const char* key, const char* line)
 {
     s_commandOpen = false;
-    fprintf(s_commands, "%u %s %d %u%s\n", tick, key, lineNo, s_commandEvents, s_commandText);
+    fprintf(s_commands, "%u %s %s %u%s\n", tick, key, line, s_commandEvents, s_commandText);
+}
+
+static void CommandEnd(unsigned tick, const char* key, int lineNo)
+{
+    char line[16];
+    sprintf(line, "%d", lineNo);
+    CommandEndAs(tick, key, line);
+}
+
+static char* ReplayWord(char** cursor)
+{
+    char* p = *cursor;
+    if (*p != ' ')
+        return nullptr;
+    p++;
+    char* word = p;
+    while (*p != '\0' && *p != ' ')
+        p++;
+    if (p == word)
+        return nullptr;
+    *cursor = p;
+    return word;
+}
+
+static unsigned ReplayHex(char c)
+{
+    return (unsigned)(c <= '9' ? c - '0' : c - 'a' + 10);
+}
+
+static void ReplayCommands(unsigned tick)
+{
+    for (;;) {
+        if (!s_replayPending) {
+            if (!ReadReplayLine())
+                return;
+            s_replayPending = true;
+        }
+        char* p = s_replayLine;
+        char* end;
+        unsigned lineTick = strtoul(p, &end, 10);
+        if (end == p || !isdigit((unsigned char)*p))
+            FailReplay("needs <tick> <key> <line> <count>");
+        if (lineTick > tick)
+            return;
+        if (lineTick < tick)
+            FailReplay("has a tick before the tick it is read at: the lines are not in delivery order");
+        s_replayPending = false;
+        p = end;
+        char* key = ReplayWord(&p);
+        char* line = key ? ReplayWord(&p) : nullptr;
+        char* countText = line ? ReplayWord(&p) : nullptr;
+        if (countText == nullptr) {
+            FailReplay("needs <tick> <key> <line> <count>");
+            return;
+        }
+        char keyText[16];
+        char lineText[16];
+        if (line - key - 1 >= (int)sizeof keyText || countText - line - 1 >= (int)sizeof lineText) {
+            FailReplay("has a key or line field that is too long");
+            return;
+        }
+        memcpy(keyText, key, line - key - 1);
+        keyText[line - key - 1] = '\0';
+        memcpy(lineText, line, countText - line - 1);
+        lineText[countText - line - 1] = '\0';
+        if (strcmp(keyText, "spawn") != 0 && strcmp(keyText, "order") != 0 && strcmp(keyText, "console") != 0
+            && strcmp(keyText, "interface") != 0)
+            FailReplay("has a key that is not spawn, order, console or interface");
+        unsigned count = strtoul(countText, &end, 10);
+        if (end != p || !isdigit((unsigned char)*countText))
+            FailReplay("has a count that is not a number");
+        CommandBegin();
+        for (unsigned i = 0; i < count; i++) {
+            char* kind = ReplayWord(&p);
+            char* hex = kind ? ReplayWord(&p) : nullptr;
+            if (hex == nullptr) {
+                FailReplay("has fewer <KIND> <hex> pairs than its count");
+                return;
+            }
+            unsigned digits = (unsigned)(p - hex);
+            if (digits % 2 != 0 || digits < 2 * sizeof(int) || digits / 2 > sizeof s_replayEvent) {
+                FailReplay("has a payload that is not a whole event");
+                return;
+            }
+            unsigned char* bytes = (unsigned char*)s_replayEvent;
+            for (unsigned b = 0; b < digits / 2; b++) {
+                char hi = hex[2 * b];
+                char lo = hex[2 * b + 1];
+                if (!isxdigit((unsigned char)hi) || !isxdigit((unsigned char)lo) || isupper((unsigned char)hi) || isupper((unsigned char)lo))
+                    FailReplay("has a payload that is not lowercase hexadecimal");
+                bytes[b] = (unsigned char)(ReplayHex(hi) << 4 | ReplayHex(lo));
+            }
+            SchedPublish(SCHED_ENGINE, s_replayEvent, digits / 2);
+        }
+        if (*p != '\0')
+            FailReplay("has more <KIND> <hex> pairs than its count");
+        CommandEndAs(tick, keyText, lineText);
+    }
 }
 
 void HarnessBeforeStep()
@@ -4415,6 +4591,17 @@ void HarnessBeforeStep()
     if (!s_commandUnitsWritten && s_commands != nullptr) {
         s_commandUnitsWritten = true;
         fprintf(s_commands, "units %u %u\n", Ref<Unit>((Unit*)GameRef(GAME_UNITS)).offset, (unsigned)UNIT_STRIDE);
+    }
+    if (s_replay != nullptr && !s_replayUnitsChecked) {
+        s_replayUnitsChecked = true;
+        unsigned offset = Ref<Unit>((Unit*)GameRef(GAME_UNITS)).offset;
+        if (offset != s_replayUnitsOffset || s_replayUnitsStride != (unsigned)UNIT_STRIDE) {
+            char msg[200];
+            sprintf(msg, "testmode: -testcommands: the file's units line is %u %u, this build's is %u %u: "
+                         "play the file on the build that wrote it\n", s_replayUnitsOffset, s_replayUnitsStride, offset,
+                    (unsigned)UNIT_STRIDE);
+            Fail(msg);
+        }
     }
     if (s_gameType == 3) {
         for (int i = 0; i < MAX_PLAYERS; i++)
@@ -4433,6 +4620,10 @@ void HarnessBeforeStep()
         char msg[96];
         sprintf(msg, "testmode: quirk flags changed at tick %u\n", tick);
         Fail(msg);
+    }
+    if (s_replay != nullptr) {
+        ReplayCommands(tick);
+        return;
     }
     for (int i = 0; i < s_spawnCount; i++) {
         if (s_spawns[i].tick != tick)

@@ -3,6 +3,7 @@
     uv run tools/fullgate.py                          # print the count and whether the full run is due
     uv run tools/fullgate.py due                      # the same, exit 1 when any merge needed the gate
     uv run tools/fullgate.py run                      # play the full suite, the round trip, the coverage check and the match setup test, print the comment text
+    uv run tools/fullgate.py run --replay             # and the replay check after them: the nightly run
     uv run tools/fullgate.py --no-fetch               # do not fetch origin/moddable first
     uv run tools/fullgate.py --comments-json FILE     # tracking issue comments from a file (gh's --json comments)
     uv run tools/test_fullgate.py                     # tests, on a temporary repository and fake comments
@@ -10,13 +11,13 @@
 The pull request gate plays the tier; the full `reference.py --check` runs on the tip of moddable nightly, when
 a merge since the last run needed a gate (issue #631). The maintainer runs it when `due` exits 1, then comments
 on tracking issue #632: `Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n>
-equal, coverage: <result>, match setup: <n> of 15 ok`. The newest comment of that form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
+equal, coverage: <result>, match setup: <n> of 15 ok[, replay: <n> of <n> equal]`. The newest comment of that form names the last full run. The merges counted are the first-parent merge commits `Merge pull request #N`
 on origin/moddable after that sha whose diff against their first parent touches GATE_PATHS, the paths
 reference/README.md, "Gate", says need a gate (test_fullgate.py checks the two agree).
 
 `run` plays `reference.py --check --both-modes --no-cache` and then, straight after it, `--check --no-cache
 --roundtrip auto` (the same exe, a fresh Wine prefix for each), prints their output to stderr and the text of the
-comment to stdout (or to --out FILE), and exits with the first nonzero status of the four. Posting stays with the maintainer.
+comment to stdout (or to --out FILE), and exits with the first nonzero status of its checks. Posting stays with the maintainer.
 The round trip run scans block pointers too; the comment names them only when they are not all covered.
 
 After them `run` builds the coverage exe (tools/coverage_runtime.sh, then the BT_COVERAGE=ON build in build/coverage, with its
@@ -26,6 +27,12 @@ data/coverage.csv goes stale a periodic run says so (issue #770). The comment's 
 
 Last, on a fresh prefix, `run` plays `tools/test_matchsetup.py` on the exe (issue #1158), whose checks need Wine and so
 run in no pull request's CI. The comment's match setup field is its `<n> of 15 ok` line, or `not finished`.
+
+With --replay, which the nightly run passes, `run` then plays `tools/replay.py --check` on the exe on a fresh prefix
+(issue #1156): every stored seam call recording recorded again and compared, so that recordings a change made stale show
+at the next periodic run (pull request CI only replays the stored files). It takes about 37 minutes, hence the flag. The
+comment's replay field is `<n> of <n> equal`, counted from its per-recording lines, or `not finished`; without --replay the
+comment has no replay field.
 
 The comments are read through `bwai-outside gh issue -R ozgb/byte-tactics-moddable view 632 --json comments`,
 or through the command in FULLGATE_GH (split like a shell line, the issue arguments appended) or from
@@ -69,6 +76,7 @@ EQUAL_LINE = re.compile(r"^(\d+) of (\d+) scenarios equal, total ", re.MULTILINE
 POINTERS_OK = re.compile(r"^(?:\[(\w+)\] )?block pointers: all covered by ", re.MULTILINE)
 COVERAGE_OK = re.compile(r"^coverage: no subsystem fell$", re.MULTILINE)
 MATCH_SETUP_LINE = re.compile(r"^(\d+ of \d+) ok$", re.MULTILINE)
+REPLAY_LINE = re.compile(r"^[\w.-]+/[\w.-]+\.txt: (equal|differs)", re.MULTILINE)
 POINTERS_BAD = re.compile(r"^(?:\[(\w+)\] )?(\d+) problems with the pointers out of the block", re.MULTILINE)
 CHECK_COMMAND = ["uv", "run", "tools/reference.py", "--check", "--no-cache"]
 COVERAGE_DIR = "build/coverage"
@@ -178,9 +186,15 @@ def match_setup_result(output: str) -> str:
     return f"{match.group(1)} ok" if match else "not finished"
 
 
+def replay_result(output: str) -> str:
+    """The replay field: `<n> of <n> equal` from the per-recording lines of a replay.py --check run, or `not finished`."""
+    verdicts = REPLAY_LINE.findall(output)
+    return f"{verdicts.count('equal')} of {len(verdicts)} equal" if verdicts else "not finished"
+
+
 def comment_text(sha: str, check: tuple[int, str], roundtrip: tuple[int, str], coverage: tuple[int, str],
-                 matchsetup: tuple[int, str]) -> str:
-    """The comment for issue #632 from the exit status and output of the both-modes run, the round trip run, the coverage check and the match setup test."""
+                 matchsetup: tuple[int, str], replay: tuple[int, str] | None = None) -> str:
+    """The comment for issue #632 from the exit status and output of the both-modes run, the round trip run, the coverage check, the match setup test and, when it ran, the replay check."""
     (code, output), (trip_code, trip_output), (cov_code, cov_output), (setup_code, setup_output) = check, roundtrip, coverage, matchsetup
     text = (f"Full gate on {sha}: {equal_count(output)} equal (both modes), block pointers: {pointer_result(output)}, "
             f"round trip: {equal_count(trip_output)} equal, coverage: {coverage_result(cov_code, cov_output)}")
@@ -188,7 +202,11 @@ def comment_text(sha: str, check: tuple[int, str], roundtrip: tuple[int, str], c
     if "problems" in trip_pointers:
         text += f" (block pointers: {trip_pointers})"
     text += f", match setup: {match_setup_result(setup_output)}"
-    for name, status in (("both modes", code), ("round trip", trip_code), ("coverage", cov_code), ("match setup", setup_code)):
+    statuses = [("both modes", code), ("round trip", trip_code), ("coverage", cov_code), ("match setup", setup_code)]
+    if replay is not None:
+        text += f", replay: {replay_result(replay[1])}"
+        statuses.append(("replay", replay[0]))
+    for name, status in statuses:
         if status != 0:
             text += f", {name} exit {1 if status == BUILD_FAILED else status}"
     return text
@@ -231,8 +249,13 @@ def match_setup(exe: list[str], log: Path | None) -> tuple[int, str]:
     return stream(["uv", "run", "tools/test_matchsetup.py", *exe], log, "match setup")
 
 
+def replay_check(exe: list[str], log: Path | None) -> tuple[int, str]:
+    """Play tools/replay.py --check on the exe; (exit status, output)."""
+    return stream(["uv", "run", "tools/replay.py", "--check", *exe], log, "replay")
+
+
 def run(args: argparse.Namespace) -> int:
-    """Play the both-modes check, the round trip check, the coverage check and the match setup test, and print the comment for issue #632."""
+    """Play the both-modes check, the round trip check, the coverage check, the match setup test and with --replay the replay check, and print the comment for issue #632."""
     sha = args.sha or git("rev-parse", "HEAD").strip()
     exe = ["--exe", args.exe] + (["--game-dir", args.game_dir] if args.game_dir else [])
     log = Path(args.log) if args.log else None
@@ -253,6 +276,12 @@ def run(args: argparse.Namespace) -> int:
     results.append(match_setup(exe, log))
     seconds = int(time.time() - started)
     print(f"fullgate: match setup took {seconds // 60}:{seconds % 60:02d}", file=sys.stderr, flush=True)
+    if args.replay:
+        shutil.rmtree(ROOT / "build/playtest/prefix", ignore_errors=True)
+        started = time.time()
+        results.append(replay_check(exe, log))
+        seconds = int(time.time() - started)
+        print(f"fullgate: replay took {seconds // 60}:{seconds % 60:02d}", file=sys.stderr, flush=True)
     text = comment_text(sha, *results)
     if args.out:
         Path(args.out).write_text(text + "\n")
@@ -268,6 +297,7 @@ def main() -> int:
     parser.add_argument("--comments-json", metavar="FILE", help="issue comments as JSON, instead of gh")
     parser.add_argument("--exe", default="build/modern/TotalA.exe", help="run: the exe to play")
     parser.add_argument("--game-dir", default=os.path.expanduser("~/.ta"), help="run: the game directory")
+    parser.add_argument("--replay", action="store_true", help="run: also play replay.py --check, about 37 minutes (the nightly run passes it)")
     parser.add_argument("--sha", help="run: the commit the comment names, default HEAD")
     parser.add_argument("--out", metavar="FILE", help="run: also write the comment text to FILE")
     parser.add_argument("--log", metavar="FILE", help="run: append every run's output to FILE")

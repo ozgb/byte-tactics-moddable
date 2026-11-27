@@ -1357,6 +1357,132 @@ class LoadOrderTest(unittest.TestCase):
             self.assertFalse(run.parent.exists())
 
 
+class ReplayTest(unittest.TestCase):
+    HEADER = {"game_seed": "1", "crt_seed": "1", "view_seed": "1"}
+    ROWS = [(1, "tick", "1" * 16), (1, "view", "3" * 16), (2, "tick", "2" * 16), (2, "view", "4" * 16)]
+
+    def scenarios(self, tmp: Path) -> dict[str, Path]:
+        texts = {"clicks": "ticks 9\ninput 2 char a\n", "plain": "ticks 50\n"}
+        for name, text in texts.items():
+            (tmp / f"{name}.txt").write_text(text)
+        return {name: tmp / f"{name}.txt" for name in texts}
+
+    def test_names(self):
+        self.assertEqual(reference.replay_name("ui-keys"), "ui-keys+commands")
+        self.assertEqual(reference.replay_source("ui-keys+commands"), "ui-keys")
+        self.assertIsNone(reference.replay_source("ui-keys"))
+        self.assertEqual(reference.untag(reference.tag("ui-keys+commands", "wasm")), "ui-keys+commands")
+
+    def test_only_a_scenario_with_input_lines_is_replayed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            scenarios = self.scenarios(Path(tmp))
+            self.assertEqual(reference.with_replays(scenarios), {"clicks+commands": scenarios["clicks"]})
+
+    def test_a_scenario_with_menus_is_not_replayed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            scenarios = self.scenarios(Path(tmp))
+            menus = Path(tmp) / "menus.txt"
+            menus.write_text("frontend 1\nticks 9\ninput 2 char a\n")
+            self.assertTrue(reference.interfacelog.has_input(menus.read_text()))
+            self.assertEqual(reference.with_replays({**scenarios, "menus": menus}), {"clicks+commands": scenarios["clicks"]})
+
+    def play(self, scenarios, writes="bt-commands 2\nunits 1 2\n", fail=(), modes=(None,)):
+        calls = []
+        lock = threading.Lock()
+
+        def fake_play_scenario(exe, scenario, game_dir, want=None, poison=False, keep_always=False, scans=None,
+                               scan_every=1, retry_any=False, save_to=None, load_from=None, mode=None, watch=None,
+                               name=None, testcommands=None):
+            key = reference.tag(name or scenario.stem, mode)
+            with lock:
+                calls.append((key, want, watch, testcommands.read_text() if testcommands else None))
+            if scenario.stem in fail and name is None:
+                raise reference.tracediff.Error("boom")
+            if name is None and writes is not None:
+                reference.COMMAND_TEXTS[key] = writes
+            return {}, [], 0.0, None
+
+        failed: dict[str, str] = {}
+        played = {**scenarios, **reference.with_replays(scenarios)}
+        expected = {name: ("want", name) for name in played}
+        with mock.patch.object(reference.playtest, "template_prefix"), \
+                mock.patch.object(reference, "COMMAND_TEXTS", {}), \
+                mock.patch.object(reference, "play_scenario", fake_play_scenario):
+            reference.play_all(Path("x.exe"), played, None, 3, expected, failed=failed,
+                               **({"modes": modes} if modes != (None,) else {}))
+        return calls, failed
+
+    def test_a_replay_plays_its_own_runs_commands_after_it(self):
+        for modes in ((None,), reference.MODES):
+            with tempfile.TemporaryDirectory() as tmp, mock.patch.object(reference, "REPLAY_LEFT_OUT", {}):
+                calls, failed = self.play(self.scenarios(Path(tmp)), modes=modes)
+            self.assertEqual(failed, {})
+            keys = [c[0] for c in calls]
+            for mode in modes:
+                replay = reference.tag("clicks+commands", mode)
+                self.assertLess(keys.index(reference.tag("clicks", mode)), keys.index(replay))
+                key, want, _, played = calls[keys.index(replay)]
+                self.assertEqual(want, ("want", "clicks+commands"))
+                self.assertEqual(played, "bt-commands 2\nunits 1 2\n")
+            self.assertEqual(len(calls), 3 * len(modes))
+
+    def test_a_replay_fails_without_running_when_its_scenario_failed_or_wrote_no_file(self):
+        for kwargs in ({"fail": ("clicks",)}, {"writes": None}):
+            with tempfile.TemporaryDirectory() as tmp:
+                calls, failed = self.play(self.scenarios(Path(tmp)), **kwargs)
+            self.assertNotIn("clicks+commands", [c[0] for c in calls])
+            self.assertIn("clicks+commands: clicks failed to run or wrote no commands.txt", failed["clicks+commands"])
+
+    def test_a_listed_replay_is_played_without_its_traces_or_the_watch(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(reference, "REPLAY_LEFT_OUT", {"clicks": "why"}):
+            scenarios = self.scenarios(Path(tmp))
+            watch = reference.Watch({})
+            calls = []
+
+            def fake_play_scenario(exe, scenario, game_dir, want=None, *args, watch=None, name=None, **kw):
+                calls.append((name or scenario.stem, want, watch))
+                reference.COMMAND_TEXTS[scenario.stem] = "bt-commands 2\n"
+                return {}, [], 0.0, None
+
+            played = {**scenarios, **reference.with_replays(scenarios)}
+            with mock.patch.object(reference.playtest, "template_prefix"), \
+                    mock.patch.object(reference, "COMMAND_TEXTS", {}), \
+                    mock.patch.object(reference, "play_scenario", fake_play_scenario):
+                reference.play_all(Path("x.exe"), played, None, 1, {n: ("want", n) for n in played}, watch=watch)
+        self.assertIn(("clicks+commands", None, None), calls)
+        self.assertIn(("clicks", ("want", "clicks"), watch), calls)
+
+    def report(self, digests, left_out):
+        results = {reference.tag("clicks+commands", mode): (self.HEADER, digests, 1.0, None) for mode in reference.MODES}
+        expected = {"clicks+commands": (self.HEADER, reference.tracedigest.digests(self.ROWS))}
+        with mock.patch.object(reference, "REPLAY_LEFT_OUT", left_out):
+            return reference.replay_report({"clicks+commands": Path("clicks.txt")}, reference.MODES, results, expected)
+
+    def test_report(self):
+        same = reference.tracedigest.digests(self.ROWS)
+        other = reference.tracedigest.digests(self.ROWS[:2] + [(2, "tick", "9" * 16), self.ROWS[3]])
+        bad, stale, lines = self.report(same, {})
+        self.assertEqual((bad, stale), ([], []))
+        self.assertRegex(lines[0], r"^ok   clicks\+commands \[wasm\] \(2 ticks")
+        self.assertEqual(lines[-1], "2 of 2 runs from commands.txt equal, 0 left out (REPLAY_LEFT_OUT)")
+        bad, stale, lines = self.report(other, {})
+        self.assertEqual(bad, ["clicks+commands [wasm]", "clicks+commands [native]"])
+        self.assertRegex(lines[0], r"^DIFF clicks\+commands \[wasm\] .* tick 2: stored")
+        bad, stale, lines = self.report(other, {"clicks": "a field (#1)"})
+        self.assertEqual((bad, stale), ([], []))
+        self.assertRegex(lines[0], r"^left clicks\+commands \[wasm\] .* tick 2: .*: a field \(#1\)$")
+        self.assertEqual(lines[-1], "0 of 2 runs from commands.txt equal, 2 left out (REPLAY_LEFT_OUT)")
+        bad, stale, lines = self.report(same, {"clicks": "a field (#1)"})
+        self.assertEqual((bad, stale), ([], ["clicks+commands [wasm]", "clicks+commands [native]"]))
+        self.assertIn("equal, but REPLAY_LEFT_OUT lists it: remove it", lines[0])
+
+    def test_every_listed_scenario_has_input_lines(self):
+        scenarios = reference.scenario_files()
+        for name in reference.REPLAY_LEFT_OUT:
+            self.assertIn(name, scenarios)
+            self.assertTrue(interfacelog.has_input(scenarios[name].read_text()), name)
+
+
 class GateTierTest(unittest.TestCase):
     def test_every_scenario_has_a_trace_and_is_listed_once(self):
         scenarios = reference.scenario_files()

@@ -380,8 +380,10 @@ presentation state.
 
 Presentation reads these and owns them; they are presentation state, not facts of the view:
 
-- the selection: bit 0x10 of `Unit.flags` and the selection state bits, taken out of the judged state by #1050;
-- the build menu's page bits of `Unit.flags` (#1115);
+- the selection: bit 0x10 of `Unit.flags`, taken out of the judged state by #1050, and the selection state bits 6 and
+  7 (`selectState`), still hashed until #1132;
+- the build menu's page bits of `Unit.flags`, still hashed: unit creation sets them too, and no run from the command
+  log differs on them (`docs/state.md`);
 - the camera, its position and the screen shake's offset;
 - the unit and the feature under the cursor (the hover unit), and the hot spots of the radar picture's blips;
 - the order mode the cursor is in, and the build placement's height;

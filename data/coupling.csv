@@ -676,7 +676,7 @@ game,harness,shared_write,Game::localPlayer,4
 game,harness,shared_write,Game::mode_391f1,1
 game,harness,shared_write,Game::numPlayers,2
 game,harness,shared_write,Game::playerIndex,4
-game,harness,shared_write,Game::ticks,4
+game,harness,shared_write,Game::ticks,5
 game,harness,shared_write,Game::uiOptionFlags,1
 game,harness,shared_write,LoadingFlags::value,1
 game,harness,shared_write,Player::allied,1

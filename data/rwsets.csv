@@ -62547,9 +62547,11 @@ address,function,file,kind,target
 ,ReplayCommands,src/harness/harness.cpp,call,strtoul
 ,ReplayCommands,src/harness/harness.cpp,deref_read,*char
 ,ReplayCommands,src/harness/harness.cpp,deref_write,*unsigned char
+,ReplayCommands,src/harness/harness.cpp,field_write,Game::ticks
 ,ReplayCommands,src/harness/harness.cpp,function,
 ,ReplayCommands,src/harness/harness.cpp,global_escape,s_replayEvent@src/harness/harness.cpp
 ,ReplayCommands,src/harness/harness.cpp,global_escape,s_replayLine@src/harness/harness.cpp
+,ReplayCommands,src/harness/harness.cpp,global_read,g_game
 ,ReplayCommands,src/harness/harness.cpp,global_read,s_replayPending@src/harness/harness.cpp
 ,ReplayCommands,src/harness/harness.cpp,global_write,s_replayPending@src/harness/harness.cpp
 ,ReplayCompareCStrings,src/harness/replay_objects.cpp,call,AddCString

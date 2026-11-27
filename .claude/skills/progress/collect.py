@@ -21,7 +21,8 @@ FOUNDATIONS = [
     dict(id="runtime", label="Runtime", spec="runtime.md", btm_dir="runtime", issue=None,
          heads=["runtime-spec"], kit="runtime vectors"),
     dict(id="files", label="Data loading", spec=None, btm_dir="files", issue=None,
-         heads=["import-nanolathe", "files-port", "files-formats"], kit="files gate", spec_by_import="import-nanolathe"),
+         heads=["import-nanolathe", "files-port", "files-formats"], kit="files gate", spec_by_import="import-nanolathe"),    dict(id="presentation", label="Presentation", spec="presentation.md", btm_dir="presentation", issue=1047,
+         heads=["spec-presentation", "impl/presentation"], kit=None, kit_note="prerequisites in #1047"),
 ]
 SUBSYSTEMS = [
     ("wind_meteors", "Wind & meteors", None),
@@ -126,7 +127,7 @@ def main(out):
         kit_state = "ready" if kit else ("partial" if recs else "none")
         return {
             "id": r["id"], "label": r["label"], "group": r["group"],
-            "kit": kit_state, "kit_note": kit or ("%d recordings, gate route waits on #1209" % recs if recs else "no recordings"),
+            "kit": kit_state, "kit_note": kit or r.get("kit_note") or ("%d recordings, gate route waits on #1209" % recs if recs else "no recordings"),
             "recordings": recs, "spec": spec, "spec_pin": pin, "impl": impl,
             "active": bool(live) or bool(issue and issue["claimed"] and issue["state"] == "OPEN"),
             "issue": issue,

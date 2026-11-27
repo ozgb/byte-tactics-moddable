@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-27T18:05:31+00:00",
+ "generated": "2026-11-27T18:33:37+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -9,7 +9,7 @@
   },
   "180": {
    "done": 9,
-   "total": 27
+   "total": 28
   }
  },
  "rows": [
@@ -119,6 +119,26 @@
      "live": false
     }
    ]
+  },
+  {
+   "id": "presentation",
+   "label": "Presentation",
+   "group": "foundation",
+   "kit": "none",
+   "kit_note": "prerequisites in #1047",
+   "recordings": null,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1047,
+    "title": "Presentation layer: Prerequisites for a clean-room rewrite",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1047",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
   },
   {
    "id": "wind_meteors",

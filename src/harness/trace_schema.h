@@ -87,7 +87,7 @@ static const TraceField kUnitFields[] = {
     { "health", 0x108, 2, TF_SCALAR, TT_NONE, 0x0 },
     { "field_10e", 0x10e, 1, TF_SCALAR, TT_NONE, 0x0 },
     { "bit0", 0x10f, 1, TF_SCALAR, TT_NONE, 0x0 },
-    { "flags", 0x110, 4, TF_SCALAR, TT_NONE, 0xffffffef },
+    { "flags", 0x110, 4, TF_SCALAR, TT_NONE, 0xffffff2f },
 };
 
 static const TraceField kUnitPlan[] = {
@@ -119,7 +119,7 @@ static const TraceField kUnitPlan[] = {
     { "", 0xf9, 7, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x104, 6, TF_BYTES, TT_NONE, 0x0 },
     { "", 0x10e, 2, TF_BYTES, TT_NONE, 0x0 },
-    { "", 0x110, 4, TF_SCALAR, TT_NONE, 0xffffffef },
+    { "", 0x110, 4, TF_SCALAR, TT_NONE, 0xffffff2f },
 };
 
 static const TraceField kProjectileFields[] = {

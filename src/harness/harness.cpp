@@ -35,6 +35,10 @@
 #if BT_ACCESS_LOG
 #include "../../lib/accesslog/access_log.h"
 #endif
+#if BT_COVERAGE
+extern "C" int __cdecl __llvm_profile_write_file(void);
+extern "C" void __cdecl __llvm_profile_initialize_file(void);
+#endif
 
 #include "../../link/globals.h"
 
@@ -1774,8 +1778,19 @@ void HarnessExit()
     }
 }
 
+#if BT_COVERAGE
+static void __cdecl WriteCoverageProfile(void)
+{
+    __llvm_profile_initialize_file();
+    __llvm_profile_write_file();
+}
+#endif
+
 void HarnessInit(char* cmdLine)
 {
+#if BT_COVERAGE
+    atexit(WriteCoverageProfile);
+#endif
 #if BT_ACCESS_LOG
     AccessLogInit();
 #endif

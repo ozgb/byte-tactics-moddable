@@ -469,14 +469,16 @@ and so on), and this page is updated to name it. The current tag is
   choose how it is drawn, a surface that shares its name with another live surface named `<name>#<n>`, and a surface
   made in pixels freed earlier in the frame a new target (`ui-dialogs` and `ui-share-chat` need the last two). The
   display lists hold every frame up to the last `frames` tick, stored xz compressed in
-  `reference/displaylists/<scenario>.txt.xz` (thirteen lists, `ui-dialogs` now among them), and drawn from blank
-  targets they give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display digest changes.
-  `frontend-skirmish` stores no display digest: its menu cursor follows the wall clock, not the frames (#1166). The trace format is still `bt-trace 10`. The
-  traces of the 97 are those of v49 but for their commit line, which names 0758dafdb, the reference tip with the
-  display log's target fix (#1154); the four new scenarios store their traces, sounds, UI logs, events, frames and the
-  views of their frame ticks. `display-debug-overlay`'s debug panel reads `FRATE: 0`, as #1147 draws it. The sounds,
-  UI logs, interface commands, events, frames and views of the 97 are those of v49, and the saves decode equal to
-  v49's.
+  `reference/displaylists/<scenario>.txt.xz` (fourteen lists, `ui-dialogs` and `ui-debug-keys` now among them), and
+  drawn from blank targets they give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display
+  digest changes, and `ui-debug-keys` stores its display digest for the first time. `frontend-skirmish` stores no
+  display digest: its menu cursor follows the wall clock, not the frames (#1166). The trace format is still
+  `bt-trace 10`. The traces of the 97 of v50 are those of v51 but for their commit line, which names 0758dafdb, the
+  reference with the display log's target fix (#1154), as `ui-debug-keys`'s already did; the four new scenarios store
+  their traces, sounds, UI logs, events, frames and the views of their frame ticks. `display-debug-overlay`'s debug
+  panel reads `FRATE: 0`, as #1147 draws it. A `--traces` run at the reference tip 5e2e36a08, which changes only
+  `tools/playtest.py`, gives every one of these files again but for the commit line. The sounds, UI logs, interface
+  commands, events, frames and views of the 98 are those of v51, and the saves decode equal to v51's.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

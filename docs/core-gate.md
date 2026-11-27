@@ -61,7 +61,7 @@ the same relative paths, unpacking each `.xz` file under its name without `.xz`.
 
 | Call | Arguments | Value |
 | --- | --- | --- |
-| `rows` | dump, schema | the rows the dump gives, in the order of the dump's blocks: a list of `[tick, phase, hash]`, `tick` an integer, `phase` a row name of `docs/trace-format.md`, section 2 (`units` to `meteors`, `world` and `tick`), and `hash` its 16 lowercase hex digits |
+| `rows` | dump, schema | the rows the dump gives, by tick and then in the row order of `docs/trace-format.md`, section 2, whatever the order of the dump's blocks: a list of `[tick, phase, hash]`, `tick` an integer, `phase` a row name of `docs/trace-format.md`, section 2 (`units` to `meteors`, `world` and `tick`), and `hash` its 16 lowercase hex digits |
 
 The dump is a `dump.txt` of a test-mode run (`docs/trace-format.md`, section 10), and the schema is the kit's
 `data/trace_schema.json`, which the gate copies to `trace_schema.json`. A dump gives a phase row for each phase block,

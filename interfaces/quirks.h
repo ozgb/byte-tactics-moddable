@@ -4,7 +4,7 @@
 // Major version of the quirks interface, changed when a flag is retired: it keeps its slot under a retired name, since a flag never moves.
 #define QUIRKS_VERSION_MAJOR 1
 // Minor version of the quirks interface, changed when a flag is appended at the end.
-#define QUIRKS_VERSION_MINOR 0
+#define QUIRKS_VERSION_MINOR 1
 
 // The quirk flags of a match, one int per flag (0 or 1) in the order of quirks.def; a new flag goes at the end, and no flag moves or goes away.
 struct Quirks {
@@ -22,6 +22,8 @@ struct Quirks {
     int hoverBobWallClock;
     // frontend.bound-logo-select (view): the list of free logos stops at 24, so every index fits its array.
     int boundLogoSelect;
+    // players.rank-compaction-per-tick (sim): the tick compacts the ranks of the score panel once, instead of each drawn frame of the panel.
+    int rankCompactionPerTick;
 };
 
 #endif

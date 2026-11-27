@@ -106,6 +106,7 @@ int g_cursorX = kScreenWidth / 2;
 int g_cursorY = kScreenHeight / 2;
 
 const int kKeyCount = 256;
+const int kGogNoCdTrackCount = 17;
 
 struct KeyState {
     bool down;
@@ -945,13 +946,13 @@ int HeadlessMusicPlaying()
 
 int HeadlessMusicTrackCount()
 {
-    return 0;
+    return kGogNoCdTrackCount;
 }
 
 int HeadlessMusicTrackIsAudio(int track)
 {
     (void)track;
-    return -1;
+    return 0;
 }
 
 int HeadlessMusicTrackLength(int track)

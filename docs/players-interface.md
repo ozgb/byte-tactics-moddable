@@ -1,6 +1,6 @@
 # The players interface
 
-Players sits behind `interfaces/players.h` (version 5.3; 5.0 makes the condition slots stdcall instead of thiscall, with no unused register argument; 5.1 adds the console's kinds SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS; 5.2 adds SET_CHEATS and LEAVE_GAME; 5.3 adds SET_CONTROL and SET_VIEW), the sixth module on the scheduler after economy
+Players sits behind `interfaces/players.h` (version 5.4; 5.0 makes the condition slots stdcall instead of thiscall, with no unused register argument; 5.1 adds the console's kinds SET_STORE, SET_TYPE, END_GAME and DEACTIVATE_CONDITIONS; 5.2 adds SET_CHEATS and LEAVE_GAME; 5.3 adds SET_CONTROL and SET_VIEW; 5.4 adds COMPACT_RANKS), the sixth module on the scheduler after economy
 (`docs/economy-interface.md`), features (`docs/features-interface.md`), targeting (`docs/targeting-interface.md`),
 los_radar (`docs/los-radar-interface.md`) and map (`docs/map-interface.md`) (#967). It is the players as the
 simulation sees them: each player's update (its resources' bookkeeping, the commander's respawn, the end of the game),
@@ -36,7 +36,9 @@ Players' place in it:
   now publishes SET_STORE too. Since 5.3 the console's `control` and `view` publish SET_CONTROL and SET_VIEW from
   `SCHED_ENGINE` through a synchronous route, in place of their writes to `Game::localPlayer` and `Game::playerIndex`;
   the command's test of the player (below 10, active, of type 1 to 3, with index other than 10) is made where players
-  applies the event.
+  applies the event. Since 5.4 the score panel publishes COMPACT_RANKS from `SCHED_ENGINE` on a frame it draws, when
+  its pass over its own copy of the ranks changed one; it replaces the panel's direct decrements of `Player.rank`
+  (#1113).
   Players' handler (`PlayersInbox`, `src/seams/players_world.cpp`) passes each to `Apply`, and records it with its
   outcome in the trace's dump (section 5). Economy's SHARE reaches it through `PlayersOnEconomyShare`, which builds a
   TRANSFER and hands it to the same handler; it moved from players' files into the same glue, as it is the engine's
@@ -80,6 +82,7 @@ Players' place in it:
 | the console: `doubleshot`, `halfshot`, `radar`, `shootall`, `treedeath` | writes to `uiOptionFlags` | SET_CHEATS from the engine |
 | the quit dialog's leave choice, the defeated player's stop-watching choice (`HandleSurrenderChoice`, `ContinueWatchingCallback`) | the end bit of `endGameFlags` | LEAVE_GAME from the engine |
 | the debug hotkey that fills the stores (`HandleDebugHotkey`) | writes to the `Player` record's stores | SET_STORE from the engine |
+| the score panel closes the gaps in the ranks while it draws (`DrawScorePanel`) | decrements of `Player.rank` | COMPACT_RANKS from the engine |
 | the console: `+give` (`CmdGive`) | `TransferMetal`, `TransferEnergy`, announced | TRANSFER from the engine |
 | the in-game dialogs: give the selected units (`GiveSelectedUnitsToPlayer`), share resources | `GiveUnitToPlayer`, `TransferMetal`, `TransferEnergy` | GIVE_UNIT, TRANSFER from the engine |
 | economy: the SHARE effect (`UpdateResourceSharing`) | `TransferMetal`, `TransferEnergy`, announced | TRANSFER, through `PlayersOnEconomyShare` |
@@ -113,13 +116,29 @@ one: 1 for UNIT_CREATED, UNIT_DIED and KILL_UNITS; for GIVE_UNIT, 1 when players
 CAPTURE_UNIT) and 0 when the unit was already the receiver's, dead, dying, or the receiver could not take it (the
 outcome is players' decision: units can still refuse a local copy at its unit limit, and the unit then stays with its
 old owner); for TRANSFER, 1, or 0 when either player is
-slot 10 or the amount is 0; 1 for SET_STORE, SET_TYPE, END_GAME, DEACTIVATE_CONDITIONS and LEAVE_GAME; for SET_CHEATS, 1, or 0 when `clear` or `set` has a bit outside 0x788 (the five cheat toggles); for SET_CONTROL and SET_VIEW, 1, or 0 when the player is above 9, not active, of a type other than 1 to 3 or of index 10. `Apply` first rejects an event naming no unit (GIVE_UNIT, UNIT_CREATED, UNIT_DIED), a
+slot 10 or the amount is 0; 1 for SET_STORE, SET_TYPE, END_GAME, DEACTIVATE_CONDITIONS and LEAVE_GAME; for COMPACT_RANKS, 1, or 0 when the quirk flag `players.rank-compaction-per-tick` is on and the event changes nothing; for SET_CHEATS, 1, or 0 when `clear` or `set` has a bit outside 0x788 (the five cheat toggles); for SET_CONTROL and SET_VIEW, 1, or 0 when the player is above 9, not active, of a type other than 1 to 3 or of index 10. `Apply` first rejects an event naming no unit (GIVE_UNIT, UNIT_CREATED, UNIT_DIED), a
 player above 9 for GIVE_UNIT or above 10 for KILL_UNITS and TRANSFER, a resource other than 0 or 1, a SET_STORE or SET_TYPE for a player above 9, a SET_STORE for a resource other than 0 or 1, an END_GAME for a victory other than 0 or 1, a SET_CHEATS with a bit outside 0x788 in `clear` or `set`, a SET_CONTROL or SET_VIEW for a player that fails the console's test, a GIVE_UNIT, UNIT_CREATED or
 UNIT_DIED with no conditions (3.1c's GIVE_UNIT had no such check and crashed there, so no
 trace depends on it), and an
 unknown kind, with outcome 0 and no change. KILL_UNITS takes slot 10, the
 `Player` record past the ten players (`pad_2851`), because 3.1c's `KillPlayerUnits` is reachable with it from the
 network (`RemovePlayer` of an unknown id); a module publishing from WASM can reach the others.
+
+**The ranks.** `Player.rank` is a player's place on the score panel, 0 first: `SetupPlayerSlot` sets it to the slot,
+and the kill credit of `ApplyUnitDeath` moves the killer up past the players with fewer kills. A defeated player keeps
+its rank, so a defeat leaves a gap. 3.1c's score panel closes the gaps on each frame it draws (`DrawScorePanel`): for
+each place `i` from 0 below `numPlayers`, when no counted player holds it, every counted player whose rank is above `i`
+moves down one, and the pass goes on to `i + 1` without looking at `i` again. A counted player is active, of type 1, 2
+or 3, not the record past the ten players (`index` 10), not defeated (`unitCount` 0 with `unitsCreated` above 0), and
+not only watching (bit 0x40 of its setup's flags). The pass keeps the counted players in order. It closes a lone gap,
+but a run of gaps, or a rank past `numPlayers`, takes more than one pass, so the pass is not idempotent. The panel runs
+it on its own copy of the ranks, draws from the copy, and publishes COMPACT_RANKS when the copy changed; `Apply` runs
+the pass once per event on `Player.rank` (`CompactPlayerRanks`). On one machine, the number of events that change a rank
+is the number of frames on which 3.1c's pass changed one, so the ranks are 3.1c's. A pass more, as from another
+machine's panel, closes the same gaps sooner and keeps the order. No reference scenario draws the panel (it shows only
+while F4 has toggled it on or Space is held), so with every flag off no trace has the event. With the quirk flag
+`players.rank-compaction-per-tick` on, `UpdatePlayersFinish` runs the pass once per tick instead, and COMPACT_RANKS
+changes nothing (outcome 0), so the ranks no longer depend on which frames are drawn (`docs/quirks.md`).
 
 **Every slot of 2.0.** The 30 slots of players 2.0, and what each became in 3.0:
 
@@ -178,7 +197,7 @@ scenario plays (section 6).
 objects, `Game::endGameCountdown` and `Game::endGameFlags`, and `Game::localPlayer` and `Game::playerIndex` (SET_CONTROL
 and SET_VIEW).
 
-**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 5.3; the payloads are unchanged since 4.0 besides the new kinds) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values sign-extended) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
+**Payloads.** Every event and effect starts with `PlayersEventHeader`: `kind` and `unit` (a block offset; 0 for KILL_UNITS and TRANSFER, which name none). Each kind has the payload of `interfaces/players.h` (version 5.4; the payloads are unchanged since 4.0 besides the new kinds) that starts with it, or is the header alone. The ownership record that comes with a handed-over unit is `PlayersOwnershipRecord`: `present` (1 when the fields come from a record), `hitPoints`, `buildPercent`, `angles[3]` (bank, heading, pitch, 16-bit values sign-extended) and `stockpiles[3]` (0 to 255). `Apply(event, size)` refuses an event smaller than its kind's payload, with outcome 0 and no change, besides the refusals of section 2.
 
 | Kind | Payload | Fields after the header |
 |---|---|---|
@@ -194,6 +213,7 @@ and SET_VIEW).
 | LEAVE_GAME 202 | the header alone | none; raises bit 2 of `endGameFlags`, the end bit |
 | SET_CONTROL 203 | `PlayersSetPlayer` | `player` (0 to 9): `localPlayer` and `playerIndex` become it |
 | SET_VIEW 204 | `PlayersSetPlayer` | `player` (0 to 9): only `playerIndex` becomes it |
+| COMPACT_RANKS 205 | the header alone | none; one pass of the score panel over `Player.rank` (section 2, "The ranks") |
 | KILL_UNIT 208 | `PlayersKillUnit` | `selfDestruct`: 0 by 30000 damage the unit deals itself, 1 by self-destruct |
 | SEND_UNIT 209 | `PlayersSendUnit` | `player`: the player it goes to |
 | CAPTURE_UNIT 210 | `PlayersCaptureUnit` | `player` (the player the copy is made for), `record` (a `PlayersOwnershipRecord`) |
@@ -245,6 +265,7 @@ as the table below says.
 | units KILL_UNITS | synchronous | The gate (section 8). |
 | engine KILL_UNITS | synchronous | #952's rule. Queued it stayed equal on the tier, which has no network path: the engine publishes it from `RemovePlayer`, a packet of the net phase (`HandleNetPackets`), and the packets after it in the same phase read the dead units (a unit's state packet, a kill packet). The console's `+kill`, `+iwin` and `+ilose` publish it outside the tick (the console runs before `SchedBeginTick`, in the harness and in the main loop's input), where #970's rule delivers it at once. |
 | engine SET_CHEATS, LEAVE_GAME | synchronous | Published only outside the tick (the console, the quit and defeat dialogs), where #970's rule delivers an event at once either way; synchronous like the console's other kinds of 5.1. |
+| engine COMPACT_RANKS | synchronous | Published only outside the tick, by the score panel as it draws, so it lands where 3.1c's draw wrote the ranks, before the next tick. |
 | units UNIT_CREATED | queued | Equal on the tier, and #952's rule does not need it: no condition type overrides `OnUnitCreated`, so the event writes nothing in the default, and nothing in the phase can read a difference while it is pending. Its order against UNIT_DIED is kept, as a synchronous route delivers players' inbox before it hands over its event. |
 | units UNIT_DIED | synchronous | The gate (section 8). |
 | orders GIVE_UNIT | synchronous | The gate (section 8). |

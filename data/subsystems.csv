@@ -3200,6 +3200,7 @@ CommandLineNumber::~CommandLineNumber,src/debug/debug_lib.cpp,platform,folder:sr
 CommandLineSwitch::~CommandLineSwitch,src/debug/command_line.h,platform,folder:src/debug/,
 CommandNameLess::operator(),src/util/commands.cpp,platform,folder:src/util/,
 CommandNameNotEqual::operator(),src/util/commands.cpp,platform,folder:src/util/,
+CompactPlayerRanks,src/game/players_events.cpp,players,file:src/game/players,
 CompareEntryNames,src/host/win32/files.cpp,platform,folder:src/host/,
 CompareFrom,src/harness/display_log.cpp,harness,folder:src/harness/,
 CompareOut,src/harness/block_scan.cpp,harness,folder:src/harness/,
@@ -3234,6 +3235,7 @@ CountMissionUnitsNative,src/seams/native.cpp,seams,folder:src/seams/,
 CountMissionsNative,src/seams/native.cpp,seams,folder:src/seams/,
 CountStartPositionsNative,src/seams/native.cpp,seams,folder:src/seams/,
 CountUse,src/state/block.cpp,game,default,
+CountsForRank,src/game/players_events.cpp,players,file:src/game/players,
 CreateFactoryIndex,src/units/factory_index.cpp,units,default:src/units/,
 CreatePlayerObjectStateNative,src/seams/native.cpp,seams,folder:src/seams/,
 CreateSquadManagerNative,src/seams/native.cpp,seams,folder:src/seams/,
@@ -3846,6 +3848,7 @@ HarnessEventLogOpen,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessEventText,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessExit,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessFeaturesEvent,src/harness/harness.cpp,harness,folder:src/harness/,
+HarnessFrameClockElapsedMs,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessFrameDrawn,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessFrameEnd,src/harness/harness.cpp,harness,folder:src/harness/,
 HarnessGameSeed,src/harness/harness.cpp,harness,folder:src/harness/,
@@ -4599,6 +4602,7 @@ PlayersEventSize,src/game/players_event_size.h,game,file:src/game/players,game
 PlayersInbox,src/seams/players_world.cpp,seams,folder:src/seams/,
 PlayersInit,src/game/players.cpp,players,file:src/game/players,
 PlayersOnEconomyShare,src/seams/players_world.cpp,seams,folder:src/seams/,
+PlayersPublishCompactRanks,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishDeactivateConditions,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishEndGame,src/game/players_events.h,game,file:src/game/players,game
 PlayersPublishKillUnits,src/game/players_events.h,game,file:src/game/players,game

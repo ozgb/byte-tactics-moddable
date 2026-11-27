@@ -54,6 +54,7 @@
 #include "../state/block_vector.h"
 #include "../game/match_setup.h"
 #include "../game/scheduler.h"
+#include "../sound/sound.h"
 #include "../game/units_events.h"
 #include "../game/orders_events.h"
 #include "share_packets.h"
@@ -151,6 +152,9 @@ static int s_displayTickLine = 0;
 static unsigned s_displayTick = 0;
 static int s_displayTickDone = 0;
 static unsigned s_displayFrames = 0;
+static const unsigned kFrameClockStepMs = 33;
+static unsigned s_frameClockMs = 0;
+static unsigned s_frameClockRead = 0;
 static unsigned s_displaySteps = 0;
 static char s_scenarioQuirks[512];
 static Quirks s_scenarioQuirkSet;
@@ -2015,6 +2019,10 @@ void HarnessStartSkirmish()
     if (g_seams.mission->GetGameType() != 3)
         g_game->netGameFlags_2a44.bits.b3 = 1;
     g_game->gui.hotGadgetIndex = -1;
+    Sound* sound = (Sound*)g_game->sound;
+    sound->trackCount = 0;
+    sound->currentTrack = 0;
+    sound->dataTrack = 1;
 }
 
 static void UiEndOfTick();
@@ -4674,10 +4682,18 @@ const char* HarnessMapName()
     return s_map;
 }
 
+unsigned int HarnessFrameClockElapsedMs()
+{
+    unsigned elapsed = s_frameClockMs - s_frameClockRead;
+    s_frameClockRead = s_frameClockMs;
+    return elapsed;
+}
+
 void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY)
 {
     if (!HarnessTestMode())
         return;
+    s_frameClockMs += kFrameClockStepMs;
     unsigned tick = GameU32(GAME_TICK);
     if (DlIsOn() != 0 && s_replayPath[0] != '\0' && tick >= 1)
         DisplayReplayRun(s_replayPath, s_frameTicks, s_frameCount);

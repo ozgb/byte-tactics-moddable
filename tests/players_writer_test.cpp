@@ -17,6 +17,7 @@
 #include "../src/map/spatial_bucket.h"
 #include "../src/game/unit_resources.h"
 #include "../src/network/player.h"
+#include "../src/network/player_info.h"
 #include "../src/units/unit.h"
 #include "../src/game/game.h"
 #pragma pack(pop)
@@ -377,6 +378,124 @@ static void CheckRejected()
     Check(units.size() == withDying.size(), "the unit snapshots have one size");
 }
 
+static void ScorePanelPass()
+{
+    for (int i = 0; i < (int)g_game->numPlayers; i++) {
+        int n;
+        Player* p = g_game->players;
+        for (n = 0; n < 10; n++, p++) {
+            if (p->active == 0)
+                continue;
+            unsigned char c = p->type;
+            if (c != 1 && c != 2 && c != 3)
+                continue;
+            if (p->index == 0xa)
+                continue;
+            if (p->unitCount == 0 && p->unitsCreated != 0)
+                continue;
+            if (p->info->flags_9b & 0x40)
+                continue;
+            if (p->rank != i)
+                continue;
+            break;
+        }
+        if (n == 10) {
+            Player* q = g_game->players;
+            for (int k = n; k != 0; k--, q++) {
+                if (q->active == 0)
+                    continue;
+                unsigned char c = q->type;
+                if (c != 1 && c != 2 && c != 3)
+                    continue;
+                if (q->index == 0xa)
+                    continue;
+                if (q->unitCount == 0 && q->unitsCreated != 0)
+                    continue;
+                if (q->info->flags_9b & 0x40)
+                    continue;
+                if (q->rank > i)
+                    q->rank--;
+            }
+        }
+    }
+}
+
+struct RankCase {
+    const char* name;
+    int numPlayers;
+    int slots;
+    unsigned char ranks[10];
+    unsigned char defeated[10];
+    unsigned char watching[10];
+};
+
+static void SetRanks(const RankCase& c, PlayerInfo* infos)
+{
+    memset(g_game->players, 0, sizeof(g_game->players));
+    g_game->numPlayers = (unsigned short)c.numPlayers;
+    for (int n = 0; n < 10; n++) {
+        Player* p = &g_game->players[n];
+        p->active = n < c.slots;
+        p->type = (unsigned char)(1 + n % 3);
+        p->index = (unsigned char)n;
+        p->rank = c.ranks[n];
+        p->unitsCreated = 4;
+        p->unitCount = c.defeated[n] ? 0 : 2;
+        infos[n].flags_9b = c.watching[n] ? 0x40 : 0;
+        p->info = &infos[n];
+    }
+}
+
+static void CheckCompactRanks()
+{
+    PlayerInfo* infos = (PlayerInfo*)SimAlloc(10 * sizeof(PlayerInfo));
+    memset((void*)infos, 0, 10 * sizeof(PlayerInfo));
+    static const RankCase cases[] = {
+        { "a defeat in the middle", 4, 4, { 0, 1, 2, 3 }, { 0, 1, 0, 0 }, { 0 } },
+        { "a defeat of the leader", 2, 2, { 0, 1 }, { 1, 0 }, { 0 } },
+        { "two defeats in a row", 5, 5, { 0, 1, 2, 3, 4 }, { 0, 1, 1, 0, 0 }, { 0 } },
+        { "a watcher and a defeat", 5, 5, { 3, 0, 1, 4, 2 }, { 0, 0, 1, 0, 0 }, { 0, 1, 0, 0, 0 } },
+        { "a rank past the number of players", 2, 4, { 0, 3, 1, 2 }, { 0, 0, 1, 1 }, { 0 } },
+    };
+    static unsigned char expected[sizeof(g_game->players)];
+    for (unsigned int c = 0; c < sizeof cases / sizeof cases[0]; c++) {
+        char what[160];
+        for (int pass = 1; pass <= 3; pass++) {
+            SetRanks(cases[c], infos);
+            for (int k = 0; k < pass; k++)
+                ScorePanelPass();
+            memcpy(expected, g_game->players, sizeof expected);
+            SetRanks(cases[c], infos);
+            int outcome = 1;
+            for (int k = 0; k < pass; k++) {
+                PlayersEventHeader e;
+                memset(&e, 0, sizeof e);
+                e.kind = PLAYERS_COMPACT_RANKS;
+                outcome &= Offer(e);
+            }
+            sprintf(what, "%s: %d COMPACT_RANKS leave the ranks of %d passes of the score panel", cases[c].name, pass, pass);
+            Check(memcmp(expected, g_game->players, sizeof expected) == 0, what);
+            sprintf(what, "%s: COMPACT_RANKS has outcome 1", cases[c].name);
+            Check(outcome == 1, what);
+            SetRanks(cases[c], infos);
+            for (int k = 0; k < pass; k++)
+                CompactPlayerRanks();
+            sprintf(what, "%s: %d passes of the tick leave the ranks of %d passes of the score panel", cases[c].name, pass, pass);
+            Check(memcmp(expected, g_game->players, sizeof expected) == 0, what);
+        }
+    }
+
+    SetRanks(cases[0], infos);
+    memcpy(expected, g_game->players, sizeof expected);
+    g_quirks.rankCompactionPerTick = 1;
+    PlayersEventHeader e;
+    memset(&e, 0, sizeof e);
+    e.kind = PLAYERS_COMPACT_RANKS;
+    Check(Offer(e) == 0, "with players.rank-compaction-per-tick on, COMPACT_RANKS has outcome 0");
+    Check(memcmp(expected, g_game->players, sizeof expected) == 0, "with players.rank-compaction-per-tick on, COMPACT_RANKS changes no rank");
+    g_quirks.rankCompactionPerTick = 0;
+}
+
 int main()
 {
     Setup();
@@ -417,6 +536,7 @@ int main()
         noDeath.dropped, noGive.dropped, firstDeath, firstGive, deathDiffering, giveDiffering, giveConditions, giveEffects);
 
     CheckRejected();
+    CheckCompactRanks();
 
     printf(g_failures ? "FAILED\n" : "players_writer_test: all passed\n");
     return g_failures != 0;

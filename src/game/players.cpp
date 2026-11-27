@@ -683,6 +683,8 @@ void __stdcall UpdatePlayerTail(int player)
 
 void __stdcall UpdatePlayersFinish()
 {
+    if (g_quirks.rankCompactionPerTick)
+        CompactPlayerRanks();
     if (g_seams.mission->GetGameType() == 3 &&
         g_game->commanderDeath != 2 &&
         CountCombatPlayers() == 0) {

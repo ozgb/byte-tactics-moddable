@@ -168,6 +168,7 @@ GATE_TIER = (
     "share-all",
     "ui-build-menu",
     "ui-build-place",
+    "ui-debug-keys",
     "ui-dialogs",
     "ui-groups",
     "ui-keys",
@@ -917,7 +918,11 @@ def recheck(found: Found, column: int = DIGEST) -> str | None:
 
 def scenario_frontend(scenario: Path) -> bool:
     """Whether the scenario has a `frontend 1` line, so that the menus set up its match and its setup log is stored."""
-    return any(line.split() == ["frontend", "1"] for line in scenario.read_text().splitlines())
+    values = [line.split()[1:] for line in scenario.read_text().splitlines() if line.split()[:1] == ["frontend"]]
+    for value in values:
+        if value not in (["0"], ["1"]):
+            sys.exit(f"{scenario}: frontend takes 0 or 1, not {' '.join(value) or 'nothing'}")
+    return ["1"] in values
 
 
 def scenario_saves(scenario: Path) -> bool:
@@ -2173,15 +2178,9 @@ def copy_ui(directory: Path) -> None:
     UIS.mkdir(parents=True, exist_ok=True)
     for old in UIS.glob("*.txt"):
         old.unlink()
-    copied = 0
     for path in logs:
-        scenario = SCENARIOS / path.name
-        # TODO(#1145): store the UI log of a frontend scenario once the headless host's CD audio draws as the reference's does
-        if scenario.exists() and scenario_frontend(scenario):
-            continue
         shutil.copyfile(path, UIS / path.name)
-        copied += 1
-    print(f"{copied} UI logs copied to {UIS.relative_to(ROOT)}")
+    print(f"{len(logs)} UI logs copied to {UIS.relative_to(ROOT)}")
 
 
 def copy_commands(directory: Path) -> None:

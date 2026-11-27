@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include "../../interfaces/host.h"
 #include "../harness/replay.h"
+#include "../harness/harness.h"
+#include "../util/engine_services.h"
 #include "win_types.h"
 
 #include "rect.h"
@@ -11,7 +13,7 @@
 
 inline void FrameRateCounter::Tick()
 {
-    unsigned int now = host_time_ms();
+    unsigned int now = HarnessTestMode() ? lastTick + HarnessFrameClockElapsedMs() : host_time_ms();
     accum += now - lastTick;
     lastTick = now;
     frames++;

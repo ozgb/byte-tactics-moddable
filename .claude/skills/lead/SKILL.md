@@ -43,6 +43,8 @@ Nothing else needs you. A pull request waiting on the maintainer, on CI or on th
 
 ### 2. Take an issue
 
+First release each of your claims whose next step waits on an open issue or another pull request you aren't working on (`docs/team.md`, "Issue states", Claimed): comment `Lead: Released, lead <name>.` with what is done and what it waits on, and unassign yourself. A claim waiting only on its own pull request's review or CI stands.
+
 While you hold **fewer than 3 claims** (`docs/team.md`, "Issue states"; `uv run tools/available.py --claims` counts yours, and count an issue agent you have briefed that hasn't claimed yet), take the first available issue `uv run tools/available.py` lists (`AGENTS.md` step 2): #2's "Priority now" first, in its order, then any other claimable issue, oldest first, inside your lane (`BT_LEAD_LANE`, which the tool reads). Never take a `parked` issue. When nothing is available, say so in your report and why (the tool gives each issue's reason).
 
 Where there is a choice, prefer an issue that touches different files from the ones you hold: two that regenerate the same files merge one at a time. Available issues that touch the same files and run the same gate go to the same agent, for one pull request.

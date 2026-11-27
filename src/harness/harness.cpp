@@ -130,6 +130,7 @@ static char s_commit[64] = "-";
 static char s_scenarioPath[512];
 static FILE* s_trace = NULL;
 static FILE* s_commands = nullptr;
+static unsigned s_lastTick = 0;
 static bool s_interfaceOpen = false;
 static FILE* s_dump = NULL;
 static FILE* s_sound = nullptr;
@@ -195,6 +196,15 @@ static void Fail(const char* text)
 {
     host_log(text);
     host_exit(2);
+}
+
+static void CloseCommands()
+{
+    if (s_commands == nullptr)
+        return;
+    fprintf(s_commands, "end %u\n", s_lastTick);
+    fclose(s_commands);
+    s_commands = nullptr;
 }
 
 static void FailLine(int lineNo, const char* what, const char* key, const char* detail)
@@ -1653,6 +1663,7 @@ static bool s_replayUnitsChecked = false;
 static unsigned s_replayUnitsOffset = 0;
 static unsigned s_replayUnitsStride = 0;
 static unsigned s_replayEvent[1024];
+static unsigned s_replayEnd = 0;
 
 static void FailReplay(const char* what)
 {
@@ -1683,12 +1694,40 @@ static void OpenTestCommands(const char* path)
         Fail(msg);
         return;
     }
-    if (!ReadReplayLine() || strcmp(s_replayLine, "bt-commands 2") != 0)
-        FailReplay("must be bt-commands 2");
+    if (!ReadReplayLine() || strcmp(s_replayLine, "bt-commands 3") != 0)
+        FailReplay("must be bt-commands 3");
     int used = 0;
     if (!ReadReplayLine() || sscanf(s_replayLine, "units %u %u%n", &s_replayUnitsOffset, &s_replayUnitsStride, &used) != 2
         || s_replayLine[used] != '\0')
         FailReplay("must be units <offset> <stride>");
+    long start = ftell(s_replay);
+    int startLineNo = s_replayLineNo;
+    bool ended = false;
+    unsigned lastTick = 0;
+    int lastTickLineNo = 0;
+    while (ReadReplayLine()) {
+        if (ended)
+            FailReplay("follows the end line");
+        if (strncmp(s_replayLine, "end ", 4) == 0) {
+            used = 0;
+            if (!isdigit((unsigned char)s_replayLine[4]) || sscanf(s_replayLine, "end %u%n", &s_replayEnd, &used) != 1
+                || s_replayLine[used] != '\0')
+                FailReplay("must be end <tick>");
+            ended = true;
+        } else if (isdigit((unsigned char)s_replayLine[0])) {
+            lastTick = strtoul(s_replayLine, nullptr, 10);
+            lastTickLineNo = s_replayLineNo;
+        }
+    }
+    if (!ended)
+        FailReplay("is the last line, which must be end <tick>");
+    if (lastTickLineNo != 0 && lastTick > s_replayEnd + 1) {
+        s_replayLineNo = lastTickLineNo;
+        FailReplay("has a tick after the tick that follows the end line's");
+    }
+    if (start < 0 || fseek(s_replay, start, SEEK_SET) != 0)
+        FailReplay("cannot be read again");
+    s_replayLineNo = startLineNo;
 }
 
 static void ParseTestCommands(char* cmdLine)
@@ -1839,6 +1878,7 @@ void HarnessExit()
 {
     if (HarnessTestMode())
         CheckFrameInputsDelivered();
+    CloseCommands();
     if (HarnessTestMode() && s_blockScan)
         BlockScanWrite(strcmp(s_commit, "unknown") == 0 ? "-" : s_commit);
 #if BT_ACCESS_LOG
@@ -2126,6 +2166,56 @@ static void VisitSharePackets();
 static void WriteTickRow();
 static void WriteViewRow();
 
+static void FinishRun(bool early, const char* last)
+{
+    char msg[100];
+    CheckFrameInputsDelivered();
+    if (s_trace != NULL)
+        fclose(s_trace);
+    CloseCommands();
+    if (s_dump != NULL)
+        fclose(s_dump);
+    if (s_sound != nullptr)
+        fclose(s_sound);
+    if (s_events != nullptr)
+        fclose(s_events);
+    s_events = nullptr;
+    if (s_ui != nullptr)
+        fclose(s_ui);
+    s_ui = nullptr;
+    DlClose();
+    if (!early && s_displayTickLine != 0 && !s_displayTickDone) {
+        sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_displayTick);
+        Fail(msg);
+    }
+    if (!early && s_frameNext < s_frameCount) {
+        sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_frameTicks[s_frameNext]);
+        Fail(msg);
+    }
+    s_trace = NULL;
+    s_dump = NULL;
+    s_sound = nullptr;
+    if (s_blockScan)
+        BlockScanWrite(strcmp(s_commit, "unknown") == 0 ? "-" : s_commit);
+    host_log(last);
+    MatchSetup setup = MatchSetupCurrent();
+    if (setup.blockBytes != kSimBlockBytes || setup.searchSteps != 0) {
+        sprintf(msg, "testmode: match setup block_bytes %u search_steps %u\n", setup.blockBytes, setup.searchSteps);
+        host_log(msg);
+    }
+    char replayError[300];
+    replayError[0] = '\0';
+    if (!ReplayWrite(replayError, sizeof replayError)) {
+        char text[360];
+        sprintf(text, "testmode: cannot write a replay file%s%s\n", replayError[0] == '\0' ? "" : ": ", replayError);
+        Fail(text);
+    }
+#if BT_ACCESS_LOG
+    AccessLogFinish();
+#endif
+    host_exit(0);
+}
+
 void HarnessAfterStep()
 {
     s_recordPhase = -1;
@@ -2133,6 +2223,8 @@ void HarnessAfterStep()
 #if BT_ACCESS_LOG
     AccessLogScope accessWindow(ACCESS_WINDOW_OFF, ACCESS_WINDOW_PRESENTATION);
 #endif
+    if (HarnessTestMode())
+        s_lastTick = (unsigned)g_game->ticks;
     if (HarnessTestMode() && s_trace != nullptr) {
         VisitSharePackets();
         WriteTickRow();
@@ -2171,58 +2263,12 @@ void HarnessAfterStep()
         s_interfaceOpen = true;
         return;
     }
-    CheckFrameInputsDelivered();
     char msg[64];
-    if (s_trace != NULL)
-        fclose(s_trace);
-    if (s_commands != nullptr)
-        fclose(s_commands);
-    s_commands = nullptr;
-    if (s_dump != NULL)
-        fclose(s_dump);
-    if (s_sound != nullptr)
-        fclose(s_sound);
-    if (s_events != nullptr)
-        fclose(s_events);
-    s_events = nullptr;
-    if (s_ui != nullptr)
-        fclose(s_ui);
-    s_ui = nullptr;
-    DlClose();
-    if (!gameOver && s_displayTickLine != 0 && !s_displayTickDone) {
-        sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_displayTick);
-        Fail(msg);
-    }
-    if (!gameOver && s_frameNext < s_frameCount) {
-        sprintf(msg, "testmode: no frame was drawn at tick %u\n", s_frameTicks[s_frameNext]);
-        Fail(msg);
-    }
-    s_trace = NULL;
-    s_dump = NULL;
-    s_sound = nullptr;
-    if (s_blockScan)
-        BlockScanWrite(strcmp(s_commit, "unknown") == 0 ? "-" : s_commit);
     if (gameOver && (unsigned)g_game->ticks < s_ticks)
         sprintf(msg, "testmode: game over at tick %u\n", (unsigned)g_game->ticks);
     else
         sprintf(msg, "testmode: reached tick %u\n", s_ticks);
-    host_log(msg);
-    MatchSetup setup = MatchSetupCurrent();
-    if (setup.blockBytes != kSimBlockBytes || setup.searchSteps != 0) {
-        sprintf(msg, "testmode: match setup block_bytes %u search_steps %u\n", setup.blockBytes, setup.searchSteps);
-        host_log(msg);
-    }
-    char replayError[300];
-    replayError[0] = '\0';
-    if (!ReplayWrite(replayError, sizeof replayError)) {
-        char text[360];
-        sprintf(text, "testmode: cannot write a replay file%s%s\n", replayError[0] == '\0' ? "" : ": ", replayError);
-        Fail(text);
-    }
-#if BT_ACCESS_LOG
-    AccessLogFinish();
-#endif
-    host_exit(0);
+    FinishRun(gameOver, msg);
 }
 
 #include "trace_schema.h"
@@ -4490,6 +4536,8 @@ static void ReplayCommands(unsigned tick)
                 return;
             s_replayPending = true;
         }
+        if (strncmp(s_replayLine, "end ", 4) == 0)
+            return;
         char* p = s_replayLine;
         char* end;
         unsigned lineTick = strtoul(p, &end, 10);
@@ -4598,6 +4646,11 @@ void HarnessBeforeStep()
     }
     if (s_replay != nullptr) {
         ReplayCommands(tick);
+        if (tick > s_replayEnd) {
+            char msg[80];
+            sprintf(msg, "testmode: -testcommands ended the run after tick %u\n", s_replayEnd);
+            FinishRun(true, msg);
+        }
         return;
     }
     for (int i = 0; i < s_spawnCount; i++) {
@@ -5221,7 +5274,7 @@ static void OpenTrace(unsigned controlWord)
     s_commands = fopen("commands.txt", "wb");
     if (s_commands == nullptr)
         Fail("testmode: cannot write commands.txt\n");
-    fputs("bt-commands 2\n", s_commands);
+    fputs("bt-commands 3\n", s_commands);
     s_sound = fopen("sound.txt", "wb");
     if (s_sound == nullptr)
         Fail("testmode: cannot write sound.txt\n");

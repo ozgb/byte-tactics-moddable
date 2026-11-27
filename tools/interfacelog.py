@@ -2,10 +2,10 @@
 
     uv run tools/interfacelog.py commands.txt
 
-The `interface` lines of a `bt-commands 2` file hold the raw payload of each event the game's interface sent to the
+The `interface` lines of a `bt-commands 3` file hold the raw payload of each event the game's interface sent to the
 simulation. The output is `bt-interface 1`, then one line per event: `<tick> <KIND>` and ` <field> <value>` for each
 field of the kind in data/trace_schema.json, with unit references as the unit's index (`-` for none, `heap` for a
-pointer that is no unit of the table). Scripted lines (spawn, order, console) are left out.
+pointer that is no unit of the table). Scripted lines (spawn, order, console) and the `end` line are left out.
 """
 
 import argparse
@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-COMMANDS_HEADER = "bt-commands 2"
+COMMANDS_HEADER = "bt-commands 3"
 INTERFACE_HEADER = "bt-interface 1"
 MAX_UNITS = 65536
 
@@ -63,16 +63,22 @@ def decode_record(tick: str, name: str, payload: bytes, entry: dict | None, unit
 
 
 def decode(commands_text: str, schema: dict) -> str:
-    """The `bt-interface 1` text of the interface records of a `bt-commands 2` file."""
+    """The `bt-interface 1` text of the interface records of a `bt-commands 3` file."""
     lines = commands_text.splitlines()
     if not lines or lines[0] != COMMANDS_HEADER:
         raise ValueError(f"not a {COMMANDS_HEADER} file")
     by_name = kinds(schema)
     units: tuple[int, int] | None = None
     out = [INTERFACE_HEADER]
+    if len(lines) < 2 or lines[-1].split()[:1] != ["end"]:
+        raise ValueError(f"commands.txt line {len(lines)}: the last line must be `end <tick>`")
     for number, line in enumerate(lines[1:], 2):
         words = line.split()
         try:
+            if words[0] == "end":
+                if number != len(lines) or len(words) != 2 or not words[1].isdigit():
+                    raise ValueError
+                continue
             if words[0] == "units":
                 units = (int(words[1]), int(words[2]))
                 if units[1] <= 0:

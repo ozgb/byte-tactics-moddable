@@ -393,7 +393,7 @@ class InterfaceLogTest(unittest.TestCase):
         return (payload + bytes(8) + units).hex()
 
     def commands(self, *lines: str) -> str:
-        return "\n".join(["bt-commands 2", f"units {self.OFFSET} {self.STRIDE}", *lines]) + "\n"
+        return "\n".join(["bt-commands 3", f"units {self.OFFSET} {self.STRIDE}", *lines, "end 40"]) + "\n"
 
     def test_group_command_without_a_target(self):
         text = self.commands(f"23 interface - 1 ORDERS_GROUP_COMMAND {self.group()}")
@@ -412,7 +412,7 @@ class InterfaceLogTest(unittest.TestCase):
             self.assertIn(" target heap ", interfacelog.decode(text, self.SCHEMA))
 
     def test_without_a_units_line_every_ref_is_heap(self):
-        text = f"bt-commands 2\n23 interface - 1 ORDERS_GROUP_COMMAND {self.group()}\n"
+        text = f"bt-commands 3\n23 interface - 1 ORDERS_GROUP_COMMAND {self.group()}\nend 22\n"
         self.assertIn("unit heap mode 3", interfacelog.decode(text, self.SCHEMA))
 
     def test_queue_build_and_cancel(self):
@@ -440,6 +440,15 @@ class InterfaceLogTest(unittest.TestCase):
             interfacelog.decode(self.commands("23 interface - 1 ORDERS_CANCEL zz"), self.SCHEMA)
         with self.assertRaises(ValueError):
             interfacelog.decode(self.commands("23 interface"), self.SCHEMA)
+
+    def test_the_end_line_is_the_last_and_holds_a_tick(self):
+        with self.assertRaises(ValueError):
+            interfacelog.decode("bt-commands 3\nunits 1 2\n", self.SCHEMA)
+        with self.assertRaises(ValueError):
+            interfacelog.decode(self.commands("end 39"), self.SCHEMA)
+        with self.assertRaises(ValueError):
+            interfacelog.decode("bt-commands 3\nunits 1 2\nend x\n", self.SCHEMA)
+        self.assertEqual(interfacelog.decode("bt-commands 3\nunits 1 2\nend 0\n", self.SCHEMA), "bt-interface 1\n")
 
     def test_has_input(self):
         self.assertTrue(interfacelog.has_input("ticks 10\ninput 20 mouse left down 1 2\n"))
@@ -1353,7 +1362,7 @@ class ReplayTest(unittest.TestCase):
             self.assertTrue(reference.interfacelog.has_input(menus.read_text()))
             self.assertEqual(reference.with_replays({**scenarios, "menus": menus}), {"clicks+commands": scenarios["clicks"]})
 
-    def play(self, scenarios, writes="bt-commands 2\nunits 1 2\n", fail=(), modes=(None,)):
+    def play(self, scenarios, writes="bt-commands 3\nunits 1 2\nend 0\n", fail=(), modes=(None,)):
         calls = []
         lock = threading.Lock()
 
@@ -1390,7 +1399,7 @@ class ReplayTest(unittest.TestCase):
                 self.assertLess(keys.index(reference.tag("clicks", mode)), keys.index(replay))
                 key, want, _, played = calls[keys.index(replay)]
                 self.assertEqual(want, ("want", "clicks+commands"))
-                self.assertEqual(played, "bt-commands 2\nunits 1 2\n")
+                self.assertEqual(played, "bt-commands 3\nunits 1 2\nend 0\n")
             self.assertEqual(len(calls), 3 * len(modes))
 
     def test_a_replay_fails_without_running_when_its_scenario_failed_or_wrote_no_file(self):
@@ -1408,7 +1417,7 @@ class ReplayTest(unittest.TestCase):
 
             def fake_play_scenario(exe, scenario, game_dir, want=None, *args, watch=None, name=None, **kw):
                 calls.append((name or scenario.stem, want, watch))
-                reference.COMMAND_TEXTS[scenario.stem] = "bt-commands 2\n"
+                reference.COMMAND_TEXTS[scenario.stem] = "bt-commands 3\nend 0\n"
                 return {}, [], 0.0, None
 
             played = {**scenarios, **reference.with_replays(scenarios)}

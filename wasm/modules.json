@@ -59,9 +59,6 @@
       "SimFree": [["linear"], "void"],
       "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
       "SimCaptureAlloc": [["int", "linear"], "linear"],
-      "GetGafFrame": [["linear", "int"], "linear"],
-      "InitGafSequence": [["linear", "linear", "int"], "void"],
-      "StepGafSequence": [["linear"], "int"],
       "GetSlotDpid": [["int"], "int"],
       "FindSlotByDpid": [["int"], "int"],
       "Emit": [["linear", "int"], "void"]

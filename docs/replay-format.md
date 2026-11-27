@@ -26,6 +26,9 @@ uv run tools/replay.py --compare DIR_A DIR_B
 `--subsystem` is repeatable and defaults to every subsystem that has a `tests/replay/<subsystem>/` directory.
 `--check` records again and fails when a recording of `tests/replay/` differs. `--compare` fails when two
 directories differ and names the first differing line. Record on a fresh Wine prefix, as the gate runs.
+`--check` compares as text, except for what a module's behaviour does not depend on (#1209): `services.GetGafFrame` is a query answered by its
+arguments, so its calls may come in any order and number, but a call whose arguments the stored recording has no answer to, or whose answer
+differs, is a difference (reported as the query); and the `y` of the position of `los_radar.GetMapCellAtPosition` is an unread argument.
 Both play a scenario once for each subsystem it records: a run records one call at a time, so with two `record`
 lines a call one subsystem makes into the other would be an import of the first and missing from the second's
 recording. A run fails instead, with "a call of a recorded subsystem made inside a call of another recorded

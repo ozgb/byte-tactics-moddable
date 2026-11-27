@@ -181,7 +181,8 @@ GATE_TIER = (
     "units-transport-ship",
 )
 RUN_SECONDS_BASE = 120
-RUN_TICKS_PER_SECOND = 25
+DEFAULT_TICKS_PER_SECOND = 25
+RUN_TICKS_PER_SECOND = DEFAULT_TICKS_PER_SECOND
 RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK = 6
 RUN_ATTEMPTS = 2
 GATE_SCAN_EVERY = 8
@@ -963,6 +964,13 @@ def scenario_saves(scenario: Path) -> bool:
     return any(line.split()[:1] == ["save"] for line in scenario.read_text().splitlines())
 
 
+def run_timeout(ticks: int, scan_every_tick: bool = False) -> float:
+    """The seconds a run of `ticks` ticks may take before it counts as a hang, at RUN_TICKS_PER_SECOND (--ticks-per-second)."""
+    if scan_every_tick:
+        return RUN_SECONDS_BASE + ticks / (RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK * RUN_TICKS_PER_SECOND / DEFAULT_TICKS_PER_SECOND)
+    return RUN_SECONDS_BASE + ticks / RUN_TICKS_PER_SECOND
+
+
 def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
                   want: tuple[dict[str, str], list[tuple[int, str, str, str]]] | None = None, poison: bool = False,
                   keep_always: bool = False, scans: dict[str, str | None] | None = None,
@@ -984,7 +992,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     With `scans` (a dict) the run has the block pointer scan on (every `scan_every` ticks), and its blockptrs.txt text (None if the run
     wrote none) is stored there under the scenario's name before the run directory is removed. A scan of every
     tick is slow (about 20 ticks a second at the end of a long run), so its timeout uses
-    RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK. With `retry_any` a failed run is tried once more whatever the failure.
+    RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK, scaled as --ticks-per-second scales the other. With `retry_any` a failed run is tried once more whatever the failure.
 
     With `save_to` (a directory), each of tracediff.SAVE_FILES the run wrote in its game copy is copied there by its
     file name before the run's directory is removed (nothing is copied for a file the run wrote none of). With
@@ -1003,8 +1011,7 @@ def play_scenario(exe: Path, scenario: Path, game_dir: str | None,
     stem = name or scenario.stem
     key = tag(stem, mode)
     ticks = scenario_ticks(scenario)
-    rate = RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK if scans is not None and scan_every == 1 else RUN_TICKS_PER_SECOND
-    timeout = RUN_SECONDS_BASE + ticks / rate
+    timeout = run_timeout(ticks, scans is not None and scan_every == 1)
     end = want[1][-1][0] if want is not None and want[1] else ticks
     t0 = time.time()
     for attempt in range(RUN_ATTEMPTS):
@@ -2373,7 +2380,7 @@ def copy_setup(directory: Path) -> None:
     print(f"{len(logs)} setup logs copied to {SETUPS.relative_to(ROOT)}")
 
 
-def write_traces(game_dir: str | None, parallel: int) -> None:
+def write_traces(game_dir: str | None, parallel: int, ticks_per_second: float | None = None) -> None:
     directory = reference_branch()
     branch_scenarios = directory / "reference/scenarios"
     shutil.rmtree(branch_scenarios, ignore_errors=True)
@@ -2381,6 +2388,8 @@ def write_traces(game_dir: str | None, parallel: int) -> None:
     cmd = ["uv", "run", "tools/reference.py", "HEAD", "--traces", "--parallel", str(parallel)]
     if game_dir:
         cmd += ["--game-dir", game_dir]
+    if ticks_per_second is not None:
+        cmd += ["--ticks-per-second", f"{ticks_per_second:g}"]
     if subprocess.run(cmd, cwd=directory, env=REF_ENV).returncode:
         fail("tools/reference.py --traces failed on the reference branch")
     produced = sorted((directory / "reference/traces").glob("*.txt"))
@@ -2445,9 +2454,16 @@ def main() -> None:
     ap.add_argument("--game-dir", help="--traces, --check: the game's install (default: Steam's)")
     ap.add_argument("--parallel", type=int, default=None, metavar="N",
                     help="--traces, --check: scenarios played at once (default: half the CPUs, at most 6, or 10 with --both-modes)")
+    ap.add_argument("--ticks-per-second", type=float, default=None, metavar="N",
+                    help=f"--traces, --check: the slowest game speed that is not a hang, in the run timeout (default {DEFAULT_TICKS_PER_SECOND})")
     args = ap.parse_args()
     if args.parallel is None:
         args.parallel = default_parallel(args.both_modes)
+    if args.ticks_per_second is not None and args.ticks_per_second <= 0:
+        ap.error("--ticks-per-second takes a number above 0")
+    if args.ticks_per_second is not None:
+        global RUN_TICKS_PER_SECOND
+        RUN_TICKS_PER_SECOND = args.ticks_per_second
     if args.parallel < 1:
         ap.error("--parallel takes 1 or more")
     if args.traces == args.check:
@@ -2491,7 +2507,7 @@ def main() -> None:
     if args.exe and not args.check:
         ap.error("--exe needs --check")
     if args.traces:
-        write_traces(args.game_dir, args.parallel)
+        write_traces(args.game_dir, args.parallel, args.ticks_per_second)
         return
     if not args.exe:
         ap.error("--check needs --exe: the gate is the modern build, --exe build/modern/TotalA.exe")

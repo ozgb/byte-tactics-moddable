@@ -53,7 +53,7 @@ enum MapEventKind {
     MAP_REMOVE_UNIT = 161,
     // Takes unit off the cells, as MAP_REMOVE_UNIT does, and out of the spatial grid, as it dies; the header alone; outcome 1.
     MAP_CLEAR_UNIT = 162,
-    // Makes the units whose footprints overlap unit's give up the cells unit covers; the header alone; outcome 1.
+    // Sets bit 0x8000000 of unit's flags, has every object in unit's footprint claim its cells again, and refreshes the pass maps over the footprint; the header alone; outcome 1.
     MAP_RECLAIM_FOOTPRINT = 163,
     // Opens or closes the yard of unit when its footprint is clear for that state, and claims its cells for the state (MapSetYard); outcome 1 when it changed, 0 when the footprint was not clear.
     MAP_SET_YARD = 164,

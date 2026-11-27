@@ -215,8 +215,8 @@ the digests that should become a target gets a new tag (`reference-traces-v53`
 and so on), and this page is updated to name it. The current tag is
 `reference-traces-v52`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
 exported from and pairs it with the highest `reference-traces-v*` tag merged into that commit, so the two need not be on
-the same commit: the kit at `interfaces-v55` pairs with `reference-traces-v51`, and `interfaces-v56`, on the commit of
-`reference-traces-v52`, pairs with it.
+the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `reference-traces-v51`, and the kit at
+`interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.

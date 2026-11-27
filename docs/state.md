@@ -119,15 +119,12 @@ Crossings left during play, each waiting on another decision:
   assignment, which the mask cannot bound, so the table lists that write too.
 - `DispatchOrdersPanelPageFlags` and `StepBuildMenuPageBack` (control_panel.cpp) write the build-menu page bits of
   `Unit.flags`: bit 0x400000, the build menu rather than the orders, and the page number. Only presentation reads
-  them, but the trace still hashes them, since the mask covers only the selection bit 0x10. `InitUnitFromType`
+  them, but the trace still hashes them, since the mask covers only the selection bits (0x10 and 0xc0). `InitUnitFromType`
   (units.cpp) sets them too, for every builder with more than one menu page, so a mask would change nearly every
   trace. No run played from its command log (`docs/commands.md`, section 2.2) differs on them.
-- The selection functions of selection.cpp (`MarkLocalVisibleUnits`, `FindNextUnmarkedLocalUnit`,
-  `FocusNextLocalUnit`, `FocusCommander`) write bits 6 and 7 of `Unit.flags` (`selectState`), the mark of the units
-  that focusing the next unit has visited, and only they read it. It is still hashed, and it is the one difference
-  of every `ui-` scenario played from its command log but the last tick of `ui-dialogs` (#1136): #1132 masks it.
-- The selection (`Unit.flags` bit 0x10 and the other selection fields) is written by the selection functions of
-  selection.cpp; #1050 takes it out of the judged state.
+- The selection (`Unit.flags` bit 0x10, its visit mark `selectState` and the other selection fields) is written by
+  the selection functions of selection.cpp; #1050 and #1132 take the two bit fields out of the judged state ("The
+  selection" below).
 
 Not crossings:
 - `HandleGameKey` (keys.cpp), the debug key, toggles bits 0 and 1 of `endGameFlags` (the debug display and debug mode)
@@ -208,7 +205,7 @@ covers the save and load code as it covers the tick's.
 The selection is view state (#1047, decided by the human on 2026-11-24), though it is a bit of the simulation's unit
 record: `selected`, bit 0x10 of `Unit.flags` (+0x110). It stays there in this repository, as 3.1c lays it out; moving
 it is work for the re-implementation. The trace masks it out of the `Unit` table (`tools/traceschema.py`, mask
-0xffffffef), so no row hashes it (the phase rows, `world` and the end-of-tick `tick` row), and two runs that differ
+0xffffff2f, with the visit mark below), so no row hashes it (the phase rows, `world` and the end-of-tick `tick` row), and two runs that differ
 only in what is selected have equal traces. The save keeps the bit as 3.1c writes it. What a presentation is judged on
 is the UI log's `select` record (`docs/ui-log.md`), and the group command a click sends carries its units
 (`OrdersGroupCommand`), so the simulation never needs the selection to carry out an order.
@@ -223,6 +220,16 @@ Who touches the bit:
 - Game logic writes it twice more, and reads it nowhere else: `InitUnitFromType` (units.cpp) clears it for a new unit, and
   `LoadUnit` (unit_save.cpp) restores it from the save.
 - The harness reads it for the UI log's `select` record.
+
+Bits 6 and 7 of `Unit.flags` (`selectState`) are the selection's visit mark: the units that focusing the next unit has
+visited. They are view state for the same reason, and the trace masks them too (mask 0xffffff2f, #1132). Without the
+mask, each `ui-` scenario played from its command log (`docs/commands.md`, section 2.2) differed from its own run in
+them alone: the run from the log replays the commands, not the clicks that set the mark.
+
+Who touches the visit mark:
+- Presentation sets, clears and reads it: `MarkLocalVisibleUnits`, `FindNextUnmarkedLocalUnit`, `FocusNextLocalUnit` and
+  `FocusCommander` (selection.cpp).
+- Game logic writes it once, and reads it nowhere: `LoadUnit` (unit_save.cpp) restores it from the save.
 
 ## The debug bits of endGameFlags
 

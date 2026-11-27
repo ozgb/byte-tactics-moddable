@@ -191,21 +191,9 @@ UI_LOGS: dict[str, str | None] = {}
 INTERFACE_LOGS: dict[str, str | None] = {}
 COMMAND_TEXTS: dict[str, str | None] = {}
 REPLAY_SUFFIX = "+commands"
-SELECT_STATE = "Unit.flags bits 6 and 7 (selectState), which the selection writes, are still hashed (#1132)"
 REPLAY_LEFT_OUT = {
-    "ui-build-menu": SELECT_STATE,
-    "ui-build-place": SELECT_STATE,
-    "ui-click-select": SELECT_STATE,
-    "ui-debug-keys": SELECT_STATE,
-    "ui-dialogs": SELECT_STATE + "; and the exit menu's Yes ends the run after tick 61, but its PLAYERS_LEAVE_GAME, stamped "
-                  "tick 62, makes the run from the file play tick 62 too (#1136)",
-    "ui-drag-select": SELECT_STATE,
-    "ui-groups": SELECT_STATE,
-    "ui-keys": SELECT_STATE,
-    "ui-left-click-orders": SELECT_STATE,
-    "ui-right-click": SELECT_STATE,
-    "ui-scroll-groups": SELECT_STATE,
-    "ui-share-chat": SELECT_STATE,
+    "ui-dialogs": "the exit menu's Yes ends the run after tick 61, but its PLAYERS_LEAVE_GAME, stamped tick 62, makes the run "
+                  "from the file play tick 62 too (#1136)",
 }
 EVENT_LOGS: dict[str, str | None] = {}
 SETUP_LOGS: dict[str, str | None] = {}

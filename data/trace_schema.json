@@ -1238,7 +1238,7 @@
         {"name": "health", "offset": 264, "size": 2, "kind": "scalar", "target": null},
         {"name": "activateFlags", "offset": 270, "size": 1, "kind": "scalar", "target": null},
         {"name": "bit0", "offset": 271, "size": 1, "kind": "scalar", "target": null},
-        {"name": "flags", "offset": 272, "size": 4, "kind": "scalar", "target": null, "mask": 4294967279, "mask_reason": "bit 0x10 is the selection, view state: presentation sets it and reads it, and the tick only clears it"}
+        {"name": "flags", "offset": 272, "size": 4, "kind": "scalar", "target": null, "mask": 4294967087, "mask_reason": "bit 0x10 is the selection and bits 6 and 7 (selectState) its visit mark, view state: presentation sets and reads them, and the tick only clears the selection"}
       ],
       "plan": [
         {"name": "", "offset": 0, "size": 4, "kind": "ref", "target": "heap"},
@@ -1269,7 +1269,7 @@
         {"name": "", "offset": 249, "size": 7, "kind": "bytes", "target": null},
         {"name": "", "offset": 260, "size": 6, "kind": "bytes", "target": null},
         {"name": "", "offset": 270, "size": 2, "kind": "bytes", "target": null},
-        {"name": "flags", "offset": 272, "size": 4, "kind": "scalar", "target": null, "mask": 4294967279}
+        {"name": "flags", "offset": 272, "size": 4, "kind": "scalar", "target": null, "mask": 4294967087}
       ],
       "excluded": [
         {"field": "+0xbc..+0xeb", "reason": "the resource account, private to economy: the hash judges it by what it feeds in the Player and Unit tables"},

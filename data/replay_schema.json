@@ -21918,7 +21918,6 @@
    {
     "name": "GetGafFrame",
     "id": "RI_GET_GAF_FRAME",
-    "header": "src/util/engine_services.h",
     "declaration": "GafFrame* __stdcall GetGafFrame(FrameTable* table, int index);",
     "args": [
      {
@@ -21970,7 +21969,6 @@
    {
     "name": "InitGafSequence",
     "id": "RI_INIT_GAF_SEQUENCE",
-    "header": "src/util/engine_services.h",
     "declaration": "void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);",
     "args": [
      {
@@ -21998,7 +21996,6 @@
    {
     "name": "StepGafSequence",
     "id": "RI_STEP_GAF_SEQUENCE",
-    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall StepGafSequence(Handle* player);",
     "args": [
      {

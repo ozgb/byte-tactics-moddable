@@ -1,15 +1,15 @@
 {
- "generated": "2026-11-27T20:05:04+00:00",
+ "generated": "2026-11-27T21:05:04+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
   "2": {
-   "done": 58,
-   "total": 63
+   "done": 59,
+   "total": 64
   },
   "180": {
-   "done": 9,
-   "total": 28
+   "done": 10,
+   "total": 29
   }
  },
  "rows": [
@@ -281,7 +281,7 @@
     "number": 1190,
     "title": "Spec: Write the mission spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1190",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
@@ -309,7 +309,7 @@
     "number": 1191,
     "title": "Spec: Write the pathfinding spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1191",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
@@ -337,7 +337,7 @@
     "number": 1192,
     "title": "Spec: Write the map spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1192",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [

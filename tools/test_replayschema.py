@@ -391,7 +391,7 @@ class WritesThroughPointers(unittest.TestCase):
             self.assertEqual(path.read_text(), text, path)
 
 
-class Services(unittest.TestCase):
+class ServiceHeaders(unittest.TestCase):
     def test_a_declaration_the_header_lacks_is_an_error(self):
         ann = annotations()
         ann["services"][1]["declaration"] = "int __stdcall RandomInt(unsigned range);"

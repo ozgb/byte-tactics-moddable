@@ -34,6 +34,7 @@ struct RadarSurfaceView {
 
 #include "../network/player.h"
 #include "../harness/display_game.h"
+#include "../harness/display_log.h"
 
 #include "../weapons/weapon_def.h"
 

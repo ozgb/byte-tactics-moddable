@@ -57,10 +57,10 @@ reports one.
 
 | In the VM | Host side | Direction |
 | --- | --- | --- |
-| `/work` | the clean-room tree | read-write |
+| `/work` | the clean-room tree | read-write (read-only with `--review`) |
 | `/data` | the data kit | read-only |
-| `/srv/outbox` | `SESSION/outbox` | read-write: gate requests and the git bundle |
-| `/srv/inbox` | `SESSION/inbox` | read-only: gate results, written by the broker only |
+| `/srv/outbox` | `SESSION/outbox` | read-write: gate requests, the git bundle and a review report |
+| `/srv/inbox` | `SESSION/inbox` | read-only: gate results, written by the broker only, and a handed-in review report |
 | `/srv/proxy.sock` | a Unix socket served by `proxy.py` | the only way out |
 
 The VM has no network device that reaches anything. `launch.py` starts `socat` in the VM so that
@@ -81,6 +81,17 @@ command by `--secret-env` and never written to disk (see Credentials).
   `sni_refused`. After the session `launch.py` runs
   `proxy.py --check-log`, which fails if any logged request is off the allowlist. The canary
   probes go to `SESSION/canary-proxy.log` (the log is rotated by SIGHUP once the canary passes).
+- **Code review:** `launch.py --review` starts a review session (#1218): `/work` is mounted read-only and the broker
+  runs with `--review`: it pushes nothing, answers every gate request with an error, and takes the report. The
+  reviewer writes `/srv/outbox/.review.tmp` and renames it to `review.md`; the broker opens it as it opens a bundle
+  (`O_NOFOLLOW`, a regular file of at most 1 MiB, UTF-8) and copies it to `SESSION/review.md`, with its sha256 in
+  `SESSION/review.state`, once per distinct report. No other broker takes a report. `launch.py --review-report
+  R/review.md` copies that report, unchanged, into the next session's inbox as `/srv/inbox/review.md`, and refuses
+  a file not named `review.md`, a symlink (R included), or one whose sha256 is not `R/review.state`. Both files are
+  plain files on the host, so this catches a mistaken edit, not a forgery.
+- **Proxy log check:** after every session `launch.py` runs `proxy.py --check-log` and writes its output to
+  `SESSION/check-log.txt`, ending `check-log: pass` or `check-log: fail (exit N)`. A failure makes the exit status
+  5 when the agent's was 0.
 - **Git:** the agent runs `git bundle create /srv/outbox/.btm.tmp BRANCH ...` and renames the
   file to `/srv/outbox/btm.bundle`. No repository is shared: the broker opens the bundle with
   `O_NOFOLLOW` through a descriptor of the outbox directory (a symlink is refused), checks that it

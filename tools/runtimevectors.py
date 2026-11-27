@@ -376,6 +376,10 @@ FOOTER = """
 ## Left out
 
 - `qsort`: game logic has no qsort call, and the order in which equal elements end is left open.
+- `sprintf` with a width or precision above 4096: the records' widths and precisions are at most 8, and
+  game logic writes none wider, so a runtime may refuse a larger one or write it as it likes.
+- `shuffle` of more than 2^24 elements: the records' sizes are 0 to 32769, and game logic shuffles at most 10, so a
+  runtime may refuse a larger range or shuffle it as it likes.
 """
 
 

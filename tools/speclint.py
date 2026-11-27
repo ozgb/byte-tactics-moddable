@@ -24,7 +24,10 @@ Runs on a spec writer's machine, because it reads src/, include/ and lib/. A spe
   * a `<module>.<Name>` (Name capitalised; `<module>.<Name>*` for every name with that prefix) whose module is a header
     of the kit's interfaces/ and whose Name that header doesn't declare (as a word of its code, comments taken out:
     a slot, an event kind, a type, a constant) and the kit's wasm/modules.json has no signature for (the host's
-    `services` names): an import that left its interface. A module with no header is left to the rules above;
+    `services` names): an import that left its interface. A `services.<Name>` that is a recorded call of the table of
+    routes in the kit's docs/module-abi.md (section 9.3, "Routes in the recordings": a row whose first two cells are
+    `` `services.<Name>` `` and the import it maps to) is declared too, since the recordings carry it. A module with no
+    header is left to the rules above;
   * a `` `interfaces/<module>.h`, version N.M `` whose header the kit doesn't have, carries no `_VERSION_MAJOR` and
     `_MINOR` macros, or carries another major or a minor below M. A minor bump only adds to an interface, so a spec
     written against N.0 still holds at N.1, but not at another major or at a minor the kit hasn't reached.
@@ -273,16 +276,31 @@ def kit_signatures(kit: Path) -> dict[str, set[str]]:
     return {interface: set(names) for interface, names in signatures.items()}
 
 
+ABI_PAGE = "docs/module-abi.md"
+ROUTE_ROW = re.compile(r"^\|\s*`services\.([A-Z]\w*)`\s*\|\s*`[a-z][a-z0-9_]*\.[A-Z]\w*`\s*\|", re.M)
+
+
+def kit_routes(kit: Path) -> set[str]:
+    """The recorded calls of the routes table of the kit's docs/module-abi.md: the names a row maps from services to an import."""
+    path = kit / ABI_PAGE
+    if not path.is_file():
+        return set()
+    return set(ROUTE_ROW.findall(path.read_text(encoding="utf-8")))
+
+
 def header_version(code: str) -> tuple[int, int] | None:
     """The (major, minor) of a header's version macros, None when it has no pair."""
     major, minor = VERSION_MAJOR.search(code), VERSION_MINOR.search(code)
     return (int(major.group(1)), int(minor.group(1))) if major and minor else None
 
 
-def interface_problems(spec: str, headers: dict[str, str], signatures: dict[str, set[str]]) -> list[tuple[int, str]]:
+def interface_problems(spec: str, headers: dict[str, str], signatures: dict[str, set[str]],
+                       routes: set[str] = frozenset()) -> list[tuple[int, str]]:
     """The problems of a spec's `module.Name` imports and cited header versions against the kit's headers."""
     problems: set[tuple[int, str]] = set()
     declared = {module: set(IDENTIFIER.findall(code)) | signatures.get(module, set()) for module, code in headers.items()}
+    if "services" in declared:
+        declared["services"] |= routes
     for m in MODULE_NAME.finditer(spec):
         module, name, prefix = m.groups()
         if module not in declared:
@@ -336,7 +354,7 @@ def main(argv: list[str] | None = None) -> int:
     text = args.spec.read_text(encoding="utf-8")
     problems = sorted(lint(text, source_ids, identifiers(kit), source_runs, args.run, literals, kit)
                       + event_problems(text, event_kinds(args.kit), page_terms(args.kit), args.spec.name == "TEMPLATE.md")
-                      + interface_problems(text, kit_headers(args.kit), kit_signatures(args.kit)))
+                      + interface_problems(text, kit_headers(args.kit), kit_signatures(args.kit), kit_routes(args.kit)))
     for number, message in problems:
         print(f"{args.spec}:{number}: {message}")
     if problems:

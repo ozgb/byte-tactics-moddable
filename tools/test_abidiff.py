@@ -444,12 +444,14 @@ class IncludedRecordsTest(unittest.TestCase):
 KINDS = {"Roll": [["int"], "int"], "Fail": [["linear"], "void"], "Args_Get": [["int"], "int"], "Extra": [[], "void"]}
 
 
-def imports_verdict(text: str, imports: list[list[str]], kinds: dict | None = None) -> list[abidiff.Result]:
-    """The import check of a services header against modules importing the given names of services, with the manifest's kinds."""
+def imports_verdict(text: str, imports: list[list[str]], kinds: dict | None = None, signed: list[str] | None = None) -> list[abidiff.Result]:
+    """The import check of a services header against modules importing the given names of services, with the manifest's
+    signatures for the names of signed (every name a module imports, when None) and their kinds."""
     signatures = dict(KINDS, **(kinds or {}))
-    modules = {"modules": [{"name": "m%d" % i, "imports": {"services": {n: signatures[n] for n in names}}}
-                           for i, names in enumerate(imports)],
-               "signatures": {"services": signatures}}
+    names = sorted({n for group in imports for n in group}) if signed is None else signed
+    modules = {"modules": [{"name": "m%d" % i, "imports": {"services": {n: signatures[n] for n in group}}}
+                           for i, group in enumerate(imports)],
+               "signatures": {"services": {n: signatures[n] for n in names}}}
     with tempfile.TemporaryDirectory() as tmp:
         (Path(tmp) / "services.h").write_text(text)
         return abidiff.imports_results(Path(tmp), modules)
@@ -458,19 +460,29 @@ def imports_verdict(text: str, imports: list[list[str]], kinds: dict | None = No
 class ServicesImportsTest(unittest.TestCase):
     text = services("int Get(int i);", "int __stdcall Roll(int range); void Fail(char* message);")
 
-    def test_declared_exactly_the_union_of_the_imports_passes(self):
+    def test_declared_exactly_the_signatures_passes(self):
         (result,) = imports_verdict(self.text, [["Roll", "Args_Get"], ["Fail", "Roll"]])
         self.assertTrue(result.ok, result)
-        self.assertEqual((result.name, result.summary), ("services (imports)", "ok (3 entries, each imported with its kinds)"))
+        self.assertEqual((result.name, result.summary), ("services (imports)", "ok (3 entries, each with its kinds; 3 imported)"))
 
-    def test_an_entry_no_module_imports_fails(self):
+    def test_an_entry_no_module_imports_passes_with_its_signature(self):
+        (result,) = imports_verdict(self.text, [["Roll", "Fail"]], signed=["Args_Get", "Fail", "Roll"])
+        self.assertTrue(result.ok, result)
+        self.assertEqual(result.summary, "ok (3 entries, each with its kinds; 2 imported)")
+
+    def test_an_entry_without_a_signature_fails(self):
         (result,) = imports_verdict(self.text, [["Roll", "Fail"]])
         self.assertFalse(result.ok)
-        self.assertEqual(result.summary, "FAIL (the entries differ from the modules' imports)")
-        self.assertEqual(result.details, ["declared but imported by no module: Args_Get"])
+        self.assertEqual(result.summary, "FAIL (the entries differ from the manifest's signatures)")
+        self.assertEqual(result.details, ["declared but without a signature in the manifest: Args_Get"])
+
+    def test_a_signature_the_header_does_not_declare_fails(self):
+        (result,) = imports_verdict(self.text, [["Roll"]], signed=["Args_Get", "Extra", "Fail", "Roll"])
+        self.assertFalse(result.ok)
+        self.assertEqual(result.details, ["a signature in the manifest but not declared: Extra"])
 
     def test_an_import_the_header_does_not_declare_fails(self):
-        (result,) = imports_verdict(self.text, [["Roll", "Fail", "Args_Get", "Extra"]])
+        (result,) = imports_verdict(self.text, [["Roll", "Fail", "Args_Get", "Extra"]], signed=["Args_Get", "Fail", "Roll"])
         self.assertFalse(result.ok)
         self.assertEqual(result.details, ["imported but not declared: Extra"])
 
@@ -493,10 +505,10 @@ class ServicesImportsTest(unittest.TestCase):
         (bad,) = imports_verdict(text, [["Use"]], {"Use": [["linear", "linear", "linear", "f32", "int", "int"], "f64"]})
         self.assertFalse(bad.ok)
 
-    def test_no_module_means_nothing_may_be_declared(self):
+    def test_no_signature_means_nothing_may_be_declared(self):
         (result,) = imports_verdict(self.text, [])
         self.assertFalse(result.ok)
-        self.assertEqual(result.details, ["declared but imported by no module: Args_Get, Fail, Roll"])
+        self.assertEqual(result.details, ["declared but without a signature in the manifest: Args_Get, Fail, Roll"])
 
     def test_only_named_entry_headers_are_checked(self):
         with tempfile.TemporaryDirectory() as tmp:

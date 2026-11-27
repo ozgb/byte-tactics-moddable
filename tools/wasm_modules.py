@@ -64,9 +64,10 @@ the callee, each the index of a caller parameter of the same kind, or {"const": 
 is "pass" (the callee's result is the caller's, of the same kind), "void" (the caller has no result) or
 {"const": n} (the caller's int result). Only reorders, drops and added constants fit; a conversion that needs
 code (linear and handle, int and f64) is refused by the loader. build writes "signatures" for the names the manifest's
-modules use and no others: from the modules built against the current major, else the old entry, and fails when only an
+modules use: from the modules built against the current major, else the old entry, and fails when only an
 older module uses a name its interface's header no longer declares; check fails when an older module has a changed slot
-or import with no adapter.
+or import with no adapter. The services group keeps every entry it has, imported or not: it is every service
+interfaces/services.h declares (docs/module-abi.md, 9.3), which tools/abidiff.py checks.
 
 adapters builds lib/wasmloader with clang for the build machine, together with tests/wasm/adapters/adapters.c, and runs it
 against the libwasmtime that the pinned wasmtime package ships (fetched with uv). tests/wasm/adapters holds a manifest of
@@ -274,7 +275,7 @@ def header_text(interface):
 
 
 def current_signatures(game, modules, majors, declares=header_declares):
-    """The signatures of the manifest: the current one of every name a module uses, from the modules built against the current major, else the old entry."""
+    """The signatures of the manifest: the current one of every name a module uses, from the modules built against the current major, else the old entry, and every services entry as it stands."""
     current, older = {}, {}
     for entry in modules:
         for interface in module_interfaces(entry):
@@ -294,7 +295,7 @@ def current_signatures(game, modules, majors, declares=header_declares):
         for name, signature in names.items():
             if (interface, name) in current:
                 out.setdefault(interface, {})[name] = current[(interface, name)][1]
-            elif (interface, name) in older:
+            elif (interface, name) in older or interface in HOST_NAMED:
                 out.setdefault(interface, {})[name] = signature
     for (interface, name), (_, signature) in current.items():
         out.setdefault(interface, {})[name] = signature

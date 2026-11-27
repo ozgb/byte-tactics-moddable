@@ -389,6 +389,67 @@ class LaunchRefusalTests(unittest.TestCase):
         with self.assertRaises(ln.Refusal):
             ln.check_argv(argv + ["-v", "/home:/home"])
 
+    def test_review_session_mounts_work_read_only(self):
+        argv = ln.create_argv("n", "/i.smolmachine", "/t", "/d", "/s", "/p.sock", work_read_only=True)
+        ln.check_argv(argv)
+        self.assertIn("/t:/work:ro", argv)
+        self.assertNotIn("/t:/work", argv)
+        review = ln.broker_argv("/s", "/g", "/i.smolmachine", review=True)
+        self.assertIn("--review", review)
+        self.assertNotIn("--core-image", review)
+        self.assertNotIn("--review", ln.broker_argv("/s"))
+        self.assertEqual(ln.broker_env()["WINEARCH"], "win64")
+
+    def test_review_report_is_handed_in_byte_for_byte(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            reviewer = bk.prepare(Path(tmp) / "r")
+            session = bk.prepare(Path(tmp) / "s")
+            (reviewer / "outbox" / bk.REVIEW_NAME).write_bytes(b"# Findings\n1. x\n")
+            bk.take_review(reviewer)
+            report = reviewer / bk.REVIEW_NAME
+            ln.hand_in_review(report, session)
+            self.assertEqual((session / "inbox" / bk.REVIEW_NAME).read_bytes(), b"# Findings\n1. x\n")
+
+    def test_only_the_report_the_broker_took_is_handed_in(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            reviewer = bk.prepare(Path(tmp) / "r")
+            session = bk.prepare(Path(tmp) / "s")
+            (reviewer / "outbox" / bk.REVIEW_NAME).write_bytes(b"# Findings\n1. x\n")
+            bk.take_review(reviewer)
+            report = reviewer / bk.REVIEW_NAME
+            link = Path(tmp) / bk.REVIEW_NAME
+            link.symlink_to(report)
+            retyped = Path(tmp) / "other" / bk.REVIEW_NAME
+            retyped.parent.mkdir()
+            retyped.write_bytes(b"# Findings\n1. x\n")
+            renamed = reviewer / "notes.md"
+            renamed.write_bytes(report.read_bytes())
+            linked_dir = Path(tmp) / "linked"
+            linked_dir.symlink_to(reviewer)
+            for path in (link, retyped, renamed, linked_dir / bk.REVIEW_NAME):
+                with self.assertRaises(ln.Refusal):
+                    ln.hand_in_review(path, session)
+            (reviewer / bk.REVIEW_STATE).write_bytes(b"\xff\xfe")
+            with self.assertRaises(ln.Refusal):
+                ln.hand_in_review(report, session)
+            bk.take_review(reviewer)
+            report.write_bytes(b"# Findings\n1. x, edited\n")
+            with self.assertRaises(ln.Refusal):
+                ln.hand_in_review(report, session)
+            self.assertFalse((session / "inbox" / bk.REVIEW_NAME).exists())
+
+    def test_check_log_outcome_is_recorded(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for code, verdict in ((0, "check-log: pass"), (1, "check-log: fail (exit 1)")):
+                runner = lambda argv, **kw: subprocess.CompletedProcess(argv, code, "out\n", "")
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(ln.record_check_log(tmp, Path(tmp) / "proxy.log", "allow.txt", runner), code == 0)
+                self.assertTrue((Path(tmp) / "check-log.txt").read_text().endswith(verdict + "\n"))
+
+    def test_review_and_review_report_exclude_each_other(self):
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            ln.main(["--tree", "/t", "--datakit", "/d", "--image", "/i", "--review", "--review-report", "/r", "--", "true"])
+
 
 class CanaryTests(unittest.TestCase):
     def test_host_paths(self):
@@ -581,6 +642,49 @@ class BrokerTests(unittest.TestCase):
         bk.process_mailbox(self.session, bk.stub_gate)
         for name in ("bad1", "bad2", "bad3"):
             self.assertIn("error", json.loads((self.session / "inbox" / f"{name}.json").read_text()))
+
+    def test_no_gate_answers_every_request_with_an_error(self):
+        self.request("r1")
+        self.assertEqual(bk.process_mailbox(self.session, bk.no_gate, bk.no_gate), ["r1"])
+        result = json.loads((self.session / "inbox" / "r1.json").read_text())
+        self.assertEqual(result["error"], bk.NO_GATE)
+
+    def test_review_is_taken_once(self):
+        (self.session / "outbox" / bk.REVIEW_NAME).write_text("# Findings\n")
+        self.assertIsNotNone(bk.take_review(self.session))
+        self.assertIsNone(bk.take_review(self.session))
+        self.assertEqual((self.session / bk.REVIEW_NAME).read_text(), "# Findings\n")
+        (self.session / "outbox" / bk.REVIEW_NAME).write_text("# Findings\n2\n")
+        self.assertIsNotNone(bk.take_review(self.session))
+        self.assertEqual((self.session / bk.REVIEW_NAME).read_text(), "# Findings\n2\n")
+        self.assertEqual((self.session / "broker.log").read_text().count("review:"), 2)
+
+    def test_bad_reviews_are_refused(self):
+        secret = Path(self.tmp.name) / "secret"
+        secret.write_text("SECRET-DECOMPILED")
+        review = self.session / "outbox" / bk.REVIEW_NAME
+        review.symlink_to(secret)
+        self.assertIsNone(bk.take_review(self.session))
+        review.unlink()
+        review.write_bytes(b"\xff\xfe")
+        self.assertIsNone(bk.take_review(self.session))
+        review.write_bytes(b"x" * (bk.MAX_REVIEW + 1))
+        self.assertIsNone(bk.take_review(self.session))
+        self.assertFalse((self.session / bk.REVIEW_NAME).exists())
+        self.assertEqual((self.session / "broker.log").read_text().count("review refused"), 3)
+
+    def test_a_refusal_is_logged_once_per_reason(self):
+        (self.session / "outbox" / bk.REVIEW_NAME).write_bytes(b"\xff\xfe")
+        for _ in range(3):
+            self.assertIsNone(bk.take_review(self.session))
+        self.assertEqual((self.session / "broker.log").read_text().count("review refused"), 1)
+
+    def test_only_a_review_broker_takes_a_report(self):
+        (self.session / "outbox" / bk.REVIEW_NAME).write_text("# Findings\n")
+        bk.one_pass(self.session, gate=bk.stub_gate)
+        self.assertFalse((self.session / bk.REVIEW_NAME).exists())
+        bk.one_pass(self.session, gate=bk.no_gate, core_gate=bk.no_gate, review=True)
+        self.assertTrue((self.session / bk.REVIEW_NAME).exists())
 
     def test_symlinked_module_is_refused(self):
         self.request("link")

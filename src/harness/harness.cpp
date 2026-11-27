@@ -4597,6 +4597,9 @@ static void ReplayCommands(unsigned tick)
         unsigned count = strtoul(countText, &end, 10);
         if (end != p || !isdigit((unsigned char)*countText))
             FailReplay("has a count that is not a number");
+        bool fromInterface = strcmp(keyText, "interface") == 0;
+        if (fromInterface)
+            g_game->ticks = (int)tick - 1;
         CommandBegin();
         for (unsigned i = 0; i < count; i++) {
             char* kind = ReplayWord(&p);
@@ -4622,6 +4625,8 @@ static void ReplayCommands(unsigned tick)
         }
         if (*p != '\0')
             FailReplay("has more <KIND> <hex> pairs than its count");
+        if (fromInterface)
+            g_game->ticks = (int)tick;
         CommandEndAs(tick, keyText, lineText);
     }
 }

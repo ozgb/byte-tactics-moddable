@@ -44,10 +44,12 @@ major is the old major; a module built against a major between the baseline's an
 
 A bump with nothing changed is fine. A version that goes down fails.
 
-For services.h, the entries must also be exactly the union of the modules' `imports.services` in wasm/modules.json,
-by import name (`Class::Method` is imported as `Class_Method`): one line, `services (imports): ok` or a FAIL naming each
-entry no module imports and each import the header doesn't declare. The engine's other services live in
-src/util/engine_services.h, which no module includes.
+For services.h, the entries must also be exactly the names of `signatures.services` in wasm/modules.json, by import name
+(`Class::Method` is imported as `Class_Method`), each with the kinds the manifest gives it, and every name of a module's
+`imports.services` must be one of them: one line, `services (imports): ok` or a FAIL naming each entry without a
+signature, each signature the header doesn't declare, each import it doesn't declare, and each entry whose kinds differ.
+A service may be declared before any module imports it. The engine's other services live in src/util/engine_services.h,
+which no module includes.
 
 A retype is a parameter or return type that changed in a slot. Once an `interfaces-v*` tag exists, every
 retype is breaking (even `void*` to `Foo*`). Until then (the baseline is the merge base), a retype that
@@ -522,25 +524,29 @@ def signature_kinds(sig: Signature, handles: set[str]) -> tuple[list[str], str]:
 
 
 def check_imports(iface: Interface, manifest: dict | None, handles: set[str] | None = None) -> Result:
-    """Whether an imported interface declares exactly what the modules import of it, each with the parameter and result
-    kinds the manifest's signatures give it."""
+    """Whether an imported interface declares exactly the entries of the manifest's signatures for it, each with the
+    parameter and result kinds they give it, and every name a module imports of it."""
     declared = {import_name(e): sig for e, sig in iface.entries.items()}
+    recorded = (manifest or {}).get("signatures", {}).get(iface.name, {})
     imported = manifest_imports(manifest, iface.name)
-    details = ["declared but imported by no module: %s" % ", ".join(sorted(set(declared) - imported))] if set(declared) - imported else []
-    details += ["imported but not declared: %s" % ", ".join(sorted(imported - set(declared)))] if imported - set(declared) else []
+    details = []
+    for text, names in (("declared but without a signature in the manifest", set(declared) - set(recorded)),
+                        ("a signature in the manifest but not declared", set(recorded) - set(declared)),
+                        ("imported but not declared", imported - set(declared))):
+        if names:
+            details.append("%s: %s" % (text, ", ".join(sorted(names))))
     name = "%s (imports)" % iface.name
     if details:
-        return Result(name, False, "FAIL (the entries differ from the modules' imports)", details)
-    recorded = (manifest or {}).get("signatures", {}).get(iface.name, {})
+        return Result(name, False, "FAIL (the entries differ from the manifest's signatures)", details)
     for entry in sorted(declared):
         params, ret = signature_kinds(declared[entry], handles or set())
-        have = recorded.get(entry)
-        if have is None or [list(have[0]), have[1]] != [params, ret]:
-            details.append("%s: the header declares (%s) -> %s, the manifest has %s" % (
-                entry, ", ".join(params), ret, "no signature" if have is None else "(%s) -> %s" % (", ".join(have[0]), have[1])))
+        have = recorded[entry]
+        if [list(have[0]), have[1]] != [params, ret]:
+            details.append("%s: the header declares (%s) -> %s, the manifest has (%s) -> %s" % (
+                entry, ", ".join(params), ret, ", ".join(have[0]), have[1]))
     if details:
         return Result(name, False, "FAIL (the kinds differ from the manifest's signatures)", details)
-    return Result(name, True, "ok (%d entries, each imported with its kinds)" % len(declared))
+    return Result(name, True, "ok (%d entries, each with its kinds; %d imported)" % (len(declared), len(imported)))
 
 
 def imports_results(directory: Path, manifest: dict | None) -> list[Result]:

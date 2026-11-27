@@ -375,8 +375,9 @@ row hashes:
 
 The excluded fields have no `units[i].<field>` line; the dump holds them under the record's prefix.
 
-`flags` (+0x110) is hashed with the mask 0xffffffef: bit 0x10, the selection, is view state (`docs/state.md`, "The
-selection"), so two runs that differ only in what is selected have equal rows. The dump prints the masked value.
+`flags` (+0x110) is hashed with the mask 0xffffff2f: bit 0x10, the selection, and bits 6 and 7, its visit mark
+(`selectState`), are view state (`docs/state.md`, "The selection"), so two runs that differ only in what is selected
+or which units focusing has visited have equal rows. The dump prints the masked value.
 
 ### 7.2 projectiles (section 2)
 
@@ -735,12 +736,12 @@ record 53 (section 8.37). `goal(g)` below describes what that record writes: the
 `movementState.units[i].goal`, each `H32` is a 4-byte value line, each `HB` a `hex:` line, and nothing is hashed.
 
 `goal(g)`, with the goal's class by the kind of object it is (none 0, patrol 1, AI search 2, packed 3,
-lite 4, packed position 5):
+lite 4, packed position 5, any other kind 6, never seen in a conforming run):
 
 ```
 if g == null:  H32(0)                       # dump: <prefix>.class
 else:
-    H32(class)                              # dump: <prefix>.class; an object of no known class fails the run
+    H32(class)                              # dump: <prefix>.class; 6 for a goal of none of these kinds, with no fields
     patrol (1):     HT(PatrolGoal, g);   n = min(u32 at g+0x18, 3);   HB(n*4 bytes at g+0xc)     # dump: <prefix>.points
     AI search (2):  HT(AiSearchGoal, g); n = min(u32 at g+0x5c, 20);  HB(n*4 bytes at g+0xc)
     packed (3), lite (4), packed position (5):
@@ -756,7 +757,8 @@ for id in 0 .. fxCount-1:                   # the order effects in numbering ord
     f = the effect with number id
     path order (4):  HT(PathOrderRef, f)                 # dump: orderFx[id].refOwner, .refNext, .refValue
     unknown (0):     H32(id);  H32(0);  H32(a number identifying the object's type)   # never seen in a conforming run
-    any other class: nothing is hashed
+    approach radius (1), ring approach (2), point marker (3), air maneuver (5): nothing is hashed
+    any other class: the dump fails (section 11)
 END
 ```
 The harness also dumps every effect, whatever its class, with these lines (none hashed, but the ones of `PathOrderRef`
@@ -784,8 +786,10 @@ Dump: `orderFx[id].<field>`.
 
 Since format 8 section 22 hashes only, for a path order (a move target), the table `PathOrderRef` (a
 split of `PathOrder`: `refOwner`, `refNext`, `refValue`, units' link, which units reads). Not its number: the numbers
-count the targets of every class, and the other classes are movement's own. Nothing is hashed for the other classes, not even
-their `H32(id)` or class. An unknown class still hashes `H32(id)`, its class and the type number. The fields of the targets are only
+count the targets of every class, and the other classes are movement's own. Nothing is hashed for classes 1, 2, 3 and 5, not
+even their `H32(id)` or class. Class 0 (an effect of none of the five types) still hashes `H32(id)`, its class and the type
+number. A class above 5 is none of the format's: the reference never writes one, and a dump that holds one fails, so it has no
+hash (section 11). The fields of the targets are only
 movement's (`docs/movement-interface.md`, section 5), and a wrong value of one shows through the unit's motion.
 
 ### 8.12 scripts (section 23)
@@ -940,7 +944,8 @@ if present:
 Condition classes: 0 unknown, defeat: passes z 1, passes x 2, death timer 3,
 type killed 4, all of type 5, all killed 6, commander 7; victory: timer 8, passes z 9, passes x 10,
 move to radius 11, kill type 12, kill all of type 13, capture 14, build 15, kill mobile 16, destroy
-all 17, kill commander 18. A null entry has no lines. The numbers are written as `0x` and twice the byte count of hex digits.
+all 17, kill commander 18. A null entry has no lines. An entry of class 0 fails the run (section 11).
+The numbers are written as `0x` and twice the byte count of hex digits.
 
 ### 8.18 unit definitions (section 29, tick 1 only)
 
@@ -1881,7 +1886,7 @@ For each live unit with a motion (the ref at +0 of the unit), one record `moveme
 | --- | --- | --- |
 | `motion.p2.x`, `motion.p2.y`, `motion.p2.z` | 4 | scalar (the motion at +0x14, +0x18, +0x1c) |
 | `motion.turn` | 2 | scalar (the motion at +0x24) |
-| `goal.class` | 4 | scalar: 0 none, 1 patrol, 2 AI search, 3 packed, 4 lite, 5 packed position (the numbers of section 8.10) |
+| `goal.class` | 4 | scalar: 0 none, 1 patrol, 2 AI search, 3 packed, 4 lite, 5 packed position, 6 any other kind (the numbers of section 8.10) |
 
 then, by the goal's class, the lines `goal.<field>`:
 - 1: the table `PatrolGoal`, then `goal.points`, a bytes field of min(count, 3) * 4 bytes at +0xc;
@@ -2095,8 +2100,10 @@ To recompute a hash from the dump:
 - **Clamps.** The limits (4096 orders in a chain, 32 stack words, 20 and 3 goal points, 512 script
   pieces, 4096 statics, 2^22 cells, and so on) are part of the format: a state beyond a limit hashes
   as if the count were as the section says.
-- **Failures.** An object of unknown class (a goal, order effect or mission condition) fails the
-  run in the reference, so its hash is never written.
+- **Failures.** A mission condition of unknown class (0) fails the run in the reference, so its
+  hash is never written (section 8.17). A dump that holds an order effect of a class above 5 fails
+  too: the reference never writes one, so it has no hash (section 8.11). An order effect of
+  class 0 is hashed, and a goal of class 6 is reported with no fields (section 8.10): neither fails.
 
 ## 12. Format numbers
 

@@ -540,6 +540,11 @@ class SharedStateTest(unittest.TestCase):
         want.end()
         self.assertEqual(w.hash.h, want.h)
 
+    def test_an_order_effect_class_above_5_fails(self):
+        w = tr.Walker(HEAP_SCHEMA, [("orderFx[0].class", "0x00000006")])
+        with self.assertRaisesRegex(tr.Error, "unknown order effect class 6"):
+            w.order_effects()
+
     def test_scripts_hash_only_the_presence_and_the_transforms(self):
         lines = [("units[1].script.transforms[0].angle", "0x00000007"),
                  ("units[1].script.transforms[1].angle", "0x00000008")]
@@ -635,6 +640,11 @@ class TailWriteTest(unittest.TestCase):
             self.assertEqual(got[phase], self.trace[(24, phase)])
         self.assertNotEqual(got["tick"], self.trace[(24, "tick")])
 
+    def test_the_rows_keep_the_row_order_whatever_the_block_order(self):
+        reversed_blocks = dict(reversed(list(self.blocks.items())))
+        self.assertEqual([phase for _, phase, _ in tr.rehash(self.schema, reversed_blocks)],
+                         ["units", "projectiles", "explosions", "players", "features", "wind", "meteors", "world", "tick"])
+
     def test_the_unchanged_dump_gives_the_stored_tick_row(self):
         self.assertEqual(self.rows_with_tick_block(lambda path, value: (path, value))["tick"], self.trace[(24, "tick")])
 
@@ -650,7 +660,7 @@ class TailWriteTest(unittest.TestCase):
 
 
 class SelectionTest(unittest.TestCase):
-    """The selection (bit 0x10 of a unit's flags) and the debug bits (bits 0 and 1 of endGameFlags) are view state: setting them between two ticks changes no row (#1050)."""
+    """The selection (bit 0x10 of a unit's flags), its visit mark (bits 6 and 7) and the debug bits (bits 0 and 1 of endGameFlags) are view state: setting them between two ticks changes no row (#1050, #1132)."""
 
     FIXTURE = Path(__file__).resolve().parent / "testdata/tracerehash/orders-build-patrol-24"
 
@@ -672,6 +682,13 @@ class SelectionTest(unittest.TestCase):
         got = self.rows_with_flags(0x10)
         for phase, value in got.items():
             self.assertEqual(value, self.trace[(24, phase)], phase)
+
+    def test_the_visit_mark_changes_no_row(self):
+        self.assertEqual(int(dict(self.blocks[(24, "tick")])["units[1].flags"], 16) & 0xC0, 0)
+        for bit in (0x40, 0x80, 0xC0):
+            got = self.rows_with_flags(bit)
+            for phase, value in got.items():
+                self.assertEqual(value, self.trace[(24, phase)], (bit, phase))
 
     def test_the_debug_bits_change_no_row(self):
         self.assertEqual(int(dict(self.blocks[(24, "tick")])["game.endGameFlags"], 16) & 3, 0)

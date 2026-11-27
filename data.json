@@ -1,7 +1,7 @@
 {
- "generated": "2026-11-27T18:00:12+00:00",
+ "generated": "2026-11-27T18:05:31+00:00",
  "interfaces": 64,
- "core_pin": 59,
+ "core_pin": 64,
  "milestones": {
   "2": {
    "done": 58,
@@ -21,8 +21,8 @@
    "kit_note": "core gate",
    "recordings": null,
    "spec": "done",
-   "spec_pin": 59,
-   "impl": "building",
+   "spec_pin": 64,
+   "impl": "built",
    "active": true,
    "issue": {
     "number": 1207,
@@ -35,16 +35,16 @@
     {
      "number": 52,
      "title": "Implementer: impl/engine-core",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/52",
-     "live": true
+     "live": false
     },
     {
      "number": 51,
      "title": "Update: Move the core specs to interfaces-v64",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/51",
-     "live": true
+     "live": false
     },
     {
      "number": 48,
@@ -127,7 +127,7 @@
    "kit": "ready",
    "kit_note": "scenario gate",
    "recordings": 3,
-   "spec": "done",
+   "spec": "stale",
    "spec_pin": 59,
    "impl": "built",
    "active": false,

@@ -181,7 +181,7 @@ load model UnitDef#208 "objects3d\\CORMEX.3DO" [4470]
 cache debris 100000 0
   block 0 100000 null
 call 700 UpdateUnitWeapons
-  r Game.flags_2a44 4
+  r Game.flags_2a44 12
   r Game.seaLevel 0
   r Game.gravity 8155
   r Game.projectileCount 0

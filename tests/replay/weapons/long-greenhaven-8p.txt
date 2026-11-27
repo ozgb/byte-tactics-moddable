@@ -184,7 +184,7 @@ cache debris 100000 38114
   block 37980 134 ExplodedSlot#2
   block 38114 61886 null
 call 30518 UpdateUnitWeapons
-  r Game.flags_2a44 4
+  r Game.flags_2a44 12
   r Game.seaLevel 45
   r Game.gravity 8155
   r Game.projectileCount 2

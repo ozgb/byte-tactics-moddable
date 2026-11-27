@@ -82,7 +82,7 @@
     "inject": {
       "define": "BT_REPLAY_INJECT_START_SHIFT=15",
       "recording": "console-ilose.txt",
-      "expect": 237,
+      "expect": 239,
       "field": "out.x"
     }
   },

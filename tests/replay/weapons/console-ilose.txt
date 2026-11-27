@@ -6556,7 +6556,7 @@ call 0 FindWeaponByName
 call 0 Apply
   r Game.width 224
   r Game.height 102
-  r Game.flags_2a44 4
+  r Game.flags_2a44 12
   r Game.seaLevel 0
   r Game.uiOptionFlags 12
   r Game.gravity 8155

@@ -1,9 +1,15 @@
 #ifndef OBJECT_STATE_H
 #define OBJECT_STATE_H
-struct ModelBuildList;
 struct ModelState;
 struct Object3do;
 struct Unit;
+
+struct ModelBuildList {
+    char unknown_0[8];
+    int count;
+    char unknown_c[0x20 - 0xc];
+    const char** names;
+};
 
 struct ModelState;
 struct ModelPiece;

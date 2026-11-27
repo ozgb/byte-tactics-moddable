@@ -313,6 +313,7 @@ Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name);
 int __stdcall SetButtonStageByName(Gui* obj, char* name, int value);
 #include "../graphics/palette.h"
 #include "../game/game_state.h"
+#include "../harness/display_game.h"
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 
@@ -2014,6 +2015,8 @@ void OpenOptionsPanel()
     g_optionsFlipSurface = AllocSurface("FLIPSURFACE", layer->entries->width, layer->entries->height);
     memcpy(g_optionsFlipSurface->pixels, ((Surface*)layer->entries->u.assets.surface)->pixels,
            layer->entries->width * layer->entries->height);
+    if (DisplayLogWants())
+        DisplayLogWritten(g_optionsFlipSurface);
     FrameFromSurface((GafFrame*)&g_optionsFlipFrame, g_optionsFlipSurface);
     g_optionsLightbarX = 0;
     g_optionsLightbarMaxX = layer->entries->width - 1;

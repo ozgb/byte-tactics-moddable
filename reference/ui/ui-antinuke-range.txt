@@ -1,0 +1,9 @@
+bt-ui 2
+1 scroll 304 32
+1 view 1
+1 select -
+3606 input mouse move 424 300
+3607 input mouse left down 424 300
+3608 input mouse left up 424 300
+3609 select 2
+3610 view 2

@@ -1,0 +1,22 @@
+# The human player opens the chat line with Enter, types +dither and sends it, so the fog is drawn dithered.
+game_seed 1053
+crt_seed 2053
+view_seed 3053
+map The Pass
+start_positions fixed
+ticks 120
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+order 2 0:ARMCOM:1 move 900 600
+input 10 char 13
+input 12 char +
+input 14 char d
+input 16 char i
+input 18 char t
+input 20 char h
+input 22 char e
+input 24 char r
+input 26 char 13
+frames 27

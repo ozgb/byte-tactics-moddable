@@ -12,7 +12,7 @@ code as a base. This page names the current tag: **`reference-traces-v53`**.
   format is in `docs/trace-format.md`, the scenario format in `docs/scenario-format.md`, the hashed fields in
   `data/trace_schema.json`, and the coverage decisions in
   `data/trace_coverage.csv`.
-- The scenario list: `reference/scenarios/`, 98 scenarios, each with its own
+- The scenario list: `reference/scenarios/`, 102 scenarios, each with its own
   seeds and tick count.
 - The digests: `reference/traces/<scenario>.txt`, one 64-bit digest and one 64-bit end-of-tick state per tick
   for each scenario, and with the next free reference-traces tag after the merge also the hash of that tick's `view` row.
@@ -215,7 +215,9 @@ the digests that should become a target gets a new tag (`reference-traces-v53`
 and so on), and this page is updated to name it. The current tag is
 `reference-traces-v53`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
 exported from and pairs it with the highest `reference-traces-v*` tag merged into that commit, so the two need not be on
-the same commit: the kit at `interfaces-v58` pairs with `reference-traces-v53`.
+the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `reference-traces-v51`, and the kit at
+`interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it, and the kit at `interfaces-v58` pairs with
+`reference-traces-v53`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -463,6 +465,23 @@ the same commit: the kit at `interfaces-v58` pairs with `reference-traces-v53`.
   store (#1053). Its commit line names 0758dafdb, the reference tip with the frame clock (#1147). The trace format is
   still `bt-trace 10`. No other trace's tick rows change, so the other traces, event digests, sound logs, UI logs,
   interface commands, display logs, frames, views and saves are those of v50.
+- `reference-traces-v52` (#1053): the 98 scenarios of v51 and four new ones, `ui-antinuke-range`,
+  `display-chat-dither`, `display-debug-overlay` and `display-tab-menu`, whose frames draw the display kinds no other
+  scenario does. The display log is version 1.2 (`docs/display-log.md`): `picture` lines for the pictures the game
+  made, `pixels` items for what the game writes into a target without a drawing item, the fields of a `model` that
+  choose how it is drawn, a surface that shares its name with another live surface named `<name>#<n>`, and a surface
+  made in pixels freed earlier in the frame a new target (`ui-dialogs` and `ui-share-chat` need the last two). The
+  display lists hold every frame up to the last `frames` tick, stored xz compressed in
+  `reference/displaylists/<scenario>.txt.xz` (fourteen lists, `ui-dialogs` and `ui-debug-keys` now among them), and
+  drawn from blank targets they give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display
+  digest changes, and `ui-debug-keys` stores its display digest for the first time. `frontend-skirmish` stores no
+  display digest: its menu cursor follows the wall clock, not the frames (#1166). The trace format is still
+  `bt-trace 10`. The traces of the 97 of v50 are those of v51 but for their commit line, which names 0758dafdb, the
+  reference with the display log's target fix (#1154), as `ui-debug-keys`'s already did; the four new scenarios store
+  their traces, sounds, UI logs, events, frames and the views of their frame ticks. `display-debug-overlay`'s debug
+  panel reads `FRATE: 0`, as #1147 draws it. A `--traces` run at the reference tip 5e2e36a08, which changes only
+  `tools/playtest.py`, gives every one of these files again but for the commit line. The sounds, UI logs, interface
+  commands, events, frames and views of the 98 are those of v51, and the saves decode equal to v51's.
 - `reference-traces-v53` (#1132): the scenarios of v52 with the selection's visit mark, bits 6 and 7 of `Unit.flags`
   (`selectState`), out of the judged state and the view. The trace masks them out of the `Unit` table (mask 0xffffff2f,
   `docs/state.md`, "The selection"), and the view clears them from `ViewUnit.flags`, at view version 2.1

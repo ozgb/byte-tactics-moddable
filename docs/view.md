@@ -565,6 +565,8 @@ need the debug bits), only by the menus and setup screens, or only by a cache pr
 | `Unit::f_1f` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
 | `Unit::f_3b` | Left out: only the debug overlays draw it, which need the debug masks 0x1 and 0x2 of `endGameFlags` (presentation state); with them clear no display, sound or command depends on it. |
 | `Unit::f_57` | `ViewUnit.weaponBuild` (Units), with the weapon definitions as loaded data. |
+| `Unit::field_18` | `ViewUnit.weaponBuild` (Units), with the weapon definitions as loaded data. |
+| `Unit::field_1e` | `ViewUnit.stockpile` (Units). |
 | `Unit::fireOrder` | `ViewUnit.fireOrder` (Units). |
 | `Unit::flags` | `ViewUnit.flags` (Units), cut by its rule; bit 0x10, bits 6 and 7 (`selectState`) and the build menu's page bits are presentation state. |
 | `Unit::group` | `ViewUnit.group` (Units). |

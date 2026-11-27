@@ -1407,9 +1407,9 @@ void __stdcall BlitFeatureGaf(void* dest, Cell* cell, int ix, int iy)
             st->unit = unit;
             unit->angles = spot->rot;
             unit->pos = spot->pos;
-            DisplayLogFeatureType(f->name);
+            DisplayLogFeatureType(f->name, cell->spot);
             DrawUnit(dest, (UnitDrawView*)unit);
-            DisplayLogFeatureType(nullptr);
+            DisplayLogFeatureType(nullptr, -1);
         }
     } else {
         if (f->over) {

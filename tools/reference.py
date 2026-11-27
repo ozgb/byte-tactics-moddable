@@ -94,6 +94,7 @@ from pathlib import Path
 
 import blockpointers
 import displaylog
+import displayreplay
 import eventdigest
 import interfacelog
 import playtest
@@ -208,7 +209,8 @@ CACHE_ENV = "BT_GATE_CACHE"
 KEY_TREES = ("reference/scenarios", "reference/traces", "reference/sounds", "reference/ui", "reference/commands", "reference/events", "reference/display", "reference/displaylists", "reference/frames", "reference/views", "reference/saves", "reference/setup",
             "tools/playtest")
 KEY_TOOLS = ("tools/reference.py", "tools/playtest.py", "tools/tracediff.py", "tools/tracedigest.py", "tools/savefile.py",
-             "tools/blockpointers.py", "tools/eventdigest.py", "tools/displaylog.py", "tools/tracerehash.py", "tools/interfacelog.py")
+             "tools/blockpointers.py", "tools/eventdigest.py", "tools/displaylog.py", "tools/displayreplay.py", "tools/tracerehash.py",
+             "tools/interfacelog.py")
 KEY_DATA = ("data/block_pointers.csv", "docs/sim-events.md")
 KEY_RUNTIME_FILES = ("wasmtime_host.dll", "modules.json")
 RETRY_DIALOG = "dialog-directx"
@@ -1424,9 +1426,10 @@ def events_report(scenarios: dict[str, Path], logs: dict[str, str | None], direc
     return differing, lines
 
 
-def stored_without_scenario(directory: Path, known: set[str], what: str) -> tuple[list[str], list[str]]:
-    """(the names, the report lines) of the stored files of `directory` that no scenario owns."""
-    names = [p.stem for p in sorted(directory.glob("*.txt")) if p.stem not in known] if directory.is_dir() else []
+def stored_without_scenario(directory: Path, known: set[str], what: str, suffix: str = ".txt") -> tuple[list[str], list[str]]:
+    """(the names, the report lines) of the stored files of `directory` (`<name><suffix>`) that no scenario owns."""
+    stems = [p.name[:-len(suffix)] for p in sorted(directory.glob(f"*{suffix}"))] if directory.is_dir() else []
+    names = [stem for stem in stems if stem not in known]
     return names, [f"DIFF {name} stored {what} has no scenario of that name" for name in names]
 
 
@@ -1463,7 +1466,9 @@ def display_list_report(scenarios: dict[str, Path], logs: dict[str, str | None],
                         known: set[str] | None = None) -> tuple[list[str], list[str]]:
     """(the scenarios whose display list differs from reference/displaylists/, the report lines).
 
-    Only a scenario with a `frames` line has a list; one with no stored list is only counted. With `end_of_tick` the items of a frame are compared as sorted layered lines. A stored list with no scenario fails."""
+    Only a scenario with a `frames` line has a list (every frame up to its last `frames` tick), stored as `<scenario>.txt.xz`; one
+    with no stored list is only counted. With `end_of_tick` the items of a frame are compared as sorted layered lines. A stored list
+    with no scenario fails."""
     known = set(scenario_files()) if known is None else known
     framed = [name for name, path in scenarios.items() if scenario_frames(path)]
     differing: list[str] = []
@@ -1471,13 +1476,13 @@ def display_list_report(scenarios: dict[str, Path], logs: dict[str, str | None],
     unstored: list[str] = []
     equal = 0
     for name in framed:
-        stored = directory / f"{name}.txt"
+        stored = displayreplay.stored_list(name, directory)
         if not stored.is_file():
             unstored.append(name)
             continue
         got = logs.get(name)
         try:
-            diff = displaylog.list_difference(stored.read_text(), got, end_of_tick) if got is not None else f"the run wrote no {DISPLAYLIST_FILE}"
+            diff = displaylog.list_difference(displayreplay.read_list(stored), got, end_of_tick) if got is not None else f"the run wrote no {DISPLAYLIST_FILE}"
         except displaylog.Error as e:
             diff = f"unreadable display list: {e}"
         if diff:
@@ -1485,7 +1490,7 @@ def display_list_report(scenarios: dict[str, Path], logs: dict[str, str | None],
             lines.append(f"DIFF {name} display list {diff}")
         else:
             equal += 1
-    extra, extra_lines = stored_without_scenario(directory, known, "display list")
+    extra, extra_lines = stored_without_scenario(directory, known, "display list", displayreplay.LIST_SUFFIX)
     differing += extra
     lines += extra_lines
     lines.append(f"display lists: {equal} of {len(framed)} equal, {len(differing)} differ, {len(unstored)} with no stored list in {directory.relative_to(ROOT)}")
@@ -1500,8 +1505,8 @@ def unlisted_frame(name: str, logs: dict[str, str | None], stored: str, end_of_t
     frame = displaylog.digest_frame(stored, got, end_of_tick)
     if frame is None:
         return None
-    listed = directory / f"{name}.txt"
-    if listed.is_file() and re.search(rf"^frame {frame[0]} ", listed.read_text(), re.M):
+    listed = displayreplay.stored_list(name, directory)
+    if listed.is_file() and re.search(rf"^frame {frame[0]} ", displayreplay.read_list(listed), re.M):
         return None
     return frame[1]
 
@@ -1989,6 +1994,12 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
         elif instrumented:
             print(f"{label}block pointers: not scanned, access-log build")
         pointers += report_fuel(exe, scenarios, mode_view(FUEL, scenarios, mode), mode == "native" if both_modes else None, label)
+    display_replay_bad = 0
+    if game_dir is not None and quirks is None and not instrumented:
+        framed = {name: path for name, path in scenarios.items() if scenario_frames(path)}
+        replay_names, replay_lines = displayreplay.check(exe, game_dir, framed, max(1, parallel), run_slot)
+        print("\n".join(replay_lines))
+        display_replay_bad = len(replay_names)
     if not bad and replay_bad:
         report_replay_divergence()
     if not bad and replay_stale:
@@ -2000,7 +2011,7 @@ def check_traces(exe: Path, game_dir: str | None, parallel: int, tier: bool = Fa
             report_event_records(first_events[0], first_events[1], expected, exe, scenarios, poison, game_dir, end_of_tick)
         if first_display is not None:
             report_display_items(*first_display, expected, exe, scenarios, poison, game_dir, end_of_tick)
-        if pointers or sound_bad or ui_bad or events_bad or display_bad or frame_bad or view_bad or save_bad or setup_bad:
+        if pointers or sound_bad or ui_bad or events_bad or display_bad or frame_bad or view_bad or save_bad or setup_bad or display_replay_bad:
             sys.exit(1)
         if tier:
             print(tier_message(len(scenarios), head_commit()))
@@ -2318,18 +2329,28 @@ def copy_events(directory: Path) -> None:
 
 
 def copy_display(directory: Path) -> None:
-    """Replace reference/display/ and reference/displaylists/ by the files the reference branch checkout `directory` wrote (none written leaves a directory as it is)."""
+    """Replace reference/display/ and reference/displaylists/ by the files the reference branch checkout `directory` wrote (none written leaves a directory as it is).
+
+    The display lists are stored as xz (displayreplay.pack_list), `<scenario>.txt.xz`."""
     for source, dest in ((directory / "reference/display", DISPLAYS), (directory / "reference/displaylists", DISPLAYLISTS)):
         logs = sorted(source.glob("*.txt"))
         if not logs:
             print(f"the reference branch wrote no files in {dest.relative_to(ROOT)}; it is untouched")
             continue
         dest.mkdir(parents=True, exist_ok=True)
-        for old in dest.glob("*.txt"):
+        for old in (*dest.glob("*.txt"), *dest.glob(f"*{displayreplay.LIST_SUFFIX}")):
             old.unlink()
+        copied = 0
         for path in logs:
-            shutil.copyfile(path, dest / path.name)
-        print(f"{len(logs)} display files copied to {dest.relative_to(ROOT)}")
+            # TODO(#1166): store the display digest of a frontend scenario once the menu cursor is drawn on the frames, not the wall clock
+            if dest == DISPLAYS and (SCENARIOS / path.name).exists() and scenario_frontend(SCENARIOS / path.name):
+                continue
+            if dest == DISPLAYLISTS:
+                (dest / f"{path.stem}{displayreplay.LIST_SUFFIX}").write_bytes(displayreplay.pack_list(path.read_text(encoding="latin-1")))
+            else:
+                shutil.copyfile(path, dest / path.name)
+            copied += 1
+        print(f"{copied} display files copied to {dest.relative_to(ROOT)}")
 
 
 def copy_setup(directory: Path) -> None:

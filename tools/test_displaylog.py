@@ -20,7 +20,7 @@ def frame(*items: str, number: int = 1, tick: int = 0, steps: int = 1, cursor: s
 
 
 def listing(*frames: str) -> str:
-    return "bt-display 1\n" + "".join(frames)
+    return "bt-display 1.2\n" + "".join(frames)
 
 
 def fill(target: str, x0: int, y0: int, x1: int, y1: int, colour: int = 1) -> str:
@@ -114,7 +114,7 @@ class DigestTest(unittest.TestCase):
         items = [A, C]
         ordered = displaylog.hash_bytes(("".join(line + "\n" for line in [f"frame 1 0 1 {PALETTE}", *items, CURSOR])).encode())
         sets = displaylog.hash_bytes(("".join(line + "\n" for line in [f"frame 1 0 1 {PALETTE}", "0 " + A, "0 " + C, CURSOR])).encode())
-        self.assertEqual(digest_text(listing(frame(*items))), f"bt-display-digest 1\nlog bt-display 1\n1 0 2 {ordered:016x} {sets:016x}\n")
+        self.assertEqual(digest_text(listing(frame(*items))), f"bt-display-digest 1\nlog bt-display 1.2\n1 0 2 {ordered:016x} {sets:016x}\n")
 
     def test_the_hash_is_the_word_then_byte_fnv(self):
         h = displaylog.OFFSET_BASIS
@@ -246,7 +246,7 @@ class ParseTest(unittest.TestCase):
 
     def test_a_frame_needs_its_cursor(self):
         with self.assertRaises(Error):
-            parse_layered("bt-display 1\n" + frame(A).rsplit("\n", 2)[0] + "\n")
+            parse_layered("bt-display 1.2\n" + frame(A).rsplit("\n", 2)[0] + "\n")
 
     def test_an_item_needs_an_area(self):
         with self.assertRaises(Error):
@@ -256,7 +256,7 @@ class ParseTest(unittest.TestCase):
 
     def test_a_line_outside_a_frame(self):
         with self.assertRaises(Error):
-            parse_layered("bt-display 1\n" + A + "\n")
+            parse_layered("bt-display 1.2\n" + A + "\n")
 
     def test_a_blit_needs_a_source(self):
         with self.assertRaises(Error):
@@ -332,6 +332,68 @@ def mock_argv(argv: tuple[str, ...]):
 
     return swap()
 
+
+
+def picture_line(width: int = 2, height: int = 2, pixels: bytes = bytes([1, 2, 3, 4]), name: str = "screen", x: int = 0, y: int = 0,
+                 transparency: int = 9) -> tuple[str, str]:
+    """(the picture's name, its `picture` line) for a made picture of these pixels."""
+    picture = f"@{name}:{width}x{height}:{displaylog.hash_bytes(pixels):016x}"
+    return picture, f"picture {picture} {x} {y} {transparency} {pixels.hex()}"
+
+
+class PictureTest(unittest.TestCase):
+    def test_a_picture_line_is_read_with_its_pixels(self):
+        name, line = picture_line(x=-3, y=4)
+        found = displaylog.pictures(listing(frame(line, f"sprite_shadow screen 0 0 2 2 {name} 0 0")))
+        self.assertEqual(list(found), [name])
+        self.assertEqual((found[name].x_offset, found[name].y_offset, found[name].transparency), (-3, 4, 9))
+        self.assertEqual((found[name].width, found[name].height, found[name].pixels), (2, 2, bytes([1, 2, 3, 4])))
+
+    def test_a_picture_known_by_no_name_has_a_picture_line(self):
+        pixels = bytes([5, 6])
+        line = f"picture ?2x1:{displaylog.hash_bytes(pixels):016x} 0 0 0 0506"
+        self.assertEqual(displaylog.pictures(listing(frame(line)))[line.split(" ")[1]].pixels, pixels)
+
+    def test_a_picture_line_is_not_an_item_nor_in_the_digest(self):
+        name, line = picture_line()
+        item = f"sprite screen 0 0 2 2 {name} 0 0"
+        with_line = parse_layered(listing(frame(line, item)))[0]
+        self.assertEqual([i.line for i in with_line.items], [item])
+        self.assertEqual(digest_text(listing(frame(line, item))), digest_text(listing(frame(item))))
+
+    def test_pixels_that_do_not_have_the_hash_are_an_error(self):
+        name, line = picture_line()
+        with self.assertRaises(Error):
+            parse_layered(listing(frame(line.replace(name, name[:-1] + "0" if name[-1] != "0" else name[:-1] + "1"))))
+
+    def test_pixels_that_do_not_fit_the_size_are_an_error(self):
+        _, line = picture_line(width=3)
+        with self.assertRaises(Error):
+            parse_layered(listing(frame(line)))
+
+    def test_a_picture_line_after_an_item_is_an_error(self):
+        _, line = picture_line()
+        with self.assertRaises(Error):
+            parse_layered(listing(frame(A, line)))
+
+    def test_picture_lines_are_compared(self):
+        _, one = picture_line()
+        _, two = picture_line(x=1)
+        self.assertIn("picture line", list_difference(listing(frame(one, A)), listing(frame(two, A))))
+        self.assertIn("only A has the picture line", list_difference(listing(frame(one, A)), listing(frame(A))))
+
+    def test_a_pixels_item_is_ordered_like_a_draw(self):
+        name, line = picture_line(width=10, height=10, pixels=bytes(100))
+        self.assertEqual(layers_of(A, f"pixels screen 0 0 10 10 {name}"), [0, 1])
+
+    def test_kinds_counts_the_items_by_kind(self):
+        name, line = picture_line()
+        text = listing(frame(line, A, B, f"pixels screen 0 0 2 2 {name}"), frame(C, number=2, tick=1))
+        self.assertEqual(displaylog.kinds(text), {"fill": 3, "pixels": 1})
+
+    def test_every_kind_of_the_format_is_known(self):
+        self.assertEqual(len(set(displaylog.KINDS)), len(displaylog.KINDS))
+        self.assertIn("pixels", displaylog.KINDS)
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,8 @@
+bt-ui 2
+1 scroll 304 32
+1 view 1
+1 select -
+10 input key down 122
+11 input key up 122
+20 input char 109
+22 input char 109

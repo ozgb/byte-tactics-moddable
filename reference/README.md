@@ -168,12 +168,15 @@ scenarios whose `input` lines drive it (the events are in [docs/commands.md](../
 
 `--check` compares each run's `display.txt`, the digest of every frame it drew, line by line with
 `reference/display/<scenario>.txt` and names the first frame that differs, and for a scenario with a `frames` line it
-compares the run's `displaylist.txt` with `reference/displaylists/<scenario>.txt` and names the first frame and item that
-differ (format and meaning in [docs/display-log.md](../docs/display-log.md)). `--tier` compares the tier's digests and
+compares the run's `displaylist.txt` with `reference/displaylists/<scenario>.txt.xz` (every frame up to the last
+`frames` tick, xz compressed) and names the first frame and item that differ (format and meaning in
+[docs/display-log.md](../docs/display-log.md)). With a game directory, `--check` also replays the stored lists
+(`tools/displayreplay.py --check`): the exe draws each list from blank targets and every frame it draws at a `frames`
+tick must equal the stored frame, byte for byte. `--tier` compares the tier's digests and
 the full `--check` all of them. When a digest differs at a frame no stored list holds, the check plays the reference
 build of the stored traces and the exe with `-testdisplay <tick>` and names the first differing item
 (`tools/tracediff.py --display`). A stored file with no scenario fails, and a scenario with no stored digest is only
-counted. `--traces` copies the files the reference branch wrote into `reference/display/` and
+counted. `--traces` copies the files the reference branch wrote into `reference/display/` and, compressed with xz,
 `reference/displaylists/`.
 
 ## Traces
@@ -259,6 +262,9 @@ seeds) and runs deterministically: two runs give identical traces.
 | console-iwin | The Pass | 2 | 100 | Console: `iwin`, so the other side loses its units and the run ends at tick 30 |
 | console-sight | The Pass | 2 | 200 | Console: `los`, `lostype`, `mapping`, `radar`, `nowisee`, then `ai` and `reloadaiprofiles` |
 | console-units | The Pass | 2 | 300 | Console: unit names typed alone, `move`, `reload`, `kill`, the damage toggles, `search`, `edge`, `assign` and `selectable` |
+| display-chat-dither | The Pass | 2 | 120 | The chat line types and sends `+dither`, so the fog is dithered (`sprite_lit`, `sprite_erase`, `dither`) |
+| display-debug-overlay | The Pass | 2 | 60 | Debug mode (F11 after the cheat code) and its occupancy overlay (`polygon`) |
+| display-tab-menu | The Pass | 2 | 60 | Game type 3: Tab opens the in-game tab menu, whose current button has a lit box (`outline_lit`) |
 | duel-coast-to-coast | Coast To Coast | 2 | 5400 | Two Core players on Coast To Coast, three minutes, difficulty 2 |
 | duel-great-divide | Great Divide | 2 | 3600 | Two Arm players on Great Divide, random start positions, two minutes |
 | duel-pass-dark | The Pass | 2 | 2700 | Two players on The Pass with the map unmapped and line of sight off, ninety seconds |
@@ -307,6 +313,7 @@ seeds) and runs deterministically: two runs give identical traces.
 | trio-anteer-strait | Anteer Strait | 3 | 5400 | Three players on Anteer Strait, players 0 and 1 allied, three minutes, line of sight type 0 |
 | trio-dark-side | Dark Side | 3 | 9000 | Three players on Dark Side, fixed start positions, five minutes |
 | trio-etorrep-glacier | Etorrep Glacier | 3 | 3600 | Three Core players on Etorrep Glacier, random start positions, two minutes |
+| ui-antinuke-range | The Pass | 2 | 3620 | A human Core anti-nuke builds one missile and is selected: the minimap draws its coverage as a dashed circle (`circle_dashed`) |
 | ui-build-menu | The Pass | 2 | 200 | Scripted build menu clicks, the build menu and its queue counts in frames |
 | ui-build-place | The Pass | 2 | 200 | Scripted build placement (`IssueMobileBuildOrders`) |
 | ui-click-select | The Pass | 2 | 120 | Scripted click selection (`input`, interface type 1), the commander and unit panels in frames |
@@ -340,6 +347,9 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | console-iwin | judged | - |
 | console-sight | judged | - |
 | console-units | judged | - |
+| display-chat-dither | left out | has `input` lines: it needs the presentation |
+| display-debug-overlay | left out | has `input` lines: it needs the presentation |
+| display-tab-menu | left out | has `input` lines: it needs the presentation |
 | duel-coast-to-coast | judged | - |
 | duel-great-divide | judged | - |
 | duel-pass-dark | judged | - |
@@ -411,6 +421,7 @@ A core is judged on the scenarios marked `judged`; the others are `left out` for
 | trio-anteer-strait | judged | - |
 | trio-dark-side | judged | - |
 | trio-etorrep-glacier | judged | - |
+| ui-antinuke-range | left out | has `input` lines: it needs the presentation |
 | ui-build-menu | left out | has `input` lines: it needs the presentation |
 | ui-build-place | left out | has `input` lines: it needs the presentation |
 | ui-click-select | left out | has `input` lines: it needs the presentation |
@@ -686,7 +697,7 @@ uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-di
 ```
 
 `--tier` is the same `--check` restricted to the 44 scenarios of the `GATE_TIER` constant of
-`tools/reference.py`, 39,161 ticks of the 377,011 that the suite's 98 scenarios play (10.4%), none longer than 9000.
+`tools/reference.py`, 39,161 ticks of the 380,871 that the suite's 102 scenarios play (10.3%), none longer than 9000.
 A scenario's ticks here are those its stored trace holds, as `tools/coverage.py` counts them, so a mission that a
 victory condition ends early counts the ticks it played, not its `ticks` line. It is the
 gate of a pull request, except for the changes in "When the full suite is the gate". A pass says how

@@ -42,13 +42,6 @@ ModelState* __stdcall CreateObjectState(Object3do* obj)
     return state;
 }
 
-struct ModelBuildList {
-    char unknown_0[8];
-    int count;
-    char unknown_c[0x20 - 0xc];
-    const char** names;
-};
-
 // FUNCTION: 0x45a950
 ModelState* __stdcall CreatePlayerObjectState(Object3do* obj, ModelBuildList* list, Unit* owner)
 {

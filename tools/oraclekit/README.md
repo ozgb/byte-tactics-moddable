@@ -23,7 +23,7 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | `reference/events/` | the stored sim event digests: for each scenario, the tick, phase, record count and hash of each run of sim events, and for each tick its count, the hash of the records whose order counts and the hash of their set | `docs/events-log.md` |
 | `docs/events-log.md`, `tools/eventdigest.py` | the sim event log format, the digest format and the tool that makes a digest from a log and compares it with a stored one (standard library only, with `tools/tracerehash.py`; it reads the order classes from `docs/sim-events.md`) | `docs/events-log.md` |
 | `reference/display/` | the stored display digests: for each scenario, each frame's number, tick, item count, the hash of its display list in order and the hash of its items with their layers | `docs/display-log.md` |
-| `reference/displaylists/` | the stored display lists of the frames whose pixels are stored, for the scenarios with a `frames` line | `docs/display-log.md` |
+| `reference/displaylists/` | the stored display lists (xz), for the scenarios with a `frames` line: every frame up to the last frame whose pixels are stored, with a `picture` line for each picture the game made, so that a list holds every pixel its frames draw | `docs/display-log.md` |
 | `docs/display-log.md`, `tools/displaylog.py` | the display log format, which orders of its items count, the digest format and the tool that makes a digest from a display list and compares lists and digests (standard library only) | `docs/display-log.md` |
 | `interfaces/` | the subsystem interface headers (the seams) | `docs/module-abi.md` |
 | `docs/scenario-format.md` | the scenario format, the test-mode run and its outputs | itself |
@@ -50,10 +50,17 @@ writes its own sound log, UI log and frames in its test mode and compares them w
 The commands the reference used to write them are in `reference/README.md`, which stays in the source
 repository; the formats are in `docs/sound-log.md`, `docs/frame-dump.md` and `docs/ui-log.md`.
 
+The display has two contracts. The stored frames (`reference/frames/`) are the oracle of the default software
+rasteriser at 640x480 and 256 colours: a build that draws that way must write the same frames byte for byte, and the
+stored display lists, drawn from blank targets with the game's data and their `picture` lines, give those frames
+(`docs/display-log.md`, "The replay"). Any other host (another rasteriser, size, colour depth or a browser) is judged
+on the display list alone: its display digests and lists must equal `reference/display/` and
+`reference/displaylists/`.
+
 A presentation is judged on a frame it draws from the view alone. For each tick of a scenario's `frames` line the kit holds three
 files that belong together: the view of that tick (`reference/views/<scenario>/<tick>.bin`, the input: the bytes of
 `docs/view.md`, "The recorded view", which `tools/viewblock.py show` prints field by field), the display list the reference drew
-from the state behind it (`reference/displaylists/<scenario>.txt`, the frame of that tick, `docs/display-log.md`, the output as items)
+from the state behind it (`reference/displaylists/<scenario>.txt.xz`, the frame of that tick, `docs/display-log.md`, the output as items)
 and the pixels of the frame (`reference/frames/<scenario>/<tick>.bin`, `docs/frame-dump.md`, the output as a picture). A build that
 fills a `PlayerView` from the view file alone, runs its presentation and writes its display list and its frame for that tick is equal when
 its list equals the stored one under the rule of `docs/display-log.md` and its pixels equal the stored frame. The view of every tick,

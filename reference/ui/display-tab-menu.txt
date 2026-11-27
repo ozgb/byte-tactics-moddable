@@ -1,0 +1,5 @@
+bt-ui 2
+1 scroll 304 32
+1 view 1
+1 select -
+10 input char 9

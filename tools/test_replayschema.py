@@ -5,6 +5,7 @@
 
 import copy
 import csv
+import functools
 import json
 import re
 import tempfile
@@ -15,13 +16,41 @@ from unittest import mock
 import coupling
 import replayschema as rs
 
+REAL_INTERFACES = rs.INTERFACES
+
 
 def row(function, kind, target):
     return {"address": "", "function": function, "file": "", "kind": kind, "target": target}
 
 
+@functools.cache
+def stored_annotations():
+    return rs.load_annotations(fixtures=True)
+
+
 def annotations():
-    return copy.deepcopy(rs.load_annotations(fixtures=True))
+    return copy.deepcopy(stored_annotations())
+
+
+@functools.cache
+def stored_rows():
+    return tuple(rs.read_rows())
+
+
+def read_rows():
+    return [dict(r) for r in stored_rows()]
+
+
+@functools.cache
+def stored_generated(fixtures: bool):
+    return rs.generate(read_rows(), annotations() if fixtures else None)
+
+
+def generate(ann=None, fixtures=True):
+    """rs.generate on the stored rows: of `ann`, or of the stored annotations (with the fixture kinds unless `fixtures` is false) built once per run and copied."""
+    if ann is None and rs.INTERFACES == REAL_INTERFACES:
+        return copy.deepcopy(stored_generated(fixtures))
+    return rs.generate(read_rows(), ann if ann is not None else annotations() if fixtures else None)
 
 
 def build(rows, ann=None, assignment=None):
@@ -217,7 +246,7 @@ class Unrecorded(unittest.TestCase):
 
     def test_an_unrecorded_slot_that_a_complete_subsystem_imports_keeps_its_import_hook(self):
         ann = self.imported()
-        files, errors, model = rs.generate(rs.read_rows(), ann)
+        files, errors, model = rs.generate(read_rows(), ann)
         self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
         weapons = model["subsystems"]["weapons"]
         self.assertNotIn("FindWeaponByName", weapons["slots"])
@@ -232,7 +261,7 @@ class Unrecorded(unittest.TestCase):
         self.assertNotIn("on[SUB_WEAPONS] ||", hooks.split("s_rec_weapons.FindWeaponByName")[0].rsplit("if (", 1)[1])
 
     def test_an_imported_slot_that_is_not_recorded_has_no_recording_slot(self):
-        files, _, model = rs.generate(rs.read_rows(), self.imported())
+        files, _, model = rs.generate(read_rows(), self.imported())
         spec = model["subsystems"]["weapons"]
         self.assertNotIn(("weapons", "FindWeaponByName"), model["slot_list"])
         self.assertEqual(spec["slots"].keys() & {"FindWeaponByName"}, set())
@@ -294,7 +323,7 @@ class Rules(unittest.TestCase):
         self.assertTrue(any("weapons is complete but has pending untracked" in e and "Player::noSuchMember" in e for e in errors), errors)
 
     def test_the_range_marks_both_fields_of_the_pair(self):
-        files, _, _ = rs.generate(rs.read_rows())
+        files, _, _ = generate(fixtures=False)
         lines = files[rs.SCHEMA_H].split("\n")
         begin = [l for l in lines if l.startswith('    { "unitsBegin"')][0].rstrip(" },").split(", ")
         end = [l for l in lines if l.startswith('    { "unitsEnd"')][0].rstrip(" },").split(", ")
@@ -356,7 +385,7 @@ class WritesThroughPointers(unittest.TestCase):
         self.assertTrue(any("the rule for deref_write *short names the unknown field Game.nowhere" in e for e in errors), errors)
 
     def test_the_committed_schema_is_unchanged_by_the_forms(self):
-        files, errors, _ = rs.generate(rs.read_rows())
+        files, errors, _ = generate(fixtures=False)
         self.assertEqual(errors, [])
         for path, text in files.items():
             self.assertEqual(path.read_text(), text, path)
@@ -367,7 +396,7 @@ class Services(unittest.TestCase):
         ann = annotations()
         ann["services"][1]["declaration"] = "int __stdcall RandomInt(unsigned range);"
         with self.assertRaises(rs.Error):
-            rs.generate(rs.read_rows(), ann)
+            rs.generate(read_rows(), ann)
 
     def test_a_hook_that_gives_other_arguments_is_an_error(self):
         spec = copy.deepcopy(annotations()["services"])
@@ -379,7 +408,7 @@ class Services(unittest.TestCase):
         self.assertTrue(any("RI_GET_INT_ARG" in e and "no service spec" in e for e in rs.check_service_hooks(spec)))
 
     def test_every_service_has_a_line_in_the_recorder_and_an_answer(self):
-        files, _, _ = rs.generate(rs.read_rows())
+        files, _, _ = generate(fixtures=False)
         for s in annotations()["services"]:
             self.assertIn("case %s:" % s["id"], files[rs.SERVICES_INC])
             self.assertIn("StartImport(t, %s);" % s["id"], files[rs.SERVICES_SLOTS])
@@ -389,7 +418,7 @@ class TargetingForms(unittest.TestCase):
     """The forms #669 added: unit-id fields, raw byte pointers, in-out structs, vec3 out, unit vectors and reach lists."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def test_a_pos_the_call_writes_only_on_success_is_an_out_struct_with_a_condition(self):
         _, _, model = self.generated()
@@ -460,7 +489,7 @@ class TargetingForms(unittest.TestCase):
     def test_an_import_annotation_is_for_a_scalar_and_a_known_form(self):
         fixtures = json.loads(rs.FIXTURES_JSON.read_text())
         fixtures["fixtures"]["HandGoal"]["args"]["goal"]["import"] = {"mode": "object", "kind": "NoSuchKind"}
-        errors = rs.generate(rs.read_rows(), None, fixtures=fixtures)[1]
+        errors = rs.generate(read_rows(), None, fixtures=fixtures)[1]
         self.assertTrue(any("`import` of the argument goal" in e for e in errors), errors)
 
     def test_a_unit_buffer_slot_without_playsas_records_itself_and_replays_itself(self):
@@ -743,7 +772,7 @@ class Tables(unittest.TestCase):
     """N1: an object of a kind with a table is Kind#index, where the annotation names the table once."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def test_units_and_players_are_instances_of_the_table_form(self):
         _, errors, model = self.generated()
@@ -826,21 +855,21 @@ class Tables(unittest.TestCase):
     def test_an_array_length_with_an_addend_is_in_the_generated_table(self):
         ann = annotations()
         ann["game_fields"]["visibilityMask"]["length"] = "(width+0xff)>>8"
-        files, errors, _ = rs.generate(rs.read_rows(), ann)
+        files, errors, _ = rs.generate(read_rows(), ann)
         self.assertEqual(errors, [])
         self.assertIn("{ offsetof(Game, width), (unsigned char)sizeof(((Game*)nullptr)->width), 8, 255u }", files[rs.SCHEMA_H])
 
     def test_a_length_may_name_a_member_of_an_embedded_struct(self):
         ann = annotations()
         ann["game_fields"]["visibilityMask"]["length"] = "settings.field_471*2"
-        files, errors, _ = rs.generate(rs.read_rows(), ann)
+        files, errors, _ = rs.generate(read_rows(), ann)
         self.assertEqual(errors, [])
         self.assertIn("{ offsetof(Game, settings.field_471), (unsigned char)sizeof(((Game*)nullptr)->settings.field_471), 0 }", files[rs.SCHEMA_H])
 
     def test_a_dotted_length_member_must_exist(self):
         ann = annotations()
         ann["game_fields"]["visibilityMask"]["length"] = "settings.nothing*2"
-        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        _, errors, _ = rs.generate(read_rows(), ann)
         self.assertTrue(any("settings.nothing, which is no member of Game" in e for e in errors), errors)
 
 
@@ -848,7 +877,7 @@ class ProductCounts(unittest.TestCase):
     """A table counted by a product of block fields needs those fields in the read set of every slot that reaches it."""
 
     def test_cell_is_a_table_counted_by_width_times_height(self):
-        _, errors, model = rs.generate(rs.read_rows(), annotations())
+        _, errors, model = generate()
         self.assertEqual(errors, [])
         cell = {t["kind"]: t for t in model["tables"]}["Cell"]
         self.assertEqual((cell["member"], cell["ref"], cell["alloc"]), ("cells", True, 0))
@@ -857,12 +886,12 @@ class ProductCounts(unittest.TestCase):
     def test_a_slot_that_reaches_the_table_must_read_both_factors(self):
         ann = annotations()
         del ann["subsystems"]["map"]["slots"]["GetCellMeanHeight"]
-        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        _, errors, _ = rs.generate(read_rows(), ann)
         self.assertTrue(any("map.GetCellMeanHeight reaches Cell, whose count multiplies Game.width" in e for e in errors), errors)
         self.assertTrue(any("map.GetCellMeanHeight reaches Cell, whose count multiplies Game.height" in e for e in errors), errors)
 
     def without_factors(self):
-        return [r for r in rs.read_rows() if not (r["function"] in ("GetCellMeanHeight", "GetCellCachedWidth", "WholePart") and r["target"] in ("Game::width", "Game::height"))]
+        return [r for r in read_rows() if not (r["function"] in ("GetCellMeanHeight", "GetCellCachedWidth", "WholePart") and r["target"] in ("Game::width", "Game::height"))]
 
     def test_one_missing_factor_is_reported_alone(self):
         ann = annotations()
@@ -883,7 +912,7 @@ class Arrays(unittest.TestCase):
     """N2: an array whose length is a field expression, written whole at first use and as element runs after it."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def test_an_array_of_an_object_is_a_field_with_a_length_expression(self):
         files, errors, model = self.generated()
@@ -939,7 +968,7 @@ class StructForms(unittest.TestCase):
     """N3, N4 and N10: a nullable struct in, an array of structs in, and structs by value as arguments and results."""
 
     def generated(self, ann):
-        return rs.generate(rs.read_rows(), ann)
+        return rs.generate(read_rows(), ann)
 
     def targeting(self, **pos):
         ann = annotations()
@@ -1044,7 +1073,7 @@ class Polymorphic(unittest.TestCase):
     """N5: a base kind lists its concrete kinds, each concrete kind names its vtable, a code pointer is an index in a table."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def errors(self, ann):
         return self.generated(ann)[1]
@@ -1214,7 +1243,7 @@ class Callbacks(unittest.TestCase):
     """N6: an import that calls back into the subsystem records each call under its i line, and the stub makes them in order."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def with_import(self, mutate=None, slot="StartScriptWithArgsByIndex", importer="wind_meteors"):
         ann = annotations()
@@ -1344,7 +1373,7 @@ class Callbacks(unittest.TestCase):
     def fixture_errors(self, mutate):
         fixtures = json.loads(rs.FIXTURES_JSON.read_text())
         mutate(fixtures["fixtures"])
-        return rs.generate(rs.read_rows(), annotations(), fixtures=fixtures)[1]
+        return rs.generate(read_rows(), annotations(), fixtures=fixtures)[1]
 
     def test_the_callback_key_is_rejected_on_the_other_forms(self):
         ann = annotations()
@@ -1414,7 +1443,7 @@ class Vectors(unittest.TestCase):
     """N8: a BlockVector member is [length/capacity] and its elements, as handles, runs of bytes or lines of fields."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def errors(self, ann):
         return self.generated(ann)[1]
@@ -1514,7 +1543,7 @@ class Services(unittest.TestCase):
         return [s for s in (ann or annotations())["services"] if s["name"] == name][0]
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def errors(self, ann):
         return self.generated(ann)[1]
@@ -1617,7 +1646,7 @@ class ReentrantServices(unittest.TestCase):
     """ExecuteCommandText: the commands it runs are c lines under its i line."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def spec(self):
         return [s for s in annotations()["services"] if s["name"] == "ExecuteCommandText"][0]
@@ -1722,7 +1751,7 @@ class RawPointers(unittest.TestCase):
     """A ptr field is a raw pointer to a named object, and a service writes the fields of its object argument as o lines."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def spec(self, name, ann=None):
         return [s for s in (ann or annotations())["services"] if s["name"] == name][0]
@@ -1766,7 +1795,7 @@ class Conditions(unittest.TestCase):
     """A `when` on any field: a mask, a value, and an optional `via` field that leads to the object the condition reads."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def field(self, ann, kind, name):
         return [f for f in ann["objects"][kind]["fields"] if f["name"] == name][0]
@@ -1868,7 +1897,7 @@ class InsideSites(unittest.TestCase):
     """`inside` lists every {kind, member} a kind is embedded at."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def test_each_site_is_a_row_of_the_site_table(self):
         files, errors, _ = self.generated()
@@ -1973,7 +2002,7 @@ class FeatureKinds(unittest.TestCase):
         ann = annotations()
         kinds = {"Feature", "Spot", "Pool", "Handle"}
         functions = set(rs.read_assignment()["features"])
-        left = sorted({"%s %s" % (r["function"], r["target"]) for r in rs.read_rows()
+        left = sorted({"%s %s" % (r["function"], r["target"]) for r in read_rows()
                        if r["function"] in functions and r["kind"] in rs.OBJECT_KINDS and r["target"].split("::")[0] in kinds and not rs.object_targets(r["target"], ann)})
         self.assertEqual(left, [])
 
@@ -1982,7 +2011,7 @@ class FeatureKinds(unittest.TestCase):
         have = {(r["kind"], r["target"]) for r in ann["rules"]}
         for want in (("field_escape", "Game::pool"), ("deref_read", "*int"), ("deref_write", "*int"), ("field_read", "Pool::entries"), ("field_read", "Game::cells")):
             self.assertIn(want, have)
-        _, errors, model = rs.generate(rs.read_rows(), ann)
+        _, errors, model = rs.generate(read_rows(), ann)
         self.assertEqual([e for e in errors if e.startswith("features")], [])
         self.assertNotIn("pending", model["subsystems"]["features"])
 
@@ -2011,7 +2040,7 @@ class AllOfKinds(unittest.TestCase):
     def test_the_generated_slot_has_a_list_of_kinds(self):
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureLane", "note": "test"})
-        files, errors, _ = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::p1cd5"), row("WeaponCanReachUnit", "field_escape", "Game::players")], ann)
+        files, errors, _ = rs.generate(read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::p1cd5"), row("WeaponCanReachUnit", "field_escape", "Game::players")], ann)
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
         self.assertIn("kReplayWeaponsWeaponCanReachUnitAllOf[] = { ROK_PLAYER, ROK_FIXTURELANE };", text)
@@ -2019,14 +2048,14 @@ class AllOfKinds(unittest.TestCase):
         self.assertTrue(slot.endswith("kReplayWeaponsWeaponCanReachUnitAllOf, 2 },"), slot)
 
     def test_a_slot_with_one_kind_is_a_list_of_one(self):
-        files, _, _ = rs.generate(rs.read_rows())
+        files, _, _ = generate(fixtures=False)
         text = files[rs.SCHEMA_H]
         self.assertIn("kReplayWeaponsFindTargetableProjectileAllOf[] = { ROK_PROJECTILE };", text)
         slot = [l for l in text.split("\n") if l.startswith('    { "FindTargetableProjectile", SUB_WEAPONS')][0]
         self.assertTrue(slot.endswith("kReplayWeaponsFindTargetableProjectileAllOf, 1 },"), slot)
 
     def test_a_slot_with_none_has_no_list(self):
-        files, _, _ = rs.generate(rs.read_rows())
+        files, _, _ = generate(fixtures=False)
         slot = [l for l in files[rs.SCHEMA_H].split("\n") if l.startswith('    { "GetWeaponRange", SUB_WEAPONS')][0]
         self.assertTrue(slot.endswith("nullptr, 0 },"), slot)
 
@@ -2041,7 +2070,7 @@ class DeltaKinds(unittest.TestCase):
     """`delta` on a table kind."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def test_the_kind_row_says_it_is_a_delta(self):
         files, errors, model = self.generated()
@@ -2073,7 +2102,7 @@ class GameRefs(unittest.TestCase):
     """A `ref` field of Game."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def test_the_field_has_a_target_in_the_field_table(self):
         files, errors, model = self.generated()
@@ -2158,7 +2187,7 @@ class ArgumentShapes(unittest.TestCase):
         return rs.check_forms("x.Y", s["args"], s["result"], ann)
 
     def generated(self, ann):
-        return rs.generate(rs.read_rows(), ann)
+        return rs.generate(read_rows(), ann)
 
     def test_an_out_vector_is_recorded_after_the_import_line_and_pushed_by_the_stub(self):
         s, _ = self.slot([("int", "owner"), (self.SPANS, "goals")], {"goals": self.VECTOR})
@@ -2378,21 +2407,21 @@ class ArgumentShapes(unittest.TestCase):
         self.assertIn("CompareWeaponResult(g_result_units_Pick);", runner)
 
     def test_an_all_of_rule_may_name_a_table_behind_a_ref_field_and_not_a_kind_with_no_table(self):
-        _, errors, model = rs.generate(rs.read_rows(), annotations())
+        _, errors, model = generate()
         self.assertEqual([e for e in errors if "all-of" in e], [])
         self.assertEqual(model["subsystems"]["mission"]["slots"]["CountStartPositions"]["allOf"], ["Mission", "MissionRule"])
         ann = annotations()
         for rule in ann["rules"]:
             if rule["target"] == "Mission::missionIndex":
                 rule["object"] = "MissionType"
-        errors = rs.generate(rs.read_rows(), ann)[1]
+        errors = rs.generate(read_rows(), ann)[1]
         self.assertTrue(any("the all-of rule names MissionType, which is no table kind of the schema" in e for e in errors), errors)
 
     def test_a_condition_is_result_not_equal_to_a_number(self):
         for when, ok in (("result != 0", True), ("result != 65535", True), ("result != x", False)):
             ann = annotations()
             ann["subsystems"]["targeting"]["slots"]["GetWeaponTargetPos"]["args"]["pos"]["when"] = when
-            errors = rs.generate(rs.read_rows(), ann)[1]
+            errors = rs.generate(read_rows(), ann)[1]
             self.assertEqual(not any("`when` is only" in e for e in errors), ok, (when, errors))
 
     def test_the_replayer_passes_an_in_out_value_by_address_or_null_and_compares_it_after(self):
@@ -2551,7 +2580,7 @@ class ArgumentShapes(unittest.TestCase):
         fixtures = json.loads(rs.FIXTURES_JSON.read_text())
         fixtures["fixtures"]["FillGoals"]["args"]["goals"]["dir"] = "in"
         fixtures["fixtures"]["Query"]["args"]["nowhere"] = {"mode": "scalar"}
-        _, errors, _ = rs.generate(rs.read_rows(), rs.load_annotations(), None, fixtures)
+        _, errors, _ = rs.generate(read_rows(), rs.load_annotations(), None, fixtures)
         self.assertTrue(any("fixtures.FillGoals: the argument goals is a vector, and only a vector out is recorded" in e for e in errors), errors)
         self.assertTrue(any("fixtures.Query: the note for nowhere names no parameter" in e for e in errors), errors)
 
@@ -2560,7 +2589,7 @@ class ElementForms(unittest.TestCase):
     """Arrays of refs, arrays of embeds, tables behind a ref field, sites in an array element, `vptr` and embedded polymorphic kinds."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def errors(self, ann):
         return self.generated(ann)[1]
@@ -2654,7 +2683,7 @@ class ElementForms(unittest.TestCase):
         self.has(ann, "a kind in a table behind a ref field is a state kind with no sites")
         ann = annotations()
         ann["rules"].append({"kind": "field_escape", "target": "Game::p1cd5", "rule": "all-of", "object": "FixtureGroup", "note": "test"})
-        errors = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::p1cd5"), row("WeaponCanReachUnit", "field_escape", "Game::players")], ann)[1]
+        errors = rs.generate(read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::p1cd5"), row("WeaponCanReachUnit", "field_escape", "Game::players")], ann)[1]
         self.assertFalse(any("which is no table kind of the schema" in e for e in errors), errors)
 
     def test_a_vptr_kind_has_its_global_in_the_vtable_functions(self):
@@ -2741,7 +2770,7 @@ class CapacityTables(unittest.TestCase):
     """A table with a live count and room for more: a `capacity`, and `"alloc": "module"` for memory the module frees."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -2797,10 +2826,10 @@ class CapacityTables(unittest.TestCase):
     def test_a_slot_that_reaches_the_table_reads_the_capacity_member(self):
         ann = self.table(annotations(), capacity="hotRadarCount")
         ann["rules"].append({"kind": "field_escape", "target": "Game::hotRadar", "rule": "all-of", "object": "FixtureEye", "note": "test"})
-        errors = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::hotRadar")], ann)[1]
+        errors = rs.generate(read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::hotRadar")], ann)[1]
         self.assertTrue(any("weapons.WeaponCanReachUnit reaches FixtureEye, whose capacity is Game.hotRadarCount" in e for e in errors), errors)
         ann["subsystems"]["weapons"]["slots"].setdefault("WeaponCanReachUnit", {})["reads"] = ["Game.hotRadarCount"]
-        errors = rs.generate(rs.read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::hotRadar")], ann)[1]
+        errors = rs.generate(read_rows() + [row("WeaponCanReachUnit", "field_escape", "Game::hotRadar")], ann)[1]
         self.assertEqual([e for e in errors if "reaches" in e], [])
 
     def test_a_table_behind_a_ref_field_has_a_capacity_that_is_a_member_of_the_owner(self):
@@ -2848,7 +2877,7 @@ class SelfPointers(unittest.TestCase):
     """A field that points into its own object: a member (never a line), or an element of the array a member holds (written as the index)."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -2879,7 +2908,7 @@ class SelfPointers(unittest.TestCase):
         self.assertIn('static_assert(sizeof(((FixtureEye*)nullptr)->pos) >= 1,', text)
 
     def test_the_real_schema_has_the_two_self_pointers_of_an_eye(self):
-        files, _, _ = rs.generate(rs.read_rows())
+        files, _, _ = generate(fixtures=False)
         self.assertIn("static const ReplaySelfSpec kReplaySelfs[] = {\n    { offsetof(Eye, screenPos), 0 },\n    { offsetof(Eye, flagB), 0 },\n};", files[rs.SCHEMA_H])
 
     def test_a_self_pointer_is_never_walked(self):
@@ -2942,7 +2971,7 @@ class RefCTypes(unittest.TestCase):
     """A ref whose C type differs from its target kind: `Ref<char>` to a state kind."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -2988,7 +3017,7 @@ class CStrings(unittest.TestCase):
     """A pointer to a NUL-terminated string is a field kind, and the element kind of an array and a vector."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -3077,7 +3106,7 @@ class Blobs(unittest.TestCase):
     """A ptr with a blob records the bytes it leads to, as the array of a companion field named `<field>[]`."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -3112,7 +3141,7 @@ class Blobs(unittest.TestCase):
         self.assertEqual([names[i] for i in s["objectReads"]], ["FixtureProgram.entries", "FixtureProgram.entries[]"])
 
     def test_the_real_schema_has_only_the_pixels_of_a_gaf_frame(self):
-        files, _, _ = rs.generate(rs.read_rows())
+        files, _, _ = generate(fixtures=False)
         blobs = [line for line in files[rs.SCHEMA_H].split("\n") if "RK_BLOB," in line]
         self.assertEqual(len(blobs), 1)
         self.assertIn('"pixelsOrLayers[]", offsetof(GafFrame, pixelsOrLayers)', blobs[0])
@@ -3136,7 +3165,7 @@ class LoadForms(unittest.TestCase):
     """Load-time data a recording carries as the inputs of its load: the `loads` annotation, the pointer modes and the field kind that name a load."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -3146,7 +3175,7 @@ class LoadForms(unittest.TestCase):
         return next(f for f in ann["objects"]["FixtureLane"]["fields"] if f["name"] == name)
 
     def test_the_real_loads_have_holders_and_ids(self):
-        files, errors, model = rs.generate(rs.read_rows())
+        files, errors, model = generate(fixtures=False)
         self.assertEqual(errors, [])
         self.assertEqual([(l["name"], [h["kind"] for h in l["holders"]]) for l in model["loads"]], [("cob", ["UnitDef"]), ("model", ["UnitDef"])])
         text = files[rs.SCHEMA_H]
@@ -3237,7 +3266,7 @@ class LoadForms(unittest.TestCase):
         def has(change, text):
             fixtures = json.loads(rs.FIXTURES_JSON.read_text())
             change(fixtures["fixtures"])
-            errors = rs.generate(rs.read_rows(), annotations(), fixtures=fixtures)[1]
+            errors = rs.generate(read_rows(), annotations(), fixtures=fixtures)[1]
             self.assertTrue(any(text in e for e in errors), (text, errors))
 
         has(lambda f: f["Attach"]["args"]["script"].update(load="nowhere"), "names the load nowhere, which is no entry of `loads`")
@@ -3250,7 +3279,7 @@ class CountedForms(unittest.TestCase):
     """An array of embedded structs counted by a member of its owner, and an array whose length follows a load field to the loaded file."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -3260,7 +3289,7 @@ class CountedForms(unittest.TestCase):
         return next(f for f in ann["objects"][kind]["fields"] if f["name"] == name)
 
     def test_the_real_schema_counts_the_pieces_of_a_model_state(self):
-        files, errors, model = rs.generate(rs.read_rows())
+        files, errors, model = generate(fixtures=False)
         self.assertEqual(errors, [])
         text = files[rs.SCHEMA_H]
         self.assertIn("REPLAY_MAX_SIZE(sizeof(ModelState), offsetof(ModelState, pieces[0]) + 128 * sizeof(((ModelState*)nullptr)->pieces[0]))", text)
@@ -3315,7 +3344,7 @@ class NestedVectors(unittest.TestCase):
     """A value kind may have vector fields, so a vector holds vectors to any depth; a kind that derives from BlockVector is its own vector."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -3339,7 +3368,7 @@ class NestedVectors(unittest.TestCase):
         self.assertIn('static_assert(__is_same(FixtureRow::value_type, short), "FixtureRow::cells holds short");', text)
 
     def test_the_real_schema_has_vectors_in_the_value_kinds_of_the_los_tables_only(self):
-        _, _, model = rs.generate(rs.read_rows())
+        _, _, model = generate(fixtures=False)
         scopes = {o["name"]: o["scope"] for o in model["objects"]}
         self.assertEqual([(f["object"], f["name"]) for f in model["object_fields"] if f["kind"] == "vector" and scopes[f["object"]] == "value"],
                          [("LosLine", "steps"), ("LosTable", "lines")])
@@ -3363,7 +3392,7 @@ class SimVectors(unittest.TestCase):
     """A BlockVector member of SimGlobals is a field of kind vector, written as an object's vector field is."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]
@@ -3384,12 +3413,12 @@ class SimVectors(unittest.TestCase):
         self.assertIn('static_assert(__is_same(decltype(((SimGlobals*)nullptr)->g_missionOrderTableVec)::value_type, OrderTableEntry)', text)
 
     def test_the_real_schema_has_the_order_and_los_tables_as_its_vectors_in_the_block(self):
-        files, _, model = rs.generate(rs.read_rows())
+        files, _, model = generate(fixtures=False)
         self.assertEqual(sorted(f["name"] for f in model["fields"] if f["kind"] == "vector"), ["SimGlobals.g_losTables", "SimGlobals.g_missionOrderTableVec"])
 
     def test_a_test_only_global_is_in_no_slot_set(self):
-        real, _ = rs.build(rs.load_annotations(), rs.read_rows(), rs.read_assignment())
-        both, _ = rs.build(rs.load_annotations(fixtures=True), rs.read_rows(), rs.read_assignment())
+        real, _ = rs.build(rs.load_annotations(), read_rows(), rs.read_assignment())
+        both, _ = rs.build(rs.load_annotations(fixtures=True), read_rows(), rs.read_assignment())
         for sub, spec in both["subsystems"].items():
             for slot, s in spec["slots"].items():
                 self.assertEqual(s["reads"], real["subsystems"][sub]["slots"][slot]["reads"], (sub, slot))
@@ -3456,7 +3485,7 @@ class EventForms(unittest.TestCase):
     def test_the_poly_form_of_refs_is_checked(self):
         ann = annotations()
         ann["subsystems"]["movement"]["slots"]["Apply"]["args"]["event"]["refs"]["MovementTarget.target"] = {"kind": "OrderFx", "poly": "Order"}
-        errors = rs.generate(rs.read_rows(), ann)[1]
+        errors = rs.generate(read_rows(), ann)[1]
         self.assertTrue(any("with the same kind in both" in e for e in errors), errors)
 
     def test_a_kind_missing_from_the_table_is_an_error(self):
@@ -3487,7 +3516,7 @@ class EventForms(unittest.TestCase):
         self.assertNotIn("TargetingSetPos", ann["objects"])
 
     def test_an_event_is_recorded_with_its_size_and_replayed_into_a_zeroed_buffer(self):
-        files, _, _ = rs.generate(rs.read_rows(), rs.load_annotations())
+        files, _, _ = generate(fixtures=False)
         hooks = files[rs.HOOKS_H]
         body = hooks[hooks.index("RecTargetingApply"):]
         body = body[:body.index("\n}\n")]
@@ -3503,15 +3532,15 @@ class EventForms(unittest.TestCase):
     def test_an_event_needs_a_table_and_a_size(self):
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["Apply"]["args"]["event"] = {"mode": "event", "events": "nothing", "size": "size"}
-        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        _, errors, _ = rs.generate(read_rows(), ann)
         self.assertTrue(any("needs `events`" in e for e in errors))
         ann = annotations()
         ann["subsystems"]["targeting"]["slots"]["Apply"]["args"]["event"] = {"mode": "event", "events": "targeting", "size": "event"}
-        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        _, errors, _ = rs.generate(read_rows(), ann)
         self.assertTrue(any("needs a `size`" in e for e in errors))
 
     def test_a_kind_left_unrecorded_is_passed_through_before_any_line(self):
-        files, _, _ = rs.generate(rs.read_rows(), rs.load_annotations())
+        files, _, _ = generate(fixtures=False)
         hooks = files[rs.HOOKS_H]
         body = hooks[hooks.index("RecScriptsApply"):]
         body = body[:body.index("\n}\n")]
@@ -3545,7 +3574,7 @@ class EventForms(unittest.TestCase):
                                  (["WEAPONS_DETONATE"], "maps the name of a kind")):
             ann = annotations()
             ann["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["unrecorded"] = unrecorded
-            _, errors, _ = rs.generate(rs.read_rows(), ann)
+            _, errors, _ = rs.generate(read_rows(), ann)
             self.assertTrue(any(want in e for e in errors), (unrecorded, errors))
 
     def test_kind_writes_name_a_recorded_kind_and_object_fields(self):
@@ -3556,11 +3585,11 @@ class EventForms(unittest.TestCase):
                                   (["PLAYERS_SET_STORE"], "maps the name of a kind")):
             ann = annotations()
             ann["subsystems"]["players"]["slots"]["Apply"]["args"]["event"]["kindWrites"] = kind_writes
-            _, errors, _ = rs.generate(rs.read_rows(), ann)
+            _, errors, _ = rs.generate(read_rows(), ann)
             self.assertTrue(any(want in e for e in errors), (kind_writes, errors))
 
     def test_kind_writes_add_to_the_writes_of_that_kind_alone(self):
-        files, errors, model = rs.generate(rs.read_rows(), annotations())
+        files, errors, model = generate()
         self.assertEqual(errors, [])
         slot = model["subsystems"]["players"]["slots"]["Apply"]
         self.assertEqual([k["kind"] for k in slot["kindWrites"]], ["PLAYERS_SET_STORE"])
@@ -3576,19 +3605,19 @@ class EventForms(unittest.TestCase):
                            ({"WeaponsDamage.source": "WeaponAimCobCb"}, "WeaponsDamage.source, which is a unit ref already")):
             ann = annotations()
             ann["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]["refs"] = refs
-            _, errors, _ = rs.generate(rs.read_rows(), ann)
+            _, errors, _ = rs.generate(read_rows(), ann)
             self.assertTrue(any(want in e for e in errors), (refs, errors))
 
 
 class Committed(unittest.TestCase):
     def test_the_data_is_current_and_complete(self):
-        files, errors, model = rs.generate(rs.read_rows())
+        files, errors, model = generate(fixtures=False)
         self.assertEqual(errors, [])
         for path, want in files.items():
             self.assertEqual(path.read_text(), want, path)
 
     def test_no_test_kind_is_in_the_committed_schema(self):
-        files, _, _ = rs.generate(rs.read_rows())
+        files, _, _ = generate(fixtures=False)
         for path in (rs.JSON_OUT, rs.SCHEMA_H, rs.VTABLES_CPP):
             self.assertNotIn("Fixture", files[path], path)
         self.assertIn("FixtureView", files[rs.FIXTURE_SCHEMA_H])
@@ -3596,8 +3625,8 @@ class Committed(unittest.TestCase):
         self.assertIn("BT_REPLAY_FIXTURES", files[rs.SCHEMA_H])
 
     def test_the_test_schema_adds_its_kinds_after_the_real_ones(self):
-        real, _ = rs.build(rs.load_annotations(), rs.read_rows(), rs.read_assignment())
-        both, _ = rs.build(rs.load_annotations(fixtures=True), rs.read_rows(), rs.read_assignment())
+        real, _ = rs.build(rs.load_annotations(), read_rows(), rs.read_assignment())
+        both, _ = rs.build(rs.load_annotations(fixtures=True), read_rows(), rs.read_assignment())
         names = [o["name"] for o in both["objects"]]
         self.assertEqual(names[:len(real["objects"])], [o["name"] for o in real["objects"]])
         self.assertTrue(all(n.startswith("Fixture") for n in names[len(real["objects"]):]))
@@ -3606,11 +3635,11 @@ class Committed(unittest.TestCase):
     def test_the_test_kinds_are_checked_too(self):
         ann = annotations()
         ann["objects"]["FixtureCell"]["delta"] = "yes"
-        files, errors, _ = rs.generate(rs.read_rows(), rs.load_annotations(), None, {"objects": {"FixtureCell": ann["objects"]["FixtureCell"]}, "includes": ["../../tests/replay_fixtures.h"]})
+        files, errors, _ = rs.generate(read_rows(), rs.load_annotations(), None, {"objects": {"FixtureCell": ann["objects"]["FixtureCell"]}, "includes": ["../../tests/replay_fixtures.h"]})
         self.assertTrue(any("FixtureCell delta" in e for e in errors), errors)
 
     def test_every_simulation_subsystem_is_covered(self):
-        files, _, model = rs.generate(rs.read_rows())
+        files, _, model = generate(fixtures=False)
         written = json.loads(files[rs.JSON_OUT])
         self.assertEqual(sorted(written["subsystems"]), sorted(m[0] for m in rs.seam_members() + rs.world_members()))
         self.assertEqual(set(written["subsystems"]), set(coupling.SIM_SUBSYSTEMS) | {"files", "network", "econworld", "pathworld"})
@@ -3618,7 +3647,7 @@ class Committed(unittest.TestCase):
     def test_every_manifest_slot_has_sets(self):
         manifest = json.loads((rs.ROOT / "wasm/modules.json").read_text())
         exports = [m for m in manifest["modules"] if m["name"] == "wind_meteors"][0]["exports"]
-        _, _, model = rs.generate(rs.read_rows())
+        _, _, model = generate(fixtures=False)
         self.assertEqual(sorted(exports), sorted(model["subsystems"]["wind_meteors"]["slots"]))
 
 
@@ -3629,7 +3658,7 @@ class EventWeapons(unittest.TestCase):
         return ann["subsystems"]["weapons"]["slots"]["Apply"]["args"]["event"]
 
     def test_a_listed_member_leads_to_the_weapon(self):
-        files, errors, _ = rs.generate(rs.read_rows(), annotations())
+        files, errors, _ = generate()
         self.assertEqual([e for e in errors if "`weapons`" in e], [])
         schema = files[rs.SCHEMA_H]
         self.assertIn("ROK_WEAPONSSPAWN, RK_I32, ROK_WEAPONDEF,", schema)
@@ -3638,11 +3667,11 @@ class EventWeapons(unittest.TestCase):
     def test_a_member_that_is_no_int_is_an_error(self):
         ann = annotations()
         self.event(ann)["weapons"] = ["WeaponsSpawn.announce", "WeaponsSpawn.weapon", "WeaponsSpawn.weapon"]
-        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        _, errors, _ = rs.generate(read_rows(), ann)
         self.assertFalse(any("names WeaponsSpawn.announce" in e for e in errors), errors)
         self.assertTrue(any("names WeaponsSpawn.weapon twice" in e for e in errors), errors)
         self.event(ann)["weapons"] = ["WeaponsSpawn.pos", "WeaponsSpawn.nothing"]
-        _, errors, _ = rs.generate(rs.read_rows(), ann)
+        _, errors, _ = rs.generate(read_rows(), ann)
         self.assertTrue(any("names WeaponsSpawn.pos, which is no int member" in e for e in errors), errors)
         self.assertTrue(any("names WeaponsSpawn.nothing, which is no int member" in e for e in errors), errors)
 
@@ -3651,7 +3680,7 @@ class UnitsById(unittest.TestCase):
     """A slot's own reach for the units it reaches by their id (`by_id`)."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def by_id(self, ann):
         return ann["subsystems"]["weapons"]["slots"]["UpdateProjectiles"]["by_id"]
@@ -3722,7 +3751,7 @@ class CompleteImports(unittest.TestCase):
     """A complete subsystem that imports a slot of another complete one is replayed against the import stubs, not the other module."""
 
     def generated(self):
-        files, errors, _ = rs.generate(rs.read_rows(), annotations())
+        files, errors, _ = generate()
         self.assertEqual(errors, [])
         return files
 
@@ -3752,7 +3781,7 @@ class CompleteImports(unittest.TestCase):
 
 class Regions(unittest.TestCase):
     def model(self, ann=None):
-        return rs.build(ann or annotations(), rs.read_rows(), rs.read_assignment())
+        return rs.build(ann or annotations(), read_rows(), rs.read_assignment())
 
     def test_the_region_is_a_block_field_of_its_own_base(self):
         model, errors = self.model()
@@ -3798,7 +3827,7 @@ class Regions(unittest.TestCase):
         self.assertEqual((emit["effect"]["mode"], emit["effect"]["events"], emit["effect"]["size"]), ("effect", "economy", "size"))
 
     def test_the_hooks_wrap_the_world_and_record_init_whatever_the_window(self):
-        files, errors, _ = rs.generate(rs.read_rows())
+        files, errors, _ = generate(fixtures=False)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
         self.assertIn("a1 = WrapWorldEconworld(a1);", hooks)
@@ -3824,7 +3853,7 @@ class CompilerVtablesAndRefArrays(unittest.TestCase):
     """A vtable the compiler emits is named by its symbol, and an array of refs in the sim globals is one ref field per element."""
 
     def generated(self, ann=None):
-        return rs.generate(rs.read_rows(), ann or annotations())
+        return generate(ann)
 
     def has(self, ann, text):
         errors = self.generated(ann)[1]

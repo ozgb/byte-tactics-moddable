@@ -2725,7 +2725,7 @@ weapons,UpdateExplodedPieces,src/weapons/explosions.cpp,0,0,0,0,0,0,?UpdateExplo
 wind_meteors,*,,16,0,198,0,56,0,,0,
 wind_meteors,AddPoints,src/map/meteors.cpp,1,0,0,0,0,0,?AddPoints@@YG?AUPoint16@@U1@0@Z,0,wasm
 wind_meteors,DisableMeteors,src/map/meteors.cpp,1,0,0,0,0,0,?DisableMeteors@@YGXXZ,0,wasm
-wind_meteors,EmptyShutdownPreCleanup,src/map/meteors.cpp,1,0,0,0,0,0,?EmptyShutdownPreCleanup@@YGXXZ,0,shutdown
+wind_meteors,EmptyShutdownPreCleanup,src/map/meteors.cpp,1,0,0,0,0,0,?EmptyShutdownPreCleanup@@YGXXZ,0,wasm
 wind_meteors,EnableMeteors,src/map/meteors.cpp,1,0,0,0,0,0,?EnableMeteors@@YGXXZ,0,wasm
 wind_meteors,InitMeteors,src/map/meteors.cpp,1,0,0,0,0,0,?InitMeteors@@YGXXZ,0,wasm
 wind_meteors,LoadMeteorDefaults,src/map/meteors.cpp,1,0,0,0,0,0,?LoadMeteorDefaults@@YGXPAUMeteorShowerParams@@@Z,0,wasm

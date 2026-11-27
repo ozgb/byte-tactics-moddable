@@ -13,7 +13,11 @@
 
 The exe is the coverage build (clang's -fprofile-instr-generate -fcoverage-mapping -fprofile-update=atomic, #385). Every scenario
 of reference/scenarios/ is played under Wine through tools/reference.py with LLVM_PROFILE_FILE naming
-build/coverage-run/<scenario>/cov-%p.profraw, so parallel runs never share a file. A scenario that fails
+build/coverage-run/<scenario>/cov-%p.profraw, so parallel runs never share a file. The link leaves out the
+profile runtime's initialiser, which would register its own writer, so the exe writes the profile itself: in
+host_exit, the end of a test-mode run, and through the atexit handler HarnessInit registers (WriteCoverageProfile in
+src/harness/harness.cpp), when the game leaves through its exit menu and WinMain returns to the CRT's exit (ui-dialogs).
+host_exit ends with TerminateProcess, which skips atexit, so no run writes it twice. A scenario that fails
 or writes no profile exits 1: the coverage of a partial suite is not a baseline. The profiles are merged
 (llvm-profdata merge -sparse) into build/coverage-run/merged.profdata, whose path is printed so that
 `llvm-cov show <exe> -instr-profile=<it>` can show the source, and `llvm-cov export -format=text` gives
@@ -61,7 +65,9 @@ is what llvm-cov reports for the other side when an update was lost between thre
 profile updates (-fprofile-update=atomic) make that rare but not impossible.
 
 Run time. The coverage build plays slower than the gate's exe (a six-player game needs a timeout of more than the gate's 25 ticks
-a second under load), so the suite's runs time out at TICKS_PER_SECOND ticks a second.
+a second under load), so the suite's runs time out at TICKS_PER_SECOND ticks a second. A run that times out is tried
+once more at RETRY_TICKS_PER_SECOND, so only a scenario that a loaded machine slowed pays the longer timeout (a flat
+RETRY_TICKS_PER_SECOND would give `long-greenhaven-8p` about 7.5 hours).
 
 The tier. `--tier` plays the scenarios of reference.GATE_TIER (the pull request gate, plus the scenarios that save the
 games they load) and prints the lines hit and functions entered as a share of the full suite's, the sums of
@@ -156,6 +162,8 @@ APART = (KIT, DEMO)
 SATURATED = 1 << 62
 TIER_LINE_FLOOR = 96
 TICKS_PER_SECOND = 6
+RETRY_TICKS_PER_SECOND = 2
+TIMED_OUT = "still runs after"
 CHOOSE_FLOOR_TICKS = 600
 CHOOSE_MIN_NEW_LINES = 20
 CHOOSE_PLAYERS = 8
@@ -601,6 +609,14 @@ def windows_path(path: Path) -> str:
     return "Z:" + str(path.resolve()).replace("/", "\\")
 
 
+def with_retry_timeout(args: tuple, kwargs: dict) -> tuple[tuple, dict]:
+    """The arguments of a tracediff.play call with its timeout set for the scenario's ticks at RETRY_TICKS_PER_SECOND."""
+    timeout = reference.RUN_SECONDS_BASE + reference.scenario_ticks(args[1]) / RETRY_TICKS_PER_SECOND
+    if len(args) > 4:
+        return (*args[:4], timeout, *args[5:]), kwargs
+    return args, {**kwargs, "timeout": timeout}
+
+
 def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] | None) -> Path:
     """Play the scenarios on the coverage exe, one profile directory each; the merged profile's path. Exits 1 on a failure or a missing profile."""
     scenarios = reference.scenario_files()
@@ -615,6 +631,8 @@ def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] 
     original_play = reference.play_scenario
     original_tracediff_play = tracediff.play
 
+    timed_out: set[str] = set()
+
     def tracediff_play(*args, **kwargs):
         name = getattr(local, "scenario", None)
         if name:
@@ -622,7 +640,14 @@ def play_suite(exe: Path, game_dir: str | None, parallel: int, names: list[str] 
                 stale.unlink()
             profile = windows_path(RUN_DIR / name) + "\\cov-%p.profraw"
             kwargs["env"] = {**os.environ, "LLVM_PROFILE_FILE": profile}
-        return original_tracediff_play(*args, **kwargs)
+            if name in timed_out:
+                args, kwargs = with_retry_timeout(args, kwargs)
+        try:
+            return original_tracediff_play(*args, **kwargs)
+        except tracediff.Error as e:
+            if name and TIMED_OUT in str(e):
+                timed_out.add(name)
+            raise
 
     def play_scenario(exe, scenario, *args, **kwargs):
         local.scenario = scenario.stem

@@ -1169,7 +1169,9 @@ void DisplayReplayRun(const char* path, const unsigned* frameTicks, unsigned fra
     char* text = ReadAll(path);
     Measure(text);
     RestartSequences();
-    unsigned written = 0;
+    unsigned long long written = 0;
+    if (frameCount > 8 * sizeof written)
+        ReplayFail("more frames ticks than the replay marks", nullptr);
     unsigned tick = 0;
     unsigned frames = 0;
     char* words[kMaxWords];
@@ -1207,9 +1209,9 @@ void DisplayReplayRun(const char* path, const unsigned* frameTicks, unsigned fra
             frames++;
         } else if (strcmp(words[0], "cursor") == 0) {
             for (unsigned i = 0; i < frameCount; i++) {
-                if (frameTicks[i] == tick && (written & (1u << i)) == 0) {
+                if (frameTicks[i] == tick && (written & (1ull << i)) == 0) {
                     WriteFrame(tick);
-                    written |= 1u << i;
+                    written |= 1ull << i;
                 }
             }
         } else if (n >= 6) {

@@ -186,7 +186,8 @@ void UpdateRadarMapped(const RadarMappedCapture* capture)
             dst++;
         }
     }
-    DisplayLogWritten((Surface*)g_game->mappedSurface);
+    if (DisplayLogWants())
+        DisplayLogWritten((Surface*)g_game->mappedSurface);
     g_game->timer.word.flags.pending = 1;
 }
 

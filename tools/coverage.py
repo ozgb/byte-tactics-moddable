@@ -13,7 +13,11 @@
 
 The exe is the coverage build (clang's -fprofile-instr-generate -fcoverage-mapping -fprofile-update=atomic, #385). Every scenario
 of reference/scenarios/ is played under Wine through tools/reference.py with LLVM_PROFILE_FILE naming
-build/coverage-run/<scenario>/cov-%p.profraw, so parallel runs never share a file. A scenario that fails
+build/coverage-run/<scenario>/cov-%p.profraw, so parallel runs never share a file. The link leaves out the
+profile runtime's initialiser, which would register its own writer, so the exe writes the profile itself: in
+host_exit, the end of a test-mode run, and through the atexit handler HarnessInit registers (WriteCoverageProfile in
+src/harness/harness.cpp), when the game leaves through its exit menu and WinMain returns to the CRT's exit (ui-dialogs).
+host_exit ends with TerminateProcess, which skips atexit, so no run writes it twice. A scenario that fails
 or writes no profile exits 1: the coverage of a partial suite is not a baseline. The profiles are merged
 (llvm-profdata merge -sparse) into build/coverage-run/merged.profdata, whose path is printed so that
 `llvm-cov show <exe> -instr-profile=<it>` can show the source, and `llvm-cov export -format=text` gives

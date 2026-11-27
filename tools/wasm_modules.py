@@ -2,7 +2,7 @@
 
     uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm, rust.wasm and wind_meteors.wasm
     uv run tools/wasm_modules.py build-variant --define NAME=VALUE --name NAME   # wind_meteors.wasm built with the defines, as build/wasm-modules/NAME.wasm
-    uv run tools/wasm_modules.py runtime DIR   # modules.json and the built .wasm of every manifest entry without "blocked", copied into DIR
+    uv run tools/wasm_modules.py runtime DIR   # modules.json and the built .wasm of every manifest entry that is not blocked, copied into DIR
     uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
     uv run tools/wasm_modules.py check-module FILE.wasm --name SUBSYSTEM [--manifest M]   # the window, imports, exports, kinds and size of one built file
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
@@ -216,9 +216,19 @@ def build_variant(defines, name):
             build_game_module(entry, game, defines, name)
 
 
+def is_blocked(entry):
+    """Whether a manifest entry is blocked: its "blocked" is a reason (a non-empty string) or true, as the loader reads it. Absent is not blocked; any other value is a manifest fault."""
+    if "blocked" not in entry:
+        return False
+    value = entry["blocked"]
+    if value is True or (isinstance(value, str) and value):
+        return True
+    raise ValueError(f"{entry.get('name')}: blocked must be a reason or true, not {value!r}")
+
+
 def built_modules(game):
-    """The entries of a manifest whose default builds to WASM: an entry with "blocked" holds the reason it does not yet."""
-    return [entry for entry in game["modules"] if "blocked" not in entry]
+    """The entries of a manifest whose default builds to WASM."""
+    return [entry for entry in game["modules"] if not is_blocked(entry)]
 
 
 def copy_runtime(game, out, dest):
@@ -688,7 +698,7 @@ def check_tools_game(pins):
 
 def check_size(entry, size):
     """Reasons a module's .wasm of the given size is over its manifest size_budget; none for a blocked entry, which has no budgets to judge."""
-    if "blocked" in entry:
+    if is_blocked(entry):
         return []
     budget = entry.get("size_budget")
     if not isinstance(budget, int) or budget <= 0:

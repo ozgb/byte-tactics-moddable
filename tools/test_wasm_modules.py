@@ -517,6 +517,23 @@ class AdapterManifestTests(unittest.TestCase):
         self.assertEqual(json.loads(text)["adapters"][1]["name"], "Log")
 
 
+class BlockedFormsTests(unittest.TestCase):
+    def test_a_reason_and_true_are_blocked_and_absent_is_not(self):
+        self.assertTrue(wm.is_blocked({"name": "m", "blocked": "not yet"}))
+        self.assertTrue(wm.is_blocked({"name": "m", "blocked": True}))
+        self.assertFalse(wm.is_blocked({"name": "m"}))
+
+    def test_any_other_value_is_a_manifest_fault(self):
+        for value in (False, "", 1, None, ["x"]):
+            with self.assertRaises(ValueError, msg=repr(value)):
+                wm.is_blocked({"name": "m", "blocked": value})
+
+    def test_a_true_entry_has_no_size_to_judge_and_no_copy(self):
+        self.assertEqual(wm.check_size({"name": "m", "blocked": True}, 10**9), [])
+        game = {"modules": [{"name": "alpha"}, {"name": "beta", "blocked": True}]}
+        self.assertEqual([e["name"] for e in wm.built_modules(game)], ["alpha"])
+
+
 class RuntimeCopyTests(unittest.TestCase):
     GAME = {"modules": [{"name": "alpha"}, {"name": "beta", "blocked": "not yet"}]}
 

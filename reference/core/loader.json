@@ -898,6 +898,34 @@
   "results": [
    ["manifest", {"error": "manifest", "modules": []}]
   ]},
+ {"name": "manifest_blocked_true",
+  "calls": [
+   ["manifest", "loader/blocked_true.json"]
+  ],
+  "results": [
+   ["manifest", null]
+  ]},
+ {"name": "manifest_blocked_reason",
+  "calls": [
+   ["manifest", "loader/blocked_reason.json"]
+  ],
+  "results": [
+   ["manifest", null]
+  ]},
+ {"name": "manifest_blocked_false",
+  "calls": [
+   ["manifest", "loader/blocked_false.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "manifest_blocked_number",
+  "calls": [
+   ["manifest", "loader/blocked_number.json"]
+  ],
+  "results": [
+   ["manifest", {"error": "manifest", "modules": []}]
+  ]},
  {"name": "manifest_pages_max",
   "calls": [
    ["manifest", "loader/pages_max.json"]

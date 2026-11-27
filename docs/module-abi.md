@@ -293,7 +293,7 @@ valid JSON to the loader, so the whole manifest is refused as not valid JSON. A 
 | `data_base`, `table_base` | the module's window and table range (section 2) | loader, required |
 | `exports` | the slot names, in the interface's slot order, without the engine slots | loader; checks |
 | `engine` | `{slot: reason}`, the slots of the interface that stay in the engine (section 6): the host calls the native default for them, and the module does not export them | host; checks |
-| `blocked` | the subsystem's default does not build to WASM yet: the reason, or `true` in the data kit, whose manifest leaves the reason out (it names source files). Such an entry has no `.wasm` and no budgets yet, the host runs the native default for every slot, and the gate judges no fuel or size for a module of it until the entry's budgets are set | build and checks; host; gate |
+| `blocked` | the subsystem's default does not build to WASM yet: the reason (a non-empty string), or `true` in the data kit, whose manifest leaves the reason out (it names source files); the loader refuses any other value, `false` included, as a manifest fault, and an entry that is not blocked has no `blocked`. Such an entry has no `.wasm` and no budgets yet, the host runs the native default for every slot, and the gate judges no fuel or size for a module of it until the entry's budgets are set | build and checks; host; gate |
 | `data` | the loader data words (section 8.2), in order: the four every module has, then `g_region` for a module whose slots take its region | loader; checks |
 | `interface` | the interface whose slots the module implements | loader (majors) |
 | `majors` | the major of each interface it uses, section 10 | loader |

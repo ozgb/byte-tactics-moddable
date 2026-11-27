@@ -273,7 +273,7 @@ void Start(const char* only)
     GlueModule* const* modules = GlueModules(&moduleCount);
     for (unsigned i = 0; i < moduleCount; i++) {
         GlueModule* glue = modules[i];
-        int blocked = wl_module_text(s_loader, glue->def->name, "blocked") != nullptr;
+        int blocked = wl_module_blocked(s_loader, glue->def->name);
         if (blocked != glue->def->blocked)
             LoaderFatal(glue->def->name, "the manifest and the glue tables disagree on whether the module builds");
     }

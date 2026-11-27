@@ -297,6 +297,13 @@ class RecordingsRoute(unittest.TestCase):
             name, vector = rule.split(" ")
             self.assertIn(f'{{ "{name}", "{vector.split(".")[0]}=(", 1 }}', source)
 
+    def test_a_blocked_true_entry_of_the_kit_is_blocked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = Path(tmp) / "modules.json"
+            manifest.write_text(json.dumps({"modules": [{"name": "a", "blocked": True}, {"name": "b"}]}))
+            self.assertTrue(oraclegate.blocked("a", manifest))
+            self.assertFalse(oraclegate.blocked("b", manifest))
+
     def test_a_blocked_entry_takes_the_recordings_route(self):
         self.assertTrue(oraclegate.blocked("los_radar"))
         self.assertFalse(oraclegate.blocked("wind_meteors"))

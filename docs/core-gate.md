@@ -159,7 +159,8 @@ The two groups share their calls. A vector's manifest and modules are files of `
 Section 5.2's refusals of the numbers are vectors for each number a manifest has: `stack_size` (`manifest_stack_negative`,
 `manifest_stack_fraction`), `fuel_budget` (`manifest_fuel_negative`, `manifest_fuel_fraction`, `manifest_fuel_text`, and
 `manifest_fuel_zero`, since section 11.3's range starts at 1) and `size_budget` (`manifest_size_budget_negative`,
-`manifest_size_budget_fraction`). `manifest_pages_max` accepts `memory_pages` 65536 with the block at its ceiling and
+`manifest_size_budget_fraction`). `blocked` is accepted as a reason or as `true` (`manifest_blocked_reason`,
+`manifest_blocked_true`) and refused as `false` or a number (`manifest_blocked_false`, `manifest_blocked_number`). `manifest_pages_max` accepts `memory_pages` 65536 with the block at its ceiling and
 a `fuel_budget` of 2147483647, and the fuel group's `budget_max` runs a module on that budget.
 
 | Call | Arguments | Value |
@@ -190,7 +191,7 @@ Every error ends the run (section 13), so it is the last line. Only a module who
 
 | Class | Section | When |
 | --- | --- | --- |
-| `manifest` | 5.2, 10 | the manifest is not valid JSON or not an object (a number anywhere in it that has a fraction or an exponent, as `4096.5`, `4096.0` or `1e3`, or is above 2147483647, makes it invalid JSON: `manifest_data_base_fraction`), a required number of section 4.1 (`memory_pages`, `table_size`, `window`, `table_slots`) is missing, a value is not a non-negative integer (a negative `data_base` or `table_base` of a module entry included), `memory_pages` or `window` is 0 or `memory_pages` above 65536, `stack_size` is not a non-negative integer, `block_base` comes without `block_size`, `scratch` is not `[base, size]`, a module entry's `fuel_budget` is not an integer from 1 to 2147483647 or its `size_budget` not a non-negative integer; and at `load`, a refusal of the interface majors (section 10.2: a module built against a major the manifest's does not match, with no adapter, or an adapter of section 10.2 that is refused), whose `modules` is empty |
+| `manifest` | 5.2, 10 | the manifest is not valid JSON or not an object (a number anywhere in it that has a fraction or an exponent, as `4096.5`, `4096.0` or `1e3`, or is above 2147483647, makes it invalid JSON: `manifest_data_base_fraction`), a required number of section 4.1 (`memory_pages`, `table_size`, `window`, `table_slots`) is missing, a value is not a non-negative integer (a negative `data_base` or `table_base` of a module entry included), `memory_pages` or `window` is 0 or `memory_pages` above 65536, `stack_size` is not a non-negative integer, `block_base` comes without `block_size`, `scratch` is not `[base, size]`, a module entry's `fuel_budget` is not an integer from 1 to 2147483647 its `size_budget` not a non-negative integer or its `blocked` neither a non-empty string nor `true`; and at `load`, a refusal of the interface majors (section 10.2: a module built against a major the manifest's does not match, with no adapter, or an adapter of section 10.2 that is refused), whose `modules` is empty |
 | `layout` | 5.2 | the block, the scratch area or the load data region does not fit the memory, the scratch area passes the block base, the load data region starts below the block's ceiling or the scratch area's end, or `block_max` is below `block_size` |
 | `module_entry` | 5.2 | `modules` missing, not a list or empty, an entry that is not an object or has no name, a name listed twice, a missing `data_base` or `table_base`, `exports` or `data` present and not a list of names |
 | `window` | 5.2 | a module's window does not fit the memory, or its table range does not fit the table |
@@ -268,7 +269,7 @@ counter's initial value, 9223372036854775807, which its calls lower as they burn
    memory and starts at or above the block's ceiling (`block_base + block_max`) and the scratch area's end (`layout`);
 5. `modules` (`module_entry`), then each entry in the manifest's order, each one whole before the next: an object with
    a name, `data_base` and then `table_base` (missing: `module_entry`; negative: `manifest`), `fuel_budget` and then
-   `size_budget` (`manifest`), `exports` and then `data`, then a name an earlier entry has (`module_entry`);
+   `size_budget` and then `blocked` (`manifest`), `exports` and then `data`, then a name an earlier entry has (`module_entry`);
 6. once every entry is read, each module in the manifest's order: its window and table range (`window`), its window
    against the block base, then the scratch base, then the load data base (`window_reaches`), then its overlap with each later module in
    turn, each pair checked memory first and then table before the next pair (`overlap`). So a `window` or

@@ -355,6 +355,19 @@ static int check_strings(wl_loader* loader, const wl_json* entry, const char* ke
     return 1;
 }
 
+static int check_blocked(wl_loader* loader, const wl_json* entry, const char* owner)
+{
+    const wl_json* value = wl_json_get(entry, "blocked");
+    if (!value) {
+        return 1;
+    }
+    if ((value->kind == WL_JSON_STRING && value->text[0]) || (value->kind == WL_JSON_BOOL && value->number)) {
+        return 1;
+    }
+    set_error(loader, "%s: blocked must be a reason or true", owner);
+    return 0;
+}
+
 static int read_fuel_budget(wl_loader* loader, const wl_json* entry, const char* owner)
 {
     unsigned budget = 1;
@@ -520,6 +533,7 @@ int wl_load_manifest_text(wl_loader* loader, const char* text, size_t size, cons
             || !read_unsigned(loader, entry, "table_base", owner, 1, &unused)
             || !read_fuel_budget(loader, entry, owner)
             || !read_unsigned(loader, entry, "size_budget", owner, 0, &unused)
+            || !check_blocked(loader, entry, owner)
             || !check_strings(loader, entry, "exports", entry_name->text)
             || !check_strings(loader, entry, "data", entry_name->text)) {
             goto bad;
@@ -606,6 +620,12 @@ const char* wl_module_text(const wl_loader* loader, const char* module, const ch
     const wl_json* entry = loader->manifest ? find_entry(loader, module) : NULL;
     const wl_json* item = wl_json_get(entry, key);
     return item && item->kind == WL_JSON_STRING ? item->text : NULL;
+}
+
+int wl_module_blocked(const wl_loader* loader, const char* module)
+{
+    const wl_json* entry = loader->manifest ? find_entry(loader, module) : NULL;
+    return wl_json_get(entry, "blocked") != NULL;
 }
 
 int wl_module_publishes(const wl_loader* loader, const char* module, int kind, long* size)

@@ -49,6 +49,7 @@ from pathlib import Path
 
 import reference
 import replay
+import wasm_modules
 
 ROOT = Path(__file__).resolve().parent.parent
 FORMAT = 4
@@ -109,7 +110,7 @@ def blocked(subsystem: str, manifest: Path = MANIFEST) -> bool:
     """Whether the subsystem's entry of the game manifest is blocked: its default does not build to WASM, so no scenario can load a module of it, and it has no budgets."""
     for entry in json.loads(manifest.read_text())["modules"]:
         if entry["name"] == subsystem:
-            return "blocked" in entry
+            return wasm_modules.is_blocked(entry)
     raise Error(f"{manifest} has no module {subsystem}")
 
 
@@ -149,7 +150,7 @@ def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) 
         if (build / name).is_file():
             shutil.copy2(build / name, directory / name)
     for entry in manifest_entries(build):
-        if "blocked" not in entry:
+        if not wasm_modules.is_blocked(entry):
             shutil.copy2(build / f"{entry['name']}.wasm", directory / f"{entry['name']}.wasm")
     shutil.copyfile(module, directory / f"{subsystem}.wasm")
     return directory / "TotalA.exe"

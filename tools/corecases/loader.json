@@ -1399,6 +1399,42 @@
   ]
  },
  {
+  "name": "manifest_blocked_true",
+  "calls": [
+   [
+    "manifest",
+    "loader/blocked_true.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_blocked_reason",
+  "calls": [
+   [
+    "manifest",
+    "loader/blocked_reason.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_blocked_false",
+  "calls": [
+   [
+    "manifest",
+    "loader/blocked_false.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_blocked_number",
+  "calls": [
+   [
+    "manifest",
+    "loader/blocked_number.json"
+   ]
+  ]
+ },
+ {
   "name": "manifest_pages_max",
   "calls": [
    [

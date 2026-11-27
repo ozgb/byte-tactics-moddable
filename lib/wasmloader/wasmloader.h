@@ -65,6 +65,7 @@ size_t WL_CALL wl_manifest_module_count(const wl_loader* loader);
 const char* WL_CALL wl_manifest_module_name(const wl_loader* loader, size_t index);
 int WL_CALL wl_module_int(const wl_loader* loader, const char* module, const char* key, long* value);
 const char* WL_CALL wl_module_text(const wl_loader* loader, const char* module, const char* key);
+int WL_CALL wl_module_blocked(const wl_loader* loader, const char* module);
 int WL_CALL wl_module_publishes(const wl_loader* loader, const char* module, int kind, long* size);
 
 int WL_CALL wl_create_memory(wl_loader* loader);

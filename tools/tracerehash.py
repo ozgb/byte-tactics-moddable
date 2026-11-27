@@ -132,9 +132,16 @@ def check_failures(blocks) -> None:
     (docs/trace-format.md, section 11): the reference fails the run on each, so neither has a hash."""
     for (tick, phase), lines in blocks:
         for path, value in lines:
-            if FX_CLASS.fullmatch(path) and int(value, 16) > 5:
-                raise Error(f"{tick} {phase} {path}: an order effect of class {int(value, 16)} fails the run")
-            if CONDITION_CLASS.fullmatch(path) and int(value, 16) == 0:
+            fx, condition = FX_CLASS.fullmatch(path), CONDITION_CLASS.fullmatch(path)
+            if not (fx or condition):
+                continue
+            try:
+                number = int(value, 16)
+            except ValueError:
+                raise Error(f"{tick} {phase} {path}: {value!r} is not a hex value") from None
+            if fx and number > 5:
+                raise Error(f"{tick} {phase} {path}: an order effect of class {number} fails the run")
+            if condition and number == 0:
                 raise Error(f"{tick} {phase} {path}: a mission condition of class 0 fails the run")
 
 

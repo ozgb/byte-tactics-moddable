@@ -300,8 +300,8 @@ of section 13 end it with an error that also carries the text: an import's refus
 ["wind_meteors"], "message": TEXT}`, where TEXT is section 13's text from `import ` to the end of its line, and a full
 handle table (section 8.1), `{"error": "glue", "modules": ["wind_meteors"], "message": "wind_meteors: the handle
 table is full"}`. `FatalError` (section 13) ends it with the message itself, not a trap text: `{"error": "fatal",
-"modules": ["wind_meteors"], "message": TEXT}`, where TEXT is the module's message up to its NUL or its first line
-break.
+"modules": ["wind_meteors"], "message": TEXT}`, where TEXT is the module's message up to its NUL, its first line
+break or its 699th byte, whichever comes first.
 
 **The refusal vectors.** Each replays a short recording of `reference/core/host/` against a fixture module beside it,
 `wind_meteors_<vector>.wasm`, made from its `.wat` with the fuel pass. A fixture is shaped as a wind_meteors module of

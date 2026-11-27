@@ -769,6 +769,8 @@ jobs:
         run: |
           uv run tools/test_eventdigest.py
           uv run tools/test_displaylog.py
+          uv run tools/test_displayreplay.py
+          uv run tools/displayreplay.py --kinds
           uv run tools/test_reference.py
 
   replay-hosts:

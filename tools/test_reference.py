@@ -1918,6 +1918,42 @@ class RecheckTest(unittest.TestCase):
             found, _ = self.found(tmp, self.rows([(1, "1")]) + "2 tick " + "2" * 5, self.rows([(1, "1"), (2, "9"), (3, "3")]))
             self.assertIn("does not reach tick 2", reference.recheck(found))
 
+    def test_a_run_whose_directory_is_gone_keeps_the_trace_the_watch_read(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            good = reference.tracedigest.digests([(t, phase, h) for t, v in ((1, "1"), (2, "2"), (3, "3")) for phase, h in (("tick", v * 16), ("view", "7" * 16))])
+            text = self.HEADER + self.rows([(1, "1"), (2, "9"), (3, "3")])
+            live = Path(tmp) / "work/i1/game/trace.txt"
+            live.parent.mkdir(parents=True)
+            live.write_text(text)
+            keep_run = reference.keep_run
+
+            def gone(run, *a, **k):
+                reference.shutil.rmtree(run)
+                return keep_run(run, *a, **k)
+            proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+            watch = reference.Watch({"a": ({}, good)}, lambda pid, started: live)
+            try:
+                with mock.patch.object(reference, "ROOT", Path(tmp)), mock.patch.object(reference, "keep_run", gone):
+                    watch.started("a")(proc)
+                    watch.poll()
+            finally:
+                proc.kill()
+                proc.wait()
+            found = watch.found
+            self.assertFalse(live.parent.exists())
+            self.assertEqual((found.kept / "trace.txt").read_text(), text)
+            self.assertEqual(found.tick, 2)
+            self.assertIn("tick 2", found.diff)
+            self.assertIsNone(reference.recheck(found))
+
+    def test_a_kept_directory_without_a_trace_says_nothing_was_kept(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            found, _ = self.found(tmp, "", self.rows([(1, "1"), (2, "9"), (3, "3")]))
+            (found.kept / "trace.txt").unlink()
+            note = reference.recheck(found)
+            self.assertIn("no trace.txt was kept", note)
+            self.assertNotIn("cannot read", note)
+
     def test_the_diff_line_names_the_trace_the_watch_read(self):
         with tempfile.TemporaryDirectory() as tmp:
             found, live = self.found(tmp, self.rows([(1, "1")]), self.rows([(1, "1"), (2, "9"), (3, "3")]))

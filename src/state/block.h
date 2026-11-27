@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 #include "alloc_hooks.h"
+#include "../../interfaces/services.h"
 #include "../harness/replay.h"
 
 // The size of the block every sim allocation comes from when the match setup asks for no more, in bytes.
@@ -13,9 +14,6 @@ const unsigned int kSimBlockCeilingBytes = 256u << 20;
 // The unit a block's size is a multiple of, in bytes (a WASM page).
 const unsigned int kSimBlockPage = 65536;
 enum : unsigned int { SIM_TICKS_PER_SECOND = 30 };
-
-// Allocates size zeroed bytes from the sim block, 8-byte aligned.
-void* __cdecl SimAlloc(unsigned int size);
 
 // Allocates like SimAlloc; the tag names the site for the analysis tools and the block ignores it.
 __declspec(noinline) inline void* __cdecl SimAllocTagged(const char* tag, unsigned int size)
@@ -40,9 +38,6 @@ void* __cdecl SimAllocAt(unsigned int offset, unsigned int size);
 
 // Resizes a sim block like realloc, zeroing the bytes beyond the old size.
 void* __cdecl SimRealloc(void* p, unsigned int size);
-
-// Returns a sim block to the free list; null is ignored.
-void __cdecl SimFree(void* p);
 
 // True when p lies inside the sim block.
 int __cdecl SimOwns(const void* p);

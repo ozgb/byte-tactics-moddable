@@ -112,10 +112,6 @@ void __stdcall CopyDwordIfNonNull(int* dest, int* src);
 void __stdcall MakeHeap(HeapEntry* first, HeapEntry* last, int* distanceTag, HeapEntry* valueTag);
 void __stdcall PopHeapFirst(HeapEntry* first, HeapEntry* last, HeapEntry* dest, HeapEntry val, int* distanceTag);
 
-void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);
-
-int __stdcall GetSlotDpid(unsigned char index);
-unsigned char __stdcall FindSlotByDpid(int id);
 unsigned char FindHostSlot();
 
 char* __stdcall Translate(const char* key);
@@ -128,8 +124,6 @@ int __stdcall UsesDataArchives(void);
 int __stdcall GetPreferredLanguage(void);
 void __stdcall SaveSettings();
 void* __stdcall LoadAnimGaf(char* name);
-
-void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);
 
 class CommandArgs {
 public:

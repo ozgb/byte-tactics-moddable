@@ -259,12 +259,19 @@ class Interfaces(unittest.TestCase):
         (self.kit_dir / "wasm").mkdir()
         signatures = {"signatures": {"services": {"GameRand": [["int"], "int"]}}}
         (self.kit_dir / "wasm" / "modules.json").write_text(json.dumps(signatures))
+        (self.kit_dir / "docs").mkdir()
+        (self.kit_dir / "docs" / "module-abi.md").write_text(
+            "| Recorded call | Import | What the module does |\n| --- | --- | --- |\n"
+            "| `services.SchedPublish` | `services.Emit` | publishes |\n"
+            "| `services.ScheduleMapCanBuildAt` | `map.CanBuildAt` | asks |\n"
+            "| `services.SimFree` | `[linear] -> void` | not a route |\n")
 
     def tearDown(self):
         self.tmp.cleanup()
 
     def problems(self, text):
-        return speclint.interface_problems(text, speclint.kit_headers(self.kit_dir), speclint.kit_signatures(self.kit_dir))
+        return speclint.interface_problems(text, speclint.kit_headers(self.kit_dir), speclint.kit_signatures(self.kit_dir),
+                                           speclint.kit_routes(self.kit_dir))
 
     def test_a_slot_of_the_header_passes(self):
         self.assertEqual(self.problems("| `units.SetStateBits` | `[block, int] -> void` |\n| `map.GetGroundHeight` |"), [])
@@ -286,6 +293,15 @@ class Interfaces(unittest.TestCase):
     def test_a_host_name_of_the_manifest_passes(self):
         self.assertEqual(self.problems("`services.GameRand` and `services.RandomInt`."), [])
         self.assertEqual(len(self.problems("`services.CommandArgs_GetIntArg`.")), 1)
+
+    def test_a_recorded_call_of_the_routes_table_passes(self):
+        self.assertEqual(speclint.kit_routes(self.kit_dir), {"SchedPublish", "ScheduleMapCanBuildAt"})
+        self.assertEqual(self.problems("`services.SchedPublish` is made through `services.Emit`? No: `services.ScheduleMapCanBuildAt`."),
+                         [(1, "`services.Emit` is not declared by the kit's interfaces/services.h")])
+        self.assertEqual(len(self.problems("`services.SimFree` and `services.ScheduleTargetingFind`.")), 2)
+
+    def test_a_kit_without_the_page_has_no_routes(self):
+        self.assertEqual(speclint.kit_routes(self.kit_dir / "nowhere"), set())
 
     def test_a_module_with_no_header_is_left_to_the_other_rules(self):
         self.assertEqual(self.problems("`ghost.Apply`, `rng.Seed` and `scripts.GetSweetSpot`."), [])

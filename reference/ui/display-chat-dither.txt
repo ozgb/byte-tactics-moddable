@@ -1,0 +1,14 @@
+bt-ui 2
+1 scroll 304 32
+1 view 1
+1 select -
+3 view 2
+10 input char 13
+12 input char 43
+14 input char 100
+16 input char 105
+18 input char 116
+20 input char 104
+22 input char 101
+24 input char 114
+26 input char 13

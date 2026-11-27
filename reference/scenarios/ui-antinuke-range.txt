@@ -1,0 +1,20 @@
+# A human Core anti-nuke on The Pass builds one missile (stocked at tick 3605) and is then selected, so the minimap draws its coverage as a dashed circle.
+game_seed 1055
+crt_seed 2055
+view_seed 3055
+map The Pass
+start_positions fixed
+ticks 3620
+commander_death 0
+player0.controller human
+player0.side Core
+player0.metal 30000
+player0.energy 60000
+player1.controller human
+player1.side Arm
+spawn 2 0 CORFMD 600 300
+order 10 0:CORFMD:1 qbuild MAKEANTI 1
+input 3606 mouse move 424 300
+input 3607 mouse left down 424 300
+input 3608 mouse left up 424 300
+frames 3610

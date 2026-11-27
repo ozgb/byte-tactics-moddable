@@ -2,6 +2,7 @@
 #define SURFACE_H
 
 #include "rect.h"
+#include "../util/point.h"
 struct DirectDrawSurfaceRefs;
 
 class HapiBank;
@@ -13,6 +14,10 @@ struct Display;
 struct GafFrame;
 struct Point;
 struct Range;
+
+struct FrameQuad {
+    Point p[4];
+};
 
 struct Surface {
     int width;

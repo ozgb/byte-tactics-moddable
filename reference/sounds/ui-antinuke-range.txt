@@ -1,0 +1,4 @@
+bt-sound 1
+0 stop_all - - - - -
+10 play ADDBUILD -585 - - -
+3609 play_file loadwtr1.WAV -585 - - -

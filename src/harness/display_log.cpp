@@ -158,12 +158,13 @@ static void HexHash(char* out, unsigned long long h)
     sprintf(out, "%08x%08x", (unsigned)(h >> 32), (unsigned)h);
 }
 
-static void Fail(const char* what, const char* limit)
+[[noreturn]] static void Fail(const char* what, const char* limit)
 {
     char msg[200];
     sprintf(msg, "testmode: the display log is out of %s (limit %s)\n", what, limit);
     host_log(msg);
     host_exit(2);
+    __builtin_unreachable();
 }
 
 static char s_nameBytes[kNameBytes];
@@ -189,7 +190,7 @@ static int Escape(char* out, const char* p, int n)
     }
     for (int i = 0; i < n; i++) {
         unsigned char c = (unsigned char)p[i];
-        if (c < 0x21 || c > 0x7e || c == '%' || c == ',') {
+        if (c < 0x21 || c > 0x7e || c == '%' || c == ',' || c == '#') {
             *out++ = '%';
             *out++ = digits[c >> 4];
             *out++ = digits[c & 15];
@@ -200,11 +201,8 @@ static int Escape(char* out, const char* p, int n)
     return (int)(out - start);
 }
 
-static int Intern(const char* p, int n)
+static int InternEscaped(const char* buf, int written)
 {
-    char buf[1024];
-    int written = Escape(buf, p, n > 300 ? 300 : n);
-    buf[written] = '\0';
     unsigned h = 2166136261u;
     for (int i = 0; i < written; i++)
         h = (h ^ (unsigned char)buf[i]) * 16777619u;
@@ -227,6 +225,14 @@ static int Intern(const char* p, int n)
     s_nameHash[slot] = s_nameCount + 1;
     s_nameCount++;
     return offset;
+}
+
+static int Intern(const char* p, int n)
+{
+    char buf[1024];
+    int written = Escape(buf, p, n > 300 ? 300 : n);
+    buf[written] = '\0';
+    return InternEscaped(buf, written);
 }
 
 static int InternLower(const char* p, int n, int slashes)
@@ -254,6 +260,7 @@ struct Region {
     int surface;
     int name;
     int live;
+    unsigned char* shadow;
 };
 
 static Region s_regions[kMaxRegions];
@@ -348,13 +355,40 @@ static int FindByBlock(const void* block)
     return HashFind(s_blockHash, block, BlockKey);
 }
 
+static void RetireTargets(const unsigned char* base);
+
 static void RemoveRegion(int index)
 {
+    RetireTargets(s_regions[index].pixels);
     HashRemove(s_pixelHash, PixelKey, index);
     HashRemove(s_blockHash, BlockKey, index);
     s_regions[index].live = 0;
+    free(s_regions[index].shadow);
+    s_regions[index].shadow = nullptr;
     s_regionFree[s_regionFreeCount++] = index;
     s_epoch++;
+}
+
+static int SurfaceNameTaken(int name, int index)
+{
+    for (int i = 0; i < s_regionCount; i++) {
+        if (i != index && s_regions[i].live != 0 && s_regions[i].surface != 0 && s_regions[i].name == name)
+            return 1;
+    }
+    return 0;
+}
+
+static int UniqueSurfaceName(int name, int index)
+{
+    if (SurfaceNameTaken(name, index) == 0)
+        return name;
+    char buf[1024];
+    for (int n = 2;; n++) {
+        int written = sprintf(buf, "%.1000s#%d", s_nameBytes + name, n);
+        int candidate = InternEscaped(buf, written);
+        if (SurfaceNameTaken(candidate, index) == 0)
+            return candidate;
+    }
 }
 
 static void AddRegion(const void* block, const unsigned char* pixels, int width, int height, int pitch, int surface, const char* name)
@@ -381,9 +415,12 @@ static void AddRegion(const void* block, const unsigned char* pixels, int width,
     r->pitch = pitch;
     r->surface = surface;
     r->live = 1;
+    r->shadow = surface != 0 && width > 0 && height > 0 ? (unsigned char*)calloc((size_t)width * height, 1) : nullptr;
     if (surface != 0 && name != nullptr && strcmp(name, "OFFSCREEN") == 0)
         name = "screen";
     r->name = Intern(name == nullptr ? "" : name, name == nullptr ? 0 : (int)strlen(name));
+    if (surface != 0)
+        r->name = UniqueSurfaceName(r->name, index);
     HashInsert(s_pixelHash, pixels, index);
     HashInsert(s_blockHash, block, index);
     s_epoch++;
@@ -395,6 +432,8 @@ struct GafRecord {
     int entry;
     int index;
     int dead;
+    int xOffset;
+    int yOffset;
 };
 
 static unsigned s_gafEpoch = 1;
@@ -469,7 +508,7 @@ void DlGafBegin(const char* path, const void* base)
     s_gafBlocks[slot].live = 1;
 }
 
-void DlGafFrame(const char* entry, int index, const void* frame)
+void DlGafFrame(const char* entry, int index, const void* frame, int xOffset, int yOffset)
 {
     DlLock lock;
     if (s_gafCount >= kMaxGafRecords)
@@ -480,6 +519,8 @@ void DlGafFrame(const char* entry, int index, const void* frame)
     r->entry = Intern(entry, (int)strlen(entry));
     r->index = index;
     r->dead = 0;
+    r->xOffset = xOffset;
+    r->yOffset = yOffset;
     GafInsert(s_gafCount);
     s_gafCount++;
     s_gafEpoch++;
@@ -732,6 +773,7 @@ struct TargetSlot {
     int overflow;
     int maxDraw;
     int maxRead;
+    int retired;
 };
 
 static TargetSlot s_targets[kMaxTargets];
@@ -758,7 +800,8 @@ static int s_dropItem = 0;
 static TargetSlot* SlotFor(const unsigned char* base, int width, int height, int name)
 {
     for (int i = 0; i < s_targetCount; i++) {
-        if (s_targets[i].base == base)
+        const TargetSlot* s = &s_targets[i];
+        if (s->base == base && s->retired == 0)
             return &s_targets[i];
     }
     if (s_targetCount >= kMaxTargets)
@@ -781,7 +824,16 @@ static TargetSlot* SlotFor(const unsigned char* base, int width, int height, int
     t->overflow = -1;
     t->maxDraw = -1;
     t->maxRead = -1;
+    t->retired = 0;
     return t;
+}
+
+static void RetireTargets(const unsigned char* base)
+{
+    for (int i = 0; i < s_targetCount; i++) {
+        if (s_targets[i].base == base)
+            s_targets[i].retired = 1;
+    }
 }
 
 static int NewNode(int x0, int y0, int x1, int y1, int layer, int next)
@@ -940,6 +992,78 @@ static int GafLookup(const void* key)
     return s_lastGaf;
 }
 
+static char* s_pictureText = nullptr;
+static int s_pictureUsed = 0;
+static int s_pictureCap = 0;
+static const int kPictureSetSize = 1 << 17;
+static unsigned long long s_pictureSet[kPictureSetSize];
+static unsigned char s_pictureState[kPictureSetSize];
+static int s_picturePending[kPictureSetSize];
+static int s_picturePendingCount = 0;
+static int s_pictureEntries = 0;
+
+static void PictureText(const char* p, int n)
+{
+    if (s_pictureUsed + n + 1 > s_pictureCap) {
+        int cap = s_pictureCap < (1 << 20) ? (1 << 20) : s_pictureCap;
+        while (cap < s_pictureUsed + n + 1)
+            cap *= 2;
+        char* grown = (char*)realloc(s_pictureText, (size_t)cap);
+        if (grown == nullptr)
+            Fail("memory for pictures", "malloc");
+        s_pictureText = grown;
+        s_pictureCap = cap;
+    }
+    memcpy(s_pictureText + s_pictureUsed, p, (size_t)n);
+    s_pictureUsed += n;
+}
+
+static void AddPictureLine(const char* name, const unsigned char* pixels, int width, int height, int pitch, int xOffset,
+                           int yOffset, int transparency)
+{
+    char head[600];
+    sprintf(head, "%s %d %d %d ", name, xOffset, yOffset, transparency);
+    unsigned long long key = HashRun((const unsigned char*)head, (unsigned)strlen(head));
+    if (key == 0)
+        key = 1;
+    unsigned slot = (unsigned)(key ^ (key >> 32)) & (kPictureSetSize - 1);
+    for (;;) {
+        if (s_pictureSet[slot] == 0)
+            break;
+        if (s_pictureSet[slot] == key) {
+            if (s_pictureState[slot] != 0)
+                return;
+            break;
+        }
+        slot = (slot + 1) & (kPictureSetSize - 1);
+    }
+    if (s_pictureSet[slot] == 0) {
+        if (s_pictureEntries >= kPictureSetSize / 2)
+            Fail("pictures", "65536");
+        s_pictureEntries++;
+        s_pictureSet[slot] = key;
+    }
+    s_pictureState[slot] = 1;
+    s_picturePending[s_picturePendingCount++] = (int)slot;
+    PictureText("picture ", 8);
+    PictureText(head, (int)strlen(head));
+    static const char digits[] = "0123456789abcdef";
+    char row[1024];
+    for (int y = 0; y < height; y++) {
+        const unsigned char* src = pixels + (size_t)y * pitch;
+        for (int x = 0; x < width;) {
+            int n = 0;
+            while (x < width && n < (int)sizeof row - 1) {
+                row[n++] = digits[src[x] >> 4];
+                row[n++] = digits[src[x] & 15];
+                x++;
+            }
+            PictureText(row, n);
+        }
+    }
+    PictureText("\n", 1);
+}
+
 static void PutPictureName(const DlPicture* p)
 {
     char text[400];
@@ -950,6 +1074,12 @@ static void PutPictureName(const DlPicture* p)
         DlPutRaw(s_nameBytes + s_gaf[g].entry);
         DlPutRaw(":");
         DlPutInt(s_gaf[g].index);
+        if (p->layered == 0 && (p->xOffset != s_gaf[g].xOffset || p->yOffset != s_gaf[g].yOffset)) {
+            DlPutRaw(":");
+            DlPutInt(p->xOffset);
+            DlPutRaw(",");
+            DlPutInt(p->yOffset);
+        }
         return;
     }
     int r = FindByBlock(p->key);
@@ -970,6 +1100,107 @@ static void PutPictureName(const DlPicture* p)
     else
         sprintf(text, "?%dx%d:%s", p->width, p->height, hash);
     DlPutRaw(text);
+    if (strcmp(hash, "-") != 0)
+        AddPictureLine(text, p->pixels, p->width, p->height, p->width, p->xOffset, p->yOffset, p->transparency);
+}
+
+static int s_pixelsChecked = 0;
+static int s_inPixels = 0;
+
+static void CheckRegion(Region* r)
+{
+    {
+        if (r->live == 0 || r->surface == 0 || r->shadow == nullptr || r->pixels == nullptr)
+            return;
+        int x0 = r->width, y0 = -1, x1 = -1, y1 = -1;
+        for (int y = 0; y < r->height; y++) {
+            const unsigned char* a = r->pixels + (size_t)y * r->pitch;
+            const unsigned char* b = r->shadow + (size_t)y * r->width;
+            if (memcmp(a, b, (size_t)r->width) == 0)
+                continue;
+            if (y0 < 0)
+                y0 = y;
+            y1 = y;
+            int left = 0;
+            while (a[left] == b[left])
+                left++;
+            int right = r->width - 1;
+            while (a[right] == b[right])
+                right--;
+            if (left < x0)
+                x0 = left;
+            if (right > x1)
+                x1 = right;
+        }
+        if (y0 < 0 || y1 < y0 || x1 < x0)
+            return;
+        int width = x1 - x0 + 1;
+        int height = y1 - y0 + 1;
+        size_t bytes = (size_t)width * height;
+        if (bytes == 0)
+            return;
+        unsigned char* copy = (unsigned char*)malloc(bytes);
+        if (copy == nullptr)
+            Fail("memory for pixels", "malloc");
+        for (int y = 0; y < height; y++) {
+            memcpy(copy + (size_t)y * width, r->pixels + (size_t)(y0 + y) * r->pitch + x0, (size_t)width);
+            memcpy(r->shadow + (size_t)(y0 + y) * r->width + x0, copy + (size_t)y * width, (size_t)width);
+        }
+        DlSurface d;
+        d.pixels = r->pixels;
+        d.width = r->width;
+        d.height = r->height;
+        d.pitch = r->pitch;
+        d.clipLeft = 0;
+        d.clipTop = 0;
+        d.clipRight = r->width - 1;
+        d.clipBottom = r->height - 1;
+        if (DlBegin("pixels", &d, x0, y0, x1 + 1, y1 + 1, nullptr) >= 0) {
+            char hash[24];
+            HexHash(hash, HashRun(copy, (unsigned)(width * height)));
+            char text[400];
+            sprintf(text, " @%s:%dx%d:%s", s_nameBytes + r->name, width, height, hash);
+            DlPutRaw(text);
+            AddPictureLine(text + 1, copy, width, height, width, 0, 0, 0);
+        }
+        DlEnd();
+        free(copy);
+    }
+}
+
+static void CheckPixels()
+{
+    if (s_pixelsChecked != 0 || s_inPixels != 0)
+        return;
+    s_pixelsChecked = 1;
+    s_inPixels = 1;
+    for (int i = 0; i < s_regionCount; i++)
+        CheckRegion(&s_regions[i]);
+    s_inPixels = 0;
+}
+
+void DlWritten(const void* block)
+{
+    DlLock lock;
+    if (g_dlOn == 0 || s_inPixels != 0)
+        return;
+    int r = FindByBlock(block);
+    if (r < 0)
+        return;
+    s_inPixels = 1;
+    CheckRegion(&s_regions[r]);
+    s_inPixels = 0;
+}
+
+static void SnapshotSurfaces()
+{
+    for (int i = 0; i < s_regionCount; i++) {
+        Region* r = &s_regions[i];
+        if (r->live == 0 || r->surface == 0 || r->shadow == nullptr || r->pixels == nullptr)
+            continue;
+        for (int y = 0; y < r->height; y++)
+            memcpy(r->shadow + (size_t)y * r->width, r->pixels + (size_t)y * r->pitch, (size_t)r->width);
+    }
 }
 
 void DlPictureReads(const DlPicture* picture, const unsigned char** reads)
@@ -1008,6 +1239,7 @@ int DlBegin(const char* kind, const DlSurface* dst, int x0, int y0, int x1, int 
     DlLock lock;
     if (s_itemCount >= kMaxItems)
         Fail("items in a frame", "32768");
+    CheckPixels();
     Resolved r;
     Resolve(dst, &r);
     g_dlOffX = r.offX;
@@ -1161,7 +1393,7 @@ void DlOpen(int listAll)
         return;
     }
     setvbuf(s_digest, s_digestBuffer, _IOFBF, sizeof s_digestBuffer);
-    fprintf(s_digest, "bt-display-digest 1\nlog bt-display 1\n");
+    fprintf(s_digest, "bt-display-digest 1\nlog bt-display 1.2\n");
     s_list = fopen("displaylist.txt", "wb");
     if (s_list == nullptr) {
         host_log("testmode: cannot write displaylist.txt\n");
@@ -1169,7 +1401,7 @@ void DlOpen(int listAll)
         return;
     }
     setvbuf(s_list, s_listBuffer, _IOFBF, sizeof s_listBuffer);
-    fprintf(s_list, "bt-display 1\n");
+    fprintf(s_list, "bt-display 1.2\n");
     s_listAll = listAll;
     g_dlOwner = host_thread_id();
     g_dlLock = host_mutex_create();
@@ -1199,6 +1431,7 @@ void DlFrameEnd(unsigned number, unsigned tick, unsigned steps, const unsigned c
                 int cursorX, int cursorY)
 {
     DlLock lock;
+    CheckPixels();
     char line[200];
     unsigned long long paletteHash = HashRun(palette, 1024);
     char paletteText[20];
@@ -1248,12 +1481,20 @@ void DlFrameEnd(unsigned number, unsigned tick, unsigned steps, const unsigned c
     HexHash(orderedText, HashEnd(&ordered));
     HexHash(setText, HashEnd(&set));
     fprintf(s_digest, "%u %u %d %s %s\n", number, tick, s_itemCount, orderedText, setText);
-    if (list || s_listAll) {
+    int listed = list || s_listAll;
+    for (int i = 0; i < s_picturePendingCount; i++)
+        s_pictureState[s_picturePending[i]] = listed ? 2 : 0;
+    s_picturePendingCount = 0;
+    if (listed) {
         fputs(line, s_list);
+        fwrite(s_pictureText, 1, (size_t)s_pictureUsed, s_list);
         for (int i = 0; i < s_itemCount; i++)
             fwrite(s_text + s_items[i].lineOff, 1, (size_t)(s_items[i].end - s_items[i].lineOff), s_list);
         fputs(cursorLine, s_list);
     }
+    s_pictureUsed = 0;
+    SnapshotSurfaces();
+    s_pixelsChecked = 0;
     s_itemCount = 0;
     s_textUsed = 0;
     s_targetCount = 0;

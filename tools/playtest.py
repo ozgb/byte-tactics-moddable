@@ -611,6 +611,8 @@ class Instance:
             args += ["-testdump", str(self.run.testdump)]
         if self.run.testmode and self.run.testdisplay is not None:
             args += ["-testdisplay", self.run.testdisplay]
+        if self.run.testmode and self.run.testreplay is not None:
+            args += ["-testreplay", self.run.testreplay]
         if self.run.testmode and self.run.testcommands:
             args += ["-testcommands", TESTCOMMANDS_FILE]
         if self.run.testmode:
@@ -1074,7 +1076,7 @@ class Run:
                  windowed: bool = False, put: list[tuple[str, Path]] | None = None,
                  collect: list[str] | None = None, xserver: bool = False, native_modules: bool = False,
                  framedump: bool = False, blockscan_verify: bool = False, record: str | None = None,
-                 testdisplay: str | None = None, testcommands: bool = False):
+                 testdisplay: str | None = None, testreplay: str | None = None, testcommands: bool = False):
         self.number = number
         self.name = name
         self.scenario = scenario
@@ -1088,6 +1090,7 @@ class Run:
         self.testmode = testmode
         self.testdump = testdump
         self.testdisplay = testdisplay
+        self.testreplay = testreplay
         self.testcommands = testcommands
         self.poison = poison
         self.blockscan = blockscan
@@ -1631,6 +1634,9 @@ def main() -> None:
                     help="--testmode: also run with -testdump TICK, which writes dump.txt")
     ap.add_argument("--testdisplay", metavar="TICK|all",
                     help="--testmode: also run with -testdisplay TICK (or all), which writes that frame's items (every frame's) to displaylist.txt")
+    ap.add_argument("--testreplay", metavar="PATH",
+                    help="--testmode: run with -testreplay PATH (a display list in the game copy, placed with --put), which draws "
+                         "the list's frames after the load, writes frames/<tick>.bin for the scenario's frames and exits")
     ap.add_argument("--testcommands", metavar="FILE",
                     help="--testmode: play the commands of FILE (a run's commands.txt) instead of the scenario's (-testcommands)")
     ap.add_argument("--poison", action="store_true",
@@ -1726,6 +1732,8 @@ def main() -> None:
             ap.error(f"{path} must be a path inside the game directory")
     if args.testdump is not None and args.testdump < 0:
         ap.error("--testdump takes a tick of 0 or more")
+    if args.testreplay is not None and (not args.testmode or Path(args.testreplay).is_absolute() or ".." in Path(args.testreplay).parts):
+        ap.error("--testreplay needs --testmode and a path inside the game directory")
     if args.testdisplay is not None and not args.testmode:
         ap.error("--testdisplay needs --testmode")
     if args.testdisplay is not None and args.testdisplay != "all" and not args.testdisplay.isdigit():
@@ -1796,7 +1804,8 @@ def main() -> None:
                                 args.windowed, put if sc is testmode else None,
                                 args.collect if sc is testmode else None, args.xserver and sc is testmode,
                                 args.native_modules, args.framedump, args.blockscan_verify, args.record,
-                                args.testdisplay if sc is testmode else None, args.testcommands is not None and sc is testmode))
+                                args.testdisplay if sc is testmode else None,
+                                args.testreplay if sc is testmode else None, args.testcommands is not None and sc is testmode))
     parallel = args.parallel or min(3, len(runs))
     template = template_prefix()
     dplay = directplay_prefix() if any(sc.directplay for sc in scenarios) else None

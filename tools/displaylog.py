@@ -7,7 +7,8 @@
     uv run tools/displaylog.py compare a.txt b.txt --end-of-tick               # items compared as sorted `<layer> <item>` lines
     uv run tools/displaylog.py against-digests a/display.txt b/display.txt     # compare two digest files
 
-A display list (`bt-display 1`) holds frames: a frame line, one line for each item and a cursor line. An item whose area
+A display list (`bt-display 1.2`) holds frames: a frame line, a `picture` line for each picture the game made that the list
+names for the first time, one line for each item and a cursor line. An item whose area
 is empty changes no pixel and is left out when a list is read, as the game leaves it out of its log ("Draws that change no
 pixel"), so a list that holds such items has the digest of the same list without them. The layer of an item is computed
 from the lines alone ("Which orders count"): 0 when it depends on no item before it, else one more than the highest layer
@@ -26,8 +27,8 @@ import sys
 from pathlib import Path
 
 DIGEST_HEADER = "bt-display-digest 1"
-LOG_HEADER = "bt-display 1"
-DIGEST_LOG_LINE = "log bt-display 1"
+LOG_HEADER = "bt-display 1.2"
+DIGEST_LOG_LINE = "log bt-display 1.2"
 OFFSET_BASIS = 0xCBF29CE484222325
 PRIME = 0x100000001B3
 MASK64 = (1 << 64) - 1
@@ -35,6 +36,9 @@ TARGET_PREFIX = "target:"
 PICTURE_KINDS = frozenset({"sprite", "sprite_opaque", "sprite_blend", "sprite_gray", "sprite_shadow", "sprite_lit",
                            "sprite_erase", "lens", "quad"})
 SOURCE_KINDS = frozenset({"blit", "copy"})
+KINDS = ("sprite", "sprite_opaque", "sprite_blend", "sprite_gray", "sprite_shadow", "sprite_lit", "sprite_erase", "lens", "quad",
+         "blit", "copy", "clear", "fill", "fade", "gray", "dither", "outline", "outline_lit", "line", "pixel", "circle",
+         "circle_dashed", "polygon", "text", "terrain", "pixels", "model", "cargo", "projectile", "debris", "shard")
 CELL_SHIFT = 6
 MAX_CELLS = 64
 
@@ -79,6 +83,7 @@ class Frame:
         self.line_number = line_number
         self.line = line
         self.items: list[Item] = []
+        self.pictures: list[tuple[int, str]] = []
         self.cursor = ""
         self.cursor_number = 0
 
@@ -103,6 +108,38 @@ def parse_item(number: int, line: str) -> Item:
     return Item(number, line, kind, words[1], area, reads)
 
 
+class Picture:
+    """A picture the game made, from its `picture` line: its name, offsets, transparent index, size and pixels."""
+
+    def __init__(self, name: str, x_offset: int, y_offset: int, transparency: int, width: int, height: int, pixels: bytes) -> None:
+        self.name = name
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+        self.transparency = transparency
+        self.width = width
+        self.height = height
+        self.pixels = pixels
+
+
+def parse_picture(number: int, line: str) -> Picture:
+    """The picture of a `picture <name> <x offset> <y offset> <transparent index> <pixels>` line; an Error when it is not well formed."""
+    words = line.split(" ")
+    if len(words) != 6 or words[1][:1] not in ("@", "?"):
+        raise Error(f"line {number} is not a picture line: `{line[:200]}`")
+    try:
+        size = words[1].lstrip("?").split(":")[-2]
+        width, height = (int(v) for v in size.split("x"))
+        x_offset, y_offset, transparency = int(words[2]), int(words[3]), int(words[4])
+        pixels = bytes.fromhex(words[5])
+    except (IndexError, ValueError):
+        raise Error(f"line {number} is not a picture line: `{line[:200]}`") from None
+    if width <= 0 or height <= 0 or len(pixels) != width * height or not 0 <= transparency <= 255:
+        raise Error(f"line {number}: the pixels of {words[1]} do not fit its size")
+    if words[1].split(":")[-1] != f"{hash_bytes(pixels):016x}":
+        raise Error(f"line {number}: the pixels of {words[1]} do not have its hash")
+    return Picture(words[1], x_offset, y_offset, transparency, width, height, pixels)
+
+
 def parse_list(text: str) -> list[Frame]:
     """The frames of a display list (layers not yet computed), without the items whose area is empty; an Error for a list that is not well formed."""
     lines = text.split("\n")
@@ -122,6 +159,11 @@ def parse_list(text: str) -> list[Frame]:
             current = Frame(int(words[1]), int(words[2]), number, line)
         elif current is None:
             raise Error(f"line {number} is outside a frame: `{line}`")
+        elif words[0] == "picture":
+            if current.items:
+                raise Error(f"line {number}: a picture line after an item of its frame")
+            parse_picture(number, line)
+            current.pictures.append((number, line))
         elif words[0] == "cursor":
             current.cursor = line
             current.cursor_number = number
@@ -134,6 +176,26 @@ def parse_list(text: str) -> list[Frame]:
     if current is not None:
         raise Error(f"the frame at line {current.line_number} has no cursor line")
     return frames
+
+
+def pictures(text: str) -> dict[str, Picture]:
+    """Every picture a display list's `picture` lines define, by name (a later line for a name replaces an earlier one)."""
+    found: dict[str, Picture] = {}
+    for number, line in enumerate(text.split("\n"), 1):
+        if line.startswith("picture "):
+            picture = parse_picture(number, line)
+            found[picture.name] = picture
+    return found
+
+
+def kinds(text: str) -> dict[str, int]:
+    """How many items of each kind a display list holds, items with an empty area included."""
+    found: dict[str, int] = {}
+    for line in text.split("\n")[1:]:
+        kind = line.split(" ", 1)[0]
+        if kind and kind not in ("frame", "cursor", "picture"):
+            found[kind] = found.get(kind, 0) + 1
+    return found
 
 
 def overlaps(a: tuple[int, int, int, int], b: tuple[int, int, int, int]) -> bool:
@@ -314,6 +376,13 @@ def frame_difference(a: Frame, b: Frame, end_of_tick: bool) -> str | None:
     where = f"frame {a.number} (tick {a.tick})"
     if a.line != b.line:
         return f"{where}: frame line {a.line_number} of A `{a.line}`, line {b.line_number} of B `{b.line}`"
+    for (nx, x), (ny, y) in zip(a.pictures, b.pictures):
+        if x != y:
+            return f"{where}: picture line {nx} of A `{x[:120]}`, line {ny} of B `{y[:120]}`"
+    if len(a.pictures) != len(b.pictures):
+        longer, which = (a.pictures, "A") if len(a.pictures) > len(b.pictures) else (b.pictures, "B")
+        number, text = longer[min(len(a.pictures), len(b.pictures))]
+        return f"{where}: only {which} has the picture line {number} (`{text[:120]}`)"
     if end_of_tick:
         one, two = layered_lines(a), layered_lines(b)
         for (x, nx), (y, ny) in zip(one, two):

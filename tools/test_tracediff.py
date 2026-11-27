@@ -555,7 +555,7 @@ class DisplayTest(unittest.TestCase):
 
     @staticmethod
     def listing(*items: str, tick: int = 4) -> str:
-        return "bt-display 1\n" + "".join(line + "\n" for line in [f"frame 1 {tick} 1 {DisplayTest.PALETTE}", *items, "cursor - - -"])
+        return "bt-display 1.2\n" + "".join(line + "\n" for line in [f"frame 1 {tick} 1 {DisplayTest.PALETTE}", *items, "cursor - - -"])
 
     def test_lists_are_compared_with_both_lines(self):
         one = self.listing("fill screen 0 0 10 10 1", "fill screen 20 20 30 30 2")

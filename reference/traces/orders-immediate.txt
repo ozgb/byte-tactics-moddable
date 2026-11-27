@@ -1,6 +1,6 @@
 bt-digest 10
 trace_format bt-trace 10
-commit a30a983b5a667dc9c3e1dcca0c135196bc5b1c49
+commit 0758dafdb98c0c7266fe81aa6b8a0144920d986b
 scenario reference/scenarios/orders-immediate.txt
 game_seed 301
 crt_seed 1301

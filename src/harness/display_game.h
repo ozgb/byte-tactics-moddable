@@ -76,11 +76,12 @@ void DisplayLogShard(void* dst, Vec3* offset, DebrisPiece* piece, const short* a
 void DisplayLogNoAngles();
 
 void DisplayLogAllocSurface(Surface* surface, const char* name);
+void DisplayLogWritten(Surface* surface);
 void DisplayLogAllocFrame(GafFrame* frame, const char* name);
 void DisplayLogGaf(const char* path, void* base);
 void DisplayLog3do(const char* path, Object3do* root);
 void DisplayLogFont(Font* font, const char* name);
-void DisplayLogFeatureType(const char* name);
+void DisplayLogFeatureType(const char* name, int spot);
 void DisplayLogFrameEnd(Display* display);
 
 #endif

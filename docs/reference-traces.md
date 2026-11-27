@@ -485,7 +485,7 @@ the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `re
 - `reference-traces-v53` (#1132): the 102 scenarios of v52 with the selection's visit mark, bits 6 and 7 of
   `Unit.flags` (`selectState`), out of the judged state and the view. The trace masks them out of the `Unit` table (mask
   0xffffff2f, `docs/state.md`, "The selection"), and the view clears them from `ViewUnit.flags`, at view version 2.1
-  (`docs/view.md`), so a `ui-` scenario played from its command log gives its own `tick` rows (eight still differ in the view's `orders[i].created`, #1187). The `tick` rows change only
+  (`docs/view.md`), so a `ui-` scenario played from its command log gives its own `tick` rows (eight differed in the view's `orders[i].created` until #1187 gave the interface's records the live tick counter). The `tick` rows change only
   in the thirteen `ui-` scenarios, the only ones whose units get the mark. The view header carries the minor version, so every view file and every `view` row changes, and with
   them every digest. The commit line names 2d6f1c7c1, the reference tip with the view 2.1 fill (#1183). The trace
   format is still `bt-trace 10`. The event digests, sound logs, UI logs, interface commands, display logs, frames and

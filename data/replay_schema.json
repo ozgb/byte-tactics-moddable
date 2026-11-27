@@ -21528,8 +21528,7 @@
      }
     ],
     "result": "alloc",
-    "size": "size",
-    "header": "src/state/block.h"
+    "size": "size"
    },
    {
     "name": "SimAllocTagged",
@@ -21562,13 +21561,11 @@
       "mode": "allocated",
       "param": "p"
      }
-    ],
-    "header": "src/state/block.h"
+    ]
    },
    {
     "name": "RecordSimEvent",
     "id": "RI_RECORD_SIM_EVENT",
-    "header": "src/util/engine_services.h",
     "declaration": "void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);",
     "args": [
      {
@@ -21824,7 +21821,6 @@
    {
     "name": "SimCaptureAlloc",
     "id": "RI_SIM_CAPTURE_ALLOC",
-    "header": "src/util/engine_services.h",
     "declaration": "void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);",
     "args": [
      {
@@ -21843,7 +21839,6 @@
    {
     "name": "FindSlotByDpid",
     "id": "RI_FIND_SLOT_BY_DPID",
-    "header": "src/util/engine_services.h",
     "declaration": "unsigned char __stdcall FindSlotByDpid(int id);",
     "args": [
      {
@@ -21857,7 +21852,6 @@
    {
     "name": "GetSlotDpid",
     "id": "RI_GET_SLOT_DPID",
-    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall GetSlotDpid(unsigned char index);",
     "args": [
      {
@@ -21924,7 +21918,6 @@
    {
     "name": "GetGafFrame",
     "id": "RI_GET_GAF_FRAME",
-    "header": "src/util/engine_services.h",
     "declaration": "GafFrame* __stdcall GetGafFrame(FrameTable* table, int index);",
     "args": [
      {
@@ -21976,7 +21969,6 @@
    {
     "name": "InitGafSequence",
     "id": "RI_INIT_GAF_SEQUENCE",
-    "header": "src/util/engine_services.h",
     "declaration": "void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);",
     "args": [
      {
@@ -22004,7 +21996,6 @@
    {
     "name": "StepGafSequence",
     "id": "RI_STEP_GAF_SEQUENCE",
-    "header": "src/util/engine_services.h",
     "declaration": "int __stdcall StepGafSequence(Handle* player);",
     "args": [
      {

@@ -54,6 +54,16 @@
       "HapiBank_OpenAccount": [["handle", "linear"], "int"],
       "HapiBank_SetIntegerItem": [["handle", "linear", "int"], "int"],
       "HapiBank_GetIntegerItem": [["handle", "linear", "int"], "int"],
+      "SimAlloc": [["int"], "linear"],
+      "SimAllocTagged": [["linear", "int"], "linear"],
+      "SimFree": [["linear"], "void"],
+      "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
+      "SimCaptureAlloc": [["int", "linear"], "linear"],
+      "GetGafFrame": [["linear", "int"], "linear"],
+      "InitGafSequence": [["linear", "linear", "int"], "void"],
+      "StepGafSequence": [["linear"], "int"],
+      "GetSlotDpid": [["int"], "int"],
+      "FindSlotByDpid": [["int"], "int"],
       "Emit": [["linear", "int"], "void"]
     },
     "weapons": {

@@ -581,14 +581,15 @@ signature. The game manifest's module imports `weapons.FindWeaponByName`. The ho
 
 ### 9.3 Engine services
 
-The `services` group is the engine functions a module may import, and `interfaces/services.h` declares exactly those:
-the union of `imports.services` over the manifest's modules, each as a free function under its import name. An engine
-class's member is imported as `<Class>_<Member>`, with the object as the first argument: a `linear` address when it
-lives in the module's memory (a `TdfFileLayout`) and a `handle` when it is an engine object (a `TdfRecord`, a
-`HapiBank`). The rest of the engine's services (the scheduler's publishing and synchronous calls, the recorders of the
-dump's events, the allocator, the whole TDF and console command classes) are in an engine header outside `interfaces/`,
-which only the native engine includes. The imports' signatures are below; they are also `signatures.services` of the
-manifest.
+The `services` group is the engine functions a module may import, and `interfaces/services.h` declares exactly those,
+each as a free function under its import name. `signatures.services` of the manifest gives each one's kinds, whether or
+not a module of the manifest imports it yet, and a module's `imports.services` is a subset of it. An engine class's
+member is imported as `<Class>_<Member>`, with the object as the first argument: a `linear` address when it lives in the
+module's memory (a `TdfFileLayout`) and a `handle` when it is an engine object (a `TdfRecord`, a `HapiBank`). The rest
+of the engine's services (the scheduler's publishing and synchronous calls, the recorders of the dump's events, the
+whole TDF and console command classes) are in an engine header outside `interfaces/`, which only the native engine
+includes; a module reaches the scheduler's calls through the imports of "Routes in the recordings" below. The imports'
+signatures are below.
 
 | Import | Signature (kinds) | Behaviour |
 | --- | --- | --- |
@@ -606,7 +607,54 @@ manifest.
 | `HapiBank_OpenAccount` | `[handle, linear] -> int` | opens the named account of a saved-game bank |
 | `HapiBank_SetIntegerItem` | `[handle, linear, int] -> int` | writes an integer item of the open account |
 | `HapiBank_GetIntegerItem` | `[handle, linear, int] -> int` | reads an integer item, or the default |
+| `SimAlloc` | `[int] -> linear` | allocates the size in bytes in the state block, zeroed and 8-byte aligned, and returns its address; the allocation stays until `SimFree` returns it, across ticks, and its bytes are game state like any other of the block; a size the block cannot hold ends the game (section 13) |
+| `SimAllocTagged` | `[linear, int] -> linear` | allocates as `SimAlloc` does (arguments: tag, size); the tag is a NUL-terminated name of the allocation, which the recordings carry and which changes nothing |
+| `SimFree` | `[linear] -> void` | returns an allocation of `SimAlloc` or `SimAllocTagged`, by the address they returned, to the block; null does nothing |
+| `RecordSimEvent` | `[int, int, linear, int] -> void` | appends a sim event to the sim event queue of the block (arguments: kind, flags, the arguments as an array of 32-bit words, their count): one record per six arguments, at least one, each with the kind, the tick and the next six arguments (zero past the count), every record after the first with the flags and the continuation flag; the kinds, their arguments and the flags are in `docs/sim-events.md`; a queue that has no room ends the game in test mode, and otherwise drops the event and counts it in the queue's dropped count |
+| `SimCaptureAlloc` | `[int, linear] -> linear` | reserves the size in bytes, rounded up to 8, in the radar arena of the block (`docs/sim-events.md`, "Radar events"), zeroes it, writes its offset in the arena to the 32-bit word at the second argument and returns its address; the offset is what a radar event records, and it holds until the drain that hands over that event empties the arena; an arena that has no room ends the game in test mode, and otherwise returns 0, writes nothing and counts it in the arena's dropped count |
+| `GetGafFrame` | `[linear, int] -> linear` | returns the frame of the given index of a frame table (a GAF animation's frames: its count, a 16-bit word at the start, and 8-byte entries from offset 40, each the frame's address and its duration in ticks), or 0 when the index is negative or not below the count |
+| `InitGafSequence` | `[linear, linear, int] -> void` | starts a sequence cursor (a 12-byte record of the block: the frame index and the ticks left on it, two 16-bit words, the loop flag, a byte, and at offset 8 the animation's address) on an animation (a frame table, its loop flag the byte at offset 2) at a frame index, the first frame when the index is not below the count, with that frame's duration as its ticks left |
+| `StepGafSequence` | `[linear] -> int` | advances a sequence cursor by a tick: a cursor with no animation stays and returns 0; one with two or more ticks left loses one and returns 0; otherwise it moves to the next frame and its duration and returns 1, and past the last frame it goes back to the first when the animation loops, and when it does not, it drops the animation (address 0) and returns 1 |
+| `GetSlotDpid` | `[int] -> int` | returns the network id of the player in a slot of the game record, or -1 when the slot is 10 (none) or its player's type is 0 (empty) |
+| `FindSlotByDpid` | `[int] -> int` | returns the lowest slot, 0 to 9, whose network id (as `GetSlotDpid` gives it) is the argument, or 10 when none is or the argument is -1 |
 | `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; the host refuses, as an import error, an effect outside the module memory, a kind not in the entry's `publishes` table, and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect to its subscribers as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
+
+**A malformed argument changes nothing and does not trap** (ozgb/btm#25). The default modules never pass one, so no
+recording shows what it does, and this is the contract: an address the import does not trap on (section 7.2) that is not
+what the argument must be, or a number outside its range, makes the call return 0 (null, for an address; `-1` for
+`GetSlotDpid` and `10` for `FindSlotByDpid`, their answers for none) and write nothing. For each service above:
+`SimFree` of an address that is not a live allocation (not one `SimAlloc` or `SimAllocTagged` returned, or one already
+returned); `RecordSimEvent` with a kind that is not
+a kind of `interfaces/sim_events.h`, or with a null array and a count above 0; `SimCaptureAlloc` with a null offset
+address; `GetGafFrame` with a null table; `InitGafSequence` with a null cursor or animation, or a negative index;
+`StepGafSequence` with a null cursor; `GetSlotDpid` with a slot above 10. `SimAllocTagged` takes any tag, null
+included, since the tag changes nothing.
+
+**Routes in the recordings.** A recording carries some calls a module makes to the engine under the engine's own
+service names (`docs/replay-format.md`): the scheduler's publishing call and its synchronous calls into another
+subsystem. No module imports these names. A module makes the call through the import of the table below, and a spec
+names that import, never the recorded name. The import takes the arguments of the slot it names, in the slot's order. The
+recorded line shows the ones the recording keeps: an argument it leaves out (the event of `SchedPublish`, the position
+buffer of `GetWeaponTargetPos`, the record of `Spend`) is not in the line, and a cell the line gives by value (`(x,y)`)
+is passed as the address of a `Point16` holding it. The engine delivers the
+callee's pending inbox before the call when the slot's header says so, and records a synchronous call into a module in
+the dump as section "Who records the dump's events" states.
+
+| Recorded call | Import | What the module does |
+| --- | --- | --- |
+| `services.SchedPublish` | `services.Emit` | publishes an effect to its own outbox; the recorded outbox (the first argument) is always the module's own, the interface of its entry, and the recorded size is `Emit`'s second argument |
+| `services.ScheduleTargetingTargetUnit` | `targeting.GetWeaponTargetUnit` | asks for the unit a weapon aims at |
+| `services.ScheduleTargetingTargetPos` | `targeting.GetWeaponTargetPos` | asks for the position a weapon aims at, into a `Vec3` of its own; the recording's `x`, `y` and `z` outputs are the three words the callee wrote |
+| `services.ScheduleTargetingFind` | `targeting.FindWeaponTarget` | picks the best enemy for a weapon |
+| `services.ScheduleTargetingFireAtWill` | `targeting.FindBestTargetIfFireAtWill` | picks the best enemy for a unit that fires at will |
+| `services.ScheduleMapCanBuildAt` | `map.CanBuildAt` | asks whether a unit type can be built at a cell; the recording's `SimGlobals.g_lastPlaceMetalSum` output is the placement record the callee filled |
+| `services.ScheduleMapCanPlaceUnitFootprint` | `map.CanPlaceUnitFootprint` | asks whether a unit type's footprint fits at a cell, with the same output |
+| `services.ScheduleEconomySpend` | `economy.Spend` | spends a player's energy and metal (an `EconomySpend`) |
+| `services.ScheduleEconomyRequestGranted` | `economy.RequestGranted` | asks whether a unit's request for resources would be granted |
+| `services.ScheduleMetalExtraction` | `economy.UpdateMetalExtraction` | sets a metal extractor's rate |
+
+`tools/speclint.py` reads the first two columns of this table from the kit's copy of this page: a spec may name a
+recorded call of the first column (to say which recorded line an import makes) as well as its import.
 
 **Who records the dump's events.** In test mode a dump lists the events and effects of each module on the scheduler
 (`docs/trace-format.md`, sections 8.22 and 8.24 to 8.30). The engine records each event it delivers to a module's
@@ -622,20 +670,21 @@ value and its size), and the gate judges an effect through what its subscribers 
 `data/replay_schema.json`) is not the module's import list, which is `imports.services` of its manifest entry:
 targeting's names `RandomInt` and `Emit`, and its recordings carry `i services.Emit` lines.
 
-The services interface is at major 4 and minor 0 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+The services interface is at major 4 and minor 1 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). The 1.x line added the scheduler's services one minor at a time; major 2 gave every recorder
 of the dump's events and wind_meteors' publishing import the payload's size, and 2.1 and 2.2 added the recorders of orders, movement,
 units and scripts. Major 3 splits the header: `interfaces/services.h` keeps the imports above, the TDF and bank
 members become free functions under their import names, the strings they only read become const, the size
-of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces that wind_meteors-only import with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports the old service, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import.
+of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces that wind_meteors-only import with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports the old service, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import. Minor 1 adds the allocation services (`SimAlloc`, `SimAllocTagged`, `SimFree`), the sim event services (`RecordSimEvent`, `SimCaptureAlloc`), the GAF services (`GetGafFrame`, `InitGafSequence`, `StepGafSequence`) and the player slot services (`GetSlotDpid`, `FindSlotByDpid`), the services the recordings of the subsystems other than wind_meteors import, so that each module's manifest entry can list them.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter
 types, const-ness, calling convention and `static`. An entry removed or retyped is breaking and needs a major bump; one
 added needs the minor bump. An overload added to a name that had one signature is breaking too, since both signatures
 would map to the same `Class_Method` import. It also ties the header to the manifest: the entries, by import name, must
-be exactly the union of the modules' `imports.services`, or the `services (imports)` line fails. A service a module
-starts to import is added to the header and the manifest in one change.
+be exactly the names of `signatures.services`, each with its kinds there, and every name of a module's `imports.services`
+must be one of them, or the `services (imports)` line fails. A service is added to the header and to
+`signatures.services` in one change, before or with the first module that imports it.
 The baseline is the newest `interfaces-v*` tag.
 
 A service never returns a native address. A service that finds something outside what it may reach
@@ -658,6 +707,8 @@ An interface has a major version that changes when a slot is removed or its sign
   one the interface still declares. A module built against the current major gives its name's
   signature; a name only older modules use keeps its entry, and the build fails when the interface's
   header no longer declares it (that module needs an adapter or a rebuild before the slot can go).
+  `services` is the exception: it has every service `interfaces/services.h` declares, imported or
+  not (section 9.3).
 - `adapters`: a list of `{"interface", "from_major", "name", "args", "result"}`.
 
 ### 10.2 What the loader does

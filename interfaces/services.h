@@ -2,11 +2,12 @@
 #define INTERFACES_SERVICES_H
 
 #include "rand_stream.h"
+#include "sim_events.h"
 
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 4
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 0
+#define SERVICES_VERSION_MINOR 1
 
 // Advances the named random stream of the game logic (LIBCMT rand) and returns the next value, 0 to 0x7fff; the stream's state is in the block.
 int __cdecl GameRand(RandStream stream);
@@ -53,6 +54,38 @@ int __stdcall HapiBank_OpenAccount(HapiBank* bank, const char* name);
 int __stdcall HapiBank_SetIntegerItem(HapiBank* bank, const char* name, int value);
 // Reads an integer item of the open account, or def when it is missing.
 int __stdcall HapiBank_GetIntegerItem(HapiBank* bank, const char* name, int def);
+
+// Allocates size zeroed bytes in the state block, 8-byte aligned, and returns their address; a size the block cannot hold ends the game.
+void* __cdecl SimAlloc(unsigned int size);
+// Allocates like SimAlloc; the tag, a NUL-terminated name of the allocation, is for the analysis tools and changes nothing.
+void* __cdecl SimAllocTagged(const char* tag, unsigned int size);
+// Returns an allocation of SimAlloc or SimAllocTagged to the block; null, or an address that is not a live allocation, changes nothing.
+void __cdecl SimFree(void* p);
+
+// Appends a sim event of the kind to the sim event queue, its count arguments read from args, in records of six arguments each.
+void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);
+// Reserves bytes zeroed bytes of the radar arena, writes their offset in the arena to offset and returns their address, or null when it is full.
+void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);
+
+// A table of the frames of a GAF animation, which a module reads only through the GAF services and its count field.
+struct FrameTable;
+// One frame of a GAF animation: its size, its offsets and its pixels.
+struct GafFrame;
+// The entry of a GAF animation whose frames a sequence steps through.
+struct GafEntry;
+// The cursor of a GAF sequence, in the block: the frame, the ticks left on it, whether it loops, and the entry.
+struct Handle;
+// Returns the frame of the given index of a frame table, or null when the index is outside the table.
+GafFrame* __stdcall GetGafFrame(FrameTable* table, int index);
+// Starts a sequence on an entry at a frame (the first when the index is outside the entry), with that frame's duration.
+void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);
+// Advances a sequence by a tick and returns 1 when it moved to the next frame (or ended), 0 when it stayed or has no entry.
+int __stdcall StepGafSequence(Handle* player);
+
+// Returns the network id of a player slot, or -1 when the slot is 10 or holds no player.
+int __stdcall GetSlotDpid(unsigned char index);
+// Returns the player slot whose network id is id, or 10 when none has it or id is -1.
+unsigned char __stdcall FindSlotByDpid(int id);
 
 // Publishes an effect, its payload of size bytes, to the calling module's outbox, from which the engine's router copies it to each subscriber of its kind; a kind outside the caller's publishes table, or a size other than its payload's, is refused.
 void __stdcall Emit(const void* effect, unsigned int size);

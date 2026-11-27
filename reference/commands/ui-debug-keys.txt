@@ -1,0 +1,6 @@
+bt-interface 1
+47 PLAYERS_SET_STORE unit - player 0 resource 0 add 0 amount 1148846080
+47 PLAYERS_SET_STORE unit - player 0 resource 1 add 0 amount 1148846080
+47 PLAYERS_SET_STORE unit - player 1 resource 0 add 0 amount 1148846080
+47 PLAYERS_SET_STORE unit - player 1 resource 1 add 0 amount 1148846080
+53 UNITS_FORGET_ATTACKER unit 252

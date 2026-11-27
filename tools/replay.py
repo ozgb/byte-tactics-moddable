@@ -32,7 +32,7 @@ SCHEMA = ROOT / "data/replay_schema.json"
 WINDOWS = RECORDINGS / "windows.json"
 PLAYTESTS = RECORDINGS / "playtests.json"
 FORMAT = 2
-RUN_SECONDS_BASE = 120
+RUN_SECONDS_BASE = 600
 RUN_TICKS_PER_SECOND = 25
 
 

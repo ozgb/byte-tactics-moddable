@@ -21030,8 +21030,8 @@ address,function,file,kind,target
 0x466b70,CalcRadarViewportRect,src/ingame/radar.cpp,field_read,Game::width_142eb
 0x466b70,CalcRadarViewportRect,src/ingame/radar.cpp,function,
 0x466b70,CalcRadarViewportRect,src/ingame/radar.cpp,global_read,g_game
-0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,call,DisplayLogWants
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,call,DisplayLogWritten
+0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,call,DlIsOn
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,deref_read,*unsigned char
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,deref_write,*unsigned char
 0x466c20,UpdateRadarMapped,src/ingame/radar.cpp,field_read,Display::grayTable

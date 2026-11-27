@@ -692,10 +692,26 @@ def effect_kinds(text):
     return values
 
 
-def check_publishes(game):
-    """Reasons a module's manifest "publishes" table is not an object from effect kinds of its interface to their payload sizes."""
+def routed_details(outbox):
+    """{kind value: (kind name, payload struct, payload size)} of every kind a route takes from the outbox of a subsystem."""
+    import routes
     import traceschema
 
+    by_name = {}
+    for module in traceschema.EVENT_MODULES:
+        for _value, (name, struct, size, _fields) in traceschema.event_kinds(module).items():
+            by_name[name] = (struct, size)
+    return {int(value): (kind, *by_name[kind]) for publisher, kind, value, _sub, _how in routes.rows()
+            if publisher == outbox and kind in by_name}
+
+
+def routed_kinds(outbox):
+    """{kind value: payload size} of every kind a route takes from the outbox of a subsystem (data/routes.csv)."""
+    return {value: size for value, (_name, _struct, size) in routed_details(outbox).items()}
+
+
+def check_publishes(game):
+    """Reasons a module's manifest "publishes" table is not an object from kinds its outbox's routes carry to their payload sizes."""
     problems = []
     for entry in game["modules"]:
         if "publishes" not in entry:
@@ -703,24 +719,21 @@ def check_publishes(game):
         name = entry["name"]
         table = entry["publishes"]
         if not isinstance(table, dict):
-            problems.append(f"{name}: publishes must be an object from effect kinds to payload sizes")
+            problems.append(f"{name}: publishes must be an object from kinds to payload sizes")
             continue
+        outbox = entry.get("interface", "")
         try:
-            module = traceschema.module_of_header(entry.get("interface", "") + ".h")
-            kinds = traceschema.event_kinds(module)
-            effects = effect_kinds(header_text(entry["interface"]))
+            routed = routed_details(outbox)
         except (ValueError, KeyError, OSError) as e:
-            problems.append(f"{name}: cannot read the effect kinds of interface {entry.get('interface')!r}: {e}")
+            problems.append(f"{name}: cannot read the routes of outbox {outbox!r}: {e}")
             continue
         for key, size in table.items():
             if not isinstance(key, str) or not key.isdigit() or isinstance(size, bool) or not isinstance(size, int):
                 problems.append(f"{name}: publishes {key!r}: {size!r} must be a decimal kind and an integer size")
-            elif int(key) not in effects:
-                problems.append(f"{name}: publishes {key}, which is not an effect kind of interfaces/{entry['interface']}.h")
-            elif int(key) not in kinds:
-                problems.append(f"{name}: publishes {key}, which has no payload struct")
-            elif kinds[int(key)][2] != size:
-                problems.append(f"{name}: publishes {key} with size {size}, but {kinds[int(key)][1]} is {kinds[int(key)][2]} bytes")
+            elif int(key) not in routed:
+                problems.append(f"{name}: publishes {key}, which no route takes from the {outbox} outbox")
+            elif routed[int(key)][2] != size:
+                problems.append(f"{name}: publishes {key} with size {size}, but {routed[int(key)][1]} is {routed[int(key)][2]} bytes")
     return problems
 
 

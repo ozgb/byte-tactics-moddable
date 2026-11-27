@@ -275,14 +275,26 @@ class Budgets(unittest.TestCase):
         self.assertEqual(wm.check_publishes(game), [])
         self.assertEqual(next(m for m in game["modules"] if m["name"] == "wind_meteors")["publishes"], {"80": 36})
 
-    def publishes_problems(self, publishes):
+    def publishes_problems(self, publishes, interface=None):
         game = wm.game_manifest()
         entry = dict(next(m for m in game["modules"] if m["name"] == "wind_meteors"), publishes=publishes)
+        if interface:
+            entry["interface"] = interface
         return wm.check_publishes(dict(game, modules=[entry]))
 
-    def test_publishes_refuses_a_kind_that_is_not_an_effect_kind(self):
-        self.assertTrue(any("not an effect kind" in p for p in self.publishes_problems({"64": 4})))
-        self.assertTrue(any("not an effect kind" in p for p in self.publishes_problems({"999": 36})))
+    def test_publishes_refuses_a_kind_no_route_takes_from_the_outbox(self):
+        self.assertTrue(any("no route takes from the wind_meteors outbox" in p for p in self.publishes_problems({"64": 4})))
+        self.assertTrue(any("no route takes from the wind_meteors outbox" in p for p in self.publishes_problems({"132": 36})))
+        self.assertTrue(any("no route takes" in p for p in self.publishes_problems({"999": 36})))
+
+    def test_publishes_accepts_a_routed_inbox_kind(self):
+        size = wm.routed_kinds("map")[132]
+        self.assertEqual(self.publishes_problems({"132": size}, interface="map"), [])
+        self.assertTrue(any("size 4" in p for p in self.publishes_problems({"132": 4}, interface="map")))
+
+    def test_routed_kinds_are_the_routes_of_an_outbox(self):
+        self.assertEqual(wm.routed_kinds("wind_meteors"), {80: 36})
+        self.assertEqual(wm.routed_kinds("no_such_outbox"), {})
 
     def test_publishes_refuses_a_wrong_size(self):
         self.assertTrue(any("size 32" in p for p in self.publishes_problems({"80": 32})))
@@ -296,14 +308,18 @@ class Budgets(unittest.TestCase):
         with self.assertRaises(ValueError):
             wm.effect_kinds("enum XEffectKind { X_A = OTHER + 1 };")
 
-    def test_publishes_reports_an_unreadable_enum_instead_of_crashing(self):
-        original = wm.header_text
-        wm.header_text = lambda name: "enum WindMeteorsEffectKind { WIND_METEORS_EFFECT_SPAWN = BASE };"
+    def test_publishes_reports_an_unreadable_route_table_instead_of_crashing(self):
+        import routes
+        original = routes.rows
+
+        def broken():
+            raise ValueError("route kind X is not an enumerator of any interface")
+        routes.rows = broken
         try:
             problems = self.publishes_problems({"80": 36})
         finally:
-            wm.header_text = original
-        self.assertTrue(any("cannot read the effect kinds" in p for p in problems))
+            routes.rows = original
+        self.assertTrue(any("cannot read the routes" in p for p in problems))
 
     def test_publishes_refuses_a_malformed_table(self):
         self.assertTrue(self.publishes_problems([80]))

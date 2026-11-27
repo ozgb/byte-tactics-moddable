@@ -1,6 +1,6 @@
 """Host-side broker for a clean-room session: git sync and the gate mailbox.
 
-    uv run tools/cleanroom/broker.py serve --session DIR [--interval SECONDS] [--btm-token-file FILE] [--no-push] [--game-dir DIR] [--core-image FILE]
+    uv run tools/cleanroom/broker.py serve --session DIR [--interval SECONDS] [--btm-token-file FILE] [--no-push] [--review] [--game-dir DIR] [--core-image FILE]
     uv run tools/cleanroom/broker.py once --session DIR
 
 The session directory holds `outbox/` (the agent writes, the broker reads), `inbox/` (only the
@@ -27,6 +27,12 @@ wind_meteors module) and `outbox/ID/ready` make a core request, opened and check
 `core` and `subsystem` is refused. The broker runs `tools/coregate.py CORE --module MODULE --sandbox IMAGE --out DIR` in
 `SESSION/gate/ID/` on the host (the core only ever runs inside a microVM that script starts) and lets only
 `out/result.json` cross, with `"gate": "coregate"`. Without `--core-image` a core request is answered with an error.
+
+Review hand-over: with `--review` the broker serves a code review session. It pushes nothing, answers every gate
+request with an error (a reviewer never submits), and takes the report the session writes to `outbox/review.md`:
+it opens it as it opens a bundle, requires a regular file of at most 1 MiB in UTF-8, and copies it to
+`SESSION/review.md` by rename, with its sha256 in `SESSION/review.state`. Each distinct report is taken once, and
+a refusal is logged once per reason. Only a `--review` broker takes a report.
 
 Push: after each sync the broker pushes every `refs/heads/impl/<name>` of the bare repository whose commit changed to
 `--btm-remote` and opens a pull request into `main` of `--btm-repo` for each new branch. It reads the token from
@@ -65,6 +71,11 @@ MAX_CORE = 256 * 1024 * 1024
 ELF_MAGIC = b"\x7fELF"
 MAX_BUNDLE = 1024 * 1024 * 1024
 BUNDLE_NAME = "btm.bundle"
+REVIEW_NAME = "review.md"
+REVIEW_STATE = "review.state"
+REVIEW_REFUSED = "review.refused"
+MAX_REVIEW = 1024 * 1024
+NO_GATE = "this session has no gate: a code review session does not submit"
 STATE_NAME = "bundle.state"
 PUSH_STATE = "push.state"
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
@@ -236,6 +247,57 @@ def sync_refs(session):
         if fd is not None:
             os.close(fd)
         scratch.unlink(missing_ok=True)
+
+
+def write_bytes_atomic(directory, name, data):
+    """Write data to directory/name through a temporary name and a rename."""
+    tmp = Path(directory) / f".{name}.tmp"
+    tmp.write_bytes(data)
+    os.replace(tmp, Path(directory) / name)
+
+
+def refuse_review(session, reason):
+    """Log a refused review, once for each run of the same reason."""
+    marker = Path(session) / REVIEW_REFUSED
+    if marker.exists() and marker.read_text() == reason:
+        return
+    marker.write_text(reason)
+    log(session, f"review refused: {reason}")
+
+
+def take_review(session):
+    """Copy a new outbox/review.md to SESSION/review.md; return its sha256, or None when there is nothing new."""
+    session = Path(session)
+    state = session / REVIEW_STATE
+    fd = open_outbox(session)
+    try:
+        try:
+            file_fd, size = open_regular(REVIEW_NAME, fd)
+        except FileNotFoundError:
+            return None
+        except (ValueError, OSError) as err:
+            refuse_review(session, str(err))
+            return None
+        if size > MAX_REVIEW:
+            os.close(file_fd)
+            refuse_review(session, "too large")
+            return None
+        try:
+            data = read_limited(file_fd, MAX_REVIEW)
+            data.decode("utf-8")
+        except (ValueError, OSError) as err:
+            refuse_review(session, str(err))
+            return None
+    finally:
+        os.close(fd)
+    (session / REVIEW_REFUSED).unlink(missing_ok=True)
+    digest = hashlib.sha256(data).hexdigest()
+    if state.exists() and state.read_bytes().strip() == digest.encode():
+        return None
+    write_bytes_atomic(session, REVIEW_NAME, data)
+    state.write_text(digest + "\n")
+    log(session, f"review: {digest[:12]}, {len(data)} bytes")
+    return digest
 
 
 def read_token(token_file):
@@ -586,6 +648,11 @@ def write_push_refusals(inbox, refused):
     write_result(inbox, "push", {"refused": [refused[ref] for ref in sorted(refused)]})
 
 
+def no_gate(first, second, request_id):
+    """Answer a gate request in a session that may not submit."""
+    return {"gate": "none", "id": request_id, "error": NO_GATE}
+
+
 def process_mailbox(session, gate=None, core_gate=None):
     """Answer every ready request that has no result yet; return the ids answered."""
     session = Path(session)
@@ -623,23 +690,25 @@ def process_mailbox(session, gate=None, core_gate=None):
     return answered
 
 
-def one_pass(session, push=None, gate=None, core_gate=None):
-    """Sync the bundle, push when `push` (a dict of push_branches options) is given, answer the mailbox."""
+def one_pass(session, push=None, gate=None, core_gate=None, review=False):
+    """Sync the bundle (and the review when `review`), push when `push` (a dict of push_branches options) is given, answer the mailbox."""
     sync_refs(session)
+    if review:
+        take_review(session)
     if push:
         push_branches(session, **push)
     return process_mailbox(session, gate, core_gate)
 
 
-def serve(session, interval, push=None, gate=None, core_gate=None):
+def serve(session, interval, push=None, gate=None, core_gate=None, review=False):
     stop = []
     signal.signal(signal.SIGTERM, lambda *_: stop.append(1))
     signal.signal(signal.SIGINT, lambda *_: stop.append(1))
     log(session, "broker started")
     while not stop:
-        one_pass(session, push, gate, core_gate)
+        one_pass(session, push, gate, core_gate, review)
         time.sleep(interval)
-    one_pass(session, push, gate, core_gate)
+    one_pass(session, push, gate, core_gate, review)
     log(session, "broker stopped")
     return 0
 
@@ -654,20 +723,24 @@ def main(argv=None):
     ap.add_argument("--btm-repo", default=DEFAULT_REPO, help="OWNER/NAME for pull requests")
     ap.add_argument("--api-base", default=DEFAULT_API)
     ap.add_argument("--no-push", action="store_true", help="do not push branches or open pull requests")
+    ap.add_argument("--review", action="store_true", help="code review session: take outbox/review.md, push nothing, answer every gate request with an error")
     ap.add_argument("--gate-timeout", type=int, default=GATE_TIMEOUT)
     ap.add_argument("--game-dir", default=None, help="game directory for the real gate (default: oraclegate looks in Steam/GOG places)")
     ap.add_argument("--core-image", default=None, help="clean-room .smolmachine the core gate runs cores in (default: core requests are refused)")
     args = ap.parse_args(argv)
     prepare(args.session)
-    push = None if args.no_push else {
+    push = None if args.no_push or args.review else {
         "token_file": args.btm_token_file, "remote": args.btm_remote, "repo": args.btm_repo, "api_base": args.api_base,
     }
-    gate = make_gate(args.session, timeout=args.gate_timeout, game_dir=args.game_dir)
-    core_gate = make_core_gate(args.session, args.core_image, timeout=args.gate_timeout) if args.core_image else None
+    if args.review:
+        gate = core_gate = no_gate
+    else:
+        gate = make_gate(args.session, timeout=args.gate_timeout, game_dir=args.game_dir)
+        core_gate = make_core_gate(args.session, args.core_image, timeout=args.gate_timeout) if args.core_image else None
     if args.cmd == "once":
-        print(json.dumps(one_pass(args.session, push, gate, core_gate)))
+        print(json.dumps(one_pass(args.session, push, gate, core_gate, args.review)))
         return 0
-    return serve(args.session, args.interval, push, gate, core_gate)
+    return serve(args.session, args.interval, push, gate, core_gate, args.review)
 
 
 if __name__ == "__main__":

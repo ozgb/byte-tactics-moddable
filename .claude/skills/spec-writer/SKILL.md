@@ -11,7 +11,7 @@ The pilot that set this process is #800: `specs/wind_meteors.md` on btm main is 
 
 - **The btm clone:** `~/source/repos/btm`, for writing and pushing specs.
 - **A session directory:** `~/cleanroom/<subsystem>/` (outside `~/source/repos`, which `launch.py` refuses), with `tree/` (a btm clone on the spec branch), `datakit/` (a kit export) and one directory per session.
-- **The modern build** with `wasm_runtime` built, the VM image (`tools/cleanroom/build-image.sh build/scratch/cleanroom-image`), and the credentials of `docs/cleanroom.md`.
+- **The modern build** with `wasm_runtime` built, the VM image (`tools/cleanroom/build-image.sh build/scratch/cleanroom-image`), and the credentials of `docs/cleanroom.md`, all in the worktree you run `launch.py` from: the broker gates from that worktree's `build/`. `launch.py` runs the broker with `WINEARCH=win64` (`AGENTS.md`, step 4) whatever your shell sets.
 
 The setup is done when `uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta` passes and a smoke session (`docs/cleanroom.md`, "First real session", with `sleep` as the command) returns `equal` for the 3.1c module.
 
@@ -73,7 +73,7 @@ This step is done when phase 1 gives `approve`, or every point it raised is answ
 The implementer learns only from the spec and the gate. When a verdict differs, or `SPEC-QUESTIONS.md` asks something, find the gap in the spec, fix it there (phase 2 on the diff, then push), update `tree/`, and run a new session.
 
 5. When the broker refuses a push (a built file in a commit), run a short session that asks the implementer to rewrite its branch with source only.
-6. When the pull request appears, check its files: source, notes and specs only, no `.wasm`, nothing from this repository. Then check the session's proxy log: `uv run tools/cleanroom/proxy.py --check-log S/proxy.log --allow tools/cleanroom/allowlist.txt`.
+6. When the pull request appears, check its files: source, notes and specs only, no `.wasm`, nothing from this repository. Then check that `S/check-log.txt` ends `check-log: pass`: `launch.py` runs `proxy.py --check-log` on the session's proxy log after every session, and exits 5 when it fails.
 
 This step is done when a verdict is `equal`, the implementer's pull request holds only its own source, and every session's proxy log is on the allowlist.
 
@@ -87,12 +87,39 @@ The engine core (#1207) runs the same way, with these differences:
 - **The verdict** is per group (`docs/core-gate.md`, "The verdict"). The broker runs every group, so a group the session leaves out (`files` until the Nanolathe port merges) still appears; judge the session on the others, and say which you left out and why on the issue before the first session.
 - **Time:** a full core gate runs every vector in its own VM exec, and a core is far more code than a module, so a session runs for hours. Poll the inbox and `broker.log` in the foreground.
 
-## 7. Hand over
+## 7. Code review in the sandbox
+
+The oracle judges what the recordings and scenarios reach; the review catches what they don't. You can't review the module yourself: you have read the source, so any finding of yours would carry it into the implementation. A fresh session in the VM does it, and its report reaches the implementer only through the mailbox.
+
+The review runs in rounds on an `equal` head. A round is **clean** when its report's first line counts no `bug` and no `risk` (`Findings: 0 bug, 0 risk, N nit.`). Each round:
+
+1. Update `tree/` to the implementer's branch at the pull request's head, and keep `.review/` in `tree/.git/info/exclude`.
+2. Write the prompt from [`code-reviewer-prompt.md`](code-reviewer-prompt.md), with the subsystem filled in and `<base>` set to the spec branch's head in the first round, and to the head the last round reviewed after that.
+3. Run the session with a new session directory R, `/work` read-only, no gate and nothing pushed:
+
+   ```sh
+   uv run tools/cleanroom/launch.py --review --tree T --datakit K --session R --image I --game-dir ~/.ta -- claude -p "$(cat PROMPT)" --dangerously-skip-permissions
+   ```
+
+   The report crosses as `R/review.md`, and `R/check-log.txt` must end `check-log: pass`.
+4. When the report lists any finding, run an implementer session on the same tree, still on the implementer's branch (don't reset it to the spec branch as step 6 does), with a new session directory S: the prompt from [`implementer-prompt.md`](implementer-prompt.md), and step 6's `launch.py` line with `--session S --review-report R/review.md`. `launch.py` hands in R's report byte for byte, and refuses a file whose sha256 differs from `R/review.state`: that catches a copy edited by mistake, so never edit, rename or retype the report. The implementer fixes each finding, nits included, or answers it in `IMPLEMENTATION-NOTES.md`, submits again, and hands the branch over.
+5. When the round was clean, the review is done once the head is `equal` (after step 4, if it ran). Otherwise start the next round on the new head.
+
+When the implementer hands over a head that isn't `equal` (it is blocked on spec questions), don't start a round: answer the questions in the spec, then run step 4 again with the same `R/review.md`. A round only ever reviews an `equal` head.
+
+Don't relay, summarise or judge a finding to the implementer, and don't add to the report. You may act on the spec, never on the module. When a finding or a question shows a gap in the spec, fix the spec as in step 6 (phase 2 on the diff, then push), then fetch the new spec head into `tree/` (`git -C tree fetch origin spec-<subsystem>:spec-<subsystem>`) without touching the implementer's branch; the implementer merges it (its prompt says so).
+
+**Stop after three rounds** that aren't clean: comment on the spec's issue with each round's findings and what became of them, label the issue `needs-human`, and ping the human once (`tools/notify.py`, `docs/team.md`, "Human review"). The human decides whether to merge, run more rounds or change the spec.
+
+This step is done when the last round was clean, every finding of every round is fixed or answered on the pushed head, the verdict on that head is `equal`, and every session's `check-log.txt` ends `check-log: pass`.
+
+## 8. Hand over
 
 Comment on the spec's issue with:
 
 - the sessions in order, and each verdict;
+- each review round's findings, and what became of each (the commit that fixed it, or the answer in `IMPLEMENTATION-NOTES.md`);
 - every spec change and the review that asked for it;
 - the gaps in the kit you worked around.
 
-File each kit gap as an issue. The human reviews the implementer's pull request and merges both.
+File each kit gap as an issue. The maintainer merges the spec's pull request, then the implementer's, without the human, when the oracle verdict on the implementer's head is `equal`, the last review round was clean (no `bug` or `risk`) and every finding of every round is fixed or answered on that head, phase 2's `approve` is on the spec's head, every session ran in the VM with a `check-log.txt` ending `check-log: pass`, and the implementer's pull request is source only with CI green.

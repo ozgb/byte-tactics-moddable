@@ -642,7 +642,7 @@ the dump as section "Who records the dump's events" states.
 
 | Recorded call | Import | What the module does |
 | --- | --- | --- |
-| `services.SchedPublish` | `services.Emit` | publishes an effect to its own outbox; the recorded outbox (the first argument) is always the module's own, the interface of its entry, and the recorded size is `Emit`'s second argument |
+| `services.SchedPublish` | `services.Emit` | publishes an effect of its own interface's effect kinds (an `<Interface>EffectKind` of its header, which its entry's `publishes` table lists) to its own outbox; the recorded outbox (the first argument) is always the module's own, the interface of its entry, and the recorded size is `Emit`'s second argument; a recorded publish of any other kind has no import yet ("Publishes `Emit` does not carry" below) |
 | `services.ScheduleTargetingTargetUnit` | `targeting.GetWeaponTargetUnit` | asks for the unit a weapon aims at |
 | `services.ScheduleTargetingTargetPos` | `targeting.GetWeaponTargetPos` | asks for the position a weapon aims at, into a `Vec3` of its own; the recording's `x`, `y` and `z` outputs are the three words the callee wrote |
 | `services.ScheduleTargetingFind` | `targeting.FindWeaponTarget` | picks the best enemy for a weapon |
@@ -652,6 +652,50 @@ the dump as section "Who records the dump's events" states.
 | `services.ScheduleEconomySpend` | `economy.Spend` | spends a player's energy and metal (an `EconomySpend`) |
 | `services.ScheduleEconomyRequestGranted` | `economy.RequestGranted` | asks whether a unit's request for resources would be granted |
 | `services.ScheduleMetalExtraction` | `economy.UpdateMetalExtraction` | sets a metal extractor's rate |
+
+**Publishes `Emit` does not carry.** Most of the recorded `SchedPublish` calls of a module are not of its own effect
+kinds: the module publishes, to its own outbox, an event of another module's inbox (or of its own), and the route of
+`docs/schedule.md`, "Routes", delivers it there. `Emit` refuses these kinds, as an import error, and widening it (or the
+`publishes` table) to them changes the module ABI, so it waits on #1206. Until then a module cannot make these publishes,
+and a spec names them by their kind and their route, not as an import. By the routes, they are:
+
+| Publisher | Inbox | Kinds |
+| --- | --- | --- |
+| ai | targeting | `TARGETING_SET_UNIT` (96), `TARGETING_SET_POS` (97), `TARGETING_CLEAR` (98) |
+| economy | los_radar | `LOS_RADAR_SHARE_MAPPING` (134), `LOS_RADAR_SHARE_RADAR` (135) |
+| features | economy | `ECONOMY_INCOME` (4) |
+| map | los_radar | `LOS_RADAR_CELL_HEIGHTS` (132) |
+| movement | los_radar | `LOS_RADAR_UPDATE_UNIT` (128) |
+| movement | map | `MAP_ADD_UNIT` (160), `MAP_REMOVE_UNIT` (161) |
+| orders | economy | `ECONOMY_REQUEST` (2), `ECONOMY_INCOME` (4) |
+| orders | features | `FEATURES_REMOVE` (33), `FEATURES_RECLAIM` (35) |
+| orders | movement | `MOVEMENT_SET_TARGET` (326), `MOVEMENT_DESTROY_TARGET` (327), `MOVEMENT_SET_FLIGHT_MODE` (328), `MOVEMENT_SET_ALTITUDE` (329), `MOVEMENT_SET_APPROACH_RADIUS` (330), `MOVEMENT_SET_HEADING` (331) |
+| orders | orders | `ORDERS_COMMAND` (295) |
+| orders | players | `PLAYERS_GIVE_UNIT` (192) |
+| orders | targeting | `TARGETING_SET_UNIT` (96), `TARGETING_SET_POS` (97), `TARGETING_CLEAR` (98) |
+| orders | weapons | `WEAPONS_DAMAGE` (256), `WEAPONS_RELEASE` (259), `WEAPONS_CLAIM` (260), `WEAPONS_ADD_STOCKPILE` (269) |
+| players | economy | `ECONOMY_RESET` (0), `ECONOMY_INCOME` (4) |
+| players | los_radar | `LOS_RADAR_UPDATE_UNIT` (128), `LOS_RADAR_RECALCULATE` (133) |
+| scripts | map | `MAP_SET_YARD` (164) |
+| scripts | units | `UNITS_ATTACH_TO_PIECE` (357), `UNITS_SCRIPT_VALUE` (386) |
+| scripts | weapons | `WEAPONS_AIM_DONE` (263), `WEAPONS_EXPLODE_PIECE` (264) |
+| units | ai | `AI_SET_SQUAD` (226) |
+| units | economy | `ECONOMY_RESET` (0), `ECONOMY_LOAD` (1), `ECONOMY_REQUEST` (2), `ECONOMY_INCOME` (4) |
+| units | features | `FEATURES_PLACE` (32) |
+| units | los_radar | `LOS_RADAR_UPDATE_UNIT` (128), `LOS_RADAR_REMOVE_UNIT` (129), `LOS_RADAR_REVEAL_UNIT` (130), `LOS_RADAR_ADD_EYEBALL` (131), `LOS_RADAR_SIGHT_RESET` (137), `LOS_RADAR_SIGHT_LOAD` (138) |
+| units | map | `MAP_ADD_UNIT` (160), `MAP_REMOVE_UNIT` (161), `MAP_CLEAR_UNIT` (162), `MAP_RECLAIM_FOOTPRINT` (163), `MAP_SET_YARD` (164), `MAP_BUCKET_UNLINK` (165), `MAP_BUCKET_PREPEND` (166), `MAP_LOAD_PATH_LOCK_STAMP` (169) |
+| units | movement | `MOVEMENT_NEW` (320), `MOVEMENT_DESTROY` (321), `MOVEMENT_LOAD` (322), `MOVEMENT_SET_MODE` (323), `MOVEMENT_SET_SPEED` (324) |
+| units | orders | `ORDERS_ADD` (288), `ORDERS_STOP` (290), `ORDERS_BE_CARRIED` (291), `ORDERS_STATUS_FLAGS` (292) |
+| units | players | `PLAYERS_KILL_UNITS` (193), `PLAYERS_UNIT_CREATED` (194), `PLAYERS_UNIT_DIED` (195) |
+| units | scripts | `SCRIPTS_START` (416) |
+| units | targeting | `TARGETING_RESET` (99), `TARGETING_LOAD` (100) |
+| units | weapons | `WEAPONS_DAMAGE` (256), `WEAPONS_DETONATE` (258), `WEAPONS_RELEASE` (259), `WEAPONS_INIT_SLOTS` (261), `WEAPONS_REMOVE_PROJECTILES` (262), `WEAPONS_SET_STOCKPILES` (267) |
+| weapons | features | `FEATURES_DAMAGE` (34) |
+| weapons | targeting | `TARGETING_CLEAR` (98) |
+
+The effect kinds `Emit` carries are the rest of the routes' rows: every row whose kind is an effect kind of the
+publisher's own interface (ai, economy, features, map, movement, orders, players, targeting, weapons and wind_meteors
+each have some).
 
 `tools/speclint.py` reads the first two columns of this table from the kit's copy of this page: a spec may name a
 recorded call of the first column (to say which recorded line an import makes) as well as its import.

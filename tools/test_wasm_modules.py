@@ -255,6 +255,18 @@ class LayoutTests(unittest.TestCase):
     def test_pages_must_hold_the_block(self):
         self.assertTrue(wm.check_layout(dict(self.PINS, memory_pages=527), self.RANGES))
 
+    LOAD = dict(PINS, load_data=[269484032, 67108864], memory_pages=5136)
+
+    def test_load_data_ending_the_memory_passes(self):
+        self.assertEqual(wm.check_layout(self.LOAD, self.RANGES), [])
+
+    def test_pages_must_end_at_the_load_data(self):
+        self.assertTrue(any("does not end at the load data" in p for p in wm.check_layout(dict(self.LOAD, memory_pages=4112), self.RANGES)))
+
+    def test_load_data_must_start_at_the_block_ceiling(self):
+        problems = wm.check_layout(dict(self.LOAD, load_data=[269484033, 67108863]), self.RANGES)
+        self.assertTrue(any("not at the block's ceiling" in p for p in problems))
+
 
 class Budgets(unittest.TestCase):
     def test_a_module_over_its_size_budget_fails(self):

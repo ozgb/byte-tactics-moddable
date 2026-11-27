@@ -39,7 +39,7 @@ manifest to DIR that moves the second module's bases onto the first's and expect
 the loader to refuse it, naming both modules.
 
 wind-meteors builds wind_meteors.wasm (tools/wasm_modules.py build), creates the
-memory of wasm/modules.json (block_base, block_size, scratch and memory_pages fall back to
+memory of wasm/modules.json (block_base, block_size, scratch, load_data and memory_pages fall back to
 the game's values when the manifest lacks them), loads the module with every import
 stubbed to trap and prints its slot handles and the addresses of its data exports.
 
@@ -62,7 +62,7 @@ LOADER_DIR = ROOT / "lib" / "wasmloader"
 HOST_SOURCES = ROOT / "src" / "host" / "win32"
 VENDORED_INCLUDE = ROOT / "third_party" / "wasmtime" / "include"
 GAME_MANIFEST = ROOT / "wasm" / "modules.json"
-GAME_BLOCK_DEFAULTS = {"memory_pages": 4112, "block_base": 0x100000, "block_size": 32 * 1024 * 1024, "block_max": 256 * 1024 * 1024, "scratch": [0xF0000, 0x10000]}
+GAME_BLOCK_DEFAULTS = {"memory_pages": 5136, "block_base": 0x100000, "block_size": 32 * 1024 * 1024, "block_max": 256 * 1024 * 1024, "scratch": [0xF0000, 0x10000], "load_data": [0x10100000, 64 * 1024 * 1024]}
 DLL_CRATE = HOST_DIR / "dll"
 MSVC5 = (ROOT / "toolchain" / "msvc5-sp3").resolve()
 MODULES_DIR = ROOT / "tests" / "wasm" / "modules"

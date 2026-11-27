@@ -179,7 +179,7 @@ An error is `{"error": CLASS, "modules": [names]}`: its class, below, and the mo
   the entry has no name, or when the fault is in `modules` itself (`manifest_no_name`, `manifest_no_modules`,
   `manifest_modules_missing`: `[]`). A name listed twice is named once (`manifest_duplicate`: `["a"]`).
 - `window` and `window_reaches` name the module at fault (`manifest_window_memory`, `manifest_window_table`,
-  `manifest_reaches_block`, `manifest_reaches_scratch`: `["b"]`).
+  `manifest_reaches_block`, `manifest_reaches_scratch`, `manifest_reaches_load_data`: `["b"]`).
 - `overlap` names both modules, the earlier in the manifest first (`manifest_overlap`, `manifest_overlap_table`:
   `["a", "b"]`).
 - The classes of `load` and `call` name the module loaded or called (`not_in_manifest`: `["zz"]`), except the
@@ -191,10 +191,10 @@ Every error ends the run (section 13), so it is the last line. Only a module who
 | Class | Section | When |
 | --- | --- | --- |
 | `manifest` | 5.2, 10 | the manifest is not valid JSON or not an object (a number anywhere in it that has a fraction or an exponent, as `4096.5`, `4096.0` or `1e3`, or is above 2147483647, makes it invalid JSON: `manifest_data_base_fraction`), a required number of section 4.1 (`memory_pages`, `table_size`, `window`, `table_slots`) is missing, a value is not a non-negative integer (a negative `data_base` or `table_base` of a module entry included), `memory_pages` or `window` is 0 or `memory_pages` above 65536, `stack_size` is not a non-negative integer, `block_base` comes without `block_size`, `scratch` is not `[base, size]`, a module entry's `fuel_budget` is not an integer from 1 to 2147483647 or its `size_budget` not a non-negative integer; and at `load`, a refusal of the interface majors (section 10.2: a module built against a major the manifest's does not match, with no adapter, or an adapter of section 10.2 that is refused), whose `modules` is empty |
-| `layout` | 5.2 | the block or the scratch area does not fit the memory, the scratch area passes the block base, or `block_max` is below `block_size` |
+| `layout` | 5.2 | the block, the scratch area or the load data region does not fit the memory, the scratch area passes the block base, the load data region starts below the block's ceiling or the scratch area's end, or `block_max` is below `block_size` |
 | `module_entry` | 5.2 | `modules` missing, not a list or empty, an entry that is not an object or has no name, a name listed twice, a missing `data_base` or `table_base`, `exports` or `data` present and not a list of names |
 | `window` | 5.2 | a module's window does not fit the memory, or its table range does not fit the table |
-| `window_reaches` | 5.2 | a window reaches the block base or the scratch base |
+| `window_reaches` | 5.2 | a window reaches the block base, the scratch base or the load data base |
 | `overlap` | 5.2 | two windows overlap, or two table ranges |
 | `not_in_manifest` | 5.2 | a module loaded that the manifest does not list |
 | `loaded_twice` | 5.2 | a module loaded a second time |
@@ -247,6 +247,15 @@ module is then loaded with no slots and no data words, and `call` still reaches 
 `call` names an export, not a slot of `exports`. A module whose entry has no `fuel_budget` gets no fuel set: `fuel` gives its
 counter's initial value, 9223372036854775807, which its calls lower as they burn fuel (the fuel group's `unbudgeted`).
 
+**Load data** (section 4.1). A `load_data` is `[base, size]`; a manifest without one has none.
+
+| Vector | What it judges |
+| --- | --- |
+| `manifest_load_data_shape`, `manifest_load_data_negative` | a `load_data` that is not `[base, size]` (one number), or has a negative size: `manifest` |
+| `manifest_layout_load_data_memory`, `manifest_layout_load_data_block`, `manifest_layout_load_data_scratch` | a `load_data` that does not fit the memory, starts below the block's ceiling, or starts below the scratch area's end: `layout` |
+| `manifest_load_data_ok`, `manifest_load_data_empty` | a `load_data` that starts at the block's ceiling, and one of size 0: accepted (`null`) |
+| `manifest_order_scratch_load_data` | a scratch area that does not fit the memory with a malformed `load_data`: `layout`, step 3 before step 4 |
+
 **Which error comes first.** When a manifest holds more than one fault, the error is the first fault in this order:
 
 1. the manifest as a whole: valid JSON (so a number with a fraction or an exponent, wherever it is, is a fault of this
@@ -255,15 +264,17 @@ counter's initial value, 9223372036854775807, which its calls lower as they burn
 2. the block, when `block_base` is present: `block_base` and `block_size` (`manifest`), then `block_max`, then whether
    the block fits the memory (`layout`);
 3. `scratch`: its form (`manifest`), then whether it fits the memory and lies below the block base (`layout`);
-4. `modules` (`module_entry`), then each entry in the manifest's order, each one whole before the next: an object with
+4. `load_data`, when present: its form, `[base, size]` of two non-negative integers (`manifest`), then whether it fits the
+   memory and starts at or above the block's ceiling (`block_base + block_max`) and the scratch area's end (`layout`);
+5. `modules` (`module_entry`), then each entry in the manifest's order, each one whole before the next: an object with
    a name, `data_base` and then `table_base` (missing: `module_entry`; negative: `manifest`), `fuel_budget` and then
    `size_budget` (`manifest`), `exports` and then `data`, then a name an earlier entry has (`module_entry`);
-5. once every entry is read, each module in the manifest's order: its window and table range (`window`), its window
-   against the block base and then the scratch base (`window_reaches`), then its overlap with each later module in
+6. once every entry is read, each module in the manifest's order: its window and table range (`window`), its window
+   against the block base, then the scratch base, then the load data base (`window_reaches`), then its overlap with each later module in
    turn, each pair checked memory first and then table before the next pair (`overlap`). So a `window` or
    `window_reaches` fault of a module comes before its overlap with a later one, and an overlap of two modules comes
    before a `window` fault of a third, later module;
-6. at `load`: a module not in the manifest (`not_in_manifest`), no memory (`no_memory`), a module loaded already
+7. at `load`: a module not in the manifest (`not_in_manifest`), no memory (`no_memory`), a module loaded already
    (`loaded_twice`), the interface majors (`manifest`), then `compile`, `instantiate` and `export`.
 
 A vector `pair_<a>_<b>` holds a fault of class `a` and one of class `b` in one manifest, and expects `a`, for each pair
@@ -272,7 +283,7 @@ of the classes `manifest`, `layout`, `module_entry`, `window`, `window_reaches` 
 vector is a step 1 fault (`window` 0), so the order list above, not this sentence, decides between a `manifest` fault of
 a later step and a fault of an earlier one: a `scratch` that is not `[base, size]` (step 3, `manifest`) against a block
 that does not fit the memory (step 2, `layout`) gives `layout`. `manifest_entry` in a name is a `manifest` fault of an
-entry (a negative `data_base` or `table_base`), which comes in step 4, after `layout`.
+entry (a negative `data_base` or `table_base`), which comes in step 5, after `layout`.
 
 The gate makes no `call` or `fuel` call that names a module not loaded, and no `fuel` call on a module without
 `__fuel_get`: they are not part of the call text, and a core may answer them as it likes.
@@ -321,6 +332,13 @@ data words at 0x30000 to 0x3000c and the eight slots, and does in one slot what 
 | `handles_full` | as `handles_32`, with a 33rd record | `wind_meteors: the handle table is full` (class `glue`) |
 | `import_string_cut` | `LoadMeteorDefaults` reads the field `Meteor` with `size` 3 into `params.weapon` | `o params.weapon "Me"`: the copy is cut to `size` - 1 bytes and a 0 (`docs/replay-format.md`, a text out with a `size`) |
 | `fatal_error` | `UpdateMeteors` calls `FatalError` with the message `meteor stop` | `{"error": "fatal", "modules": ["wind_meteors"], "message": "meteor stop"}` |
+| `alloc_zero` | `SimAlloc(0)` | `o params.radius 1`: the address it returns is not null (the recording's `services.SimAlloc 0` line has it) |
+| `alloc_tagged_null` | `SimAllocTagged` with a null tag and a size of 8 | `o params.radius 1`: a null tag is taken like any tag, and the address is not null |
+| `free_twice` | `SimAlloc(8)`, then `SimFree` of it twice | `o params.radius 7`, reached with one `services.SimFree` line: the second free of an address already returned does nothing and does not trap |
+| `record_event_kind` | `RecordSimEvent` of kind 36, a kind not of `interfaces/sim_events.h`, with no arguments | `o params.radius 7`, with no `services.RecordSimEvent` line: the call changes nothing |
+| `record_event_null_array` | `RecordSimEvent` of kind 1 with a null array and a count of 3 | `o params.radius 7`, with no `services.RecordSimEvent` line |
+| `capture_null_offset` | `SimCaptureAlloc(8, 0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.SimCaptureAlloc` line: a null offset address gives a null result |
+| `slot_dpid_above` | `GetSlotDpid(11)` | `o params.radius -1`, with no `services.GetSlotDpid` line: a slot above 10 gives the answer for none |
 | `emit_size`, `emit_past`, `emit_kind`, `emit_payload_size`, `emit_weapon` | `Emit` of a SPAWN of 3 bytes, of one that runs past the memory, of kind 81, of 40 bytes, and of weapon 256 | section 13's five `Emit` texts; a size of 3 is refused as outside an effect before its kind is read (section 9.3 gives the order of the checks) |
 
 The gate never gives the core the in-repo engine's wind_meteors module. The module is the one that comes with the
@@ -543,6 +561,10 @@ Lifting the freeze removes the header rows.
 - **The stack-depth limit:** the `stack` class is judged by `trap_stack`, which recurses without end, so any limit
   passes it. How deep a module may call before the engine's stack overflows (the host's, not the module's
   `stack_size`, which nothing guards, `docs/module-abi.md` section 2.2) is not judged.
+- **The drain of the queue and the arena** (`docs/sim-events.md`): no field a host replay compares is a queue or an arena
+  record, and nothing between its calls drains, so the `host` group cannot see that the queue drains and the radar
+  arena empties between ticks. The `events` group judges the queue's drain, and no
+  group the arena's (the radar arena limit above).
 - **The services a module imports** (`docs/module-abi.md`, section 9.3) are judged by the `host` group only as far as
   the recordings call them. Of the import refusals of section 13, the `host` group judges every one but two:
   `returned a buffer other than the one it was given` (`BuildDataPath`) and `returned a weapon outside the sim block`

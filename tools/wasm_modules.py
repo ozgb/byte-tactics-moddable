@@ -586,7 +586,17 @@ def check_layout(pins, ranges):
         for other_name, other_low, other_high in named[index + 1:]:
             if low < other_high and other_low < high:
                 problems.append(f"{name}: {low:#x}..{high:#x} overlaps {other_name}'s {other_low:#x}..{other_high:#x}")
-    if pins["memory_pages"] * 65536 != base + size:
+    load_data = pins.get("load_data")
+    if load_data:
+        load_low, load_size = load_data
+        for name, low, high in named:
+            if high > load_low:
+                problems.append(f"{name}: {low:#x}..{high:#x} reaches the load data at {load_low:#x}")
+        if load_low != base + size:
+            problems.append(f"load_data starts at {load_low:#x}, not at the block's ceiling {base + size:#x}")
+        if pins["memory_pages"] * 65536 != load_low + load_size:
+            problems.append(f"memory_pages {pins['memory_pages']} does not end at the load data: {load_low + load_size:#x} bytes needed")
+    elif pins["memory_pages"] * 65536 != base + size:
         problems.append(f"memory_pages {pins['memory_pages']} does not hold the block: {base + size:#x} bytes needed")
     return problems
 

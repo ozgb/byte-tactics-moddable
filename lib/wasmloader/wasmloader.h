@@ -49,6 +49,9 @@ typedef struct wl_layout {
     unsigned block_max;
     unsigned scratch_base;
     unsigned scratch_size;
+    int has_load_data;
+    unsigned load_data_base;
+    unsigned load_data_size;
 } wl_layout;
 
 wl_loader* WL_CALL wl_create(const wl_config* config, char* error, size_t error_size);

@@ -56,8 +56,8 @@ any module is loaded. Modules do not create or grow them.
 
 ### 2.1 The memory
 
-- The module imports it as `env.memory`. Its size is `memory_pages` of the manifest (4112 pages of
-  65536 bytes in the game manifest, 269484032 bytes: the block's ceiling and the 1 MiB below it). Its minimum and maximum are both
+- The module imports it as `env.memory`. Its size is `memory_pages` of the manifest (5136 pages of
+  65536 bytes in the game manifest, 336592896 bytes: the 1 MiB below the block, the block up to its ceiling, and the 64 MiB of load data above it). Its minimum and maximum are both
   `memory_pages`, so it never grows and never moves, and an address stays valid for the whole run.
 - A module declares its own minimum in its import. It must be at most `memory_pages`. It must not
   declare a maximum smaller than `memory_pages`. Linking with `--import-memory` and no
@@ -70,15 +70,17 @@ any module is loaded. Modules do not create or grow them.
   | module windows, one per module, `window` bytes each | from each module's `data_base` | `window`, `modules[].data_base` |
   | scratch area, 65536 bytes | 0xF0000 (983040) | `scratch` = `[base, size]` |
   | the state block, 32 MiB to 256 MiB | 0x100000 (1048576) | `block_base`, `block_size`, `block_max` |
+  | load data, 64 MiB | 0x10100000 (269484032), the block's ceiling | `load_data` = `[base, size]` |
 
-  The memory holds the block at its ceiling: `block_base + block_max` equals `memory_pages * 65536`.
+  The load data region starts at the block's ceiling, `block_base + block_max`, and ends at the memory's end:
+  `load_data` base plus size equals `memory_pages * 65536`. Its bytes are read-only load data (section 7.1).
   The block itself is as large as the match needs (`block_size` to `block_max`, a multiple of 65536,
   `docs/state.md`, "The size of the block"): it starts at `block_base`, the engine tells modules
   only addresses inside it, and the bytes after its end are never read or written. A module must not
   assume the block ends at the end of the memory. A manifest without `block_max` has a block of
   `block_size` bytes only.
-- Windows sit below the scratch area. The loader refuses a window that reaches the scratch base or
-  the block base (section 5).
+- Windows sit below the scratch area. The loader refuses a window that reaches the scratch base,
+  the block base or the load data base (section 5).
 - **The state block** holds the whole simulation state. The engine allocates and owns it; modules
   read and write it through the addresses the engine gives them. A module keeps nothing between
   ticks outside the block (section 12).
@@ -273,6 +275,7 @@ manifest per run.
 | `stack_size` | bytes of every module stack | host and checks (the loader checks only that it is a non-negative integer) |
 | `block_base`, `block_size`, `block_max` | the state block: `block_base` needs `block_size` (a `block_size` without `block_base` is ignored, and there is no block); `block_max`, optional, at least `block_size` (the default), is the most the block can grow to | loader |
 | `scratch` | `[base, size]` of the scratch area | loader |
+| `load_data` | `[base, size]` of the load data region, optional: it starts at or above the block's ceiling and the scratch area's end, and fits the memory | loader |
 | `majors`, `signatures`, `adapters` | section 10 | loader |
 | `modules` | a non-empty list of module entries | loader, required |
 | `tools` | the pinned tool versions: `clang`, `wasm-tools` (game manifest); `clang`, `rustc`, `wasmtime` (fixture manifest) | checks |
@@ -345,13 +348,14 @@ them at start-up (section 13). When a manifest has more than one fault, the load
 - A manifest that is not valid JSON (a number with a fraction or an exponent included, section 4.1) or not an
   object; a required field missing; a value that is not a non-negative integer (`stack_size`, and a module's
   `fuel_budget` and `size_budget`, included); `memory_pages` or `window` zero, or `memory_pages` over 65536; a
-  `fuel_budget` of 0 (section 11.3); a `scratch` that is not `[base, size]`.
+  `fuel_budget` of 0 (section 11.3); a `scratch` or a `load_data` that is not `[base, size]`.
 - A block that does not fit the memory; a scratch area that does not fit the memory or that passes
-  the block base.
+  the block base; a load data region that does not fit the memory or that starts below the block's
+  ceiling or the scratch area's end.
 - No modules, a module without a name, a duplicate name, a missing `data_base` or `table_base`,
   `exports` or `data` that is not a list of names.
 - A module whose window does not fit the memory, or whose table range does not fit the table.
-- A window that reaches the block base or the scratch base.
+- A window that reaches the block base, the scratch base or the load data base.
 - Two windows that overlap, or two table ranges that overlap.
 - A module not in the manifest, loaded twice, or loaded before the memory exists.
 - A module that does not compile, or does not instantiate: an import the host did not define, an
@@ -1051,13 +1055,14 @@ The values below are read from the files named; they are copied here for orienta
 
 | Name | Game manifest | Fixture manifest |
 | --- | --- | --- |
-| `memory_pages` | 4112 | 4 |
+| `memory_pages` | 5136 | 4 |
 | `table_size` | 528 | 64 |
 | `window` | 32768 | 65536 |
 | `table_slots` | 32 | 16 |
 | `stack_size` | 4096 | 4096 |
 | `block_base`, `block_size`, `block_max` | 1048576 (0x100000), 33554432, 268435456 | none |
 | `scratch` | `[983040, 65536]` (0xF0000) | none |
+| `load_data` | `[269484032, 67108864]` (0x10100000) | none |
 | `build_flags` | `-mno-nontrapping-fptoint` | none |
 | `fuel` | version 1 | none |
 | `majors` | one per interface header, as `wasm/modules.json` records them; they move with the headers | none |

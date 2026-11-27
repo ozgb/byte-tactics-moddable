@@ -393,6 +393,10 @@ static int check_layout(wl_loader* loader)
             set_error(loader, "module %s: window [%#x, %#x) reaches the scratch area at %#x", an, (unsigned)a_low, (unsigned)a_high, l->scratch_base);
             return 0;
         }
+        if (l->has_load_data && a_high > l->load_data_base) {
+            set_error(loader, "module %s: window [%#x, %#x) reaches the load data at %#x", an, (unsigned)a_low, (unsigned)a_high, l->load_data_base);
+            return 0;
+        }
         for (b = a->next; b; b = b->next) {
             const char* bn = wl_json_get(b, "name")->text;
             unsigned long long b_low = (unsigned long long)wl_json_get(b, "data_base")->number;
@@ -419,6 +423,7 @@ int wl_load_manifest_text(wl_loader* loader, const char* text, size_t size, cons
     const wl_json* list;
     const wl_json* entry;
     const wl_json* scratch;
+    const wl_json* load_data;
     wl_layout layout;
     char owner[128];
     memset(&layout, 0, sizeof layout);
@@ -472,6 +477,28 @@ int wl_load_manifest_text(wl_loader* loader, const char* text, size_t size, cons
         if ((unsigned long long)layout.scratch_base + layout.scratch_size > (unsigned long long)layout.pages * 65536ull
             || (layout.has_block && (unsigned long long)layout.scratch_base + layout.scratch_size > layout.block_base)) {
             set_error(loader, "%s: scratch [%#x, %#x) does not fit below the block", name, layout.scratch_base, layout.scratch_base + layout.scratch_size);
+            goto bad;
+        }
+    }
+    load_data = wl_json_get(root, "load_data");
+    if (load_data) {
+        unsigned long long end;
+        if (load_data->kind != WL_JSON_ARRAY || wl_json_count(load_data) != 2 || load_data->first->kind != WL_JSON_NUMBER
+            || load_data->first->next->kind != WL_JSON_NUMBER || load_data->first->number < 0 || load_data->first->next->number < 0) {
+            set_error(loader, "%s: load_data must be [base, size]", name);
+            goto bad;
+        }
+        layout.has_load_data = 1;
+        layout.load_data_base = (unsigned)load_data->first->number;
+        layout.load_data_size = (unsigned)load_data->first->next->number;
+        end = (unsigned long long)layout.load_data_base + layout.load_data_size;
+        if (end > (unsigned long long)layout.pages * 65536ull) {
+            set_error(loader, "%s: load_data [%#x, +%#x) does not fit the memory", name, layout.load_data_base, layout.load_data_size);
+            goto bad;
+        }
+        if ((layout.has_block && layout.load_data_base < (unsigned long long)layout.block_base + layout.block_max)
+            || layout.load_data_base < (unsigned long long)layout.scratch_base + layout.scratch_size) {
+            set_error(loader, "%s: load_data [%#x, +%#x) does not lie above the block and the scratch area", name, layout.load_data_base, layout.load_data_size);
             goto bad;
         }
     }

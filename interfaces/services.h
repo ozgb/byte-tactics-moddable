@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 4
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 1
+#define SERVICES_VERSION_MINOR 2
 
 // Advances the named random stream of the game logic (LIBCMT rand) and returns the next value, 0 to 0x7fff; the stream's state is in the block.
 int __cdecl GameRand(RandStream stream);
@@ -66,6 +66,21 @@ void __cdecl SimFree(void* p);
 void __stdcall RecordSimEvent(SimEventKind kind, unsigned int flags, const unsigned int* args, unsigned int count);
 // Reserves bytes zeroed bytes of the radar arena, writes their offset in the arena to offset and returns their address, or null when it is full.
 void* SimCaptureAlloc(unsigned int bytes, unsigned int* offset);
+
+// A table of the frames of a GAF animation: load data the host maps into the shared memory outside the block, which a module reads and never writes.
+struct FrameTable;
+// One frame of a GAF animation: its size, its offsets and its pixels.
+struct GafFrame;
+// The entry of a GAF animation whose frames a sequence steps through.
+struct GafEntry;
+// The cursor of a GAF sequence, in the block: the frame, the ticks left on it, whether it loops, and the entry.
+struct Handle;
+// Returns the frame of the given index of a frame table, or null when the index is outside the table.
+GafFrame* __stdcall GetGafFrame(FrameTable* table, int index);
+// Starts a sequence on an entry at a frame (the first when the index is outside the entry), with that frame's duration.
+void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);
+// Advances a sequence by a tick and returns 1 when it moved to the next frame (or ended), 0 when it stayed or has no entry.
+int __stdcall StepGafSequence(Handle* player);
 
 // Returns the network id of a player slot, or -1 when the slot is 10 or holds no player.
 int __stdcall GetSlotDpid(unsigned char index);

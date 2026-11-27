@@ -12,7 +12,12 @@ runs beside it: it reads a git bundle and the gate requests from the outbox as d
 --review starts a code review session: /work is mounted read-only, the broker pushes nothing and runs no gate, and
 the reviewer's report crosses as SESSION/review.md (broker.py, "Review hand-over"). --review-report
 R/review.md hands the report review session R took to the next implementer session as
-/srv/inbox/review.md, byte for byte; a file whose sha256 is not R/review.state is refused.
+/srv/inbox/review.md, byte for byte; a file whose sha256 is not R/review.state is refused. That check
+catches a mistaken edit, not a forgery: R's files are plain files on the host.
+
+After the session the proxy log is checked against the allowlist, and the result is written to
+SESSION/check-log.txt, ending `check-log: pass` or `check-log: fail`; a failure makes the exit status 5
+when the agent's was 0.
 
 Refusals, each exit status 2 before any VM exists: a mount that is, contains or sits inside this
 repository (except under build/scratch), another worktree of it, ~/.claude*, $CLAUDE_CONFIG_DIR, ~/.ta, ~/.ssh,
@@ -343,11 +348,11 @@ def remove_canary(name, runner=run):
 def broker_argv(session, game_dir=None, core_image=None, review=False):
     """Return the argv that starts broker.py for this session, with --game-dir and --core-image when given.
 
-    A review session's broker pushes nothing and runs no gate.
+    A review session's broker takes the report, pushes nothing and runs no gate.
     """
     argv = [sys.executable, str(HERE / "broker.py"), "serve", "--session", str(session)]
     if review:
-        return argv + ["--no-push", "--no-gate"]
+        return argv + ["--review"]
     if game_dir:
         argv += ["--game-dir", str(game_dir)]
     if core_image:
@@ -363,20 +368,43 @@ def broker_env():
 def hand_in_review(report, session):
     """Copy a review session's R/review.md into the session inbox as review.md, or raise Refusal.
 
-    The report must be the one the broker took, with the sha256 its review.state records.
+    The report must match the sha256 in R/review.state, which only a --review broker writes. This catches a
+    copy edited by mistake, not a forgery: both files are plain files on the host.
     """
     path = Path(report)
-    if path.name != broker.REVIEW_NAME or path.is_symlink() or not path.is_file():
-        raise Refusal(f"review report {path} is not a review session's regular {broker.REVIEW_NAME}")
-    state = path.parent / broker.REVIEW_STATE
-    if state.is_symlink() or not state.is_file():
-        raise Refusal(f"review report {path} has no {broker.REVIEW_STATE} beside it")
-    data = path.read_bytes()
-    if len(data) > broker.MAX_REVIEW:
-        raise Refusal(f"review report {path} is larger than {broker.MAX_REVIEW} bytes")
-    if hashlib.sha256(data).hexdigest() != state.read_text().strip():
-        raise Refusal(f"review report {path} is not the report the broker took")
+    if path.name != broker.REVIEW_NAME:
+        raise Refusal(f"review report {path} is not named {broker.REVIEW_NAME}")
+    try:
+        dir_fd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    except OSError as err:
+        raise Refusal(f"review report {path}: {err}") from err
+    try:
+        reads = {}
+        for name, limit in ((broker.REVIEW_NAME, broker.MAX_REVIEW), (broker.REVIEW_STATE, 1024)):
+            try:
+                fd, _ = broker.open_regular(name, dir_fd)
+                reads[name] = broker.read_limited(fd, limit)
+            except FileNotFoundError:
+                raise Refusal(f"review report {path}: no {name} in {path.parent}") from None
+            except (ValueError, OSError) as err:
+                raise Refusal(f"review report {path}: {name}: {err}") from err
+    finally:
+        os.close(dir_fd)
+    data = reads[broker.REVIEW_NAME]
+    if hashlib.sha256(data).hexdigest().encode() != reads[broker.REVIEW_STATE].strip():
+        raise Refusal(f"review report {path} is not the report its review session's broker took")
     broker.write_bytes_atomic(Path(session) / "inbox", broker.REVIEW_NAME, data)
+
+
+def record_check_log(session, proxy_log, allow, runner=run):
+    """Check the proxy log against the allowlist, write the outcome to SESSION/check-log.txt; return True on a pass."""
+    result = runner([sys.executable, str(HERE / "proxy.py"), "--check-log", str(proxy_log), "--allow", str(allow)],
+                    capture_output=True)
+    verdict = "pass" if result.returncode == 0 else f"fail (exit {result.returncode})"
+    (Path(session) / "check-log.txt").write_text(f"{result.stdout}{result.stderr}check-log: {verdict}\n")
+    sys.stdout.write(result.stdout)
+    sys.stderr.write(result.stderr)
+    return result.returncode == 0
 
 
 def start_session(args):
@@ -467,8 +495,9 @@ def start_session(args):
             run([str(SMOLVM), "machine", "stop", "--name", name], capture_output=True)
             run([str(SMOLVM), "machine", "delete", "--name", name, "--force"], capture_output=True)
         shutil.rmtree(sockdir, ignore_errors=True)
-    if proxy_log.exists():
-        run([sys.executable, str(HERE / "proxy.py"), "--check-log", str(proxy_log), "--allow", args.allow])
+    if proxy_log.exists() and not record_check_log(session, proxy_log, args.allow):
+        print("launch: the proxy log has requests off the allowlist (SESSION/check-log.txt)", file=sys.stderr)
+        status = status or 5
     return status
 
 

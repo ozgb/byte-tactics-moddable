@@ -395,11 +395,9 @@ class LaunchRefusalTests(unittest.TestCase):
         self.assertIn("/t:/work:ro", argv)
         self.assertNotIn("/t:/work", argv)
         review = ln.broker_argv("/s", "/g", "/i.smolmachine", review=True)
-        self.assertIn("--no-push", review)
-        self.assertIn("--no-gate", review)
+        self.assertIn("--review", review)
         self.assertNotIn("--core-image", review)
-        self.assertNotIn("--no-push", ln.broker_argv("/s"))
-        self.assertNotIn("--no-gate", ln.broker_argv("/s"))
+        self.assertNotIn("--review", ln.broker_argv("/s"))
         self.assertEqual(ln.broker_env()["WINEARCH"], "win64")
 
     def test_review_report_is_handed_in_byte_for_byte(self):
@@ -426,13 +424,27 @@ class LaunchRefusalTests(unittest.TestCase):
             retyped.write_bytes(b"# Findings\n1. x\n")
             renamed = reviewer / "notes.md"
             renamed.write_bytes(report.read_bytes())
-            for path in (link, retyped, renamed):
+            linked_dir = Path(tmp) / "linked"
+            linked_dir.symlink_to(reviewer)
+            for path in (link, retyped, renamed, linked_dir / bk.REVIEW_NAME):
                 with self.assertRaises(ln.Refusal):
                     ln.hand_in_review(path, session)
+            (reviewer / bk.REVIEW_STATE).write_bytes(b"\xff\xfe")
+            with self.assertRaises(ln.Refusal):
+                ln.hand_in_review(report, session)
+            bk.take_review(reviewer)
             report.write_bytes(b"# Findings\n1. x, edited\n")
             with self.assertRaises(ln.Refusal):
                 ln.hand_in_review(report, session)
             self.assertFalse((session / "inbox" / bk.REVIEW_NAME).exists())
+
+    def test_check_log_outcome_is_recorded(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for code, verdict in ((0, "check-log: pass"), (1, "check-log: fail (exit 1)")):
+                runner = lambda argv, **kw: subprocess.CompletedProcess(argv, code, "out\n", "")
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(ln.record_check_log(tmp, Path(tmp) / "proxy.log", "allow.txt", runner), code == 0)
+                self.assertTrue((Path(tmp) / "check-log.txt").read_text().endswith(verdict + "\n"))
 
     def test_review_and_review_report_exclude_each_other(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
@@ -660,6 +672,19 @@ class BrokerTests(unittest.TestCase):
         self.assertIsNone(bk.take_review(self.session))
         self.assertFalse((self.session / bk.REVIEW_NAME).exists())
         self.assertEqual((self.session / "broker.log").read_text().count("review refused"), 3)
+
+    def test_a_refusal_is_logged_once_per_reason(self):
+        (self.session / "outbox" / bk.REVIEW_NAME).write_bytes(b"\xff\xfe")
+        for _ in range(3):
+            self.assertIsNone(bk.take_review(self.session))
+        self.assertEqual((self.session / "broker.log").read_text().count("review refused"), 1)
+
+    def test_only_a_review_broker_takes_a_report(self):
+        (self.session / "outbox" / bk.REVIEW_NAME).write_text("# Findings\n")
+        bk.one_pass(self.session, gate=bk.stub_gate)
+        self.assertFalse((self.session / bk.REVIEW_NAME).exists())
+        bk.one_pass(self.session, gate=bk.no_gate, core_gate=bk.no_gate, review=True)
+        self.assertTrue((self.session / bk.REVIEW_NAME).exists())
 
     def test_symlinked_module_is_refused(self):
         self.request("link")

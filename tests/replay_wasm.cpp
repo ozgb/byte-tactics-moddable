@@ -29,12 +29,28 @@ char s_wasmPath[320];
 char s_directory[320];
 wl_loader* s_loader;
 int s_active;
-void (*s_trapHook)(const char* errorClass);
+void (*s_trapHook)(const char* errorClass, const char* text);
+
+}
+
+const char* ReplayWasmRefusal(const char* text)
+{
+    for (const char* p = strstr(text, "import "); p != nullptr; p = strstr(p + 1, "import "))
+        if (p == text || p[-1] == ' ' || p[-1] == '\n')
+            return p;
+    return nullptr;
+}
+
+namespace {
 
 const char* TrapClass(const char* text, bool outOfFuel)
 {
     if (outOfFuel || strstr(text, "ran out of fuel") != nullptr)
         return "out_of_fuel";
+    if (ReplayWasmRefusal(text) != nullptr)
+        return "import";
+    if (strstr(text, ": the handle table is full") != nullptr)
+        return "glue";
     if (strstr(text, "unreachable") != nullptr)
         return "unreachable";
     if (strstr(text, "out of bounds memory") != nullptr)
@@ -62,7 +78,7 @@ void __cdecl OnTrap(void* user, const char* module, const char* message)
         return;
     if (s_trapHook != nullptr) {
         unsigned budget;
-        s_trapHook(TrapClass(message, s_glue != nullptr && s_glue->outOfFuel(&budget) != 0));
+        s_trapHook(TrapClass(message, s_glue != nullptr && s_glue->outOfFuel(&budget) != 0), message);
     }
     sprintf(text, "%s trapped: %s", module, message);
     Stop(text);
@@ -110,7 +126,7 @@ const ModuleMemory* __stdcall ModulesMemory()
 void __stdcall ModulesFatal(const char* text)
 {
     if (s_trapHook != nullptr)
-        s_trapHook(TrapClass(text, false));
+        s_trapHook(TrapClass(text, false), text);
     printf("FAIL: %s: %s\n", s_wasmPath, text);
     exit(2);
 }
@@ -120,7 +136,7 @@ extern "C" void HOST_CALL host_log(const char* text)
     fputs(text, stdout);
 }
 
-void ReplayWasmSetTrapHook(void (*hook)(const char* errorClass))
+void ReplayWasmSetTrapHook(void (*hook)(const char* errorClass, const char* text))
 {
     s_trapHook = hook;
 }

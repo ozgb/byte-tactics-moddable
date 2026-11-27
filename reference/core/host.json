@@ -19,5 +19,110 @@
   ],
   "results": [
    ["replay", [["w Game.windCounter 0", "w Game.windSpeedDenominator 0", "w Game.windSpeedMin 0", "w Game.windSpeedMax 0", "w SimGlobals.g_meteorNextStrikeTime 0", "w SimGlobals.g_meteorSpawnMagnitude 0", "w SimGlobals.g_meteorSpawnInterval 0", "w SimGlobals.g_meteorActive 0", "w SimGlobals.g_meteorOrigin (0,0)", "w SimGlobals.g_meteorsEnabled 0", "w SimGlobals.g_meteorNextHitTime 0"], ["o params.weapon \"Meteor\"", "o params.radius 300", "o params.density f32:0x40000000", "o params.duration f32:0x40a00000", "o params.interval f32:0x42700000"], ["w SimGlobals.g_meteorWeaponName \"Meteor\"", "w SimGlobals.g_meteorSpawnMagnitude 300", "w SimGlobals.g_meteorSpawnInterval 15", "w SimGlobals.g_meteorShowerDuration 150", "w SimGlobals.g_meteorScheduleGap 1800"], ["w SimGlobals.g_meteorsEnabled 1"], ["w SimGlobals.g_meteorWeaponName \"hailstorm\"", "w SimGlobals.g_meteorSpawnMagnitude 2800", "w SimGlobals.g_meteorSpawnInterval 0", "w SimGlobals.g_meteorShowerDuration 1050", "w SimGlobals.g_meteorScheduleGap 1560"], ["w Game.windSpeedMin 2200", "w Game.windSpeedMax 4000"], ["w Game.windSpeedDenominator 5000"], ["w Game.windX 0", "w Game.windZ 0", "w Game.windEnabled 0"], ["w SimGlobals.g_meteorWeapon weapondef#226"], ["w Game.windCounter 180", "w Game.windX 4484", "w Game.windZ 1122", "w Game.windDirection 46636", "w Game.windSpeed 2311", "w Game.windStrength f32:0x3eeca57a", "w Game.windEnabled 1", "w rng.main 0x120f7e4f", "w rng.seed 0x3fa8b62c"], ["w SimGlobals.g_meteorNextStrikeTime 2611", "w SimGlobals.g_meteorActive 1", "w SimGlobals.g_meteorStrikeEndTime 1051", "w SimGlobals.g_meteorOrigin (17,232)", "w SimGlobals.g_meteorNextHitTime 1", "w SimGlobals.g_meteorTarget (26,246)", "w rng.main 0xce86cc55"], ["w Game.windEnabled 0"], ["w SimGlobals.g_meteorNextHitTime 2", "w rng.main 0x64934577"], [], ["w SimGlobals.g_meteorNextHitTime 3", "w rng.main 0x6bb157a9"], [], ["w SimGlobals.g_meteorNextHitTime 4", "w rng.main 0xce5c4b6b"], [], ["w SimGlobals.g_meteorNextHitTime 5", "w rng.main 0xbe5dad3d"], [], ["w SimGlobals.g_meteorNextHitTime 6", "w rng.main 0xaadf6d9f"], [], ["w SimGlobals.g_meteorNextHitTime 7", "w rng.main 0xc40f0111"], [], ["w SimGlobals.g_meteorNextHitTime 8", "w rng.main 0x60d98013"], [], ["w SimGlobals.g_meteorNextHitTime 9", "w rng.main 0x7f88c725"], [], ["w SimGlobals.g_meteorNextHitTime 10", "w rng.main 0xa04996c7"], [], ["w SimGlobals.g_meteorNextHitTime 11", "w rng.main 0x70e2b379"], [], ["w SimGlobals.g_meteorNextHitTime 12", "w rng.main 0xbb2505bb"], [], ["w SimGlobals.g_meteorNextHitTime 13", "w rng.main 0xd3dcba0d"], [], ["w SimGlobals.g_meteorNextHitTime 14", "w rng.main 0xf64b60ef"], [], ["w SimGlobals.g_meteorNextHitTime 15", "w rng.main 0x98730ee1"], [], ["w SimGlobals.g_meteorNextHitTime 16", "w rng.main 0x66ba7c63"], [], ["w SimGlobals.g_meteorNextHitTime 17", "w rng.main 0x49b225f5"], [], ["w SimGlobals.g_meteorNextHitTime 18", "w rng.main 0x2f026c17"], [], ["w SimGlobals.g_meteorNextHitTime 19", "w rng.main 0x56cab349"], [], ["w SimGlobals.g_meteorNextHitTime 20", "w rng.main 0x30f9840b"], [], ["w SimGlobals.g_meteorNextHitTime 21", "w rng.main 0x7265aadd"], [], ["w SimGlobals.g_meteorNextHitTime 22", "w rng.main 0x87b0583f"], [], ["w SimGlobals.g_meteorNextHitTime 23", "w rng.main 0xfc3840b1"], [], ["w SimGlobals.g_meteorNextHitTime 24", "w rng.main 0x5da5bcb3"], [], ["w SimGlobals.g_meteorNextHitTime 25", "w rng.main 0xa8d7e8c5"], [], ["w SimGlobals.g_meteorNextHitTime 26", "w rng.main 0xf33ac567"], [], ["w SimGlobals.g_meteorNextHitTime 27", "w rng.main 0xdbce5719"], [], ["w SimGlobals.g_meteorNextHitTime 28", "w rng.main 0xe966c65b"], [], ["w SimGlobals.g_meteorNextHitTime 29", "w rng.main 0x67ed7fad"], [], ["w SimGlobals.g_meteorNextHitTime 30", "w rng.main 0x24ab538f"], [], ["w SimGlobals.g_meteorNextHitTime 31", "w rng.main 0xa9e39681"], [], ["w SimGlobals.g_meteorNextHitTime 32", "w rng.main 0xdc484103"], [], ["w SimGlobals.g_meteorNextHitTime 33", "w rng.main 0x310f0f95"], [], ["w SimGlobals.g_meteorNextHitTime 34", "w rng.main 0xa9afa2b7"], [], ["w SimGlobals.g_meteorNextHitTime 35", "w rng.main 0x6a929ee9"], [], ["w SimGlobals.g_meteorNextHitTime 36", "w rng.main 0xac39ccab"], [], ["w SimGlobals.g_meteorNextHitTime 37", "w rng.main 0x02a9387d"], [], ["w SimGlobals.g_meteorNextHitTime 38", "w rng.main 0x151952df"], [], ["w SimGlobals.g_meteorNextHitTime 39", "w rng.main 0xf03a1051"], [], ["w SimGlobals.g_meteorNextHitTime 40", "w rng.main 0xaf8f0953"], [], ["w SimGlobals.g_meteorNextHitTime 41", "w rng.main 0x5eac9a65"], [], ["w SimGlobals.g_meteorNextHitTime 42", "w rng.main 0x395e0407"], [], ["w SimGlobals.g_meteorNextHitTime 43", "w rng.main 0xe9fc8ab9"], [], ["w SimGlobals.g_meteorNextHitTime 44", "w rng.main 0x9f7f96fb"], [], ["w SimGlobals.g_meteorNextHitTime 45", "w rng.main 0xe10dd54d"], [], ["w SimGlobals.g_meteorNextHitTime 46", "w rng.main 0x7317562f"], [], ["w SimGlobals.g_meteorNextHitTime 47", "w rng.main 0x8240ae21"], [], ["w SimGlobals.g_meteorNextHitTime 48", "w rng.main 0x2aa715a3"], [], ["w SimGlobals.g_meteorNextHitTime 49", "w rng.main 0x66458935"], [], ["w SimGlobals.g_meteorNextHitTime 50", "w rng.main 0x0382e957"], [], ["w SimGlobals.g_meteorNextHitTime 51", "w rng.main 0x8d311a89"], [], ["w SimGlobals.g_meteorNextHitTime 52", "w rng.main 0x9785254b"], [], ["w SimGlobals.g_meteorNextHitTime 53", "w rng.main 0xc1d0561d"], [], ["w SimGlobals.g_meteorNextHitTime 54", "w rng.main 0x7b025d7f"], [], ["w SimGlobals.g_meteorNextHitTime 55", "w rng.main 0x473c6ff1"], [], ["w SimGlobals.g_meteorNextHitTime 56", "w rng.main 0x76fd65f3"], [], ["w SimGlobals.g_meteorNextHitTime 57", "w rng.main 0x04aedc05"], [], ["w SimGlobals.g_meteorNextHitTime 58", "w rng.main 0x339b52a7"], [], ["w SimGlobals.g_meteorNextHitTime 59", "w rng.main 0xa3954e59"], [], ["w SimGlobals.g_meteorNextHitTime 60", "w rng.main 0x66d7779b"], [], ["w SimGlobals.g_meteorNextHitTime 61", "w rng.main 0x53e5baed"], [], ["w SimGlobals.g_meteorNextHitTime 62", "w rng.main 0xdb7768cf"], [], ["w SimGlobals.g_meteorNextHitTime 63", "w rng.main 0x2ab255c1"], [], ["w SimGlobals.g_meteorNextHitTime 64", "w rng.main 0xe43efa43"], [], ["w SimGlobals.g_meteorNextHitTime 65", "w rng.main 0x4efd92d5"], [], ["w SimGlobals.g_meteorNextHitTime 66", "w rng.main 0x0f643ff7"], [], ["w SimGlobals.g_meteorNextHitTime 67", "w rng.main 0x68ce2629"], [], ["w SimGlobals.g_meteorNextHitTime 68", "w rng.main 0x2e438deb"], [], ["w SimGlobals.g_meteorNextHitTime 69", "w rng.main 0x068303bd"], [], ["w SimGlobals.g_meteorNextHitTime 70", "w rng.main 0x0553781f"], [], ["w SimGlobals.g_meteorNextHitTime 71", "w rng.main 0xec675f91"], [], ["w SimGlobals.g_meteorNextHitTime 72", "w rng.main 0x3858d293"], [], ["w SimGlobals.g_meteorNextHitTime 73", "w rng.main 0x8286ada5"], [], ["w SimGlobals.g_meteorNextHitTime 74", "w rng.main 0x46dab147"], [], ["w SimGlobals.g_meteorNextHitTime 75", "w rng.main 0xd4c0a1f9"], [], ["w SimGlobals.g_meteorNextHitTime 76", "w rng.main 0xacd6683b"], [], ["w SimGlobals.g_meteorNextHitTime 77", "w rng.main 0xd91d308d"], [], ["w SimGlobals.g_meteorNextHitTime 78", "w rng.main 0x7bb38b6f"], [], ["w SimGlobals.g_meteorNextHitTime 79", "w rng.main 0xf0608d61"], [], ["w SimGlobals.g_meteorNextHitTime 80", "w rng.main 0xff77eee3"], [], ["w SimGlobals.g_meteorNextHitTime 81", "w rng.main 0xd4df2c75"], [], ["w SimGlobals.g_meteorNextHitTime 82", "w rng.main 0x443ba697"], [], ["w SimGlobals.g_meteorNextHitTime 83", "w rng.main 0x6b91c1c9"], [], ["w SimGlobals.g_meteorNextHitTime 84", "w rng.main 0x8fdd068b"], [], ["w SimGlobals.g_meteorNextHitTime 85", "w rng.main 0x2b69415d"], [], ["w SimGlobals.g_meteorNextHitTime 86", "w rng.main 0x23f4a2bf"], [], ["w SimGlobals.g_meteorNextHitTime 87", "w rng.main 0x0ee2df31"], [], ["w SimGlobals.g_meteorNextHitTime 88", "w rng.main 0xdc094f33"], [], ["w SimGlobals.g_meteorNextHitTime 89", "w rng.main 0x43dc0f45"], [], ["w SimGlobals.g_meteorNextHitTime 90", "w rng.main 0x7c041fe7"], [], ["w SimGlobals.g_meteorNextHitTime 91", "w rng.main 0x0da68599"], [], ["w SimGlobals.g_meteorNextHitTime 92", "w rng.main 0xc2e468db"], [], ["w SimGlobals.g_meteorNextHitTime 93", "w rng.main 0x8d5c362d"], [], ["w SimGlobals.g_meteorNextHitTime 94", "w rng.main 0x95b3be0f"], [], ["w SimGlobals.g_meteorNextHitTime 95", "w rng.main 0x64735501"], [], ["w SimGlobals.g_meteorNextHitTime 96", "w rng.main 0xd6b9f383"], [], ["w SimGlobals.g_meteorNextHitTime 97", "w rng.main 0x65925615"], [], ["w SimGlobals.g_meteorNextHitTime 98", "w rng.main 0xbcf11d37"], [], ["w SimGlobals.g_meteorNextHitTime 99", "w rng.main 0xc7a3ed69"], [], ["w SimGlobals.g_meteorNextHitTime 100", "w rng.main 0xbfb98f2b"], [], ["w SimGlobals.g_meteorNextHitTime 101", "w rng.main 0x8f2b0efd"], [], ["w SimGlobals.g_meteorNextHitTime 102", "w rng.main 0x6acddd5f"], [], ["w SimGlobals.g_meteorNextHitTime 103", "w rng.main 0x21d6eed1"], [], ["w SimGlobals.g_meteorNextHitTime 104", "w rng.main 0xae76dbd3"], [], ["w SimGlobals.g_meteorNextHitTime 105", "w rng.main 0x385700e5"], [], ["w SimGlobals.g_meteorNextHitTime 106", "w rng.main 0x7fff9e87"], [], ["w SimGlobals.g_meteorNextHitTime 107", "w rng.main 0xa26ef939"], [], ["w SimGlobals.g_meteorNextHitTime 108", "w rng.main 0xde69797b"], [], ["w SimGlobals.g_meteorNextHitTime 109", "w rng.main 0x914acbcd"], [], ["w SimGlobals.g_meteorNextHitTime 110", "w rng.main 0x8f6000af"], [], ["w SimGlobals.g_meteorNextHitTime 111", "w rng.main 0x5c12aca1"], [], ["w SimGlobals.g_meteorNextHitTime 112", "w rng.main 0x286d0823"], [], ["w SimGlobals.g_meteorNextHitTime 113", "w rng.main 0xf2bf0fb5"], [], ["w SimGlobals.g_meteorNextHitTime 114", "w rng.main 0x386ca3d7"], [], ["w SimGlobals.g_meteorNextHitTime 115", "w rng.main 0x732ca909"], [], ["w SimGlobals.g_meteorNextHitTime 116", "w rng.main 0xa54127cb"], [], ["w SimGlobals.g_meteorNextHitTime 117", "w rng.main 0x94706c9d"], [], ["w SimGlobals.g_meteorNextHitTime 118", "w rng.main 0x91c727ff"], [], ["w SimGlobals.g_meteorNextHitTime 119", "w rng.main 0xdc6b8e71"], [], ["w SimGlobals.g_meteorNextHitTime 120", "w rng.main 0x60097873"], [], ["w SimGlobals.g_meteorNextHitTime 121", "w rng.main 0xd39f8285"], [], ["w SimGlobals.g_meteorNextHitTime 122", "w rng.main 0xa3b52d27"], [], ["w SimGlobals.g_meteorNextHitTime 123", "w rng.main 0xab41fcd9"], [], ["w SimGlobals.g_meteorNextHitTime 124", "w rng.main 0x18cd9a1b"], [], ["w SimGlobals.g_meteorNextHitTime 125", "w rng.main 0x0990f16d"], [], ["w SimGlobals.g_meteorNextHitTime 126", "w rng.main 0xf2a0534f"], [], ["w SimGlobals.g_meteorNextHitTime 127", "w rng.main 0xf0669441"], [], ["w SimGlobals.g_meteorNextHitTime 128", "w rng.main 0x16f92cc3"], [], ["w SimGlobals.g_meteorNextHitTime 129", "w rng.main 0xf20d5955"], [], ["w SimGlobals.g_meteorNextHitTime 130", "w rng.main 0x19963a77"], [], ["w SimGlobals.g_meteorNextHitTime 131", "w rng.main 0x2853f4a9"], [], ["w SimGlobals.g_meteorNextHitTime 132", "w rng.main 0x0bdbd06b"], [], ["w SimGlobals.g_meteorNextHitTime 133", "w rng.main 0xa1e15a3d"], [], ["w SimGlobals.g_meteorNextHitTime 134", "w rng.main 0x74c8829f"], [], ["w SimGlobals.g_meteorNextHitTime 135", "w rng.main 0x39c8be11"], [], ["w SimGlobals.g_meteorNextHitTime 136", "w rng.main 0x05292513"], [], ["w SimGlobals.g_meteorNextHitTime 137", "w rng.main 0x0d5d9425"], [], ["w SimGlobals.g_meteorNextHitTime 138", "w rng.main 0xdc0ccbc7"], [], ["w SimGlobals.g_meteorNextHitTime 139", "w rng.main 0x04479079"], [], ["w SimGlobals.g_meteorNextHitTime 140", "w rng.main 0x6f78cabb"], [], ["w SimGlobals.g_meteorNextHitTime 141", "w rng.main 0x1ed6a70d"], [], ["w SimGlobals.g_meteorNextHitTime 142", "w rng.main 0x6d5cb5ef"], [], ["w SimGlobals.g_meteorNextHitTime 143", "w rng.main 0x7e970be1"], [], ["w SimGlobals.g_meteorNextHitTime 144", "w rng.main 0x28c66163"], [], ["w SimGlobals.g_meteorNextHitTime 145", "w rng.main 0x5d2532f5"], [], ["w SimGlobals.g_meteorNextHitTime 146", "w rng.main 0x6755e117"], [], ["w SimGlobals.g_meteorNextHitTime 147", "w rng.main 0x6541d049"], [], ["w SimGlobals.g_meteorNextHitTime 148", "w rng.main 0xa2f1890b"], [], ["w SimGlobals.g_meteorNextHitTime 149", "w rng.main 0x2225d7dd"], [], ["w SimGlobals.g_meteorNextHitTime 150", "w rng.main 0x13b9ed3f"]]]
+  ]},
+ {"name": "import_pointer",
+  "calls": [
+   ["replay", "host/import_pointer.txt", "host/wind_meteors_import_pointer.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import FatalError: pointer argument 0 is outside the module memory"}]
+  ]},
+ {"name": "import_pointer_last",
+  "calls": [
+   ["replay", "host/import_pointer_last.txt", "host/wind_meteors_import_pointer_last.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import BuildDataPath: pointer argument 3 is outside the module memory"}]
+  ]},
+ {"name": "import_buffer_size",
+  "calls": [
+   ["replay", "host/import_buffer_size.txt", "host/wind_meteors_import_buffer_size.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import TdfRecord_GetFieldString: the buffer size is below 1"}]
+  ]},
+ {"name": "import_buffer_past",
+  "calls": [
+   ["replay", "host/import_buffer_past.txt", "host/wind_meteors_import_buffer_past.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import TdfRecord_GetFieldString: the buffer runs past the module memory"}]
+  ]},
+ {"name": "import_null_handle",
+  "calls": [
+   ["replay", "host/import_null_handle.txt", "host/wind_meteors_import_null_handle.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import TdfRecord_GetFieldInt: null handle"}]
+  ]},
+ {"name": "import_unknown_handle",
+  "calls": [
+   ["replay", "host/import_unknown_handle.txt", "host/wind_meteors_import_unknown_handle.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import TdfRecord_GetFieldInt: unknown handle 2"}]
+  ]},
+ {"name": "import_stale_handle",
+  "calls": [
+   ["replay", "host/import_stale_handle.txt", "host/wind_meteors_import_stale_handle.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import TdfRecord_GetFieldInt: unknown handle 1"}]
+  ]},
+ {"name": "handles_32",
+  "calls": [
+   ["replay", "host/handles_32.txt", "host/wind_meteors_handles_32.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 32", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "handles_full",
+  "calls": [
+   ["replay", "host/handles_full.txt", "host/wind_meteors_handles_full.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "glue", "modules": ["wind_meteors"], "message": "wind_meteors: the handle table is full"}]
+  ]},
+ {"name": "import_string_cut",
+  "calls": [
+   ["replay", "host/import_string_cut.txt", "host/wind_meteors_import_string_cut.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"Me\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "emit_size",
+  "calls": [
+   ["replay", "host/emit_size.txt", "host/wind_meteors_emit_size.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the size is outside an effect"}]
+  ]},
+ {"name": "emit_past",
+  "calls": [
+   ["replay", "host/emit_past.txt", "host/wind_meteors_emit_past.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the effect runs past the module memory"}]
+  ]},
+ {"name": "emit_kind",
+  "calls": [
+   ["replay", "host/emit_kind.txt", "host/wind_meteors_emit_kind.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the kind is not in the module's publishes table"}]
+  ]},
+ {"name": "emit_payload_size",
+  "calls": [
+   ["replay", "host/emit_payload_size.txt", "host/wind_meteors_emit_payload_size.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the size is not the payload's size of its kind"}]
+  ]},
+ {"name": "emit_weapon",
+  "calls": [
+   ["replay", "host/emit_weapon.txt", "host/wind_meteors_emit_weapon.wasm"]
+  ],
+  "results": [
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the weapon slot is outside the table of weapons"}]
   ]}
 ]}

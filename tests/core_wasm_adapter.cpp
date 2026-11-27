@@ -34,6 +34,12 @@ void WL_CALL Trap(void*, const char*, const char*)
 {
 }
 
+const char* WL_CALL Mix(void*, wasmtime_val_raw_t* a)
+{
+    a[0].i32 = a[0].i32 + 10 * a[1].i32 + 100 * a[2].i32;
+    return 0;
+}
+
 void Fail(const char* what)
 {
     fprintf(stderr, "core_wasm_adapter: %s\n", what);
@@ -368,6 +374,9 @@ void DoCall(int argc, char** argv)
         raw[i - 3].i32 = (int)strtol(argv[i], 0, 10);
     unsigned params = 0, results = 1;
     Signature(*m, argv[2], &params, &results);
+    wasmtime_func_t func;
+    if (wl_export_func(s_loader, m->module, argv[2], &func) && wl_slot_result(m->module, &func) >= 0)
+        results = (unsigned)wl_slot_result(m->module, &func);
     if (Invoke(m, argv[2], raw)) {
         char json[64];
         if (results)
@@ -439,7 +448,7 @@ void Run(const char* callsPath)
                 LoaderErrorLine("manifest");
             Line("manifest", "null");
         } else if (strcmp(call, "memory") == 0) {
-            if (!wl_create_memory(s_loader))
+            if (!wl_create_memory(s_loader) || !wl_define_import(s_loader, "fixture", "mix", "iii>i", Mix, 0))
                 LoaderErrorLine("memory");
             Line("memory", "null");
         } else if (strcmp(call, "load") == 0) {

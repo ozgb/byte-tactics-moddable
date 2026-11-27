@@ -259,6 +259,8 @@ class Echo(unittest.TestCase):
             script, calls, out = Path(tmp) / "echo.py", Path(tmp) / "calls", Path(tmp) / "out"
             script.write_text(ECHO)
             for v in coregate.stored(["host"])["host"]["vectors"]:
+                if v["calls"][0][2] != "module.wasm":
+                    continue
                 full = coregate.ROOT / "tests" / "replay" / "wind_meteors" / Path(v["calls"][0][1]).name
                 calls.write_text(coregate.calls_text([["replay", str(full), "module.wasm"]]))
                 subprocess.run([sys.executable, str(script), "host", str(calls), str(out)], check=True)
@@ -271,7 +273,9 @@ class Echo(unittest.TestCase):
             result = coregate.judge(lambda inputs: [sys.executable, str(script)], coregate.ROOT / "tools" / "coregate.py",
                                     ("host",))
         self.assertEqual(result["groups"]["host"]["status"], "differs")
-        self.assertTrue(all(v["status"] == "differs" for v in result["vectors"].values()))
+        recorded = {"host/" + v["name"] for v in coregate.stored(["host"])["host"]["vectors"] if v["calls"][0][2] == "module.wasm"}
+        self.assertTrue(recorded)
+        self.assertTrue(all(result["vectors"][name]["status"] == "differs" for name in recorded))
 
 
 @unittest.skipUnless(ENGINE and shutil.which("wine"), "needs the modern build's adapters and wine")

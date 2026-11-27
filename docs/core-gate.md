@@ -46,7 +46,7 @@ the wrong call, or a missing one, is `differs`.
 | `commands` | the delivery of the commands of a tick (`docs/commands.md`, sections 1 and 2): their order and the tick each precedes |
 | `loader` | the manifest and module checks of `docs/module-abi.md`, section 5.2, and the start-up errors and traps of section 13 |
 | `fuel` | the fuel of section 11: the budget set for each tick, the fuel left, and the call at which a module runs out |
-| `host` | hosting a module: the recordings of `tests/replay/wind_meteors/` replayed against a wind_meteors module, as `docs/replay-format.md` states ("Replaying") |
+| `host` | hosting a module: the recordings of `tests/replay/wind_meteors/` replayed against a wind_meteors module, as `docs/replay-format.md` states ("Replaying"), and the import refusals and the full handle table of `docs/module-abi.md` sections 8.1 and 13 on fixture modules |
 | `files` | the files gate (`docs/files-gate.md`), with its own groups |
 | `console` | reading a console line (`docs/commands.md`, section 3) and the events of the commands of section 4.2 that need nothing but a stated match setup |
 | `runtime` | the results of the runtime calls of the game logic: the entries of the runtime vectors, one call per record |
@@ -139,6 +139,11 @@ lines are the `commands.txt` the in-repo engine wrote for them.
 The two groups share their calls. A vector's manifest and modules are files of `reference/core/loader/` or
 `reference/core/fuel/`, made from the WebAssembly text beside each module (`NAME.wat`), with the fuel pass of
 `docs/module-abi.md` section 11 applied to the modules of the fuel group. The manifests have the layout of section 4.
+Section 5.2's refusals of the numbers are vectors for each number a manifest has: `stack_size` (`manifest_stack_negative`,
+`manifest_stack_fraction`), `fuel_budget` (`manifest_fuel_negative`, `manifest_fuel_fraction`, `manifest_fuel_text`, and
+`manifest_fuel_zero`, since section 11.3's range starts at 1) and `size_budget` (`manifest_size_budget_negative`,
+`manifest_size_budget_fraction`). `manifest_pages_max` accepts `memory_pages` 65536 with the block at its ceiling and
+a `fuel_budget` of 2147483647, and the fuel group's `budget_max` runs a module on that budget.
 
 | Call | Arguments | Value |
 | --- | --- | --- |
@@ -168,7 +173,7 @@ Every error ends the run (section 13), so it is the last line. Only a module who
 
 | Class | Section | When |
 | --- | --- | --- |
-| `manifest` | 5.2, 10 | the manifest is not valid JSON or not an object (a number anywhere in it that has a fraction or an exponent, as `4096.5`, `4096.0` or `1e3`, or is above 2147483647, makes it invalid JSON: `manifest_data_base_fraction`), a required number of section 4.1 (`memory_pages`, `table_size`, `window`, `table_slots`) is missing, a value is not a non-negative integer (a negative `data_base` or `table_base` of a module entry included), `memory_pages` or `window` is 0 or `memory_pages` above 65536, `block_base` comes without `block_size`, `scratch` is not `[base, size]`; and at `load`, a refusal of the interface majors (section 10.2: a module built against a major the manifest's does not match, with no adapter), whose `modules` is empty |
+| `manifest` | 5.2, 10 | the manifest is not valid JSON or not an object (a number anywhere in it that has a fraction or an exponent, as `4096.5`, `4096.0` or `1e3`, or is above 2147483647, makes it invalid JSON: `manifest_data_base_fraction`), a required number of section 4.1 (`memory_pages`, `table_size`, `window`, `table_slots`) is missing, a value is not a non-negative integer (a negative `data_base` or `table_base` of a module entry included), `memory_pages` or `window` is 0 or `memory_pages` above 65536, `stack_size` is not a non-negative integer, `block_base` comes without `block_size`, `scratch` is not `[base, size]`, a module entry's `fuel_budget` is not an integer from 1 to 2147483647 or its `size_budget` not a non-negative integer; and at `load`, a refusal of the interface majors (section 10.2: a module built against a major the manifest's does not match, with no adapter, or an adapter of section 10.2 that is refused), whose `modules` is empty |
 | `layout` | 5.2 | the block or the scratch area does not fit the memory, the scratch area passes the block base, or `block_max` is below `block_size` |
 | `module_entry` | 5.2 | `modules` missing, not a list or empty, an entry that is not an object or has no name, a name listed twice, a missing `data_base` or `table_base`, `exports` or `data` present and not a list of names |
 | `window` | 5.2 | a module's window does not fit the memory, or its table range does not fit the table |
@@ -187,8 +192,30 @@ Every error ends the run (section 13), so it is the last line. Only a module who
 | `stack` | 13 | the engine's stack overflows |
 | `out_of_fuel` | 13 | the module's counter went below zero (section 11) |
 
-The host defines no import beyond the memory and the table, so every fixture module imports only those, except the
-ones that refuse to instantiate.
+Beyond the memory and the table, the host defines one import at `memory`, `fixture.mix`, of the signature
+`[[int, int, int], int]`: it returns a + 10 * b + 100 * c of its arguments a, b and c, in i32 arithmetic that wraps. The
+fixture modules import nothing else, except the ones that refuse to instantiate. `host_import` calls it unadapted.
+
+**NaN.** `nan_canonical` returns and stores computed NaNs (section 3.2): f32 0/0, -1/0 (an infinity, -8388608), a NaN
+with a payload plus 1 (of either sign), the square root of -1, and an f64 0/0 and -5/0 (an infinity) stored to memory
+and read back as two words. Every NaN is the canonical one, 2143289344 (0x7fc00000), and 0 then 2146959360 (0x7ff80000)
+for the f64.
+
+**Adapters** (section 10.2). A module built against major 1 of an interface whose manifest major is 2 loads only
+through an adapter of its entry, and each refusal is a `manifest` error at `load`, with `modules` empty:
+
+| Vector | What it judges |
+| --- | --- |
+| `adapter_slot` | four adapted slots of `adapt.wasm`: `f` called with two arguments reaches the module's three as `[1, 0, {"const": 7}]` (2, 3 gives 723); `g` with none gets the constant 4 and returns the constant 9; `h` returns nothing (`"void"`) though the module's returns an int; `f16` passes 16 arguments reversed |
+| `adapter_import` | an adapted import: the module's `fixture.mix` of two parameters reaches the host's of three as `[1, {"const": 5}, 0]` (2, 3 gives 253) |
+| `adapter_none` | a slot that changed with no adapter |
+| `adapter_kind`, `adapter_const_kind` | an `args` entry that changes a parameter's kind (`linear` to `int`), a constant for a parameter that is not `int` |
+| `adapter_index`, `adapter_index_negative` | an `args` index at or past the caller's parameter count, or negative |
+| `adapter_args_length` | `args` of another length than the callee's parameters |
+| `adapter_result_form`, `adapter_result_const_kind`, `adapter_result_pass_void`, `adapter_result_pass_kind`, `adapter_result_void` | a `result` that is not `"pass"`, `"void"` or `{"const": n}`; a constant for a result that is not `int`; `"pass"` when the caller's result is `void`, or of another kind; `"void"` when the caller expects a result |
+| `adapter_values` | a signature of 17 parameters (the most is 16) |
+| `adapter_import_undefined`, `adapter_import_signature` | an adapted import the host does not define, or defines with another signature than the manifest's |
+| `major_not_number` | a module's major that is not a number |
 
 A `block_size` without `block_base` is no block, and is not refused. `exports` and `data` may be left out of an entry: the
 module is then loaded with no slots and no data words, and `call` still reaches any function the module exports, since
@@ -199,13 +226,13 @@ counter's initial value, 9223372036854775807, which its calls lower as they burn
 
 1. the manifest as a whole: valid JSON (so a number with a fraction or an exponent, wherever it is, is a fault of this
    step, before any `layout` fault) and an object, then the required numbers in the order `memory_pages`, `table_size`,
-   `window`, `table_slots`, then their ranges (`manifest`);
+   `window`, `table_slots`, then `stack_size`, then their ranges (`manifest`);
 2. the block, when `block_base` is present: `block_base` and `block_size` (`manifest`), then `block_max`, then whether
    the block fits the memory (`layout`);
 3. `scratch`: its form (`manifest`), then whether it fits the memory and lies below the block base (`layout`);
 4. `modules` (`module_entry`), then each entry in the manifest's order, each one whole before the next: an object with
-   a name, `data_base` and then `table_base` (missing: `module_entry`; negative: `manifest`), `exports` and then
-   `data`, then a name an earlier entry has (`module_entry`);
+   a name, `data_base` and then `table_base` (missing: `module_entry`; negative: `manifest`), `fuel_budget` and then
+   `size_budget` (`manifest`), `exports` and then `data`, then a name an earlier entry has (`module_entry`);
 5. once every entry is read, each module in the manifest's order: its window and table range (`window`), its window
    against the block base and then the scratch base (`window_reaches`), then its overlap with each later module in
    turn, each pair checked memory first and then table before the next pair (`overlap`). So a `window` or
@@ -233,7 +260,8 @@ The gate makes no `call` or `fuel` call that names a module not loaded, and no `
 
 The recording, in `reference/core/host/`, is a file of `tests/replay/wind_meteors/` with what the core must produce taken
 out: every `w` line and every closing `o` line (`docs/replay-format.md`, "Lines") is withheld, and the rest (the `call`
-lines, the `r`, `a`, `i` and `c` lines, and each import's own `o` lines) is kept in order. The module is `module.wasm`.
+lines, the `r`, `a`, `i` and `c` lines, and each import's own `o` lines) is kept in order. The module is `module.wasm`,
+except for the refusal vectors below.
 The core replays the recording as `docs/replay-format.md` states: it restores each `r` line, builds the slot's arguments
 from the `a` lines (an event payload as "Event arguments", "The payload in memory", states), calls the slot of its
 module, answers each import from its `i` and its own `o` lines, and writes, for the call, the fields of the write set
@@ -242,7 +270,30 @@ own arguments and returned. The last known value of a field is as `docs/replay-f
 the `w` lines the core wrote in place of the withheld ones. The expected values are the lines the gate withheld, which the in-repo engine writes
 when it runs its own wind_meteors module on the same input, so a core passes only by running the module and reading
 what it wrote: the stored lines are not in its input (`tools/test_coregate.py` checks that a core that echoes the lines
-of a recording fails). A trap or running out of fuel ends the run with an error of the loader classes.
+of a recording fails). A trap or running out of fuel ends the run with an error of the loader classes, and two errors
+of section 13 end it with an error that also carries the text: an import's refusal, `{"error": "import", "modules":
+["wind_meteors"], "message": TEXT}`, where TEXT is section 13's text from `import ` to the end of its line, and a full
+handle table (section 8.1), `{"error": "glue", "modules": ["wind_meteors"], "message": "wind_meteors: the handle
+table is full"}`.
+
+**The refusal vectors.** Each replays a short recording of `reference/core/host/` against a fixture module beside it,
+`wind_meteors_<vector>.wasm`, made from its `.wat` with the fuel pass. A fixture is shaped as a wind_meteors module of
+the game manifest (`wasm/modules.json`): it imports the memory, the table and the services it calls, exports the four
+data words at 0x30000 to 0x3000c and the eight slots, and does in one slot what its vector judges:
+
+| Vector | Slot and imports | Value |
+| --- | --- | --- |
+| `import_pointer` | `FatalError(-16)` | `import FatalError: pointer argument 0 is outside the module memory` |
+| `import_pointer_last` | `BuildDataPath` with argument 3 the memory's size, the first address past it | `import BuildDataPath: pointer argument 3 is outside the module memory` |
+| `import_buffer_size` | `TdfRecord_GetFieldString` with `size` 0 | `import TdfRecord_GetFieldString: the buffer size is below 1` |
+| `import_buffer_past` | `TdfRecord_GetFieldString` with a buffer of 5 bytes 4 below the memory's end | `import TdfRecord_GetFieldString: the buffer runs past the module memory` |
+| `import_null_handle` | `TdfRecord_GetFieldInt` of handle 0 | `import TdfRecord_GetFieldInt: null handle` |
+| `import_unknown_handle` | `TdfFile_LoadFile` issues handle 1, then `TdfRecord_GetFieldInt` of handle 2 | `import TdfRecord_GetFieldInt: unknown handle 2` |
+| `import_stale_handle` | the first call keeps handle 1 in a static, the second passes it back: the table was cleared when the first returned | `import TdfRecord_GetFieldInt: unknown handle 1` |
+| `handles_32` | `LoadMeteorDefaults` gets a root record and 31 `TdfFile_SelectRecord` results, 32 distinct records in one call, and writes the last handle to `params.radius` | `o params.radius 32`: 32 handles fit, numbered from 1 |
+| `handles_full` | as `handles_32`, with a 33rd record | `wind_meteors: the handle table is full` (class `glue`) |
+| `import_string_cut` | `LoadMeteorDefaults` reads the field `Meteor` with `size` 3 into `params.weapon` | `o params.weapon "Me"`: the copy is cut to `size` - 1 bytes and a 0 |
+| `emit_size`, `emit_past`, `emit_kind`, `emit_payload_size`, `emit_weapon` | `Emit` of a SPAWN of 3 bytes, of one that runs past the memory, of kind 81, of 40 bytes, and of weapon 256 | section 13's five `Emit` texts |
 
 The gate never gives the core the in-repo engine's wind_meteors module. The module is the one that comes with the
 core's submission (below): the clean room's own, which the module gate has judged.
@@ -454,7 +505,8 @@ Lifting the freeze removes the header rows.
   nothing but the match setup it states; the others wait for the scenario mode too.
 - **The limit of 20 words** of a console line changes nothing any command of the `console` group reads (none reads
   past word 5, and none compares the count of words with a number above 6), so no vector can tell it apart.
-- **The radar arena** of `docs/sim-events.md` is not called: its snapshots are written by the logic of los_radar.
+- **The radar arena** of `docs/sim-events.md` is judged by no group: its snapshots are written by the logic of
+  los_radar, so only the scenario mode reaches it, once los_radar is a module. A core may leave it out until then.
 - **A link into a path order** in the hash group: the rule that hashes a `link:` value of 2^31 or more is stated
   (`docs/trace-format.md`), but no dump of the scenarios searched (each scenario at two points, and the order
   scenarios at ten to twenty ticks) holds one.
@@ -463,7 +515,20 @@ Lifting the freeze removes the header rows.
 - **The stack-depth limit:** the `stack` class is judged by `trap_stack`, which recurses without end, so any limit
   passes it. How deep a module may call before the engine's stack overflows (the host's, not the module's
   `stack_size`, which nothing guards, `docs/module-abi.md` section 2.2) is not judged.
-- **The services a module imports** (`docs/module-abi.md`, section 9.3), and the import refusals and glue errors of
-  section 13, are judged by the `host` group only as far as the recordings call them; the loader's fixture modules import
-  nothing but the memory and the table.
-- **Hidden state** (section 12) is checked by the module gate on each module, not here.
+- **The services a module imports** (`docs/module-abi.md`, section 9.3) are judged by the `host` group only as far as
+  the recordings call them. Of the import refusals of section 13, the `host` group judges every one but two:
+  `returned a buffer other than the one it was given` (`BuildDataPath`) and `returned a weapon outside the sim block`
+  (`FindWeaponByName`) are refusals of the result of the engine's own service, and a replay answers each import from
+  its recording, which gives the result the engine gave, always the buffer and a weapon of the block. A core checks
+  them in its own services, and only the scenario mode reaches them. The glue errors of a slot (`slot <name>: ...`)
+  are judged by no group.
+- **Hidden state** (section 12) is checked by the module gate on each module. No group of the core gate runs a module
+  over ticks with its statics hashed (a replay doesn't check them: `import_stale_handle` keeps a static between calls),
+  so a core's own check, and its error text, are judged only by the scenario mode.
+- **`memory` at 65536 pages** is not judged: `manifest_pages_max` accepts the manifest, but the in-repo engine is a
+  32-bit program that can't create 4 GiB of memory, so no vector calls `memory` on it. A core must not need 4 GiB of
+  RAM for it (a reserved, untouched memory is enough), since a grader may have less.
+- **Numbers above 2147483647** in a manifest are refused as invalid JSON (section 4.1), so no vector holds a larger
+  `fuel_budget` or `size_budget`.
+- **Runtime results at large sizes:** a `sprintf` width or precision above 4096 and a `shuffle` of more than 2^24
+  elements are in no record (`tests/runtime/vectors/README.md`, "Left out"), and a core may refuse them.

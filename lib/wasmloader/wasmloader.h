@@ -88,6 +88,7 @@ int WL_CALL wl_export_memory(wl_loader* loader, const wl_module* module, const c
 int WL_CALL wl_table_entry(wl_loader* loader, unsigned index, wasmtime_val_t* value);
 int WL_CALL wl_call(wl_loader* loader, const wl_module* module, const wasmtime_func_t* func, wasmtime_val_raw_t* args_and_results, size_t count);
 unsigned WL_CALL wl_table_filled(const wl_module* module);
+int WL_CALL wl_slot_result(const wl_module* module, const wasmtime_func_t* func);
 
 #ifdef __cplusplus
 }

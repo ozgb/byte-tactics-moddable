@@ -1,0 +1,69 @@
+bt-replay 2
+subsystem wind_meteors 3.1
+call 0 LoadMeteorDefaults
+  i services.TdfFile_Construct file#1
+  i services.TdfFile_LoadFile file#1 "a.tdf" = 1
+  o file#1.root rec#1
+  o file#1.current null
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#2
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#3
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#4
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#5
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#6
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#7
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#8
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#9
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#10
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#11
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#12
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#13
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#14
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#15
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#16
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#17
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#18
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#19
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#20
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#21
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#22
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#23
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#24
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#25
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#26
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#27
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#28
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#29
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#30
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#31
+  i services.TdfFile_SelectRecord file#1 "r" = 1
+  o file#1.current rec#32

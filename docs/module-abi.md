@@ -265,7 +265,7 @@ manifest per run.
 | `table_size` | entries in the shared table | loader, required |
 | `window` | bytes of every module window, more than 0 | loader, required |
 | `table_slots` | table entries of every module range | loader, required |
-| `stack_size` | bytes of every module stack | host and checks (the loader accepts it) |
+| `stack_size` | bytes of every module stack | host and checks (the loader checks only that it is a non-negative integer) |
 | `block_base`, `block_size`, `block_max` | the state block: `block_base` needs `block_size` (a `block_size` without `block_base` is ignored, and there is no block); `block_max`, optional, at least `block_size` (the default), is the most the block can grow to | loader |
 | `scratch` | `[base, size]` of the scratch area | loader |
 | `majors`, `signatures`, `adapters` | section 10 | loader |
@@ -290,8 +290,8 @@ valid JSON to the loader, so the whole manifest is refused as not valid JSON. A 
 | `slots` | `{slot: [[argument kinds], result kind]}` | loader (adapters); checks |
 | `imports` | `{group: {import: [[argument kinds], result kind]}}` | loader (adapters); checks |
 | `publishes` | `{kind: payload size}`, the kinds the module may publish through `Emit` (the kind as a decimal string, the size in bytes; wind_meteors': `{"80": 36}`); each kind is an effect of the entry's `interface` header and the size is that kind's payload size | host (the `Emit` import); checks |
-| `fuel_budget` | fuel per tick, section 11 | host; checks |
-| `size_budget` | the most bytes the `.wasm` may be | checks |
+| `fuel_budget` | fuel per tick, section 11 | host; loader (its range, 11.3); checks |
+| `size_budget` | the most bytes the `.wasm` may be | checks; loader (a non-negative integer) |
 | `cxx`, `c` | source files of the module in the reference repository | the reference build only; the kit's manifest leaves them out |
 
 A kind is one of `int`, `f32`, `f64`, `void` (a result only), `linear`, `block`, `scratch`, `handle`
@@ -324,8 +324,9 @@ them at start-up (section 13). When a manifest has more than one fault, the load
 `docs/core-gate.md`, "loader and fuel", states.
 
 - A manifest that is not valid JSON (a number with a fraction or an exponent included, section 4.1) or not an
-  object; a required field missing; a value that is not a non-negative integer; `memory_pages` or `window` zero, or
-  `memory_pages` over 65536; a `scratch` that is not `[base, size]`.
+  object; a required field missing; a value that is not a non-negative integer (`stack_size`, and a module's
+  `fuel_budget` and `size_budget`, included); `memory_pages` or `window` zero, or `memory_pages` over 65536; a
+  `fuel_budget` of 0 (section 11.3); a `scratch` that is not `[base, size]`.
 - A block that does not fit the memory; a scratch area that does not fit the memory or that passes
   the block base.
 - No modules, a module without a name, a duplicate name, a missing `data_base` or `table_base`,

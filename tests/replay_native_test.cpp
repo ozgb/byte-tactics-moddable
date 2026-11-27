@@ -9260,8 +9260,16 @@ int SelfTest(const char* file)
 
 FILE* g_coreOut;
 
-void CoreError(const char* errorClass)
+void CoreError(const char* errorClass, const char* text)
 {
+    if (strcmp(errorClass, "import") == 0 || strcmp(errorClass, "glue") == 0) {
+        if (strcmp(errorClass, "import") == 0)
+            text = ReplayWasmRefusal(text);
+        size_t length = strcspn(text, "\r\n");
+        fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"wind_meteors\"], \"message\": \"%.*s\"}\n", errorClass, (int)length, text);
+        fclose(g_coreOut);
+        exit(0);
+    }
     fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"wind_meteors\"]}\n", errorClass);
     fclose(g_coreOut);
     exit(0);

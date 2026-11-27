@@ -285,5 +285,24 @@
    ["fuel", 9223372036854775796],
    ["call", {"result": 10}],
    ["fuel", 9223372036854775785]
+  ]},
+ {"name": "budget_max",
+  "calls": [
+   ["manifest", "fuel/budget_max.json"],
+   ["memory"],
+   ["load", "m", "fuel/metered.wasm"],
+   ["fuel", "m"],
+   ["tick"],
+   ["call", "m", "spin", "10"],
+   ["fuel", "m"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", null],
+   ["fuel", 9223372036854775807],
+   ["tick", null],
+   ["call", {"result": 10}],
+   ["fuel", 2147483636]
   ]}
 ]}

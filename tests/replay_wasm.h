@@ -8,5 +8,6 @@ bool ReplayWasmActive();
 const char* ReplayWasmSubsystem();
 void ReplayWasmReload();
 void ReplayWasmUseSeam();
+void ReplayWasmNoBudgets();
 
 #endif

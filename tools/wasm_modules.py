@@ -3,7 +3,7 @@
     uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm, rust.wasm and wind_meteors.wasm
     uv run tools/wasm_modules.py build-variant --define NAME=VALUE --name NAME   # wind_meteors.wasm built with the defines, as build/wasm-modules/NAME.wasm
     uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
-    uv run tools/wasm_modules.py check-module FILE.wasm --name SUBSYSTEM   # the window, imports, exports, kinds and size of one built file
+    uv run tools/wasm_modules.py check-module FILE.wasm --name SUBSYSTEM [--manifest M]   # the window, imports, exports, kinds and size of one built file
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
     uv run tools/wasm_modules.py statics   # run wind_meteors for 2000 ticks and check its statics never change
     uv run tools/wasm_modules.py adapters  # run the loader's adapters and refusals over tests/wasm/adapters
@@ -32,8 +32,8 @@ bss and stack, as linked) leaves its manifest window or meets a fixture's, or wh
 leave the module's table range.
 
 check-module runs the window and table check, the imports check and the size budget on one .wasm file
-against the game manifest's entry for --name, prints each problem and exits 1 on any; tools/oraclegate.py runs it
-before it plays a submitted module.
+against the game manifest's entry for --name (in wasm/modules.json, or --manifest), prints each problem and exits 1 on any;
+tools/oraclegate.py runs it before it plays a submitted module. A blocked entry has no budgets, so its size is not judged.
 
 imports reads each built module's import and export sections with the pinned wasm-tools (found in
 build/tools/bin, install it with `cargo install wasm-tools --version <pin> --locked --root
@@ -663,7 +663,9 @@ def check_tools_game(pins):
 
 
 def check_size(entry, size):
-    """Reasons a module's .wasm of the given size is over its manifest size_budget."""
+    """Reasons a module's .wasm of the given size is over its manifest size_budget; none for a blocked entry, which has no budgets to judge."""
+    if "blocked" in entry:
+        return []
     budget = entry.get("size_budget")
     if not isinstance(budget, int) or budget <= 0:
         return [f"{entry['name']}: the manifest has no size_budget"]
@@ -891,10 +893,14 @@ def check_module_file(game, entry, path, wasm_tools):
 CANNOT_CHECK = 2
 
 
-def run_check_module(path, name):
+def run_check_module(path, name, manifest_path=None):
     """Exit 0 when the file passes, 1 when it breaks a rule, CANNOT_CHECK when the check could not run (not the module's fault)."""
     try:
-        game = game_manifest()
+        if manifest_path is None:
+            game = game_manifest()
+        else:
+            with open(manifest_path) as f:
+                game = json.load(f)
         entry = next((m for m in game["modules"] if m["name"] == name), None)
         if entry is None:
             raise SystemExit(f"check-module: the manifest has no module {name} (it has {', '.join(m['name'] for m in game['modules'])})")
@@ -1380,6 +1386,7 @@ def main():
     parser.add_argument("--define", action="append", default=[], help="build-variant: NAME=VALUE for the wind_meteors compile")
     parser.add_argument("--name", help="build-variant: the variant's name, build/wasm-modules/NAME.wasm; check-module: the subsystem the file is for")
     parser.add_argument("--game-dir", help="glue-fatal: the game's install (default: Steam's)")
+    parser.add_argument("--manifest", help="check-module: the game manifest to check against (default wasm/modules.json)")
     args = parser.parse_args()
     if args.command == "glue-fatal":
         return run_glue_fatal(args.exe, args.game_dir)
@@ -1387,7 +1394,7 @@ def main():
         if not args.module or not args.name:
             print("check-module: needs a .wasm file and --name SUBSYSTEM", file=sys.stderr)
             return CANNOT_CHECK
-        return run_check_module(args.module, args.name)
+        return run_check_module(args.module, args.name, args.manifest)
     if args.command == "build":
         build()
         return 0

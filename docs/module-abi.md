@@ -686,7 +686,7 @@ signatures are below.
 | `SimFree` | `[linear] -> void` | returns an allocation of `SimAlloc` or `SimAllocTagged`, by the address they returned, to the block; null does nothing |
 | `RecordSimEvent` | `[int, int, linear, int] -> void` | appends a sim event to the sim event queue of the block (arguments: kind, flags, the arguments as an array of 32-bit words, their count): one record per six arguments, at least one, each with the kind, the tick and the next six arguments (zero past the count), every record after the first with the flags and the continuation flag; the kinds, their arguments and the flags are in `docs/sim-events.md`; a queue that has no room ends the game in test mode, and otherwise drops the event and counts it in the queue's dropped count |
 | `SimCaptureAlloc` | `[int, linear] -> linear` | reserves the size in bytes, rounded up to 8, in the radar arena of the block (`docs/sim-events.md`, "Radar events"), zeroes it, writes its offset in the arena to the 32-bit word at the second argument and returns its address; the offset is what a radar event records, and it holds until the drain that hands over that event empties the arena; an arena that has no room ends the game in test mode, and otherwise returns 0, writes nothing and counts it in the arena's dropped count |
-| `GetGafFrame` | `[linear, int] -> linear` | returns the frame of the given index of a frame table (a GAF animation's frames: its count, a 16-bit word at the start, and 8-byte entries from offset 40, each the frame's address and its duration in ticks), or 0 when the index is negative or not below the count; the table and the frame are load data (section 7.1), so the result is an address outside the block that the module reads and never writes |
+| `GetGafFrame` | `[linear, int] -> linear` | returns the frame of the given index of a frame table (a GAF animation's frames: its count, a 16-bit word at the start, and 8-byte entries from offset 40, each the frame's address and its duration in ticks), or 0 when the index is negative or not below the count; the table and the frame are load data (section 7.1), so the result is an address outside the block that the module reads and never writes; it is a pure query (its result depends on its arguments alone and it changes nothing), so a module may call it as often as it likes and in any order: a replay answers each call by its arguments, and does not compare how many calls there are or where they fall among the other imports (section 15) |
 | `InitGafSequence` | `[linear, linear, int] -> void` | starts a sequence cursor (a 12-byte record of the block: the frame index and the ticks left on it, two 16-bit words, the loop flag, a byte, and at offset 8 the animation's address) on an animation (a frame table, load data of section 7.1, its loop flag the byte at offset 2) at a frame index, the first frame when the index is not below the count, with that frame's duration as its ticks left |
 | `StepGafSequence` | `[linear] -> int` | advances a sequence cursor by a tick: a cursor with no animation stays and returns 0; one with two or more ticks left loses one and returns 0; otherwise it moves to the next frame and its duration and returns 1, and past the last frame it goes back to the first when the animation loops, and when it does not, it drops the animation (address 0) and returns 1 |
 | `GetSlotDpid` | `[int] -> int` | returns the network id of the player in a slot of the game record, or -1 when the slot is 10 (none) or its player's type is 0 (empty) |
@@ -989,8 +989,38 @@ in one memory and one table side by side; the fixture manifest's windows and ran
 submitted module in place of the default one, and writes a result that holds verdicts and the module's own values.
 
 ```sh
-uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
+uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full | --recordings-only] [--manifest M] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
 ```
+
+Every run first removes `DIR/result.json`, `DIR/runtime/` and `DIR/logs/`, so a run that stops with an error leaves no
+earlier result behind. It has two routes, and the result's `scope` names the one it took:
+
+- **`scenarios`**, the steps below: the suite and the recordings. It is the route of a subsystem whose manifest entry builds
+  (no `blocked`), so that the game loads the module in every scenario.
+- **`recordings`**, for a subsystem whose entry is `blocked` (its default does not build to WASM, so no scenario can load a
+  module of it), or any subsystem with `--recordings-only`: step 1, then every recording of `tests/replay/<subsystem>/`
+  replayed against the module, one `replay_native_test.exe --wasm` run per recording (`docs/replay-format.md`, "Against the
+  WASM module"). The scenarios are not played: the result has `scenarios: not_judged`, and the module has met its contract
+  on those recordings only. `--manifest` judges against another game manifest than `wasm/modules.json`, on this route only.
+
+**A blocked entry is judged without budgets.** It has no `size_budget` or `fuel_budget` (section 4.2), so check-module does
+not judge the module's size, and the replayer runs it with the largest fuel budget of section 11.3, 2147483647 a tick
+(`replay_native_test.exe --wasm MODULE.wasm --no-budgets`). Everything else of step 1 is checked as for any module. The
+result has `budgets: not_judged`, and the summary line ends `budgets not judged`. A module that is equal there has met its
+contract on its recordings, and its fuel and size are judged once the entry has budgets. Every other result has
+`budgets: judged`.
+
+The recordings route names the replay rules it judged under in `rules`:
+
+- `queries`: the imports answered as pure queries, by their arguments, whenever the module calls them. They are not counted
+  and their order among the other imports is not compared, so a module that asks more often, less often or at another point
+  of the call is equal. `services.GetGafFrame` is the one (section 9.3); `InitGafSequence` and `StepGafSequence` change the
+  cursor they take, so they stay in the recorded order. A query whose arguments no recorded call has is reported at the
+  query (`query services.GetGafFrame`), with the arguments the module passed.
+- `unread_arguments`: arguments the callee never reads, which are left out of the comparison of the import's arguments.
+  `los_radar.GetMapCellAtPosition pos.y` is the one: the cell lookup reads only `x` and `z`, and the reclaim scan (the
+  pick of a random reclaimable feature in a radius) passes a position whose `y` it never sets, so the recorded `y` is whatever was on
+  the stack and no module can be asked to reproduce it. The `x` and `z` are compared.
 
 1. It runs `uv run tools/wasm_modules.py check-module MODULE.wasm --name <subsystem>` on the file: the data, bss and stack
    inside the entry's window and the table entries inside its table range, no import off the manifest's list (no global,
@@ -1015,17 +1045,20 @@ uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out 
 
 | Field | Meaning |
 | --- | --- |
-| `format` | 3 |
+| `format` | 4 |
+| `scope` | `scenarios` or `recordings`: the route the run took |
+| `budgets` | `judged`, or `not_judged` for a blocked entry's module, judged without its size and fuel budgets |
+| `rules` | with `recordings`: `queries` and `unread_arguments`, the replay rules above |
 | `verdict` | `equal`, `differs`, `failed` (a run did not finish, or a check other than the traces failed) or `refused`; a scenario counts by its `state` verdict |
 | `digest` | `equal`, `differs` or `not_judged`: whether every judged scenario is also equal on every row of each tick (absent with `refused`) |
 | `view` | `equal`, `differs` or `not_judged`: whether every judged scenario is also equal on the `view` row of each tick (absent with `refused`) |
-| `subsystem`, `suite` | the subsystem, and `tier` or `full` |
+| `subsystem`, `suite` | the subsystem, and `tier` or `full` (with `scenarios`) |
 | `module` | `sha256` and `bytes` of the submitted file |
 | `kit` | `interfaces` and `reference_traces`: the newest `interfaces-v*` and `reference-traces-v*` tags |
 | `seconds` | wall time of the run |
 | `message` | with `refused`: the problems `check-module` found or the loader's message, and no `scenarios` or `recordings` |
-| `scenarios` | by scenario name: `status` (the end-of-tick state) and, for `differs`, `tick`, `phase`, `field` and `value`; `digest` and `view`: `status` `equal`, `differs` with the first `tick` whose digest (or view) differs, or `not_judged`; an `other_checks` entry (`failed`) when every scenario is equal and another check of the run failed, with `reason` `block-pointer` when it was the block pointer check: a fault of the harness's scan of the shared state block, not of the module |
-| `recordings` | by `<subsystem>/<recording>`: `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value` |
+| `scenarios` | `not_judged` with `recordings`; otherwise by scenario name: `status` (the end-of-tick state) and, for `differs`, `tick`, `phase`, `field` and `value`; `digest` and `view`: `status` `equal`, `differs` with the first `tick` whose digest (or view) differs, or `not_judged`; an `other_checks` entry (`failed`) when every scenario is equal and another check of the run failed, with `reason` `block-pointer` when it was the block pointer check: a fault of the harness's scan of the shared state block, not of the module |
+| `recordings` | by `<subsystem>/<recording>`: `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value`; with `recordings`, `call` (the replayer's call index) in place of `line` and `kind`, and `field` is the replayer's key (a field, `import <n> <name>` or `query <name>`) |
 
 A `status` is `equal`, `differs`, `failed` (the scenario did not run to its end) or `not_judged` (the run stopped at the first
 divergence before this scenario was reported). Only the first divergence of a run carries `phase`, `field` and `value` for a
@@ -1035,7 +1068,7 @@ and are not part of the result.
 
 A module that is equal on `state` and differs on `digest` kept the end-of-tick contract with another order of work inside the
 tick: the state at the end of each tick is 3.1c's, and some phase row in between is not. Format 1 had no `digest` and judged
-the scenarios on every row; format 2 had no `view`.
+the scenarios on every row; format 2 had no `view`; format 3 had no `scope` and no recordings route.
 
 Exit status: 0 when everything is equal, 1 when something differs or failed, 2 when the loader refused the module.
 

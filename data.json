@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-27T21:05:04+00:00",
+ "generated": "2026-11-27T22:05:04+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
   "2": {
-   "done": 59,
+   "done": 60,
    "total": 64
   },
   "180": {
@@ -357,15 +357,15 @@
    "kit": "partial",
    "kit_note": "10 recordings, gate route waits on #1209",
    "recordings": 10,
-   "spec": "none",
+   "spec": "active",
    "spec_pin": null,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1193,
     "title": "Spec: Write the players spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1193",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": []
@@ -377,15 +377,15 @@
    "kit": "partial",
    "kit_note": "4 recordings, gate route waits on #1209",
    "recordings": 4,
-   "spec": "none",
+   "spec": "active",
    "spec_pin": null,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1194,
     "title": "Spec: Write the features spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1194",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": []
@@ -397,15 +397,15 @@
    "kit": "partial",
    "kit_note": "2 recordings, gate route waits on #1209",
    "recordings": 2,
-   "spec": "none",
+   "spec": "active",
    "spec_pin": null,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1195,
     "title": "Spec: Write the AI spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1195",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": []
@@ -417,15 +417,15 @@
    "kit": "partial",
    "kit_note": "9 recordings, gate route waits on #1209",
    "recordings": 9,
-   "spec": "none",
+   "spec": "active",
    "spec_pin": null,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1196,
     "title": "Spec: Write the weapons spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1196",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": []
@@ -437,15 +437,15 @@
    "kit": "partial",
    "kit_note": "4 recordings, gate route waits on #1209",
    "recordings": 4,
-   "spec": "none",
+   "spec": "active",
    "spec_pin": null,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1197,
     "title": "Spec: Write the scripts spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1197",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": []

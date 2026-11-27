@@ -440,7 +440,7 @@ and `handle` is i32; of `f32`, f32; of `f64`, f64; `void` is no result.
 | `f32` | an IEEE 754 single, the 32 bits carried unchanged: the host moves it as a 32-bit pattern and does not pass it through a wider or a canonicalising type |
 | `f64` | an IEEE 754 double |
 | `void` | no result |
-| `linear` | an address in the shared memory; 0 is null. The object it points to is in the module's window, on its stack, or in the block (or in the scratch area, for a slot argument). A callee reads and writes the object in place |
+| `linear` | an address in the shared memory; 0 is null. The object it points to is in the module's window, on its stack, or in the block (or in the scratch area, for a slot argument), and a callee reads and writes it in place; or it is load data outside the block (a frame table or one of its frames, section 7.1), which a module reads and never writes |
 | `block` | a linear address that lies inside the state block, or 0. As a result, the host checks that it lies inside the block |
 | `scratch` | a linear address in the scratch area, where the host put a copy of a native object for this call |
 | `handle` | an opaque u32 (section 8) |
@@ -469,18 +469,34 @@ one byte of the record's layout; it is not an argument kind.
   every pointer returned, is an address in the shared memory, never an offset and never a native
   address.
 - **A pointer to load data is a linear address.** Some block fields point at load data outside the
-  block: today a frame table (a GAF animation's frames) and the frames it lists. They are
-  `Game.losTable` (the sight masks), the `seq*` sequence fields of a feature, a sequence cursor's
-  animation (its `src` field) and `weapondef.explosionSeq`. Such a field holds the table's address in
-  the shared memory, not a block offset. The engine loads a frame table before the match starts and
-  neither changes nor frees it while the match runs, so the address stays valid across ticks. The host
-  maps frame tables into the shared memory outside the state block, read-only for modules: a module
-  reads a table and its frames (`FrameTable.count`, a frame's size, offsets, transparency and
-  pixels) and never writes them, and it gets their addresses only from these fields and from the GAF
-  services (section 9.3). Where in the memory the host puts them is the glue's (#1206). Of the
-  modules, only los_radar reads frame data as simulation input (the sight masks of
-  `Game.losTable`). features uses a sequence only as a timer, and weapons' cursors and debris
-  pictures are presentation state kept in the block.
+  block: a frame table (a GAF animation's frames) or one of the frames it lists. Such a field holds
+  the object's address in the shared memory, not a block offset. The engine loads or makes every
+  frame table before the match starts and neither changes nor frees it while the match runs, so the
+  address stays valid across ticks. The recordings (`tests/replay/`) show these fields:
+
+  | Subsystem | Field | Points at |
+  | --- | --- | --- |
+  | los_radar | `Game.losTable` | the sight masks, a frame table loaded from a GAF |
+  | features | `Feature.seqburn`, `Feature.seqdie`, `Feature.seqreclamate` | sequences of the feature type's GAF |
+  | features | `Spot.anim.src` | the animation of a sequence cursor, a frame table |
+  | weapons | `weapondef.explosionSeq`, `weapondef.splash` | the explosion sequences of the weapon type's GAFs (the splash one on a lava world) |
+  | weapons | `Debris.ref1.src`, `Debris.ref2.src` | the animation of a sequence cursor, a frame table |
+  | weapons | `DebrisFace.texTeamSrc` | a face's team texture, a frame table whose address weapons copies from the loaded 3DO model |
+  | weapons | `DebrisFace.texPic` | a frame of that table, which weapons writes from `GetGafFrame`'s result |
+  | weapons | `GafSrc1.ptr` to `GafSrc3.ptr`, `GafSources.ptr` | sequences of the fx GAF (`Game.src1` to `Game.src3`, `Game.sources`) |
+  | weapons | `GafLists.ptr` | the three explosions of `Game.lists`, frame tables the engine makes at load rather than reads from a GAF |
+
+  A module gets these addresses from such fields, from the GAF services (section 9.3) and from the
+  loaded 3DO model data (a face's texture). It reads a frame table and its frames
+  (`FrameTable.count`, a frame's size, offsets, transparency and pixels) and never writes them.
+  Nothing traps a write: a wasm32 memory has no read-only pages, so this is the module's obligation,
+  not something the host enforces. The host maps frame tables into the shared memory outside the
+  state block (#1206). Of the modules, only los_radar reads frame data as simulation input (the
+  sight masks of `Game.losTable`). features uses a sequence only as a timer, and weapons' cursors and
+  debris pictures are presentation state kept in the block. units reads one more such field,
+  `ModelState.bitmap`, a unit's cached picture: that frame is not load data but the presentation's,
+  which draws it and may replace it while the match runs, and units only tests whether the field is
+  null.
 - In Milestone 2 every module is WASM and every object the simulation uses is already in the shared
   memory, so no translation happens: the caller passes the address of the object where it lives. The
   two rules together mean that a pointer into the block is an offset when it is stored and an address

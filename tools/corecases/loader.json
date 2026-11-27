@@ -1468,8 +1468,7 @@
     "12",
     "13",
     "14",
-    "15",
-    "16"
+    "15"
    ]
   ]
  },
@@ -1766,6 +1765,23 @@
    [
     "manifest",
     "loader/major_not_number.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "major_manifest_not_number",
+  "calls": [
+   [
+    "manifest",
+    "loader/major_manifest_not_number.json"
    ],
    [
     "memory"

@@ -647,7 +647,7 @@ signatures are below.
 | `StepGafSequence` | `[linear] -> int` | advances a sequence cursor by a tick: a cursor with no animation stays and returns 0; one with two or more ticks left loses one and returns 0; otherwise it moves to the next frame and its duration and returns 1, and past the last frame it goes back to the first when the animation loops, and when it does not, it drops the animation (address 0) and returns 1 |
 | `GetSlotDpid` | `[int] -> int` | returns the network id of the player in a slot of the game record, or -1 when the slot is 10 (none) or its player's type is 0 (empty) |
 | `FindSlotByDpid` | `[int] -> int` | returns the lowest slot, 0 to 9, whose network id (as `GetSlotDpid` gives it) is the argument, or 10 when none is or the argument is -1 |
-| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; the host refuses, as an import error, an effect outside the module memory, a kind not in the entry's `publishes` table, and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect to its subscribers as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
+| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; the host refuses, as an import error and in this order, a pointer outside the module memory, a size outside 4 to 128 bytes (an effect holds at least its kind, and at most an inbox entry), an effect that runs past the module memory, a kind not in the entry's `publishes` table, and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect to its subscribers as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
 
 **A malformed argument changes nothing and does not trap** (ozgb/btm#25). The default modules never pass one, so no
 recording shows what it does, and this is the contract: an address the import does not trap on (section 7.2) that is not
@@ -812,8 +812,10 @@ Only reorders, drops, added constants and result changes between these forms fit
 **refuses** any conversion that needs code: a different kind (an `int` into a `linear`, a `linear`
 into a `handle`, an `int` into an `f64`), a constant for a parameter that is not `int`, an index out
 of range, an `args` of the wrong length, a `result` of another form, a constant result for a caller
-whose result is not `int`, more than 16 values. For an adapted import the host must have defined the
-import with the manifest's current signature, or the module is refused.
+whose result is not `int`, a signature of more than 16 parameters. For an adapted import the host must have defined the
+import with the manifest's current signature, or the module is refused. The loader judges the adapters from the
+entry's `slots` and `imports` and the manifest's `signatures` alone, before it compiles the module, so a refusal does
+not depend on what the module exports or imports.
 
 Adapters apply to the module's slots as the host calls them, and to its imports as the module calls
 them. They do not apply to a call through the table (2.3).

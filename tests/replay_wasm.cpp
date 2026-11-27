@@ -35,9 +35,15 @@ void (*s_trapHook)(const char* errorClass, const char* text);
 
 const char* ReplayWasmRefusal(const char* text)
 {
-    for (const char* p = strstr(text, "import "); p != nullptr; p = strstr(p + 1, "import "))
-        if (p == text || p[-1] == ' ' || p[-1] == '\n')
+    for (const char* line = text; line != nullptr; line = strchr(line, '\n'), line = line ? line + 1 : nullptr) {
+        const char* p = line + strspn(line, " \t");
+        if (strncmp(p, "import ", 7) != 0)
+            continue;
+        const char* name = p + 7;
+        size_t length = strspn(name, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_");
+        if (length > 0 && name[length] == ':' && name[length + 1] == ' ')
             return p;
+    }
     return nullptr;
 }
 

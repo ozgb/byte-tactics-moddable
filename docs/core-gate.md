@@ -206,7 +206,7 @@ through an adapter of its entry, and each refusal is a `manifest` error at `load
 
 | Vector | What it judges |
 | --- | --- |
-| `adapter_slot` | four adapted slots of `adapt.wasm`: `f` called with two arguments reaches the module's three as `[1, 0, {"const": 7}]` (2, 3 gives 723); `g` with none gets the constant 4 and returns the constant 9; `h` returns nothing (`"void"`) though the module's returns an int; `f16` passes 16 arguments reversed |
+| `adapter_slot` | four adapted slots of `adapt.wasm`: `f` called with two arguments reaches the module's three as `[1, 0, {"const": 7}]` (2, 3 gives 723); `g` with none gets the constant 4 and returns the constant 9; `h` returns nothing (`"void"`) though the module's returns an int; `f16`, of 15 parameters now and 16 in the module, passes the 15 reversed and the constant 100 last (1 to 15 gives 15 - 100, -85) |
 | `adapter_import` | an adapted import: the module's `fixture.mix` of two parameters reaches the host's of three as `[1, {"const": 5}, 0]` (2, 3 gives 253) |
 | `adapter_none` | a slot that changed with no adapter |
 | `adapter_kind`, `adapter_const_kind` | an `args` entry that changes a parameter's kind (`linear` to `int`), a constant for a parameter that is not `int` |
@@ -215,7 +215,7 @@ through an adapter of its entry, and each refusal is a `manifest` error at `load
 | `adapter_result_form`, `adapter_result_const_kind`, `adapter_result_pass_void`, `adapter_result_pass_kind`, `adapter_result_void` | a `result` that is not `"pass"`, `"void"` or `{"const": n}`; a constant for a result that is not `int`; `"pass"` when the caller's result is `void`, or of another kind; `"void"` when the caller expects a result |
 | `adapter_values` | a signature of 17 parameters (the most is 16) |
 | `adapter_import_undefined`, `adapter_import_signature` | an adapted import the host does not define, or defines with another signature than the manifest's |
-| `major_not_number` | a module's major that is not a number |
+| `major_not_number`, `major_manifest_not_number` | a module's major, or the manifest's, that is not a number |
 
 A `block_size` without `block_base` is no block, and is not refused. `exports` and `data` may be left out of an entry: the
 module is then loaded with no slots and no data words, and `call` still reaches any function the module exports, since
@@ -285,15 +285,15 @@ data words at 0x30000 to 0x3000c and the eight slots, and does in one slot what 
 | --- | --- | --- |
 | `import_pointer` | `FatalError(-16)` | `import FatalError: pointer argument 0 is outside the module memory` |
 | `import_pointer_last` | `BuildDataPath` with argument 3 the memory's size, the first address past it | `import BuildDataPath: pointer argument 3 is outside the module memory` |
-| `import_buffer_size` | `TdfRecord_GetFieldString` with `size` 0 | `import TdfRecord_GetFieldString: the buffer size is below 1` |
-| `import_buffer_past` | `TdfRecord_GetFieldString` with a buffer of 5 bytes 4 below the memory's end | `import TdfRecord_GetFieldString: the buffer runs past the module memory` |
+| `import_buffer_size` | `TdfFile_LoadFile` issues handle 1, then `TdfRecord_GetFieldString` of it with `size` 0 | `import TdfRecord_GetFieldString: the buffer size is below 1` |
+| `import_buffer_past` | `TdfFile_LoadFile` issues handle 1, then `TdfRecord_GetFieldString` of it with a buffer of 5 bytes 4 below the memory's end | `import TdfRecord_GetFieldString: the buffer runs past the module memory` |
 | `import_null_handle` | `TdfRecord_GetFieldInt` of handle 0 | `import TdfRecord_GetFieldInt: null handle` |
 | `import_unknown_handle` | `TdfFile_LoadFile` issues handle 1, then `TdfRecord_GetFieldInt` of handle 2 | `import TdfRecord_GetFieldInt: unknown handle 2` |
 | `import_stale_handle` | the first call keeps handle 1 in a static, the second passes it back: the table was cleared when the first returned | `import TdfRecord_GetFieldInt: unknown handle 1` |
 | `handles_32` | `LoadMeteorDefaults` gets a root record and 31 `TdfFile_SelectRecord` results, 32 distinct records in one call, and writes the last handle to `params.radius` | `o params.radius 32`: 32 handles fit, numbered from 1 |
 | `handles_full` | as `handles_32`, with a 33rd record | `wind_meteors: the handle table is full` (class `glue`) |
-| `import_string_cut` | `LoadMeteorDefaults` reads the field `Meteor` with `size` 3 into `params.weapon` | `o params.weapon "Me"`: the copy is cut to `size` - 1 bytes and a 0 |
-| `emit_size`, `emit_past`, `emit_kind`, `emit_payload_size`, `emit_weapon` | `Emit` of a SPAWN of 3 bytes, of one that runs past the memory, of kind 81, of 40 bytes, and of weapon 256 | section 13's five `Emit` texts |
+| `import_string_cut` | `LoadMeteorDefaults` reads the field `Meteor` with `size` 3 into `params.weapon` | `o params.weapon "Me"`: the copy is cut to `size` - 1 bytes and a 0 (`docs/replay-format.md`, a text out with a `size`) |
+| `emit_size`, `emit_past`, `emit_kind`, `emit_payload_size`, `emit_weapon` | `Emit` of a SPAWN of 3 bytes, of one that runs past the memory, of kind 81, of 40 bytes, and of weapon 256 | section 13's five `Emit` texts; a size of 3 is refused as outside an effect before its kind is read (section 9.3 gives the order of the checks) |
 
 The gate never gives the core the in-repo engine's wind_meteors module. The module is the one that comes with the
 core's submission (below): the clean room's own, which the module gate has judged.

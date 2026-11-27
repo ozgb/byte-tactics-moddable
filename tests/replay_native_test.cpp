@@ -9265,8 +9265,17 @@ void CoreError(const char* errorClass, const char* text)
     if (strcmp(errorClass, "import") == 0 || strcmp(errorClass, "glue") == 0) {
         if (strcmp(errorClass, "import") == 0)
             text = ReplayWasmRefusal(text);
-        size_t length = strcspn(text, "\r\n");
-        fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"wind_meteors\"], \"message\": \"%.*s\"}\n", errorClass, (int)length, text);
+        fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"wind_meteors\"], \"message\": \"", errorClass);
+        for (const char* p = text; *p != '\0' && *p != '\r' && *p != '\n'; p++) {
+            unsigned char c = (unsigned char)*p;
+            if (c == '"' || c == '\\')
+                fprintf(g_coreOut, "\\%c", c);
+            else if (c < 0x20 || c >= 0x7f)
+                fprintf(g_coreOut, "\\u%04x", c);
+            else
+                fputc(c, g_coreOut);
+        }
+        fputs("\"}\n", g_coreOut);
         fclose(g_coreOut);
         exit(0);
     }

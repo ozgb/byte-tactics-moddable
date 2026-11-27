@@ -885,7 +885,7 @@
    ["word", "4112"],
    ["call", "a", "h", "5"],
    ["word", "4112"],
-   ["call", "a", "f16", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"]
+   ["call", "a", "f16", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
   ],
   "results": [
    ["manifest", null],
@@ -896,7 +896,7 @@
    ["word", 4],
    ["call", {"result": null}],
    ["word", 15],
-   ["call", {"result": -15}]
+   ["call", {"result": -85}]
   ]},
  {"name": "adapter_import",
   "calls": [
@@ -1081,6 +1081,17 @@
  {"name": "major_not_number",
   "calls": [
    ["manifest", "loader/major_not_number.json"],
+   ["memory"],
+   ["load", "a", "loader/ok.wasm"]
+  ],
+  "results": [
+   ["manifest", null],
+   ["memory", null],
+   ["load", {"error": "manifest", "modules": []}]
+  ]},
+ {"name": "major_manifest_not_number",
+  "calls": [
+   ["manifest", "loader/major_manifest_not_number.json"],
    ["memory"],
    ["load", "a", "loader/ok.wasm"]
   ],

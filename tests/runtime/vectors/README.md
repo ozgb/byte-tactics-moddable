@@ -55,7 +55,7 @@ their original order.
 - `angle_of_vector` (16129 edge, 6666 random of 3361201): the angle (32768 is half a turn) of the vector whose inputs are, in record order, x and z: the arctangent of x over z (Rules)
 - `rotate_point` (1152 edge, 4000 random of 12533184): the point (x, z) rotated by an angle: the inputs are `angle`, `x` and `z`, the outputs `rx` and `rz` (Rules)
 - `rotation_matrix` (1536 edge, 1666 random of 13581376): the 3x3 rotation matrix m0 to m8 built from three angles (Rules)
-- `apply_rotation` (0 edge, 1250 random of 1250000): a vector (x, y, z) times the transpose of a 3x3 matrix m0 to m8, giving (rx, ry, rz); `aliased` is 1 when each result replaces its input before the next is computed (Rules)
+- `apply_rotation` (0 edge, 1250 random of 1250000): a vector (x, y, z) times the transpose of a 3x3 matrix m0 to m8, giving (rx, ry, rz); `aliased` is 1 when each result replaces its input before the next is computed (Rules). A record's inputs are m0 to m8 in that order (the matrix row by row, as "Rotation matrix" names its entries), then `x`, `y`, `z` and `aliased`; its outputs are `rx`, `ry` and `rz`, as `vectors.json` lists them
 - `mul_div` (294 edge, 5000 random of 2476073): a times b divided by c, the product taken in 64 bits and the quotient truncated toward zero, 0 when c is 0; a case whose quotient does not fit an int is not recorded
 - `sqrt` (0 edge, 5000 random of 2000000): the square root of a non-negative double
 - `sqrt_float` (0 edge, 10000 random of 2000000): the square root of a non-negative float, given and returned as its 32-bit pattern
@@ -85,7 +85,7 @@ their original order.
 - `strnicmp` (16981 edge, 2845 random of 20000): _strnicmp of two strings and a count: the result (-1, 0 or 1)
 - `strrchr` (1452 edge, 4455 random of 10000): strrchr of a string and a character (0 included): the offset of the match, or -1
 - `strstr` (4840 edge, 4036 random of 10000): strstr of a string and a needle: the offset of the match, or -1
-- `strtok` (540 edge, 286 random of 6000): strtok over a string in a 48 byte buffer filled with 0xAA beforehand, the first call with `delims`, the next calls with `delims2` until it returns null: the token count, `toks` as 24 pairs of i32 (offset in the buffer, length) of which the count's worth are used, then -1 (a null) or -2 and the offset a further call returns, and the buffer afterward
+- `strtok` (540 edge, 286 random of 6000): strtok over a string in a 48 byte buffer filled with 0xAA beforehand, the first call with `delims`, the next calls with `delims2` until it returns null: the token count, `toks` as 24 pairs of i32 (offset in the buffer, length) of which the count's worth are used, then two more pairs and zeros to the end of `toks`, and the buffer afterward. The first further pair is (-1, 0): -1 for the null that ended the calls (-2 would stand there had the calls stopped at 22 tokens, which no record reaches). The second is (r, 0), r being what one more call with `delims2` returns, -1 for a null and otherwise its offset; every record holds -1 there, since a call after the null returns null
 - `tolower` (384 edge, 0 random of 0): tolower of an int from -128 to 255
 - `toupper` (384 edge, 0 random of 0): toupper of an int from -128 to 255
 
@@ -222,10 +222,13 @@ R; a carry out of the top adds one to e. Then, with the float's bounds first and
 - e of 128 (1024) or more: an infinity;
 - e from -126 to 127 (-1022 to 1023): the normal number with that exponent and the rounded mantissa;
 - e below -151 (-1076): a zero;
-- e from -151 to -127 (-1076 to -1023): a denormal. Go back to the mantissa before the rounding, shift it right by
-  -127 - e places (-1023 - e), with the e that the rounding gave, and round the shifted bits to n bits by rule R,
-  dropping any carry out of the top. The denormal's fraction field is the top n - 1 of those n bits; the last one is
-  dropped.
+- e from -151 to -127 (-1076 to -1023): a denormal. Go back to the mantissa before the rounding, held as a 96-bit
+  word (its 80 bits, then 16 zero bits), and shift the word right by -127 - e places (-1023 - e), with the e that the
+  rounding gave: zeros enter at the top, and a bit shifted out of the bottom is lost. Round the shifted word to n bits
+  by rule R, dropping any carry out of the top. The n bits are the word's top n bits, the zeros the shift brought in
+  included (not n bits counted from its first 1), the dropped bits are the rest of the word, and a lost bit counts for
+  nothing: no sticky bit stands for the bits shifted out. The denormal's fraction field is the top n - 1 of those n
+  bits; the last one is dropped.
 
 So when the first rounding does not carry, a denormal is the multiple of the smallest denormal below the value, plus
 one more when the remainder is above three quarters of the smallest denormal and is not exactly seven eighths of it: a

@@ -274,7 +274,8 @@ manifest per run.
 | `build_flags` | compile flags for every game module | build |
 | `fuel` | `{"rule": text, "version": 1}`, the metering rule of section 11 | checks |
 
-A number must be a non-negative integer.
+A number must be a non-negative integer. A number with a fraction or an exponent (`4096.5`, `4096.0`, `1e3`) is not
+valid JSON to the loader, so the whole manifest is refused as not valid JSON. A number above 2147483647 is refused too.
 
 ### 4.2 Module entries
 
@@ -322,9 +323,9 @@ Each refusal is an error that names the manifest or the module (and, for overlap
 them at start-up (section 13). When a manifest has more than one fault, the loader reports the first in the order
 `docs/core-gate.md`, "loader and fuel", states.
 
-- A manifest that is not valid JSON or not an object; a required field missing; a number that is
-  not a non-negative integer; `memory_pages` or `window` zero, or `memory_pages` over 65536; a
-  `scratch` that is not `[base, size]`.
+- A manifest that is not valid JSON (a number with a fraction or an exponent included, section 4.1) or not an
+  object; a required field missing; a value that is not a non-negative integer; `memory_pages` or `window` zero, or
+  `memory_pages` over 65536; a `scratch` that is not `[base, size]`.
 - A block that does not fit the memory; a scratch area that does not fit the memory or that passes
   the block base.
 - No modules, a module without a name, a duplicate name, a missing `data_base` or `table_base`,
@@ -648,7 +649,7 @@ An interface has a major version that changes when a slot is removed or its sign
 ### 10.1 What the manifest records
 
 - `majors`: the current major of each interface and of each import group's interface, read from the
-  interface headers. The game manifest has, for example, `services` 3 and `wind_meteors` 3.
+  interface headers. The game manifest's are in `wasm/modules.json` (section 16).
 - `modules[].interface`: the interface whose slots the module implements.
 - `modules[].majors`: for its own interface and for every import group, the major the module was
   built against.
@@ -899,6 +900,7 @@ The values below are read from the files named; they are copied here for orienta
 | `scratch` | `[983040, 65536]` (0xF0000) | none |
 | `build_flags` | `-mno-nontrapping-fptoint` | none |
 | `fuel` | version 1 | none |
+| `majors` | one per interface header, as `wasm/modules.json` records them; they move with the headers | none |
 | module `wind_meteors` | `data_base` 196608 (0x30000), `table_base` 48, `fuel_budget` 250, `size_budget` 13100 | |
 | module `rust` | | `data_base` 65536, `table_base` 16 |
 | module `c` | | `data_base` 131072, `table_base` 32 |

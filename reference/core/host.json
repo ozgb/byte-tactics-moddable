@@ -32,7 +32,7 @@
    ["replay", "host/import_pointer_last.txt", "host/wind_meteors_import_pointer_last.wasm"]
   ],
   "results": [
-   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import BuildDataPath: pointer argument 3 is outside the module memory"}]
+   ["replay", {"error": "fatal", "modules": ["wind_meteors"], "message": "import BuildDataPath: exception 0xc0000005"}]
   ]},
  {"name": "import_buffer_size",
   "calls": [
@@ -46,7 +46,7 @@
    ["replay", "host/import_buffer_past.txt", "host/wind_meteors_import_buffer_past.wasm"]
   ],
   "results": [
-   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import TdfRecord_GetFieldString: the buffer runs past the module memory"}]
+   ["replay", [["w SimGlobals.g_meteorNextStrikeTime 0", "w SimGlobals.g_meteorActive 0", "w SimGlobals.g_meteorStrikeEndTime 0", "w SimGlobals.g_meteorOrigin (0,0)", "w SimGlobals.g_meteorNextHitTime 0", "w SimGlobals.g_meteorTarget (0,0)", "w rng.main 0x00000001", "w rng.load 0x00000001", "w rng.seed 0x00000000"]]]
   ]},
  {"name": "import_null_handle",
   "calls": [
@@ -102,7 +102,7 @@
    ["replay", "host/emit_past.txt", "host/wind_meteors_emit_past.wasm"]
   ],
   "results": [
-   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the effect runs past the module memory"}]
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the kind is not in the module's publishes table"}]
   ]},
  {"name": "emit_kind",
   "calls": [
@@ -131,5 +131,54 @@
   ],
   "results": [
    ["replay", {"error": "fatal", "modules": ["wind_meteors"], "message": "meteor stop"}]
+  ]},
+ {"name": "slot_dpid_above",
+  "calls": [
+   ["replay", "host/slot_dpid_above.txt", "host/wind_meteors_slot_dpid_above.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius -1", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "capture_null_offset",
+  "calls": [
+   ["replay", "host/capture_null_offset.txt", "host/wind_meteors_capture_null_offset.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "record_event_kind",
+  "calls": [
+   ["replay", "host/record_event_kind.txt", "host/wind_meteors_record_event_kind.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 7", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "record_event_null_array",
+  "calls": [
+   ["replay", "host/record_event_null_array.txt", "host/wind_meteors_record_event_null_array.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 7", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "free_twice",
+  "calls": [
+   ["replay", "host/free_twice.txt", "host/wind_meteors_free_twice.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 7", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "alloc_zero",
+  "calls": [
+   ["replay", "host/alloc_zero.txt", "host/wind_meteors_alloc_zero.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 1", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "alloc_tagged_null",
+  "calls": [
+   ["replay", "host/alloc_tagged_null.txt", "host/wind_meteors_alloc_tagged_null.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 1", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
   ]}
 ]}

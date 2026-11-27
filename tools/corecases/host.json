@@ -188,5 +188,75 @@
     "host/wind_meteors_fatal_error.wasm"
    ]
   ]
+ },
+ {
+  "name": "slot_dpid_above",
+  "calls": [
+   [
+    "replay",
+    "host/slot_dpid_above.txt",
+    "host/wind_meteors_slot_dpid_above.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "capture_null_offset",
+  "calls": [
+   [
+    "replay",
+    "host/capture_null_offset.txt",
+    "host/wind_meteors_capture_null_offset.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "record_event_kind",
+  "calls": [
+   [
+    "replay",
+    "host/record_event_kind.txt",
+    "host/wind_meteors_record_event_kind.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "record_event_null_array",
+  "calls": [
+   [
+    "replay",
+    "host/record_event_null_array.txt",
+    "host/wind_meteors_record_event_null_array.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "free_twice",
+  "calls": [
+   [
+    "replay",
+    "host/free_twice.txt",
+    "host/wind_meteors_free_twice.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "alloc_zero",
+  "calls": [
+   [
+    "replay",
+    "host/alloc_zero.txt",
+    "host/wind_meteors_alloc_zero.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "alloc_tagged_null",
+  "calls": [
+   [
+    "replay",
+    "host/alloc_tagged_null.txt",
+    "host/wind_meteors_alloc_tagged_null.wasm"
+   ]
+  ]
  }
 ]

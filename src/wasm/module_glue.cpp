@@ -276,12 +276,29 @@ IMPORT(SimAllocTaggedImport)
     return error;
 }
 
+struct LiveProbe {
+    const void* address;
+    int found;
+};
+
+void __cdecl ProbeLive(void* payload, unsigned int, void* context)
+{
+    LiveProbe* probe = (LiveProbe*)context;
+    if (payload == probe->address)
+        probe->found = 1;
+}
+
 IMPORT(SimFreeImport)
 {
     void* p = GlueLinear((unsigned)a[0].i32);
-    if (p != nullptr && !SimOwns(p))
+    if (p == nullptr)
+        return nullptr;
+    if (!SimOwns(p))
         return GlueImportError("SimFree", "the pointer is outside the sim block");
-    SimFree(p);
+    LiveProbe probe = {p, 0};
+    SimBlockForEach(ProbeLive, &probe);
+    if (probe.found)
+        SimFree(p);
     return nullptr;
 }
 
@@ -300,6 +317,10 @@ IMPORT(RecordSimEventImport)
 IMPORT(SimCaptureAllocImport)
 {
     NEED("SimCaptureAlloc", 1);
+    if (a[1].i32 == 0) {
+        a[0].i32 = 0;
+        return nullptr;
+    }
     if (ModulesMemory()->size - (unsigned)a[1].i32 < sizeof(unsigned))
         return GlueImportError("SimCaptureAlloc", "the buffer runs past the module memory");
     unsigned address;
@@ -310,7 +331,7 @@ IMPORT(SimCaptureAllocImport)
 
 IMPORT(GetSlotDpidImport)
 {
-    a[0].i32 = GetSlotDpid((unsigned char)a[0].i32);
+    a[0].i32 = (unsigned)a[0].i32 > 10 ? -1 : GetSlotDpid((unsigned char)a[0].i32);
     return nullptr;
 }
 

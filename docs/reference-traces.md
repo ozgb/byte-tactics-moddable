@@ -482,13 +482,14 @@ the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `re
   panel reads `FRATE: 0`, as #1147 draws it. A `--traces` run at the reference tip 5e2e36a08, which changes only
   `tools/playtest.py`, gives every one of these files again but for the commit line. The sounds, UI logs, interface
   commands, events, frames and views of the 98 are those of v51, and the saves decode equal to v51's.
-- `reference-traces-v53` (#1132): the scenarios of v52 with the selection's visit mark, bits 6 and 7 of `Unit.flags`
-  (`selectState`), out of the judged state and the view. The trace masks them out of the `Unit` table (mask 0xffffff2f,
-  `docs/state.md`, "The selection"), and the view clears them from `ViewUnit.flags`, at view version 2.1
-  (`docs/view.md`). A `ui-` scenario played from its command log then gives its own traces. The view header carries
-  the minor version, so every view file and every `view` row changes, and with them every digest; no `tick` row
-  changes. The commit line names 2d6f1c7c1, the reference tip with the view 2.1 fill (#1183). The trace format is still
-  `bt-trace 10`. The event digests, sound logs, UI logs, interface commands, display logs and saves are those of v52.
+- `reference-traces-v53` (#1132): the 102 scenarios of v52 with the selection's visit mark, bits 6 and 7 of
+  `Unit.flags` (`selectState`), out of the judged state and the view. The trace masks them out of the `Unit` table (mask
+  0xffffff2f, `docs/state.md`, "The selection"), and the view clears them from `ViewUnit.flags`, at view version 2.1
+  (`docs/view.md`), so a `ui-` scenario played from its command log gives its own traces. The `tick` rows change only
+  in the thirteen `ui-` scenarios, the only ones whose units get the mark. The view header carries the minor version, so every view file and every `view` row changes, and with
+  them every digest. The commit line names 2d6f1c7c1, the reference tip with the view 2.1 fill (#1183). The trace
+  format is still `bt-trace 10`. The event digests, sound logs, UI logs, interface commands, display logs, frames and
+  saves are those of v52.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

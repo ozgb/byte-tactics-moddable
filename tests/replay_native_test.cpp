@@ -9341,6 +9341,11 @@ void UnreadArgumentSelfTest()
     Imp_los_radar_GetMapCellAtPosition(&pos);
     printf("a changed z: %s\n%s", g_firstKey, g_detail.Data());
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 los_radar.GetMapCellAtPosition") == 0, "its x and z are");
+    pos.z = 2097152;
+    BeginServices("  i los_radar.GetOriginCellAtPosition pos=(1048576,77,2097152) = null\n");
+    Imp_los_radar_GetOriginCellAtPosition(&pos);
+    printf("a changed y of another lookup: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 los_radar.GetOriginCellAtPosition") == 0, "the y of any other import is compared");
 }
 
 int g_askIndex;
@@ -9395,12 +9400,21 @@ void GafQuerySelfTest(const char* file)
     char* block = (char*)malloc(length + 1);
     memcpy(block, first + 1, length);
     block[length] = '\0';
-    const char* call = strstr(text, "\ncall ");
-    const char* at = call == nullptr ? nullptr : strchr(call + 1, '\n') + 1;
+    const char* at = strstr(text, "\n  i ");
+    while (at != nullptr && IsQueryLine(at + 1))
+        at = strstr(at + 1, "\n  i ");
+    Check(at != nullptr, "the recording has an import judged in order");
+    if (at == nullptr) {
+        free(block);
+        free(text);
+        return;
+    }
+    at++;
     unsigned changedLength = 0;
     char* changed = Splice(text, size, at, 0, block, &changedLength);
     g_queryAnswers = 0;
     ReplayChangedText(changed, changedLength, out);
+    printf("an unasked frame before an import judged in order: %d frames, %s\n", g_queryAnswers, out.diverged ? out.key : "equal");
     Check(!out.diverged && g_queryAnswers == recorded, "a module that asks less often than the recording does is equal");
     free(changed);
     free(block);
@@ -9589,6 +9603,11 @@ int main(int argc, char** argv)
         ReplayWasmSelect(argv[arg + 1]);
         printf("replaying against the WASM module %s\n", argv[arg + 1]);
         arg += 2;
+        if (arg < argc && strcmp(argv[arg], "--no-budgets") == 0) {
+            ReplayWasmNoBudgets();
+            printf("an entry with no fuel_budget runs with the largest, %ld\n", 2147483647L);
+            arg++;
+        }
     }
     if (arg < argc && strcmp(argv[arg], "--self-test") == 0) {
         SelfTest(arg + 1 < argc ? argv[arg + 1] : nullptr);
@@ -9598,7 +9617,7 @@ int main(int argc, char** argv)
         expectField = argv[arg + 2];
         arg += 3;
     } else if (arg >= argc) {
-        printf("usage: replay_native_test [--wasm MODULE.wasm] [--self-test [RECORDING] | --expect CALL FIELD RECORDING...] RECORDING...\n       replay_native_test --core host CALLS OUT\n");
+        printf("usage: replay_native_test [--wasm MODULE.wasm [--no-budgets]] [--self-test [RECORDING] | --expect CALL FIELD RECORDING...] RECORDING...\n       replay_native_test --core host CALLS OUT\n");
         return 2;
     }
     for (; arg < argc; arg++)

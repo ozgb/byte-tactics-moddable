@@ -1798,9 +1798,10 @@ Two rules narrow the import comparison (`docs/module-abi.md`, section 15, names 
   and `z`, and the reclaim scan passes a position whose `y` it never sets.
 
 The los_radar self-test checks both on `console-sight`: the recording replays equal with its 26 frames, equal again when
-the module asks for the frame before each slot and twice after it (5699 calls, in another order), equal with an extra
-recorded frame it never asks for, and a frame index no line answers is reported at the query. Every `--self-test` also
-replays a cell lookup whose `y` changed, which is equal, and one whose `z` changed, which is reported at its import.
+the module asks for the frame before each slot and twice after it (5699 frames asked for over the recording's 1931 calls, in
+another order and count), equal with an extra recorded frame it never asks for, placed just before an import judged in order, and a frame index no line answers is reported at the query. Every `--self-test` also
+replays a cell lookup whose `y` changed, which is equal, one whose `z` changed, which is reported at its import, and a
+`los_radar.GetOriginCellAtPosition` whose `y` changed, which is reported too: the rule is that one import's alone.
 
 `--self-test [FILE]` first round-trips a small graph of objects (a `Player` with two `Unit`s sharing a `UnitDef`)
 through the text form and reports a changed field at its `Kind#N.field`. It then does the same for each form of the text
@@ -2033,6 +2034,10 @@ cmake --build build/modern --target wasm_runtime wasm_runtime_inject
 wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors.wasm tests/replay/wind_meteors/*.txt
 wine build/modern/replay_native_test.exe --wasm build/modern/wind_meteors_inject.wasm --expect 2 SimGlobals.g_meteorScheduleGap tests/replay/wind_meteors/meteors-hailstorm.txt
 ```
+
+`--no-budgets`, right after the module, runs an entry with no `fuel_budget` (a blocked one) with the largest fuel budget,
+2147483647 a tick, where the replay otherwise stops: the oracle's verdict on such a module says `budgets: not_judged`
+(`docs/module-abi.md`, section 15).
 
 The recordings don't depend on how the modern build runs a subsystem. A module of targeting or map, native or
 WASM, has to replay them equal, as `wind_meteors.wasm` replays its own.

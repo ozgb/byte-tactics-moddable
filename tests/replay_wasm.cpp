@@ -16,6 +16,8 @@ char s_wasmPath[320];
 char s_directory[320];
 wl_loader* s_loader;
 int s_active;
+bool s_noBudgets;
+const long kLargestFuelBudget = 2147483647;
 void (*s_trapHook)(const char* errorClass, const char* text);
 
 }
@@ -214,10 +216,18 @@ void ReplayWasmReload()
     Check(module != nullptr);
     free(bytes);
     long fuelBudget = 0;
-    if (!wl_module_int(s_loader, s_glue->def->name, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
-        Stop("the manifest has no fuel_budget");
+    if (!wl_module_int(s_loader, s_glue->def->name, "fuel_budget", &fuelBudget) || fuelBudget <= 0) {
+        if (!s_noBudgets)
+            Stop("the manifest has no fuel_budget");
+        fuelBudget = kLargestFuelBudget;
+    }
     Check(GlueBind(s_glue, s_loader, module, (unsigned)fuelBudget));
     GlueFuelClose(s_glue, &used);
+}
+
+void ReplayWasmNoBudgets()
+{
+    s_noBudgets = true;
 }
 
 void ReplayWasmUseSeam()

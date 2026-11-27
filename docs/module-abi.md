@@ -989,10 +989,11 @@ in one memory and one table side by side; the fixture manifest's windows and ran
 submitted module in place of the default one, and writes a result that holds verdicts and the module's own values.
 
 ```sh
-uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full | --recordings-only] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
+uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full | --recordings-only] [--manifest M] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
 ```
 
-It has two routes, and the result's `scope` names the one it took:
+Every run first removes `DIR/result.json`, `DIR/runtime/` and `DIR/logs/`, so a run that stops with an error leaves no
+earlier result behind. It has two routes, and the result's `scope` names the one it took:
 
 - **`scenarios`**, the steps below: the suite and the recordings. It is the route of a subsystem whose manifest entry builds
   (no `blocked`), so that the game loads the module in every scenario.
@@ -1000,8 +1001,14 @@ It has two routes, and the result's `scope` names the one it took:
   module of it), or any subsystem with `--recordings-only`: step 1, then every recording of `tests/replay/<subsystem>/`
   replayed against the module, one `replay_native_test.exe --wasm` run per recording (`docs/replay-format.md`, "Against the
   WASM module"). The scenarios are not played: the result has `scenarios: not_judged`, and the module has met its contract
-  on those recordings only. A blocked entry has no `size_budget` or `fuel_budget` (section 11.3), so for now step 1 refuses
-  its module.
+  on those recordings only. `--manifest` judges against another game manifest than `wasm/modules.json`, on this route only.
+
+**A blocked entry is judged without budgets.** It has no `size_budget` or `fuel_budget` (section 4.2), so check-module does
+not judge the module's size, and the replayer runs it with the largest fuel budget of section 11.3, 2147483647 a tick
+(`replay_native_test.exe --wasm MODULE.wasm --no-budgets`). Everything else of step 1 is checked as for any module. The
+result has `budgets: not_judged`, and the summary line ends `budgets not judged`. A module that is equal there has met its
+contract on its recordings, and its fuel and size are judged once the entry has budgets. Every other result has
+`budgets: judged`.
 
 The recordings route names the replay rules it judged under in `rules`:
 
@@ -1040,6 +1047,7 @@ The recordings route names the replay rules it judged under in `rules`:
 | --- | --- |
 | `format` | 4 |
 | `scope` | `scenarios` or `recordings`: the route the run took |
+| `budgets` | `judged`, or `not_judged` for a blocked entry's module, judged without its size and fuel budgets |
 | `rules` | with `recordings`: `queries` and `unread_arguments`, the replay rules above |
 | `verdict` | `equal`, `differs`, `failed` (a run did not finish, or a check other than the traces failed) or `refused`; a scenario counts by its `state` verdict |
 | `digest` | `equal`, `differs` or `not_judged`: whether every judged scenario is also equal on every row of each tick (absent with `refused`) |

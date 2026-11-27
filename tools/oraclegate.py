@@ -1,6 +1,6 @@
 """Judge a submitted module by behaviour alone (docs/module-abi.md, "Judging a module").
 
-    uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full | --recordings-only] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
+    uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full | --recordings-only] [--manifest M] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
 
 Refuses the module, before anything plays, when `tools/wasm_modules.py check-module` finds a problem in the file: the window,
 table, imports, exports, kinds or size budget of docs/module-abi.md, section 5.2. Then copies the runtime files of the modern build (and objs/objects.rsp, which the block pointer check reads beside the map) into a fresh directory with MODULE.wasm in place of the subsystem's module,
@@ -26,6 +26,13 @@ replay rules it was judged under in `rules`: the imports answered as pure querie
 whenever the module asks, in any count or order) and the arguments no callee reads (the `y` of the position the reclaim
 scan passes to `los_radar.GetMapCellAtPosition`, which the scan leaves unset). The scenario route's result has `scope: scenarios`.
 
+A blocked entry has no budgets, so its module is judged without them: check-module does not judge its size, and the replayer
+runs it with the largest fuel budget (`--no-budgets`, 2147483647 a tick). Its result has `budgets: not_judged`, and the
+summary line says so; every other result has `budgets: judged`. `--manifest` judges against another game manifest than
+wasm/modules.json (recordings route only): check-module, the replayer and the blocked test all read it.
+
+Every run first removes DIR/result.json, DIR/runtime and DIR/logs, so a run that stops with an error leaves no earlier result.
+
 Exit status: 0 when every scenario and recording is equal, 1 when one differs or failed to run, 2 when the loader refused
 the module or the arguments were wrong.
 """
@@ -46,6 +53,7 @@ import replay
 ROOT = Path(__file__).resolve().parent.parent
 FORMAT = 4
 REPLAYER = "replay_native_test.exe"
+MANIFEST = ROOT / "wasm/modules.json"
 REPLAY_TIMEOUT = 3600
 RULES = {"queries": ["services.GetGafFrame"], "unread_arguments": ["los_radar.GetMapCellAtPosition pos.y"]}
 RUNTIME_FILES = ("TotalA.exe", "TotalA.map", "CMakeCache.txt", "wasmtime_host.dll", "modules.json")
@@ -93,15 +101,22 @@ def manifest_modules(build: Path) -> list[str]:
     return [m["name"] for m in json.loads((build / "modules.json").read_text())["modules"]]
 
 
-def blocked(subsystem: str) -> bool:
-    """Whether the subsystem's entry of wasm/modules.json is blocked: its default does not build to WASM, so no scenario can load a module of it."""
-    for entry in json.loads((ROOT / "wasm/modules.json").read_text())["modules"]:
+def blocked(subsystem: str, manifest: Path = MANIFEST) -> bool:
+    """Whether the subsystem's entry of the game manifest is blocked: its default does not build to WASM, so no scenario can load a module of it, and it has no budgets."""
+    for entry in json.loads(manifest.read_text())["modules"]:
         if entry["name"] == subsystem:
             return "blocked" in entry
-    raise Error(f"wasm/modules.json has no module {subsystem}")
+    raise Error(f"{manifest} has no module {subsystem}")
 
 
-def prepare_replay_runtime(build: Path, subsystem: str, module: Path, directory: Path) -> Path:
+def clear_run(out: Path) -> None:
+    """Remove what an earlier run left in `out`, so that a run that stops early leaves no result that is not its own."""
+    for stale in ("runtime", "logs"):
+        shutil.rmtree(out / stale, ignore_errors=True)
+    (out / "result.json").unlink(missing_ok=True)
+
+
+def prepare_replay_runtime(build: Path, subsystem: str, module: Path, directory: Path, manifest: Path = MANIFEST) -> Path:
     """A fresh directory with the files `replay_native_test.exe --wasm` reads beside the module: the wasmtime DLL, the manifest and `module` as the subsystem's."""
     for name in ("wasmtime_host.dll", REPLAYER):
         if not (build / name).is_file():
@@ -109,7 +124,7 @@ def prepare_replay_runtime(build: Path, subsystem: str, module: Path, directory:
     shutil.rmtree(directory, ignore_errors=True)
     directory.mkdir(parents=True)
     shutil.copy2(build / "wasmtime_host.dll", directory / "wasmtime_host.dll")
-    shutil.copy2(ROOT / "wasm/modules.json", directory / "modules.json")
+    shutil.copy2(manifest, directory / "modules.json")
     shutil.copyfile(module, directory / f"{subsystem}.wasm")
     return directory / f"{subsystem}.wasm"
 
@@ -147,9 +162,11 @@ def refusal(wine_log: str) -> str | None:
     return None
 
 
-def check_module(module: Path, subsystem: str) -> str | None:
+def check_module(module: Path, subsystem: str, manifest: Path | None = None) -> str | None:
     """The problems `wasm_modules.py check-module` finds in the file (a subprocess, as the build runs it), None when there are none."""
     cmd = [sys.executable, str(ROOT / "tools/wasm_modules.py"), "check-module", str(module), "--name", subsystem]
+    if manifest is not None:
+        cmd += ["--manifest", str(manifest)]
     r = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
     if r.returncode == 0:
         return None
@@ -318,7 +335,7 @@ def build_result(subsystem: str, module: Path, full: bool, kit: dict, suite: dic
                  message: str | None, seconds: float) -> dict:
     """The contents of result.json. Every value comes from a parsed field, none from a report's text."""
     result = {"format": FORMAT, "subsystem": subsystem, "module": {"sha256": sha256(module), "bytes": module.stat().st_size},
-              "kit": kit, "scope": "scenarios", "suite": "full" if full else "tier", "seconds": round(seconds)}
+              "kit": kit, "scope": "scenarios", "budgets": "judged", "suite": "full" if full else "tier", "seconds": round(seconds)}
     if message is not None:
         result.update(verdict="refused", message=message)
         return result
@@ -327,10 +344,11 @@ def build_result(subsystem: str, module: Path, full: bool, kit: dict, suite: dic
     return result
 
 
-def build_recordings_result(subsystem: str, module: Path, kit: dict, recordings: dict | None, message: str | None, seconds: float) -> dict:
+def build_recordings_result(subsystem: str, module: Path, kit: dict, recordings: dict | None, message: str | None, seconds: float,
+                            budgets: bool = True) -> dict:
     """The contents of result.json for the recordings route. Every value comes from a parsed field, none from a report's text."""
     result = {"format": FORMAT, "subsystem": subsystem, "module": {"sha256": sha256(module), "bytes": module.stat().st_size},
-              "kit": kit, "scope": "recordings", "rules": RULES, "seconds": round(seconds)}
+              "kit": kit, "scope": "recordings", "budgets": "judged" if budgets else "not_judged", "rules": RULES, "seconds": round(seconds)}
     if message is not None:
         result.update(verdict="refused", message=message)
         return result
@@ -343,23 +361,23 @@ def recording_files(subsystem: str) -> list[Path]:
     return sorted((ROOT / "tests/replay" / subsystem).glob("*.txt"))
 
 
-def judge_recordings(module: Path, subsystem: str, build: Path, out: Path) -> dict:
-    """Judge the module on the recordings of tests/replay/SUBSYSTEM/ alone, one replayer run per recording."""
+def judge_recordings(module: Path, subsystem: str, build: Path, out: Path, manifest: Path = MANIFEST) -> dict:
+    """Judge the module on the recordings of tests/replay/SUBSYSTEM/ alone, one replayer run per recording; a blocked entry's without its budgets."""
     started = time.time()
-    for stale in ("runtime", "logs"):
-        shutil.rmtree(out / stale, ignore_errors=True)
-    problems = check_module(module, subsystem)
+    clear_run(out)
+    budgets = not blocked(subsystem, manifest)
+    problems = check_module(module, subsystem, None if manifest == MANIFEST else manifest)
     kit = kit_version()
     if problems is not None:
-        return build_recordings_result(subsystem, module, kit, None, problems, time.time() - started)
+        return build_recordings_result(subsystem, module, kit, None, problems, time.time() - started, budgets)
     files = recording_files(subsystem)
     if not files:
         raise Error(f"tests/replay/{subsystem}/ has no recordings")
-    wasm = prepare_replay_runtime(build, subsystem, module, out / "runtime")
+    wasm = prepare_replay_runtime(build, subsystem, module, out / "runtime", manifest)
     (out / "logs/recordings").mkdir(parents=True)
     recordings = {}
     for path in files:
-        cmd = ["wine", str(build / REPLAYER), "--wasm", str(wasm), str(path.relative_to(ROOT))]
+        cmd = ["wine", str(build / REPLAYER), "--wasm", str(wasm), *([] if budgets else ["--no-budgets"]), str(path.relative_to(ROOT))]
         log = out / "logs/recordings" / path.name
         try:
             with log.open("w") as f:
@@ -367,7 +385,7 @@ def judge_recordings(module: Path, subsystem: str, build: Path, out: Path) -> di
         except subprocess.TimeoutExpired:
             code = -1
         recordings[f"{subsystem}/{path.stem}"] = parse_replay(log.read_text(errors="replace"), code)
-    return build_recordings_result(subsystem, module, kit, recordings, None, time.time() - started)
+    return build_recordings_result(subsystem, module, kit, recordings, None, time.time() - started, budgets)
 
 
 def stream(cmd: list[str], log: Path) -> tuple[int, str]:
@@ -378,8 +396,7 @@ def stream(cmd: list[str], log: Path) -> tuple[int, str]:
 
 def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game_dir: str | None) -> dict:
     started = time.time()
-    for stale in ("runtime", "logs"):
-        shutil.rmtree(out / stale, ignore_errors=True)
+    clear_run(out)
     problems = check_module(module, subsystem)
     if problems is not None:
         return build_result(subsystem, module, full, kit_version(), None, None, problems, time.time() - started)
@@ -418,6 +435,7 @@ def summary(result: dict) -> str:
     bad = [f"{n}: {v['status']}" + (f" ({v['reason']})" if "reason" in v else "") + (f" at call {v['call']}, {v['field']}" if "call" in v else "")
            for n, v in {**scenarios, **result["recordings"]}.items() if v["status"] != "equal"]
     scope = " on recordings; scenarios not judged" if result["scope"] == "recordings" else ""
+    scope += "; budgets not judged" if result.get("budgets") == "not_judged" else ""
     return f"{result['verdict']}{scope} ({len(bad)} not equal)" + "".join("\n  " + b for b in bad)
 
 
@@ -429,17 +447,22 @@ def main() -> int:
     route.add_argument("--full", action="store_true", help="play the full --check instead of the tier")
     route.add_argument("--recordings-only", action="store_true", help="judge on the recordings of tests/replay/SUBSYSTEM/ alone (the route of a blocked manifest entry)")
     ap.add_argument("--out", type=Path, default=ROOT / "build/oracle", help="the directory of the run: runtime/, logs/ and result.json (default build/oracle)")
+    ap.add_argument("--manifest", type=Path, help="the game manifest to judge against (default wasm/modules.json; recordings route only)")
     ap.add_argument("--build-dir", type=Path, default=ROOT / "build/modern")
     ap.add_argument("--game-dir")
     args = ap.parse_args()
     if not args.module.is_file():
         ap.error(f"{args.module} is not a file")
+    manifest = args.manifest.resolve() if args.manifest else MANIFEST
+    (args.out / "result.json").unlink(missing_ok=True)
     try:
-        if args.recordings_only or blocked(args.subsystem):
+        if args.recordings_only or blocked(args.subsystem, manifest):
             if args.full:
                 ap.error(f"{args.subsystem}'s manifest entry is blocked: no scenario can load its module, so it is judged on its recordings alone")
-            result = judge_recordings(args.module.resolve(), args.subsystem, args.build_dir.resolve(), args.out.resolve())
+            result = judge_recordings(args.module.resolve(), args.subsystem, args.build_dir.resolve(), args.out.resolve(), manifest)
         else:
+            if args.manifest:
+                ap.error("--manifest judges on the recordings route only: add --recordings-only")
             result = judge(args.module.resolve(), args.subsystem, args.full, args.build_dir.resolve(), args.out.resolve(), args.game_dir)
     except (Error, OSError) as e:
         print(f"oraclegate: {e}", file=sys.stderr)

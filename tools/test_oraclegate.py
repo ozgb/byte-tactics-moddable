@@ -272,7 +272,7 @@ class RecordingsRoute(unittest.TestCase):
         recordings = {"los_radar/console-sight": {"status": "equal"}}
         with tempfile.TemporaryDirectory() as tmp:
             result = oraclegate.build_recordings_result("los_radar", self.module(tmp), {}, recordings, None, 3)
-        self.assertEqual((result["format"], result["scope"], result["scenarios"], result["verdict"]), (4, "recordings", "not_judged", "equal"))
+        self.assertEqual((result["format"], result["scope"], result["scenarios"], result["verdict"], result["budgets"]), (4, "recordings", "not_judged", "equal", "judged"))
         self.assertEqual(result["rules"], {"queries": ["services.GetGafFrame"], "unread_arguments": ["los_radar.GetMapCellAtPosition pos.y"]})
         self.assertEqual(oraclegate.summary(result), "equal on recordings; scenarios not judged (0 not equal)")
 
@@ -302,6 +302,92 @@ class RecordingsRoute(unittest.TestCase):
         self.assertFalse(oraclegate.blocked("wind_meteors"))
         with self.assertRaises(oraclegate.Error):
             oraclegate.blocked("nope")
+
+
+class BlockedEntry(unittest.TestCase):
+    """A fixture manifest whose wind_meteors entry is marked blocked, without its budgets, judged with the replayer mocked."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        self.build = self.dir / "build"
+        self.build.mkdir()
+        for name in ("wasmtime_host.dll", oraclegate.REPLAYER):
+            (self.build / name).write_text("x")
+        game = json.loads(oraclegate.MANIFEST.read_text())
+        entry = next(m for m in game["modules"] if m["name"] == "wind_meteors")
+        for budget in ("fuel_budget", "size_budget"):
+            del entry[budget]
+        entry["blocked"] = "a fixture: its default does not build"
+        self.manifest = self.dir / "modules.json"
+        self.manifest.write_text(json.dumps(game))
+        self.module = self.dir / "m.wasm"
+        self.module.write_bytes(b"\0asm\1\0\0\0")
+        self.calls = []
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def fake_run(self, cmd, **kw):
+        self.calls.append(cmd)
+        if cmd[0] == "wine":
+            kw["stdout"].write(f"{cmd[-1]}: 10 calls, 3 imports, identical on a second run\nreplay_native_test: all passed\n")
+            return subprocess.CompletedProcess(cmd, 0)
+        if "check-module" in cmd:
+            return subprocess.CompletedProcess(cmd, 0, "wind_meteors: ok\n", "")
+        return subprocess.CompletedProcess(cmd, 1, "", "")
+
+    def judge(self, manifest):
+        with mock.patch.object(oraclegate.subprocess, "run", side_effect=self.fake_run):
+            return oraclegate.judge_recordings(self.module, "wind_meteors", self.build, self.dir / "out", manifest)
+
+    def test_a_blocked_entry_is_judged_on_its_recordings_without_budgets(self):
+        self.assertTrue(oraclegate.blocked("wind_meteors", self.manifest))
+        result = self.judge(self.manifest)
+        self.assertEqual((result["scope"], result["scenarios"], result["budgets"], result["verdict"]), ("recordings", "not_judged", "not_judged", "equal"))
+        self.assertEqual(sorted(result["recordings"]), [f"wind_meteors/{p.stem}" for p in oraclegate.recording_files("wind_meteors")])
+        self.assertEqual(oraclegate.summary(result), "equal on recordings; scenarios not judged; budgets not judged (0 not equal)")
+        replays = [c for c in self.calls if c[0] == "wine"]
+        self.assertTrue(replays and all("--no-budgets" in c for c in replays))
+        check = next(c for c in self.calls if "check-module" in c)
+        self.assertEqual(check[check.index("--manifest") + 1], str(self.manifest))
+        self.assertEqual((self.dir / "out/runtime/modules.json").read_text(), self.manifest.read_text())
+
+    def test_an_entry_with_budgets_is_judged_with_them(self):
+        result = self.judge(oraclegate.MANIFEST)
+        self.assertEqual(result["budgets"], "judged")
+        self.assertFalse(any("--no-budgets" in c for c in self.calls))
+        self.assertFalse(any("--manifest" in c for c in self.calls))
+        self.assertEqual(oraclegate.summary(result), "equal on recordings; scenarios not judged (0 not equal)")
+
+    def test_a_refused_blocked_module_still_names_its_budgets(self):
+        with mock.patch.object(oraclegate, "check_module", return_value="wind_meteors: has no stack pointer"):
+            result = oraclegate.judge_recordings(self.module, "wind_meteors", self.build, self.dir / "out", self.manifest)
+        self.assertEqual((result["verdict"], result["budgets"]), ("refused", "not_judged"))
+
+
+class StaleResult(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        self.out = self.dir / "out"
+        self.out.mkdir()
+        (self.out / "result.json").write_text(json.dumps({"verdict": "equal"}))
+        self.module = self.dir / "m.wasm"
+        self.module.write_bytes(b"\0asm\1\0\0\0")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_a_recordings_run_that_stops_leaves_no_earlier_result(self):
+        with mock.patch.object(oraclegate, "check_module", return_value=None), self.assertRaises(oraclegate.Error):
+            oraclegate.judge_recordings(self.module, "wind_meteors", self.dir / "no-build", self.out)
+        self.assertFalse((self.out / "result.json").exists())
+
+    def test_a_scenario_run_that_stops_leaves_no_earlier_result(self):
+        with mock.patch.object(oraclegate, "check_module", return_value=None), self.assertRaises((oraclegate.Error, OSError)):
+            oraclegate.judge(self.module, "wind_meteors", False, self.dir / "no-build", self.out, None)
+        self.assertFalse((self.out / "result.json").exists())
 
 
 class Refusal(unittest.TestCase):

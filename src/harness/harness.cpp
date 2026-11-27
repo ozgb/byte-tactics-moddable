@@ -4946,7 +4946,7 @@ const char* HarnessMapName()
     return s_map;
 }
 
-int __stdcall GetTickRate();
+#include "../graphics/display.h"
 
 unsigned int __stdcall HarnessMenuTicks(unsigned int live)
 {

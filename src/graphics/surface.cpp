@@ -278,7 +278,7 @@ static inline int RestoreSurfacesInline(Display* d)
 
 static void RedrawCursorOnFrame(Display* d)
 {
-    if (HarnessTestMode() && d->cursorThreadEnabled == 1 && d->cursorSprite != 0)
+    if (HarnessTestMode() && d->cursorThreadEnabled == 1 && d->cursorSprite != nullptr)
         RedrawMouseCursor(d);
 }
 

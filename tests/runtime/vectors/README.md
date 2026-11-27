@@ -316,6 +316,7 @@ belongs to it.
   byte, the value accumulated modulo 2^32 and negated after a `-`; no digit gives 0.
 - `%s` and `%d`, `%i` and `%x` of `sscanf` treat these bytes as "sscanf" says: part of a word, and not a digit.
 
+
 ## Left out
 
 - `qsort`: game logic has no qsort call, and the order in which equal elements end is left open.

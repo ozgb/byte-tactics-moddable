@@ -660,7 +660,8 @@ class Walker:
 
 
 def rehash(schema: Schema, blocks: dict[tuple[int, str], list[tuple[str, str]]]) -> list[tuple[int, str, int]]:
-    """The (tick, phase, hash) rows a dump gives, phases in order, `world` after `meteors`, `tick` after that."""
+    """The (tick, phase, hash) rows a dump gives, by tick and then in the row order of docs/trace-format.md, section 2,
+    whatever the order of its blocks."""
     rows = []
     for tick in sorted({t for t, _ in blocks}):
         for phase in PHASES:

@@ -768,6 +768,11 @@ IDENTIFIER = re.compile(r"^[A-Za-z_]\w*$")
 
 
 @functools.lru_cache(maxsize=None)
+def layout_schema() -> traceschema.Schema:
+    return traceschema.Schema()
+
+
+@functools.lru_cache(maxsize=None)
 def game_functions() -> frozenset[str]:
     """The names of the functions of data/game_logic.csv, the ones a loader of `loads` may name."""
     with (ROOT / "data/game_logic.csv").open(newline="") as f:
@@ -785,7 +790,7 @@ def check_loads(ann: dict, known_functions) -> tuple[list[dict], list[str]]:
     kinds = ann["objects"]
     if not isinstance(loads, dict):
         return out, ["`loads` maps the name of a load kind to its type, loader and holders"]
-    layout = {l["name"]: l for l in traceschema.Schema().layout("Game")[0]}
+    layout = {l["name"]: l for l in layout_schema().layout("Game")[0]}
     for name, spec in loads.items():
         where = "load %s" % name
         if not re.match(r"^[a-z][a-z0-9_]*$", name):
@@ -1127,30 +1132,52 @@ def tracked(target: str, game: dict, sim: dict, aliases: dict | None = None) -> 
     return None
 
 
-def object_targets(target: str, ann: dict) -> list[tuple[str, str]]:
-    """(kind, field) of every object field the target `Type::member` names: the member of a state or index kind of that type, or an alias.
-
-    A value kind is not matched: the fields of a struct argument are recorded as its lines, never as `r` and `w` lines of an object."""
-    if "::" not in target:
-        return []
-    type_name, member = target.split("::", 1)
-    hits = []
+def object_target_index(ann: dict) -> dict[str, list[tuple[str, str]]]:
+    """Each `Type::member` and alias to the (kind, field) hits object_targets gives it."""
+    index: dict[str, list[tuple[str, str]]] = {}
     for kind, spec in ann["objects"].items():
         if spec["scope"] == "value":
             continue
         for f in spec["fields"]:
-            if (spec["type"] == type_name and f["name"] == member) or target in f.get("aliases", []):
-                hits.append((kind, f["name"]))
-    return hits
+            keys = [a for a in f.get("aliases", []) if "::" in a]
+            if "::" not in spec["type"]:
+                keys.append("%s::%s" % (spec["type"], f["name"]))
+            for key in dict.fromkeys(keys):
+                index.setdefault(key, []).append((kind, f["name"]))
+    return index
 
 
-def whole_struct_kinds(kind: str, target: str, ann: dict) -> list[str]:
+def object_targets(target: str, ann: dict, index: dict | None = None) -> list[tuple[str, str]]:
+    """(kind, field) of every object field the target `Type::member` names: the member of a state or index kind of that type, or an alias.
+
+    A value kind is not matched: the fields of a struct argument are recorded as its lines, never as `r` and `w` lines of an object."""
+    if index is None:
+        index = object_target_index(ann)
+    return list(index.get(target, ()))
+
+
+def whole_struct_index(ann: dict) -> dict[str, list[str]]:
+    """Each type name to the state and index kinds a `deref_write` of it assigns whole."""
+    index: dict[str, list[str]] = {}
+    for kind, spec in ann["objects"].items():
+        if spec["scope"] == "value":
+            continue
+        names = [spec["type"]]
+        for f in spec["fields"]:
+            for a in f.get("aliases", []):
+                names += [a[:m.start()] for m in re.finditer(r"(?=::)", a)]
+        for name in dict.fromkeys(names):
+            index.setdefault(name, []).append(kind)
+    return index
+
+
+def whole_struct_kinds(kind: str, target: str, ann: dict, index: dict | None = None) -> list[str]:
     """The state and index kinds a `deref_write *T` assigns whole: those of type T, or with a field that aliases a member of T (a view)."""
     if kind != "deref_write" or not target.startswith("*") or BARE_POINTER.match(target):
         return []
-    type_name = target[1:]
-    return [k for k, spec in ann["objects"].items() if spec["scope"] != "value"
-            and (spec["type"] == type_name or any(a.startswith(type_name + "::") for f in spec["fields"] for a in f.get("aliases", [])))]
+    if index is None:
+        index = whole_struct_index(ann)
+    return list(index.get(target[1:], ()))
 
 
 WALKABLE = ("ref", "embed", "unitid", "weapon", "refs", "embeds")
@@ -1394,7 +1421,7 @@ STATE_PATH = re.compile(r"^Game(\.[A-Za-z_]\w*)+$")
 
 @functools.lru_cache(maxsize=None)
 def game_members() -> frozenset[str]:
-    return frozenset(l["name"] for l in traceschema.Schema().layout("Game")[0])
+    return frozenset(l["name"] for l in layout_schema().layout("Game")[0])
 
 
 def arg_type(a: dict) -> str:
@@ -1958,6 +1985,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for i, r in enumerate(ann["rules"]):
         rules_of.setdefault((r["kind"], r["target"]), []).append(i)
     fixture_only = {"SimGlobals." + n for n in ann.get("fixture_sim", [])}
+    target_index = object_target_index(ann)
+    whole_index = whole_struct_index(ann)
     state_types = {spec["type"] for spec in ann["objects"].values() if spec["scope"] == "state"}
     kind_types = {spec["type"] for spec in ann["objects"].values()}
     exempt_types = ann.get("exempt_types", {})
@@ -2046,10 +2075,10 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                             pass
                         elif target.startswith("Game::") or target.startswith("g_"):
                             pending["untracked"].add(target)
-                    for whole in whole_struct_kinds(kind, target, ann):
+                    for whole in whole_struct_kinds(kind, target, ann, whole_index):
                         obj_writes.update(i for i, f in enumerate(object_fields) if f["object"] == whole)
                     if kind in OBJECT_KINDS:
-                        hits = object_targets(target, ann)
+                        hits = object_targets(target, ann, target_index)
                         for hit in hits:
                             i = object_index[(hit[0], hit[1])]
                             if "r" in OBJECT_KINDS[kind]:
@@ -2278,7 +2307,7 @@ def block_vector(name: str, spec: dict, owner: str, vectors: list[dict], ann: di
 
 
 def field_table(game: dict, sim: dict, arrays: list[dict], errors: list[str], kinds: dict | None = None, vectors: list[dict] | None = None, ann: dict | None = None) -> list[dict]:
-    schema = traceschema.Schema()
+    schema = layout_schema()
     layout = {l["name"]: l for l in schema.layout("Game")[0]}
     fields = []
     for name, kind in game.items():
@@ -4202,6 +4231,7 @@ def render_service_answers(services: list[dict], linked: set[str] | None = None)
 VTABLES_CPP = ROOT / "src/harness/replay_vtables.cpp"
 
 
+@functools.lru_cache(maxsize=None)
 def declaring_header(name: str) -> str:
     """The header under src/ that defines class or struct `name`, relative to the root, or "" when none does."""
     pattern = re.compile(r"^\s*(?:class|struct)\s+%s\b[^;]*$" % re.escape(name), re.M)

@@ -131,8 +131,8 @@ order, hands it to a `Set*` event): the same-statement answer is the new target.
 query that writes nothing. `NewUnitMotion` is both: unit creation runs in the tick (a build, a spawn) and outside it when
 a game is set up.
 
-**The network's writers** wait for #948 (parked), as #954's did. `ReceiveUnitStates` (`unit_position.cpp`, called from
-`HandleNetPackets`, phase 0) calls `ReadNetState` and `UpdateMotion` directly: `TODO(#948)` marks the `UpdateMotion`
+**The network's writers** wait for the network transport (#392). `ReceiveUnitStates` (`unit_position.cpp`, called from
+`HandleNetPackets`, phase 0) calls `ReadNetState` and `UpdateMotion` directly: `TODO(#392)` marks the `UpdateMotion`
 call. `NetSendUnitStates` calls `HasNetState` and `WriteNetState`, which read.
 
 **`UpdateMotion` and the scheduler.** The scheduler's units step is:
@@ -268,7 +268,7 @@ outside the tick, after LOAD has been delivered, and `HasNetState` reads the goa
 | units DESTROY, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but a unit can be killed inside its own update (`SelfDestructOrder` publishes a DAMAGE of 30000 on itself in `RunOrders`, and `ApplyUnitDeath` publishes DESTROY), and `SchedUnitsPhase` then tests `u->motion != 0`, delivers movement's inbox and calls `UpdateMotion(u)`, which would take the pointer the delivered DESTROY has just cleared. |
 | units LOAD, to movement | queued | Published only by `LoadUnitMotion` (`unit_save.cpp`), which `LoadUnit` calls from `LoadUnits` (`settings_campaign.cpp`) while a saved game loads, outside the tick, where `SchedPublish` delivers at once (#970). Queued, with COMMAND, QUEUE_BUILD and (in 3.0) PLACED, it stayed equal (section 8). |
 | units SET_MODE, to movement | synchronous | #952's rule. Queued it stayed equal on the tier (which has no transport), but `ApplyAttachUnit` publishes it when a unit is attached or detached, and `PrepVtolClimb` and the VTOL orders that follow it read `unit->motion->flags & 3`, the mode bits, in the statements after their ATTACH_TO_PIECE, before movement's inbox is delivered ahead of `UpdateMotion` (`vtol_orders.cpp`: `PrepVtolClimb` and the cases of lines 618, 1059, 1645 and 1894). |
-| units SET_SPEED, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, which has no network path: `ReadUnitState` publishes it in the net phase, and the next `ReceiveUnitStates` of the same phase calls `UpdateMotion` directly for every unit of its player (`TODO(#948)`), without a delivery, and `UpdateMotion` reads the speed. The same argument as the engine's REMOTE_DAMAGE row of `docs/weapons-interface.md`. |
+| units SET_SPEED, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, which has no network path: `ReadUnitState` publishes it in the net phase, and the next `ReceiveUnitStates` of the same phase calls `UpdateMotion` directly for every unit of its player (`TODO(#392)`), without a delivery, and `UpdateMotion` reads the speed. The same argument as the engine's REMOTE_DAMAGE row of `docs/weapons-interface.md`. |
 | map PLACED, to movement | removed in 4.0 | Queued in 3.0: #952's rule found no read, as it wrote `UnitMotion::pathLockStamp` (the tick), which only `GetMotionState` (the saved game, outside the tick) and the trace's hash, taken after a phase boundary, read; map's `AddUnitToMap`, its refresh and `spatialBucket` code did not read it. Since 4.0 map writes the stamp itself (`docs/map-interface.md`, section 3), so there is no event. |
 | orders SET_TARGET, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but an order can set its target and be deleted in the same `RunOrders` (or `AddOrder`'s pruning), and `Order::~Order` reads `UnitTarget` (`order_queue.cpp`) to decide whether the goal still steers to its own target: a pending SET_TARGET leaves the old target and the wrong branch. |
 | orders DESTROY_TARGET, to movement | synchronous | #952's rule. Queued it stayed equal on the tier, but it frees the target's block in the sim heap, and the orders that run after it in the same `RunOrders` loop and in `RunSecondaryOrders` build new targets through the `New*` slots, whose allocations read the heap's free list: queued, they would get other offsets, which the hashed orders keep. |
@@ -472,7 +472,7 @@ After this change:
 - **Units and scripts (#986), done:** the adapters (`src/seams/units_world.cpp`, `src/seams/scripts_world.cpp`) are
   handlers of their inboxes. Units' slots `SetUnitPosition`, `SetStateBits` and `UpdateSfxOccupy` and scripts'
   `StartScript` left the seams: `UnitsApply` calls the first three, and the start is scripts' event START.
-- **The network's writers (#948):** `ReceiveUnitStates` calls `ReadNetState` and `UpdateMotion` directly (`TODO(#948)`),
+- **The network's writers (#392):** `ReceiveUnitStates` calls `ReadNetState` and `UpdateMotion` directly (`TODO(#392)`),
   and `NetSendUnitStates` calls the net-state slots.
 - **The state** is in the shared block, and only what other subsystems read stays hashed (section 5).
 - **The steering reads of orders** (the VTOL orders read `UnitMotion::flags`, `velocity`, `field_22` by view) stay views.
@@ -528,4 +528,4 @@ Movement took at most 147 deliveries in one tick (edges-economy-targeting, tick 
 movement runs inside another delivery in two places the code shows: `Apply` of orders' STOP calls `DeleteOrders`, and
 `Order::~Order` publishes SET_TARGET and DESTROY_TARGET (`order_queue.cpp`), so movement's `Apply` runs inside orders'
 `Apply`; and `ApplyAttachUnit`, the handler of orders' ATTACH_TO_PIECE, publishes SET_MODE. The network's
-`ReceiveUnitStates` calls `UpdateMotion` directly, without a delivery (`TODO(#948)`).
+`ReceiveUnitStates` calls `UpdateMotion` directly, without a delivery (`TODO(#392)`).

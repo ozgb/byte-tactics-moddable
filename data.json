@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-27T22:05:04+00:00",
+ "generated": "2026-11-27T23:05:04+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -8,8 +8,8 @@
    "total": 64
   },
   "180": {
-   "done": 10,
-   "total": 29
+   "done": 11,
+   "total": 30
   }
  },
  "rows": [
@@ -187,8 +187,8 @@
    "id": "economy",
    "label": "Economy",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "6 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 6,
    "spec": "stale",
    "spec_pin": 7,
@@ -215,8 +215,8 @@
    "id": "targeting",
    "label": "Targeting",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "9 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 9,
    "spec": "stale",
    "spec_pin": 6,
@@ -250,8 +250,8 @@
    "id": "los_radar",
    "label": "LOS & radar",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "3 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 3,
    "spec": "active",
    "spec_pin": null,
@@ -270,8 +270,8 @@
    "id": "mission",
    "label": "Mission",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "2 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 2,
    "spec": "active",
    "spec_pin": null,
@@ -298,8 +298,8 @@
    "id": "pathfinding",
    "label": "Pathfinding",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "5 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 5,
    "spec": "active",
    "spec_pin": null,
@@ -309,7 +309,7 @@
     "number": 1191,
     "title": "Spec: Write the pathfinding spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1191",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [
@@ -326,8 +326,8 @@
    "id": "map",
    "label": "Map",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "5 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 5,
    "spec": "active",
    "spec_pin": null,
@@ -354,8 +354,8 @@
    "id": "players",
    "label": "Players",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "10 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 10,
    "spec": "active",
    "spec_pin": null,
@@ -368,14 +368,22 @@
     "claimed": true,
     "state": "OPEN"
    },
-   "prs": []
+   "prs": [
+    {
+     "number": 54,
+     "title": "Add: Specify the players subsystem",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/54",
+     "live": true
+    }
+   ]
   },
   {
    "id": "features",
    "label": "Features",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "4 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 4,
    "spec": "active",
    "spec_pin": null,
@@ -385,17 +393,25 @@
     "number": 1194,
     "title": "Spec: Write the features spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1194",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
-   "prs": []
+   "prs": [
+    {
+     "number": 53,
+     "title": "Add: Specify the features subsystem",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/53",
+     "live": true
+    }
+   ]
   },
   {
    "id": "ai",
    "label": "AI",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "2 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 2,
    "spec": "active",
    "spec_pin": null,
@@ -414,8 +430,8 @@
    "id": "weapons",
    "label": "Weapons",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "9 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 9,
    "spec": "active",
    "spec_pin": null,
@@ -434,8 +450,8 @@
    "id": "scripts",
    "label": "Scripts",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "4 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 4,
    "spec": "active",
    "spec_pin": null,
@@ -454,18 +470,18 @@
    "id": "movement",
    "label": "Movement",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "6 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 6,
-   "spec": "none",
+   "spec": "active",
    "spec_pin": null,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1198,
     "title": "Spec: Write the movement spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1198",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": []
@@ -474,8 +490,8 @@
    "id": "orders",
    "label": "Orders",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "8 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 8,
    "spec": "none",
    "spec_pin": null,
@@ -494,8 +510,8 @@
    "id": "units",
    "label": "Units",
    "group": "subsystem",
-   "kit": "partial",
-   "kit_note": "8 recordings, gate route waits on #1209",
+   "kit": "ready",
+   "kit_note": "recordings gate",
    "recordings": 8,
    "spec": "none",
    "spec_pin": null,

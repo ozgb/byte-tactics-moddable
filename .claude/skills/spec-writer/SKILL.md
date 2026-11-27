@@ -77,6 +77,15 @@ The implementer learns only from the spec and the gate. When a verdict differs, 
 
 This step is done when a verdict is `equal`, the implementer's pull request holds only its own source, and every session's proxy log is on the allowlist.
 
+### A core session
+
+The engine core (#1207) runs the same way, with these differences:
+
+- **The prompt** is [`core-implementer-prompt.md`](core-implementer-prompt.md), with the groups the session is not judged on filled in. The tree is btm `main` on the core specs' branch, so it holds `wind_meteors/`, the module the core hosts.
+- **The request** is `outbox/ID/core` (a static musl x86_64 executable) and `outbox/ID/module.wasm`, with no `subsystem` file. `launch.py` gives the broker the session's image as `--core-image`, and `tools/coregate.py` runs the core in a second microVM of that image, one run per vector.
+- **The verdict** is per group (`docs/core-gate.md`, "The verdict"). The broker runs every group, so a group the session leaves out (`files` until the Nanolathe port merges) still appears; judge the session on the others, and say which you left out and why on the issue before the first session.
+- **Time:** a full core gate runs every vector in its own VM exec, and a core is far more code than a module, so a session runs for hours. Poll the inbox and `broker.log` in the foreground.
+
 ## 7. Hand over
 
 Comment on the spec's issue with:

@@ -1,0 +1,23 @@
+# Debug mode (F11, with debug_keys 1) and its two hotkeys: = fills every player's energy and metal stores, and ] makes the unit under the cursor forget its attacker. Debug mode draws the frame rate, which a test-mode run counts on the frames it draws.
+game_seed 319
+crt_seed 1319
+view_seed 2319
+map The Pass
+start_positions fixed
+ticks 80
+player0.controller human
+player0.side Arm
+player1.controller ai
+player1.side Core
+debug_keys 1
+console 1 +iface 0
+spawn 2 1 CORAK 470 300
+input 5 mouse move 384 240
+input 6 mouse left down 384 240
+input 7 mouse left up 384 240
+input 40 key down f11
+input 41 key up f11
+input 45 char =
+input 50 mouse move 294 290
+input 51 char ]
+frames 44 70

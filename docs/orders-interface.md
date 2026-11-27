@@ -118,7 +118,7 @@ are the UI, the console, the harness and the saved game's load.
 - **A saved game's load** calls the slot `LoadOrders` for each unit from units' `LoadUnit` (`unit_save.cpp`), outside
   the tick, and publishes movement's LOAD (`docs/movement-interface.md`, section 2). `SaveOrders` is its writer's mirror.
 - **The network's `ReceiveUnitStates`** (`unit_position.cpp`) calls movement's `ReadNetState` and `UpdateMotion`
-  directly. It is the network's writer, and waits for #948 (parked), as #954's did: `TODO(#948)` in
+  directly. It is the network's writer, and waits for the network transport (#392): `TODO(#392)` in
   `ReceiveUnitStates` marks the `UpdateMotion` call. `ReadNetState` has no marker and is left as it was.
 
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 48) and returned to no

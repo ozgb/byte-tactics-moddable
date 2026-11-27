@@ -487,7 +487,7 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd;
          u = (Unit*)((char*)u + 0x118)) {
         if ((u->flags & 0x10000000) && u->motion) {
-            // TODO(#948): the network's writers go on the scheduler
+            // TODO(#392): the network's writers go on the scheduler
             g_seams.movement->UpdateMotion(u);
             ScheduleUnitsDeliver();
             UpdateUnitHeight(u);

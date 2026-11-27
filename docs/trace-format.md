@@ -2033,7 +2033,7 @@ To recompute a hash from the dump:
 
 1. Read the lines of the block in order. The phase-row lines, from `gameTick` to the last `meteors.<name>` line, are
    all read: none is skipped there, so a `features[i].*` line of section 7 is hash input although it shares its first
-   name with the economy events. Lines are skipped only in the world part, from the first `game.<name>` line on, and
+   name with the `features.*` events (section 8.25). Lines are skipped only in the world part, from the first `game.<name>` line on, and
    only at four places, a line being skipped when its path is one of the listed names followed by `.` (or, in the last
    list, by `.` or `[`, so `economy[0].kind` is skipped and `economyState.x` is not an `economy` line):
    - after the `pathfinder.*` lines of sections 16 and 17 (read for their shape, not hashed; section 8.7), the lines of

@@ -3,10 +3,13 @@
     uv run tools/test_tracedigest.py
 """
 
+import contextlib
+import io
 import tempfile
 import unittest
 from pathlib import Path
 
+import test_matchsetup
 import tracedigest as tg
 from tracediff import Error
 from traceschema import TRACE_FORMAT
@@ -62,6 +65,27 @@ class DigestTest(unittest.TestCase):
             path.write_text(f"bt-digest {TRACE_FORMAT}\ncommit x\n1 0123456789abcdef 0123456789abcdef\n")
             with self.assertRaises(Error):
                 tg.parse_digest(path)
+
+
+class MatchSetupTest(unittest.TestCase):
+    def test_the_stored_traces_it_compares_have_ticks(self):
+        for name in ("console-units", "orders-move-attack"):
+            self.assertTrue(test_matchsetup.stored_of(name), name)
+
+    def test_a_run_trace_digests_to_its_ticks(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "trace.txt"
+            path.write_text(f"bt-trace {TRACE_FORMAT}\ngame_seed 1\n" + "".join(f"{t} {p} {h}\n" for t, p, h in ROWS))
+            self.assertEqual(test_matchsetup.digest_of(path), tg.digests(ROWS))
+            self.assertTrue(test_matchsetup.digest_of(path))
+
+    def test_a_trace_check_fails_on_an_empty_trace(self):
+        test_matchsetup.check.failed = False
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            test_matchsetup.check([] == [], "empty", ([], []))
+        self.assertIn("FAIL empty (no ticks", out.getvalue())
+        self.assertTrue(test_matchsetup.check.failed)
+        test_matchsetup.check.failed = False
 
 
 if __name__ == "__main__":

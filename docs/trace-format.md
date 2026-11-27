@@ -123,7 +123,7 @@ A plain FNV-1a over bytes would differ: only the 8-byte words use the word step.
 
 | Key | Meaning |
 | --- | --- |
-| `trace_format` | The format number, 9 (section 12). |
+| `trace_format` | The format number, 10 (section 12). |
 | `targets` | The pointer target names with their numeric `tag` (used in section 5). |
 | `tables` | Table name to table, sorted by name. |
 | `game_scalars` | Fields of the game record hashed in the `game` section (section 8.1), in hash order. |
@@ -2033,7 +2033,9 @@ To recompute a hash from the dump:
 
 1. Read the lines of the block, in order, skip the `pathfinder.*` lines (section 8.7), the `economyState.*`, `aiState.*`, `weaponsState.*`, `ordersState.*`, `movementState.*`, `unitsState.*` and `scriptsState.*` lines that follow them (sections 8.22, 8.30, 8.31 and 8.36 to 8.39)
    and the `results.*`, `economy.*`, `windMeteors.*`, `features.*`, `targeting.*`, `los_radar.*`, `map.*`, `playersEvents.*`, `aiEvents.*`, `weaponsEvents.*`, `ordersEvents.*`, `movementEvents.*` and `packets.*` lines that end the block (sections 8.21 to 8.33), and parse the
-   paths into the structure of sections 6 to 8.
+   paths into the structure of sections 6 to 8. The skipped `scriptsState.*` lines are not parsed into tables, but they
+   still give section 23's presence byte: a unit's is 1 exactly when the block has its `scriptsState.units[i].scale` line
+   (section 8.12).
 2. For each table at a path, look the fields up in `data/trace_schema.json` by name (or `+0x<offset>`).
    Turn each value back into bytes: a scalar's hex number into `size` little-endian bytes; a `hex:`
    run into its bytes; a pointer into its ID.
@@ -2045,14 +2047,14 @@ To recompute a hash from the dump:
 
 ### What you need besides the lines
 
-- A table is hashed only when its lines are present: a unit, order, motion, script, AI record,
+- A table is hashed only when its lines are present: a unit, order, motion, AI record,
   squad manager, squads, econ, mission conditions, spatial overflow, mission, weapon
   damage table and category mask each have a presence byte (or are in a loop that skips them), which is
-  1 exactly when their lines are in the block. A `0` presence byte has no line.
+  1 exactly when their lines are in the block. A `0` presence byte has no line. A script's presence byte is the
+  exception: it comes from record 55's lines, not from lines of a hashed table (section 8.12).
 - The conditional tables of sections 8.9, 8.11 and 8.10 (`OrderPosY`, `PathOrderPosY`,
   `PathOrderHeading`, `PathOrderPiece`, `PathOrderFollow`, `AirManeuverOrderHeading`,
-  `LiteGoalState`) and of 8.12 (`ScriptChannelPiece`, `ScriptChannelDelay`, `ScriptChannelWait`),
-  and `MissionStartRest` are hashed exactly when the table's fields are present
+  `LiteGoalState`) and `MissionStartRest` are hashed exactly when the table's fields are present
   at the same path.
 - `SpotObject` against `SpotAnim` is told by the names of the fields at the path: the line after
   `features[i].next` is `anim.index` for a SpotAnim and `state` for a SpotObject (section 7.5).

@@ -8,19 +8,25 @@
 - setup-save, setup-load: the save keeps the block size and the limit, and the loaded game plays them.
 - hpa-derived: the demo pathfinder's region makes the engine size a block above 32 MiB.
 - net-setup: a game_type 3 match plays the setup the host's PlayerInfo carries.
+
+It prints one `ok` or `FAIL` line per check, then `<n> of 15 ok`. A check that compares traces fails when either has no ticks.
+`tools/fullgate.py run` plays it nightly, after the coverage check.
 """
 
 import argparse
 import re
-import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+import tracedigest
+from tracediff import parse_trace
 
 ROOT = Path(__file__).resolve().parent.parent
 
 SCENARIOS = ROOT / "tests" / "matchsetup"
 FLOOR = 32 << 20
+CHECKS = 15
 
 
 def play(options, name, put=(), collect=()):
@@ -47,26 +53,33 @@ def setup_line(log):
 
 
 def digest(run):
-    return tracedigest_lines(run / "trace.txt")
+    return digest_of(run / "trace.txt")
 
 
-def tracedigest_lines(path):
-    result = subprocess.run(["uv", "run", str(ROOT / "tools" / "tracedigest.py"), str(path), "--commit", "x", "--scenario", "x"],
-                            capture_output=True, text=True, cwd=ROOT, check=True)
-    return [line for line in result.stdout.splitlines() if re.match(r"\d+ [0-9a-f]{16}$", line)]
+def digest_of(path):
+    """The (tick, digest, state, view) rows of a trace.txt."""
+    return tracedigest.digests(parse_trace(path)[1])
 
 
 def stored_of(name):
-    return [line for line in (ROOT / "reference" / "traces" / f"{name}.txt").read_text().splitlines() if re.match(r"\d+ [0-9a-f]{16}$", line)]
+    """The (tick, digest, state, view) rows of reference/traces/<name>.txt."""
+    return tracedigest.parse_digest(ROOT / "reference" / "traces" / f"{name}.txt")[1]
 
 
-def check(ok, what):
+def check(ok, what, traces=()):
+    """Prints ok or FAIL for `what`; a check that compares traces fails when any of them has no ticks."""
+    empty = [i for i, trace in enumerate(traces) if not trace]
+    if empty:
+        ok, what = False, f"{what} (no ticks in trace {', '.join(str(i + 1) for i in empty)} of {len(traces)})"
     print(("ok   " if ok else "FAIL ") + what)
-    if not ok:
+    if ok:
+        check.passed += 1
+    else:
         check.failed = True
 
 
 check.failed = False
+check.passed = 0
 
 
 def main():
@@ -77,21 +90,24 @@ def main():
     options = parser.parse_args()
 
     run, log = play(options, "block-large")
-    stored = stored_of("console-units")
-    check(digest(run) == stored, "block-large: a 128 MiB block plays the stored trace of console-units")
+    played, stored = digest(run), stored_of("console-units")
+    check(played == stored, "block-large: a 128 MiB block plays the stored trace of console-units", (played, stored))
     check(setup_line(log) == (128 << 20, 20), "block-large: the match played with the 128 MiB block (and `search 20` from the script)")
 
     run, log = play(options, "block-roundtrip")
-    check(digest(run) == stored_of("orders-move-attack"), "block-roundtrip: the copy of the grown block continues to the stored trace")
+    played, stored = digest(run), stored_of("orders-move-attack")
+    check(played == stored, "block-roundtrip: the copy of the grown block continues to the stored trace", (played, stored))
 
     traces = {}
     for name, limit in (("steps-high", 3000), ("steps-low", 600)):
         first, log = play(options, name)
         second, _ = play(options, name)
-        traces[name] = digest(first)
+        traces[name], again = digest(first), digest(second)
         check(setup_line(log) == (FLOOR, limit), f"{name}: the match played with {limit} search steps and the 32 MiB block")
-        check(traces[name] == digest(second), f"{name}: two runs have identical traces")
-    check(traces["steps-high"] != traces["steps-low"], "the two limits play differently")
+        check(traces[name] == again, f"{name}: two runs have identical traces", (traces[name], again))
+    high, low = traces["steps-high"], traces["steps-low"]
+    first_differing = next((a[0] for a, b in zip(high, low) if a != b), None)
+    check(high != low, f"the two limits play differently (first differing tick {first_differing})", (high, low))
 
     run, log = play(options, "setup-save", collect=["savegame/harness.sav", "savegame/harness.opt"])
     check(setup_line(log) == (96 << 20, 3000), "setup-save: played with a 96 MiB block and 3000 steps")
@@ -102,7 +118,7 @@ def main():
         run2, log2 = play(options, "setup-load", put=[("savegame/harness.sav", save), ("savegame/harness.opt", options_file)])
         loaded.append(digest(run2))
         check(setup_line(log2) == (96 << 20, 3000), "setup-load: the loaded game plays the saved block size and limit")
-    check(loaded[0] == loaded[1], "setup-load: two loads have identical traces")
+    check(loaded[0] == loaded[1], "setup-load: two loads have identical traces", loaded)
 
     run, log = play(options, "hpa-derived")
     line = setup_line(log)
@@ -110,7 +126,8 @@ def main():
 
     run, log = play(options, "net-setup")
     check(setup_line(log) == (96 << 20, 3000), "net-setup: game_type 3 plays the block size and the limit from the host's PlayerInfo")
-    sys.exit(1 if check.failed else 0)
+    print(f"{check.passed} of {CHECKS} ok")
+    sys.exit(1 if check.failed or check.passed != CHECKS else 0)
 
 
 if __name__ == "__main__":

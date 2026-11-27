@@ -217,11 +217,13 @@ static wl_json* parse_value(reader* r, int depth)
             fail(r, "number with a leading zero");
         } else {
             while (r->at < r->size && r->text[r->at] >= '0' && r->text[r->at] <= '9') {
-                if (value > (0x7fffffffL - 9) / 10) {
+                int digit = r->text[r->at] - '0';
+                if (value > (0x7fffffffL - digit) / 10) {
                     fail(r, "number out of range");
                     break;
                 }
-                value = value * 10 + (r->text[r->at++] - '0');
+                value = value * 10 + digit;
+                r->at++;
             }
             if (!r->failed && r->at < r->size && (r->text[r->at] == '.' || r->text[r->at] == 'e' || r->text[r->at] == 'E')) {
                 fail(r, "only integers are allowed");

@@ -3938,7 +3938,6 @@ GlueImportNetworkSendWeaponFireAt,src/wasm/glue_tables.cpp,platform,folder:src/w
 GlueImportOrdersGetOrderFlags,src/wasm/glue_tables.cpp,platform,folder:src/wasm/,
 GlueImportOrdersGetOrderType,src/wasm/glue_tables.cpp,platform,folder:src/wasm/,
 GlueImportPathfindingCancel,src/wasm/glue_tables.cpp,platform,folder:src/wasm/,
-GlueImportPathfindingCellsChanged,src/wasm/glue_tables.cpp,platform,folder:src/wasm/,
 GlueImportPathfindingSubmit,src/wasm/glue_tables.cpp,platform,folder:src/wasm/,
 GlueImportPathworldBeginSearch,src/wasm/glue_tables.cpp,platform,folder:src/wasm/,
 GlueImportPathworldEndSearch,src/wasm/glue_tables.cpp,platform,folder:src/wasm/,

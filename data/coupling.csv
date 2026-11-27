@@ -2133,7 +2133,7 @@ harness,platform,shared_write,PathWorldView::Tick,1
 harness,platform,shared_write,PathWorldView::UnitState,1
 harness,platform,shared_write,PathWorldView::UnitsPerPlayer,1
 harness,platform,shared_write,PathfindingSeam::Cancel,4
-harness,platform,shared_write,PathfindingSeam::CellsChanged,4
+harness,platform,shared_write,PathfindingSeam::CellsChanged,3
 harness,platform,shared_write,PathfindingSeam::Poll,3
 harness,platform,shared_write,PathfindingSeam::Step,3
 harness,platform,shared_write,PathfindingSeam::Submit,4
@@ -2170,7 +2170,7 @@ harness,platform,shared_write,Seams::mission,5
 harness,platform,shared_write,Seams::movement,12
 harness,platform,shared_write,Seams::network,21
 harness,platform,shared_write,Seams::orders,4
-harness,platform,shared_write,Seams::pathfinding,5
+harness,platform,shared_write,Seams::pathfinding,4
 harness,platform,shared_write,Seams::pathworld,18
 harness,platform,shared_write,Seams::players,2
 harness,platform,shared_write,Seams::scripts,18
@@ -6896,7 +6896,7 @@ seams,platform,shared_write,OrdersSeam::RunSecondaryOrders,3
 seams,platform,shared_write,PathPoint::x,4
 seams,platform,shared_write,PathPoint::y,4
 seams,platform,shared_write,PathfindingSeam::Cancel,4
-seams,platform,shared_write,PathfindingSeam::CellsChanged,4
+seams,platform,shared_write,PathfindingSeam::CellsChanged,3
 seams,platform,shared_write,PathfindingSeam::Poll,3
 seams,platform,shared_write,PathfindingSeam::Step,3
 seams,platform,shared_write,PathfindingSeam::Submit,4
@@ -6936,7 +6936,7 @@ seams,platform,shared_write,Seams::mission,5
 seams,platform,shared_write,Seams::movement,12
 seams,platform,shared_write,Seams::network,21
 seams,platform,shared_write,Seams::orders,4
-seams,platform,shared_write,Seams::pathfinding,5
+seams,platform,shared_write,Seams::pathfinding,4
 seams,platform,shared_write,Seams::pathworld,18
 seams,platform,shared_write,Seams::players,2
 seams,platform,shared_write,Seams::scripts,18

@@ -51020,12 +51020,6 @@ address,function,file,kind,target
 ,GlueImportPathfindingCancel,src/wasm/glue_tables.cpp,function,
 ,GlueImportPathfindingCancel,src/wasm/glue_tables.cpp,global_read,g_seams
 ,GlueImportPathfindingCancel,src/wasm/glue_tables.cpp,indirect_call,indirect via void (*)(PathHandle) __attribute__((stdcall)) [PathfindingSeam::Cancel]
-,GlueImportPathfindingCellsChanged,src/wasm/glue_tables.cpp,field_read,PathfindingSeam::CellsChanged
-,GlueImportPathfindingCellsChanged,src/wasm/glue_tables.cpp,field_read,Seams::pathfinding
-,GlueImportPathfindingCellsChanged,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
-,GlueImportPathfindingCellsChanged,src/wasm/glue_tables.cpp,function,
-,GlueImportPathfindingCellsChanged,src/wasm/glue_tables.cpp,global_read,g_seams
-,GlueImportPathfindingCellsChanged,src/wasm/glue_tables.cpp,indirect_call,"indirect via void (*)(int, int, int, int, unsigned int, int) __attribute__((stdcall)) [PathfindingSeam::CellsChanged]"
 ,GlueImportPathfindingSubmit,src/wasm/glue_tables.cpp,call,GlueImportError
 ,GlueImportPathfindingSubmit,src/wasm/glue_tables.cpp,call,GlueInMemory
 ,GlueImportPathfindingSubmit,src/wasm/glue_tables.cpp,call,GlueLinear
@@ -65340,10 +65334,6 @@ address,function,file,kind,target
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,global_read,s_inner_pathfinding
 ,RecPathfindingCancel,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)(PathHandle) __attribute__((stdcall)) [PathfindingSeam::Cancel]
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,call,ArgValue
-,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,call,FinishImport
-,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,call,ImportValue
-,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,call,ReplayText::Add
-,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,call,SlotScope::Import
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
 ,RecPathfindingCellsChanged,src/harness/replay_hooks.inc,field_read,PathfindingSeam::CellsChanged

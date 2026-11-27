@@ -571,6 +571,8 @@ at once. These are the events it publishes, besides the group commands of a clic
   not carried or carrying; then, when the map button is on, LOS_RADAR_SHARE_MAP from the local player to that player.
 - **The chat line** (Enter): a line that starts with `+` runs as a console line (section 3) and publishes what that
   command publishes (section 4) as the interface's events; any other line is a chat message and publishes nothing.
+- **The score panel**, on a frame it draws, when its pass over its own copy of the players' ranks closed a gap:
+  PLAYERS_COMPACT_RANKS (`docs/players-interface.md`, section 2, "The ranks"). No scenario shows the panel yet.
 
 The interface's events, the paths that publish them and the scenarios whose stored logs
 (`reference/commands/<scenario>.txt`) hold them. `tools/commands.py --check` fails when an event of the first column is
@@ -584,6 +586,7 @@ in no stored log, or a stored log holds an interface event the table does not li
 | `ORDERS_GROUP_BUILD` | a build site placed from the build menu | ui-build-place |
 | `ORDERS_GROUP_COMMAND` | a click order, a command key and a click, a minimap order, the self-destruct key | ui-dialogs, ui-groups, ui-keys, ui-left-click-orders, ui-right-click, ui-scroll-groups |
 | `ORDERS_QUEUE_BUILD` | the build menu of a factory | ui-build-menu, ui-scroll-groups |
+| `PLAYERS_COMPACT_RANKS` | the score panel, on a frame it draws | none |
 | `PLAYERS_GIVE_UNIT` | the share dialog | ui-share-chat |
 | `PLAYERS_LEAVE_GAME` | the quit dialog, the defeated player's dialog | ui-dialogs |
 | `PLAYERS_SET_STORE` | the debug hotkey `=` | none |

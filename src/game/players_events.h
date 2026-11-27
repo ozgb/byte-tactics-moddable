@@ -118,6 +118,14 @@ inline void PlayersPublishLeaveGame(int outbox)
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void PlayersPublishCompactRanks(int outbox)
+{
+    PlayersEventHeader event;
+    memset(&event, 0, sizeof(event));
+    event.kind = PLAYERS_COMPACT_RANKS;
+    SchedPublish(outbox, &event, sizeof(event));
+}
+
 template <class U>
 inline void PlayersPublishGiveUnit(int outbox, U* unit, int player, const OwnershipTransferPacket* record)
 {

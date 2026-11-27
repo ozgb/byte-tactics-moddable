@@ -1019,6 +1019,7 @@ game,players,shared_write,Game::endGameFlags,2
 game,players,shared_write,Game::endGameVictory,3
 game,players,shared_write,Game::localPlayer,11
 game,players,shared_write,Game::mapFlags,1
+game,players,shared_write,Game::numPlayers,1
 game,players,shared_write,Game::playerIndex,4
 game,players,shared_write,Game::ticks,4
 game,players,shared_write,Game::uiOptionFlags,1
@@ -1028,9 +1029,9 @@ game,players,shared_write,Player::energyStorageBonus,3
 game,players,shared_write,Player::metalStorageBonus,3
 game,players,shared_write,Player::rejectReason,2
 game,players,shared_write,Player::syncTick,1
-game,players,shared_write,Player::unitsCreated,5
+game,players,shared_write,Player::unitsCreated,6
 game,players,shared_write,PlayerInfo::color,3
-game,players,shared_write,PlayerInfo::flags_9b,3
+game,players,shared_write,PlayerInfo::flags_9b,4
 game,players,shared_write,PlayerInfo::side,5
 game,players,shared_write,PlayersEndGame::victory,1
 game,players,shared_write,PlayersEventHeader::kind,1
@@ -1959,6 +1960,7 @@ harness,platform,shared_write,g_quirks,1
 harness,players,call,ResetPlayerSlots,1
 harness,players,shared_write,FeaturesSeam::FindFeatureAtPos,1
 harness,players,shared_write,Game::localPlayer,11
+harness,players,shared_write,Game::numPlayers,1
 harness,players,shared_write,Game::playerIndex,4
 harness,players,shared_write,LosRadarSeam::ClampWorldPosToTerrain,1
 harness,players,shared_write,MapSeam::GetCellMeanHeight,1
@@ -1973,7 +1975,7 @@ harness,players,shared_write,Player::energyCapacity,1
 harness,players,shared_write,Player::metalCapacity,1
 harness,players,shared_write,Player::shareEnergy,1
 harness,players,shared_write,Player::shareMetal,1
-harness,players,shared_write,Player::type,14
+harness,players,shared_write,Player::type,15
 harness,players,shared_write,PlayerInfo::energy,2
 harness,players,shared_write,PlayerInfo::metal,2
 harness,players,shared_write,Seams::ai,5
@@ -1985,6 +1987,7 @@ harness,players,shared_write,Seams::network,4
 harness,players,shared_write,Seams::units,6
 harness,players,shared_write,UnitsSeam::CreateUnit,1
 harness,players,shared_write,UnitsSeam::FindUnitTypeId,4
+harness,players,shared_write,g_quirks,2
 harness,presentation,call,GetDisplay,3
 harness,presentation,call,HideSoftwareCursor,1
 harness,presentation,call,InitMissionStatus,2
@@ -3202,8 +3205,9 @@ network,players,call,SetupPlayerSlot,1
 network,players,shared_write,Game::endGameFlags,2
 network,players,shared_write,Game::endGameVictory,3
 network,players,shared_write,Game::head,1
+network,players,shared_write,Game::numPlayers,1
 network,players,shared_write,Game::tail,1
-network,players,shared_write,Player::active,10
+network,players,shared_write,Player::active,11
 network,players,shared_write,Player::alliance,2
 network,players,shared_write,Player::allied,7
 network,players,shared_write,Player::alliedBy,3
@@ -3215,8 +3219,8 @@ network,players,shared_write,Player::exploredHeight,1
 network,players,shared_write,Player::exploredSize,1
 network,players,shared_write,Player::exploredWidth,1
 network,players,shared_write,Player::id,2
-network,players,shared_write,Player::index,9
-network,players,shared_write,Player::info,9
+network,players,shared_write,Player::index,10
+network,players,shared_write,Player::info,10
 network,players,shared_write,Player::keepaliveFlags,1
 network,players,shared_write,Player::kills,3
 network,players,shared_write,Player::lobbyDataSynced,2
@@ -3231,7 +3235,7 @@ network,players,shared_write,Player::totalEnergyConsumed,2
 network,players,shared_write,Player::totalEnergyProduced,2
 network,players,shared_write,Player::totalMetalConsumed,2
 network,players,shared_write,Player::totalMetalProduced,2
-network,players,shared_write,Player::type,14
+network,players,shared_write,Player::type,15
 network,players,shared_write,PlayerInfo::color,3
 network,players,shared_write,PlayerInfo::kind,4
 network,presentation,call,BeginTextEdit,2
@@ -4523,6 +4527,7 @@ presentation,game,call,LosRadarPublishShareMap,1
 presentation,game,call,MatchSetupToInfo,1
 presentation,game,call,OrdersPublishQueueBuild,1
 presentation,game,call,PlayerRecordAt,1
+presentation,game,call,PlayersPublishCompactRanks,1
 presentation,game,call,PlayersPublishLeaveGame,2
 presentation,game,call,PlayersPublishSetStore,1
 presentation,game,call,PlayersPublishTransfer,1
@@ -5016,14 +5021,14 @@ presentation,players,shared_write,Game::commanderDeath,3
 presentation,players,shared_write,Game::endGameVictory,3
 presentation,players,shared_write,Game::head,1
 presentation,players,shared_write,Game::mapFlags,1
+presentation,players,shared_write,Game::numPlayers,1
 presentation,players,shared_write,Game::uiOptionFlags,1
-presentation,players,shared_write,Player::active,10
+presentation,players,shared_write,Player::active,11
 presentation,players,shared_write,Player::alliance,2
 presentation,players,shared_write,Player::allied,7
 presentation,players,shared_write,Player::alliedBy,3
 presentation,players,shared_write,Player::id,2
-presentation,players,shared_write,Player::index,9
-presentation,players,shared_write,Player::rank,1
+presentation,players,shared_write,Player::index,10
 presentation,players,shared_write,Player::rejectReason,2
 presentation,players,shared_write,PlayerInfo::bit5,2
 presentation,players,shared_write,PlayerInfo::bit6,1
@@ -5116,7 +5121,6 @@ presentation,units,shared_write,Player::active,6
 presentation,units,shared_write,Player::allied,1
 presentation,units,shared_write,Player::id,2
 presentation,units,shared_write,Player::index,5
-presentation,units,shared_write,Player::rank,1
 presentation,units,shared_write,PlayerInfo::bit6,1
 presentation,units,shared_write,PlayerInfo::side,3
 presentation,units,shared_write,Point16::x,8
@@ -5468,7 +5472,7 @@ seams,game,shared_write,OrdersStop::all,1
 seams,game,shared_write,OrdersStop::h,1
 seams,game,shared_write,PathfindingSeam::Poll,1
 seams,game,shared_write,PathfindingSeam::Step,1
-seams,game,shared_write,PlayersEventHeader::kind,10
+seams,game,shared_write,PlayersEventHeader::kind,11
 seams,game,shared_write,PlayersSeam::UpdateBlink,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerBody,1
 seams,game,shared_write,PlayersSeam::UpdatePlayerHead,1
@@ -6709,11 +6713,11 @@ units,players,shared_write,Player::commanderLosses,1
 units,players,shared_write,Player::flags,1
 units,players,shared_write,Player::kills,3
 units,players,shared_write,Player::losses,3
-units,players,shared_write,Player::rank,1
+units,players,shared_write,Player::rank,2
 units,players,shared_write,Player::syncTick,1
-units,players,shared_write,Player::unitCount,11
+units,players,shared_write,Player::unitCount,12
 units,players,shared_write,Player::unitsBegin,3
-units,players,shared_write,Player::unitsCreated,5
+units,players,shared_write,Player::unitsCreated,6
 units,players,shared_write,Player::unitsEnd,3
 units,players,shared_write,Point16::x,3
 units,players,shared_write,Point16::y,3

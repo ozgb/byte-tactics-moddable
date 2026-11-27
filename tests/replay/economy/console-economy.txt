@@ -5,7 +5,7 @@ call 0 RegionSize
   o result 120048
 call 0 Init
   a map (2501,2)
-  a region 4185712
+  a region 4185720
   a size 120048
   w region [120048]
 call 30 UpdatePlayerEconomy

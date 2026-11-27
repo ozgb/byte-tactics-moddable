@@ -350,8 +350,12 @@ record.
 The score panel shows only in skirmish and multiplayer, and counts commanders' kills when `commanderDeath` is 2. 3.1c
 shows no ally's resources: the share dialog lists the players to give to, by name only.
 
-`players[i].rank` is compacted while the score panel draws: a quirk of 3.1c that is the simulation's to fix, not the
-view's (#1113).
+On each frame it draws the score panel, 3.1c closes the gaps that defeated players leave in `players[i].rank`: for
+each place from 0 below the number of players, when no counted player holds it, every counted player above it moves
+down one. A counted player is one the panel lists: active, a human or a computer, not defeated (no units left after
+making one) and not only watching. A presentation runs that pass on its own copy of `rank` and draws from the copy;
+when the pass changed a place, it publishes `PLAYERS_COMPACT_RANKS` (`docs/players-interface.md`), and the simulation
+runs the same pass on its ranks.
 
 ## Messages
 

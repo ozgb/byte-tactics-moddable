@@ -765,6 +765,10 @@ void __stdcall DrawScorePanel(void* surface)
     DrawTextClipped(surface, buf, panel.right - GetTextPixelWidth(buf) - 2, y, maxw, 0);
     y += 0xf;
 
+    unsigned char ranks[10];
+    for (int k = 0; k < 10; k++)
+        ranks[k] = g_game->players[k].rank;
+    int compacted = 0;
     for (int i = 0; i < (int)g_game->numPlayers; i++) {
         Player* p = g_game->players;
         Quad dst;
@@ -786,7 +790,7 @@ void __stdcall DrawScorePanel(void* surface)
                 continue;
             if (p->info->flags_9b & 0x40)
                 continue;
-            if (p->rank != i)
+            if (ranks[n] != i)
                 continue;
             Rect hr;
             hr.left = panel.left + 4;
@@ -819,8 +823,8 @@ void __stdcall DrawScorePanel(void* surface)
             break;
         }
         if (n == 10) {
-            Player* q = g_game->players;
-            for (int k = n; k != 0; k--, q++) {
+            for (int k = 0; k < 10; k++) {
+                const Player* q = &g_game->players[k];
                 if (q->active == 0)
                     continue;
                 unsigned char c = q->type;
@@ -832,11 +836,15 @@ void __stdcall DrawScorePanel(void* surface)
                     continue;
                 if (q->info->flags_9b & 0x40)
                     continue;
-                if (q->rank > i)
-                    q->rank--;
+                if (ranks[k] > i) {
+                    ranks[k]--;
+                    compacted = 1;
+                }
             }
         }
     }
+    if (compacted)
+        PlayersPublishCompactRanks(SCHED_ENGINE);
 }
 
 // FUNCTION: 0x494e70

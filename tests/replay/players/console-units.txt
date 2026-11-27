@@ -25487,22 +25487,22 @@ call 150 Apply
   r Player#0.metal f32:0x447a0000
   r Player#1.energy f32:0x447a0000
   r Player#1.metal f32:0x447a0000
-  r Player#2.energy f32:0x447a0000
-  r Player#2.metal f32:0x447a0000
-  r Player#3.energy f32:0x447a0000
-  r Player#3.metal f32:0x447a0000
-  r Player#4.energy f32:0x447a0000
-  r Player#4.metal f32:0x447a0000
-  r Player#5.energy f32:0x447a0000
-  r Player#5.metal f32:0x447a0000
-  r Player#6.energy f32:0x447a0000
-  r Player#6.metal f32:0x447a0000
-  r Player#7.energy f32:0x447a0000
-  r Player#7.metal f32:0x447a0000
-  r Player#8.energy f32:0x447a0000
-  r Player#8.metal f32:0x447a0000
-  r Player#9.energy f32:0x447a0000
-  r Player#9.metal f32:0x447a0000
+  r Player#2.energy f32:0x00000000
+  r Player#2.metal f32:0x00000000
+  r Player#3.energy f32:0x00000000
+  r Player#3.metal f32:0x00000000
+  r Player#4.energy f32:0x00000000
+  r Player#4.metal f32:0x00000000
+  r Player#5.energy f32:0x00000000
+  r Player#5.metal f32:0x00000000
+  r Player#6.energy f32:0x00000000
+  r Player#6.metal f32:0x00000000
+  r Player#7.energy f32:0x00000000
+  r Player#7.metal f32:0x00000000
+  r Player#8.energy f32:0x00000000
+  r Player#8.metal f32:0x00000000
+  r Player#9.energy f32:0x00000000
+  r Player#9.metal f32:0x00000000
   r SideDef#0.commander "ARMCOM"
   r SideDef#1.commander "CORCOM"
   r SideDef#2.commander ""

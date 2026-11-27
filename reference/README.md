@@ -575,21 +575,26 @@ periodic run.
 The full `--check` runs nightly on the tip of `moddable`, when a pull request that needed the gate
 has merged since the last run. `uv run tools/fullgate.py` lists those merged since the newest `Full
 gate on <sha>` comment on the tracking issue (#632), and `uv run tools/fullgate.py due` exits 1 when
-there is one or more. When it is due, the maintainer runs `uv run tools/fullgate.py run` on the tip
+there is one or more. When it is due, the maintainer runs `uv run tools/fullgate.py run --replay` on the tip
 (`tools/worktree.sh --tip`). A night with no run is not a failure: the next one covers its merges. It plays the full `--check
 --both-modes --no-cache` (no `--tier`) and then, straight after it on a fresh prefix, `--check --no-cache
 --roundtrip auto`, which saves the block at an early, a middle and the second to last tick of every scenario,
 restores it and carries on, so that state outside the block shows as a divergence from the stored traces. The
 round trip run scans and checks block pointers as the full run does. Last it builds the coverage exe
 (`build/coverage`) and plays `tools/coverage.py --check` on it, so a coverage link that breaks or a stale
-`data/coverage.csv` shows at the next periodic run. `run` prints the comment text and posts nothing:
+`data/coverage.csv` shows at the next periodic run. Then, each on a fresh prefix, it plays `tools/test_matchsetup.py`
+(whose checks need Wine) and, with `--replay`, `tools/replay.py --check`, which records every stored seam call
+recording again and compares it, so that recordings a change made stale show too (pull request CI replays only the
+stored files). The replay check takes about 37 minutes, so it is a flag; the nightly run passes it, and without it the
+comment has no replay field. `run` prints the comment text and posts nothing:
 
 ```
-Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n> equal, coverage: <result>
+Full gate on <sha>: <n> of <n> equal (both modes), block pointers: <result>, round trip: <n> of <n> equal, coverage: <result>, match setup: <n> of 15 ok, replay: <n> of <n> equal
 ```
 
 The maintainer posts it on #632 and adds the play-tests (`tools/playtest.py` smoke, full, mp and music) and their results.
-A run that fails appends `, both modes exit <n>`, `, round trip exit <n>` or `, coverage exit <n>`, and names round trip block pointer
+A run that fails appends `, both modes exit <n>`, `, round trip exit <n>`, `, coverage exit <n>`, `, match setup exit <n>` or
+`, replay exit <n>`, and names round trip block pointer
 problems in parentheses after the round trip count.
 
 **A periodic failure is fixed afterwards, not by freezing merges.** The maintainer files it at once

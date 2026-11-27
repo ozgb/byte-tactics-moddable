@@ -10782,8 +10782,8 @@ call 0 UpdateSquads
   r Player#2.explored null
   r Player#2.exploredWidth 0
   r Player#2.exploredHeight 0
-  r Player#2.energy f32:0x447a0000
-  r Player#2.metal f32:0x447a0000
+  r Player#2.energy f32:0x00000000
+  r Player#2.metal f32:0x00000000
   r Player#2.index 10
   r Player#2.ai null
   r Player#2.groups null
@@ -10801,8 +10801,8 @@ call 0 UpdateSquads
   r Player#3.explored null
   r Player#3.exploredWidth 0
   r Player#3.exploredHeight 0
-  r Player#3.energy f32:0x447a0000
-  r Player#3.metal f32:0x447a0000
+  r Player#3.energy f32:0x00000000
+  r Player#3.metal f32:0x00000000
   r Player#3.index 10
   r Player#3.ai null
   r Player#3.groups null
@@ -10820,8 +10820,8 @@ call 0 UpdateSquads
   r Player#4.explored null
   r Player#4.exploredWidth 0
   r Player#4.exploredHeight 0
-  r Player#4.energy f32:0x447a0000
-  r Player#4.metal f32:0x447a0000
+  r Player#4.energy f32:0x00000000
+  r Player#4.metal f32:0x00000000
   r Player#4.index 10
   r Player#4.ai null
   r Player#4.groups null
@@ -10839,8 +10839,8 @@ call 0 UpdateSquads
   r Player#5.explored null
   r Player#5.exploredWidth 0
   r Player#5.exploredHeight 0
-  r Player#5.energy f32:0x447a0000
-  r Player#5.metal f32:0x447a0000
+  r Player#5.energy f32:0x00000000
+  r Player#5.metal f32:0x00000000
   r Player#5.index 10
   r Player#5.ai null
   r Player#5.groups null
@@ -10858,8 +10858,8 @@ call 0 UpdateSquads
   r Player#6.explored null
   r Player#6.exploredWidth 0
   r Player#6.exploredHeight 0
-  r Player#6.energy f32:0x447a0000
-  r Player#6.metal f32:0x447a0000
+  r Player#6.energy f32:0x00000000
+  r Player#6.metal f32:0x00000000
   r Player#6.index 10
   r Player#6.ai null
   r Player#6.groups null
@@ -10877,8 +10877,8 @@ call 0 UpdateSquads
   r Player#7.explored null
   r Player#7.exploredWidth 0
   r Player#7.exploredHeight 0
-  r Player#7.energy f32:0x447a0000
-  r Player#7.metal f32:0x447a0000
+  r Player#7.energy f32:0x00000000
+  r Player#7.metal f32:0x00000000
   r Player#7.index 10
   r Player#7.ai null
   r Player#7.groups null
@@ -10896,8 +10896,8 @@ call 0 UpdateSquads
   r Player#8.explored null
   r Player#8.exploredWidth 0
   r Player#8.exploredHeight 0
-  r Player#8.energy f32:0x447a0000
-  r Player#8.metal f32:0x447a0000
+  r Player#8.energy f32:0x00000000
+  r Player#8.metal f32:0x00000000
   r Player#8.index 10
   r Player#8.ai null
   r Player#8.groups null
@@ -10915,8 +10915,8 @@ call 0 UpdateSquads
   r Player#9.explored null
   r Player#9.exploredWidth 0
   r Player#9.exploredHeight 0
-  r Player#9.energy f32:0x447a0000
-  r Player#9.metal f32:0x447a0000
+  r Player#9.energy f32:0x00000000
+  r Player#9.metal f32:0x00000000
   r Player#9.index 10
   r Player#9.ai null
   r Player#9.groups null

@@ -191,14 +191,19 @@ MATCH_SETUP = """ok   block-large: a 128 MiB block plays the stored trace of con
 ok   net-setup: game_type 3 plays the block size and the limit from the host's PlayerInfo
 15 of 15 ok
 """
+REPLAY = "".join(f"economy/r{i}.txt: equal\n" for i in range(92))
+REPLAY_BAD = """economy/console-economy.txt: differs, line 1201: 'call 30 UnitAccount' / 'call 30 Apply'
+economy/load-midgame.txt: equal
+replay: playtest.py failed for x.exe (exit 1):
+"""
 
 
 class CommentTextTest(unittest.TestCase):
     def test_all_equal(self):
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP), (0, REPLAY))
         self.assertEqual(text, "Full gate on abc1234: 146 of 146 equal (both modes), block pointers: "
                                "all covered by data/block_pointers.csv in both modes, round trip: 73 of 73 equal, "
-                               "coverage: no subsystem fell, match setup: 15 of 15 ok")
+                               "coverage: no subsystem fell, match setup: 15 of 15 ok, replay: 92 of 92 equal")
         self.assertEqual(fullgate.last_full_run([comment(text, "2026-11-04T10:00:00Z")]), "abc1234")
 
     def test_pointer_problems_name_the_mode(self):
@@ -207,36 +212,36 @@ class CommentTextTest(unittest.TestCase):
 
     def test_round_trip_divergence_and_exit_status(self):
         trip = "70 of 73 scenarios equal, total 3:02\n"
-        text = fullgate.comment_text("abc1234", (1, BOTH_MODES_BAD), (1, trip), (0, COVERAGE), (0, MATCH_SETUP))
+        text = fullgate.comment_text("abc1234", (1, BOTH_MODES_BAD), (1, trip), (0, COVERAGE), (0, MATCH_SETUP), (0, REPLAY))
         self.assertIn("145 of 146 equal (both modes)", text)
-        self.assertTrue(text.endswith("round trip: 70 of 73 equal, coverage: no subsystem fell, match setup: 15 of 15 ok, both modes exit 1, round trip exit 1"))
+        self.assertTrue(text.endswith("round trip: 70 of 73 equal, coverage: no subsystem fell, match setup: 15 of 15 ok, replay: 92 of 92 equal, both modes exit 1, round trip exit 1"))
 
     def test_a_run_that_did_not_finish(self):
-        text = fullgate.comment_text("abc1234", (1, ""), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP))
+        text = fullgate.comment_text("abc1234", (1, ""), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP), (0, REPLAY))
         self.assertIn("not finished equal (both modes), block pointers: not reported", text)
 
     def test_round_trip_pointer_problems_are_named(self):
         trip = "73 of 73 scenarios equal, total 3:02\n2 problems with the pointers out of the block; add them\n"
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (1, trip), (0, COVERAGE), (0, MATCH_SETUP))
-        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: no subsystem fell (block pointers: 2 block pointer problems), match setup: 15 of 15 ok, round trip exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (1, trip), (0, COVERAGE), (0, MATCH_SETUP), (0, REPLAY))
+        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: no subsystem fell (block pointers: 2 block pointer problems), match setup: 15 of 15 ok, replay: 92 of 92 equal, round trip exit 1"))
 
     def test_coverage_fall_names_the_status(self):
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (1, COVERAGE_FELL), (0, MATCH_SETUP))
-        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: failed, match setup: 15 of 15 ok, coverage exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (1, COVERAGE_FELL), (0, MATCH_SETUP), (0, REPLAY))
+        self.assertTrue(text.endswith("round trip: 73 of 73 equal, coverage: failed, match setup: 15 of 15 ok, replay: 92 of 92 equal, coverage exit 1"))
 
     def test_coverage_build_failure_and_no_output(self):
         self.assertEqual(fullgate.coverage_result(fullgate.BUILD_FAILED, "FAILED: link\n"), "build failed")
         self.assertEqual(fullgate.coverage_result(1, ""), "not finished")
         self.assertEqual(fullgate.coverage_result(0, COVERAGE), "no subsystem fell")
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (fullgate.BUILD_FAILED, "x"), (0, MATCH_SETUP))
-        self.assertTrue(text.endswith("coverage: build failed, match setup: 15 of 15 ok, coverage exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (fullgate.BUILD_FAILED, "x"), (0, MATCH_SETUP), (0, REPLAY))
+        self.assertTrue(text.endswith("coverage: build failed, match setup: 15 of 15 ok, replay: 92 of 92 equal, coverage exit 1"))
 
     def test_match_setup_failure_and_no_output(self):
         failed = "ok   block-large: ...\nFAIL the two limits play differently (first differing tick None)\n14 of 15 ok\n"
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (1, failed))
-        self.assertTrue(text.endswith("coverage: no subsystem fell, match setup: 14 of 15 ok, match setup exit 1"))
-        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (1, "steps-low: the run failed\n"))
-        self.assertTrue(text.endswith("match setup: not finished, match setup exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (1, failed), (0, REPLAY))
+        self.assertTrue(text.endswith("coverage: no subsystem fell, match setup: 14 of 15 ok, replay: 92 of 92 equal, match setup exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (1, "steps-low: the run failed\n"), (0, REPLAY))
+        self.assertTrue(text.endswith("match setup: not finished, replay: 92 of 92 equal, match setup exit 1"))
 
     def test_coverage_check_builds_then_plays(self):
         calls = []
@@ -267,6 +272,7 @@ class CommentTextTest(unittest.TestCase):
     def test_run_plays_every_check_and_prints_the_comment(self):
         played = []
         setup = []
+        replayed = []
 
         def fake_play(args, log, what):
             played.append((what, args))
@@ -274,11 +280,12 @@ class CommentTextTest(unittest.TestCase):
 
         out = io.StringIO()
         old = sys.argv
-        sys.argv = ["fullgate.py", "run", "--sha", "abc1234", "--exe", "x.exe", "--game-dir", ""]
+        sys.argv = ["fullgate.py", "run", "--replay", "--sha", "abc1234", "--exe", "x.exe", "--game-dir", ""]
         try:
             with unittest.mock.patch.object(fullgate, "play", fake_play), unittest.mock.patch.object(
                     fullgate, "coverage_check", lambda game_dir, log: (0, COVERAGE)), unittest.mock.patch.object(
                     fullgate, "match_setup", lambda exe, log: setup.append(exe) or (0, MATCH_SETUP)), unittest.mock.patch.object(
+                    fullgate, "replay_check", lambda exe, log: replayed.append(exe) or (0, REPLAY)), unittest.mock.patch.object(
                     fullgate.shutil, "rmtree"), contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
                 code = fullgate.main()
         finally:
@@ -288,13 +295,46 @@ class CommentTextTest(unittest.TestCase):
         self.assertEqual(played[0][1], ["--exe", "x.exe", "--both-modes"])
         self.assertEqual(played[1][1], ["--exe", "x.exe", "--roundtrip", "auto"])
         self.assertEqual(setup, [["--exe", "x.exe"]])
-        self.assertIn("round trip: 73 of 73 equal, coverage: no subsystem fell, match setup: 15 of 15 ok", out.getvalue())
+        self.assertEqual(replayed, [["--exe", "x.exe"]])
+        self.assertIn("round trip: 73 of 73 equal, coverage: no subsystem fell, match setup: 15 of 15 ok, replay: 92 of 92 equal",
+                      out.getvalue())
 
     def test_match_setup_plays_the_test_on_the_exe(self):
         calls = []
         with unittest.mock.patch.object(fullgate, "stream", lambda command, log, what: calls.append(command) or (0, MATCH_SETUP)):
             self.assertEqual(fullgate.match_setup(["--exe", "x.exe", "--game-dir", "g"], None), (0, MATCH_SETUP))
         self.assertEqual(calls, [["uv", "run", "tools/test_matchsetup.py", "--exe", "x.exe", "--game-dir", "g"]])
+
+    def test_run_without_replay_leaves_it_out(self):
+        replayed = []
+        out = io.StringIO()
+        old = sys.argv
+        sys.argv = ["fullgate.py", "run", "--sha", "abc1234", "--exe", "x.exe", "--game-dir", ""]
+        try:
+            with unittest.mock.patch.object(fullgate, "play", lambda args, log, what: (0, BOTH_MODES)), unittest.mock.patch.object(
+                    fullgate, "coverage_check", lambda game_dir, log: (0, COVERAGE)), unittest.mock.patch.object(
+                    fullgate, "match_setup", lambda exe, log: (0, MATCH_SETUP)), unittest.mock.patch.object(
+                    fullgate, "replay_check", lambda exe, log: replayed.append(exe) or (1, REPLAY_BAD)), unittest.mock.patch.object(
+                    fullgate.shutil, "rmtree"), contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                code = fullgate.main()
+        finally:
+            sys.argv = old
+        self.assertEqual(code, 0)
+        self.assertEqual(replayed, [])
+        self.assertTrue(out.getvalue().rstrip().endswith("match setup: 15 of 15 ok"))
+
+    def test_replay_check_plays_replay_on_the_exe(self):
+        calls = []
+        with unittest.mock.patch.object(fullgate, "stream", lambda command, log, what: calls.append(command) or (0, REPLAY)):
+            self.assertEqual(fullgate.replay_check(["--exe", "x.exe", "--game-dir", "g"], None), (0, REPLAY))
+        self.assertEqual(calls, [["uv", "run", "tools/replay.py", "--check", "--exe", "x.exe", "--game-dir", "g"]])
+
+    def test_replay_differences_and_a_run_that_did_not_finish(self):
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP), (1, REPLAY_BAD))
+        self.assertTrue(text.endswith("match setup: 15 of 15 ok, replay: 1 of 2 equal, replay exit 1"))
+        text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP),
+                                     (1, "replay: playtest.py failed for x.exe (exit 1):\n"))
+        self.assertTrue(text.endswith("replay: not finished, replay exit 1"))
 
 
 class GatePathsTest(unittest.TestCase):

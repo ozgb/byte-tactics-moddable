@@ -39,6 +39,10 @@ call 0 GetGameType
   o result 2
 call 0 GetGameType
   o result 2
+call 0 GetGameType
+  o result 2
+call 0 GetGameType
+  o result 2
 call 0 GetMissionParams
   r Mission#0.surfaceMetal 3
   r Mission#0.minWindSpeed 100

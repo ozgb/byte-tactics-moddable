@@ -320,9 +320,6 @@ call 670 Apply
 call 670 UpdateMotion
   a unit Unit#4
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
-  o PathOrder#2.posX 30408704
-  o PathOrder#2.posY 1376256
-  o PathOrder#2.posZ 22020096
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
@@ -337,6 +334,9 @@ call 670 UpdateMotion
   w UnitMotion#2.lastMoveTick 670
   w UnitMotion#2.p2X 12475
   w UnitMotion#2.p2Z -16931
+  w PathOrder#2.posX 30408704
+  w PathOrder#2.posY 1376256
+  w PathOrder#2.posZ 22020096
 call 670 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -736,9 +736,6 @@ call 685 UpdateMotion
   r Unit#4.flags 0x10e40026
   a unit Unit#4
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
-  o PathOrder#1.posX 30408704
-  o PathOrder#1.posY 1376256
-  o PathOrder#1.posZ 22020096
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
@@ -753,6 +750,9 @@ call 685 UpdateMotion
   w UnitMotion#2.lastMoveTick 685
   w UnitMotion#2.p2X 21436
   w UnitMotion#2.p2Z -18608
+  w PathOrder#1.posX 30408704
+  w PathOrder#1.posY 1376256
+  w PathOrder#1.posZ 22020096
 call 685 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1155,9 +1155,6 @@ call 700 UpdateMotion
   r Unit#4.flags 0x10e40026
   a unit Unit#4
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
-  o PathOrder#2.posX 30408704
-  o PathOrder#2.posY 1376256
-  o PathOrder#2.posZ 22020096
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
@@ -1172,6 +1169,9 @@ call 700 UpdateMotion
   w UnitMotion#2.lastMoveTick 700
   w UnitMotion#2.p2X 30323
   w UnitMotion#2.p2Z 25448
+  w PathOrder#2.posX 30408704
+  w PathOrder#2.posY 1376256
+  w PathOrder#2.posZ 22020096
 call 700 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1564,9 +1564,6 @@ call 715 UpdateMotion
   r Unit#4.flags 0x10e40026
   a unit Unit#4
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
-  o PathOrder#1.posX 30408704
-  o PathOrder#1.posY 1376256
-  o PathOrder#1.posZ 22020096
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
@@ -1581,6 +1578,9 @@ call 715 UpdateMotion
   w UnitMotion#2.lastMoveTick 715
   w UnitMotion#2.p2X 25967
   w UnitMotion#2.p2Z 39278
+  w PathOrder#1.posX 30408704
+  w PathOrder#1.posY 1376256
+  w PathOrder#1.posZ 22020096
 call 715 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -1968,9 +1968,6 @@ call 730 UpdateMotion
   r Unit#4.flags 0x10e40026
   a unit Unit#4
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
-  o PathOrder#2.posX 30408704
-  o PathOrder#2.posY 1376256
-  o PathOrder#2.posZ 22020096
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
@@ -1984,6 +1981,9 @@ call 730 UpdateMotion
   w UnitMotion#2.lastMoveTick 730
   w UnitMotion#2.p2X 12328
   w UnitMotion#2.p2Z 18890
+  w PathOrder#2.posX 30408704
+  w PathOrder#2.posY 1376256
+  w PathOrder#2.posZ 22020096
 call 730 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8
@@ -2362,9 +2362,6 @@ call 745 UpdateMotion
   r Unit#4.flags 0x10e40026
   a unit Unit#4
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
-  o PathOrder#1.posX 30408704
-  o PathOrder#1.posY 1376256
-  o PathOrder#1.posZ 22020096
   i scripts.GetPiecePosition Unit#2 1 = (30408704,1376256,22020096)
   i services.SchedPublish 14 16
   i services.SchedPublish 14 20
@@ -2378,6 +2375,9 @@ call 745 UpdateMotion
   w UnitMotion#2.lastMoveTick 745
   w UnitMotion#2.p2X 5747
   w UnitMotion#2.p2Z 8844
+  w PathOrder#1.posX 30408704
+  w PathOrder#1.posY 1376256
+  w PathOrder#1.posZ 22020096
 call 745 UpdateMotion
   a unit Unit#251
   i services.SchedPublish 14 8

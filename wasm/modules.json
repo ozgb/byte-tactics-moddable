@@ -463,7 +463,6 @@
         "map": 9,
         "mission": 2,
         "network": 2,
-        "pathfinding": 4,
         "scripts": 3,
         "services": 4
       },
@@ -504,9 +503,6 @@
           "SendFeatureKilled": [["int", "int"], "void"],
           "SendFeatureBurning": [["int", "int"], "void"],
           "SendFeatureReclaimed": [["block", "int", "int"], "void"]
-        },
-        "pathfinding": {
-          "CellsChanged": [["int", "int", "int", "int", "int", "int"], "void"]
         },
         "scripts": {
           "ObjectStateSize": [["linear"], "int"]
@@ -656,7 +652,7 @@
       },
       "data_base": 360448,
       "table_base": 208,
-      "blocked": "about 20 engine calls with no import (AngleOfVector, SolveLaunchAngle, InitProjectile, CalcAimAngles, AddExplosionEffect and others), the GAF services of #1217 and the aim-script vtable data",
+      "blocked": "about 20 engine calls with no import (AngleOfVector, SolveLaunchAngle, InitProjectile, CalcAimAngles, AddExplosionEffect and others), the GAF services, which the glue does not give until the frame tables are in the shared memory, and the aim-script vtable data",
       "exports": ["Apply", "UpdateProjectiles", "UpdateExplosions", "UpdateUnitWeapons", "FindWeaponByName", "GetWeaponRange",
                   "WeaponCanReachUnit", "FindTargetableProjectile", "WeaponCanReachPos"],
       "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
@@ -1109,7 +1105,6 @@
       "majors": {
         "map": 9,
         "los_radar": 5,
-        "pathfinding": 4,
         "services": 4
       },
       "data_base": 557056,
@@ -1140,9 +1135,6 @@
       "imports": {
         "los_radar": {
           "GetMapCell": [["int", "int"], "block"]
-        },
-        "pathfinding": {
-          "CellsChanged": [["int", "int", "int", "int", "int", "int"], "void"]
         },
         "services": {
           "SimAlloc": [["int"], "linear"],

@@ -713,20 +713,7 @@ void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3, unsign
         ArgValue(s_call, "classes", a4);
         ArgValue(s_call, "cause", a5);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i pathfinding.CellsChanged");
-        ImportValue(line, a0);
-        ImportValue(line, a1);
-        ImportValue(line, a2);
-        ImportValue(line, a3);
-        ImportValue(line, a4);
-        ImportValue(line, a5);
-    }
     s_inner_pathfinding->CellsChanged(a0, a1, a2, a3, a4, a5);
-    if (scope.Import()) {
-        FinishImport(line, roots);
-    }
     if (scope.Open()) {
     }
 }
@@ -5698,8 +5685,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_NETWORK_SENDFEATURERECLAIMED)
             return true;
-        if (slot == RSL_PATHFINDING_CELLSCHANGED)
-            return true;
         if (slot == RSL_SCRIPTS_OBJECTSTATESIZE)
             return true;
         return false;
@@ -5988,8 +5973,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
     case SUB_MAP:
         if (slot == RSL_LOS_RADAR_GETMAPCELL)
             return true;
-        if (slot == RSL_PATHFINDING_CELLSCHANGED)
-            return true;
         return false;
     case SUB_SCRIPTS:
         if (slot == RSL_MAP_GETGROUNDHEIGHT)
@@ -6162,7 +6145,7 @@ void HookSeams(const bool* on)
         s_rec_pathfinding.Submit = RecPathfindingSubmit;
     if (on[SUB_PATHFINDING] || on[SUB_MOVEMENT])
         s_rec_pathfinding.Cancel = RecPathfindingCancel;
-    if (on[SUB_PATHFINDING] || on[SUB_FEATURES] || on[SUB_MAP])
+    if (on[SUB_PATHFINDING])
         s_rec_pathfinding.CellsChanged = RecPathfindingCellsChanged;
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.Step = RecPathfindingStep;

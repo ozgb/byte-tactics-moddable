@@ -1408,7 +1408,10 @@ from the layout), and the export refuses a copy that names any other source name
   or the name in its last brackets (`OrderTableEntry.notify`). `replayschema.py --check` fails for an entry with no functions and no reason, a function that is
   none of the rows' functions, and a key that matches no `indirect_call` row of the slot.
 - `subsystems.<name>`: `status` (`complete` or `pending`, with the `issue` that completes it), the `imports` (slots of
-  other seams the subsystem calls) and per slot the `functions` behind it, the `native` symbol the replayer calls,
+  other seams the subsystem calls; a slot that a route calls when the subsystem publishes is not one) with
+  `unrecorded_imports`, a reason for each import that no recording of `tests/replay/<name>/` carries and no recorded
+  slot calls through the seam (`replayschema.py --check` fails on an import with neither, and on a recorded import
+  the list leaves out), and per slot the `functions` behind it, the `native` symbol the replayer calls,
   and how each pointer argument is recorded:
 
 | `mode` | Argument | Lines |

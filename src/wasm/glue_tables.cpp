@@ -5711,18 +5711,6 @@ const char* __cdecl GlueImportPathfindingCancel(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
-const char* __cdecl GlueImportPathfindingCellsChanged(wasmtime_val_raw_t* a)
-{
-    int left = (int)a[0].i32;
-    int top = (int)a[1].i32;
-    int right = (int)a[2].i32;
-    int bottom = (int)a[3].i32;
-    unsigned int classes = (unsigned int)a[4].i32;
-    int cause = (int)a[5].i32;
-    g_seams.pathfinding->CellsChanged(left, top, right, bottom, classes, cause);
-    return nullptr;
-}
-
 const char* __cdecl GlueImportPathfindingSubmit(wasmtime_val_raw_t* a)
 {
     GLUE_NEED("pathfinding.Submit", 0);
@@ -6416,7 +6404,6 @@ const GlueImport kGlueInterfaceImports[] = {
     {"orders", "GetOrderFlags", "i>i", GlueImportOrdersGetOrderFlags},
     {"orders", "GetOrderType", "iiii>i", GlueImportOrdersGetOrderType},
     {"pathfinding", "Cancel", "i>", GlueImportPathfindingCancel},
-    {"pathfinding", "CellsChanged", "iiiiii>", GlueImportPathfindingCellsChanged},
     {"pathfinding", "Submit", "i>", GlueImportPathfindingSubmit},
     {"pathworld", "BeginSearch", "i>", GlueImportPathworldBeginSearch},
     {"pathworld", "EndSearch", "i>", GlueImportPathworldEndSearch},

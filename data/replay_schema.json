@@ -15396,6 +15396,11 @@
        }
       }
      }
+    },
+    "unrecorded_imports": {
+     "files.BankOpenAccount": "opens the meteor settings of the saved-game bank: the slots reach the bank through its own inline calls, which the walk does not follow, and no recorded scenario saves or loads a game",
+     "files.BankSetInteger": "as files.BankOpenAccount: writes a meteor setting into the saved-game bank",
+     "files.BankGetInteger": "as files.BankOpenAccount: reads a meteor setting from the saved-game bank"
     }
    },
    "weapons": {
@@ -15731,7 +15736,10 @@
      "ScheduleEconomySpend",
      "ScheduleTargetingTargetPos",
      "ScheduleTargetingTargetUnit"
-    ]
+    ],
+    "unrecorded_imports": {
+     "los_radar.IsPointVisible": "whether a projectile is in view, asked only when the projectiles are drawn"
+    }
    },
    "files": {
     "status": "pending",
@@ -16026,7 +16034,6 @@
      "network.SendFeatureHit",
      "network.SendFeatureKilled",
      "network.SendFeatureReclaimed",
-     "pathfinding.CellsChanged",
      "scripts.ObjectStateSize"
     ],
     "slots": {
@@ -16220,7 +16227,10 @@
       "native": "UpdateFeaturesSlot"
      }
     },
-    "issue": 1045
+    "issue": 1045,
+    "unrecorded_imports": {
+     "los_radar.SoundHeardMask": "the players who hear a feature's sound, asked by the sound record of a burning or dying feature through an inline helper the walk does not follow"
+    }
    },
    "ai": {
     "status": "complete",
@@ -17200,7 +17210,12 @@
      "init": "Init",
      "shutdown": "Shutdown"
     },
-    "issue": 1080
+    "issue": 1080,
+    "unrecorded_imports": {
+     "pathworld.MoveClass": "the hierarchical search's set-up of a movement class, which no recorded scenario reaches",
+     "pathworld.LineOfSight": "the hierarchical search's straight-line test, which no recorded scenario reaches",
+     "pathworld.TerrainPass": "the hierarchical search's cost of a cell, which no recorded scenario reaches"
+    }
    },
    "los_radar": {
     "status": "complete",
@@ -18433,7 +18448,12 @@
     ],
     "issue": 1083,
     "import_objects": "units' handlers of a synchronous route change a unit inside SchedPublish (the CLEAR_NET_DIRTY effect clears the dirty bits that RunOrders reads again before it returns, and targeting's SET_UNIT sets a weapon's target), and units' reference slots link the reference an order embeds",
-    "fresh_allocations": "the module frees an order and allocates the next one at the same address, so the names an earlier order held at the block's first address are forgotten when a block is allocated"
+    "fresh_allocations": "the module frees an order and allocates the next one at the same address, so the names an earlier order held at the block's first address are forgotten when a block is allocated",
+    "unrecorded_imports": {
+     "movement.TargetType": "the kind of an order's target, asked when a saved game writes the order",
+     "movement.SaveTarget": "writes an order's target into a saved game",
+     "weapons.WeaponCanReachPos": "whether a weapon reaches the cursor's position, asked by the order cursor"
+    }
    },
    "units": {
     "status": "complete",
@@ -20434,8 +20454,7 @@
      }
     },
     "imports": [
-     "los_radar.GetMapCell",
-     "pathfinding.CellsChanged"
+     "los_radar.GetMapCell"
     ]
    },
    "mission": {
@@ -22760,7 +22779,7 @@
    }
   },
   "features": {
-   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [5, 1], "status": "complete", "imports": ["los_radar.GetMapCell", "los_radar.SoundHeardMask", "map.GetCellMeanHeight", "map.GetGroundHeight", "mission.GetGameType", "network.SendFeatureBurning", "network.SendFeatureHit", "network.SendFeatureKilled", "network.SendFeatureReclaimed", "pathfinding.CellsChanged", "scripts.ObjectStateSize"], "issue": 1045, "unrecorded": {"UpdateFeatures": {"reason": "the phase driver: the scheduler calls the slots below, each recorded on its own", "native": "UpdateFeaturesSlot"}, "LoadFeatureFileList": {"reason": "load class", "native": "LoadFeatureFileList"}, "FreeFeatureFileList": {"reason": "load class", "native": "FreeFeatureFileList"}, "NopAfterFeatureEnum": {"reason": "load class", "native": "NopAfterFeatureEnum"}, "ResolveFeatureLinks": {"reason": "load class", "native": "ResolveFeatureLinks"}, "InitFeatureAnimPool": {"reason": "load class", "native": "InitFeatureAnimPool"}, "FreeFeaturePool": {"reason": "load class", "native": "FreeFeaturePool"}, "PlaceMissionFeatures": {"reason": "load class", "native": "PlaceMissionFeatures"}, "StampFeatureMetal": {"reason": "load class", "native": "StampFeatureMetal"}, "FindOrLoadFeatureType": {"reason": "load class", "native": "FindOrLoadFeatureType"}, "SaveFeatures": {"reason": "a query of a saved game, outside the tick", "native": "SaveFeatures"}, "LoadFeatures": {"reason": "load class", "native": "LoadFeatures"}}},
+   "header": {"interface": "interfaces/features.h", "struct": "FeaturesSeam", "version": [5, 1], "status": "complete", "imports": ["los_radar.GetMapCell", "los_radar.SoundHeardMask", "map.GetCellMeanHeight", "map.GetGroundHeight", "mission.GetGameType", "network.SendFeatureBurning", "network.SendFeatureHit", "network.SendFeatureKilled", "network.SendFeatureReclaimed", "scripts.ObjectStateSize"], "issue": 1045, "unrecorded": {"UpdateFeatures": {"reason": "the phase driver: the scheduler calls the slots below, each recorded on its own", "native": "UpdateFeaturesSlot"}, "LoadFeatureFileList": {"reason": "load class", "native": "LoadFeatureFileList"}, "FreeFeatureFileList": {"reason": "load class", "native": "FreeFeatureFileList"}, "NopAfterFeatureEnum": {"reason": "load class", "native": "NopAfterFeatureEnum"}, "ResolveFeatureLinks": {"reason": "load class", "native": "ResolveFeatureLinks"}, "InitFeatureAnimPool": {"reason": "load class", "native": "InitFeatureAnimPool"}, "FreeFeaturePool": {"reason": "load class", "native": "FreeFeaturePool"}, "PlaceMissionFeatures": {"reason": "load class", "native": "PlaceMissionFeatures"}, "StampFeatureMetal": {"reason": "load class", "native": "StampFeatureMetal"}, "FindOrLoadFeatureType": {"reason": "load class", "native": "FindOrLoadFeatureType"}, "SaveFeatures": {"reason": "a query of a saved game, outside the tick", "native": "SaveFeatures"}, "LoadFeatures": {"reason": "load class", "native": "LoadFeatures"}}},
    "slots": {
     "GetCellFeature": {"conv": "__stdcall", "ret": "unsigned short", "functions": ["GetCellFeature"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.feature", "Cell.offsetY", "Cell.offsetX"], "objectWrites": [], "allOf": [], "args": [{"name": "cell", "type": "Cell*", "line": "cell", "mode": "object", "kind": "Cell"}], "result": {"type": "unsigned short", "mode": "scalar"}, "native": "GetCellFeature"},
     "GetFootprintCentre": {"conv": "__stdcall", "ret": "void", "functions": ["GetFootprintCentre"], "reads": [], "writes": [], "objectReads": ["Unit.cell", "Unit.footprint", "Feature.footprint"], "objectWrites": [], "allOf": [], "args": [{"name": "cell", "type": "Point16*", "line": "cell", "mode": "struct", "kind": "Point16", "dir": "in"}, {"name": "def", "type": "Feature*", "line": "def", "mode": "object", "kind": "Feature"}, {"name": "out", "type": "Vec3*", "line": "out", "mode": "value", "kind": "Vec3", "dir": "out"}], "result": null, "native": "GetFootprintCentreSlot"},
@@ -22910,7 +22929,7 @@
    }
   },
   "map": {
-   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [9, 2], "status": "complete", "imports": ["los_radar.GetMapCell", "pathfinding.CellsChanged"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}, {"name": "skip", "type": "int", "line": "skip", "mode": "scalar"}, {"name": "ids", "type": "unsigned short*", "line": "ids", "mode": "bytes-out", "length": "capacity", "elem": "u16", "resultElem": "u16", "lengthIndex": 4}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "FreePassMaps": {"reason": "#660 part 3", "native": "FreePassMaps"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "RefreshMovedUnits": {"reason": "#660 part 3", "native": "RefreshMovedUnitsSlot"}, "RefreshUnitIfStale": {"reason": "#660 part 3", "native": "RefreshUnitIfStaleSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}, "PathLockStamp": {"reason": "a query of a saved game, outside the tick", "native": "PathLockStamp"}}},
+   "header": {"interface": "interfaces/map.h", "struct": "MapSeam", "version": [9, 2], "status": "complete", "imports": ["los_radar.GetMapCell"], "issue": 693, "unrecorded": {"UnitsInRange": {"reason": "#660 part 3", "native": "UnitsInRange", "conv": "__stdcall", "ret": "int", "functions": [], "reads": [], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "value", "kind": "Vec3", "byPointer": true}, {"name": "range", "type": "int", "line": "range", "mode": "scalar"}, {"name": "skip", "type": "int", "line": "skip", "mode": "scalar"}, {"name": "ids", "type": "unsigned short*", "line": "ids", "mode": "bytes-out", "length": "capacity", "elem": "u16", "resultElem": "u16", "lengthIndex": 4}, {"name": "capacity", "type": "int", "line": "capacity", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}}, "FreePassMaps": {"reason": "#660 part 3", "native": "FreePassMaps"}, "LoadMetalPlotmap": {"reason": "#660 part 3", "native": "LoadMetalPlotmap"}, "LoadPlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "LoadPlayerFeaturesPlotmap"}, "SaveMetalPlotmap": {"reason": "#660 part 3", "native": "SaveMetalPlotmap"}, "SavePlayerFeaturesPlotmap": {"reason": "#660 part 3", "native": "SavePlayerFeaturesPlotmap"}, "PickRandomReclaimableResourcesInRadius": {"reason": "#660 part 3", "native": "PickRandomReclaimableResourcesInRadius"}, "AllocateBuckets": {"reason": "#660 part 3", "native": "AllocateBucketsSlot"}, "FreeBuckets": {"reason": "#660 part 3", "native": "FreeBucketsSlot"}, "RefreshMovedUnits": {"reason": "#660 part 3", "native": "RefreshMovedUnitsSlot"}, "RefreshUnitIfStale": {"reason": "#660 part 3", "native": "RefreshUnitIfStaleSlot"}, "WriteState": {"reason": "a dump query, called from the harness only", "native": "WriteStateSlot"}, "PathLockStamp": {"reason": "a query of a saved game, outside the tick", "native": "PathLockStamp"}}},
    "slots": {
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["ApplyMapEvent", "MapUnitOfHandle", "MapPoint", "AddUnitToMap", "RefreshAllPassMapsForUnits", "RefreshAndReportAllPassMaps", "PassMap::Refresh", "GetPassMapFootprintValueWithEdgeStrips", "GetPassMapFootprintValue", "FootprintValueWithEdgeStrips", "FootprintValue", "SetOwner", "UnlinkBucketUnit", "RemoveUnitFromMap", "RefreshPassMapsForUnit", "VisitObjectsInArea", "ClearFootprintAndUnlink", "ForceNeighborFootprintReclaim", "SetYardOpen", "ClaimFootprintCells", "IsFootprintClear", "RefreshAllPassMaps", "SpatialBucket::PrependUnit", "SpatialBucket::UnlinkUnit"], "reads": ["Game.ticks", "Game.width", "Game.height", "Game.seaLevel", "Game.featureCount", "Game.width_142a3", "Game.height_142a7", "Game.poolCount", "Game.overflowBucket", "Game.baseX", "Game.baseY", "Game.mapWidth", "Game.mapHeight"], "writes": ["Game.seaLevel", "Game.mapWidth", "Game.mapHeight"], "objectReads": ["Player.active", "Player.type", "Unit.cell", "Unit.footprint", "Unit.id", "Unit.cobStateFlags", "Unit.cargo", "Unit.spatialBucket", "Unit.flags", "Unit.cargoNext", "Unit.carrier", "Unit.def", "Unit.player", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "UnitDef.yardmap", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.high", "Cell.low", "Cell.feature", "Cell.offsetY", "Cell.offsetX", "Cell.flags", "Cell.occupant", "Cell.occupant2", "UnitMotion.pathLockStamp", "PassMap.footprintX", "PassMap.footprintZ", "PassMap.maxWaterDepth", "PassMap.minWaterDepth", "PassMap.maxSlope", "PassMap.badSlope", "PassMap.maxWaterSlope", "PassMap.badWaterSlope", "PassMap.defined", "PassMap.width", "PassMap.height", "PassMap.cells", "PassMap.lastTick", "Feature.flags16"], "objectWrites": ["Unit.cobStateFlags", "Unit.spatialBucket", "Unit.flags", "Unit.cargoNext", "SpatialBucket.head", "OverflowBucket.head", "Cell.unit", "Cell.unit2", "Cell.flags", "UnitMotion.pathLockStamp", "PassMap.cells"], "allOf": ["Unit", "SpatialBucket", "Cell", "PassMap", "Feature"], "args": [{"name": "event", "type": "MapEventHeader*", "line": "event", "mode": "event", "events": "map", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyMapEventSlot"},
     "GetCellMeanHeight": {"conv": "__stdcall", "ret": "int", "functions": ["GetCellMeanHeight", "GetCellCachedWidth", "WholePart"], "reads": ["Game.width", "Game.height"], "writes": [], "objectReads": ["Cell.high", "Cell.low"], "objectWrites": [], "allOf": ["Cell"], "args": [{"name": "pos", "type": "Vec3*", "line": "pos", "mode": "vec3", "label": "pos", "axes": "xz"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetCellMeanHeight"},

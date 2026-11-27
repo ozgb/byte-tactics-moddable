@@ -1813,6 +1813,42 @@ def through_key(target: str, through: dict) -> str | None:
     return None
 
 
+RECORDED_IMPORT = re.compile(r"^\s*i (\w+\.\w+)\b", re.M)
+
+
+def recorded_imports(sub: str) -> set[str]:
+    """The imports the recordings of a subsystem carry as `i` lines (tests/replay/<sub>/)."""
+    return {m for path in sorted((ROOT / "tests/replay" / sub).glob("*.txt")) for m in RECORDED_IMPORT.findall(path.read_text())}
+
+
+def seam_calls(functions: list[str], by_function: dict, members: list[tuple[str, str]]) -> set[str]:
+    """The `<seam>.<slot>` names the functions call through a seam table."""
+    owners = {struct: name for name, struct in members}
+    out = set()
+    for fn in functions:
+        for r in by_function.get(fn, []):
+            seam = SEAM_CALL.search(r["target"]) if r["kind"] == "indirect_call" and r["target"].startswith("indirect via ") else None
+            if seam and seam.group(1) in owners:
+                out.add("%s.%s" % (owners[seam.group(1)], seam.group(2)))
+    return out
+
+
+def uncalled_imports(sub: str, spec: dict, called: set[str], recorded: set[str], groups: set[str]) -> list[str]:
+    """The import list of a complete subsystem against its recordings: each import is recorded, called through the seam by a
+    slot's closure or given a reason in `unrecorded_imports`, and each recorded import is listed."""
+    imports = spec.get("imports", [])
+    reasons = spec.get("unrecorded_imports", {})
+    errors = ["%s imports %s, which no recording of tests/replay/%s carries and no slot calls through the seam: drop it, "
+              "or give the reason in `unrecorded_imports`" % (sub, imp, sub)
+              for imp in imports if imp not in called and imp not in recorded and imp not in reasons]
+    errors += ["%s: `unrecorded_imports` names %s, which it does not import" % (sub, imp) for imp in reasons if imp not in imports]
+    errors += ["%s: `unrecorded_imports` gives %s a reason, but a recording carries it" % (sub, imp) for imp in reasons if imp in recorded]
+    errors += ["%s: `unrecorded_imports` gives %s no reason" % (sub, imp) for imp, why in reasons.items() if not why]
+    errors += ["%s's recordings carry %s, which it does not import" % (sub, imp) for imp in sorted(recorded)
+               if imp not in imports and imp.split(".")[0] in groups]
+    return errors
+
+
 def unaccounted_indirect(target: str, sub: str, spec: dict, ann: dict, closure: set, by_function: dict, members: list[tuple[str, str]], own_functions) -> str | None:
     """Why an indirect_call row is not accounted for, or None.
 
@@ -2022,6 +2058,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                 region = None
         errors += ["%s: annotated slot %s is not in interfaces/%s.h" % (sub, n, sub) for n in notes if n not in names]
         slots = {}
+        called = set()
         pending = {"untracked": set(), "rules": set(), "functions": [], "args": [], "types": set(), "indirect": set()}
         unrecorded = {}
         for s in iface["slots"]:
@@ -2039,6 +2076,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                         continue
             skipped = s["name"] in unrecorded
             functions = [] if skipped else functions_of(s, sub, assignment, note)
+            if skipped:
+                called.update(seam_calls(functions_of(s, sub, assignment, note), by_function, members))
             if not functions and not skipped:
                 pending["functions"].append(s["name"])
             reads, writes = set(), set()
@@ -2138,6 +2177,9 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                                            lambda name: [] if name not in names or name in unrecorded else functions_of({"name": name}, sub, assignment, notes.get(name, {})))
                 if why is not None:
                     pending["indirect"].add("%s: %s (%s)" % (s["name"], target, why))
+                elif SEAM_CALL.search(target) and target.startswith("indirect via "):
+                    owner = {struct: name for name, struct in members}.get(SEAM_CALL.search(target).group(1))
+                    called.add("%s.%s" % (owner, SEAM_CALL.search(target).group(2)))
             errors += ["%s.%s: the `through` entry for %s matches no indirect_call row of the slot" % (sub, s["name"], k) for k in through if k not in through_used]
             if draws:
                 reads.update(RNG_FIELDS)
@@ -2243,6 +2285,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             subsystems[sub]["freshAllocations"] = spec["fresh_allocations"]
         if unrecorded:
             subsystems[sub]["unrecorded"] = unrecorded
+        if complete:
+            errors += uncalled_imports(sub, spec, called, recorded_imports(sub), {m[0] for m in members})
         left = {k: v for k, v in done.items() if v}
         if complete and left:
             for k, v in left.items():

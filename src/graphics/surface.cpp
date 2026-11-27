@@ -486,6 +486,9 @@ static inline HRESULT RestoreSurfacesInline(Display* d)
 }
 
 void __stdcall HarnessFrameDrawn(const unsigned char* pixels, int pitch, int width, int height, const PALETTEENTRY* entries);
+int HarnessTestMode();
+struct Obj_004c2380;
+void __stdcall RedrawMouseCursor(Obj_004c2380* app);
 
 struct Desc {
     DWORD dwSize, dwFlags, height, width;
@@ -510,6 +513,8 @@ void FlipScreen(void)
 
     if ((flags & 2) == 0) {
         LONG held = Lock();
+        if (HarnessTestMode() && d->cursorThreadEnabled == 1 && d->bmp != 0)
+            RedrawMouseCursor((Obj_004c2380*)d);
         Surface* p = &d->cached;
         DrawSurface(p, d->overrideSurface, 0, 0);
         HarnessFrameDrawn(p->pixels, p->pitch, p->width, p->height, d->entries);
@@ -534,6 +539,8 @@ void FlipScreen(void)
             return;
 
         LONG held = Lock();
+        if (HarnessTestMode() && d->cursorThreadEnabled == 1 && d->bmp != 0)
+            RedrawMouseCursor((Obj_004c2380*)d);
         desc.dwSize = sizeof(desc);
         unsigned long lr = d->screen.primary->Lock(0, (DDSURFACEDESC*)&desc, 1, 0);
         if (lr == 0) {

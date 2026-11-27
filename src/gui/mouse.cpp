@@ -56,6 +56,9 @@ struct Obj_004c2380 {
 
 #pragma pack(pop)
 
+BOOL __stdcall HarnessGetCursorPos(POINT* pt);
+int HarnessTestMode();
+
 Obj_004c2380* GetDisplay(void);
 
 extern LONG g_gfxBlitLockHeld;
@@ -188,7 +191,7 @@ void __stdcall CaptureBackgroundAndDrawCursor(Obj_004c2380* obj)
         if (LockPrimary(&s)) {
             RECT r;
             POINT pt;
-            GetCursorPos(&pt);
+            HarnessGetCursorPos(&pt);
             obj->rect.x = pt.x;
             obj->rect.y = pt.y;
             obj->x = pt.x - obj->sprite->xOffset;
@@ -225,7 +228,7 @@ void __stdcall RedrawMouseCursor(Obj_004c2380* app)
         return;
     if (LockPrimary(&info) == 0)
         return;
-    GetCursorPos(&pt);
+    HarnessGetCursorPos(&pt);
     int x = pt.x;
     int y = pt.y;
     app->rect.x = x;
@@ -277,7 +280,7 @@ void __fastcall ShowSoftwareCursor(void)
     if (o->mode != 1) {
         if (--o->count <= 0) {
             POINT pt;
-            GetCursorPos(&pt);
+            HarnessGetCursorPos(&pt);
             o->rect.x = pt.x;
             o->rect.y = pt.y;
             if (o->sprite != 0) {
@@ -308,7 +311,7 @@ void __cdecl MouseThreadProc(int param)
     while (o->pending == 0) {
         int start = GetTickCount() + 0x21;
         LONG held = LockMouse();
-        if (o->sprite != 0)
+        if (o->sprite != 0 && !HarnessTestMode())
             RedrawMouseCursor(o);
         UnlockMouse(held);
         Sleep(max(1, start - (int)GetTickCount()));

@@ -686,8 +686,7 @@ add_custom_target(wasm_runtime
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_host.py" build ${WASM_HOST_ARGS}
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build
   COMMAND "${CMAKE_COMMAND}" -E copy "${WASM_HOST_DIR}/wasmtime_host.dll" "${CMAKE_BINARY_DIR}/wasmtime_host.dll"
-  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm-modules/wind_meteors.wasm" "${CMAKE_BINARY_DIR}/wind_meteors.wasm"
-  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/wasm/modules.json" "${CMAKE_BINARY_DIR}/modules.json"
+  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" runtime "${CMAKE_BINARY_DIR}"
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   USES_TERMINAL)
 

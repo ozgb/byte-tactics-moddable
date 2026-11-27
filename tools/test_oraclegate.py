@@ -287,6 +287,20 @@ class PrepareRuntime(unittest.TestCase):
         self.assertEqual((exe.parent / "objs/objects.rsp").read_text(), "/abs/a.obj\n")
         self.assertTrue((exe.parent / "TotalA.map").is_file())
 
+    def test_a_blocked_entry_has_no_wasm_copied_and_is_not_run_in_engine(self):
+        (self.build / "modules.json").write_text(json.dumps({"modules": [{"name": "wind_meteors"}, {"name": "econ", "blocked": "not yet"}]}))
+        exe = oraclegate.prepare_runtime(self.build, "wind_meteors", self.module, self.dir / "runtime")
+        self.assertEqual(sorted(p.name for p in exe.parent.glob("*.wasm")), ["wind_meteors.wasm"])
+        self.assertTrue(oraclegate.runs_in_engine(self.build, "wind_meteors"))
+        self.assertFalse(oraclegate.runs_in_engine(self.build, "econ"))
+
+    def test_judge_refuses_a_blocked_subsystem_before_anything_plays(self):
+        (self.build / "modules.json").write_text(json.dumps({"modules": [{"name": "econ", "blocked": "not yet"}]}))
+        with mock.patch.object(oraclegate, "check_module", return_value=None), mock.patch.object(oraclegate, "probe") as probe:
+            with self.assertRaisesRegex(oraclegate.Error, "does not run econ in a scenario yet: its manifest entry is blocked"):
+                oraclegate.judge(self.module, "econ", False, self.build, self.dir / "out", None)
+        probe.assert_not_called()
+
     def test_a_build_without_the_object_list_is_an_error(self):
         (self.build / "objs/objects.rsp").unlink()
         with self.assertRaisesRegex(oraclegate.Error, "objects.rsp"):

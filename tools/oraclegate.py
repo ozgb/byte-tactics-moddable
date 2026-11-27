@@ -18,6 +18,9 @@ contract with another order inside the tick; the digest is not a failure. The `v
 (the player view of the end of the tick, docs/view.md "The recorded view"): `equal`, `differs` (from a tick) or `not_judged`, per scenario and at the top
 level. A view that differs is not a failure either: the state stays the verdict.
 
+A subsystem whose manifest entry is `blocked` is refused too, before anything plays: the engine runs its native default and never loads
+a .wasm for it, so a scenario verdict would judge the default and not the module. The runtime copies the .wasm of the entries that are not blocked.
+
 Exit status: 0 when every scenario and recording is equal, 1 when one differs or failed to run, 2 when the loader refused
 the module or the arguments were wrong.
 """
@@ -74,12 +77,21 @@ def kit_version() -> dict[str, str | None]:
     return {"interfaces": latest_tag("interfaces-v"), "reference_traces": latest_tag("reference-traces-v")}
 
 
+def manifest_entries(build: Path) -> list[dict]:
+    return json.loads((build / "modules.json").read_text())["modules"]
+
+
 def manifest_modules(build: Path) -> list[str]:
-    return [m["name"] for m in json.loads((build / "modules.json").read_text())["modules"]]
+    return [m["name"] for m in manifest_entries(build)]
+
+
+def runs_in_engine(build: Path, subsystem: str) -> bool:
+    """Does the engine of this build load a .wasm for the subsystem? An entry with "blocked" runs its native default instead; a name the manifest lacks is left to prepare_runtime to refuse."""
+    return all("blocked" not in m for m in manifest_entries(build) if m["name"] == subsystem)
 
 
 def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) -> Path:
-    """A fresh runtime in `directory`: the build's files, the object list the block pointer check reads beside the map, the manifest and the other modules as built, `module` as the subsystem's."""
+    """A fresh runtime in `directory`: the build's files, the object list the block pointer check reads beside the map, the manifest and the other modules that are not blocked, as built, `module` as the subsystem's."""
     names = manifest_modules(build)
     if subsystem not in names:
         raise Error(f"the manifest has no module {subsystem} (it has {', '.join(names)})")
@@ -93,8 +105,9 @@ def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) 
     for name in RUNTIME_FILES:
         if (build / name).is_file():
             shutil.copy2(build / name, directory / name)
-    for name in names:
-        shutil.copy2(build / f"{name}.wasm", directory / f"{name}.wasm")
+    for entry in manifest_entries(build):
+        if "blocked" not in entry:
+            shutil.copy2(build / f"{entry['name']}.wasm", directory / f"{entry['name']}.wasm")
     shutil.copyfile(module, directory / f"{subsystem}.wasm")
     return directory / "TotalA.exe"
 
@@ -261,6 +274,8 @@ def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game
     problems = check_module(module, subsystem)
     if problems is not None:
         return build_result(subsystem, module, full, kit_version(), None, None, problems, time.time() - started)
+    if not runs_in_engine(build, subsystem):
+        raise Error(f"the engine does not run {subsystem} in a scenario yet: its manifest entry is blocked")
     exe = prepare_runtime(build, subsystem, module, out / "runtime")
     (out / "logs").mkdir(parents=True, exist_ok=True)
     kit = kit_version()

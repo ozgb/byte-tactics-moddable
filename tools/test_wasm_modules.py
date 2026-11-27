@@ -502,6 +502,23 @@ class AdapterManifestTests(unittest.TestCase):
         self.assertEqual(json.loads(text)["adapters"][1]["name"], "Log")
 
 
+class RuntimeCopyTests(unittest.TestCase):
+    GAME = {"modules": [{"name": "alpha"}, {"name": "beta", "blocked": "not yet"}]}
+
+    def test_copies_the_manifest_and_only_the_unblocked_modules(self):
+        with tempfile.TemporaryDirectory() as built, tempfile.TemporaryDirectory() as dest:
+            for name in ("alpha.wasm", "beta.wasm", "c.wasm"):
+                with open(os.path.join(built, name), "wb") as f:
+                    f.write(b"x")
+            self.assertEqual(wm.copy_runtime(self.GAME, built, os.path.join(dest, "out")), [])
+            self.assertEqual(sorted(os.listdir(os.path.join(dest, "out"))), ["alpha.wasm", "modules.json"])
+
+    def test_a_missing_built_file_is_reported_and_nothing_copied(self):
+        with tempfile.TemporaryDirectory() as built, tempfile.TemporaryDirectory() as dest:
+            self.assertEqual(wm.copy_runtime(self.GAME, built, dest), ["alpha.wasm"])
+            self.assertEqual(os.listdir(dest), [])
+
+
 BUILT = os.path.join(wm.OUT, "wind_meteors.wasm")
 OBJECTS = os.path.join(wm.OUT, "wind_meteors")
 

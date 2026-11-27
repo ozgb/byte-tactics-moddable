@@ -2,6 +2,7 @@
 
     uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm, rust.wasm and wind_meteors.wasm
     uv run tools/wasm_modules.py build-variant --define NAME=VALUE --name NAME   # wind_meteors.wasm built with the defines, as build/wasm-modules/NAME.wasm
+    uv run tools/wasm_modules.py runtime DIR   # modules.json and the built .wasm of every manifest entry without "blocked", copied into DIR
     uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
     uv run tools/wasm_modules.py check-module FILE.wasm --name SUBSYSTEM   # the window, imports, exports, kinds and size of one built file
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
@@ -217,6 +218,18 @@ def build_variant(defines, name):
 def built_modules(game):
     """The entries of a manifest whose default builds to WASM: an entry with "blocked" holds the reason it does not yet."""
     return [entry for entry in game["modules"] if "blocked" not in entry]
+
+
+def copy_runtime(game, out, dest):
+    """Copy the manifest and the built .wasm of every non-blocked entry into dest; the names of the files missing from out are returned instead when any is."""
+    missing = [f"{entry['name']}.wasm" for entry in built_modules(game) if not os.path.exists(os.path.join(out, f"{entry['name']}.wasm"))]
+    if missing:
+        return missing
+    os.makedirs(dest, exist_ok=True)
+    shutil.copyfile(GAME_MODULES, os.path.join(dest, "modules.json"))
+    for entry in built_modules(game):
+        shutil.copyfile(os.path.join(out, f"{entry['name']}.wasm"), os.path.join(dest, f"{entry['name']}.wasm"))
+    return []
 
 
 def game_manifest():
@@ -1374,8 +1387,8 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "build-variant", "check", "check-module", "imports", "statics", "adapters", "fatal", "glue-fatal"])
-    parser.add_argument("module", nargs="?", help="check-module: the .wasm file to check")
+    parser.add_argument("command", choices=["build", "build-variant", "check", "check-module", "imports", "statics", "adapters", "fatal", "glue-fatal", "runtime"])
+    parser.add_argument("module", nargs="?", help="check-module: the .wasm file to check; runtime: the directory to copy into")
     parser.add_argument("--exe", default=os.path.join(ROOT, "build", "modern", "TotalA.exe"), help="glue-fatal: the exe to run")
     parser.add_argument("--define", action="append", default=[], help="build-variant: NAME=VALUE for the wind_meteors compile")
     parser.add_argument("--name", help="build-variant: the variant's name, build/wasm-modules/NAME.wasm; check-module: the subsystem the file is for")
@@ -1388,6 +1401,15 @@ def main():
             print("check-module: needs a .wasm file and --name SUBSYSTEM", file=sys.stderr)
             return CANNOT_CHECK
         return run_check_module(args.module, args.name)
+    if args.command == "runtime":
+        if not args.module:
+            print("runtime: needs the directory to copy into", file=sys.stderr)
+            return 2
+        missing = copy_runtime(game_manifest(), OUT, args.module)
+        if missing:
+            print(f"FAIL: {', '.join(missing)} missing from {OUT}: uv run tools/wasm_modules.py build", file=sys.stderr)
+            return 1
+        return 0
     if args.command == "build":
         build()
         return 0

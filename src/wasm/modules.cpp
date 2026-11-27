@@ -12,25 +12,33 @@
 #include "../game/los_helpers.h"
 #include "wasmloader.h"
 #include "modules.h"
+#include "module_glue.h"
 
 #pragma init_seg(lib)
 
 namespace {
 
 ModuleMemory s_memory;
-const char kModuleName[] = "wind_meteors";
+
+struct Loaded {
+    GlueModule* glue;
+    unsigned staticsLow;
+    unsigned staticsHigh;
+    int haveBaseline;
+    unsigned baselineLow;
+    unsigned baselineHigh;
+    unsigned fuelMax;
+    unsigned fuelMaxTick;
+    int haveFuel;
+};
+
+const unsigned kLoadedCapacity = 16;
+Loaded s_loaded[kLoadedCapacity];
+unsigned s_loadedCount;
 
 int s_wasm;
 int s_testRun;
 wl_loader* s_loader;
-unsigned s_staticsLow;
-unsigned s_staticsHigh;
-int s_haveBaseline;
-unsigned s_baselineLow;
-unsigned s_baselineHigh;
-unsigned s_fuelMax;
-unsigned s_fuelMaxTick;
-int s_haveFuel;
 int s_timing;
 int s_timingStarted;
 unsigned s_timingMs;
@@ -49,11 +57,12 @@ void __cdecl OnTrap(void* user, const char* module, const char* message)
 {
     char text[700];
     unsigned budget;
+    const char* starved;
     (void)user;
-    if (WindMeteorsFatalPending())
+    if (GlueFatalPending())
         return;
-    if (WindMeteorsOutOfFuel(&budget)) {
-        sprintf(text, "%s ran out of fuel", module);
+    if (GlueOutOfFuel(&budget, &starved)) {
+        sprintf(text, "%s ran out of fuel", starved);
         WhereText(text);
         sprintf(text + strlen(text), ": it burned more than its fuel_budget of %u in one tick", budget);
         ModulesFatal(text);
@@ -65,10 +74,10 @@ void __cdecl OnTrap(void* user, const char* module, const char* message)
     ModulesFatal(text);
 }
 
-void LoaderFatal(const char* what)
+void LoaderFatal(const char* module, const char* what)
 {
     char text[700];
-    sprintf(text, "%s", kModuleName);
+    sprintf(text, "%s", module);
     WhereText(text);
     strcat(text, ": ");
     strncat(text, what, sizeof text - strlen(text) - 1);
@@ -177,12 +186,45 @@ unsigned char* ReadFile(const char* path, size_t* size)
     return data;
 }
 
+void LoadModule(const char* exe, GlueModule* glue)
+{
+    char wasm[320];
+    char text[700];
+    const char* name = glue->def->name;
+    sprintf(wasm, "%s%s.wasm", exe, name);
+    size_t size = 0;
+    unsigned char* bytes = ReadFile(wasm, &size);
+    if (bytes == nullptr) {
+        sprintf(text, "%s is missing: build the wasm_runtime target (cmake --build <dir> --target wasm_runtime), or run with -modules=native", wasm);
+        ModulesFatal(text);
+    }
+    if (s_loadedCount == kLoadedCapacity)
+        LoaderFatal(name, "too many modules");
+    wl_module* module = wl_load_module_bytes(s_loader, name, bytes, size);
+    unsigned top = 0;
+    long dataBase = 0;
+    if (module == nullptr)
+        LoaderFatal(name, wl_error(s_loader));
+    if (!StackTop(bytes, size, &top) || !wl_module_int(s_loader, name, "data_base", &dataBase))
+        LoaderFatal(name, "cannot find the module's data base or stack top");
+    free(bytes);
+    Loaded& loaded = s_loaded[s_loadedCount++];
+    memset(&loaded, 0, sizeof loaded);
+    loaded.glue = glue;
+    loaded.staticsLow = (unsigned)dataBase;
+    loaded.staticsHigh = top - wl_get_layout(s_loader)->stack_size;
+    long fuelBudget = 0;
+    if (!wl_module_int(s_loader, name, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
+        LoaderFatal(name, "the manifest has no fuel_budget");
+    if (!GlueBind(glue, s_loader, module, (unsigned)fuelBudget))
+        LoaderFatal(name, wl_error(s_loader));
+}
+
 void Start()
 {
     char exe[300];
     char dll[320];
     char manifest[320];
-    char wasm[320];
     char error[400];
     char text[700];
     unsigned length = host_file_exe_path(exe, sizeof exe - 1);
@@ -191,14 +233,6 @@ void Start()
     exe[length] = '\0';
     sprintf(dll, "%swasmtime_host.dll", exe);
     sprintf(manifest, "%smodules.json", exe);
-    sprintf(wasm, "%s%s.wasm", exe, kModuleName);
-
-    size_t size = 0;
-    unsigned char* bytes = ReadFile(wasm, &size);
-    if (bytes == nullptr) {
-        sprintf(text, "%s is missing: build the wasm_runtime target (cmake --build <dir> --target wasm_runtime), or run with -modules=native", wasm);
-        ModulesFatal(text);
-    }
     if (SimBlockBase() != nullptr)
         ModulesFatal("the sim block was reserved before the module loader started");
 
@@ -211,39 +245,32 @@ void Start()
     config.on_trap = OnTrap;
     s_loader = wl_create(&config, error, sizeof error);
     if (s_loader == nullptr) {
-        sprintf(text, "%s: %s", kModuleName, error);
+        sprintf(text, "modules: %s", error);
         ModulesFatal(text);
     }
     if (!wl_load_manifest_file(s_loader, manifest))
-        LoaderFatal(wl_error(s_loader));
+        LoaderFatal("modules", wl_error(s_loader));
     const wl_layout* layout = wl_get_layout(s_loader);
     if (!layout->has_block || layout->block_size != kSimBlockBytes || layout->block_max != kSimBlockCeilingBytes)
-        LoaderFatal("the manifest's block does not match the game's sim block");
+        LoaderFatal("modules", "the manifest's block does not match the game's sim block");
     if (!wl_create_memory(s_loader))
-        LoaderFatal(wl_error(s_loader));
+        LoaderFatal("modules", wl_error(s_loader));
     s_memory.base = wl_memory_base(s_loader);
     s_memory.size = (unsigned)wl_memory_size(s_loader);
     s_memory.scratch = layout->scratch_base;
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
 
-    if (!WindMeteorsInstall(s_loader, s_timing))
-        LoaderFatal(wl_error(s_loader));
-    wl_module* module = wl_load_module_bytes(s_loader, kModuleName, bytes, size);
-    unsigned top = 0;
-    long dataBase = 0;
-    if (module == nullptr)
-        LoaderFatal(wl_error(s_loader));
-    if (!StackTop(bytes, size, &top) || !wl_module_int(s_loader, kModuleName, "data_base", &dataBase))
-        LoaderFatal("cannot find the module's data base or stack top");
-    free(bytes);
-    s_staticsLow = (unsigned)dataBase;
-    s_staticsHigh = top - layout->stack_size;
-    long fuelBudget = 0;
-    if (!wl_module_int(s_loader, kModuleName, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
-        LoaderFatal("the manifest has no fuel_budget");
-    if (!WindMeteorsBind(s_loader, module, (unsigned)fuelBudget))
-        LoaderFatal(wl_error(s_loader));
+    if (!GlueInstall(s_loader, s_timing))
+        LoaderFatal("modules", wl_error(s_loader));
+    for (unsigned i = 0; i < g_glueModuleCount; i++) {
+        GlueModule* glue = g_glueModules[i];
+        int blocked = wl_module_text(s_loader, glue->def->name, "blocked") != nullptr;
+        if (blocked != glue->def->blocked)
+            LoaderFatal(glue->def->name, "the manifest and the glue tables disagree on whether the module builds");
+        if (!blocked)
+            LoadModule(exe, glue);
+    }
 }
 
 }
@@ -267,7 +294,8 @@ void __stdcall ModulesHideSwitch(char* cmdLine)
     char mode[16];
     HasSwitch(cmdLine, "modules", mode, sizeof mode);
     if (s_wasm)
-        WindMeteorsUseSeam();
+        for (unsigned i = 0; i < s_loadedCount; i++)
+            GlueUseSeam(s_loaded[i].glue);
 }
 
 namespace {
@@ -313,7 +341,7 @@ void WriteTiming(unsigned tick)
     unsigned long long overhead = (host_time_counter() - overheadStart) / 20000;
     unsigned long long counter = host_time_counter() - s_timingCounter;
     unsigned ms = host_time_ms() - s_timingMs;
-    WindMeteorsTimingReport(body);
+    GlueTimingReport(body);
     FILE* file = fopen("moduletime.txt", "wb");
     if (file != nullptr) {
         fprintf(file, "bt-moduletime 1\nmode\t%s\nticks\t%u\nwall_counter\t%I64u\nwall_ms\t%u\ntimer_cost\t%I64u\n%s",
@@ -332,7 +360,9 @@ void TimingTick(unsigned tick)
         s_timingMs = host_time_ms();
         s_timingCounter = host_time_counter();
         if (!s_wasm)
-            WindMeteorsTimeNative();
+            for (unsigned i = 0; i < g_glueModuleCount; i++)
+                if (!g_glueModules[i]->def->blocked)
+                    GlueTimeNative(g_glueModules[i]);
     }
     if (tick % 600 == 0)
         WriteTiming(tick);
@@ -340,31 +370,16 @@ void TimingTick(unsigned tick)
 
 }
 
-void __stdcall ModulesCheckStatics(unsigned tick)
+namespace {
+
+void CheckStatics(Loaded& loaded, unsigned tick)
 {
-    if (s_timing)
-        TimingTick(tick);
-    if (!s_wasm)
-        return;
-    unsigned used;
-    if (WindMeteorsFuelClose(&used) && (!s_haveFuel || used > s_fuelMax)) {
-        s_haveFuel = 1;
-        s_fuelMax = used;
-        s_fuelMaxTick = tick;
-        FILE* file = fopen("fuel.txt", "wb");
-        if (file != nullptr) {
-            fprintf(file, "bt-fuel 1\n%s\t%u\t%u\n", kModuleName, s_fuelMax, s_fuelMaxTick);
-            fclose(file);
-        } else {
-            ModulesFatal("testmode: cannot write fuel.txt");
-        }
-    }
-    unsigned skip[4];
+    unsigned skip[GLUE_WORD_COUNT];
     unsigned skipCount;
-    WindMeteorsDataRanges(skip, &skipCount);
+    GlueDataRanges(loaded.glue, skip, &skipCount);
     unsigned lo = 0x84222325;
     unsigned hi = 0xcbf29ce4;
-    for (unsigned at = s_staticsLow; at < s_staticsHigh; at++) {
+    for (unsigned at = loaded.staticsLow; at < loaded.staticsHigh; at++) {
         int skipped = 0;
         for (unsigned i = 0; i < skipCount; i++)
             skipped |= at >= skip[i] && at < skip[i] + 4;
@@ -375,15 +390,48 @@ void __stdcall ModulesCheckStatics(unsigned tick)
         lo = (unsigned)product;
         hi = hi * 0x1b3u + (unsigned)(product >> 32);
     }
-    if (!s_haveBaseline) {
-        s_haveBaseline = 1;
-        s_baselineLow = lo;
-        s_baselineHigh = hi;
+    if (!loaded.haveBaseline) {
+        loaded.haveBaseline = 1;
+        loaded.baselineLow = lo;
+        loaded.baselineHigh = hi;
         return;
     }
-    if (lo != s_baselineLow || hi != s_baselineHigh) {
+    if (lo != loaded.baselineLow || hi != loaded.baselineHigh) {
         char text[200];
-        sprintf(text, "%s kept state between ticks: its statics changed at tick %u", kModuleName, tick);
+        sprintf(text, "%s kept state between ticks: its statics changed at tick %u", loaded.glue->def->name, tick);
         ModulesFatal(text);
     }
+}
+
+}
+
+void __stdcall ModulesCheckStatics(unsigned tick)
+{
+    if (s_timing)
+        TimingTick(tick);
+    if (!s_wasm)
+        return;
+    int fuelChanged = 0;
+    for (unsigned i = 0; i < s_loadedCount; i++) {
+        Loaded& loaded = s_loaded[i];
+        unsigned used;
+        if (GlueFuelClose(loaded.glue, &used) && (!loaded.haveFuel || used > loaded.fuelMax)) {
+            loaded.haveFuel = 1;
+            loaded.fuelMax = used;
+            loaded.fuelMaxTick = tick;
+            fuelChanged = 1;
+        }
+    }
+    if (fuelChanged) {
+        FILE* file = fopen("fuel.txt", "wb");
+        if (file == nullptr)
+            ModulesFatal("testmode: cannot write fuel.txt");
+        fprintf(file, "bt-fuel 1\n");
+        for (unsigned i = 0; i < s_loadedCount; i++)
+            if (s_loaded[i].haveFuel)
+                fprintf(file, "%s\t%u\t%u\n", s_loaded[i].glue->def->name, s_loaded[i].fuelMax, s_loaded[i].fuelMaxTick);
+        fclose(file);
+    }
+    for (unsigned i = 0; i < s_loadedCount; i++)
+        CheckStatics(s_loaded[i], tick);
 }

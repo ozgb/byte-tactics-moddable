@@ -9262,9 +9262,25 @@ FILE* g_coreOut;
 
 void CoreError(const char* errorClass)
 {
-    fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"wind_meteors\"]}\n", errorClass);
+    const char* subsystem = ReplayWasmSubsystem();
+    fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"%s\"]}\n", errorClass, subsystem == nullptr ? "" : subsystem);
     fclose(g_coreOut);
     exit(0);
+}
+
+void RecordingSubsystem(const char* recording, char* subsystem, size_t size)
+{
+    const char* end = recording + strlen(recording);
+    while (end > recording && end[-1] != '/' && end[-1] != '\\')
+        end--;
+    const char* start = end > recording ? end - 1 : end;
+    while (start > recording && start[-1] != '/' && start[-1] != '\\')
+        start--;
+    size_t length = end > start ? (size_t)(end - start - 1) : 0;
+    if (length >= size)
+        length = size - 1;
+    memcpy(subsystem, start, length);
+    subsystem[length] = '\0';
 }
 
 int CoreHost(const char* callsPath, const char* outPath)
@@ -9298,7 +9314,9 @@ int CoreHost(const char* callsPath, const char* outPath)
         }
         *module++ = '\0';
         recording++;
-        ReplayWasmSelect(module, "wind_meteors");
+        char subsystem[64];
+        RecordingSubsystem(recording, subsystem, sizeof subsystem);
+        ReplayWasmSelect(module, subsystem[0] != '\0' ? subsystem : nullptr);
         Outcome out;
         ReplayFile(recording, out);
         fprintf(g_coreOut, "replay\t[%s]\n", out.core.Data());

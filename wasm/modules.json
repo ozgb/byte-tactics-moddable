@@ -7,9 +7,9 @@
   "block_max": 268435456,
   "scratch": [983040, 65536],
   "memory_pages": 4112,
-  "table_size": 80,
+  "table_size": 528,
   "stack_size": 4096,
-  "window": 65536,
+  "window": 32768,
   "table_slots": 32,
   "majors": {
     "ai": 6,
@@ -36,9 +36,236 @@
     "units": 7,
     "view": 2,
     "weapons": 4,
-    "wind_meteors": 3
+    "wind_meteors": 3,
+    "econworld": 5,
+    "pathworld": 4
   },
   "signatures": {
+    "ai": {
+      "Apply": [["linear", "int"], "int"],
+      "DumpPlayerAI": [["int", "handle"], "void"],
+      "CreatePlayerAI": [["int"], "void"],
+      "DestroyPlayerAI": [["int"], "void"],
+      "UpdatePlayerAI": [["int"], "void"],
+      "RebuildFeatureCells": [["int"], "void"],
+      "CreateSquads": [["block"], "void"],
+      "FreeSquads": [["block"], "void"],
+      "UpdateSquads": [["int"], "void"],
+      "CreateSquadManager": [["block"], "void"],
+      "FreeSquadManager": [["block"], "void"]
+    },
+    "economy": {
+      "RegionSize": [["linear"], "int"],
+      "Init": [["linear", "linear", "block", "int"], "void"],
+      "Shutdown": [[], "block"],
+      "Apply": [["linear", "int"], "int"],
+      "Spend": [["linear"], "int"],
+      "UpdatePlayerEconomy": [["int"], "void"],
+      "UpdateMetalExtraction": [["int"], "void"],
+      "UpdateResourceSharing": [["int"], "void"],
+      "RequestGranted": [["int", "int"], "int"],
+      "GetEnergyUse": [["int"], "f64"],
+      "UnitAccount": [["int", "linear"], "void"]
+    },
+    "econworld": {
+      "Tick": [[], "int"],
+      "Difficulty": [[], "int"],
+      "SharingEnabled": [[], "int"],
+      "Wind": [[], "f32"],
+      "Tide": [[], "f32"],
+      "PlayerInfo": [["int", "linear"], "void"],
+      "Allied": [["int", "int"], "int"],
+      "FirstUnit": [["int"], "int"],
+      "LastUnit": [["int"], "int"],
+      "NextUnit": [["int"], "int"],
+      "UnitSlot": [["int"], "int"],
+      "UnitInfo": [["int", "linear"], "int"],
+      "TypeInfo": [["int", "linear"], "void"],
+      "CellMetal": [["int", "int"], "int"],
+      "Emit": [["linear", "int"], "void"]
+    },
+    "features": {
+      "UpdateFeatures": [[], "void"],
+      "GetCellFeature": [["block"], "int"],
+      "GetFootprintCentre": [["linear", "block", "linear"], "void"],
+      "Apply": [["linear", "int"], "int"],
+      "Place": [["linear"], "int"],
+      "FeatureTypeCount": [[], "int"],
+      "AnimateFeatureType": [["int"], "void"],
+      "ScanFeatureCell": [[], "void"],
+      "FirstFeatureSpot": [[], "int"],
+      "UpdateFeatureSpot": [["int"], "int"],
+      "FindFeatureAtPos": [["linear", "linear", "linear"], "int"]
+    },
+    "los_radar": {
+      "GetMapCell": [["int", "int"], "block"],
+      "SoundHeardMask": [["linear"], "int"],
+      "IsPointVisible": [["block", "linear"], "int"],
+      "GetSeenUnitsInRadius": [["int", "linear", "int", "linear", "int"], "int"],
+      "GetMapCellAtPosition": [["linear"], "block"],
+      "GetVisibleEnemiesInRadius": [["int", "linear", "int", "int", "linear", "int"], "int"],
+      "Apply": [["linear", "int"], "int"],
+      "GetOriginCellAtPosition": [["linear"], "block"],
+      "ClampWorldPosToTerrain": [["int", "int", "linear"], "void"],
+      "IsUnitVisibleToPlayer": [["block", "block"], "int"],
+      "UpdateUnitLineOfSight": [["block"], "void"],
+      "RecordRadarUnits": [[], "void"],
+      "UpdateSensorRadarAndCloak": [[], "void"],
+      "RecordRadarMapped": [[], "void"],
+      "ExpireEyeballs": [[], "void"],
+      "HasReadyUnitInRange": [["int", "linear", "int"], "int"],
+      "CreateUnitIndex": [["int"], "void"],
+      "FreeUnitIndex": [["int"], "void"],
+      "RefreshUnitIndex": [["int"], "void"],
+      "RegionSize": [["linear"], "int"],
+      "Init": [["linear", "block", "int"], "void"],
+      "Shutdown": [[], "block"]
+    },
+    "map": {
+      "GetCellMeanHeight": [["linear"], "int"],
+      "GetGroundHeight": [["linear"], "int"],
+      "CanBuildAt": [["block", "linear", "int", "block"], "int"],
+      "CanPlaceUnitFootprint": [["block", "int", "linear", "int"], "int"],
+      "UnitsInRange": [["linear", "int", "int", "linear", "int"], "int"],
+      "SnapWorldPosToFootprint": [["block", "linear"], "void"],
+      "CanPlaceFootprintAt": [["block", "linear"], "int"],
+      "IsPadSlotFree": [["block", "int"], "int"],
+      "Apply": [["linear", "int"], "int"],
+      "BuildAllPassMaps": [["linear", "int"], "void"],
+      "PickRandomReclaimableResourcesInRadius": [["linear", "int", "linear", "linear", "linear", "linear"], "int"],
+      "PassMapGet": [["int", "int", "int"], "int"],
+      "PassMapInBounds": [["int", "int", "int"], "int"],
+      "RefreshMovedUnits": [["int", "linear"], "void"],
+      "RefreshUnitIfStale": [["int", "linear"], "void"]
+    },
+    "mission": {
+      "GetGameType": [[], "int"],
+      "GetNameSlot": [["int"], "linear"],
+      "GetMissionParams": [["linear"], "void"],
+      "GetMissionIndex": [[], "int"],
+      "GetMissionName": [[], "linear"],
+      "GetStartPosition": [["linear", "int"], "int"],
+      "CountStartPositions": [[], "int"],
+      "HasMissionName": [[], "int"],
+      "CountMissionUnits": [[], "int"],
+      "GetMissionUnit": [["int", "linear"], "int"],
+      "CountMissionFeatures": [[], "int"],
+      "GetMissionFeature": [["int", "linear"], "int"]
+    },
+    "movement": {
+      "NewPathOrderAt": [["int", "linear"], "int"],
+      "NewPathOrderToUnit": [["int", "block"], "int"],
+      "NewPathOrderToUnitAt": [["int", "block", "linear"], "int"],
+      "NewPathOrderToUnitAtAngle": [["int", "block", "int"], "int"],
+      "NewAirManeuverOrder": [["int", "linear", "linear"], "int"],
+      "NewApproachRadius": [["int", "int", "int", "int"], "int"],
+      "NewRingApproach": [["int", "int", "int", "int", "int"], "int"],
+      "NewPointMarker": [["int", "linear", "linear"], "int"],
+      "TargetType": [["int"], "int"],
+      "UnitTarget": [["block"], "int"],
+      "Apply": [["linear", "int"], "int"],
+      "UpdateMotion": [["block"], "void"],
+      "ApplyPathEvent": [["linear", "int", "linear"], "void"],
+      "HasNetState": [["block"], "int"]
+    },
+    "network": {
+      "SendShareMapInfo": [["int", "int"], "void"],
+      "SendFeatureHit": [["block", "int", "int"], "void"],
+      "SendFeatureKilled": [["int", "int"], "void"],
+      "SendFeatureBurning": [["int", "int"], "void"],
+      "SendFeatureReclaimed": [["block", "int", "int"], "void"],
+      "SendUnitDamage": [["block", "block", "int", "int", "int"], "void"],
+      "SendWeaponFire": [["block", "block", "block", "block", "block"], "void"],
+      "SendWeaponFireAt": [["int", "block", "block"], "void"],
+      "SendProjectileDetonated": [["block", "block"], "void"],
+      "SendScriptCallByName": [["block", "linear", "int", "int", "int", "int", "int"], "int"],
+      "BroadcastPlayerInfo": [[], "void"],
+      "SendScriptCall": [["block", "int", "int", "int", "int", "int", "int"], "int"],
+      "SendNewUnit": [["block"], "void"],
+      "SendBuilderLink": [["block", "block"], "void"],
+      "SendUnitKilled": [["block", "int", "int", "int"], "void"],
+      "SendAttach": [["block", "block", "int", "int"], "void"],
+      "SendOwnershipTransfer": [["block", "block"], "void"],
+      "SendActivateFlags": [["block"], "void"],
+      "SendShareMetal": [["int", "int", "f32"], "void"],
+      "SendShareEnergy": [["int", "int", "f32"], "void"],
+      "BroadcastPlayerEconomy": [["block"], "void"]
+    },
+    "orders": {
+      "GetOrderType": [["int", "block", "block", "linear"], "int"],
+      "Apply": [["linear", "int"], "int"],
+      "RunOrders": [["block"], "void"],
+      "RunSecondaryOrders": [["block"], "void"],
+      "GetOrderFlags": [["block"], "int"],
+      "MissionTypeFromName": [["linear"], "int"],
+      "ExpandGroupCommand": [["linear", "int"], "int"]
+    },
+    "pathfinding": {
+      "CellsChanged": [["int", "int", "int", "int", "int", "int"], "void"],
+      "RegionSize": [["linear"], "int"],
+      "Init": [["linear", "block", "int"], "void"],
+      "Shutdown": [[], "block"],
+      "Submit": [["linear"], "void"],
+      "Cancel": [["int"], "void"],
+      "Step": [[], "void"],
+      "Poll": [["linear", "int", "linear", "int"], "int"]
+    },
+    "pathworld": {
+      "Tick": [[], "int"],
+      "SearchStepLimit": [[], "int"],
+      "PlayerCount": [[], "int"],
+      "IsPlaying": [["int"], "int"],
+      "UnitsPerPlayer": [[], "int"],
+      "FirstUnit": [["int"], "int"],
+      "LastUnit": [["int"], "int"],
+      "NextUnit": [["int"], "int"],
+      "UnitState": [["int", "linear"], "int"],
+      "MoveClass": [["int"], "int"],
+      "InBounds": [["int", "int", "int"], "int"],
+      "Pass": [["int", "int", "int"], "int"],
+      "SeenSize": [["linear", "linear"], "void"],
+      "Seen": [["int", "int", "int"], "int"],
+      "LineOfSight": [["int", "int", "int", "int", "int"], "int"],
+      "TerrainPass": [["int", "int", "int"], "int"],
+      "BeginSearch": [["int"], "void"],
+      "EndSearch": [["int"], "void"]
+    },
+    "players": {
+      "Apply": [["linear", "int"], "int"],
+      "UpdatePlayers": [[], "void"],
+      "DeactivateConditions": [["block"], "void"],
+      "UpdatePlayersOnStream": [["int"], "void"],
+      "UpdatePlayerHead": [["int"], "int"],
+      "UpdatePlayerBody": [["int", "int"], "int"],
+      "UpdatePlayerTail": [["int"], "void"],
+      "UpdatePlayersFinish": [[], "void"],
+      "RegionSize": [["linear"], "int"],
+      "Init": [["linear", "block", "int"], "void"],
+      "Shutdown": [[], "block"]
+    },
+    "scripts": {
+      "ObjectStateSize": [["linear"], "int"],
+      "QueryScript": [["block", "linear", "linear", "linear", "linear", "linear"], "int"],
+      "GetPieceOffset": [["block", "int", "linear"], "void"],
+      "GetPiecePosition": [["block", "int", "linear"], "void"],
+      "GetAimFromPosition": [["linear", "linear", "int"], "void"],
+      "GetSweetSpot": [["linear", "linear"], "void"],
+      "FindScript": [["block", "linear"], "int"],
+      "GetNanoPiecePosition": [["linear", "linear"], "void"],
+      "CreateObjectState": [["block"], "block"],
+      "FreeObjectState": [["block"], "void"],
+      "NewUnitScript": [["block"], "void"],
+      "SetCob": [["block", "block"], "void"],
+      "CreatePlayerObjectState": [["block", "block", "block"], "block"],
+      "SetObjectState": [["block", "block"], "void"],
+      "DeleteScript": [["linear"], "void"],
+      "Apply": [["linear", "int"], "int"],
+      "StartScriptWithArgsByIndex": [["linear", "int", "linear", "int", "int", "int", "int", "int", "int"], "int"],
+      "GetPieceAngles": [["block", "int", "linear"], "void"],
+      "PoseUnitModel": [["linear"], "void"],
+      "UpdateObjectState": [["linear"], "void"],
+      "RunScripts": [["block", "int"], "void"]
+    },
     "services": {
       "GameRand": [["int"], "int"],
       "RandomInt": [["int"], "int"],
@@ -63,8 +290,50 @@
       "FindSlotByDpid": [["int"], "int"],
       "Emit": [["linear", "int"], "void"]
     },
+    "targeting": {
+      "GetWeaponTargetUnit": [["block", "int"], "block"],
+      "FindWeaponTarget": [["block", "int", "int"], "block"],
+      "GetWeaponTargetPos": [["block", "linear", "int"], "int"],
+      "Apply": [["linear", "int"], "int"],
+      "FindBestTargetIfFireAtWill": [["block"], "block"],
+      "ChooseWeapon": [["block"], "int"],
+      "SavedTargetPair": [["block", "int"], "int"]
+    },
+    "units": {
+      "CreateUnit": [["int", "int", "linear", "int", "int", "int"], "block"],
+      "FindUnitTypeId": [["linear"], "int"],
+      "AddBuildProgress": [["block", "block", "f32"], "int"],
+      "AddRepairProgress": [["block", "block", "f32"], "int"],
+      "CanLoad": [["block", "block"], "int"],
+      "CanReclaim": [["block", "block"], "int"],
+      "CanRepair": [["block", "block"], "int"],
+      "GetFactoriesInRadius": [["int", "linear", "int", "linear", "int"], "int"],
+      "UnitRefInit": [["block", "block", "block"], "void"],
+      "UnitRefSetUnit": [["block", "block"], "void"],
+      "UnitRefGet": [["block"], "block"],
+      "UnitRefSetValue": [["block", "block"], "void"],
+      "Apply": [["linear", "int"], "int"],
+      "UpdateAllUnits": [[], "void"],
+      "KillUnit": [["block", "int"], "void"],
+      "FindUnitType": [["linear"], "block"],
+      "UnitRefUnlink": [["block"], "void"],
+      "UpdateUnitHead": [["block"], "void"],
+      "UpdateUnitBody": [["block"], "int"],
+      "UpdateUnitTail": [["block", "int"], "void"],
+      "CreateFactoryIndex": [["int"], "void"],
+      "FreeFactoryIndex": [["int"], "void"],
+      "RefreshFactoryIndex": [["int"], "void"]
+    },
     "weapons": {
-      "FindWeaponByName": [["linear"], "block"]
+      "FindWeaponByName": [["linear"], "block"],
+      "FindTargetableProjectile": [["block", "int"], "block"],
+      "WeaponCanReachPos": [["block", "linear", "linear", "int"], "int"],
+      "Apply": [["linear", "int"], "int"],
+      "UpdateProjectiles": [[], "void"],
+      "UpdateExplosions": [[], "void"],
+      "UpdateUnitWeapons": [["block"], "void"],
+      "GetWeaponRange": [["block", "int"], "int"],
+      "WeaponCanReachUnit": [["block", "block", "int"], "int"]
     },
     "wind_meteors": {
       "UpdateWind": [["int"], "void"],
@@ -129,6 +398,900 @@
         }
       },
       "publishes": {"80": 36}
+    },
+    {
+      "name": "economy",
+      "interface": "economy",
+      "majors": {
+        "economy": 5,
+        "econworld": 5,
+        "network": 2
+      },
+      "data_base": 229376,
+      "table_base": 80,
+      "blocked": "a static object with a destructor (ConstructedElement) needs __cxa_atexit, and SimBlockTrack has no import",
+      "exports": ["RegionSize", "Init", "Shutdown", "Apply", "Spend", "UpdatePlayerEconomy", "UpdateMetalExtraction",
+                  "UpdateResourceSharing", "RequestGranted", "GetEnergyUse", "UnitAccount"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase", "g_region"],
+      "engine": {"WriteState": "a dump query, called from the harness only"},
+      "slots": {
+        "RegionSize": [["linear"], "int"],
+        "Init": [["linear", "linear", "block", "int"], "void"],
+        "Shutdown": [[], "block"],
+        "Apply": [["linear", "int"], "int"],
+        "Spend": [["linear"], "int"],
+        "UpdatePlayerEconomy": [["int"], "void"],
+        "UpdateMetalExtraction": [["int"], "void"],
+        "UpdateResourceSharing": [["int"], "void"],
+        "RequestGranted": [["int", "int"], "int"],
+        "GetEnergyUse": [["int"], "f64"],
+        "UnitAccount": [["int", "linear"], "void"]
+      },
+      "imports": {
+        "econworld": {
+          "Tick": [[], "int"],
+          "Difficulty": [[], "int"],
+          "SharingEnabled": [[], "int"],
+          "Wind": [[], "f32"],
+          "Tide": [[], "f32"],
+          "PlayerInfo": [["int", "linear"], "void"],
+          "Allied": [["int", "int"], "int"],
+          "FirstUnit": [["int"], "int"],
+          "LastUnit": [["int"], "int"],
+          "NextUnit": [["int"], "int"],
+          "UnitSlot": [["int"], "int"],
+          "UnitInfo": [["int", "linear"], "int"],
+          "TypeInfo": [["int", "linear"], "void"],
+          "CellMetal": [["int", "int"], "int"],
+          "Emit": [["linear", "int"], "void"]
+        },
+        "network": {
+          "SendShareMapInfo": [["int", "int"], "void"]
+        }
+      },
+      "publishes": {"16": 16, "17": 16, "18": 28, "134": 8, "135": 8}
+    },
+    {
+      "name": "features",
+      "interface": "features",
+      "majors": {
+        "features": 5,
+        "los_radar": 5,
+        "map": 9,
+        "mission": 2,
+        "network": 2,
+        "pathfinding": 4,
+        "scripts": 3,
+        "services": 4
+      },
+      "data_base": 262144,
+      "table_base": 112,
+      "blocked": "map/features.cpp mixes the load code (std::vector of TdfFile*, insert and std::copy) with the kept slots",
+      "exports": ["UpdateFeatures", "GetCellFeature", "GetFootprintCentre", "Apply", "Place", "FeatureTypeCount",
+                  "AnimateFeatureType", "ScanFeatureCell", "FirstFeatureSpot", "UpdateFeatureSpot", "FindFeatureAtPos"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"LoadFeatureFileList": "load class", "FreeFeatureFileList": "load class", "NopAfterFeatureEnum": "load class", "ResolveFeatureLinks": "load class", "InitFeatureAnimPool": "load class", "FreeFeaturePool": "load class", "PlaceMissionFeatures": "load class", "StampFeatureMetal": "load class", "FindOrLoadFeatureType": "load class", "SaveFeatures": "a query of a saved game, outside the tick", "LoadFeatures": "load class"},
+      "slots": {
+        "UpdateFeatures": [[], "void"],
+        "GetCellFeature": [["block"], "int"],
+        "GetFootprintCentre": [["linear", "block", "linear"], "void"],
+        "Apply": [["linear", "int"], "int"],
+        "Place": [["linear"], "int"],
+        "FeatureTypeCount": [[], "int"],
+        "AnimateFeatureType": [["int"], "void"],
+        "ScanFeatureCell": [[], "void"],
+        "FirstFeatureSpot": [[], "int"],
+        "UpdateFeatureSpot": [["int"], "int"],
+        "FindFeatureAtPos": [["linear", "linear", "linear"], "int"]
+      },
+      "imports": {
+        "los_radar": {
+          "GetMapCell": [["int", "int"], "block"],
+          "SoundHeardMask": [["linear"], "int"]
+        },
+        "map": {
+          "GetCellMeanHeight": [["linear"], "int"],
+          "GetGroundHeight": [["linear"], "int"]
+        },
+        "mission": {
+          "GetGameType": [[], "int"]
+        },
+        "network": {
+          "SendFeatureHit": [["block", "int", "int"], "void"],
+          "SendFeatureKilled": [["int", "int"], "void"],
+          "SendFeatureBurning": [["int", "int"], "void"],
+          "SendFeatureReclaimed": [["block", "int", "int"], "void"]
+        },
+        "pathfinding": {
+          "CellsChanged": [["int", "int", "int", "int", "int", "int"], "void"]
+        },
+        "scripts": {
+          "ObjectStateSize": [["linear"], "int"]
+        },
+        "services": {
+          "SimAllocTagged": [["linear", "int"], "linear"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"4": 24, "48": 8, "49": 12, "50": 20, "51": 20}
+    },
+    {
+      "name": "ai",
+      "interface": "ai",
+      "majors": {
+        "ai": 6,
+        "orders": 6,
+        "mission": 2,
+        "los_radar": 5,
+        "weapons": 4,
+        "economy": 5,
+        "targeting": 4,
+        "map": 9,
+        "services": 4
+      },
+      "data_base": 294912,
+      "table_base": 144,
+      "blocked": "std::vector in ai_player.cpp and squads.cpp, file output (FilePrintf, sprintf) and the command parser",
+      "exports": ["Apply", "DumpPlayerAI", "CreatePlayerAI", "DestroyPlayerAI", "UpdatePlayerAI", "RebuildFeatureCells",
+                  "CreateSquads", "FreeSquads", "UpdateSquads", "CreateSquadManager", "FreeSquadManager"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"ResetAIPlayers": "load class", "ParseDownloadableAiWeightScripts": "load class", "ReparseAiWeightScriptsIfLimitNotSticky": "load class", "WriteState": "a dump query, called from the harness only", "LoadProfiles": "load class"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "DumpPlayerAI": [["int", "handle"], "void"],
+        "CreatePlayerAI": [["int"], "void"],
+        "DestroyPlayerAI": [["int"], "void"],
+        "UpdatePlayerAI": [["int"], "void"],
+        "RebuildFeatureCells": [["int"], "void"],
+        "CreateSquads": [["block"], "void"],
+        "FreeSquads": [["block"], "void"],
+        "UpdateSquads": [["int"], "void"],
+        "CreateSquadManager": [["block"], "void"],
+        "FreeSquadManager": [["block"], "void"]
+      },
+      "imports": {
+        "orders": {
+          "GetOrderType": [["int", "block", "block", "linear"], "int"]
+        },
+        "mission": {
+          "GetGameType": [[], "int"],
+          "GetNameSlot": [["int"], "linear"],
+          "GetMissionParams": [["linear"], "void"]
+        },
+        "los_radar": {
+          "GetMapCell": [["int", "int"], "block"],
+          "IsPointVisible": [["block", "linear"], "int"],
+          "GetSeenUnitsInRadius": [["int", "linear", "int", "linear", "int"], "int"]
+        },
+        "weapons": {
+          "FindTargetableProjectile": [["block", "int"], "block"],
+          "WeaponCanReachPos": [["block", "linear", "linear", "int"], "int"]
+        },
+        "economy": {
+          "GetEnergyUse": [["int"], "f64"]
+        },
+        "targeting": {
+          "GetWeaponTargetUnit": [["block", "int"], "block"],
+          "FindWeaponTarget": [["block", "int", "int"], "block"]
+        },
+        "map": {
+          "CanBuildAt": [["block", "linear", "int", "block"], "int"],
+          "CanPlaceUnitFootprint": [["block", "int", "linear", "int"], "int"]
+        },
+        "services": {
+          "RandomInt": [["int"], "int"],
+          "SimAlloc": [["int"], "linear"],
+          "SimAllocTagged": [["linear", "int"], "linear"],
+          "SimFree": [["linear"], "void"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"96": 16, "97": 24, "98": 12, "240": 44, "241": 16, "243": 12, "245": 16, "246": 16}
+    },
+    {
+      "name": "pathfinding",
+      "interface": "pathfinding",
+      "majors": {
+        "pathfinding": 4,
+        "pathworld": 4
+      },
+      "data_base": 327680,
+      "table_base": 176,
+      "blocked": "the direction and turn tables (g_dirDeltaX, g_dirDeltaZ, g_turnCosts) live in another file, and PathGoalDistance, PathGoalCells and PathGoalContains are direct calls with no import",
+      "exports": ["RegionSize", "Init", "Shutdown", "Submit", "Cancel", "CellsChanged", "Step", "Poll"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase", "g_region"],
+      "engine": {"WriteState": "a dump query, called from the harness only", "SetSearchScale": "optional, null for an implementation without it; called by a console command", "DebugCell": "optional, null for an implementation without it; called by the debug overlay"},
+      "slots": {
+        "RegionSize": [["linear"], "int"],
+        "Init": [["linear", "block", "int"], "void"],
+        "Shutdown": [[], "block"],
+        "Submit": [["linear"], "void"],
+        "Cancel": [["int"], "void"],
+        "CellsChanged": [["int", "int", "int", "int", "int", "int"], "void"],
+        "Step": [[], "void"],
+        "Poll": [["linear", "int", "linear", "int"], "int"]
+      },
+      "imports": {
+        "pathworld": {
+          "Tick": [[], "int"],
+          "SearchStepLimit": [[], "int"],
+          "PlayerCount": [[], "int"],
+          "IsPlaying": [["int"], "int"],
+          "UnitsPerPlayer": [[], "int"],
+          "FirstUnit": [["int"], "int"],
+          "LastUnit": [["int"], "int"],
+          "NextUnit": [["int"], "int"],
+          "UnitState": [["int", "linear"], "int"],
+          "MoveClass": [["int"], "int"],
+          "InBounds": [["int", "int", "int"], "int"],
+          "Pass": [["int", "int", "int"], "int"],
+          "SeenSize": [["linear", "linear"], "void"],
+          "Seen": [["int", "int", "int"], "int"],
+          "LineOfSight": [["int", "int", "int", "int", "int"], "int"],
+          "TerrainPass": [["int", "int", "int"], "int"],
+          "BeginSearch": [["int"], "void"],
+          "EndSearch": [["int"], "void"]
+        }
+      }
+    },
+    {
+      "name": "weapons",
+      "interface": "weapons",
+      "majors": {
+        "weapons": 4,
+        "features": 5,
+        "los_radar": 5,
+        "map": 9,
+        "mission": 2,
+        "network": 2,
+        "scripts": 3,
+        "targeting": 4,
+        "economy": 5,
+        "services": 4
+      },
+      "data_base": 360448,
+      "table_base": 208,
+      "blocked": "about 20 engine calls with no import (AngleOfVector, SolveLaunchAngle, InitProjectile, CalcAimAngles, AddExplosionEffect and others), the GAF services of #1217 and the aim-script vtable data",
+      "exports": ["Apply", "UpdateProjectiles", "UpdateExplosions", "UpdateUnitWeapons", "FindWeaponByName", "GetWeaponRange",
+                  "WeaponCanReachUnit", "FindTargetableProjectile", "WeaponCanReachPos"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"AllocWeaponArray": "load class", "FreeWeaponArray": "load class", "LoadWeaponTypes": "load class", "FreeWeaponTypes": "load class", "InitExplosions": "load class", "FreeExplosions": "load class", "LoadState": "load class", "WriteState": "a dump query, called from the harness only", "SaveState": "a query of a saved game, outside the tick"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "UpdateProjectiles": [[], "void"],
+        "UpdateExplosions": [[], "void"],
+        "UpdateUnitWeapons": [["block"], "void"],
+        "FindWeaponByName": [["linear"], "block"],
+        "GetWeaponRange": [["block", "int"], "int"],
+        "WeaponCanReachUnit": [["block", "block", "int"], "int"],
+        "FindTargetableProjectile": [["block", "int"], "block"],
+        "WeaponCanReachPos": [["block", "linear", "linear", "int"], "int"]
+      },
+      "imports": {
+        "features": {
+          "GetFootprintCentre": [["linear", "block", "linear"], "void"]
+        },
+        "los_radar": {
+          "GetMapCell": [["int", "int"], "block"],
+          "GetMapCellAtPosition": [["linear"], "block"],
+          "SoundHeardMask": [["linear"], "int"],
+          "IsPointVisible": [["block", "linear"], "int"]
+        },
+        "map": {
+          "GetCellMeanHeight": [["linear"], "int"],
+          "GetGroundHeight": [["linear"], "int"]
+        },
+        "mission": {
+          "GetMissionParams": [["linear"], "void"]
+        },
+        "network": {
+          "SendUnitDamage": [["block", "block", "int", "int", "int"], "void"],
+          "SendWeaponFire": [["block", "block", "block", "block", "block"], "void"],
+          "SendWeaponFireAt": [["int", "block", "block"], "void"],
+          "SendProjectileDetonated": [["block", "block"], "void"],
+          "SendScriptCallByName": [["block", "linear", "int", "int", "int", "int", "int"], "int"]
+        },
+        "scripts": {
+          "QueryScript": [["block", "linear", "linear", "linear", "linear", "linear"], "int"],
+          "GetPieceOffset": [["block", "int", "linear"], "void"],
+          "GetPiecePosition": [["block", "int", "linear"], "void"],
+          "GetAimFromPosition": [["linear", "linear", "int"], "void"]
+        },
+        "targeting": {
+          "GetWeaponTargetUnit": [["block", "int"], "block"],
+          "GetWeaponTargetPos": [["block", "linear", "int"], "int"]
+        },
+        "economy": {
+          "Spend": [["linear"], "int"]
+        },
+        "services": {
+          "RandomInt": [["int"], "int"],
+          "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"34": 16, "98": 12, "272": 16, "273": 16, "274": 8, "275": 16, "276": 16, "277": 12, "278": 44, "279": 16, "280": 8, "281": 12, "282": 8, "283": 8}
+    },
+    {
+      "name": "targeting",
+      "interface": "targeting",
+      "majors": {
+        "targeting": 4,
+        "los_radar": 5,
+        "weapons": 4,
+        "map": 9,
+        "scripts": 3,
+        "services": 4
+      },
+      "data_base": 393216,
+      "table_base": 240,
+      "blocked": "unit_query_buffer.h is a std::vector<Ref<Unit>> on the heap",
+      "exports": ["Apply", "GetWeaponTargetUnit", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill",
+                  "ChooseWeapon", "SavedTargetPair"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "GetWeaponTargetUnit": [["block", "int"], "block"],
+        "GetWeaponTargetPos": [["block", "linear", "int"], "int"],
+        "FindWeaponTarget": [["block", "int", "int"], "block"],
+        "FindBestTargetIfFireAtWill": [["block"], "block"],
+        "ChooseWeapon": [["block"], "int"],
+        "SavedTargetPair": [["block", "int"], "int"]
+      },
+      "imports": {
+        "los_radar": {
+          "GetVisibleEnemiesInRadius": [["int", "linear", "int", "int", "linear", "int"], "int"]
+        },
+        "weapons": {
+          "GetWeaponRange": [["block", "int"], "int"],
+          "WeaponCanReachUnit": [["block", "block", "int"], "int"]
+        },
+        "map": {
+          "GetGroundHeight": [["linear"], "int"]
+        },
+        "scripts": {
+          "GetSweetSpot": [["linear", "linear"], "void"]
+        },
+        "services": {
+          "RandomInt": [["int"], "int"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"112": 12}
+    },
+    {
+      "name": "los_radar",
+      "interface": "los_radar",
+      "majors": {
+        "los_radar": 5,
+        "network": 2,
+        "map": 9,
+        "services": 4
+      },
+      "data_base": 425984,
+      "table_base": 272,
+      "blocked": "operator new in line_of_sight.cpp and the std::allocator internals of los_tables.cpp",
+      "exports": ["Apply", "GetMapCell", "GetMapCellAtPosition", "GetOriginCellAtPosition", "ClampWorldPosToTerrain",
+                  "IsUnitVisibleToPlayer", "SoundHeardMask", "UpdateUnitLineOfSight", "RecordRadarUnits",
+                  "UpdateSensorRadarAndCloak", "RecordRadarMapped", "ExpireEyeballs", "GetVisibleEnemiesInRadius",
+                  "HasReadyUnitInRange", "IsPointVisible", "GetSeenUnitsInRadius", "CreateUnitIndex", "FreeUnitIndex",
+                  "RefreshUnitIndex", "RegionSize", "Init", "Shutdown"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase", "g_region"],
+      "engine": {"LoadTntMap": "load class", "InitRadar": "load class", "FreeRadar": "load class", "FreeMapResources": "load class", "SightCache": "a query of a saved game, outside the tick", "WriteState": "a dump query, called from the harness only", "LoadMappingData": "load class", "SaveMappingData": "load class"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "GetMapCell": [["int", "int"], "block"],
+        "GetMapCellAtPosition": [["linear"], "block"],
+        "GetOriginCellAtPosition": [["linear"], "block"],
+        "ClampWorldPosToTerrain": [["int", "int", "linear"], "void"],
+        "IsUnitVisibleToPlayer": [["block", "block"], "int"],
+        "SoundHeardMask": [["linear"], "int"],
+        "UpdateUnitLineOfSight": [["block"], "void"],
+        "RecordRadarUnits": [[], "void"],
+        "UpdateSensorRadarAndCloak": [[], "void"],
+        "RecordRadarMapped": [[], "void"],
+        "ExpireEyeballs": [[], "void"],
+        "GetVisibleEnemiesInRadius": [["int", "linear", "int", "int", "linear", "int"], "int"],
+        "HasReadyUnitInRange": [["int", "linear", "int"], "int"],
+        "IsPointVisible": [["block", "linear"], "int"],
+        "GetSeenUnitsInRadius": [["int", "linear", "int", "linear", "int"], "int"],
+        "CreateUnitIndex": [["int"], "void"],
+        "FreeUnitIndex": [["int"], "void"],
+        "RefreshUnitIndex": [["int"], "void"],
+        "RegionSize": [["linear"], "int"],
+        "Init": [["linear", "block", "int"], "void"],
+        "Shutdown": [[], "block"]
+      },
+      "imports": {
+        "network": {
+          "BroadcastPlayerInfo": [[], "void"]
+        },
+        "map": {
+          "UnitsInRange": [["linear", "int", "int", "linear", "int"], "int"],
+          "GetGroundHeight": [["linear"], "int"]
+        },
+        "services": {
+          "SimAlloc": [["int"], "linear"],
+          "SimFree": [["linear"], "void"],
+          "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
+          "SimCaptureAlloc": [["int", "linear"], "linear"]
+        }
+      }
+    },
+    {
+      "name": "orders",
+      "interface": "orders",
+      "majors": {
+        "orders": 6,
+        "movement": 5,
+        "units": 7,
+        "scripts": 3,
+        "weapons": 4,
+        "map": 9,
+        "network": 2,
+        "los_radar": 5,
+        "features": 5,
+        "targeting": 4,
+        "mission": 2,
+        "services": 4
+      },
+      "data_base": 458752,
+      "table_base": 304,
+      "blocked": "std::list in vtol_orders.cpp, the MSVC STL internals of order_list.cpp and new of sim objects",
+      "exports": ["Apply", "RunOrders", "RunSecondaryOrders", "GetOrderFlags", "GetOrderType", "MissionTypeFromName",
+                  "ExpandGroupCommand"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"RegisterAllOrderTypes": "load class", "ClearOrderTypeTable": "load class", "LoadOrders": "save class: reads the banks of a saved game", "SaveOrders": "save class: writes the banks of a saved game", "WriteState": "a dump query, called from the harness only"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "RunOrders": [["block"], "void"],
+        "RunSecondaryOrders": [["block"], "void"],
+        "GetOrderFlags": [["block"], "int"],
+        "GetOrderType": [["int", "block", "block", "linear"], "int"],
+        "MissionTypeFromName": [["linear"], "int"],
+        "ExpandGroupCommand": [["linear", "int"], "int"]
+      },
+      "imports": {
+        "movement": {
+          "NewPathOrderAt": [["int", "linear"], "int"],
+          "NewPathOrderToUnit": [["int", "block"], "int"],
+          "NewPathOrderToUnitAt": [["int", "block", "linear"], "int"],
+          "NewPathOrderToUnitAtAngle": [["int", "block", "int"], "int"],
+          "NewAirManeuverOrder": [["int", "linear", "linear"], "int"],
+          "NewApproachRadius": [["int", "int", "int", "int"], "int"],
+          "NewRingApproach": [["int", "int", "int", "int", "int"], "int"],
+          "NewPointMarker": [["int", "linear", "linear"], "int"],
+          "TargetType": [["int"], "int"],
+          "UnitTarget": [["block"], "int"]
+        },
+        "units": {
+          "CreateUnit": [["int", "int", "linear", "int", "int", "int"], "block"],
+          "FindUnitTypeId": [["linear"], "int"],
+          "AddBuildProgress": [["block", "block", "f32"], "int"],
+          "AddRepairProgress": [["block", "block", "f32"], "int"],
+          "CanLoad": [["block", "block"], "int"],
+          "CanReclaim": [["block", "block"], "int"],
+          "CanRepair": [["block", "block"], "int"],
+          "GetFactoriesInRadius": [["int", "linear", "int", "linear", "int"], "int"],
+          "UnitRefInit": [["block", "block", "block"], "void"],
+          "UnitRefSetUnit": [["block", "block"], "void"],
+          "UnitRefGet": [["block"], "block"],
+          "UnitRefSetValue": [["block", "block"], "void"]
+        },
+        "scripts": {
+          "QueryScript": [["block", "linear", "linear", "linear", "linear", "linear"], "int"],
+          "FindScript": [["block", "linear"], "int"],
+          "GetPieceOffset": [["block", "int", "linear"], "void"],
+          "GetPiecePosition": [["block", "int", "linear"], "void"],
+          "GetNanoPiecePosition": [["linear", "linear"], "void"]
+        },
+        "weapons": {
+          "GetWeaponRange": [["block", "int"], "int"],
+          "WeaponCanReachUnit": [["block", "block", "int"], "int"],
+          "WeaponCanReachPos": [["block", "linear", "linear", "int"], "int"]
+        },
+        "map": {
+          "UnitsInRange": [["linear", "int", "int", "linear", "int"], "int"],
+          "CanPlaceUnitFootprint": [["block", "int", "linear", "int"], "int"],
+          "SnapWorldPosToFootprint": [["block", "linear"], "void"],
+          "CanPlaceFootprintAt": [["block", "linear"], "int"],
+          "IsPadSlotFree": [["block", "int"], "int"],
+          "GetGroundHeight": [["linear"], "int"]
+        },
+        "network": {
+          "SendFeatureReclaimed": [["block", "int", "int"], "void"],
+          "SendScriptCall": [["block", "int", "int", "int", "int", "int", "int"], "int"],
+          "SendScriptCallByName": [["block", "linear", "int", "int", "int", "int", "int"], "int"]
+        },
+        "los_radar": {
+          "GetMapCellAtPosition": [["linear"], "block"],
+          "GetOriginCellAtPosition": [["linear"], "block"],
+          "GetVisibleEnemiesInRadius": [["int", "linear", "int", "int", "linear", "int"], "int"]
+        },
+        "features": {
+          "GetCellFeature": [["block"], "int"],
+          "FindFeatureAtPos": [["linear", "linear", "linear"], "int"]
+        },
+        "targeting": {
+          "FindBestTargetIfFireAtWill": [["block"], "block"],
+          "ChooseWeapon": [["block"], "int"]
+        },
+        "mission": {
+          "GetGameType": [[], "int"],
+          "GetMissionParams": [["linear"], "void"]
+        },
+        "services": {
+          "RandomInt": [["int"], "int"],
+          "SimAlloc": [["int"], "linear"],
+          "SimFree": [["linear"], "void"],
+          "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"2": 24, "4": 24, "33": 16, "35": 20, "96": 16, "97": 24, "98": 12, "192": 48, "256": 24, "259": 12, "260": 12, "269": 12, "295": 44, "304": 16, "305": 24, "306": 20, "307": 12, "308": 12, "309": 16, "310": 12, "311": 76, "312": 12, "313": 16, "314": 12, "315": 24, "316": 20, "317": 16, "326": 12, "327": 12, "328": 12, "329": 16, "330": 16, "331": 16}
+    },
+    {
+      "name": "units",
+      "interface": "units",
+      "majors": {
+        "units": 7,
+        "los_radar": 5,
+        "map": 9,
+        "mission": 2,
+        "network": 2,
+        "orders": 6,
+        "scripts": 3,
+        "economy": 5,
+        "services": 4
+      },
+      "data_base": 491520,
+      "table_base": 336,
+      "blocked": "std::vector, std::list and std::string in units.cpp, unit_commands.cpp, unit_types.cpp and control_panel.cpp, and UI code in its files",
+      "exports": ["Apply", "UpdateAllUnits", "KillUnit", "CreateUnit", "FindUnitType", "FindUnitTypeId", "AddBuildProgress",
+                  "AddRepairProgress", "CanLoad", "CanReclaim", "CanRepair", "UnitRefUnlink", "UpdateUnitHead", "UpdateUnitBody",
+                  "UpdateUnitTail", "GetFactoriesInRadius", "CreateFactoryIndex", "FreeFactoryIndex", "RefreshFactoryIndex",
+                  "UnitRefInit", "UnitRefSetUnit", "UnitRefGet", "UnitRefSetValue"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"UnitTypeSetAddTypeOrCategory": "load class", "AllocateUnitMemory": "load class", "FreeUnitMemory": "load class", "FreeUnitInfo": "load class", "RefreshUnitInfo": "load class", "LoadUnitTypes": "load class", "FreeUnitTypes": "load class", "LoadDownloadMenus": "load class", "FreeDownloadMenus": "load class", "FreeMovementClasses": "load class", "InitUnitCategories": "load class", "FreeUnitCategories": "load class", "KillAllUnits": "load class", "KillUnitsOfType": "load class", "ReloadUnitType": "load class", "LoadUnits": "load class", "SaveUnits": "a query of a saved game, outside the tick", "LoadUnit": "load class", "FindMissionUnit": "only units itself calls it, through the seam, while it places the units of a mission at the mission's load, which no recording holds", "WriteState": "a dump query, called from the harness only", "GetMovementLimits": "a query of the game data, outside the tick"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "UpdateAllUnits": [[], "void"],
+        "KillUnit": [["block", "int"], "void"],
+        "CreateUnit": [["int", "int", "linear", "int", "int", "int"], "block"],
+        "FindUnitType": [["linear"], "block"],
+        "FindUnitTypeId": [["linear"], "int"],
+        "AddBuildProgress": [["block", "block", "f32"], "int"],
+        "AddRepairProgress": [["block", "block", "f32"], "int"],
+        "CanLoad": [["block", "block"], "int"],
+        "CanReclaim": [["block", "block"], "int"],
+        "CanRepair": [["block", "block"], "int"],
+        "UnitRefUnlink": [["block"], "void"],
+        "UpdateUnitHead": [["block"], "void"],
+        "UpdateUnitBody": [["block"], "int"],
+        "UpdateUnitTail": [["block", "int"], "void"],
+        "GetFactoriesInRadius": [["int", "linear", "int", "linear", "int"], "int"],
+        "CreateFactoryIndex": [["int"], "void"],
+        "FreeFactoryIndex": [["int"], "void"],
+        "RefreshFactoryIndex": [["int"], "void"],
+        "UnitRefInit": [["block", "block", "block"], "void"],
+        "UnitRefSetUnit": [["block", "block"], "void"],
+        "UnitRefGet": [["block"], "block"],
+        "UnitRefSetValue": [["block", "block"], "void"]
+      },
+      "imports": {
+        "los_radar": {
+          "GetMapCell": [["int", "int"], "block"]
+        },
+        "map": {
+          "GetGroundHeight": [["linear"], "int"]
+        },
+        "mission": {
+          "GetGameType": [[], "int"],
+          "GetMissionParams": [["linear"], "void"]
+        },
+        "network": {
+          "SendNewUnit": [["block"], "void"],
+          "SendBuilderLink": [["block", "block"], "void"],
+          "SendUnitKilled": [["block", "int", "int", "int"], "void"],
+          "SendAttach": [["block", "block", "int", "int"], "void"],
+          "SendOwnershipTransfer": [["block", "block"], "void"],
+          "SendActivateFlags": [["block"], "void"]
+        },
+        "orders": {
+          "GetOrderFlags": [["block"], "int"]
+        },
+        "scripts": {
+          "QueryScript": [["block", "linear", "linear", "linear", "linear", "linear"], "int"],
+          "CreateObjectState": [["block"], "block"],
+          "FreeObjectState": [["block"], "void"],
+          "NewUnitScript": [["block"], "void"],
+          "SetCob": [["block", "block"], "void"],
+          "CreatePlayerObjectState": [["block", "block", "block"], "block"],
+          "SetObjectState": [["block", "block"], "void"],
+          "DeleteScript": [["linear"], "void"]
+        },
+        "economy": {
+          "UpdateMetalExtraction": [["int"], "void"],
+          "RequestGranted": [["int", "int"], "int"]
+        },
+        "services": {
+          "RandomInt": [["int"], "int"],
+          "SimAlloc": [["int"], "linear"],
+          "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
+          "GetSlotDpid": [["int"], "int"],
+          "FindSlotByDpid": [["int"], "int"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"0": 12, "1": 60, "2": 24, "4": 24, "32": 48, "99": 12, "100": 20, "128": 8, "129": 8, "130": 8, "131": 28, "137": 8, "138": 16, "160": 8, "161": 8, "162": 8, "163": 8, "164": 12, "165": 8, "166": 8, "169": 12, "193": 12, "194": 8, "195": 8, "226": 12, "256": 24, "258": 12, "259": 12, "261": 8, "262": 8, "267": 20, "288": 44, "290": 12, "291": 8, "292": 16, "320": 8, "321": 8, "322": 48, "323": 12, "324": 12, "416": 76}
+    },
+    {
+      "name": "players",
+      "interface": "players",
+      "majors": {
+        "players": 5,
+        "mission": 2,
+        "units": 7,
+        "map": 9,
+        "features": 5,
+        "network": 2,
+        "los_radar": 5,
+        "economy": 5,
+        "services": 4
+      },
+      "data_base": 524288,
+      "table_base": 368,
+      "blocked": "ScheduleMapCanPlaceUnitFootprint, FindHostSlot and the four g_*Key string tables have no import",
+      "exports": ["Apply", "UpdatePlayers", "DeactivateConditions", "UpdatePlayersOnStream", "UpdatePlayerHead", "UpdatePlayerBody",
+                  "UpdatePlayerTail", "UpdatePlayersFinish", "RegionSize", "Init", "Shutdown"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase", "g_region"],
+      "engine": {"LoadDefaultAIScript": "load class", "InitPlayers": "load class", "FreePlayers": "load class", "InitPlayerResources": "load class", "LoadPlayerControllers": "load class", "LoadPlayers": "load class", "SavePlayers": "load class", "RebuildAIFeatureCells": "load class", "SetupPlayerSlot": "load class", "UpdateBlink": "presentation: steps the blink of the player markers, called by the in-game dialogs", "LoadConditions": "load class", "SaveConditions": "load class", "RegisterConditions": "load class", "FreeConditions": "load class", "DeleteConditions": "load class", "NewConditions": "load class", "WriteState": "a dump query, called from the harness only"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "UpdatePlayers": [[], "void"],
+        "DeactivateConditions": [["block"], "void"],
+        "UpdatePlayersOnStream": [["int"], "void"],
+        "UpdatePlayerHead": [["int"], "int"],
+        "UpdatePlayerBody": [["int", "int"], "int"],
+        "UpdatePlayerTail": [["int"], "void"],
+        "UpdatePlayersFinish": [[], "void"],
+        "RegionSize": [["linear"], "int"],
+        "Init": [["linear", "block", "int"], "void"],
+        "Shutdown": [[], "block"]
+      },
+      "imports": {
+        "mission": {
+          "GetGameType": [[], "int"],
+          "GetMissionParams": [["linear"], "void"]
+        },
+        "units": {
+          "CreateUnit": [["int", "int", "linear", "int", "int", "int"], "block"],
+          "FindUnitTypeId": [["linear"], "int"]
+        },
+        "map": {
+          "UnitsInRange": [["linear", "int", "int", "linear", "int"], "int"],
+          "GetCellMeanHeight": [["linear"], "int"]
+        },
+        "features": {
+          "FindFeatureAtPos": [["linear", "linear", "linear"], "int"]
+        },
+        "network": {
+          "BroadcastPlayerInfo": [[], "void"],
+          "SendShareMetal": [["int", "int", "f32"], "void"],
+          "SendShareEnergy": [["int", "int", "f32"], "void"],
+          "BroadcastPlayerEconomy": [["block"], "void"]
+        },
+        "los_radar": {
+          "ClampWorldPosToTerrain": [["int", "int", "linear"], "void"]
+        },
+        "economy": {
+          "Spend": [["linear"], "int"]
+        },
+        "services": {
+          "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"0": 12, "4": 24, "128": 8, "133": 8, "208": 12, "209": 12, "210": 48}
+    },
+    {
+      "name": "map",
+      "interface": "map",
+      "majors": {
+        "map": 9,
+        "los_radar": 5,
+        "pathfinding": 4,
+        "services": 4
+      },
+      "data_base": 557056,
+      "table_base": 400,
+      "blocked": "operator new[] and delete[] of the spatial buckets",
+      "exports": ["Apply", "UnitsInRange", "GetCellMeanHeight", "CanBuildAt", "CanPlaceUnitFootprint", "BuildAllPassMaps",
+                  "SnapWorldPosToFootprint", "CanPlaceFootprintAt", "IsPadSlotFree", "PickRandomReclaimableResourcesInRadius",
+                  "GetGroundHeight", "PassMapGet", "PassMapInBounds", "RefreshMovedUnits", "RefreshUnitIfStale"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"FreePassMaps": "load class: frees the pass maps when the map is unloaded", "LoadMetalPlotmap": "save class: reads the metal plot map of a saved game into a width x height buffer of the engine", "LoadPlayerFeaturesPlotmap": "save class: reads a player's feature plot map of a saved game into a buffer of the engine", "SaveMetalPlotmap": "save class: writes the metal plot map of a saved game from a width x height buffer of the engine", "SavePlayerFeaturesPlotmap": "save class: writes a player's feature plot map of a saved game from a buffer of the engine", "AllocateBuckets": "load class: allocates the spatial buckets when the map is loaded", "FreeBuckets": "load class: frees the spatial buckets when the map is unloaded", "WriteState": "a dump query, called from the harness only", "PathLockStamp": "a query of a saved game, outside the tick"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "UnitsInRange": [["linear", "int", "int", "linear", "int"], "int"],
+        "GetCellMeanHeight": [["linear"], "int"],
+        "CanBuildAt": [["block", "linear", "int", "block"], "int"],
+        "CanPlaceUnitFootprint": [["block", "int", "linear", "int"], "int"],
+        "BuildAllPassMaps": [["linear", "int"], "void"],
+        "SnapWorldPosToFootprint": [["block", "linear"], "void"],
+        "CanPlaceFootprintAt": [["block", "linear"], "int"],
+        "IsPadSlotFree": [["block", "int"], "int"],
+        "PickRandomReclaimableResourcesInRadius": [["linear", "int", "linear", "linear", "linear", "linear"], "int"],
+        "GetGroundHeight": [["linear"], "int"],
+        "PassMapGet": [["int", "int", "int"], "int"],
+        "PassMapInBounds": [["int", "int", "int"], "int"],
+        "RefreshMovedUnits": [["int", "linear"], "void"],
+        "RefreshUnitIfStale": [["int", "linear"], "void"]
+      },
+      "imports": {
+        "los_radar": {
+          "GetMapCell": [["int", "int"], "block"]
+        },
+        "pathfinding": {
+          "CellsChanged": [["int", "int", "int", "int", "int", "int"], "void"]
+        },
+        "services": {
+          "SimAlloc": [["int"], "linear"],
+          "SimFree": [["linear"], "void"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"132": 20, "176": 32}
+    },
+    {
+      "name": "scripts",
+      "interface": "scripts",
+      "majors": {
+        "scripts": 3,
+        "map": 9,
+        "los_radar": 5,
+        "services": 4
+      },
+      "data_base": 589824,
+      "table_base": 432,
+      "blocked": "std::string in unit_script.cpp and ReleaseUnitPictures in its files",
+      "exports": ["Apply", "StartScriptWithArgsByIndex", "QueryScript", "FindScript", "GetPieceOffset", "GetPiecePosition",
+                  "GetPieceAngles", "GetNanoPiecePosition", "GetAimFromPosition", "GetSweetSpot", "PoseUnitModel",
+                  "CreateObjectState", "FreeObjectState", "UpdateObjectState", "ObjectStateSize", "NewUnitScript", "SetCob",
+                  "CreatePlayerObjectState", "SetObjectState", "RunScripts", "DeleteScript"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"SaveScriptState": "save class: a saved game", "LoadScriptState": "save class: a saved game", "WriteState": "a query for the trace dump, outside the tick"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "StartScriptWithArgsByIndex": [["linear", "int", "linear", "int", "int", "int", "int", "int", "int"], "int"],
+        "QueryScript": [["block", "linear", "linear", "linear", "linear", "linear"], "int"],
+        "FindScript": [["block", "linear"], "int"],
+        "GetPieceOffset": [["block", "int", "linear"], "void"],
+        "GetPiecePosition": [["block", "int", "linear"], "void"],
+        "GetPieceAngles": [["block", "int", "linear"], "void"],
+        "GetNanoPiecePosition": [["linear", "linear"], "void"],
+        "GetAimFromPosition": [["linear", "linear", "int"], "void"],
+        "GetSweetSpot": [["linear", "linear"], "void"],
+        "PoseUnitModel": [["linear"], "void"],
+        "CreateObjectState": [["block"], "block"],
+        "FreeObjectState": [["block"], "void"],
+        "UpdateObjectState": [["linear"], "void"],
+        "ObjectStateSize": [["linear"], "int"],
+        "NewUnitScript": [["block"], "void"],
+        "SetCob": [["block", "block"], "void"],
+        "CreatePlayerObjectState": [["block", "block", "block"], "block"],
+        "SetObjectState": [["block", "block"], "void"],
+        "RunScripts": [["block", "int"], "void"],
+        "DeleteScript": [["linear"], "void"]
+      },
+      "imports": {
+        "map": {
+          "GetGroundHeight": [["linear"], "int"]
+        },
+        "los_radar": {
+          "IsUnitVisibleToPlayer": [["block", "block"], "int"]
+        },
+        "services": {
+          "SimAlloc": [["int"], "linear"],
+          "SimAllocTagged": [["linear", "int"], "linear"],
+          "SimFree": [["linear"], "void"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"164": 12, "263": 16, "264": 16, "357": 20, "386": 16}
+    },
+    {
+      "name": "movement",
+      "interface": "movement",
+      "majors": {
+        "movement": 5,
+        "units": 7,
+        "map": 9,
+        "scripts": 3,
+        "pathfinding": 4,
+        "services": 4
+      },
+      "data_base": 622592,
+      "table_base": 464,
+      "blocked": "the MSVC vector internals of order_targets.cpp, new and delete of path orders, and PathGoal::DrawOnSurface (UI)",
+      "exports": ["Apply", "UpdateMotion", "ApplyPathEvent", "HasNetState", "NewPathOrderAt", "NewPathOrderToUnit",
+                  "NewPathOrderToUnitAt", "NewPathOrderToUnitAtAngle", "NewAirManeuverOrder", "NewApproachRadius",
+                  "NewRingApproach", "NewPointMarker", "TargetType", "UnitTarget"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"GetMotionState": "a query of a saved game, outside the tick", "ReadNetState": "network class: reads a bit stream of a network game", "WriteNetState": "network class: writes a bit stream of a network game", "LoadTarget": "save class: reads the banks of a saved game", "SaveTarget": "save class: writes the banks of a saved game", "WriteState": "a dump query, called from the harness only"},
+      "slots": {
+        "Apply": [["linear", "int"], "int"],
+        "UpdateMotion": [["block"], "void"],
+        "ApplyPathEvent": [["linear", "int", "linear"], "void"],
+        "HasNetState": [["block"], "int"],
+        "NewPathOrderAt": [["int", "linear"], "int"],
+        "NewPathOrderToUnit": [["int", "block"], "int"],
+        "NewPathOrderToUnitAt": [["int", "block", "linear"], "int"],
+        "NewPathOrderToUnitAtAngle": [["int", "block", "int"], "int"],
+        "NewAirManeuverOrder": [["int", "linear", "linear"], "int"],
+        "NewApproachRadius": [["int", "int", "int", "int"], "int"],
+        "NewRingApproach": [["int", "int", "int", "int", "int"], "int"],
+        "NewPointMarker": [["int", "linear", "linear"], "int"],
+        "TargetType": [["int"], "int"],
+        "UnitTarget": [["block"], "int"]
+      },
+      "imports": {
+        "units": {
+          "UnitRefUnlink": [["block"], "void"],
+          "UnitRefInit": [["block", "block", "block"], "void"],
+          "UnitRefSetUnit": [["block", "block"], "void"]
+        },
+        "map": {
+          "CanPlaceUnitFootprint": [["block", "int", "linear", "int"], "int"],
+          "GetGroundHeight": [["linear"], "int"]
+        },
+        "scripts": {
+          "GetPiecePosition": [["block", "int", "linear"], "void"],
+          "GetPieceAngles": [["block", "int", "linear"], "void"]
+        },
+        "pathfinding": {
+          "Submit": [["linear"], "void"],
+          "Cancel": [["int"], "void"]
+        },
+        "services": {
+          "SimAlloc": [["int"], "linear"],
+          "SimFree": [["linear"], "void"],
+          "Emit": [["linear", "int"], "void"]
+        }
+      },
+      "publishes": {"128": 8, "160": 8, "161": 8, "336": 16, "337": 12, "338": 16, "339": 20, "340": 20, "341": 12, "342": 32, "343": 12, "344": 24, "345": 16, "346": 8, "347": 12}
+    },
+    {
+      "name": "mission",
+      "interface": "mission",
+      "majors": {
+        "mission": 2
+      },
+      "data_base": 655360,
+      "table_base": 496,
+      "blocked": "its slots read a heap singleton (TheMission) with a std::vector map cache",
+      "exports": ["GetGameType", "GetNameSlot", "GetMissionIndex", "GetMissionName", "GetStartPosition", "CountStartPositions",
+                  "HasMissionName", "GetMissionParams", "CountMissionUnits", "GetMissionUnit", "CountMissionFeatures",
+                  "GetMissionFeature"],
+      "data": ["g_game", "g_simGlobals", "g_extTdf", "g_blockBase"],
+      "engine": {"SetMissionType": "load class", "FreeOtaEnumCacheAndMission": "load class", "AdvanceMission": "load class", "GetCampaignName": "a query no match makes: it serves the menus and the map list", "LoadCampaign": "load class", "LoadMissionByName": "load class", "MissionExists": "a campaign query no match makes: it reads the campaign file", "RefreshMapList": "load class", "SelectMission": "load class", "ComputeMapChecksum": "a query no match makes: it serves the menus and the map list", "GetTerrainLength": "a query no match makes: it serves the menus and the map list", "CountMissions": "a query no match makes: it serves the menus and the map list", "GetCampaignMissionName": "a query no match makes: it serves the menus and the map list", "GetBriefing": "a query no match makes: it serves the menus and the map list", "GetDescription": "a query no match makes: it serves the menus and the map list", "GetPlanet": "a query no match makes: it serves the menus and the map list", "GetTerrainSizeTier": "a query no match makes: it serves the menus and the map list", "GetTranslatedName": "a query no match makes: it serves the menus and the map list", "SelectSchema": "load class", "SetMissionUnitPosition": "load class", "GetMemory": "a query no match makes: it serves the menus and the map list", "GetNumPlayers": "a query no match makes: it serves the menus and the map list"},
+      "slots": {
+        "GetGameType": [[], "int"],
+        "GetNameSlot": [["int"], "linear"],
+        "GetMissionIndex": [[], "int"],
+        "GetMissionName": [[], "linear"],
+        "GetStartPosition": [["linear", "int"], "int"],
+        "CountStartPositions": [[], "int"],
+        "HasMissionName": [[], "int"],
+        "GetMissionParams": [["linear"], "void"],
+        "CountMissionUnits": [[], "int"],
+        "GetMissionUnit": [["int", "linear"], "int"],
+        "CountMissionFeatures": [[], "int"],
+        "GetMissionFeature": [["int", "linear"], "int"]
+      },
+      "imports": {
+
+      }
     }
   ]
 }

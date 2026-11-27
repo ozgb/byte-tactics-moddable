@@ -163,7 +163,7 @@ struct MapSeam {
     int (__stdcall* CanPlaceFootprintAt)(Unit* unit, Vec3* pos);
     // Returns 1 when a slot of a landing pad is free; a query. Hooks: none.
     int (__stdcall* IsPadSlotFree)(Unit* pad, int id);
-    // Synchronous: picks a random energy and a random metal feature to reclaim within a radius, drawing from the game logic stream, writes their positions and amounts, and returns 1 when it found either. Hooks: none.
+    // Synchronous: picks a random energy and a random metal feature to reclaim within a radius, drawing from the RandomInt generator (services.RandomInt, not a game logic stream), writes their positions and amounts, and returns 1 when it found either. Hooks: none.
     int (__stdcall* PickRandomReclaimableResourcesInRadius)(Vec3* pos, int range, Vec3** energy, float* energyAmount, Vec3** metal, float* metalAmount);
     // Allocates the spatial grid buckets, and the bucket of units off the map, for the terrain the map holds, and fills their heights and edge flags; called when the terrain's derived layers are built, outside the tick. Hooks: none.
     void (__stdcall* AllocateBuckets)(void);

@@ -134,6 +134,7 @@ LOADER = os.path.join(ROOT, "lib", "wasmloader")
 WASMTIME_INCLUDE = os.path.join(ROOT, "third_party", "wasmtime", "include")
 GUARD = "WASM_MODULES_UNDER_WASMTIME"
 HOST_NAMED = {"services"}
+WORLD_VIEWS = {"econworld": "economy", "pathworld": "pathfinding"}
 COMMENT = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
 
 
@@ -200,7 +201,7 @@ def build():
         print(f"built {os.path.join(OUT, entry['name'] + '.wasm')}")
     game = game_manifest()
     check_tools_game(game)
-    for entry in game["modules"]:
+    for entry in built_modules(game):
         build_game_module(entry, game)
     write_game_manifest(with_majors(game, header_majors()))
 
@@ -211,6 +212,11 @@ def build_variant(defines, name):
     for entry in game["modules"]:
         if entry["name"] == "wind_meteors":
             build_game_module(entry, game, defines, name)
+
+
+def built_modules(game):
+    """The entries of a manifest whose default builds to WASM: an entry with "blocked" holds the reason it does not yet."""
+    return [entry for entry in game["modules"] if "blocked" not in entry]
 
 
 def game_manifest():
@@ -230,6 +236,9 @@ def header_majors():
                 if prefix != stem.upper():
                     sys.exit(f"interfaces/{name}: the version macro prefix {prefix} is not {stem.upper()}")
                 found[stem] = int(major)
+    for view, owner in WORLD_VIEWS.items():
+        if owner in found:
+            found[view] = found[owner]
     return found
 
 
@@ -267,7 +276,7 @@ def header_declares(interface, name):
 
 @functools.cache
 def header_text(interface):
-    path = os.path.join(INTERFACES, interface + ".h")
+    path = os.path.join(INTERFACES, WORLD_VIEWS.get(interface, interface) + ".h")
     if not os.path.exists(path):
         return ""
     with open(path) as f:
@@ -668,7 +677,7 @@ def check_fuel_manifest(pins):
     problems = []
     if pins.get("fuel") != {"rule": wasm_fuel.RULE, "version": wasm_fuel.VERSION}:
         problems.append(f"the manifest's fuel entry is not the pass's rule: {wasm_fuel.RULE!r}, version {wasm_fuel.VERSION}")
-    for entry in pins["modules"]:
+    for entry in built_modules(pins):
         budget = entry.get("fuel_budget")
         if not isinstance(budget, int) or not 0 < budget < 1 << 31:
             problems.append(f"{entry['name']}: fuel_budget must be an integer from 1 to {(1 << 31) - 1}")
@@ -909,7 +918,7 @@ def run_check_module(path, name):
 def run_imports():
     game = game_manifest()
     wasm_tools = find_wasm_tools(game["tools"]["wasm-tools"])
-    specs = {m["name"]: interface_spec(m) for m in game["modules"]}
+    specs = {m["name"]: interface_spec(m) for m in built_modules(game)}
     for entry in manifest()["modules"]:
         specs[entry["name"]] = {"imports": {}, "exports": FIXTURE_EXPORTS}
     failures = []

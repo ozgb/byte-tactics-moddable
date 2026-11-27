@@ -463,12 +463,13 @@ the same commit: the kit at `interfaces-v58` pairs with `reference-traces-v53`.
   store (#1053). Its commit line names 0758dafdb, the reference tip with the frame clock (#1147). The trace format is
   still `bt-trace 10`. No other trace's tick rows change, so the other traces, event digests, sound logs, UI logs,
   interface commands, display logs, frames, views and saves are those of v50.
-- `reference-traces-v53` (#1132): the scenarios of v51 with bits 6 and 7 of `Unit.flags` (`selectState`, the
-  selection's visit mark) masked out of the `Unit` table (mask 0xffffff2f, `docs/state.md`, "The selection"), so a
-  `ui-` scenario played from its command log gives its own traces. Only the twelve `ui-` scenarios set the bits, so
-  only their traces change; their commit line names ed1f9c964, the reference merge with the mask (#1179). The trace
-  format is still `bt-trace 10`. The other traces, event digests, sound logs, UI logs, interface commands, display
-  logs, frames, views and saves are unchanged.
+- `reference-traces-v53` (#1132): the scenarios of v52 with the selection's visit mark, bits 6 and 7 of `Unit.flags`
+  (`selectState`), out of the judged state and the view. The trace masks them out of the `Unit` table (mask 0xffffff2f,
+  `docs/state.md`, "The selection"), and the view clears them from `ViewUnit.flags`, at view version 2.1
+  (`docs/view.md`). A `ui-` scenario played from its command log then gives its own traces. The view header carries
+  the minor version, so every view file and every `view` row changes, and with them every digest; no `tick` row
+  changes. The commit line names 2d6f1c7c1, the reference tip with the view 2.1 fill (#1183). The trace format is still
+  `bt-trace 10`. The event digests, sound logs, UI logs, interface commands, display logs and saves are those of v52.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

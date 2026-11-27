@@ -43,7 +43,7 @@ BLOCKED = {
     "pathfinding": "the direction and turn tables (g_dirDeltaX, g_dirDeltaZ, g_turnCosts) live in another file, and "
                    "PathGoalDistance, PathGoalCells and PathGoalContains are direct calls with no import",
     "weapons": "about 20 engine calls with no import (AngleOfVector, SolveLaunchAngle, InitProjectile, CalcAimAngles, "
-               "AddExplosionEffect and others), the GAF services of #1217 and the aim-script vtable data",
+               "AddExplosionEffect and others), the GAF services, which the glue does not give until the frame tables are in the shared memory, and the aim-script vtable data",
     "targeting": "unit_query_buffer.h is a std::vector<Ref<Unit>> on the heap",
     "los_radar": "operator new in line_of_sight.cpp and the std::allocator internals of los_tables.cpp",
     "orders": "std::list in vtol_orders.cpp, the MSVC STL internals of order_list.cpp and new of sim objects",

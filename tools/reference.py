@@ -167,6 +167,7 @@ GATE_TIER = (
     "share-all",
     "ui-build-menu",
     "ui-build-place",
+    "ui-debug-keys",
     "ui-dialogs",
     "ui-groups",
     "ui-keys",

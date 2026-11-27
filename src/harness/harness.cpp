@@ -151,6 +151,9 @@ static int s_displayTickLine = 0;
 static unsigned s_displayTick = 0;
 static int s_displayTickDone = 0;
 static unsigned s_displayFrames = 0;
+static const unsigned kFrameClockStepMs = 33;
+static unsigned s_frameClockMs = 0;
+static unsigned s_frameClockRead = 0;
 static unsigned s_displaySteps = 0;
 static char s_scenarioQuirks[512];
 static Quirks s_scenarioQuirkSet;
@@ -4654,10 +4657,18 @@ const char* HarnessMapName()
     return s_map;
 }
 
+unsigned int HarnessFrameClockElapsedMs()
+{
+    unsigned elapsed = s_frameClockMs - s_frameClockRead;
+    s_frameClockRead = s_frameClockMs;
+    return elapsed;
+}
+
 void HarnessDisplayFrame(const unsigned char* palette, const DlPicture* cursor, int cursorX, int cursorY)
 {
     if (!HarnessTestMode())
         return;
+    s_frameClockMs += kFrameClockStepMs;
     unsigned tick = GameU32(GAME_TICK);
     HarnessFrameEnd(tick);
     if (DlIsOn() == 0)

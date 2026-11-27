@@ -194,6 +194,7 @@ COMMAND_TEXTS: dict[str, str | None] = {}
 REPLAY_SUFFIX = "+commands"
 SELECT_STATE = "Unit.flags bits 6 and 7 (selectState), which the selection writes, are still hashed (#1132)"
 REPLAY_LEFT_OUT = {
+    "ui-antinuke-range": SELECT_STATE,
     "ui-build-menu": SELECT_STATE,
     "ui-build-place": SELECT_STATE,
     "ui-click-select": SELECT_STATE,

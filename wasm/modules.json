@@ -508,6 +508,8 @@
           "ObjectStateSize": [["linear"], "int"]
         },
         "services": {
+          "GameRand": [["int"], "int"],
+          "RandomInt": [["int"], "int"],
           "SimAllocTagged": [["linear", "int"], "linear"],
           "InitGafSequence": [["linear", "linear", "int"], "void"],
           "StepGafSequence": [["linear"], "int"],
@@ -915,6 +917,7 @@
           "FindFeatureAtPos": [["linear", "linear", "linear"], "int"]
         },
         "targeting": {
+          "GetWeaponTargetUnit": [["block", "int"], "block"],
           "FindBestTargetIfFireAtWill": [["block"], "block"],
           "ChooseWeapon": [["block"], "int"]
         },
@@ -1072,7 +1075,8 @@
         },
         "map": {
           "UnitsInRange": [["linear", "int", "int", "linear", "int"], "int"],
-          "GetCellMeanHeight": [["linear"], "int"]
+          "GetCellMeanHeight": [["linear"], "int"],
+          "CanPlaceUnitFootprint": [["block", "int", "linear", "int"], "int"]
         },
         "features": {
           "FindFeatureAtPos": [["linear", "linear", "linear"], "int"]
@@ -1090,6 +1094,7 @@
           "Spend": [["linear"], "int"]
         },
         "services": {
+          "RandomInt": [["int"], "int"],
           "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
           "Emit": [["linear", "int"], "void"]
         }
@@ -1102,6 +1107,7 @@
       "majors": {
         "map": 9,
         "los_radar": 5,
+        "features": 5,
         "services": 4
       },
       "data_base": 557056,
@@ -1131,9 +1137,14 @@
       },
       "imports": {
         "los_radar": {
-          "GetMapCell": [["int", "int"], "block"]
+          "GetMapCell": [["int", "int"], "block"],
+          "GetMapCellAtPosition": [["linear"], "block"]
+        },
+        "features": {
+          "GetCellFeature": [["block"], "int"]
         },
         "services": {
+          "RandomInt": [["int"], "int"],
           "SimAlloc": [["int"], "linear"],
           "SimFree": [["linear"], "void"],
           "Emit": [["linear", "int"], "void"]
@@ -1184,12 +1195,14 @@
       },
       "imports": {
         "map": {
+          "CanPlaceUnitFootprint": [["block", "int", "linear", "int"], "int"],
           "GetGroundHeight": [["linear"], "int"]
         },
         "los_radar": {
           "IsUnitVisibleToPlayer": [["block", "block"], "int"]
         },
         "services": {
+          "RandomInt": [["int"], "int"],
           "SimAlloc": [["int"], "linear"],
           "SimAllocTagged": [["linear", "int"], "linear"],
           "SimFree": [["linear"], "void"],

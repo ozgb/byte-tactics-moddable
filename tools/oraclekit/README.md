@@ -70,8 +70,9 @@ that tick shows.
 
 ## The manifest and the fuel pass
 
-`wasm/modules.json` is the game's manifest as the loader reads it, with one change: the `cxx` and `c` fields of each
-module entry (the module's source files) are removed, and the export refuses a manifest that still names a source.
+`wasm/modules.json` is the game's manifest as the loader reads it, with two changes: the `cxx` and `c` fields of each
+module entry (the module's source files) are removed, and a blocked entry's reason becomes `"blocked": true` (ABI 4.2: the
+entry has no budgets yet). The export refuses a manifest that still names a source.
 ABI 9.1 requires a module's imports and exports to equal its entry exactly; the entry is the list to build against.
 
 `tools/wasm_fuel.py` is the reference for the rule of ABI 11. `uv run tools/wasm_fuel.py module.wasm -o metered.wasm`

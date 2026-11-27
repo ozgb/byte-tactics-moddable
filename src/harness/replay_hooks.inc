@@ -5928,6 +5928,10 @@ bool IsImportOf(unsigned owner, unsigned slot)
     case SUB_MAP:
         if (slot == RSL_LOS_RADAR_GETMAPCELL)
             return true;
+        if (slot == RSL_LOS_RADAR_GETMAPCELLATPOSITION)
+            return true;
+        if (slot == RSL_FEATURES_GETCELLFEATURE)
+            return true;
         return false;
     case SUB_SCRIPTS:
         if (slot == RSL_MAP_GETGROUNDHEIGHT)
@@ -6048,7 +6052,7 @@ void HookSeams(const bool* on)
         s_rec_economy.GetEnergyUse = RecEconomyGetEnergyUse;
     if (on[SUB_ECONOMY])
         s_rec_economy.UnitAccount = RecEconomyUnitAccount;
-    if (on[SUB_FEATURES] || on[SUB_ORDERS])
+    if (on[SUB_FEATURES] || on[SUB_ORDERS] || on[SUB_MAP])
         s_rec_features.GetCellFeature = RecFeaturesGetCellFeature;
     if (on[SUB_FEATURES] || on[SUB_WEAPONS])
         s_rec_features.GetFootprintCentre = RecFeaturesGetFootprintCentre;
@@ -6142,7 +6146,7 @@ void HookSeams(const bool* on)
         s_rec_los_radar.Apply = RecLosRadarApply;
     if (on[SUB_LOS_RADAR] || on[SUB_FEATURES] || on[SUB_AI] || on[SUB_WEAPONS] || on[SUB_UNITS] || on[SUB_MAP])
         s_rec_los_radar.GetMapCell = RecLosRadarGetMapCell;
-    if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS] || on[SUB_ORDERS])
+    if (on[SUB_LOS_RADAR] || on[SUB_WEAPONS] || on[SUB_ORDERS] || on[SUB_MAP])
         s_rec_los_radar.GetMapCellAtPosition = RecLosRadarGetMapCellAtPosition;
     if (on[SUB_LOS_RADAR] || on[SUB_ORDERS])
         s_rec_los_radar.GetOriginCellAtPosition = RecLosRadarGetOriginCellAtPosition;

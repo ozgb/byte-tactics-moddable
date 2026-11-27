@@ -308,9 +308,11 @@ class RecordedImports(unittest.TestCase):
         errors = self.check([], recorded=["los_radar.GetMapCell", "services.SchedPublish"])
         self.assertEqual(errors, ["map's recordings carry los_radar.GetMapCell, which it does not import"])
 
-    def test_map_imports_only_what_its_recordings_carry(self):
+    def test_map_imports_what_its_recordings_carry_and_gives_the_rest_a_reason(self):
         schema = json.loads((Path(__file__).resolve().parent.parent / "data/replay_schema.json").read_text())
-        self.assertEqual(schema["annotations"]["subsystems"]["map"]["imports"], ["los_radar.GetMapCell"])
+        spec = schema["annotations"]["subsystems"]["map"]
+        self.assertEqual(spec["imports"], ["los_radar.GetMapCell", "los_radar.GetMapCellAtPosition", "features.GetCellFeature"])
+        self.assertEqual(set(spec["unrecorded_imports"]), {"los_radar.GetMapCellAtPosition", "features.GetCellFeature"})
         self.assertEqual(rs.recorded_imports("map") - {"services.SchedPublish", "services.SimAlloc", "services.SimFree"},
                          {"los_radar.GetMapCell"})
 

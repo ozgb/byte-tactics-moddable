@@ -118,7 +118,7 @@ The `TODO(#986)` markers that named these answers in `src/orders/unit_orders.cpp
 - **The console.** `KillAllUnits`, `KillUnitsOfType` and `ReloadUnitType` (`console_commands.cpp`), and its `CreateUnit`
   of a unit type, are slots called between ticks. They wait for #948 (parked), as #954's did.
 - **The network.** The net phase's unit packets (`ReadUnitState` through `ReceiveUnitStates`, `unit_position.cpp`;
-  `CreateUnitFromPacket`, `net_game.cpp`) write the unit record directly, and wait for #948 as well.
+  `CreateUnitFromPacket`, `net_game.cpp`) write the unit record directly, and wait for the network transport (#392).
 - **The engine's shutdown** kills every unit through the slot `KillUnit` (`game_state.cpp`), outside the tick.
 
 **Outcomes.** `Apply` returns the outcome, recorded with the event in the trace's dump (section 50) and returned to no

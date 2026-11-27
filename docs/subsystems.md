@@ -768,7 +768,7 @@ A live function that the suite cannot enter by design is counted apart, like a d
 | files | 114 of 142 | 80.3% | 80.5% | 66.1% | 28 | 35 |
 | game | 329 of 417 | 78.9% | 63.8% | 44.4% | 88 | 25 |
 | network | 65 of 297 | 21.9% | 12.5% | 5.1% | 232 | 74 |
-| platform | 442 of 1312 | 33.7% | 28.7% | 29.9% | 870 | 87 |
+| platform | 442 of 1311 | 33.7% | 28.8% | 29.9% | 869 | 87 |
 | presentation | 760 of 1153 | 65.9% | 51.2% | 42.0% | 393 | 295 |
 | seams | 217 of 234 | 92.7% | 94.5% | 59.6% | 17 | 0 |
 | state | 511 of 565 | 90.4% | 74.4% | 51.2% | 54 | 59 |

@@ -193,7 +193,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("Apply(event)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and "no slot's closure calls" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("Apply", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "ApplySlot"}})
@@ -1085,6 +1085,7 @@ class StructForms(unittest.TestCase):
     def test_a_value_out_is_recorded_as_the_result_in_the_import_line_and_the_closing_line(self):
         ann = annotations()
         ann["subsystems"]["targeting"]["imports"].append("scripts.GetPieceAngles")
+        ann["subsystems"]["targeting"].setdefault("unrecorded_imports", {})["scripts.GetPieceAngles"] = "no recording carries it yet"
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
@@ -1288,6 +1289,7 @@ class Callbacks(unittest.TestCase):
         args = {x["name"]: modes.get(x["name"], {"mode": "scalar"}) for x in params}
         ann["subsystems"]["scripts"]["slots"][slot] = {"args": args}
         ann["subsystems"][importer]["imports"].append("scripts." + slot)
+        ann["subsystems"][importer].setdefault("unrecorded_imports", {})["scripts." + slot] = "no recording carries it yet"
         if mutate:
             mutate(ann)
         return ann
@@ -2793,6 +2795,7 @@ class ElementForms(unittest.TestCase):
         ann = annotations()
         slot = ann["subsystems"]["scripts"]["slots"]["StartScriptWithArgsByIndex"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
         ann["subsystems"]["weapons"]["imports"] = ann["subsystems"]["weapons"].get("imports", []) + ["scripts.StartScriptWithArgsByIndex"]
+        ann["subsystems"]["weapons"].setdefault("unrecorded_imports", {})["scripts.StartScriptWithArgsByIndex"] = "no recording carries it yet"
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]

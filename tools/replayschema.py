@@ -1838,7 +1838,7 @@ def uncalled_imports(sub: str, spec: dict, called: set[str], recorded: set[str],
     slot's closure or given a reason in `unrecorded_imports`, and each recorded import is listed."""
     imports = spec.get("imports", [])
     reasons = spec.get("unrecorded_imports", {})
-    errors = ["%s imports %s, which no recording of tests/replay/%s carries and no slot calls through the seam: drop it, "
+    errors = ["%s imports %s, which no recording of tests/replay/%s carries and no slot's closure calls: drop it, "
               "or give the reason in `unrecorded_imports`" % (sub, imp, sub)
               for imp in imports if imp not in called and imp not in recorded and imp not in reasons]
     errors += ["%s: `unrecorded_imports` names %s, which it does not import" % (sub, imp) for imp in reasons if imp not in imports]

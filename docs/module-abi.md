@@ -289,7 +289,7 @@ valid JSON to the loader, so the whole manifest is refused as not valid JSON. A 
 | `majors` | the major of each interface it uses, section 10 | loader |
 | `slots` | `{slot: [[argument kinds], result kind]}` | loader (adapters); checks |
 | `imports` | `{group: {import: [[argument kinds], result kind]}}` | loader (adapters); checks |
-| `publishes` | `{kind: payload size}`, the kinds the module may publish through `Emit` (the kind as a decimal string, the size in bytes; wind_meteors': `{"80": 36}`); each kind is an effect of the entry's `interface` header and the size is that kind's payload size | host (the `Emit` import); checks |
+| `publishes` | `{kind: payload size}`, the kinds the module may publish through `Emit` (the kind as a decimal string, the size in bytes; wind_meteors': `{"80": 36}`); each is a kind the route table (`data/routes.csv`, `docs/schedule.md`, "Routes") takes from the entry's outbox, its `interface` (its own effect kinds and the routed inbox kinds of other modules), with that kind's payload size | host (the `Emit` import); checks |
 | `fuel_budget` | fuel per tick, section 11 | host; checks |
 | `size_budget` | the most bytes the `.wasm` may be | checks |
 | `cxx`, `c` | source files of the module in the reference repository | the reference build only; the kit's manifest leaves them out |
@@ -400,7 +400,7 @@ reads the payload of the kind it subscribed to, and does nothing with an effect 
 whose effect enums name the kinds a module publishes and whose event enums name the kinds its inbox takes, with what each
 does; and `docs/schedule.md`, "Routes", which is the route table itself, a row per publisher, kind and subscriber in the
 order the effect is delivered, with each row's delivery and the rules for when an inbox is delivered. The table is
-generated from the engine and checked in CI, so the two do not drift; it is not a file of its own in the kit.
+generated from the engine and checked in CI, so the two do not drift; it is also a file of the kit, `data/routes.csv`.
 
 - **Finding.** The host finds a slot by export name in the module's instance. It never looks one up
   in the table. (The loader keeps the slots in the order of `exports`, and puts free table entries in
@@ -614,7 +614,7 @@ signatures are below.
 | `SimCaptureAlloc` | `[int, linear] -> linear` | reserves the size in bytes, rounded up to 8, in the radar arena of the block (`docs/sim-events.md`, "Radar events"), zeroes it, writes its offset in the arena to the 32-bit word at the second argument and returns its address; the offset is what a radar event records, and it holds until the drain that hands over that event empties the arena; an arena that has no room ends the game in test mode, and otherwise returns 0, writes nothing and counts it in the arena's dropped count |
 | `GetSlotDpid` | `[int] -> int` | returns the network id of the player in a slot of the game record, or -1 when the slot is 10 (none) or its player's type is 0 (empty) |
 | `FindSlotByDpid` | `[int] -> int` | returns the lowest slot, 0 to 9, whose network id (as `GetSlotDpid` gives it) is the argument, or 10 when none is or the argument is -1 |
-| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; the host refuses, as an import error, an effect outside the module memory, a kind not in the entry's `publishes` table, and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect to its subscribers as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
+| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; `Emit` takes any kind a route carries from that outbox, the same set the native `SchedPublish` delivers; the host refuses, as an import error, an effect outside the module memory, a kind no route takes from the module's outbox or not in the entry's `publishes` table, and a size other than that kind's payload size; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect exactly as `SchedPublish` does, as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
 
 **A malformed argument changes nothing and does not trap** (ozgb/btm#25). The default modules never pass one, so no
 recording shows what it does, and this is the contract: an address the import does not trap on (section 7.2) that is not
@@ -638,7 +638,7 @@ the dump as section "Who records the dump's events" states.
 
 | Recorded call | Import | What the module does |
 | --- | --- | --- |
-| `services.SchedPublish` | `services.Emit` | publishes an effect of its own interface's effect kinds (an `<Interface>EffectKind` of its header, which its entry's `publishes` table lists) to its own outbox; the recorded outbox (the first argument) is always the module's own, the interface of its entry, and the recorded size is `Emit`'s second argument; a recorded publish of any other kind has no import yet ("Publishes `Emit` does not carry" below) |
+| `services.SchedPublish` | `services.Emit` | publishes through `Emit` any kind its outbox's routes carry (its own effect kinds and other modules' inbox kinds, `data/routes.csv`) to its own outbox; the recorded outbox (the first argument) is always the module's own, the interface of its entry, and the recorded size is `Emit`'s second argument |
 | `services.ScheduleTargetingTargetUnit` | `targeting.GetWeaponTargetUnit` | asks for the unit a weapon aims at |
 | `services.ScheduleTargetingTargetPos` | `targeting.GetWeaponTargetPos` | asks for the position a weapon aims at, into a `Vec3` of its own; the recording's `x`, `y` and `z` outputs are the three words the callee wrote |
 | `services.ScheduleTargetingFind` | `targeting.FindWeaponTarget` | picks the best enemy for a weapon |
@@ -649,49 +649,7 @@ the dump as section "Who records the dump's events" states.
 | `services.ScheduleEconomyRequestGranted` | `economy.RequestGranted` | asks whether a unit's request for resources would be granted |
 | `services.ScheduleMetalExtraction` | `economy.UpdateMetalExtraction` | sets a metal extractor's rate |
 
-**Publishes `Emit` does not carry.** Most of the recorded `SchedPublish` calls of a module are not of its own effect
-kinds: the module publishes, to its own outbox, an event of another module's inbox (or of its own), and the route of
-`docs/schedule.md`, "Routes", delivers it there. `Emit` refuses these kinds, as an import error, and widening it (or the
-`publishes` table) to them changes the module ABI, so it waits on #1206. Until then a module cannot make these publishes,
-and a spec names them by their kind and their route, not as an import. By the routes, they are:
-
-| Publisher | Inbox | Kinds |
-| --- | --- | --- |
-| ai | targeting | `TARGETING_SET_UNIT` (96), `TARGETING_SET_POS` (97), `TARGETING_CLEAR` (98) |
-| economy | los_radar | `LOS_RADAR_SHARE_MAPPING` (134), `LOS_RADAR_SHARE_RADAR` (135) |
-| features | economy | `ECONOMY_INCOME` (4) |
-| map | los_radar | `LOS_RADAR_CELL_HEIGHTS` (132) |
-| movement | los_radar | `LOS_RADAR_UPDATE_UNIT` (128) |
-| movement | map | `MAP_ADD_UNIT` (160), `MAP_REMOVE_UNIT` (161) |
-| orders | economy | `ECONOMY_REQUEST` (2), `ECONOMY_INCOME` (4) |
-| orders | features | `FEATURES_REMOVE` (33), `FEATURES_RECLAIM` (35) |
-| orders | movement | `MOVEMENT_SET_TARGET` (326), `MOVEMENT_DESTROY_TARGET` (327), `MOVEMENT_SET_FLIGHT_MODE` (328), `MOVEMENT_SET_ALTITUDE` (329), `MOVEMENT_SET_APPROACH_RADIUS` (330), `MOVEMENT_SET_HEADING` (331) |
-| orders | orders | `ORDERS_COMMAND` (295) |
-| orders | players | `PLAYERS_GIVE_UNIT` (192) |
-| orders | targeting | `TARGETING_SET_UNIT` (96), `TARGETING_SET_POS` (97), `TARGETING_CLEAR` (98) |
-| orders | weapons | `WEAPONS_DAMAGE` (256), `WEAPONS_RELEASE` (259), `WEAPONS_CLAIM` (260), `WEAPONS_ADD_STOCKPILE` (269) |
-| players | economy | `ECONOMY_RESET` (0), `ECONOMY_INCOME` (4) |
-| players | los_radar | `LOS_RADAR_UPDATE_UNIT` (128), `LOS_RADAR_RECALCULATE` (133) |
-| scripts | map | `MAP_SET_YARD` (164) |
-| scripts | units | `UNITS_ATTACH_TO_PIECE` (357), `UNITS_SCRIPT_VALUE` (386) |
-| scripts | weapons | `WEAPONS_AIM_DONE` (263), `WEAPONS_EXPLODE_PIECE` (264) |
-| units | ai | `AI_SET_SQUAD` (226) |
-| units | economy | `ECONOMY_RESET` (0), `ECONOMY_LOAD` (1), `ECONOMY_REQUEST` (2), `ECONOMY_INCOME` (4) |
-| units | features | `FEATURES_PLACE` (32) |
-| units | los_radar | `LOS_RADAR_UPDATE_UNIT` (128), `LOS_RADAR_REMOVE_UNIT` (129), `LOS_RADAR_REVEAL_UNIT` (130), `LOS_RADAR_ADD_EYEBALL` (131), `LOS_RADAR_SIGHT_RESET` (137), `LOS_RADAR_SIGHT_LOAD` (138) |
-| units | map | `MAP_ADD_UNIT` (160), `MAP_REMOVE_UNIT` (161), `MAP_CLEAR_UNIT` (162), `MAP_RECLAIM_FOOTPRINT` (163), `MAP_SET_YARD` (164), `MAP_BUCKET_UNLINK` (165), `MAP_BUCKET_PREPEND` (166), `MAP_LOAD_PATH_LOCK_STAMP` (169) |
-| units | movement | `MOVEMENT_NEW` (320), `MOVEMENT_DESTROY` (321), `MOVEMENT_LOAD` (322), `MOVEMENT_SET_MODE` (323), `MOVEMENT_SET_SPEED` (324) |
-| units | orders | `ORDERS_ADD` (288), `ORDERS_STOP` (290), `ORDERS_BE_CARRIED` (291), `ORDERS_STATUS_FLAGS` (292) |
-| units | players | `PLAYERS_KILL_UNITS` (193), `PLAYERS_UNIT_CREATED` (194), `PLAYERS_UNIT_DIED` (195) |
-| units | scripts | `SCRIPTS_START` (416) |
-| units | targeting | `TARGETING_RESET` (99), `TARGETING_LOAD` (100) |
-| units | weapons | `WEAPONS_DAMAGE` (256), `WEAPONS_DETONATE` (258), `WEAPONS_RELEASE` (259), `WEAPONS_INIT_SLOTS` (261), `WEAPONS_REMOVE_PROJECTILES` (262), `WEAPONS_SET_STOCKPILES` (267) |
-| weapons | features | `FEATURES_DAMAGE` (34) |
-| weapons | targeting | `TARGETING_CLEAR` (98) |
-
-The effect kinds `Emit` carries are the rest of the routes' rows: every row whose kind is an effect kind of the
-publisher's own interface (ai, economy, features, map, movement, orders, players, targeting, weapons and wind_meteors
-each have some).
+The kinds each module's outbox carries are the rows of `data/routes.csv` with that publisher; a spec names a publish by its kind and cites that file.
 
 `tools/speclint.py` reads the first two columns of this table from the kit's copy of this page: a spec may name a
 recorded call of the first column (to say which recorded line an import makes) as well as its import.

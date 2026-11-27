@@ -62,7 +62,8 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 phases), of the pilot's glue (src/seams/economy_world.cpp, src/seams/wind_meteors_world.cpp,
                 src/seams/features_world.cpp, src/seams/targeting_world.cpp, src/seams/los_radar_world.cpp, src/seams/map_world.cpp and for map src/seams/pathfinding_world.cpp, src/seams/players_world.cpp, src/seams/ai_world.cpp, src/seams/weapons_world.cpp, src/seams/orders_world.cpp and src/seams/movement_world.cpp: its inbox handler and the synchronous services), of the harness's recorders
                 (src/harness/replay_hooks.inc, which forward a slot call to the slot they replaced), of a WASM module's glue
-                (src/wasm/wind_meteors_glue.cpp, whose timed native table forwards a run to the native slot), the filler of
+                (src/wasm/module_glue.cpp and the generated src/wasm/glue_tables.cpp, whose timed native tables forward a run to
+                the native slot and whose interface imports call the slot a module imports), the filler of
                 a phase slot in src/seams/native.cpp (features' UpdateFeatures, which runs the scheduler's features phase),
                 and the functions of the pilot's set-up, teardown and save and load callers:
                   economy       Init, Shutdown, UpdateResourceSharing from LoadBattleAssets and ShutdownIngameSystems
@@ -89,7 +90,8 @@ slots, engine and allowed indirect calls. It fails, for each pilot, on:
                 pathfinding's world (src/seams/pathfinding_world.cpp) runs at the start and end of a search; players' are Apply and the runs, UpdatePlayers, UpdatePlayersOnStream, UpdatePlayerHead, UpdatePlayerBody,
                 UpdatePlayerTail, UpdatePlayersFinish and UpdateBlink, which the scheduler runs (players has no query slots); ai's are Apply, UpdateSquads and UpdatePlayerAI, which the scheduler runs; weapons' are Apply, UpdateProjectiles, UpdateExplosions and UpdateUnitWeapons, which the scheduler runs (engine functions: none); orders' are Apply, RunOrders and RunSecondaryOrders, which the scheduler runs, and ExpandGroupCommand, which the route of a group command runs (engine functions: none); movement's are Apply, UpdateMotion and ApplyPathEvent, which the scheduler runs, ReadNetState, which ReceiveUnitStates runs (#392), and the synchronous New* slots (NewPathOrderAt, NewPathOrderToUnit, NewPathOrderToUnitAt, NewPathOrderToUnitAtAngle, NewAirManeuverOrder, NewApproachRadius, NewRingApproach, NewPointMarker), which build a target in the block and which the functions of orders call (the slot_callers of the pilot: the orders that hold the target). units' writing slots are Apply, UpdateUnitHead, UpdateUnitBody, UpdateUnitTail, RefreshFactoryIndex and UpdateAllUnits, which the scheduler runs, and the synchronous CreateUnit, LoadUnit, AddBuildProgress, AddRepairProgress, UnitRefInit, UnitRefSetUnit, UnitRefSetValue and UnitRefUnlink, which orders, movement and players call (UNITS_SLOT_CALLERS), with the game functions that spawn units listed as its engine functions; scripts' are Apply and RunScripts, which the scheduler runs, and the synchronous slots that orders, weapons, units and the network call (SCRIPTS_SLOT_CALLERS). A presentation or unowned function fails like any other.
   set-up        an indirect call through a set-up slot, or a read of one, by any function but the owner's own, the
-                recorders of src/harness/replay_hooks.inc and the listed callers (function, file). Features' set-up slots
+                recorders of src/harness/replay_hooks.inc, a WASM glue's timed native slots (`Glue<Module>Timed<Slot>`, which
+                forward a call to the native slot they replaced) and the listed callers (function, file). Features' set-up slots
                 write, but run outside the tick, from match load, unit-type load and save and load: LoadFeatureFileList,
                 FreeFeatureFileList, NopAfterFeatureEnum, ResolveFeatureLinks, InitFeatureAnimPool, FreeFeaturePool,
                 PlaceMissionFeatures, StampFeatureMetal, FindOrLoadFeatureType, SaveFeatures and LoadFeatures. Their
@@ -219,6 +221,7 @@ ROWLESS_CALLS = ("operator=", "X87LeTest41", "operator Unit *", "operator Cell *
 NATIVE_TABLE = "src/seams/native.cpp"
 SCHEDULER_FILE = "src/game/scheduler.cpp"
 REPLAY_HOOKS_FILE = "src/harness/replay_hooks.inc"
+WASM_GLUE_FILES = ("src/wasm/module_glue.cpp", "src/wasm/glue_tables.cpp")
 PHASE_FILLERS = ((NATIVE_TABLE, "UpdateAllUnits"), (NATIVE_TABLE, "UpdatePlayers"), (NATIVE_TABLE, "UpdatePlayersOnStream"),
                  (NATIVE_TABLE, "UpdateFeatures"))
 FEATURES_GLUE_FILE = "src/seams/features_world.cpp"
@@ -272,7 +275,7 @@ ECONOMY = Pilot(
     owner="economy", header="interfaces/economy.h", seam="EconomySeam",
     writing=("Apply", "Spend", "UpdatePlayerEconomy", "UpdateMetalExtraction", "UpdateResourceSharing", "Init", "Shutdown"),
     query=("RegionSize", "RequestGranted", "GetEnergyUse", "UnitAccount", "WriteState"),
-    engine_files=(SCHEDULER_FILE, "src/seams/economy_world.cpp", REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, "src/seams/economy_world.cpp", REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
                       ("RunGameSteps", "src/ingame/game_dialogs.cpp")),
     world="EconomyWorldView",
@@ -283,7 +286,7 @@ WIND_METEORS = Pilot(
     owner="wind_meteors", header="interfaces/wind_meteors.h", seam="WindMeteorsSeam",
     writing=("UpdateWind", "UpdateMeteors", "Apply", "InitMeteors", "EmptyShutdownPreCleanup", "SaveMeteors", "LoadMeteors"),
     query=("LoadMeteorDefaults",),
-    engine_files=(SCHEDULER_FILE, "src/seams/wind_meteors_world.cpp", REPLAY_HOOKS_FILE, "src/wasm/wind_meteors_glue.cpp"),
+    engine_files=(SCHEDULER_FILE, "src/seams/wind_meteors_world.cpp", REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp"),
                       ("LoadSavedGameState", "src/game/settings_campaign.cpp"), ("SaveGameFile", "src/game/settings_campaign.cpp")),
     services=("BuildDataPath", "FatalError", "TdfFile::LoadFile", "TdfFile::SelectRecord", "TdfFile::~TdfFile",
@@ -293,7 +296,7 @@ FEATURES = Pilot(
     owner="features", header="interfaces/features.h", seam="FeaturesSeam",
     writing=("UpdateFeatures", "Apply", "Place", "AnimateFeatureType", "ScanFeatureCell", "UpdateFeatureSpot"),
     query=("GetCellFeature", "GetFootprintCentre", "FeatureTypeCount", "FirstFeatureSpot", "FindFeatureAtPos"),
-    engine_files=(SCHEDULER_FILE, FEATURES_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, FEATURES_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"),),
     allowed_indirect=("MapSeam::GetGroundHeight", "LosRadarSeam::GetMapCell"),
     filler_locals=(("FindFeatureAtPos", "Point16"), ("GetFootprintCentre", "Vec3")),
@@ -309,7 +312,7 @@ TARGETING = Pilot(
     owner="targeting", header="interfaces/targeting.h", seam="TargetingSeam",
     writing=("Apply", "GetWeaponTargetPos", "FindWeaponTarget", "FindBestTargetIfFireAtWill"),
     query=("GetWeaponTargetUnit", "ChooseWeapon", "SavedTargetPair"),
-    engine_files=(SCHEDULER_FILE, TARGETING_GLUE_FILE, REPLAY_HOOKS_FILE), engine_functions=(),
+    engine_files=(SCHEDULER_FILE, TARGETING_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES), engine_functions=(),
     by_params=False)
 LOS_RADAR = Pilot(
     owner="los_radar", header="interfaces/los_radar.h", seam="LosRadarSeam",
@@ -318,7 +321,7 @@ LOS_RADAR = Pilot(
     query=("GetMapCell", "GetMapCellAtPosition", "GetOriginCellAtPosition", "ClampWorldPosToTerrain", "IsUnitVisibleToPlayer",
            "SoundHeardMask", "GetVisibleEnemiesInRadius", "HasReadyUnitInRange", "IsPointVisible",
            "GetSeenUnitsInRadius", "RegionSize", "SightCache", "WriteState"),
-    engine_files=(SCHEDULER_FILE, LOS_RADAR_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, LOS_RADAR_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")),
     allowed_indirect=("MapSeam::GetGroundHeight", "LosRadarSeam::IsPointVisible"),
     filler_locals=(("IsUnitVisibleToPlayer", "Vec3"), ("IsUnitVisibleToPlayer", "<anon>")),
@@ -332,7 +335,7 @@ MAP = Pilot(
     writing=("Apply", "CanBuildAt", "CanPlaceUnitFootprint", "PickRandomReclaimableResourcesInRadius", "RefreshMovedUnits", "RefreshUnitIfStale"),
     query=("UnitsInRange", "GetCellMeanHeight", "SnapWorldPosToFootprint", "CanPlaceFootprintAt", "IsPadSlotFree", "GetGroundHeight",
            "PassMapGet", "PassMapInBounds", "WriteState", "PathLockStamp"),
-    engine_files=(SCHEDULER_FILE, MAP_GLUE_FILE, PATHFINDING_GLUE_FILE, REPLAY_HOOKS_FILE), engine_functions=(),
+    engine_files=(SCHEDULER_FILE, MAP_GLUE_FILE, PATHFINDING_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES), engine_functions=(),
     setup=("BuildAllPassMaps", "FreePassMaps", "LoadMetalPlotmap", "LoadPlayerFeaturesPlotmap",
            "SaveMetalPlotmap", "SavePlayerFeaturesPlotmap", "AllocateBuckets", "FreeBuckets"),
     allowed_indirect=("LosRadarSeam::GetMapCell", "FeaturesSeam::GetCellFeature"),
@@ -347,7 +350,7 @@ PLAYERS = Pilot(
     writing=("Apply", "UpdatePlayers", "UpdatePlayersOnStream", "UpdatePlayerHead", "UpdatePlayerBody", "UpdatePlayerTail", "UpdatePlayersFinish",
              "UpdateBlink", "Init", "Shutdown"),
     query=("RegionSize", "WriteState"),
-    engine_files=(SCHEDULER_FILE, PLAYERS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, PLAYERS_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"), ("LoadMatch", "src/game/game_load.cpp"),
                       ("LoadBattleAssets", "src/game/game_state.cpp"), ("ShutdownIngameSystems", "src/game/game_state.cpp")),
     rowless_calls=("operator MissionConditions *", "sprintf"),
@@ -364,7 +367,7 @@ AI = Pilot(
     owner="ai", header="interfaces/ai.h", seam="AiSeam",
     writing=("Apply", "UpdateSquads", "UpdatePlayerAI"),
     query=("WriteState",),
-    engine_files=(SCHEDULER_FILE, AI_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, AI_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(),
     rowless_calls=("AiWriteRawVector", "BlockVector::Size", "operator[]", "sprintf"),
     setup=("DumpPlayerAI", "ResetAIPlayers", "CreatePlayerAI", "DestroyPlayerAI", "RebuildFeatureCells", "ParseDownloadableAiWeightScripts",
@@ -376,7 +379,7 @@ WEAPONS = Pilot(
     owner="weapons", header="interfaces/weapons.h", seam="WeaponsSeam",
     writing=("Apply", "UpdateProjectiles", "UpdateExplosions", "UpdateUnitWeapons"),
     query=("FindWeaponByName", "GetWeaponRange", "WeaponCanReachUnit", "FindTargetableProjectile", "WeaponCanReachPos", "WriteState"),
-    engine_files=(SCHEDULER_FILE, WEAPONS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, WEAPONS_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(),
     info_types=("Fixed", "MovableVec3", "ReachPosVec3", "ReachUnitVec3", "WakeVector"),
     rowless_calls=("_strcmpi", "strcmp", "operator Projectile *", "operator WeaponDef *", "operator bool", "bx_acos", "bx_hypot", "bx_sqrt", "bx_ftol", "sprintf", "memset"),
@@ -388,7 +391,7 @@ ORDERS = Pilot(
     owner="orders", header="interfaces/orders.h", seam="OrdersSeam",
     writing=("Apply", "RunOrders", "RunSecondaryOrders", "ExpandGroupCommand"),
     query=("GetOrderFlags", "GetOrderType", "MissionTypeFromName", "WriteState"),
-    engine_files=(SCHEDULER_FILE, ORDERS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, ORDERS_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(),
     services=("Fatal",),
     allowed_indirect=("UnitsSeam::CanLoad", "UnitsSeam::CanRepair", "LosRadarSeam::GetMapCellAtPosition"),
@@ -403,7 +406,7 @@ MOVEMENT = Pilot(
     owner="movement", header="interfaces/movement.h", seam="MovementSeam",
     writing=("Apply", "UpdateMotion", "ApplyPathEvent", "ReadNetState") + MOVEMENT_NEW_SLOTS,
     query=("GetMotionState", "HasNetState", "WriteNetState", "TargetType", "UnitTarget", "WriteState"),
-    engine_files=(SCHEDULER_FILE, MOVEMENT_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, MOVEMENT_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(("ReceiveUnitStates", "src/units/unit_position.cpp"),),
     allowed_indirect=("virtual PathGoal::HasNetUnitState", "virtual PathGoal::SerializeNetUnitState", "virtual OrderFx::GetType"),
     walk_locals=(("TargetType", "TargetOfOffset", "Ref<OrderFx>"),),
@@ -421,7 +424,7 @@ UNITS = Pilot(
              "AddBuildProgress", "AddRepairProgress", "UnitRefInit", "UnitRefSetUnit", "UnitRefSetValue", "UnitRefUnlink"),
     query=("FindUnitType", "FindUnitTypeId", "FindMissionUnit", "CanLoad", "CanReclaim", "CanRepair", "GetFactoriesInRadius", "UnitRefGet",
            "GetMovementLimits", "WriteState"),
-    engine_files=(SCHEDULER_FILE, UNITS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, UNITS_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(("RunGameSteps", "src/ingame/game_dialogs.cpp"), ("CreateMissionUnits", "src/units/unit_commands.cpp"),
                       ("DefaultCommandHandler", "src/game/console_commands.cpp"), ("LoadMatch", "src/game/game_load.cpp"),
                       ("SpawnCommanderAtStartPos", "src/game/main_loop.cpp"), ("IssueScriptedSpawn", "src/harness/harness.cpp")),
@@ -449,7 +452,7 @@ SCRIPTS = Pilot(
              "UpdateObjectState", "PoseUnitModel", "NewUnitScript", "SetCob", "CreatePlayerObjectState", "SetObjectState", "CreateObjectState",
              "DeleteScript", "FreeObjectState", "LoadScriptState", "SaveScriptState"),
     query=("FindScript", "GetPieceOffset", "GetPiecePosition", "GetPieceAngles", "ObjectStateSize", "WriteState"),
-    engine_files=(SCHEDULER_FILE, SCRIPTS_GLUE_FILE, REPLAY_HOOKS_FILE),
+    engine_files=(SCHEDULER_FILE, SCRIPTS_GLUE_FILE, REPLAY_HOOKS_FILE, *WASM_GLUE_FILES),
     engine_functions=(),
     walk_locals=(("GetPieceOffset", "RotateByAngles", "Vec3"), ("GetPiecePosition", "RotateByAngles", "Vec3"),
                  ("GetPiecePosition", "GetPieceOffset", "Vec3"), ("GetPieceAngles", "GetPieceAngles", "PieceAngleRecord"),
@@ -1044,6 +1047,11 @@ def query_problems(pilot: Pilot, functions: dict, owners: dict, slot: str, fille
     return found
 
 
+def timed_native(function: str, file: str) -> bool:
+    """Whether a function is a WASM glue's timed native slot, which forwards a call to the native slot it replaced."""
+    return file in WASM_GLUE_FILES and re.fullmatch(r"Glue[A-Z][A-Za-z0-9]*Timed[A-Z]\w*", function) is not None
+
+
 def pilot_seams(root: Path, pilot: Pilot = ECONOMY) -> list:
     """(kind, subsystem, function, what) of every problem the module docstring lists under --pilot-seams, for one pilot: kind slot, call, setup or query."""
     owners = {}
@@ -1084,7 +1092,8 @@ def pilot_seams(root: Path, pilot: Pilot = ECONOMY) -> list:
         for slot in used:
             if slot in writing and owner != pilot.owner and not engine and (slot.split("::")[1], owner) not in pilot.slot_callers:
                 found.add(("call", owner, r["function"], slot))
-            elif slot in setup and owner != pilot.owner and key not in pilot.setup_callers and r["file"] != REPLAY_HOOKS_FILE:
+            elif slot in setup and owner != pilot.owner and key not in pilot.setup_callers and r["file"] != REPLAY_HOOKS_FILE \
+                    and not timed_native(r["function"], r["file"]):
                 found.add(("setup", owner, r["function"], slot))
     functions = {}
     for r in rows:

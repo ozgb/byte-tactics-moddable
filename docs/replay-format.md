@@ -1408,7 +1408,10 @@ from the layout), and the export refuses a copy that names any other source name
   or the name in its last brackets (`OrderTableEntry.notify`). `replayschema.py --check` fails for an entry with no functions and no reason, a function that is
   none of the rows' functions, and a key that matches no `indirect_call` row of the slot.
 - `subsystems.<name>`: `status` (`complete` or `pending`, with the `issue` that completes it), the `imports` (slots of
-  other seams the subsystem calls) and per slot the `functions` behind it, the `native` symbol the replayer calls,
+  other seams the subsystem calls; a slot that a route calls when the subsystem publishes is not one) with
+  `unrecorded_imports`, a reason for each import that no recording of `tests/replay/<name>/` carries and no recorded
+  slot calls through the seam (`replayschema.py --check` fails on an import with neither, and on a recorded import
+  the list leaves out), and per slot the `functions` behind it, the `native` symbol the replayer calls,
   and how each pointer argument is recorded:
 
 | `mode` | Argument | Lines |
@@ -1802,7 +1805,7 @@ with one changed constant and expects that divergence.
 
 The self-test also replays a module's region (`a module's region`): a whole write that leaves out the zero chunks, a changed run, and a changed byte reported at `region` with its byte, and a region at its recorded offset (see A module's region and world view, "A region that holds block offsets"). It runs the forms of out buffers too (`a byte buffer a slot fills`, `a scratch buffer`, `a scalar the import writes`). A result larger than its buffer is as long as the buffer, and a call with no bytes has no `o` line whatever its result. It replays an event that holds the offset of a polymorphic object (`a event.target ApproachRadius#1`, resolved to an object of that kind with its vtable, and `null`), and a region placed where it would clash, where it is not 8-byte aligned, and where it would leave a free remainder under the smallest chunk, each reported as such.
 
-The recordings of pathfinding, which the modern build runs as native code in every mode (it has no WASM module yet), hold five windows of 600 KB to 2 MB, each with the region form's `RegionSize` and `Init` first (the region at its recorded offset, `a region 4341424`, of 959,664 bytes). Every tick's `Step` is mostly imports, a walk of the unit slots through `pathworld.NextUnit` (about 2,700 lines), so a window is a few ticks: `orders-move-attack` (ticks 179 to 195: `Submit` once, `Cancel` once, `Step` 17, `Poll` 19, `CellsChanged` once; the search of tick 181 is a STARTED event of 24 bytes and a FINISHED one of 28, both found directly, with 101 `pathworld.Pass` imports, `UnitState`, `SeenSize`, `BeginSearch` and `EndSearch`), `skirmish2` (ticks 1169 to 1172: `Cancel` 2, `CellsChanged` 15 at tick 1170, `Submit` once, `Step` 4, `Poll` 6, the events of tick 1171), `orders-tier2-core` (ticks 1029 to 1031: `Cancel` 2, `Submit` once, the events of tick 1030, 299 `pathworld.Pass`), `orders-air` (ticks 3599 to 3601: `Cancel` and `Submit` once, the events of tick 3600) and `orders-factory` (ticks 17 to 20: `Cancel` once and `CellsChanged` 15 at tick 19, each with the cause 2 and its movement class bits). A unit's `PathUnit`, a movement class and a requester's `PathHandle` are numbers in the recording (`i pathworld.UnitState 3316696 = 1`, `a requester 5406984`), and `o out (0,(32,13),63113,780,2,2)` is the `PathUnitState` the stub writes. The event payload of `Poll` is `o out x:...` as long as the result (`x:0200000090983200...` for a FINISHED), and its `points` are a scratch buffer. The injected change is the default step budget of a search, 0x500 in place of 0x535 (the step-budget injection of the test build, which the game takes when the match sets no limit): `Init` writes the budget into the region (its `stepsPerTick`), so the divergence is reported at call 1 of `skirmish2`, its `Init`, at `region`, byte 72:
+The recordings of pathfinding, which the modern build runs as native code in every mode (it has no WASM module yet), hold five windows of 600 KB to 2 MB, each with the region form's `RegionSize` and `Init` first (the region at its recorded offset, `a region 4341432`, of 959,664 bytes). Every tick's `Step` is mostly imports, a walk of the unit slots through `pathworld.NextUnit` (about 2,700 lines), so a window is a few ticks: `orders-move-attack` (ticks 179 to 195: `Submit` once, `Cancel` once, `Step` 17, `Poll` 19, `CellsChanged` once; the search of tick 181 is a STARTED event of 24 bytes and a FINISHED one of 28, both found directly, with 101 `pathworld.Pass` imports, `UnitState`, `SeenSize`, `BeginSearch` and `EndSearch`), `skirmish2` (ticks 1169 to 1172: `Cancel` 2, `CellsChanged` 15 at tick 1170, `Submit` once, `Step` 4, `Poll` 6, the events of tick 1171), `orders-tier2-core` (ticks 1029 to 1031: `Cancel` 2, `Submit` once, the events of tick 1030, 299 `pathworld.Pass`), `orders-air` (ticks 3599 to 3601: `Cancel` and `Submit` once, the events of tick 3600) and `orders-factory` (ticks 17 to 20: `Cancel` once and `CellsChanged` 15 at tick 19, each with the cause 2 and its movement class bits). A unit's `PathUnit`, a movement class and a requester's `PathHandle` are numbers in the recording (`i pathworld.UnitState 3316696 = 1`, `a requester 5406984`), and `o out (0,(32,13),63113,780,2,2)` is the `PathUnitState` the stub writes. The event payload of `Poll` is `o out x:...` as long as the result (`x:0200000090983200...` for a FINISHED), and its `points` are a scratch buffer. The injected change is the default step budget of a search, 0x500 in place of 0x535 (the step-budget injection of the test build, which the game takes when the match sets no limit): `Init` writes the budget into the region (its `stepsPerTick`), so the divergence is reported at call 1 of `skirmish2`, its `Init`, at `region`, byte 72:
 
 ```sh
 wine build/modern/replay_inject_test.exe --expect 1 region tests/replay/pathfinding/skirmish2.txt
@@ -2006,8 +2009,8 @@ wine build/modern/replay_inject_test.exe --expect 10 Order#3.created tests/repla
 
 ### Against the WASM module
 
-`--wasm MODULE.wasm` replays the same recordings against `wind_meteors.wasm` instead of the native module, with the
-same import formatting, comparisons and checks:
+`--wasm MODULE.wasm` replays the same recordings against a module of `wasm/modules.json` instead of the native one,
+with the same import formatting, comparisons and checks; `wind_meteors.wasm` is the module that builds today:
 
 ```sh
 cmake --build build/modern --target wasm_runtime wasm_runtime_inject
@@ -2020,9 +2023,12 @@ WASM, has to replay them equal, as `wind_meteors.wasm` replays its own.
 
 The WASM replay loads the module through the game's own module loader, as the game does: the
 `wasmtime_host.dll` and `modules.json` beside the module file are used, the sim block of the module's memory is attached
-as the replayer's block, and the slots are called through the seam the subsystem's glue builds. The glue calls are one
-entry per subsystem in a table of the replayer (wind_meteors only for now); the module file's name selects the
-entry, and the recording's subsystem must be the same one. Each replay of a file loads the module afresh, so the two
+as the replayer's block, and the slots are called through the seam the subsystem's glue builds. The glue is generated
+for every entry of the manifest (`tools/wasm_glue.py`, `docs/module-abi.md`, section 7.2); the module file's name selects
+the entry (`economy.wasm`, or `wind_meteors_inject.wasm` for wind_meteors), the file is loaded as that entry's module, and
+the recording's subsystem must be the same one. The engine slots of the entry (`engine`) are the native ones. A module's `Emit` is compared with the
+recording's `services.Emit` or `services.SchedPublish` line, whichever the subsystem's native default makes: an `Emit`
+line by the effect's fields and its size, a `SchedPublish` line by the outbox and the size, since it carries no payload. Each replay of a file loads the module afresh, so the two
 runs of a file start from the same state. A trap or a fuel overrun stops the run with `FAIL`.
 `wind_meteors_inject.wasm` is the module built with the gap-scale injection of 31.0 (`wasm_modules.py build-variant`),
 and the divergence is reported at the same call and field as for the native one.

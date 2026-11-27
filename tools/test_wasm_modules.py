@@ -4,6 +4,7 @@
 """
 
 import json
+import re
 import os
 import subprocess
 import sys
@@ -275,14 +276,26 @@ class Budgets(unittest.TestCase):
         self.assertEqual(wm.check_publishes(game), [])
         self.assertEqual(next(m for m in game["modules"] if m["name"] == "wind_meteors")["publishes"], {"80": 36})
 
-    def publishes_problems(self, publishes):
+    def publishes_problems(self, publishes, interface=None):
         game = wm.game_manifest()
         entry = dict(next(m for m in game["modules"] if m["name"] == "wind_meteors"), publishes=publishes)
+        if interface:
+            entry["interface"] = interface
         return wm.check_publishes(dict(game, modules=[entry]))
 
-    def test_publishes_refuses_a_kind_that_is_not_an_effect_kind(self):
-        self.assertTrue(any("not an effect kind" in p for p in self.publishes_problems({"64": 4})))
-        self.assertTrue(any("not an effect kind" in p for p in self.publishes_problems({"999": 36})))
+    def test_publishes_refuses_a_kind_no_route_takes_from_the_outbox(self):
+        self.assertTrue(any("no route takes from the wind_meteors outbox" in p for p in self.publishes_problems({"64": 4})))
+        self.assertTrue(any("no route takes from the wind_meteors outbox" in p for p in self.publishes_problems({"132": 36})))
+        self.assertTrue(any("no route takes" in p for p in self.publishes_problems({"999": 36})))
+
+    def test_publishes_accepts_a_routed_inbox_kind(self):
+        size = wm.routed_kinds("map")[132]
+        self.assertEqual(self.publishes_problems({"132": size}, interface="map"), [])
+        self.assertTrue(any("size 4" in p for p in self.publishes_problems({"132": 4}, interface="map")))
+
+    def test_routed_kinds_are_the_routes_of_an_outbox(self):
+        self.assertEqual(wm.routed_kinds("wind_meteors"), {80: 36})
+        self.assertEqual(wm.routed_kinds("no_such_outbox"), {})
 
     def test_publishes_refuses_a_wrong_size(self):
         self.assertTrue(any("size 32" in p for p in self.publishes_problems({"80": 32})))
@@ -296,14 +309,18 @@ class Budgets(unittest.TestCase):
         with self.assertRaises(ValueError):
             wm.effect_kinds("enum XEffectKind { X_A = OTHER + 1 };")
 
-    def test_publishes_reports_an_unreadable_enum_instead_of_crashing(self):
-        original = wm.header_text
-        wm.header_text = lambda name: "enum WindMeteorsEffectKind { WIND_METEORS_EFFECT_SPAWN = BASE };"
+    def test_publishes_reports_an_unreadable_route_table_instead_of_crashing(self):
+        import routes
+        original = routes.rows
+
+        def broken():
+            raise ValueError("route kind X is not an enumerator of any interface")
+        routes.rows = broken
         try:
             problems = self.publishes_problems({"80": 36})
         finally:
-            wm.header_text = original
-        self.assertTrue(any("cannot read the effect kinds" in p for p in problems))
+            routes.rows = original
+        self.assertTrue(any("cannot read the routes" in p for p in problems))
 
     def test_publishes_refuses_a_malformed_table(self):
         self.assertTrue(self.publishes_problems([80]))
@@ -530,7 +547,7 @@ class ModuleFileTests(unittest.TestCase):
 
     def test_a_module_relinked_inside_the_memory_but_outside_its_window_fails(self):
         problems = self.problems(self.moved)
-        self.assertTrue(any("outside its window 0x30000..0x40000" in p for p in problems), problems)
+        self.assertTrue(any("outside its window 0x30000..0x38000" in p for p in problems), problems)
 
     def test_an_import_off_the_allowlist_fails(self):
         problems = self.problems(self.extra)
@@ -671,6 +688,69 @@ class CheckModuleExit(unittest.TestCase):
         finally:
             wm.check_module_file = saved
         self.assertEqual(code, 2)
+
+
+class GlueManifestTests(unittest.TestCase):
+    """The manifest entry of every subsystem and the generic glue's tables (tools/wasm_glue.py)."""
+
+    @classmethod
+    def setUpClass(cls):
+        import wasm_glue
+        cls.glue = wasm_glue
+        cls.game = wm.game_manifest()
+        cls.schema = wasm_glue.Schema()
+        cls.seams = wasm_glue.seams(cls.schema)
+        cls.tables = open(wasm_glue.TABLES).read()
+
+    def test_every_subsystem_has_an_entry(self):
+        self.assertEqual([m["name"] for m in self.game["modules"]], self.glue.MODULES)
+
+    def test_the_windows_and_table_ranges_do_not_meet(self):
+        ranges = [(m["name"], m["data_base"], m["data_base"] + self.game["window"], m["table_base"], m["table_base"] + self.game["table_slots"])
+                  for m in self.game["modules"]] + wm.fixture_ranges()
+        self.assertEqual(wm.check_layout(self.game, [r[:3] for r in ranges]), [])
+        tables = sorted(r[3:] for r in ranges)
+        self.assertTrue(all(a[1] <= b[0] for a, b in zip(tables, tables[1:])), tables)
+        self.assertLessEqual(tables[-1][1], self.game["table_size"])
+
+    def test_exports_and_engine_slots_are_the_header_in_order(self):
+        for entry in self.game["modules"]:
+            header = [s.name for s in self.seams[entry["name"]]]
+            self.assertEqual(entry["exports"], [n for n in header if n not in entry.get("engine", {})], entry["name"])
+            self.assertTrue(set(entry.get("engine", {})) <= set(header), entry["name"])
+            self.assertEqual(list(entry["slots"]), entry["exports"], entry["name"])
+
+    def test_a_blocked_entry_names_its_reason_and_a_built_one_its_budgets(self):
+        for entry in self.game["modules"]:
+            if "blocked" in entry:
+                self.assertTrue(entry["blocked"].strip(), entry["name"])
+            else:
+                self.assertIn("fuel_budget", entry)
+                self.assertIn("size_budget", entry)
+        self.assertEqual([m["name"] for m in wm.built_modules(self.game)], ["wind_meteors"])
+
+    def test_the_region_modules_have_the_region_word(self):
+        with_region = sorted(m["name"] for m in self.game["modules"] if "g_region" in m["data"])
+        self.assertEqual(with_region, ["economy", "los_radar", "pathfinding", "players"])
+
+    def test_the_host_routes_take_a_routed_kind_and_not_an_unrouted_one(self):
+        self.assertIn("{SCHED_WIND_METEORS, 80},", self.tables)
+        self.assertNotIn("{SCHED_WIND_METEORS, 132},", self.tables)
+        self.assertIn("{SCHED_MAP, 132},", self.tables)
+
+    def test_only_the_modules_whose_recordings_emit_publish_through_emit_from(self):
+        emit_from = [m for m in self.glue.MODULES if f'{{"{m}", ' in self.tables
+                     and re.search(r'k\w+Def = \{"%s",[^;]*, 0\};' % m, self.tables)]
+        self.assertEqual(emit_from, ["wind_meteors", "targeting"])
+
+    def test_the_scheduled_imports_call_the_wrappers(self):
+        self.assertIn("ScheduleEconomyRequestGranted(unit, resources)", self.tables)
+        self.assertIn("ScheduleMapCanBuildAt(unit, *cell, type, player)", self.tables)
+
+    def test_the_tables_and_manifest_are_current(self):
+        manifest_text, tables_text = self.glue.build()
+        self.assertEqual(manifest_text, open(wm.GAME_MODULES).read())
+        self.assertEqual(tables_text, self.tables)
 
 
 if __name__ == "__main__":

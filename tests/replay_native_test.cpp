@@ -9262,7 +9262,7 @@ FILE* g_coreOut;
 
 void CoreError(const char* errorClass, const char* text)
 {
-    if (strcmp(errorClass, "import") == 0 || strcmp(errorClass, "glue") == 0) {
+    if (strcmp(errorClass, "import") == 0 || strcmp(errorClass, "glue") == 0 || strcmp(errorClass, "fatal") == 0) {
         if (strcmp(errorClass, "import") == 0)
             text = ReplayWasmRefusal(text);
         fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"wind_meteors\"], \"message\": \"", errorClass);

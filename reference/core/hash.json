@@ -33,5 +33,33 @@
   ],
   "results": [
    ["rows", [[102, "units", "45b489503deaeac2"], [102, "projectiles", "bbc98ef850c769e6"], [102, "explosions", "bbc98ef850c769e6"], [102, "players", "bbc98ef850c769e6"], [102, "features", "bbc98ef850c769e6"], [102, "wind", "bbc98ef850c769e6"], [102, "meteors", "bbc98ef850c769e6"], [102, "world", "def9f1a3a2ee37cd"], [102, "tick", "da74a15e7c89d78e"]]]
+  ]},
+ {"name": "blocks-reordered",
+  "calls": [
+   ["rows", "hash/blocks-reordered.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", [[300, "units", "2df926ba47806a11"], [300, "units", "2df926ba47806a11"], [300, "players", "86f91a9b24267c87"], [300, "meteors", "bbfa9abdf003b7cb"], [300, "world", "c4a4e9772ebb1eb4"], [700, "units", "c9ec78de15dfecbc"], [700, "meteors", "c9ec78de15dfecbc"], [700, "world", "08bce16b6392cda7"], [700, "tick", "25d5832c1c6f47d2"]]]
+  ]},
+ {"name": "order-effect-class-6",
+  "calls": [
+   ["rows", "hash/order-effect-class-6.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", {"error": "dump"}]
+  ]},
+ {"name": "condition-class-0",
+  "calls": [
+   ["rows", "hash/condition-class-0.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", {"error": "dump"}]
+  ]},
+ {"name": "pathfinder-no-section-17",
+  "calls": [
+   ["rows", "hash/pathfinder-no-section-17.txt", "trace_schema.json"]
+  ],
+  "results": [
+   ["rows", [[300, "meteors", "bbfa9abdf003b7cb"], [300, "world", "c4a4e9772ebb1eb4"], [300, "tick", "3f2dc99327a22092"]]]
   ]}
 ]}

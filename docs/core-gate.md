@@ -32,7 +32,7 @@ is written as one (`1`, not `1.0` or `true`), and `null` is not `0`. Every numbe
 negative where a signed value is meant.
 
 **An error that ends the run.** Where the engine ends the game (a full sim event queue in a test-mode run, a loader
-refusal, a trap, running out of fuel), the core writes the call's line with the value the group states for it, answers
+refusal, a trap, running out of fuel, `FatalError`) or a dump fails (`docs/trace-format.md`, section 11), the core writes the call's line with the value the group states for it, answers
 no further call, and exits with status 0. The gate then compares the lines it wrote with the stored ones, so an error at
 the wrong call, or a missing one, is `differs`.
 
@@ -61,13 +61,20 @@ the same relative paths, unpacking each `.xz` file under its name without `.xz`.
 
 | Call | Arguments | Value |
 | --- | --- | --- |
-| `rows` | dump, schema | the rows the dump gives, by tick and then in the row order of `docs/trace-format.md`, section 2, whatever the order of the dump's blocks: a list of `[tick, phase, hash]`, `tick` an integer, `phase` a row name of `docs/trace-format.md`, section 2 (`units` to `meteors`, `world` and `tick`), and `hash` its 16 lowercase hex digits |
+| `rows` | dump, schema | the rows the dump gives, by tick and then in the row order of `docs/trace-format.md`, section 2, whatever the order of the dump's blocks: a list of `[tick, phase, hash]`, `tick` an integer, `phase` a row name of `docs/trace-format.md`, section 2 (`units` to `meteors`, `world` and `tick`), and `hash` its 16 lowercase hex digits; `{"error": "dump"}` when the dump fails |
 
 The dump is a `dump.txt` of a test-mode run (`docs/trace-format.md`, section 10), and the schema is the kit's
-`data/trace_schema.json`, which the gate copies to `trace_schema.json`. A dump gives a phase row for each phase block,
-the `world` row after the `meteors` row, and the `tick` row of its `tick` block. The rows of a vector are the ones the
-in-repo engine wrote to `trace.txt` in the run that wrote the dump. The vectors are named `<scenario>-<tick>`, and
-between them they reach:
+`data/trace_schema.json`, which the gate copies to `trace_schema.json`. A block is a run of consecutive lines of one
+tick and one phase. A dump gives a phase row for each phase block, the `world` row after the `meteors` row, and the
+`tick` row of its `tick` block, and a block that appears twice in the file gives its rows twice. Blocks of the same tick
+and phase come in the order of the file. A dump fails, and the call's value is `{"error": "dump"}`, when any of its
+blocks holds an order effect of a class above 5 (an `orderFx[id].class` line, section 8.11) or a mission condition of
+class 0 (a `playersState.conditions.victory[k].class` or `defeat[k].class` line, section 8.17), although neither line is
+hash input; each is a run the reference fails (section 11). The `pathfinder.*` lines of sections 16 and 17 are hash input
+of no row (section 8.7), so a section 17 with no lines, as a pathfinder that is not the default writes it, changes no row.
+
+The vectors named `<scenario>-<tick>` are dumps of the in-repo engine, and their rows are the ones it wrote to
+`trace.txt` in the run that wrote the dump. Between them they reach:
 
 | Vector | What it reaches |
 | --- | --- |
@@ -76,6 +83,16 @@ between them they reach:
 | `orders-air-fights-700` | non-null `list2` pointers, the overflow record, `link:` pointers, and path-order effects |
 | `orders-guard-attacked-300` | live projectiles, a live feature, the overflow record, `link:` pointers and path-order effects |
 | `meteors-earthquake-102` | many live features (the earthquake's) and a projectile |
+
+The others are made from the blocks of two of those dumps, and their rows are the in-repo engine's rows of the same
+blocks. Each has one fault:
+
+| Vector | What it holds | Value |
+| --- | --- | --- |
+| `blocks-reordered` | blocks of two ticks out of tick and of row order: tick 700's `tick` and `units` blocks (of `orders-air-fights-700`), tick 300's `meteors` and `units` (of `orders-guard-attacked-300`), tick 700's `meteors`, tick 300's `players`, then tick 300's `units` block again | tick 300's rows (its `units` row twice) and then tick 700's, in row order |
+| `order-effect-class-6` | the `wind` block of `orders-guard-attacked-300` alone, with the class of `orderFx[0]` changed from 1 to 6 | `{"error": "dump"}` |
+| `condition-class-0` | the `explosions` block of `orders-guard-attacked-300` alone, with the class of `playersState.conditions.defeat[0]` changed from 6 to 0 | `{"error": "dump"}` |
+| `pathfinder-no-section-17` | the `meteors` and `tick` blocks of `orders-guard-attacked-300` without the lines of section 17 (`pathfinder.playerTickLoad`, `pathfinder.playerBudgetCap`, `pathfinder.budgetRefreshCounter`) | the rows of those blocks in the stored dump |
 
 No vector reaches a `link:` value of 2^31 or more (a link into a path order, `docs/trace-format.md`): no dump of the
 scenarios that was searched holds one (Known limits). No vector's dump holds a string that contains a newline byte
@@ -199,7 +216,15 @@ fixture modules import nothing else, except the ones that refuse to instantiate.
 **NaN.** `nan_canonical` returns and stores computed NaNs (section 3.2): f32 0/0, -1/0 (an infinity, -8388608), a NaN
 with a payload plus 1 (of either sign), the square root of -1, and an f64 0/0 and -5/0 (an infinity) stored to memory
 and read back as two words. Every NaN is the canonical one, 2143289344 (0x7fc00000), and 0 then 2146959360 (0x7ff80000)
-for the f64.
+for the f64. `nan_bitwise` gives NaNs with a payload to `neg`, `abs` and `copysign`, which are not arithmetic (section
+3.2): f32 0x7fa00001 and 0xffc00123, and f64 0x7ff4000000000001 and 0xfff4000000000001, built from two words and stored
+back. Each result keeps the payload and changes only the sign bit: `neg` of 0x7fa00001 is -6291455 (0xffa00001), `abs` of
+0xffc00123 and `copysign` of it with 1.0 are 2143289635 (0x7fc00123), and the f64 results read back as 1 then -786432
+(0xfff40000) or 2146697216 (0x7ff40000).
+
+**Fuel set.** `fuel_set_trap` loads a module whose entry has a `fuel_budget` and whose `__fuel_set` traps at
+`unreachable`. Its first `call` sets its fuel (section 11.2) and ends with that trap, `{"error": "unreachable",
+"modules": ["a"]}`: the slot does not run.
 
 **Adapters** (section 10.2). A module built against major 1 of an interface whose manifest major is 2 loads only
 through an adapter of its entry, and each refusal is a `manifest` error at `load`, with `modules` empty:
@@ -274,7 +299,9 @@ of a recording fails). A trap or running out of fuel ends the run with an error 
 of section 13 end it with an error that also carries the text: an import's refusal, `{"error": "import", "modules":
 ["wind_meteors"], "message": TEXT}`, where TEXT is section 13's text from `import ` to the end of its line, and a full
 handle table (section 8.1), `{"error": "glue", "modules": ["wind_meteors"], "message": "wind_meteors: the handle
-table is full"}`.
+table is full"}`. `FatalError` (section 13) ends it with the message itself, not a trap text: `{"error": "fatal",
+"modules": ["wind_meteors"], "message": TEXT}`, where TEXT is the module's message up to its NUL or its first line
+break.
 
 **The refusal vectors.** Each replays a short recording of `reference/core/host/` against a fixture module beside it,
 `wind_meteors_<vector>.wasm`, made from its `.wat` with the fuel pass. A fixture is shaped as a wind_meteors module of
@@ -293,6 +320,7 @@ data words at 0x30000 to 0x3000c and the eight slots, and does in one slot what 
 | `handles_32` | `LoadMeteorDefaults` gets a root record and 31 `TdfFile_SelectRecord` results, 32 distinct records in one call, and writes the last handle to `params.radius` | `o params.radius 32`: 32 handles fit, numbered from 1 |
 | `handles_full` | as `handles_32`, with a 33rd record | `wind_meteors: the handle table is full` (class `glue`) |
 | `import_string_cut` | `LoadMeteorDefaults` reads the field `Meteor` with `size` 3 into `params.weapon` | `o params.weapon "Me"`: the copy is cut to `size` - 1 bytes and a 0 (`docs/replay-format.md`, a text out with a `size`) |
+| `fatal_error` | `UpdateMeteors` calls `FatalError` with the message `meteor stop` | `{"error": "fatal", "modules": ["wind_meteors"], "message": "meteor stop"}` |
 | `emit_size`, `emit_past`, `emit_kind`, `emit_payload_size`, `emit_weapon` | `Emit` of a SPAWN of 3 bytes, of one that runs past the memory, of kind 81, of 40 bytes, and of weapon 256 | section 13's five `Emit` texts; a size of 3 is refused as outside an effect before its kind is read (section 9.3 gives the order of the checks) |
 
 The gate never gives the core the in-repo engine's wind_meteors module. The module is the one that comes with the
@@ -530,5 +558,23 @@ Lifting the freeze removes the header rows.
   RAM for it (a reserved, untouched memory is enough), since a grader may have less.
 - **Numbers above 2147483647** in a manifest are refused as invalid JSON (section 4.1), so no vector holds a larger
   `fuel_budget` or `size_budget`.
+- **What the build checks** (`docs/module-abi.md`, section 5.2, "What the loader does not check") is judged by no
+  group: a `.wasm` larger than its `size_budget` (section 11.3), imports other than the entry's `imports` that the host
+  defines anyway, exports beyond the entry's `exports`, `data`, `__fuel_set` and `__fuel_get` (section 9.1), and a fuel
+  counter global exported (section 11.1) are refused by the build and by `wasm_modules.py check-module`, which the module
+  gate runs, and not by the loader. What section 5.2 gives the loader is judged: an import the host does not define or
+  defines with another type (`instantiate_bad_import`, `instantiate_bad_type`), and a name of `exports` or `data` the
+  module does not export as it must (`export_func`, `export_global`, `export_data_func`, `export_data`).
+- **The fuel surface** (`docs/module-abi.md`, sections 5.2 and 11.1): a module whose entry has a `fuel_budget` and that
+  lacks `__fuel_set` or `__fuel_get`, or exports either with another type than `(param i64)` and `(result i64)`, is
+  refused by the build's surface check, not by the loader, so no vector loads one and a core may answer it as it likes.
+  A `__fuel_set` with the surface intact that traps is judged (`fuel_set_trap`).
+- **Large legal manifests** (`docs/module-abi.md`, section 4.1): a `window` near 2^31 or a `table_size` of 2147483647 is
+  accepted by `manifest`, but its memory or table may be more than a grader can reserve, so no vector calls `memory` on
+  one. A core may refuse, with `memory`, a `window` or `table_size` whose memory or table it can't reserve, and the gate
+  doesn't judge it.
+- **Console commands outside the group:** `edge`, `nowisee` and `reloadaiprofiles` need only the line and the match
+  (`docs/commands.md`, section 4.2), but the `console` group holds the twelve commands of its first-word list and no
+  others, so the scenario mode judges them, not the core gate.
 - **Runtime results at large sizes:** a `sprintf` width or precision above 4096 and a `shuffle` of more than 2^24
   elements are in no record (`tests/runtime/vectors/README.md`, "Left out"), and a core may refuse them.

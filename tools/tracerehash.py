@@ -103,6 +103,41 @@ def parse_dump(text: str, trace_format: int) -> dict[tuple[int, str], list[tuple
     return blocks
 
 
+def parse_blocks(text: str, trace_format: int) -> list[tuple[tuple[int, str], list[tuple[str, str]]]]:
+    """The blocks of a dump in file order: each a run of consecutive lines of one (tick, phase), so a block repeated
+    later in the file is a block of its own."""
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    if not lines or lines[0] != f"bt-dump {trace_format}":
+        raise Error(f"not a bt-dump {trace_format} file")
+    blocks: list[tuple[tuple[int, str], list[tuple[str, str]]]] = []
+    for n, line in enumerate(lines[1:], 2):
+        parts = line.split(" ", 3)
+        if len(parts) < 3 or not parts[0].isdigit() or parts[1] not in PHASES:
+            raise Error(f"dump line {n}: cannot parse")
+        key = (int(parts[0]), parts[1])
+        if not blocks or blocks[-1][0] != key:
+            blocks.append((key, []))
+        blocks[-1][1].append((parts[2], parts[3] if len(parts) == 4 else ""))
+    return blocks
+
+
+FX_CLASS = re.compile(r"orderFx\[\d+\]\.class")
+CONDITION_CLASS = re.compile(r"playersState\.conditions\.(victory|defeat)\[\d+\]\.class")
+
+
+def check_failures(blocks) -> None:
+    """Refuse a dump that holds, in any block, an order effect of a class above 5 or a mission condition of class 0
+    (docs/trace-format.md, section 11): the reference fails the run on each, so neither has a hash."""
+    for (tick, phase), lines in blocks:
+        for path, value in lines:
+            if FX_CLASS.fullmatch(path) and int(value, 16) > 5:
+                raise Error(f"{tick} {phase} {path}: an order effect of class {int(value, 16)} fails the run")
+            if CONDITION_CLASS.fullmatch(path) and int(value, 16) == 0:
+                raise Error(f"{tick} {phase} {path}: a mission condition of class 0 fails the run")
+
+
 def parse_trace_rows(text: str) -> dict[tuple[int, str], str]:
     rows: dict[tuple[int, str], str] = {}
     for line in text.splitlines():
@@ -414,7 +449,9 @@ class Walker:
             self.pathfinder_cells()
         h.end()
         h.h8(17)
-        self.flat_list(self.schema.data["globals"]["pathfinder"], "pathfinder.")
+        globals_ = self.schema.data["globals"]["pathfinder"]
+        if globals_ and self.peek() == "pathfinder." + field_name(globals_[0]):
+            self.flat_list(globals_, "pathfinder.")
         h.end()
 
     def pathfinder_nodes(self) -> None:
@@ -659,22 +696,22 @@ class Walker:
         h.end()
 
 
-def rehash(schema: Schema, blocks: dict[tuple[int, str], list[tuple[str, str]]]) -> list[tuple[int, str, int]]:
+def rehash(schema: Schema, blocks) -> list[tuple[int, str, int]]:
     """The (tick, phase, hash) rows a dump gives, by tick and then in the row order of docs/trace-format.md, section 2,
-    whatever the order of its blocks."""
+    whatever the order of its blocks: `blocks` is parse_dump's dict or parse_blocks' list, and each block of the list
+    gives its rows, a block that appears twice among them."""
+    items = list(blocks.items()) if isinstance(blocks, dict) else list(blocks)
+    check_failures(items)
     rows = []
-    for tick in sorted({t for t, _ in blocks}):
-        for phase in PHASES:
-            if (tick, phase) not in blocks:
-                continue
-            walker = Walker(schema, blocks[(tick, phase)])
-            if phase != "tick":
-                rows.append((tick, phase, walker.phase_row(tick)))
-            if phase == "meteors":
-                rows.append((tick, "world", walker.world_row(tick)))
-            if phase == "tick":
-                walker.phase_row(tick)
-                rows.append((tick, "tick", walker.world_row(tick, reset=False)))
+    for (tick, phase), lines in sorted(items, key=lambda item: (item[0][0], PHASES.index(item[0][1]))):
+        walker = Walker(schema, lines)
+        if phase != "tick":
+            rows.append((tick, phase, walker.phase_row(tick)))
+        if phase == "meteors":
+            rows.append((tick, "world", walker.world_row(tick)))
+        if phase == "tick":
+            walker.phase_row(tick)
+            rows.append((tick, "tick", walker.world_row(tick, reset=False)))
     return rows
 
 

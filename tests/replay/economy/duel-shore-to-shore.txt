@@ -59,8 +59,8 @@ call 600 UpdatePlayerEconomy
   r Player#2.energyStorageBonus f32:0x00000000
   r Player#2.metalStorageBonus f32:0x00000000
   r Player#2.econ null
-  r Player#2.energy f32:0x447a0000
-  r Player#2.metal f32:0x447a0000
+  r Player#2.energy f32:0x00000000
+  r Player#2.metal f32:0x00000000
   r Player#3.energyIncome f32:0x00000000
   r Player#3.energyUsage f32:0x00000000
   r Player#3.energyCapacity f32:0x00000000
@@ -76,8 +76,8 @@ call 600 UpdatePlayerEconomy
   r Player#3.energyStorageBonus f32:0x00000000
   r Player#3.metalStorageBonus f32:0x00000000
   r Player#3.econ null
-  r Player#3.energy f32:0x447a0000
-  r Player#3.metal f32:0x447a0000
+  r Player#3.energy f32:0x00000000
+  r Player#3.metal f32:0x00000000
   r Player#4.energyIncome f32:0x00000000
   r Player#4.energyUsage f32:0x00000000
   r Player#4.energyCapacity f32:0x00000000
@@ -93,8 +93,8 @@ call 600 UpdatePlayerEconomy
   r Player#4.energyStorageBonus f32:0x00000000
   r Player#4.metalStorageBonus f32:0x00000000
   r Player#4.econ null
-  r Player#4.energy f32:0x447a0000
-  r Player#4.metal f32:0x447a0000
+  r Player#4.energy f32:0x00000000
+  r Player#4.metal f32:0x00000000
   r Player#5.energyIncome f32:0x00000000
   r Player#5.energyUsage f32:0x00000000
   r Player#5.energyCapacity f32:0x00000000
@@ -110,8 +110,8 @@ call 600 UpdatePlayerEconomy
   r Player#5.energyStorageBonus f32:0x00000000
   r Player#5.metalStorageBonus f32:0x00000000
   r Player#5.econ null
-  r Player#5.energy f32:0x447a0000
-  r Player#5.metal f32:0x447a0000
+  r Player#5.energy f32:0x00000000
+  r Player#5.metal f32:0x00000000
   r Player#6.energyIncome f32:0x00000000
   r Player#6.energyUsage f32:0x00000000
   r Player#6.energyCapacity f32:0x00000000
@@ -127,8 +127,8 @@ call 600 UpdatePlayerEconomy
   r Player#6.energyStorageBonus f32:0x00000000
   r Player#6.metalStorageBonus f32:0x00000000
   r Player#6.econ null
-  r Player#6.energy f32:0x447a0000
-  r Player#6.metal f32:0x447a0000
+  r Player#6.energy f32:0x00000000
+  r Player#6.metal f32:0x00000000
   r Player#7.energyIncome f32:0x00000000
   r Player#7.energyUsage f32:0x00000000
   r Player#7.energyCapacity f32:0x00000000
@@ -144,8 +144,8 @@ call 600 UpdatePlayerEconomy
   r Player#7.energyStorageBonus f32:0x00000000
   r Player#7.metalStorageBonus f32:0x00000000
   r Player#7.econ null
-  r Player#7.energy f32:0x447a0000
-  r Player#7.metal f32:0x447a0000
+  r Player#7.energy f32:0x00000000
+  r Player#7.metal f32:0x00000000
   r Player#8.energyIncome f32:0x00000000
   r Player#8.energyUsage f32:0x00000000
   r Player#8.energyCapacity f32:0x00000000
@@ -161,8 +161,8 @@ call 600 UpdatePlayerEconomy
   r Player#8.energyStorageBonus f32:0x00000000
   r Player#8.metalStorageBonus f32:0x00000000
   r Player#8.econ null
-  r Player#8.energy f32:0x447a0000
-  r Player#8.metal f32:0x447a0000
+  r Player#8.energy f32:0x00000000
+  r Player#8.metal f32:0x00000000
   r Player#9.energyIncome f32:0x00000000
   r Player#9.energyUsage f32:0x00000000
   r Player#9.energyCapacity f32:0x00000000
@@ -178,8 +178,8 @@ call 600 UpdatePlayerEconomy
   r Player#9.energyStorageBonus f32:0x00000000
   r Player#9.metalStorageBonus f32:0x00000000
   r Player#9.econ null
-  r Player#9.energy f32:0x447a0000
-  r Player#9.metal f32:0x447a0000
+  r Player#9.energy f32:0x00000000
+  r Player#9.metal f32:0x00000000
   r UnitResources#1.energyMake f32:0x00000000
   r UnitResources#1.energyUse f32:0x00000000
   r UnitResources#1.energyUsePaid f32:0x00000000
@@ -3252,6 +3252,906 @@ call 600 UpdatePlayerEconomy
   w Player#1.totalEnergyConsumed f64:0x4081300022000000
   w Player#1.energy f32:0x458fac00
   w Player#1.metal f32:0x459afc4e
+call 600 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 600 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 601 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 601 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 602 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 602 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 603 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 603 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 604 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 604 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 605 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 605 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 606 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 606 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 607 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 607 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 608 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 608 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 609 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 609 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 610 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 610 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 611 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 611 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 612 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 612 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 613 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 613 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 614 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 614 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 615 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 615 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 616 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 616 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 617 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 617 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 618 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 618 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 619 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 619 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 620 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 620 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 621 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 621 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 622 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 622 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 623 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 623 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 624 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 624 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 625 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 625 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 626 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 626 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 627 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 627 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 628 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 628 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 629 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 629 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
 call 630 UpdatePlayerEconomy
   a player 0
   i econworld.PlayerInfo 0 = (1,2,0,0,0,0,0,1,1)
@@ -6298,6 +7198,906 @@ call 630 UpdatePlayerEconomy
   w Player#1.totalEnergyConsumed f64:0x4081500022000000
   w Player#1.energy f32:0x458ff000
   w Player#1.metal f32:0x459b085e
+call 630 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 630 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 631 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 631 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 632 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 632 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 633 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 633 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 634 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 634 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 635 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 635 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 636 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 636 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 637 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 637 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 638 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 638 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 639 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 639 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 640 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 640 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 641 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 641 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 642 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 642 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 643 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 643 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 644 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 644 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 645 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 645 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 646 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 646 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 647 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 647 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 648 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 648 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 649 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 649 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 650 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 650 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 651 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 651 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 652 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 652 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 653 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 653 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 654 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 654 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 655 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 655 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 656 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 656 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 657 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 657 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 658 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 658 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
+call 659 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 659 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000
 call 660 UpdatePlayerEconomy
   a player 0
   i econworld.PlayerInfo 0 = (1,2,0,0,0,0,0,1,1)
@@ -9344,3 +11144,33 @@ call 660 UpdatePlayerEconomy
   w Player#1.totalEnergyConsumed f64:0x4081700022000000
   w Player#1.energy f32:0x45903400
   w Player#1.metal f32:0x459b146e
+call 660 UnitAccount
+  a unit Unit#1
+  i econworld.UnitSlot Unit#1 = 1
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x41480000
+  o out.energyUseprev f32:0x00000000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f000000
+  o out.metalUseprev f32:0x00000000
+call 660 UnitAccount
+  a unit Unit#2
+  i econworld.UnitSlot Unit#2 = 2
+  o out.energyMake f32:0x00000000
+  o out.energyUse f32:0x00000000
+  o out.energyUsepaid f32:0x00000000
+  o out.energyStall f32:0x00000000
+  o out.energyMakeprev f32:0x00000000
+  o out.energyUseprev f32:0x40400000
+  o out.metalMake f32:0x00000000
+  o out.metalUse f32:0x00000000
+  o out.metalUsepaid f32:0x00000000
+  o out.metalStall f32:0x00000000
+  o out.metalMakeprev f32:0x3f810625
+  o out.metalUseprev f32:0x00000000

@@ -355,39 +355,52 @@ static int check_strings(wl_loader* loader, const wl_json* entry, const char* ke
     return 1;
 }
 
+static int read_fuel_budget(wl_loader* loader, const wl_json* entry, const char* owner)
+{
+    unsigned budget = 1;
+    if (!read_unsigned(loader, entry, "fuel_budget", owner, 0, &budget)) {
+        return 0;
+    }
+    if (budget == 0) {
+        set_error(loader, "%s: fuel_budget must be from 1 to 2147483647", owner);
+        return 0;
+    }
+    return 1;
+}
+
 static int check_layout(wl_loader* loader)
 {
     wl_layout* l = &loader->layout;
     const wl_json* list = wl_json_get(loader->manifest, "modules");
     const wl_json* a;
     const wl_json* b;
-    unsigned long memory_bytes = (unsigned long)l->pages * 65536ul;
+    unsigned long long memory_bytes = (unsigned long long)l->pages * 65536ull;
     for (a = list->first; a; a = a->next) {
         const char* an = wl_json_get(a, "name")->text;
-        unsigned long a_low = (unsigned long)wl_json_get(a, "data_base")->number;
-        unsigned long a_high = a_low + l->window;
+        unsigned long long a_low = (unsigned long long)wl_json_get(a, "data_base")->number;
+        unsigned long long a_high = a_low + l->window;
         unsigned a_table = (unsigned)wl_json_get(a, "table_base")->number;
         if (a_high > memory_bytes || a_table + l->table_slots > l->table_size) {
-            set_error(loader, "module %s: window [%#lx, %#lx) or table [%u, %u) does not fit the memory or table",
-                      an, a_low, a_high, a_table, a_table + l->table_slots);
+            set_error(loader, "module %s: window [%#x, %#x) or table [%u, %u) does not fit the memory or table",
+                      an, (unsigned)a_low, (unsigned)a_high, a_table, a_table + l->table_slots);
             return 0;
         }
         if (l->has_block && a_high > l->block_base) {
-            set_error(loader, "module %s: window [%#lx, %#lx) reaches the block at %#x", an, a_low, a_high, l->block_base);
+            set_error(loader, "module %s: window [%#x, %#x) reaches the block at %#x", an, (unsigned)a_low, (unsigned)a_high, l->block_base);
             return 0;
         }
         if (l->scratch_size && a_high > l->scratch_base) {
-            set_error(loader, "module %s: window [%#lx, %#lx) reaches the scratch area at %#x", an, a_low, a_high, l->scratch_base);
+            set_error(loader, "module %s: window [%#x, %#x) reaches the scratch area at %#x", an, (unsigned)a_low, (unsigned)a_high, l->scratch_base);
             return 0;
         }
         for (b = a->next; b; b = b->next) {
             const char* bn = wl_json_get(b, "name")->text;
-            unsigned long b_low = (unsigned long)wl_json_get(b, "data_base")->number;
-            unsigned long b_high = b_low + l->window;
+            unsigned long long b_low = (unsigned long long)wl_json_get(b, "data_base")->number;
+            unsigned long long b_high = b_low + l->window;
             unsigned b_table = (unsigned)wl_json_get(b, "table_base")->number;
             if (a_low < b_high && b_low < a_high) {
-                set_error(loader, "modules %s and %s overlap in memory: [%#lx, %#lx) and [%#lx, %#lx)",
-                          an, bn, a_low, a_high, b_low, b_high);
+                set_error(loader, "modules %s and %s overlap in memory: [%#x, %#x) and [%#x, %#x)",
+                          an, bn, (unsigned)a_low, (unsigned)a_high, (unsigned)b_low, (unsigned)b_high);
                 return 0;
             }
             if (a_table < b_table + l->table_slots && b_table < a_table + l->table_slots) {
@@ -442,7 +455,7 @@ int wl_load_manifest_text(wl_loader* loader, const char* text, size_t size, cons
             set_error(loader, "%s: block_max is below block_size", name);
             goto bad;
         }
-        if ((unsigned long)layout.block_base + layout.block_max > (unsigned long)layout.pages * 65536ul) {
+        if ((unsigned long long)layout.block_base + layout.block_max > (unsigned long long)layout.pages * 65536ull) {
             set_error(loader, "%s: the block [%#x, %#x) does not fit the memory", name, layout.block_base, layout.block_base + layout.block_max);
             goto bad;
         }
@@ -456,8 +469,8 @@ int wl_load_manifest_text(wl_loader* loader, const char* text, size_t size, cons
         }
         layout.scratch_base = (unsigned)scratch->first->number;
         layout.scratch_size = (unsigned)scratch->first->next->number;
-        if ((unsigned long)layout.scratch_base + layout.scratch_size > (unsigned long)layout.pages * 65536ul
-            || (layout.has_block && layout.scratch_base + layout.scratch_size > layout.block_base)) {
+        if ((unsigned long long)layout.scratch_base + layout.scratch_size > (unsigned long long)layout.pages * 65536ull
+            || (layout.has_block && (unsigned long long)layout.scratch_base + layout.scratch_size > layout.block_base)) {
             set_error(loader, "%s: scratch [%#x, %#x) does not fit below the block", name, layout.scratch_base, layout.scratch_base + layout.scratch_size);
             goto bad;
         }
@@ -478,6 +491,8 @@ int wl_load_manifest_text(wl_loader* loader, const char* text, size_t size, cons
         wl_format(owner, sizeof owner, "%s: module %s", name, entry_name->text);
         if (!read_unsigned(loader, entry, "data_base", owner, 1, &unused)
             || !read_unsigned(loader, entry, "table_base", owner, 1, &unused)
+            || !read_fuel_budget(loader, entry, owner)
+            || !read_unsigned(loader, entry, "size_budget", owner, 0, &unused)
             || !check_strings(loader, entry, "exports", entry_name->text)
             || !check_strings(loader, entry, "data", entry_name->text)) {
             goto bad;
@@ -1378,6 +1393,15 @@ static const wl_adapter* slot_adapter(const wl_module* module, const wasmtime_fu
         }
     }
     return NULL;
+}
+
+int wl_slot_result(const wl_module* module, const wasmtime_func_t* func)
+{
+    const wl_adapter* adapter = slot_adapter(module, func);
+    if (!adapter) {
+        return -1;
+    }
+    return adapter->result == WL_RESULT_VOID ? 0 : 1;
 }
 
 int wl_call(wl_loader* loader, const wl_module* module, const wasmtime_func_t* func, wasmtime_val_raw_t* args_and_results, size_t count)

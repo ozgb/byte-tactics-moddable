@@ -1,0 +1,70 @@
+{
+ "memory_pages": 4,
+ "table_size": 16,
+ "window": 4096,
+ "table_slots": 4,
+ "stack_size": 1024,
+ "block_base": 196608,
+ "block_size": 65536,
+ "scratch": [
+  131072,
+  65536
+ ],
+ "modules": [
+  {
+   "name": "a",
+   "data_base": 4096,
+   "table_base": 0,
+   "exports": [
+    "m"
+   ],
+   "data": [
+    "g_word"
+   ],
+   "majors": {
+    "fixture": 1
+   },
+   "imports": {
+    "fixture": {
+     "mix": [
+      [
+       "int",
+       "int"
+      ],
+      "int"
+     ]
+    }
+   }
+  }
+ ],
+ "majors": {
+  "fixture": 2
+ },
+ "signatures": {
+  "fixture": {
+   "mix": [
+    [
+     "int",
+     "int",
+     "int"
+    ],
+    "int"
+   ]
+  }
+ },
+ "adapters": [
+  {
+   "interface": "fixture",
+   "from_major": 1,
+   "name": "mix",
+   "args": [
+    1,
+    {
+     "const": 5
+    },
+    0
+   ],
+   "result": "pass"
+  }
+ ]
+}

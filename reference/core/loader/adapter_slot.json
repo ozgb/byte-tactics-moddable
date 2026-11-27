@@ -1,0 +1,183 @@
+{
+ "memory_pages": 4,
+ "table_size": 16,
+ "window": 4096,
+ "table_slots": 4,
+ "stack_size": 1024,
+ "block_base": 196608,
+ "block_size": 65536,
+ "scratch": [
+  131072,
+  65536
+ ],
+ "modules": [
+  {
+   "name": "a",
+   "data_base": 4096,
+   "table_base": 0,
+   "exports": [
+    "f",
+    "g",
+    "h",
+    "f16"
+   ],
+   "data": [
+    "g_word"
+   ],
+   "interface": "t",
+   "majors": {
+    "t": 1
+   },
+   "slots": {
+    "f": [
+     [
+      "int",
+      "int",
+      "int"
+     ],
+     "int"
+    ],
+    "g": [
+     [
+      "int"
+     ],
+     "int"
+    ],
+    "h": [
+     [
+      "int"
+     ],
+     "int"
+    ],
+    "f16": [
+     [
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int",
+      "int"
+     ],
+     "int"
+    ]
+   }
+  }
+ ],
+ "majors": {
+  "t": 2
+ },
+ "signatures": {
+  "t": {
+   "f": [
+    [
+     "int",
+     "int"
+    ],
+    "int"
+   ],
+   "g": [
+    [],
+    "int"
+   ],
+   "h": [
+    [
+     "int"
+    ],
+    "void"
+   ],
+   "f16": [
+    [
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int",
+     "int"
+    ],
+    "int"
+   ]
+  }
+ },
+ "adapters": [
+  {
+   "interface": "t",
+   "from_major": 1,
+   "name": "f",
+   "args": [
+    1,
+    0,
+    {
+     "const": 7
+    }
+   ],
+   "result": "pass"
+  },
+  {
+   "interface": "t",
+   "from_major": 1,
+   "name": "g",
+   "args": [
+    {
+     "const": 4
+    }
+   ],
+   "result": {
+    "const": 9
+   }
+  },
+  {
+   "interface": "t",
+   "from_major": 1,
+   "name": "h",
+   "args": [
+    0
+   ],
+   "result": "void"
+  },
+  {
+   "interface": "t",
+   "from_major": 1,
+   "name": "f16",
+   "args": [
+    14,
+    13,
+    12,
+    11,
+    10,
+    9,
+    8,
+    7,
+    6,
+    5,
+    4,
+    3,
+    2,
+    1,
+    0,
+    {
+     "const": 100
+    }
+   ],
+   "result": "pass"
+  }
+ ]
+}

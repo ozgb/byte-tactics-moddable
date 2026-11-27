@@ -1244,5 +1244,553 @@
     "-1"
    ]
   ]
+ },
+ {
+  "name": "manifest_stack_negative",
+  "calls": [
+   [
+    "manifest",
+    "loader/stack_negative.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_stack_fraction",
+  "calls": [
+   [
+    "manifest",
+    "loader/stack_fraction.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_fuel_negative",
+  "calls": [
+   [
+    "manifest",
+    "loader/fuel_negative.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_fuel_fraction",
+  "calls": [
+   [
+    "manifest",
+    "loader/fuel_fraction.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_fuel_zero",
+  "calls": [
+   [
+    "manifest",
+    "loader/fuel_zero.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_fuel_text",
+  "calls": [
+   [
+    "manifest",
+    "loader/fuel_text.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_size_budget_negative",
+  "calls": [
+   [
+    "manifest",
+    "loader/size_budget_negative.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_size_budget_fraction",
+  "calls": [
+   [
+    "manifest",
+    "loader/size_budget_fraction.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_pages_max",
+  "calls": [
+   [
+    "manifest",
+    "loader/pages_max.json"
+   ]
+  ]
+ },
+ {
+  "name": "nan_canonical",
+  "calls": [
+   [
+    "manifest",
+    "loader/nan.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/nan.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "div32",
+    "0",
+    "0"
+   ],
+   [
+    "call",
+    "a",
+    "div32",
+    "-1082130432",
+    "0"
+   ],
+   [
+    "call",
+    "a",
+    "add32",
+    "2141192193",
+    "1065353216"
+   ],
+   [
+    "call",
+    "a",
+    "add32",
+    "-4194303",
+    "1065353216"
+   ],
+   [
+    "call",
+    "a",
+    "sqrt32",
+    "-1082130432"
+   ],
+   [
+    "call",
+    "a",
+    "div64",
+    "4200",
+    "0",
+    "0"
+   ],
+   [
+    "word",
+    "4200"
+   ],
+   [
+    "word",
+    "4204"
+   ],
+   [
+    "call",
+    "a",
+    "div64",
+    "4208",
+    "-5",
+    "0"
+   ],
+   [
+    "word",
+    "4208"
+   ],
+   [
+    "word",
+    "4212"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_slot",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_slot.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/adapt.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "f",
+    "2",
+    "3"
+   ],
+   [
+    "call",
+    "a",
+    "g"
+   ],
+   [
+    "word",
+    "4112"
+   ],
+   [
+    "call",
+    "a",
+    "h",
+    "5"
+   ],
+   [
+    "word",
+    "4112"
+   ],
+   [
+    "call",
+    "a",
+    "f16",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_import",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_import.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/adapt_import.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "m",
+    "2",
+    "3"
+   ]
+  ]
+ },
+ {
+  "name": "host_import",
+  "calls": [
+   [
+    "manifest",
+    "loader/host_import.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/mix.wasm"
+   ],
+   [
+    "call",
+    "a",
+    "m3",
+    "1",
+    "2",
+    "3"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_none",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_none.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_kind",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_kind.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_const_kind",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_const_kind.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_index",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_index.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_index_negative",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_index_negative.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_args_length",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_args_length.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_result_form",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_result_form.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_result_const_kind",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_result_const_kind.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_result_pass_void",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_result_pass_void.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_result_pass_kind",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_result_pass_kind.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_result_void",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_result_void.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_values",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_values.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_import_undefined",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_import_undefined.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "adapter_import_signature",
+  "calls": [
+   [
+    "manifest",
+    "loader/adapter_import_signature.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "major_not_number",
+  "calls": [
+   [
+    "manifest",
+    "loader/major_not_number.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "major_manifest_not_number",
+  "calls": [
+   [
+    "manifest",
+    "loader/major_manifest_not_number.json"
+   ],
+   [
+    "memory"
+   ],
+   [
+    "load",
+    "a",
+    "loader/ok.wasm"
+   ]
+  ]
  }
 ]

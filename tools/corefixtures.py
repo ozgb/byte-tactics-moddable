@@ -1,9 +1,9 @@
-"""Build the WebAssembly fixtures of the core gate's loader and fuel groups, standard library and wasm-tools only.
+"""Build the WebAssembly fixtures of the core gate's loader, fuel and host groups, standard library and wasm-tools only.
 
-    uv run tools/corefixtures.py build     # rebuild every reference/core/{loader,fuel}/NAME.wasm from its NAME.wat
+    uv run tools/corefixtures.py build     # rebuild every reference/core/{loader,fuel,host}/NAME.wasm from its NAME.wat
     uv run tools/corefixtures.py check     # exit 1 when a committed .wasm differs from a rebuild
 
-The fuel group's modules also get the fuel pass of docs/module-abi.md, section 11 (tools/wasm_fuel.py). wasm-tools is
+The fuel and host groups' modules also get the fuel pass of docs/module-abi.md, section 11 (tools/wasm_fuel.py). wasm-tools is
 build/tools/bin/wasm-tools, else $WASM_TOOLS or PATH.
 """
 
@@ -14,8 +14,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CORE = os.path.join(ROOT, "reference", "core")
-GROUPS = ("loader", "fuel")
-METERED = ("fuel",)
+GROUPS = ("loader", "fuel", "host")
+METERED = ("fuel", "host")
 WASM_TOOLS = os.path.join(ROOT, "build", "tools", "bin", "wasm-tools")
 
 sys.path.insert(0, os.path.join(ROOT, "tools"))

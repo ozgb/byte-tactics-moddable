@@ -213,7 +213,7 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v52`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v51`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v53`
+`reference-traces-v51`. The oracle kit pairs it with the interfaces tagged at the same commit, `interfaces-v54`
 (`tools/oraclekit.py export`).
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
@@ -457,8 +457,8 @@ and so on), and this page is updated to name it. The current tag is
   made in pixels freed earlier in the frame a new target (`ui-dialogs` and `ui-share-chat` need the last two). The
   display lists hold every frame up to the last `frames` tick, stored xz compressed in
   `reference/displaylists/<scenario>.txt.xz` (thirteen lists, `ui-dialogs` now among them), and drawn from blank
-  targets they give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display digest changes,
-  and `frontend-skirmish` stores its display digest for the first time. The trace format is still `bt-trace 10`. The
+  targets they give the stored frames byte for byte (`tools/displayreplay.py --check`). Every display digest changes.
+  `frontend-skirmish` stores no display digest: its menu cursor follows the wall clock, not the frames (#1166). The trace format is still `bt-trace 10`. The
   traces of the 97 are those of v49 but for their commit line, which names 0758dafdb, the reference tip with the
   display log's target fix (#1154); the four new scenarios store their traces, sounds, UI logs, events, frames and the
   views of their frame ticks. `display-debug-overlay`'s debug panel reads `FRATE: 0`, as #1147 draws it. The sounds,

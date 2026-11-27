@@ -305,6 +305,21 @@ class DisplayLogTest(unittest.TestCase):
             self.assertEqual((root / "reference/display/a.txt").read_text(), "digest\n")
             self.assertEqual((root / "reference/displaylists/old.txt").read_text(), "old\n")
 
+    def test_copy_display_leaves_out_a_frontend_scenarios_digest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src, root = Path(tmp) / "branch", Path(tmp) / "tree"
+            (src / "reference/display").mkdir(parents=True)
+            (root / "reference/scenarios").mkdir(parents=True)
+            for name, scenario in (("menu", "frontend 1\nticks 10\n"), ("battle", "ticks 10\n")):
+                (src / f"reference/display/{name}.txt").write_text("digest\n")
+                (root / f"reference/scenarios/{name}.txt").write_text(scenario)
+            with mock.patch.object(reference, "ROOT", root), mock.patch.object(reference, "DISPLAYS", root / "reference/display"), \
+                    mock.patch.object(reference, "DISPLAYLISTS", root / "reference/displaylists"), \
+                    mock.patch.object(reference, "SCENARIOS", root / "reference/scenarios"), contextlib.redirect_stdout(io.StringIO()) as out:
+                reference.copy_display(src)
+            self.assertEqual(sorted(p.name for p in (root / "reference/display").iterdir()), ["battle.txt"])
+            self.assertIn("1 display files copied", out.getvalue())
+
     def test_copy_display_stores_the_lists_as_xz(self):
         with tempfile.TemporaryDirectory() as tmp:
             src, root = Path(tmp) / "branch", Path(tmp) / "tree"

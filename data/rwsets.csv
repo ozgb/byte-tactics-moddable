@@ -35264,6 +35264,7 @@ address,function,file,kind,target
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,HandleListBoxInput
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,HandleSliderInput
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,HandleTextInput
+0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,HarnessMenuTicks
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,IsKeyDown
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,PeekKey
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,call,PopKey
@@ -35339,6 +35340,7 @@ address,function,file,kind,target
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,indirect_call,indirect via void (*)(Gui *) __attribute__((stdcall)) [Layer::textHandler]
 0x4a9fd0,UpdateMenu,src/gui/gui.cpp,member_read,Gadget::u
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,call,GetTicks
+0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,call,HarnessMenuTicks
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,call,SimBlockTrack
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,call,memset
 0x4aa850,SetCurrentGuiContext,src/gui/gui.cpp,field_escape,Gui::values
@@ -39844,6 +39846,7 @@ address,function,file,kind,target
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,Surface::pitch
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,field_write,Surface::width
 0x4c2870,ShowSoftwareCursor,src/gui/mouse.cpp,function,
+0x4c2990,MouseThreadProc,src/gui/mouse.cpp,call,HarnessTestMode
 0x4c2990,MouseThreadProc,src/gui/mouse.cpp,call,LockMouse
 0x4c2990,MouseThreadProc,src/gui/mouse.cpp,call,RedrawMouseCursor
 0x4c2990,MouseThreadProc,src/gui/mouse.cpp,call,UnlockMouse
@@ -40361,6 +40364,7 @@ address,function,file,kind,target
 0x4c63a0,FlipScreen,src/graphics/surface.cpp,call,GetScreenWidth
 0x4c63a0,FlipScreen,src/graphics/surface.cpp,call,HarnessFrameDrawn
 0x4c63a0,FlipScreen,src/graphics/surface.cpp,call,Lock
+0x4c63a0,FlipScreen,src/graphics/surface.cpp,call,RedrawCursorOnFrame
 0x4c63a0,FlipScreen,src/graphics/surface.cpp,call,RestoreSurfacesInline
 0x4c63a0,FlipScreen,src/graphics/surface.cpp,call,Unlock
 0x4c63a0,FlipScreen,src/graphics/surface.cpp,call,host_frame_lock
@@ -50208,6 +50212,10 @@ address,function,file,kind,target
 ,HarnessMapEvent,src/harness/harness.cpp,function,
 ,HarnessMapName,src/harness/harness.cpp,function,
 ,HarnessMapName,src/harness/harness.cpp,global_escape,s_map@src/harness/harness.cpp
+,HarnessMenuTicks,src/harness/harness.cpp,call,GetTickRate
+,HarnessMenuTicks,src/harness/harness.cpp,call,HarnessTestMode
+,HarnessMenuTicks,src/harness/harness.cpp,function,
+,HarnessMenuTicks,src/harness/harness.cpp,global_read,s_frameClockMs@src/harness/harness.cpp
 ,HarnessMovementEvent,src/harness/harness.cpp,call,RecordEvent
 ,HarnessMovementEvent,src/harness/harness.cpp,function,
 ,HarnessOrdersEvent,src/harness/harness.cpp,call,RecordEvent
@@ -61758,6 +61766,11 @@ address,function,file,kind,target
 ,RectArea,src/harness/display_game.cpp,field_read,Rect::right
 ,RectArea,src/harness/display_game.cpp,field_read,Rect::top
 ,RectArea,src/harness/display_game.cpp,function,
+,RedrawCursorOnFrame,src/graphics/surface.cpp,call,HarnessTestMode
+,RedrawCursorOnFrame,src/graphics/surface.cpp,call,RedrawMouseCursor
+,RedrawCursorOnFrame,src/graphics/surface.cpp,field_read,Display::cursorSprite
+,RedrawCursorOnFrame,src/graphics/surface.cpp,field_read,Display::cursorThreadEnabled
+,RedrawCursorOnFrame,src/graphics/surface.cpp,function,
 ,RefAbs,src/harness/harness.cpp,call,SimBlockBase
 ,RefAbs,src/harness/harness.cpp,function,
 ,RefreshAllPassMapsForUnits,src/map/pass_map.cpp,call,RefreshAndReportAllPassMaps

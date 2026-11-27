@@ -339,9 +339,11 @@ class ModuleManifestTest(unittest.TestCase):
             entry = kit["modules"][0]
             self.assertNotIn("cxx", entry)
             self.assertNotIn("c", entry)
+            self.assertIs(entry["blocked"], True)
             want = json.loads(MODULES_TEXT)
             for field in oraclekit.MODULE_SOURCE_FIELDS:
                 del want["modules"][0][field]
+            want["modules"][0]["blocked"] = True
             self.assertEqual(kit, want)
             self.assertEqual(oraclekit.verify(Path(out) / "k"), [])
 
@@ -370,6 +372,13 @@ class ModuleManifestTest(unittest.TestCase):
         document = json.loads(kit)
         for entry in document["modules"]:
             self.assertFalse(set(oraclekit.MODULE_SOURCE_FIELDS) & set(entry), entry["name"])
+            if "blocked" in entry:
+                self.assertIs(entry["blocked"], True, entry["name"])
+            else:
+                self.assertIn("fuel_budget", entry, entry["name"])
+                self.assertIn("size_budget", entry, entry["name"])
+        blocked = {e["name"] for e in document["modules"] if "blocked" in e}
+        self.assertEqual(blocked, {e["name"] for e in json.loads((ROOT / oraclekit.MODULES).read_text())["modules"] if "blocked" in e})
         meteors = next(e for e in document["modules"] if e["name"] == "wind_meteors")
         self.assertEqual(meteors["imports"]["services"]["Emit"], [["linear", "int"], "void"])
         self.assertEqual(meteors["exports"][:2], ["UpdateWind", "UpdateMeteors"])

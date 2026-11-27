@@ -340,10 +340,11 @@ def difference(want: tuple[dict[str, str], list[tuple[int, str, str, str]]], hea
     return diff
 
 
-def keep_run(run: Path, scenario: str, suffix: str = "", logs: bool = False) -> Path:
+def keep_run(run: Path, scenario: str, suffix: str = "", logs: bool = False, trace: bytes = b"") -> Path:
     """Copy the run's trace.txt (and dump.txt and blockptrs.txt, if any) to build/scratch/check-<scenario>-<time>/.
 
     With `logs`, also the run's result.json, crash.txt and Wine's stderr (wine.log), which hold the host's last words.
+    `trace` is the trace text already read from the run, kept as trace.txt when the run's directory no longer has one.
     """
     kept = ROOT / "build/scratch" / f"check-{scenario}{suffix}-{time.strftime('%Y%m%d-%H%M%S')}"
     kept.mkdir(parents=True, exist_ok=True)
@@ -353,6 +354,8 @@ def keep_run(run: Path, scenario: str, suffix: str = "", logs: bool = False) -> 
     for name in names:
         if (run / name).is_file():
             shutil.copy2(run / name, kept / name)
+    if trace and not (kept / "trace.txt").is_file():
+        (kept / "trace.txt").write_bytes(trace)
     return kept
 
 
@@ -823,6 +826,7 @@ class LiveRun:
     seen: int = 0
     started: float = field(default_factory=time.time)
     tail: tracedigest.TraceTail = field(default_factory=tracedigest.TraceTail)
+    read: bytearray = field(default_factory=bytearray)
 
 
 @dataclass
@@ -886,13 +890,14 @@ class Watch:
             f.seek(run.offset)
             data = f.read()
         run.offset += len(data)
+        run.read += data
         want = self.expected[run.scenario][1]
         for got in run.tail.feed(data):
             index = run.seen
             run.seen += 1
             diff = first_difference(want[index:index + 1], [got], self.column)
             if diff:
-                self.halt(name, diff, run.seen, time.time() - run.started, keep_run(run.path.parent, name),
+                self.halt(name, diff, run.seen, time.time() - run.started, keep_run(run.path.parent, name, trace=bytes(run.read)),
                           trace=run.path,
                           digest=(want[index][0], want[index][self.column], got[self.column]) if index < len(want) else None)
                 return
@@ -929,6 +934,8 @@ def recheck(found: Found, column: int = DIGEST) -> str | None:
     """After a halt, what the kept trace.txt holds at the tick that the watch found different in `column`: a line to print, or None when the file agrees with the watch."""
     if found.early or not found.kept or not found.stored:
         return None
+    if not (found.kept / "trace.txt").is_file():
+        return f"recheck: no trace.txt was kept in {found.kept.name}: the run's directory was gone before it was copied"
     try:
         data = (found.kept / "trace.txt").read_bytes()
         done = {row[0]: row[column] for row in tracedigest.TraceTail().feed(data)}

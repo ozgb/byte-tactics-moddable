@@ -111,9 +111,12 @@ When the implementer hands over a head that isn't `equal` (it is blocked on spec
 
 Don't relay, summarise or judge a finding to the implementer, and don't add to the report. You may act on the spec, never on the module. When a finding or a question shows a gap in the spec, fix the spec as in step 6 (phase 2 on the diff, then push), then fetch the new spec head into `tree/` (`git -C tree fetch origin spec-<subsystem>:spec-<subsystem>`) without touching the implementer's branch; the implementer merges it (its prompt says so).
 
-**Stop after three rounds** that aren't clean: comment on the spec's issue with each round's findings and what became of them, label the issue `needs-human`, and ping the human once (`tools/notify.py`, `docs/team.md`, "Human review"). The human decides whether to merge, run more rounds or change the spec.
+**Stop after three rounds** that aren't clean. A review that doesn't converge doesn't hold the merge (#2's decisions, from #1207). Sort what is left:
 
-This step is done when the last round was clean, every finding of every round is fixed or answered on the pushed head, the verdict on that head is `equal`, and every session's `check-log.txt` ends `check-log: pass`.
+- **Findings no vector reaches** (behaviour the specs or the ABI define, which the implementer answered "no vector reaches it"): file them as vectors on the gate's issue (as #1224 does for the core), and list them in the hand-over. The pull requests merge on `equal`.
+- **A dispute about what the spec means, or a finding a vector already reaches:** comment on the spec's issue with each round's findings and what became of them, label the issue `needs-human`, and ping the human once (`tools/notify.py`, `docs/team.md`, "Human review"). The human decides whether to merge, run more rounds or change the spec.
+
+This step is done when the last round was clean (or, after three rounds, its remaining findings are filed as vectors), every finding of every round is fixed or answered on the pushed head, the verdict on that head is `equal`, and every session's `check-log.txt` ends `check-log: pass`.
 
 ## 8. Hand over
 
@@ -121,7 +124,8 @@ Comment on the spec's issue with:
 
 - the sessions in order, and each verdict;
 - each review round's findings, and what became of each (the commit that fixed it, or the answer in `IMPLEMENTATION-NOTES.md`);
+- the findings filed as vectors after three rounds, and the issue that holds them;
 - every spec change and the review that asked for it;
 - the gaps in the kit you worked around.
 
-File each kit gap as an issue. The maintainer merges the spec's pull request, then the implementer's, without the human, when the oracle verdict on the implementer's head is `equal`, the last review round was clean (no `bug` or `risk`) and every finding of every round is fixed or answered on that head, phase 2's `approve` is on the spec's head, every session ran in the VM with a `check-log.txt` ending `check-log: pass`, and the implementer's pull request is source only with CI green.
+File each kit gap as an issue. The maintainer merges the spec's pull request, then the implementer's, without the human, when the oracle verdict on the implementer's head is `equal`, the last review round was clean (no `bug` or `risk`), or after three rounds its remaining findings are filed as vectors, and every finding of every round is fixed or answered on that head, phase 2's `approve` is on the spec's head, every session ran in the VM with a `check-log.txt` ending `check-log: pass`, and the implementer's pull request is source only with CI green.

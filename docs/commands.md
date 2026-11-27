@@ -157,8 +157,9 @@ again: a run from the file delivers no `input` lines, so its menus never start t
 `commands.txt` must decode to `reference/commands/<scenario>.txt`. `REPLAY_LEFT_OUT` in that tool lists the
 scenarios whose run from the file still differs, each with the hashed field and its issue: their run is played and
 its records judged, its traces are reported as `left` and not judged, and an entry whose run turns equal fails until
-it is removed. No scenario is listed: the selection's bits (`Unit.flags` 0x10 and `selectState`, 0xc0) are out of the
-trace and the view, so every run from the file equals its scenario's. `ui-dialogs` ends in the exit menu after tick
+it is removed. The selection's bits (`Unit.flags` 0x10 and `selectState`, 0xc0) are out of the trace and the view,
+so every run from the file has its scenario's `tick` rows. Eight `ui-` scenarios are listed: in their runs from the
+file a click's order has `created` one tick later, which the view publishes (`PlayerView.orders`, #1187). `ui-dialogs` ends in the exit menu after tick
 61: its `PLAYERS_LEAVE_GAME` is stamped tick 62, and its run from the file publishes it and ends at `end 61`, with as
 many ticks as the scenario.
 

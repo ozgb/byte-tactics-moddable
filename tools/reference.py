@@ -192,7 +192,17 @@ UI_LOGS: dict[str, str | None] = {}
 INTERFACE_LOGS: dict[str, str | None] = {}
 COMMAND_TEXTS: dict[str, str | None] = {}
 REPLAY_SUFFIX = "+commands"
-REPLAY_LEFT_OUT: dict[str, str] = {}
+ORDER_CREATED = "the view's orders[i].created (Order.created) is one tick later from the file (#1187)"
+REPLAY_LEFT_OUT = {
+    "ui-build-menu": ORDER_CREATED,
+    "ui-build-place": ORDER_CREATED,
+    "ui-dialogs": ORDER_CREATED,
+    "ui-groups": ORDER_CREATED,
+    "ui-keys": ORDER_CREATED,
+    "ui-left-click-orders": ORDER_CREATED,
+    "ui-right-click": ORDER_CREATED,
+    "ui-scroll-groups": ORDER_CREATED,
+}
 EVENT_LOGS: dict[str, str | None] = {}
 SETUP_LOGS: dict[str, str | None] = {}
 DISPLAY_LOGS: dict[str, str | None] = {}

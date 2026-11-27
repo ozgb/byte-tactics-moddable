@@ -135,7 +135,8 @@ traces of the run that wrote it, without the presentation and without the scenar
   what the check below finds.
 
 `tools/reference.py --check` plays each scenario with `input` lines a second time, from the `commands.txt` of its own
-run in the same mode (the run `<scenario>+commands`). The run must give the scenario's stored traces, and its
+run in the same mode (the run `<scenario>+commands`). A scenario with `frontend 1` (`frontend-skirmish`) is not played
+again: a run from the file delivers no `input` lines, so its menus never start the match. The run must give the scenario's stored traces, and its
 `commands.txt` must decode to `reference/commands/<scenario>.txt`. `REPLAY_LEFT_OUT` in that tool lists the
 scenarios whose run from the file still differs, each with the hashed field and its issue: their run is played and
 its records judged, its traces are reported as `left` and not judged, and an entry whose run turns equal fails until

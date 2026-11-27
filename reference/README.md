@@ -118,8 +118,8 @@ without them must have none, and its run must send no command of the interface. 
 fails. The reference branch writes `interface.txt` in the decoded form, and `--traces` copies the files it stored
 into `reference/commands/`.
 
-A scenario with `input` lines is played a second time from the `commands.txt` of its own run, in the same mode
-(`-testcommands`, [docs/commands.md](../docs/commands.md), section 2.2): the run `<scenario>+commands` starts when the
+A scenario with `input` lines and no `frontend 1` is played a second time from the `commands.txt` of its own run, in the
+same mode (`-testcommands`, [docs/commands.md](../docs/commands.md), section 2.2): the run `<scenario>+commands` starts when the
 scenario's run has finished, must give the scenario's stored traces, and its interface records must decode to the
 stored file. Its lines follow the scenario lines, with `<K> of <N> runs from commands.txt equal` after the total. A
 scenario of `REPLAY_LEFT_OUT` (in `tools/reference.py`, each with its reason) has its run reported as `left`: its

@@ -1345,6 +1345,14 @@ class ReplayTest(unittest.TestCase):
             scenarios = self.scenarios(Path(tmp))
             self.assertEqual(reference.with_replays(scenarios), {"clicks+commands": scenarios["clicks"]})
 
+    def test_a_scenario_with_menus_is_not_replayed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            scenarios = self.scenarios(Path(tmp))
+            menus = Path(tmp) / "menus.txt"
+            menus.write_text("frontend 1\nticks 9\ninput 2 char a\n")
+            self.assertTrue(reference.interfacelog.has_input(menus.read_text()))
+            self.assertEqual(reference.with_replays({**scenarios, "menus": menus}), {"clicks+commands": scenarios["clicks"]})
+
     def play(self, scenarios, writes="bt-commands 2\nunits 1 2\n", fail=(), modes=(None,)):
         calls = []
         lock = threading.Lock()

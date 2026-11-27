@@ -547,8 +547,13 @@ def replay_source(name: str) -> str | None:
 
 
 def with_replays(scenarios: dict[str, Path]) -> dict[str, Path]:
-    """The runs from commands.txt of the scenarios with `input` lines, by replay_name, each with its scenario's file."""
-    return {replay_name(name): path for name, path in scenarios.items() if interfacelog.has_input(path.read_text())}
+    """The runs from commands.txt of the scenarios with `input` lines, by replay_name, each with its scenario's file.
+
+    A scenario with `frontend 1` has none: a run from the file delivers no `input` lines, so its menus never start
+    the match.
+    """
+    return {replay_name(name): path for name, path in scenarios.items()
+            if interfacelog.has_input(path.read_text()) and not scenario_frontend(path)}
 
 
 def default_modes(both_modes: bool) -> tuple[str | None, ...]:

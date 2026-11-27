@@ -286,6 +286,9 @@
       "SimFree": [["linear"], "void"],
       "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
       "SimCaptureAlloc": [["int", "linear"], "linear"],
+      "GetGafFrame": [["linear", "int"], "linear"],
+      "InitGafSequence": [["linear", "linear", "int"], "void"],
+      "StepGafSequence": [["linear"], "int"],
       "GetSlotDpid": [["int"], "int"],
       "FindSlotByDpid": [["int"], "int"],
       "Emit": [["linear", "int"], "void"]
@@ -510,6 +513,8 @@
         },
         "services": {
           "SimAllocTagged": [["linear", "int"], "linear"],
+          "InitGafSequence": [["linear", "linear", "int"], "void"],
+          "StepGafSequence": [["linear"], "int"],
           "Emit": [["linear", "int"], "void"]
         }
       },
@@ -707,6 +712,9 @@
         "services": {
           "RandomInt": [["int"], "int"],
           "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
+          "GetGafFrame": [["linear", "int"], "linear"],
+          "InitGafSequence": [["linear", "linear", "int"], "void"],
+          "StepGafSequence": [["linear"], "int"],
           "Emit": [["linear", "int"], "void"]
         }
       },
@@ -814,7 +822,8 @@
           "SimAlloc": [["int"], "linear"],
           "SimFree": [["linear"], "void"],
           "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
-          "SimCaptureAlloc": [["int", "linear"], "linear"]
+          "SimCaptureAlloc": [["int", "linear"], "linear"],
+          "GetGafFrame": [["linear", "int"], "linear"]
         }
       }
     },

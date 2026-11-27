@@ -460,7 +460,7 @@ and `handle` is i32; of `f32`, f32; of `f64`, f64; `void` is no result.
 | `f32` | an IEEE 754 single, the 32 bits carried unchanged: the host moves it as a 32-bit pattern and does not pass it through a wider or a canonicalising type |
 | `f64` | an IEEE 754 double |
 | `void` | no result |
-| `linear` | an address in the shared memory; 0 is null. The object it points to is in the module's window, on its stack, or in the block (or in the scratch area, for a slot argument). A callee reads and writes the object in place |
+| `linear` | an address in the shared memory; 0 is null. The object it points to is in the module's window, on its stack, or in the block (or in the scratch area, for a slot argument), and a callee reads and writes it in place; or it is load data outside the block (a frame table or one of its frames, section 7.1), which a module reads and never writes |
 | `block` | a linear address that lies inside the state block, or 0. As a result, the host checks that it lies inside the block |
 | `scratch` | a linear address in the scratch area, where the host put a copy of a native object for this call |
 | `handle` | an opaque u32 (section 8) |
@@ -488,6 +488,35 @@ one byte of the record's layout; it is not an argument kind.
 - **A pointer argument is a linear address.** Every pointer given to a slot or to an import, and
   every pointer returned, is an address in the shared memory, never an offset and never a native
   address.
+- **A pointer to load data is a linear address.** Some block fields point at load data outside the
+  block: a frame table (a GAF animation's frames) or one of the frames it lists. Such a field holds
+  the object's address in the shared memory, not a block offset. The engine loads or makes every
+  frame table before the match starts and neither changes nor frees it while the match runs, so the
+  address stays valid across ticks. The recordings (`tests/replay/`) show these fields:
+
+  | Subsystem | Field | Points at |
+  | --- | --- | --- |
+  | los_radar | `Game.losTable` | the sight masks, a frame table loaded from a GAF |
+  | features | `Feature.seqburn`, `Feature.seqdie`, `Feature.seqreclamate` | sequences of the feature type's GAF |
+  | features | `Spot.anim.src` | the animation of a sequence cursor, a frame table |
+  | weapons | `weapondef.explosionSeq`, `weapondef.splash` | the explosion sequences of the weapon type's GAFs (the splash one on a lava world) |
+  | weapons | `Debris.ref1.src`, `Debris.ref2.src` | the animation of a sequence cursor, a frame table |
+  | weapons | `DebrisFace.texTeamSrc` | a face's team texture, a frame table whose address weapons copies from the loaded 3DO model |
+  | weapons | `DebrisFace.texPic` | a frame of that table, which weapons writes from `GetGafFrame`'s result |
+  | weapons | `GafSrc1.ptr` to `GafSrc3.ptr`, `GafSources.ptr` | sequences of the fx GAF (`Game.src1` to `Game.src3`, `Game.sources`) |
+  | weapons | `GafLists.ptr` | the three explosions of `Game.lists`, frame tables the engine makes at load rather than reads from a GAF |
+
+  A module gets these addresses from such fields, from the GAF services (section 9.3) and from the
+  loaded 3DO model data (a face's texture). It reads a frame table and its frames
+  (`FrameTable.count`, a frame's size, offsets, transparency and pixels) and never writes them.
+  Nothing traps a write: a wasm32 memory has no read-only pages, so this is the module's obligation,
+  not something the host enforces. The host maps frame tables into the shared memory outside the
+  state block (#1206). Of the modules, only los_radar reads frame data as simulation input (the
+  sight masks of `Game.losTable`). features uses a sequence only as a timer, and weapons' cursors and
+  debris pictures are presentation state kept in the block. units reads one more such field,
+  `ModelState.bitmap`, a unit's cached picture: that frame is not load data but the presentation's,
+  which draws it and may replace it while the match runs, and units only tests whether the field is
+  null.
 - In Milestone 2 every module is WASM and every object the simulation uses is already in the shared
   memory, so no translation happens: the caller passes the address of the object where it lives. The
   two rules together mean that a pointer into the block is an offset when it is stored and an address
@@ -654,6 +683,9 @@ signatures are below.
 | `SimFree` | `[linear] -> void` | returns an allocation of `SimAlloc` or `SimAllocTagged`, by the address they returned, to the block; null does nothing |
 | `RecordSimEvent` | `[int, int, linear, int] -> void` | appends a sim event to the sim event queue of the block (arguments: kind, flags, the arguments as an array of 32-bit words, their count): one record per six arguments, at least one, each with the kind, the tick and the next six arguments (zero past the count), every record after the first with the flags and the continuation flag; the kinds, their arguments and the flags are in `docs/sim-events.md`; a queue that has no room ends the game in test mode, and otherwise drops the event and counts it in the queue's dropped count |
 | `SimCaptureAlloc` | `[int, linear] -> linear` | reserves the size in bytes, rounded up to 8, in the radar arena of the block (`docs/sim-events.md`, "Radar events"), zeroes it, writes its offset in the arena to the 32-bit word at the second argument and returns its address; the offset is what a radar event records, and it holds until the drain that hands over that event empties the arena; an arena that has no room ends the game in test mode, and otherwise returns 0, writes nothing and counts it in the arena's dropped count |
+| `GetGafFrame` | `[linear, int] -> linear` | returns the frame of the given index of a frame table (a GAF animation's frames: its count, a 16-bit word at the start, and 8-byte entries from offset 40, each the frame's address and its duration in ticks), or 0 when the index is negative or not below the count; the table and the frame are load data (section 7.1), so the result is an address outside the block that the module reads and never writes |
+| `InitGafSequence` | `[linear, linear, int] -> void` | starts a sequence cursor (a 12-byte record of the block: the frame index and the ticks left on it, two 16-bit words, the loop flag, a byte, and at offset 8 the animation's address) on an animation (a frame table, load data of section 7.1, its loop flag the byte at offset 2) at a frame index, the first frame when the index is not below the count, with that frame's duration as its ticks left |
+| `StepGafSequence` | `[linear] -> int` | advances a sequence cursor by a tick: a cursor with no animation stays and returns 0; one with two or more ticks left loses one and returns 0; otherwise it moves to the next frame and its duration and returns 1, and past the last frame it goes back to the first when the animation loops, and when it does not, it drops the animation (address 0) and returns 1 |
 | `GetSlotDpid` | `[int] -> int` | returns the network id of the player in a slot of the game record, or -1 when the slot is 10 (none) or its player's type is 0 (empty) |
 | `FindSlotByDpid` | `[int] -> int` | returns the lowest slot, 0 to 9, whose network id (as `GetSlotDpid` gives it) is the argument, or 10 when none is or the argument is -1 |
 | `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; `Emit` takes any kind a route carries from that outbox, the same set the native `SchedPublish` delivers; the host refuses, as an import error, an effect outside the module memory, a kind no route takes from the module's outbox or not in the entry's `publishes` table, and a size other than that kind's payload size; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect exactly as `SchedPublish` does, as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
@@ -665,7 +697,8 @@ what the argument must be, or a number outside its range, makes the call return 
 `SimFree` of an address that is not a live allocation (not one `SimAlloc` or `SimAllocTagged` returned, or one already
 returned); `RecordSimEvent` with a kind that is not
 a kind of `interfaces/sim_events.h`, or with a null array and a count above 0; `SimCaptureAlloc` with a null offset
-address; `GetSlotDpid` with a slot above 10. `SimAllocTagged` takes any tag, null
+address; `GetGafFrame` with a null table; `InitGafSequence` with a null cursor or animation, or a negative index;
+`StepGafSequence` with a null cursor; `GetSlotDpid` with a slot above 10. `SimAllocTagged` takes any tag, null
 included, since the tag changes nothing.
 
 **Routes in the recordings.** A recording carries some calls a module makes to the engine under the engine's own
@@ -696,8 +729,7 @@ The kinds each module's outbox carries are the rows of `data/routes.csv` with th
 `economy.RequestGranted` reaches the engine's `ScheduleEconomyRequestGranted`, so a module's call gets the same check a
 native caller's does: a call made while economy's inbox has events not yet delivered is a fatal error. Two recorded
 calls have no import. `services.ScheduleUnitsDeliver` (deliver units' inbox now) is made only by units'
-`ReceiveUnitStates`, a network slot that stays in the engine, so no module makes it and no slot matches it. The GAF
-services are open (#1217).
+`ReceiveUnitStates`, a network slot that stays in the engine, so no module makes it and no slot matches it.
 
 **What stays in the engine.** A slot of an entry's `engine` (section 6) is not a module's, and nothing a module imports
 reaches its state. `WriteState`, the dump's writer of a subsystem's state, is one: it is called by the test harness
@@ -727,12 +759,12 @@ value and its size), and the gate judges an effect through what its subscribers 
 `data/replay_schema.json`) is not the module's import list, which is `imports.services` of its manifest entry:
 targeting's names `RandomInt` and `Emit`, and its recordings carry `i services.Emit` lines.
 
-The services interface is at major 4 and minor 1 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+The services interface is at major 4 and minor 2 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). The 1.x line added the scheduler's services one minor at a time; major 2 gave every recorder
 of the dump's events and wind_meteors' publishing import the payload's size, and 2.1 and 2.2 added the recorders of orders, movement,
 units and scripts. Major 3 splits the header: `interfaces/services.h` keeps the imports above, the TDF and bank
 members become free functions under their import names, the strings they only read become const, the size
-of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces that wind_meteors-only import with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports the old service, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import. Minor 1 adds the allocation services (`SimAlloc`, `SimAllocTagged`, `SimFree`), the sim event services (`RecordSimEvent`, `SimCaptureAlloc`) and the player slot services (`GetSlotDpid`, `FindSlotByDpid`), services the recordings of the subsystems other than wind_meteors import, so that each module's manifest entry can list them. The recordings of features, los_radar and weapons also import three GAF services (`services.GetGafFrame`, `services.InitGafSequence`, `services.StepGafSequence`), which are not services of the header yet: where a module finds the frame tables they take is open (#1217).
+of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces that wind_meteors-only import with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports the old service, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import. Minor 1 adds the allocation services (`SimAlloc`, `SimAllocTagged`, `SimFree`), the sim event services (`RecordSimEvent`, `SimCaptureAlloc`) and the player slot services (`GetSlotDpid`, `FindSlotByDpid`), services the recordings of the subsystems other than wind_meteors import, so that each module's manifest entry can list them. Minor 2 adds the GAF services (`GetGafFrame`, `InitGafSequence`, `StepGafSequence`), which the recordings of features, los_radar and weapons import, with `linear` kinds: the frame tables they take are load data in the shared memory (section 7.1).
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter

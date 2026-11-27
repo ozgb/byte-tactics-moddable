@@ -540,6 +540,11 @@ class SharedStateTest(unittest.TestCase):
         want.end()
         self.assertEqual(w.hash.h, want.h)
 
+    def test_an_order_effect_class_above_5_fails(self):
+        w = tr.Walker(HEAP_SCHEMA, [("orderFx[0].class", "0x00000006")])
+        with self.assertRaisesRegex(tr.Error, "unknown order effect class 6"):
+            w.order_effects()
+
     def test_scripts_hash_only_the_presence_and_the_transforms(self):
         lines = [("units[1].script.transforms[0].angle", "0x00000007"),
                  ("units[1].script.transforms[1].angle", "0x00000008")]

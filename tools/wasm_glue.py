@@ -85,7 +85,6 @@ SCHEDULED = {
     "ScheduleMetalExtraction": ("economy", "UpdateMetalExtraction", "ScheduleMetalExtraction({0})"),
     "ScheduleFeaturesPlace": ("features", "Place", "ScheduleFeaturesPlace({0})"),
 }
-LATER_SERVICES = {"GetGafFrame", "InitGafSequence", "StepGafSequence"}
 
 SEAM_SLOT = re.compile(r"^\s*(?P<ret>[^()\n/]+?)\s*\((?P<conv>__\w+)\*\s*(?P<name>\w+)\)\((?P<params>[^)]*)\);", re.M)
 SERVICE_DECL = re.compile(r"^[^/\n][^\n(]*?\b(\w+)\(", re.M)
@@ -282,7 +281,7 @@ def module_imports(subsystem, schema, all_seams, services):
         if name in SCHEDULED:
             group, slot, _ = SCHEDULED[name]
             add(group, slot)
-    service_list = [s for s in services if s in wanted and s not in LATER_SERVICES]
+    service_list = [s for s in services if s in wanted]
     for group in groups:
         names = {s.name for s in all_seams[group]}
         missing = [n for n in groups[group] if n not in names]

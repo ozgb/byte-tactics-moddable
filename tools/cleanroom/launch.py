@@ -9,7 +9,7 @@ clean-room tree (read-write at /work), the data kit (read-only at /data), the ma
 /srv/outbox (read-write) and /srv/inbox (read-only) and the proxy socket /srv/proxy.sock. broker.py
 runs beside it: it reads a git bundle and the gate requests from the outbox as data.
 
---review starts a code review session: /work is mounted read-only, the broker pushes nothing, and
+--review starts a code review session: /work is mounted read-only, the broker pushes nothing and runs no gate, and
 the reviewer's report crosses as SESSION/review.md (broker.py, "Review hand-over"). --review-report
 R/review.md hands the report review session R took to the next implementer session as
 /srv/inbox/review.md, byte for byte; a file whose sha256 is not R/review.state is refused.
@@ -340,16 +340,24 @@ def remove_canary(name, runner=run):
     return runner(exec_in(name, ["test", "!", "-e", CANARY_DIR])).returncode
 
 
-def broker_argv(session, game_dir=None, core_image=None, push=True):
-    """Return the argv that starts broker.py for this session, with --game-dir and --core-image when given."""
+def broker_argv(session, game_dir=None, core_image=None, review=False):
+    """Return the argv that starts broker.py for this session, with --game-dir and --core-image when given.
+
+    A review session's broker pushes nothing and runs no gate.
+    """
     argv = [sys.executable, str(HERE / "broker.py"), "serve", "--session", str(session)]
-    if not push:
-        argv.append("--no-push")
+    if review:
+        return argv + ["--no-push", "--no-gate"]
     if game_dir:
         argv += ["--game-dir", str(game_dir)]
     if core_image:
         argv += ["--core-image", str(core_image)]
     return argv
+
+
+def broker_env():
+    """Return the broker's environment: the gate's Wine prefix is 64-bit whatever the shell says."""
+    return {**os.environ, "WINEARCH": "win64"}
 
 
 def hand_in_review(report, session):
@@ -421,7 +429,7 @@ def start_session(args):
         procs.append(proxy)
         if not wait_for(sock):
             raise RuntimeError("the proxy did not start")
-        procs.append(subprocess.Popen(broker_argv(session, args.game_dir, image, push=not args.review)))
+        procs.append(subprocess.Popen(broker_argv(session, args.game_dir, image, review=args.review), env=broker_env()))
         if run(argv).returncode:
             raise RuntimeError("machine create failed")
         created = True

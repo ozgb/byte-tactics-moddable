@@ -82,7 +82,8 @@ command by `--secret-env` and never written to disk (see Credentials).
   `proxy.py --check-log`, which fails if any logged request is off the allowlist. The canary
   probes go to `SESSION/canary-proxy.log` (the log is rotated by SIGHUP once the canary passes).
 - **Code review:** `launch.py --review` starts a review session (#1218): `/work` is mounted read-only and the broker
-  runs with `--no-push`. The reviewer writes `/srv/outbox/review.md`; the broker opens it as it opens a bundle
+  runs with `--no-push` and `--no-gate` (every gate request gets an error result). The reviewer writes
+  `/srv/outbox/.review.tmp` and renames it to `review.md`; the broker opens it as it opens a bundle
   (`O_NOFOLLOW`, a regular file of at most 1 MiB, UTF-8) and copies it to `SESSION/review.md`, once per distinct
   report. `launch.py --review-report R/review.md` copies the report review session R took, unchanged, into the next
   session's inbox as `/srv/inbox/review.md`, and refuses any other file: one not named `review.md`, a symlink, or one

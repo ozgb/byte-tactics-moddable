@@ -11,7 +11,7 @@ The pilot that set this process is #800: `specs/wind_meteors.md` on btm main is 
 
 - **The btm clone:** `~/source/repos/btm`, for writing and pushing specs.
 - **A session directory:** `~/cleanroom/<subsystem>/` (outside `~/source/repos`, which `launch.py` refuses), with `tree/` (a btm clone on the spec branch), `datakit/` (a kit export) and one directory per session.
-- **The modern build** with `wasm_runtime` built, the VM image (`tools/cleanroom/build-image.sh build/scratch/cleanroom-image`), and the credentials of `docs/cleanroom.md`, all in the worktree you run `launch.py` from: the broker gates from that worktree's `build/`. Run `launch.py` with `WINEARCH=win64` (`AGENTS.md`, step 4), which the gate inherits; with `win32` every verdict is a gate error.
+- **The modern build** with `wasm_runtime` built, the VM image (`tools/cleanroom/build-image.sh build/scratch/cleanroom-image`), and the credentials of `docs/cleanroom.md`, all in the worktree you run `launch.py` from: the broker gates from that worktree's `build/`. `launch.py` runs the broker with `WINEARCH=win64` (`AGENTS.md`, step 4) whatever your shell sets.
 
 The setup is done when `uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta` passes and a smoke session (`docs/cleanroom.md`, "First real session", with `sleep` as the command) returns `equal` for the 3.1c module.
 
@@ -95,7 +95,7 @@ The review runs in rounds, until a round raises no findings. Each round:
 
 1. Update `tree/` to the implementer's branch at the pull request's head, and keep `.review/` in `tree/.git/info/exclude`.
 2. Write the prompt from [`code-reviewer-prompt.md`](code-reviewer-prompt.md), with the subsystem filled in and `<base>` set to the spec branch's head in the first round, and to the head the last round reviewed after that.
-3. Run the session with a new session directory R, `/work` read-only and nothing pushed:
+3. Run the session with a new session directory R, `/work` read-only, no gate and nothing pushed:
 
    ```sh
    uv run tools/cleanroom/launch.py --review --tree T --datakit K --session R --image I --game-dir ~/.ta -- claude -p "$(cat PROMPT)" --dangerously-skip-permissions

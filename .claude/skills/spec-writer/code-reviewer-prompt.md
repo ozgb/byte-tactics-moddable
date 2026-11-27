@@ -11,7 +11,7 @@ How:
 - Run the code-review skill at high effort, `/code-review high`, on the whole crate /work/<subsystem>/ and on the branch's changes since <base> (`git -C /work diff <base>..HEAD`). Do not pass --comment or --fix. If the skill is not available, say so on the first line of the report and do the same review yourself.
 - Judge only by what the spec and the kit say. Never write "the original does", "the reference does" or anything that guesses at code you have not seen: cite the spec section, the ABI section or the kit file each finding rests on.
 - A finding IMPLEMENTATION-NOTES.md already answers is not a finding again, unless the answer is wrong by the spec or the kit: then raise it again and say why the answer doesn't hold.
-- Change nothing and post nothing. /work is read-only; build or test only in a copy under /tmp. Do not submit to the gate.
+- Change nothing and post nothing. /work is read-only; build or test only in a copy under /tmp. Do not submit to the gate: this session has none.
 
-Write the report, in Markdown, to /srv/outbox/review.md: a numbered list of findings, each with its file and line, its severity (`bug`, `risk` or `nit`), what goes wrong and on which input, and the spec or kit text it rests on. When there are none, the report's first line is `No findings.` Keep it under 1000 words.
+Write the report, in Markdown, to /srv/outbox/.review.tmp and then rename it to /srv/outbox/review.md (`mv`), so that it is never read half written: a numbered list of findings, each with its file and line, its severity (`bug`, `risk` or `nit`), what goes wrong and on which input, and the spec or kit text it rests on. When there are none, the report's first line is `No findings.` Keep it under 1000 words.
 ```

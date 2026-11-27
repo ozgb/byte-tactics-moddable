@@ -394,8 +394,13 @@ class LaunchRefusalTests(unittest.TestCase):
         ln.check_argv(argv)
         self.assertIn("/t:/work:ro", argv)
         self.assertNotIn("/t:/work", argv)
-        self.assertIn("--no-push", ln.broker_argv("/s", push=False))
+        review = ln.broker_argv("/s", "/g", "/i.smolmachine", review=True)
+        self.assertIn("--no-push", review)
+        self.assertIn("--no-gate", review)
+        self.assertNotIn("--core-image", review)
         self.assertNotIn("--no-push", ln.broker_argv("/s"))
+        self.assertNotIn("--no-gate", ln.broker_argv("/s"))
+        self.assertEqual(ln.broker_env()["WINEARCH"], "win64")
 
     def test_review_report_is_handed_in_byte_for_byte(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -625,6 +630,12 @@ class BrokerTests(unittest.TestCase):
         bk.process_mailbox(self.session, bk.stub_gate)
         for name in ("bad1", "bad2", "bad3"):
             self.assertIn("error", json.loads((self.session / "inbox" / f"{name}.json").read_text()))
+
+    def test_no_gate_answers_every_request_with_an_error(self):
+        self.request("r1")
+        self.assertEqual(bk.process_mailbox(self.session, bk.no_gate, bk.no_gate), ["r1"])
+        result = json.loads((self.session / "inbox" / "r1.json").read_text())
+        self.assertEqual(result["error"], bk.NO_GATE)
 
     def test_review_is_taken_once(self):
         (self.session / "outbox" / bk.REVIEW_NAME).write_text("# Findings\n")

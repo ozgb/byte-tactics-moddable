@@ -1,6 +1,6 @@
 """Host-side broker for a clean-room session: git sync and the gate mailbox.
 
-    uv run tools/cleanroom/broker.py serve --session DIR [--interval SECONDS] [--btm-token-file FILE] [--no-push] [--game-dir DIR] [--core-image FILE]
+    uv run tools/cleanroom/broker.py serve --session DIR [--interval SECONDS] [--btm-token-file FILE] [--no-push] [--no-gate] [--game-dir DIR] [--core-image FILE]
     uv run tools/cleanroom/broker.py once --session DIR
 
 The session directory holds `outbox/` (the agent writes, the broker reads), `inbox/` (only the
@@ -30,7 +30,8 @@ wind_meteors module) and `outbox/ID/ready` make a core request, opened and check
 
 Review hand-over: a code review session writes its report to `outbox/review.md`. The broker opens it as it
 opens a bundle, requires a regular file of at most 1 MiB in UTF-8, and copies it to `SESSION/review.md` by
-rename. Each distinct report is taken once.
+rename. Each distinct report is taken once. A review session's broker runs with `--no-gate`: every gate request
+is answered with an error, since a reviewer never submits.
 
 Push: after each sync the broker pushes every `refs/heads/impl/<name>` of the bare repository whose commit changed to
 `--btm-remote` and opens a pull request into `main` of `--btm-repo` for each new branch. It reads the token from
@@ -72,6 +73,7 @@ BUNDLE_NAME = "btm.bundle"
 REVIEW_NAME = "review.md"
 REVIEW_STATE = "review.state"
 MAX_REVIEW = 1024 * 1024
+NO_GATE = "this session has no gate: a code review session does not submit"
 STATE_NAME = "bundle.state"
 PUSH_STATE = "push.state"
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
@@ -634,6 +636,11 @@ def write_push_refusals(inbox, refused):
     write_result(inbox, "push", {"refused": [refused[ref] for ref in sorted(refused)]})
 
 
+def no_gate(first, second, request_id):
+    """Answer a gate request in a session that may not submit."""
+    return {"gate": "none", "id": request_id, "error": NO_GATE}
+
+
 def process_mailbox(session, gate=None, core_gate=None):
     """Answer every ready request that has no result yet; return the ids answered."""
     session = Path(session)
@@ -703,6 +710,7 @@ def main(argv=None):
     ap.add_argument("--btm-repo", default=DEFAULT_REPO, help="OWNER/NAME for pull requests")
     ap.add_argument("--api-base", default=DEFAULT_API)
     ap.add_argument("--no-push", action="store_true", help="do not push branches or open pull requests")
+    ap.add_argument("--no-gate", action="store_true", help="answer every gate request with an error (a review session)")
     ap.add_argument("--gate-timeout", type=int, default=GATE_TIMEOUT)
     ap.add_argument("--game-dir", default=None, help="game directory for the real gate (default: oraclegate looks in Steam/GOG places)")
     ap.add_argument("--core-image", default=None, help="clean-room .smolmachine the core gate runs cores in (default: core requests are refused)")
@@ -711,8 +719,11 @@ def main(argv=None):
     push = None if args.no_push else {
         "token_file": args.btm_token_file, "remote": args.btm_remote, "repo": args.btm_repo, "api_base": args.api_base,
     }
-    gate = make_gate(args.session, timeout=args.gate_timeout, game_dir=args.game_dir)
-    core_gate = make_core_gate(args.session, args.core_image, timeout=args.gate_timeout) if args.core_image else None
+    if args.no_gate:
+        gate = core_gate = no_gate
+    else:
+        gate = make_gate(args.session, timeout=args.gate_timeout, game_dir=args.game_dir)
+        core_gate = make_core_gate(args.session, args.core_image, timeout=args.gate_timeout) if args.core_image else None
     if args.cmd == "once":
         print(json.dumps(one_pass(args.session, push, gate, core_gate)))
         return 0

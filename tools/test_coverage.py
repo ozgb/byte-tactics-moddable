@@ -690,6 +690,49 @@ class PlaySuiteTest(unittest.TestCase):
         self.assertEqual(seen["alpha"]["LLVM_PROFILE_FILE"], cov.windows_path(run_dir / "alpha") + "\\cov-%p.profraw")
 
 
+class RetryTimeoutTest(unittest.TestCase):
+    def test_only_a_scenario_that_timed_out_is_retried_at_the_retry_rate(self):
+        seen = []
+
+        def fake_play(exe, scenario, game_dir, dump, timeout=None, poison=False, blockscan=0, env=None):
+            seen.append((scenario.stem, timeout))
+            if scenario.stem == "slow" and len([s for s, _ in seen if s == "slow"]) == 1:
+                raise cov.tracediff.Error("line 2 (waitexit 220): the game still runs after 220s")
+            (run_dir / scenario.stem / "cov-1.profraw").write_bytes(b"x")
+            return Path()
+
+        def fake_play_all(exe, scenarios, game_dir, parallel, failed=None, retry_any=False):
+            for path in scenarios.values():
+                for attempt in range(2):
+                    try:
+                        cov.reference.play_scenario(exe, path, game_dir)
+                        break
+                    except cov.tracediff.Error:
+                        pass
+
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp) / "run"
+            files = {}
+            for name in ("fast", "slow"):
+                files[name] = Path(tmp) / f"{name}.txt"
+                files[name].write_text("ticks 600\n")
+            saved = (cov.RUN_DIR, cov.tracediff.play, cov.reference.play_scenario, cov.reference.play_all,
+                     cov.reference.scenario_files, cov.subprocess.run)
+            cov.RUN_DIR = run_dir
+            cov.tracediff.play = fake_play
+            cov.reference.play_all = fake_play_all
+            cov.reference.scenario_files = lambda: files
+            cov.subprocess.run = lambda *a, **k: None
+            try:
+                cov.reference.play_scenario = lambda exe, scenario, *a, **k: cov.tracediff.play(exe, scenario, None, None, 220)
+                cov.play_suite(Path("TotalA.exe"), None, 1, None)
+            finally:
+                (cov.RUN_DIR, cov.tracediff.play, cov.reference.play_scenario, cov.reference.play_all,
+                 cov.reference.scenario_files, cov.subprocess.run) = saved
+        retry = cov.reference.RUN_SECONDS_BASE + 600 / cov.RETRY_TICKS_PER_SECOND
+        self.assertEqual(seen, [("fast", 220), ("slow", 220), ("slow", retry)])
+
+
 class PlaySuiteRateTest(unittest.TestCase):
     def test_runs_time_out_at_the_coverage_rate_and_the_gate_rate_comes_back(self):
         seen = []

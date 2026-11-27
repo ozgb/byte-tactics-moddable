@@ -659,7 +659,7 @@ UpdateWind,src/game/game_state.cpp,wind_meteors,x,
                 ("LoadSavedGameState", "src/game/settings_campaign.cpp", "indirect_call", self.slot("LoadMeteors")),
                 ("SaveGameFile", "src/game/settings_campaign.cpp", "field_read", "WindMeteorsSeam::SaveMeteors"),
                 ("Help", "src/map/meteors.cpp", "indirect_call", self.slot("UpdateMeteors")),
-                ("TimedNativeUpdateWind", "src/wasm/wind_meteors_glue.cpp", "indirect_call", self.slot("UpdateWind"))]
+                ("GlueWindMeteorsTimedUpdateWind", "src/wasm/glue_tables.cpp", "indirect_call", self.slot("UpdateWind"))]
         self.assertEqual(self.check(rows), [])
 
     def test_a_stray_caller_of_a_writing_slot_is_found(self):
@@ -779,13 +779,18 @@ FeHelp,src/map/features.cpp,features,x,
         self.assertEqual(self.check([("LoadTntMap", "src/map/line_of_sight.cpp", "indirect_call", self.slot("InitFeatureAnimPool")),
                                      ("RecFeaturesLoadFeatureFileList", "src/harness/replay_hooks.inc", "indirect_call",
                                       self.slot("LoadFeatureFileList")),
-                                     ("FeHelp", "src/map/features.cpp", "indirect_call", self.slot("LoadFeatureFileList"))]), [])
+                                     ("FeHelp", "src/map/features.cpp", "indirect_call", self.slot("LoadFeatureFileList")),
+                                     ("GlueFeaturesTimedLoadFeatureFileList", "src/wasm/glue_tables.cpp", "indirect_call",
+                                      self.slot("LoadFeatureFileList"))]), [])
         found = self.check([("Other", "src/map/line_of_sight.cpp", "indirect_call", self.slot("InitFeatureAnimPool")),
+                            ("GlueImportFeaturesLoadFeatureFileList", "src/wasm/glue_tables.cpp", "indirect_call",
+                             self.slot("LoadFeatureFileList")),
                             ("LoadTntMap", "src/other.cpp", "indirect_call", self.slot("InitFeatureAnimPool")),
                             ("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("LoadFeatureFileList")),
                             ("Hurt", "src/units/units.cpp", "field_read", "FeaturesSeam::LoadFeatureFileList")])
         self.assertEqual([f[:3] for f in found], [("setup", "game", "Tick"), ("setup", "map", "Other"),
-                                                  ("setup", "units", "Hurt"), ("setup", "unowned", "LoadTntMap")])
+                                                  ("setup", "units", "Hurt"), ("setup", "unowned", "GlueImportFeaturesLoadFeatureFileList"),
+                                                  ("setup", "unowned", "LoadTntMap")])
 
     def test_a_setup_slot_is_no_writing_slot_for_the_engine_files(self):
         self.assertEqual(self.check([("Tick", "src/game/scheduler.cpp", "indirect_call", self.slot("Apply"))]), [])

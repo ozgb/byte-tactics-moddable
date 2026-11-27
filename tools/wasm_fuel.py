@@ -117,6 +117,23 @@ def instrument(wasm, wasm_tools=None):
     return tool(wasm_tools, ["parse", "-"], meter_text(text).encode())
 
 
+def export_types(text):
+    """{export name: the parameters and results of its function, as `wasm-tools print` writes its type} of a module's
+    function exports."""
+    types = {n: body.strip() for n, body in re.findall(r"^\s*\(type \(;(\d+);\) \(func([^\n]*)\)\)$", text, re.M)}
+    index_of, type_of = {}, {}
+    for label, index, typeno in re.findall(r"^\s*(?:\(import \"[^\"]*\" \"[^\"]*\" )?\(func (?:(\$\S+) )?\(;(\d+);\) \(type (\d+)\)", text, re.M):
+        type_of[index] = typeno
+        if label:
+            index_of[label] = index
+    out = {}
+    for name, target in re.findall(r'^\s*\(export "([^"]*)" \(func (\$\S+|\d+)\)\)', text, re.M):
+        typeno = type_of.get(index_of.get(target, target))
+        if typeno is not None:
+            out[name] = types.get(typeno)
+    return out
+
+
 def check_unmetered_surface(wasm, wasm_tools=None):
     """Reasons a metered module breaks the rule that the counter is neither imported nor exported and the two functions are exported."""
     text = tool(find_wasm_tools(wasm_tools), ["print", "-"], wasm).decode()
@@ -124,9 +141,13 @@ def check_unmetered_surface(wasm, wasm_tools=None):
     for module, name in re.findall(r'^\s*\(import "([^"]*)" "([^"]*)" \(global', text, re.M):
         problems.append(f"imports the global {module}.{name}")
     exported = re.findall(r'^\s*\(export "([^"]*)"', text, re.M)
-    for name in EXPORTS:
+    types = export_types(text)
+    for name, wanted in ((SET_EXPORT, "(param i64)"), (GET_EXPORT, "(result i64)")):
         if name not in exported:
             problems.append(f"does not export {name}")
+        elif types.get(name) != wanted:
+            got = "something other than a function" if name not in types else f"(func {types[name]})".replace(" )", ")")
+            problems.append(f"exports {name} as {got}, not (func {wanted})")
     counter = re.search(r"i64\.sub\s+global\.set ([^\s()]+)", text)
     if counter is None:
         problems.append("has no metering code")

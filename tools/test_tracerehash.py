@@ -81,6 +81,22 @@ class DumpTest(unittest.TestCase):
         blocks = tr.parse_dump("bt-dump 4\n7 units a.b str:x y\n7 units a.c 0x01\n", 4)
         self.assertEqual(blocks[(7, "units")], [("a.b", "str:x y"), ("a.c", "0x01")])
 
+    def test_parse_blocks_keeps_a_repeated_block(self):
+        blocks = tr.parse_blocks("bt-dump 4\n7 units a.b 0x01\n7 wind a.c 0x02\n7 units a.b 0x01\n", 4)
+        self.assertEqual([key for key, _ in blocks], [(7, "units"), (7, "wind"), (7, "units")])
+
+    def test_a_dump_with_a_failing_class_is_refused(self):
+        for path, value in (("orderFx[3].class", "0x00000006"), ("playersState.conditions.defeat[0].class", "0x00000000")):
+            with self.assertRaises(tr.Error):
+                tr.check_failures([((7, "wind"), [(path, value)])])
+        tr.check_failures([((7, "wind"), [("orderFx[3].class", "0x00000005"), ("orderFx[4].class", "0x00000000"),
+                                          ("playersState.conditions.victory[0].class", "0x00000011")])])
+
+    def test_a_malformed_class_is_refused(self):
+        for path in ("orderFx[3].class", "playersState.conditions.victory[0].class"):
+            with self.assertRaises(tr.Error):
+                tr.check_failures([((7, "wind"), [(path, "str:six")])])
+
     def test_parse_dump_rejects_other_formats(self):
         with self.assertRaises(tr.Error):
             tr.parse_dump("bt-dump 3\n", 4)

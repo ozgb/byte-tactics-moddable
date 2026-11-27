@@ -510,7 +510,7 @@ void __stdcall FatalError(const char* message)
 {
     ReplayImport call(RI_FATAL_ERROR);
     call.Ptr(message);
-    if (WindMeteorsDeferFatal(message))
+    if (GlueDeferFatal(message))
         return;
     host_fatal(g_display->hwnd, g_display->title, message);
 }

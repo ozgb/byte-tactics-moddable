@@ -9260,10 +9260,29 @@ int SelfTest(const char* file)
 
 FILE* g_coreOut;
 
-void CoreError(const char* errorClass)
+void CoreError(const char* errorClass, const char* text)
 {
     const char* subsystem = ReplayWasmSubsystem();
-    fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"%s\"]}\n", errorClass, subsystem == nullptr ? "" : subsystem);
+    if (subsystem == nullptr)
+        subsystem = "";
+    if (strcmp(errorClass, "import") == 0 || strcmp(errorClass, "glue") == 0) {
+        if (strcmp(errorClass, "import") == 0)
+            text = ReplayWasmRefusal(text);
+        fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"%s\"], \"message\": \"", errorClass, subsystem);
+        for (const char* p = text; *p != '\0' && *p != '\r' && *p != '\n'; p++) {
+            unsigned char c = (unsigned char)*p;
+            if (c == '"' || c == '\\')
+                fprintf(g_coreOut, "\\%c", c);
+            else if (c < 0x20 || c >= 0x7f)
+                fprintf(g_coreOut, "\\u%04x", c);
+            else
+                fputc(c, g_coreOut);
+        }
+        fputs("\"}\n", g_coreOut);
+        fclose(g_coreOut);
+        exit(0);
+    }
+    fprintf(g_coreOut, "replay\t{\"error\": \"%s\", \"modules\": [\"%s\"]}\n", errorClass, subsystem);
     fclose(g_coreOut);
     exit(0);
 }

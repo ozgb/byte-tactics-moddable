@@ -268,7 +268,7 @@ manifest per run.
 | `table_size` | entries in the shared table | loader, required |
 | `window` | bytes of every module window, more than 0 | loader, required |
 | `table_slots` | table entries of every module range | loader, required |
-| `stack_size` | bytes of every module stack | host and checks (the loader accepts it) |
+| `stack_size` | bytes of every module stack | host and checks (the loader checks only that it is a non-negative integer) |
 | `block_base`, `block_size`, `block_max` | the state block: `block_base` needs `block_size` (a `block_size` without `block_base` is ignored, and there is no block); `block_max`, optional, at least `block_size` (the default), is the most the block can grow to | loader |
 | `scratch` | `[base, size]` of the scratch area | loader |
 | `majors`, `signatures`, `adapters` | section 10 | loader |
@@ -295,8 +295,8 @@ valid JSON to the loader, so the whole manifest is refused as not valid JSON. A 
 | `slots` | `{slot: [[argument kinds], result kind]}` | loader (adapters); checks |
 | `imports` | `{group: {import: [[argument kinds], result kind]}}`; a group is `services`, an interface (section 9.2), or a world view of an interface header (`econworld`, the `EconomyWorldView` of `economy.h`; `pathworld`, the `PathWorldView` of `pathfinding.h`), whose major is its header's | loader (adapters); checks |
 | `publishes` | `{kind: payload size}`, the kinds the module may publish through `Emit` (the kind as a decimal string, the size in bytes; wind_meteors': `{"80": 36}`); each is a kind the route table (`data/routes.csv`, `docs/schedule.md`, "Routes") takes from the entry's outbox, its `interface` (its own effect kinds and the routed inbox kinds of other modules), with that kind's payload size | host (the `Emit` import); checks |
-| `fuel_budget` | fuel per tick, section 11; required unless `blocked` | host; checks |
-| `size_budget` | the most bytes the `.wasm` may be; required unless `blocked` | checks |
+| `fuel_budget` | fuel per tick, section 11; required unless `blocked` | host; loader (its range, 11.3); checks |
+| `size_budget` | the most bytes the `.wasm` may be; required unless `blocked` | checks; loader (a non-negative integer) |
 | `cxx`, `c` | source files of the module in the reference repository | the reference build only; the kit's manifest leaves them out |
 
 A kind is one of `int`, `f32`, `f64`, `void` (a result only), `linear`, `block`, `scratch`, `handle`
@@ -337,8 +337,9 @@ them at start-up (section 13). When a manifest has more than one fault, the load
 `docs/core-gate.md`, "loader and fuel", states.
 
 - A manifest that is not valid JSON (a number with a fraction or an exponent included, section 4.1) or not an
-  object; a required field missing; a value that is not a non-negative integer; `memory_pages` or `window` zero, or
-  `memory_pages` over 65536; a `scratch` that is not `[base, size]`.
+  object; a required field missing; a value that is not a non-negative integer (`stack_size`, and a module's
+  `fuel_budget` and `size_budget`, included); `memory_pages` or `window` zero, or `memory_pages` over 65536; a
+  `fuel_budget` of 0 (section 11.3); a `scratch` that is not `[base, size]`.
 - A block that does not fit the memory; a scratch area that does not fit the memory or that passes
   the block base.
 - No modules, a module without a name, a duplicate name, a missing `data_base` or `table_base`,
@@ -688,7 +689,7 @@ signatures are below.
 | `StepGafSequence` | `[linear] -> int` | advances a sequence cursor by a tick: a cursor with no animation stays and returns 0; one with two or more ticks left loses one and returns 0; otherwise it moves to the next frame and its duration and returns 1, and past the last frame it goes back to the first when the animation loops, and when it does not, it drops the animation (address 0) and returns 1 |
 | `GetSlotDpid` | `[int] -> int` | returns the network id of the player in a slot of the game record, or -1 when the slot is 10 (none) or its player's type is 0 (empty) |
 | `FindSlotByDpid` | `[int] -> int` | returns the lowest slot, 0 to 9, whose network id (as `GetSlotDpid` gives it) is the argument, or 10 when none is or the argument is -1 |
-| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; `Emit` takes any kind a route carries from that outbox, the same set the native `SchedPublish` delivers; the host refuses, as an import error, an effect outside the module memory, a kind no route takes from the module's outbox or not in the entry's `publishes` table, and a size other than that kind's payload size; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect exactly as `SchedPublish` does, as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
+| `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; `Emit` takes any kind a route carries from that outbox, the same set the native `SchedPublish` delivers; the host refuses, as an import error and in this order, a pointer outside the module memory, a size outside 4 to 128 bytes (an effect holds at least its kind, and at most an inbox entry), an effect that runs past the module memory, a kind no route takes from the module's outbox, a kind not in the entry's `publishes` table, and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect exactly as `SchedPublish` does, as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
 
 **A malformed argument changes nothing and does not trap** (ozgb/btm#25). The default modules never pass one, so no
 recording shows what it does, and this is the contract: an address the import does not trap on (section 7.2) that is not
@@ -832,8 +833,10 @@ Only reorders, drops, added constants and result changes between these forms fit
 **refuses** any conversion that needs code: a different kind (an `int` into a `linear`, a `linear`
 into a `handle`, an `int` into an `f64`), a constant for a parameter that is not `int`, an index out
 of range, an `args` of the wrong length, a `result` of another form, a constant result for a caller
-whose result is not `int`, more than 16 values. For an adapted import the host must have defined the
-import with the manifest's current signature, or the module is refused.
+whose result is not `int`, a signature of more than 16 parameters. For an adapted import the host must have defined the
+import with the manifest's current signature, or the module is refused. The loader judges the adapters from the
+entry's `slots` and `imports` and the manifest's `signatures` alone, before it compiles the module, so a refusal does
+not depend on what the module exports or imports.
 
 Adapters apply to the module's slots as the host calls them, and to its imports as the module calls
 them. They do not apply to a call through the table (2.3).

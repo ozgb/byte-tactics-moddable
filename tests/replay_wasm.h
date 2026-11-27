@@ -2,7 +2,8 @@
 #define TESTS_REPLAY_WASM_H
 
 void ReplayWasmSelect(const char* wasmPath, const char* subsystem = nullptr);
-void ReplayWasmSetTrapHook(void (*hook)(const char* errorClass));
+const char* ReplayWasmRefusal(const char* text);
+void ReplayWasmSetTrapHook(void (*hook)(const char* errorClass, const char* text));
 bool ReplayWasmActive();
 const char* ReplayWasmSubsystem();
 void ReplayWasmReload();

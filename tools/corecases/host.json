@@ -28,5 +28,155 @@
     "module.wasm"
    ]
   ]
+ },
+ {
+  "name": "import_pointer",
+  "calls": [
+   [
+    "replay",
+    "host/import_pointer.txt",
+    "host/wind_meteors_import_pointer.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "import_pointer_last",
+  "calls": [
+   [
+    "replay",
+    "host/import_pointer_last.txt",
+    "host/wind_meteors_import_pointer_last.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "import_buffer_size",
+  "calls": [
+   [
+    "replay",
+    "host/import_buffer_size.txt",
+    "host/wind_meteors_import_buffer_size.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "import_buffer_past",
+  "calls": [
+   [
+    "replay",
+    "host/import_buffer_past.txt",
+    "host/wind_meteors_import_buffer_past.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "import_null_handle",
+  "calls": [
+   [
+    "replay",
+    "host/import_null_handle.txt",
+    "host/wind_meteors_import_null_handle.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "import_unknown_handle",
+  "calls": [
+   [
+    "replay",
+    "host/import_unknown_handle.txt",
+    "host/wind_meteors_import_unknown_handle.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "import_stale_handle",
+  "calls": [
+   [
+    "replay",
+    "host/import_stale_handle.txt",
+    "host/wind_meteors_import_stale_handle.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "handles_32",
+  "calls": [
+   [
+    "replay",
+    "host/handles_32.txt",
+    "host/wind_meteors_handles_32.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "handles_full",
+  "calls": [
+   [
+    "replay",
+    "host/handles_full.txt",
+    "host/wind_meteors_handles_full.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "import_string_cut",
+  "calls": [
+   [
+    "replay",
+    "host/import_string_cut.txt",
+    "host/wind_meteors_import_string_cut.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "emit_size",
+  "calls": [
+   [
+    "replay",
+    "host/emit_size.txt",
+    "host/wind_meteors_emit_size.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "emit_past",
+  "calls": [
+   [
+    "replay",
+    "host/emit_past.txt",
+    "host/wind_meteors_emit_past.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "emit_kind",
+  "calls": [
+   [
+    "replay",
+    "host/emit_kind.txt",
+    "host/wind_meteors_emit_kind.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "emit_payload_size",
+  "calls": [
+   [
+    "replay",
+    "host/emit_payload_size.txt",
+    "host/wind_meteors_emit_payload_size.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "emit_weapon",
+  "calls": [
+   [
+    "replay",
+    "host/emit_weapon.txt",
+    "host/wind_meteors_emit_weapon.wasm"
+   ]
+  ]
  }
 ]

@@ -1,0 +1,12 @@
+(module
+  (import "env" "memory" (memory 1))
+  (import "env" "__indirect_function_table" (table 1 funcref))
+  (global (export "g_word") i32 (i32.const 4112))
+  (func (export "div32") (param i32 i32) (result i32)
+    (i32.reinterpret_f32 (f32.div (f32.reinterpret_i32 (local.get 0)) (f32.reinterpret_i32 (local.get 1)))))
+  (func (export "add32") (param i32 i32) (result i32)
+    (i32.reinterpret_f32 (f32.add (f32.reinterpret_i32 (local.get 0)) (f32.reinterpret_i32 (local.get 1)))))
+  (func (export "sqrt32") (param i32) (result i32)
+    (i32.reinterpret_f32 (f32.sqrt (f32.reinterpret_i32 (local.get 0)))))
+  (func (export "div64") (param i32 i32 i32)
+    (f64.store (local.get 0) (f64.div (f64.convert_i32_s (local.get 1)) (f64.convert_i32_s (local.get 2))))))

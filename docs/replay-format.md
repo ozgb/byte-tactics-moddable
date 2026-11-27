@@ -1532,7 +1532,9 @@ in them. The line carries the arguments by their modes and the result after ` = 
 | `arg` (`param`) | nothing: the function returns the argument (a service that fills an out argument `dst` and returns `dst`) |
 
 An out is an `o` line after the import line: `o dest "Armada"` for a text written through a pointer, `o dst 98304` for an int
-(`{"label": "dst", "int": "dst"}`), `o file#1.current rec#1` for a record a file now points at. An entry may also give `pre` lines
+(`{"label": "dst", "int": "dst"}`), `o file#1.current rec#1` for a record a file now points at. A text out with a `size`
+(`{"label": "dst", "text": "dst", "size": "size"}`, `TdfRecord_GetFieldString`) names the argument that holds the buffer's
+size: the replayer writes at most size - 1 bytes of the recorded text and then a 0, so a text longer than the buffer is cut. An entry may also give `pre` lines
 (what the replayer's definition does before it reads the line: it empties `root` and `current` for `TdfFile_Construct`, and builds the
 formatted text of a service that formats its arguments from those arguments), `effect` lines (the replayer's definition does what
 the function does to its object or to the state: `GameRand` advances its stream), `cast` and `into_size`.

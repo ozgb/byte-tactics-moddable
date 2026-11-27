@@ -1706,6 +1706,7 @@ harness,game,call,QuirksNormalise,2
 harness,game,call,QuirksParse,2
 harness,game,call,ReplayGateRef,8
 harness,game,call,SaveGameFile,1
+harness,game,call,SchedPublish,1
 harness,game,call,SchedRoutes,1
 harness,game,call,SimBlockAttach,1
 harness,game,call,SimBlockBase,27

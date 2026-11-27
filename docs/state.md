@@ -57,12 +57,12 @@ Known limits:
 
 ## Counts
 
-As of the last read of `data/state_classes.csv` (2623 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
+As of the last read of `data/state_classes.csv` (2631 rows). `tools/test_stateclasses.py` recounts the file by kind and class and fails when this table differs, so a change to the classes updates it in the same commit:
 
 | kind | sim | view | platform | mixed | const | total |
 |---|---|---|---|---|---|---|
 | global | 47 | 353 | 287 | 0 | 61 | 748 |
-| static | 7 | 28 | 697 | 0 | 71 | 803 |
+| static | 7 | 28 | 705 | 0 | 71 | 811 |
 | game-region | 112 | 491 | 130 | 49 | 0 | 782 |
 | heap | 154 | 48 | 88 | 0 | 0 | 290 |
 
@@ -119,8 +119,13 @@ Crossings left during play, each waiting on another decision:
   assignment, which the mask cannot bound, so the table lists that write too.
 - `DispatchOrdersPanelPageFlags` and `StepBuildMenuPageBack` (control_panel.cpp) write the build-menu page bits of
   `Unit.flags`: bit 0x400000, the build menu rather than the orders, and the page number. Only presentation reads
-  them, but the trace still hashes them, since the mask covers only the selection bit 0x10. #1115 finds and masks
-  the presentation writes that remain hashed.
+  them, but the trace still hashes them, since the mask covers only the selection bit 0x10. `InitUnitFromType`
+  (units.cpp) sets them too, for every builder with more than one menu page, so a mask would change nearly every
+  trace. No run played from its command log (`docs/commands.md`, section 2.2) differs on them.
+- The selection functions of selection.cpp (`MarkLocalVisibleUnits`, `FindNextUnmarkedLocalUnit`,
+  `FocusNextLocalUnit`, `FocusCommander`) write bits 6 and 7 of `Unit.flags` (`selectState`), the mark of the units
+  that focusing the next unit has visited, and only they read it. It is still hashed, and it is the one difference
+  of every `ui-` scenario played from its command log but the last tick of `ui-dialogs` (#1136): #1132 masks it.
 - The selection (`Unit.flags` bit 0x10 and the other selection fields) is written by the selection functions of
   selection.cpp; #1050 takes it out of the judged state.
 

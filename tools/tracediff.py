@@ -446,7 +446,7 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
          poison: bool = False, blockscan: int = 0, env: dict[str, str] | None = None,
          put: dict[str, Path] | None = None, collect: tuple[str, ...] = (), xserver: bool = False,
          blockscan_verify: bool = False, testdisplay: str | None = None,
-         started: Callable[[subprocess.Popen], None] | None = None) -> Path:
+         started: Callable[[subprocess.Popen], None] | None = None, testcommands: Path | None = None) -> Path:
     """Run the exe on the scenario with playtest.py, in `env` (default: this process's); the run's directory.
 
     `put` maps a path in the run's game copy to a file placed there before the exe starts, and each path of
@@ -454,6 +454,7 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
     run gives the game a display: the reference build has no headless host and exits at once without one.
     `testdisplay` (a tick, or `all`) adds that frame (every frame) to the run's displaylist.txt.
     `started` is called with the playtest.py process as soon as it starts, so that a caller can stop it.
+    `testcommands` (a run's commands.txt) plays the file's commands instead of the scenario's (docs/commands.md, section 2.2).
     """
     cmd = [sys.executable, str(ROOT / "tools/playtest.py"), "--exe", str(exe), "--testmode", str(scenario)]
     for dest, src in (put or {}).items():
@@ -466,6 +467,8 @@ def play(exe: Path, scenario: Path, game_dir: str | None, dump: int | None, time
         cmd += ["--testdump", str(dump)]
     if testdisplay is not None:
         cmd += ["--testdisplay", testdisplay]
+    if testcommands is not None:
+        cmd += ["--testcommands", str(testcommands)]
     if timeout is not None:
         cmd += ["--testmode-timeout", f"{timeout:g}"]
     if poison:

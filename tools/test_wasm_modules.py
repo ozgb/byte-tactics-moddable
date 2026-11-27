@@ -277,6 +277,9 @@ class Budgets(unittest.TestCase):
     def test_a_module_without_a_size_budget_fails(self):
         self.assertTrue(wm.check_size({"name": "m"}, 10))
 
+    def test_a_blocked_entry_has_no_size_to_judge(self):
+        self.assertEqual(wm.check_size({"name": "m", "blocked": "its default does not build"}, 10**9), [])
+
     def test_the_fuel_entry_must_be_the_passes_rule(self):
         pins = {"fuel": {"rule": wm.wasm_fuel.RULE, "version": wm.wasm_fuel.VERSION}, "modules": [{"name": "m", "fuel_budget": 5}]}
         self.assertEqual(wm.check_fuel_manifest(pins), [])

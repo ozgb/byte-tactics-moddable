@@ -193,7 +193,7 @@ class Unrecorded(unittest.TestCase):
         self.assertTrue(any("Apply(event)" in e for e in errors), errors)
         ann["subsystems"]["wind_meteors"]["slots"]["Apply"].update({"record": False, "reason": "load class"})
         model, errors = build([], ann)
-        self.assertEqual([e for e in errors if "matches no row" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
+        self.assertEqual([e for e in errors if "matches no row" not in e and "no slot's closure calls" not in e and not e.startswith(("map", "players", "ai", "orders", "los_radar", "movement", "weapons.UpdateUnitWeapons"))], [])
         spec = model["subsystems"]["wind_meteors"]
         self.assertNotIn("Apply", spec["slots"])
         self.assertEqual(spec["unrecorded"], {"Apply": {"reason": "load class", "native": "ApplySlot"}})
@@ -277,6 +277,42 @@ class Unrecorded(unittest.TestCase):
         ann["subsystems"]["weapons"]["imports"].append("wind_meteors.Apply")
         _, errors = build([], ann)
         self.assertTrue(any("wind_meteors is complete but has pending args" in e and "Apply(event)" in e for e in errors), errors)
+
+
+class RecordedImports(unittest.TestCase):
+    GROUPS = {"map", "los_radar", "pathfinding"}
+
+    def check(self, imports, called=(), recorded=(), reasons=None):
+        spec = {"imports": imports}
+        if reasons is not None:
+            spec["unrecorded_imports"] = reasons
+        return rs.uncalled_imports("map", spec, set(called), set(recorded), self.GROUPS)
+
+    def test_a_recorded_or_called_import_passes(self):
+        self.assertEqual(self.check(["los_radar.GetMapCell", "map.GetGroundHeight"], called=["map.GetGroundHeight"],
+                                    recorded=["los_radar.GetMapCell"]), [])
+
+    def test_an_import_neither_recorded_nor_called_needs_a_reason(self):
+        errors = self.check(["los_radar.GetMapCell", "pathfinding.CellsChanged"], recorded=["los_radar.GetMapCell"])
+        self.assertEqual(len(errors), 1)
+        self.assertIn("pathfinding.CellsChanged", errors[0])
+        self.assertEqual(self.check(["pathfinding.CellsChanged"], reasons={"pathfinding.CellsChanged": "a load slot calls it"}), [])
+
+    def test_a_reason_must_name_an_import_that_no_recording_carries(self):
+        self.assertEqual(len(self.check(["los_radar.GetMapCell"], recorded=["los_radar.GetMapCell"],
+                                        reasons={"los_radar.GetMapCell": "why"})), 1)
+        self.assertEqual(len(self.check([], reasons={"los_radar.GetMapCell": "why"})), 1)
+        self.assertEqual(len(self.check(["los_radar.GetMapCell"], reasons={"los_radar.GetMapCell": ""})), 1)
+
+    def test_a_recorded_import_must_be_listed(self):
+        errors = self.check([], recorded=["los_radar.GetMapCell", "services.SchedPublish"])
+        self.assertEqual(errors, ["map's recordings carry los_radar.GetMapCell, which it does not import"])
+
+    def test_map_imports_only_what_its_recordings_carry(self):
+        schema = json.loads((Path(__file__).resolve().parent.parent / "data/replay_schema.json").read_text())
+        self.assertEqual(schema["annotations"]["subsystems"]["map"]["imports"], ["los_radar.GetMapCell"])
+        self.assertEqual(rs.recorded_imports("map") - {"services.SchedPublish", "services.SimAlloc", "services.SimFree"},
+                         {"los_radar.GetMapCell"})
 
 
 class Rules(unittest.TestCase):
@@ -1049,6 +1085,7 @@ class StructForms(unittest.TestCase):
     def test_a_value_out_is_recorded_as_the_result_in_the_import_line_and_the_closing_line(self):
         ann = annotations()
         ann["subsystems"]["targeting"]["imports"].append("scripts.GetPieceAngles")
+        ann["subsystems"]["targeting"].setdefault("unrecorded_imports", {})["scripts.GetPieceAngles"] = "no recording carries it yet"
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]
@@ -1252,6 +1289,7 @@ class Callbacks(unittest.TestCase):
         args = {x["name"]: modes.get(x["name"], {"mode": "scalar"}) for x in params}
         ann["subsystems"]["scripts"]["slots"][slot] = {"args": args}
         ann["subsystems"][importer]["imports"].append("scripts." + slot)
+        ann["subsystems"][importer].setdefault("unrecorded_imports", {})["scripts." + slot] = "no recording carries it yet"
         if mutate:
             mutate(ann)
         return ann
@@ -2757,6 +2795,7 @@ class ElementForms(unittest.TestCase):
         ann = annotations()
         slot = ann["subsystems"]["scripts"]["slots"]["StartScriptWithArgsByIndex"] = {"args": {"callback": {"mode": "object", "kind": "FixtureCb", "line": "callback"}}}
         ann["subsystems"]["weapons"]["imports"] = ann["subsystems"]["weapons"].get("imports", []) + ["scripts.StartScriptWithArgsByIndex"]
+        ann["subsystems"]["weapons"].setdefault("unrecorded_imports", {})["scripts.StartScriptWithArgsByIndex"] = "no recording carries it yet"
         files, errors, _ = self.generated(ann)
         self.assertEqual(errors, [])
         hooks = files[rs.HOOKS_H]

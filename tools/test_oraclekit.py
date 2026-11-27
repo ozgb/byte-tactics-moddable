@@ -30,7 +30,7 @@ CONTENTS = [("file", "docs/a.md", ""), ("file", "data/x.json", ""), ("dir", "dat
 MODULES_TEXT = json.dumps({
     "tools": {"clang": "1"},
     "modules": [{"name": "m", "exports": ["Go"], "cxx": ["wasm/m/module.cpp", "src/map/m.cpp"], "c": ["lib/bitexact/t.c"],
-                 "imports": {"services": {"Rand": [["int"], "int"]}}}],
+                 "blocked": "g_table lives in src/map/t.cpp", "imports": {"services": {"Rand": [["int"], "int"]}}}],
 }) + "\n"
 UNNAMED_DUMP = """*** Dumping AST Record Layout
          0 | struct W::(unnamed union)::(unnamed at /a/w.h:7:9)

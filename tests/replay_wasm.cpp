@@ -5,26 +5,13 @@
 #include "../interfaces/host.h"
 #include "../src/state/block.h"
 #include "../src/wasm/modules.h"
+#include "../src/wasm/module_glue.h"
 #include "replay_wasm.h"
 
 namespace {
 
-struct Glue {
-    const char* subsystem;
-    int(__stdcall* install)(wl_loader* loader, int timing);
-    int(__stdcall* bind)(wl_loader* loader, wl_module* module, unsigned fuelBudget);
-    void(__stdcall* useSeam)();
-    int(__stdcall* fuelClose)(unsigned* used);
-    int(__stdcall* fatalPending)();
-    int(__stdcall* outOfFuel)(unsigned* budget);
-};
-
-const Glue kGlue[] = {
-    { "wind_meteors", WindMeteorsInstall, WindMeteorsBind, WindMeteorsUseSeam, WindMeteorsFuelClose, WindMeteorsFatalPending, WindMeteorsOutOfFuel },
-};
-
 ModuleMemory s_memory;
-const Glue* s_glue;
+GlueModule* s_glue;
 char s_wasmPath[320];
 char s_directory[320];
 wl_loader* s_loader;
@@ -80,11 +67,12 @@ void __cdecl OnTrap(void* user, const char* module, const char* message)
 {
     char text[700];
     (void)user;
-    if (s_glue != nullptr && s_glue->fatalPending())
+    if (GlueFatalPending())
         return;
     if (s_trapHook != nullptr) {
         unsigned budget;
-        s_trapHook(TrapClass(message, s_glue != nullptr && s_glue->outOfFuel(&budget) != 0), message);
+        const char* starved;
+        s_trapHook(TrapClass(message, GlueOutOfFuel(&budget, &starved) != 0), message);
     }
     sprintf(text, "%s trapped: %s", module, message);
     Stop(text);
@@ -159,10 +147,13 @@ void ReplayWasmSelect(const char* wasmPath, const char* subsystem)
     s_directory[length] = '\0';
     const char* stem = s_wasmPath + length;
     s_glue = nullptr;
-    for (const Glue& glue : kGlue) {
-        size_t n = strlen(glue.subsystem);
-        if (subsystem != nullptr ? strcmp(subsystem, glue.subsystem) == 0 : strncmp(stem, glue.subsystem, n) == 0 && (stem[n] == '.' || stem[n] == '_'))
-            s_glue = &glue;
+    unsigned count;
+    GlueModule* const* modules = GlueModules(&count);
+    for (unsigned i = 0; i < count; i++) {
+        const char* name = modules[i]->def->name;
+        size_t n = strlen(name);
+        if (subsystem != nullptr ? strcmp(subsystem, name) == 0 : strncmp(stem, name, n) == 0 && (stem[n] == '.' || stem[n] == '_'))
+            s_glue = modules[i];
     }
     if (s_glue == nullptr)
         Stop("no WASM glue entry for the subsystem this module file is named after");
@@ -171,7 +162,7 @@ void ReplayWasmSelect(const char* wasmPath, const char* subsystem)
 
 const char* ReplayWasmSubsystem()
 {
-    return s_glue == nullptr ? nullptr : s_glue->subsystem;
+    return s_glue == nullptr ? nullptr : s_glue->def->name;
 }
 
 bool ReplayWasmActive()
@@ -214,18 +205,18 @@ void ReplayWasmReload()
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
 
-    Check(s_glue->install(s_loader, 0));
-    wl_module* module = wl_load_module_bytes(s_loader, s_glue->subsystem, bytes, size);
+    Check(GlueInstall(s_loader, 0));
+    wl_module* module = wl_load_module_bytes(s_loader, s_glue->def->name, bytes, size);
     Check(module != nullptr);
     free(bytes);
     long fuelBudget = 0;
-    if (!wl_module_int(s_loader, s_glue->subsystem, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
+    if (!wl_module_int(s_loader, s_glue->def->name, "fuel_budget", &fuelBudget) || fuelBudget <= 0)
         Stop("the manifest has no fuel_budget");
-    Check(s_glue->bind(s_loader, module, (unsigned)fuelBudget));
-    s_glue->fuelClose(&used);
+    Check(GlueBind(s_glue, s_loader, module, (unsigned)fuelBudget));
+    GlueFuelClose(s_glue, &used);
 }
 
 void ReplayWasmUseSeam()
 {
-    s_glue->useSeam();
+    GlueUseSeam(s_glue);
 }

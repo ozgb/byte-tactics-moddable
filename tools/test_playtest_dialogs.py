@@ -1,9 +1,10 @@
-"""Tests of the error-dialog matching and the retry decision: `uv run tools/test_playtest_dialogs.py`.
+"""Tests of the error-dialog matching, the retry decision and the X server command: `uv run tools/test_playtest_dialogs.py`.
 
 Pure functions only; no game, display or Wine is run.
 """
 
 import argparse
+import os
 import tempfile
 from pathlib import Path
 
@@ -144,6 +145,40 @@ def test_collect_keeps_a_file_of_the_game_copy() -> None:
         inst.collect_traces()
         assert (run.out / "savegame/harness.sav").read_bytes() == b"written by the game"
         assert not (run.out / "savegame/absent.sav").exists()
+
+
+XVFB = ["Xvfb", "-displayfd", "7", "-screen", "0", "640x480x24", "-ac", "-br", "-noreset", "-nolisten", "tcp"]
+XEPHYR = ["Xephyr", "-displayfd", "7", "-screen", "800x600x24", "-ac", "-br", "-noreset", "-title", "t"]
+
+
+def read_only(d: Path) -> bool:
+    d.chmod(0o555)
+    return not os.access(d, os.W_OK)
+
+
+def test_writable_socket_dir_is_unchanged() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        assert playtest.x_command(None, 7, Path(d)) == XVFB
+        assert playtest.x_command("t", 7, Path(d)) == XEPHYR
+
+
+def test_missing_socket_dir_is_unchanged() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        assert playtest.x_command(None, 7, Path(d) / "none") == XVFB
+
+
+def test_read_only_socket_dir_drops_the_unix_socket() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        sock = Path(d) / "x11"
+        sock.mkdir()
+        try:
+            if not read_only(sock):
+                print("skipped: running as root, a directory is never read-only")
+                return
+            assert playtest.x_command(None, 7, sock) == [*XVFB, "-nolisten", "unix"]
+            assert playtest.x_command("t", 7, sock) == [*XEPHYR, "-nolisten", "unix"]
+        finally:
+            sock.chmod(0o755)
 
 
 if __name__ == "__main__":

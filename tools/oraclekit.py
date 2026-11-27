@@ -7,7 +7,8 @@
 
 The kit is the files of CONTENTS (the table below) in their own paths, `layout.json` (the state block
 layout, generated from the modern build's types like tools/layoutasserts.py), `wasm/modules.json` (the
-module manifest of the game without the fields that name the source files) and `README.md` (from
+module manifest of the game without the fields that name the source files, and with `"blocked": true` in place of a blocked
+entry's reason, which names them) and `README.md` (from
 tools/oraclekit/README.md). `MANIFEST.json` lists each file's path, sha256 and size, the commit, the
 `interfaces-v*` and `reference-traces-v*` tags with the commit of each (`tag_commits`) and the tool's version. The
 kit's version is the pair of tags: the `interfaces-v*` tag must be on the commit, and the `reference-traces-v*` tag is
@@ -116,7 +117,7 @@ SIM_EVENTS_HEADER = "interfaces/sim_events.h"
 SERVICES_HEADER = "interfaces/services.h"
 FREE_FUNCTION = re.compile(r"^[ \t]*(?!//|#)([^\n;{}()]*?\b(\w+)[ \t]*\([^;{}]*\)[ \t]*;)", re.M)
 TERMS_SOURCE = "tools/oraclekit/sim_event_terms.csv"
-MODULE_SOURCE_FIELDS = ("cxx", "c", "blocked")
+MODULE_SOURCE_FIELDS = ("cxx", "c")
 SOURCE_NAME = re.compile(r"(?<![\w.-])(?:src|include|orig|lib|build|cmake)/|\.(?:cpp|c|h)\b")
 SOURCE_DIR = r"(?<![\w.-])(?:src|include|orig|lib|cmake)/(?:[\w./-]*\w)?"
 SOURCE_FILE = re.compile(SOURCE_DIR + r"|(?<![\w<])[\w./-]*\w\.(?:cpp|c|h|hpp|inc)\b(?![\w(>\[])")
@@ -700,11 +701,14 @@ def renames(counts: dict[str, int]) -> str:
 
 
 def kit_modules(data: bytes) -> bytes:
-    """The module manifest of the kit: wasm/modules.json without the fields of a module entry that name its source files."""
+    """The module manifest of the kit: wasm/modules.json without the fields of a module entry that name its source files, and
+    `"blocked": true` in place of a blocked entry's reason."""
     manifest = json.loads(data)
     for entry in manifest.get("modules", []):
         for field in MODULE_SOURCE_FIELDS:
             entry.pop(field, None)
+        if "blocked" in entry:
+            entry["blocked"] = True
     return (json.dumps(manifest, indent=1) + "\n").encode()
 
 

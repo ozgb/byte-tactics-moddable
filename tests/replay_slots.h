@@ -5561,6 +5561,10 @@ void BindSeams()
         g_import_los_radar.GetOriginCellAtPosition = Imp_los_radar_GetOriginCellAtPosition;
         g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
+        g_seams.features = &g_import_features;
+        g_import_features.GetFootprintCentre = Imp_features_GetFootprintCentre;
+        g_import_features.FindFeatureAtPos = Imp_features_FindFeatureAtPos;
+        g_import_features.GetCellFeature = Imp_features_GetCellFeature;
     }
     if (strcmp(g_subsystem, "scripts") == 0) {
         g_seams.map = &g_import_map;

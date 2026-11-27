@@ -33,6 +33,7 @@ struct Loaded {
 };
 
 const unsigned kLoadedCapacity = 16;
+const int kModulesValueBytes = 512;
 Loaded s_loaded[kLoadedCapacity];
 unsigned s_loadedCount;
 
@@ -95,12 +96,13 @@ int HasSwitch(char* cmdLine, const char* name, char* value, int size)
             while (*q != '\0' && !isspace((unsigned char)*q))
                 q++;
             int n = (int)(q - start);
-            if (n >= size)
+            int fits = n < size;
+            if (!fits)
                 n = size - 1;
             memcpy(value, start, n);
             value[n] = '\0';
             memset(p, ' ', q - p);
-            return 1;
+            return fits ? 1 : -1;
         }
     }
     return 0;
@@ -220,7 +222,7 @@ void LoadModule(const char* exe, GlueModule* glue)
         LoaderFatal(name, wl_error(s_loader));
 }
 
-void Start()
+void Start(const char* only)
 {
     char exe[300];
     char dll[320];
@@ -270,9 +272,47 @@ void Start()
         int blocked = wl_module_text(s_loader, glue->def->name, "blocked") != nullptr;
         if (blocked != glue->def->blocked)
             LoaderFatal(glue->def->name, "the manifest and the glue tables disagree on whether the module builds");
-        if (!blocked)
-            LoadModule(exe, glue);
     }
+    int selected[kLoadedCapacity] = {};
+    if (only != nullptr) {
+        if (moduleCount > kLoadedCapacity)
+            LoaderFatal("modules", "too many modules");
+        char list[512];
+        strcpy(list, only);
+        for (char* name = list;;) {
+            char* comma = strchr(name, ',');
+            if (comma != nullptr)
+                *comma = '\0';
+            if (*name == '\0')
+                LoaderFatal("modules", "-modules: empty name in the list");
+            if (_stricmp(name, "native") == 0 || _stricmp(name, "wasm") == 0) {
+                sprintf(text, "-modules: %s cannot be mixed with module names", name);
+                LoaderFatal("modules", text);
+            }
+            unsigned at = 0;
+            while (at < moduleCount && _stricmp(modules[at]->def->name, name) != 0)
+                at++;
+            if (at == moduleCount) {
+                sprintf(text, "-modules: no module %s in the manifest", name);
+                LoaderFatal("modules", text);
+            }
+            if (modules[at]->def->blocked) {
+                sprintf(text, "-modules names it, but its entry is blocked: its default does not build to WASM");
+                LoaderFatal(modules[at]->def->name, text);
+            }
+            if (selected[at]) {
+                sprintf(text, "-modules: %s is named twice", name);
+                LoaderFatal("modules", text);
+            }
+            selected[at] = 1;
+            if (comma == nullptr)
+                break;
+            name = comma + 1;
+        }
+    }
+    for (unsigned i = 0; i < moduleCount; i++)
+        if (!modules[i]->def->blocked && (only == nullptr || selected[i]))
+            LoadModule(exe, modules[i]);
 }
 
 }
@@ -293,7 +333,7 @@ void __stdcall ModulesFatal(const char* text)
 
 void __stdcall ModulesHideSwitch(char* cmdLine)
 {
-    char mode[16];
+    char mode[kModulesValueBytes];
     HasSwitch(cmdLine, "modules", mode, sizeof mode);
     if (s_wasm)
         for (unsigned i = 0; i < s_loadedCount; i++)
@@ -306,7 +346,7 @@ struct Starter {
     Starter()
     {
         char line[1024];
-        char mode[16];
+        char mode[kModulesValueBytes];
         strncpy(line, host_command_line(), sizeof line - 1);
         line[sizeof line - 1] = '\0';
         s_testRun = strstr(line, "testmode") != nullptr;
@@ -317,14 +357,18 @@ struct Starter {
                 fclose(on);
         }
         s_wasm = 1;
-        if (HasSwitch(line, "modules", mode, sizeof mode)) {
+        const char* only = nullptr;
+        int found = HasSwitch(line, "modules", mode, sizeof mode);
+        if (found < 0)
+            ModulesFatal("-modules: the list of module names is too long");
+        if (found > 0) {
             if (_stricmp(mode, "native") == 0)
                 s_wasm = 0;
             else if (_stricmp(mode, "wasm") != 0)
-                ModulesFatal("-modules: expected native or wasm");
+                only = mode;
         }
         if (s_wasm)
-            Start();
+            Start(only);
     }
 };
 
@@ -361,12 +405,14 @@ void TimingTick(unsigned tick)
         s_timingFirstTick = tick;
         s_timingMs = host_time_ms();
         s_timingCounter = host_time_counter();
-        if (!s_wasm) {
-            unsigned count;
-            GlueModule* const* modules = GlueModules(&count);
-            for (unsigned i = 0; i < count; i++)
-                if (!modules[i]->def->blocked)
-                    GlueTimeNative(modules[i]);
+        unsigned count;
+        GlueModule* const* modules = GlueModules(&count);
+        for (unsigned i = 0; i < count; i++) {
+            int isLoaded = 0;
+            for (unsigned j = 0; j < s_loadedCount; j++)
+                isLoaded |= s_loaded[j].glue == modules[i];
+            if (!modules[i]->def->blocked && !isLoaded)
+                GlueTimeNative(modules[i]);
         }
     }
     if (tick % 600 == 0)

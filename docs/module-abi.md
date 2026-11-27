@@ -325,10 +325,14 @@ check uses (section 14).
 3. The host defines every import of every group (sections 9 and 10). An import that is not defined
    by the time a module that needs it is loaded is an instantiation error (the loader can stub missing
    imports as traps; the game does not ask for that).
-4. For each module: check the interface majors (section 10); zero its window; compile it; link its
+4. For each module the game loads: check the interface majors (section 10); zero its window; compile it; link its
    imports; instantiate it (this runs the start function); look up each name of `exports` as a
    function export and fill free table entries (2.3); read each name of `data` as an i32 global
    export, whose value is the address of the data word (section 8).
+   The game loads every manifest entry that is not `blocked`, in manifest order, or with
+   `-modules=<name>[,<name>...]` only the entries named; the others run their native defaults. A name
+   that is not in the manifest, that is `blocked` or that is given twice ends the game at start-up. Before
+   step 4 the game checks, for every entry, that the manifest and the glue tables agree on `blocked`.
 5. Before each slot call the host writes the data words (section 8). At the first slot call of a
    tick the host sets the fuel counter (section 11).
 

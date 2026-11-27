@@ -219,6 +219,7 @@ enum {
     UNIT_FLAG_CARGO_SELECTABLE = 0x40000000,
     UNIT_FLAG_SELECTABLE = 0x20,
     UNIT_FLAGS_SELECTION = 0x10,
+    UNIT_FLAGS_VISIT = 0xc0,
     UNIT_FLAGS_MENU = 0x03c00000,
     UNIT_FLAGS_SONAR = 0x200,
     UNIT_FLAGS_SENSED = 0x300,
@@ -574,7 +575,7 @@ static void FillUnit(PlayerView* v, ViewUnit* out, const unsigned char* unit)
         relation |= VIEW_RELATION_SELECTABLE;
     out->relation = (unsigned char)relation;
     out->ground = (flags & 3) == 1;
-    flags &= ~(unsigned)(UNIT_FLAGS_SELECTION | UNIT_FLAGS_MENU);
+    flags &= ~(unsigned)(UNIT_FLAGS_SELECTION | UNIT_FLAGS_VISIT | UNIT_FLAGS_MENU);
     if (!own)
         flags &= UNIT_FLAGS_SONAR | UNIT_FLAG_ALIVE;
     out->flags = flags;

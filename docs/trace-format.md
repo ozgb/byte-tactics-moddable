@@ -375,8 +375,9 @@ row hashes:
 
 The excluded fields have no `units[i].<field>` line; the dump holds them under the record's prefix.
 
-`flags` (+0x110) is hashed with the mask 0xffffffef: bit 0x10, the selection, is view state (`docs/state.md`, "The
-selection"), so two runs that differ only in what is selected have equal rows. The dump prints the masked value.
+`flags` (+0x110) is hashed with the mask 0xffffff2f: bit 0x10, the selection, and bits 6 and 7, its visit mark
+(`selectState`), are view state (`docs/state.md`, "The selection"), so two runs that differ only in what is selected
+or which units focusing has visited have equal rows. The dump prints the masked value.
 
 ### 7.2 projectiles (section 2)
 

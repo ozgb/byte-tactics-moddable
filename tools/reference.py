@@ -192,21 +192,16 @@ UI_LOGS: dict[str, str | None] = {}
 INTERFACE_LOGS: dict[str, str | None] = {}
 COMMAND_TEXTS: dict[str, str | None] = {}
 REPLAY_SUFFIX = "+commands"
-SELECT_STATE = "Unit.flags bits 6 and 7 (selectState), which the selection writes, are still hashed (#1132)"
+ORDER_CREATED = "the view's orders[i].created (Order.created) is one tick later from the file (#1187)"
 REPLAY_LEFT_OUT = {
-    "ui-antinuke-range": SELECT_STATE,
-    "ui-build-menu": SELECT_STATE,
-    "ui-build-place": SELECT_STATE,
-    "ui-click-select": SELECT_STATE,
-    "ui-debug-keys": SELECT_STATE,
-    "ui-dialogs": SELECT_STATE,
-    "ui-drag-select": SELECT_STATE,
-    "ui-groups": SELECT_STATE,
-    "ui-keys": SELECT_STATE,
-    "ui-left-click-orders": SELECT_STATE,
-    "ui-right-click": SELECT_STATE,
-    "ui-scroll-groups": SELECT_STATE,
-    "ui-share-chat": SELECT_STATE,
+    "ui-build-menu": ORDER_CREATED,
+    "ui-build-place": ORDER_CREATED,
+    "ui-dialogs": ORDER_CREATED,
+    "ui-groups": ORDER_CREATED,
+    "ui-keys": ORDER_CREATED,
+    "ui-left-click-orders": ORDER_CREATED,
+    "ui-right-click": ORDER_CREATED,
+    "ui-scroll-groups": ORDER_CREATED,
 }
 EVENT_LOGS: dict[str, str | None] = {}
 SETUP_LOGS: dict[str, str | None] = {}

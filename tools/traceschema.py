@@ -316,7 +316,7 @@ HEAP_TYPES: list[tuple[str, str]] = [
 
 MASKS: dict[tuple[str, int], tuple[int, str]] = {
     ("ExplodedPiece", 0x28): (0x3F, "bits 6 to 31 are never written; the explosion of a piece copies them from an uninitialised stack header"),
-    ("Unit", 0x110): (0xFFFFFFEF, "bit 0x10 is the selection, view state: presentation sets it and reads it, and the tick only clears it"),
+    ("Unit", 0x110): (0xFFFFFF2F, "bit 0x10 is the selection and bits 6 and 7 (selectState) its visit mark, view state: presentation sets and reads them, and the tick only clears the selection"),
     ("Order", 0x42): (0xFFDFFFFF, "bit 0x200000 is set by the drawing of the weapon coverage of a selected unit and read only there"),
     ("UnitMotion", 0x2E): (0x07, "bits 3 to 7 are never written; the constructor sets mode and flag"),
     ("AiSearchGoal", 0x64): (0x0B, "bits 4 to 7 are never written; bit 2 is unset by the constructor and read only after the unit state sent over the network writes it"),

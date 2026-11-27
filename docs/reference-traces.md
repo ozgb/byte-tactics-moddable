@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v52` is the fixed target for anyone writing a new
+The git tag `reference-traces-v53` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v52`**.
+code as a base. This page names the current tag: **`reference-traces-v53`**.
 
 ## What the tag holds
 
@@ -22,7 +22,7 @@ code as a base. This page names the current tag: **`reference-traces-v52`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v52
+git checkout reference-traces-v53
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -139,7 +139,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v52
+git checkout reference-traces-v53
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -213,10 +213,11 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v53`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v52`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
+`reference-traces-v53`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
 exported from and pairs it with the highest `reference-traces-v*` tag merged into that commit, so the two need not be on
 the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `reference-traces-v51`, and the kit at
-`interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it.
+`interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it, and the kit at `interfaces-v58` pairs with
+`reference-traces-v53`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -481,12 +482,20 @@ the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `re
   panel reads `FRATE: 0`, as #1147 draws it. A `--traces` run at the reference tip 5e2e36a08, which changes only
   `tools/playtest.py`, gives every one of these files again but for the commit line. The sounds, UI logs, interface
   commands, events, frames and views of the 98 are those of v51, and the saves decode equal to v51's.
+- `reference-traces-v53` (#1132): the 102 scenarios of v52 with the selection's visit mark, bits 6 and 7 of
+  `Unit.flags` (`selectState`), out of the judged state and the view. The trace masks them out of the `Unit` table (mask
+  0xffffff2f, `docs/state.md`, "The selection"), and the view clears them from `ViewUnit.flags`, at view version 2.1
+  (`docs/view.md`), so a `ui-` scenario played from its command log gives its own `tick` rows (eight still differ in the view's `orders[i].created`, #1187). The `tick` rows change only
+  in the thirteen `ui-` scenarios, the only ones whose units get the mark. The view header carries the minor version, so every view file and every `view` row changes, and with
+  them every digest. The commit line names 2d6f1c7c1, the reference tip with the view 2.1 fill (#1183). The trace
+  format is still `bt-trace 10`. The event digests, sound logs, UI logs, interface commands, display logs, frames and
+  saves are those of v52.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v52 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v53 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

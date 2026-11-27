@@ -1,6 +1,6 @@
 """Judge a submitted module by behaviour alone (docs/module-abi.md, "Judging a module").
 
-    uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
+    uv run tools/oraclegate.py MODULE.wasm --subsystem wind_meteors [--full | --recordings-only] [--out DIR] [--build-dir build/modern] [--game-dir DIR]
 
 Refuses the module, before anything plays, when `tools/wasm_modules.py check-module` finds a problem in the file: the window,
 table, imports, exports, kinds or size budget of docs/module-abi.md, section 5.2. Then copies the runtime files of the modern build (and objs/objects.rsp, which the block pointer check reads beside the map) into a fresh directory with MODULE.wasm in place of the subsystem's module,
@@ -17,6 +17,14 @@ and so is the exit status. Each scenario also has a `digest` verdict, and the re
 contract with another order inside the tick; the digest is not a failure. The `view` verdicts are the same for the hash of the `view` row
 (the player view of the end of the tick, docs/view.md "The recorded view"): `equal`, `differs` (from a tick) or `not_judged`, per scenario and at the top
 level. A view that differs is not a failure either: the state stays the verdict.
+
+A module of a subsystem whose manifest entry is `blocked` (its default does not build to WASM, so the game cannot load it in
+a scenario), or any module with `--recordings-only`, takes the recordings route instead: after the same check-module, it
+replays every recording of tests/replay/NAME/ against the module (`replay_native_test.exe --wasm`, one run per recording,
+under Wine) and judges it on those alone. Its result has `scope: recordings` and `scenarios: not_judged`, and names the
+replay rules it was judged under in `rules`: the imports answered as pure queries (`services.GetGafFrame`: by its arguments,
+whenever the module asks, in any count or order) and the arguments no callee reads (the `y` of the position the reclaim
+scan passes to `los_radar.GetMapCellAtPosition`, which the scan leaves unset). The scenario route's result has `scope: scenarios`.
 
 Exit status: 0 when every scenario and recording is equal, 1 when one differs or failed to run, 2 when the loader refused
 the module or the arguments were wrong.
@@ -36,7 +44,10 @@ import reference
 import replay
 
 ROOT = Path(__file__).resolve().parent.parent
-FORMAT = 3
+FORMAT = 4
+REPLAYER = "replay_native_test.exe"
+REPLAY_TIMEOUT = 3600
+RULES = {"queries": ["services.GetGafFrame"], "unread_arguments": ["los_radar.GetMapCellAtPosition pos.y"]}
 RUNTIME_FILES = ("TotalA.exe", "TotalA.map", "CMakeCache.txt", "wasmtime_host.dll", "modules.json")
 OBJECT_LIST = "objs/objects.rsp"
 PROBE = "game_seed 1\ncrt_seed 2\nview_seed 3\nmap The Pass\nstart_positions fixed\nticks 10\nplayer0.controller human\nplayer0.side Arm\nplayer1.controller ai\nplayer1.side Core\n"
@@ -52,6 +63,10 @@ DIVERGENCE_AT = re.compile(r"first divergence: tick (\d+), phase (\S+)$")
 DIVERGENCE_FIELD = re.compile(r"first differing field: (\S+): a=(.*?) b=(.*)$")
 FAILED_TO_RUN = re.compile(r"(\S+): failed to run")
 BLOCK_POINTER_SUMMARY = re.compile(r"(?:\[\w+\] )?\d+ problems with the pointers out of the block")
+REPLAY_DIVERGED = re.compile(r"^DIVERGED .*: first at call (\d+), (.+)$", re.M)
+REPLAY_IDENTICAL = re.compile(r": \d+ calls, \d+ imports, identical on a second run$", re.M)
+REPLAY_ARRAY_BYTE = re.compile(r"byte (\d+) of \d+: recorded \S*, replayed (\S*), \d+ bytes differ$")
+REPLAY_ARRAY_COUNT = re.compile(r"recorded \d+ elements, replayed (\d+)$")
 
 
 class Error(Exception):
@@ -76,6 +91,27 @@ def kit_version() -> dict[str, str | None]:
 
 def manifest_modules(build: Path) -> list[str]:
     return [m["name"] for m in json.loads((build / "modules.json").read_text())["modules"]]
+
+
+def blocked(subsystem: str) -> bool:
+    """Whether the subsystem's entry of wasm/modules.json is blocked: its default does not build to WASM, so no scenario can load a module of it."""
+    for entry in json.loads((ROOT / "wasm/modules.json").read_text())["modules"]:
+        if entry["name"] == subsystem:
+            return "blocked" in entry
+    raise Error(f"wasm/modules.json has no module {subsystem}")
+
+
+def prepare_replay_runtime(build: Path, subsystem: str, module: Path, directory: Path) -> Path:
+    """A fresh directory with the files `replay_native_test.exe --wasm` reads beside the module: the wasmtime DLL, the manifest and `module` as the subsystem's."""
+    for name in ("wasmtime_host.dll", REPLAYER):
+        if not (build / name).is_file():
+            raise Error(f"the build has no {name}: build the replay_native_test and wasm_runtime targets")
+    shutil.rmtree(directory, ignore_errors=True)
+    directory.mkdir(parents=True)
+    shutil.copy2(build / "wasmtime_host.dll", directory / "wasmtime_host.dll")
+    shutil.copy2(ROOT / "wasm/modules.json", directory / "modules.json")
+    shutil.copyfile(module, directory / f"{subsystem}.wasm")
+    return directory / f"{subsystem}.wasm"
 
 
 def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) -> Path:
@@ -220,6 +256,49 @@ def parse_recordings(data: dict[str, dict]) -> dict[str, dict]:
     return out
 
 
+def clean_key(text: str) -> str | None:
+    words = text.split(" ")
+    return text if len(words) <= 3 and len(text) <= 200 and all(NAME.match(w) for w in words) else None
+
+
+def replayed_side(detail: str) -> str | None:
+    """The module's side of a replayer detail line (`recorded X, replayed Y` and its array forms), never the recorded side."""
+    if m := REPLAY_ARRAY_BYTE.match(detail):
+        return f"byte {m[1]}: {m[2]}"
+    if m := REPLAY_ARRAY_COUNT.match(detail):
+        return f"{m[1]} elements"
+    if detail.startswith("recorded an array, replayed "):
+        return detail[len("recorded an array, replayed "):]
+    if detail.endswith(", replayed an array"):
+        return "an array"
+    head, sep, tail = detail.rpartition(", replayed ")
+    return tail if sep and head.startswith("recorded ") else None
+
+
+def parse_replay(output: str, exit_code: int) -> dict:
+    """The verdict of one recording from replay_native_test's report: equal, differs at a call (its tick, slot, key and the module's value) or failed."""
+    output = output.replace("\r\n", "\n")
+    if m := REPLAY_DIVERGED.search(output):
+        call, key = int(m[1]), m[2]
+        found = {"status": "differs", "call": call, "tick": None, "phase": None, "field": clean_key(key), "value": None}
+        lines = output.splitlines()
+        head = re.compile(rf"call {call} (\S+) (\S+) DIFFERS$")
+        for i, line in enumerate(lines):
+            if h := head.match(line):
+                found.update(tick=int(h[1]) if h[1].isdigit() else None, phase=clean_name(h[2]))
+                for detail in lines[i + 1:]:
+                    if not detail.startswith("    "):
+                        break
+                    if detail.startswith(f"    {key}: "):
+                        found["value"] = clean_value(replayed_side(detail[len(key) + 6:]))
+                        break
+                break
+        return found
+    if exit_code == 0 and REPLAY_IDENTICAL.search(output):
+        return {"status": "equal"}
+    return {"status": "failed"}
+
+
 def verdict_of(suite: dict[str, dict], recordings: dict[str, dict]) -> str:
     statuses = [v["status"] for v in [*suite.values(), *recordings.values()]]
     if "differs" in statuses:
@@ -239,13 +318,56 @@ def build_result(subsystem: str, module: Path, full: bool, kit: dict, suite: dic
                  message: str | None, seconds: float) -> dict:
     """The contents of result.json. Every value comes from a parsed field, none from a report's text."""
     result = {"format": FORMAT, "subsystem": subsystem, "module": {"sha256": sha256(module), "bytes": module.stat().st_size},
-              "kit": kit, "suite": "full" if full else "tier", "seconds": round(seconds)}
+              "kit": kit, "scope": "scenarios", "suite": "full" if full else "tier", "seconds": round(seconds)}
     if message is not None:
         result.update(verdict="refused", message=message)
         return result
     result.update(scenarios=suite or {}, recordings=recordings or {}, verdict=verdict_of(suite or {}, recordings or {}),
                   digest=digest_of(suite or {}), view=digest_of(suite or {}, "view"))
     return result
+
+
+def build_recordings_result(subsystem: str, module: Path, kit: dict, recordings: dict | None, message: str | None, seconds: float) -> dict:
+    """The contents of result.json for the recordings route. Every value comes from a parsed field, none from a report's text."""
+    result = {"format": FORMAT, "subsystem": subsystem, "module": {"sha256": sha256(module), "bytes": module.stat().st_size},
+              "kit": kit, "scope": "recordings", "rules": RULES, "seconds": round(seconds)}
+    if message is not None:
+        result.update(verdict="refused", message=message)
+        return result
+    result.update(scenarios="not_judged", recordings=recordings or {}, verdict=verdict_of({}, recordings or {}),
+                  digest="not_judged", view="not_judged")
+    return result
+
+
+def recording_files(subsystem: str) -> list[Path]:
+    return sorted((ROOT / "tests/replay" / subsystem).glob("*.txt"))
+
+
+def judge_recordings(module: Path, subsystem: str, build: Path, out: Path) -> dict:
+    """Judge the module on the recordings of tests/replay/SUBSYSTEM/ alone, one replayer run per recording."""
+    started = time.time()
+    for stale in ("runtime", "logs"):
+        shutil.rmtree(out / stale, ignore_errors=True)
+    problems = check_module(module, subsystem)
+    kit = kit_version()
+    if problems is not None:
+        return build_recordings_result(subsystem, module, kit, None, problems, time.time() - started)
+    files = recording_files(subsystem)
+    if not files:
+        raise Error(f"tests/replay/{subsystem}/ has no recordings")
+    wasm = prepare_replay_runtime(build, subsystem, module, out / "runtime")
+    (out / "logs/recordings").mkdir(parents=True)
+    recordings = {}
+    for path in files:
+        cmd = ["wine", str(build / REPLAYER), "--wasm", str(wasm), str(path.relative_to(ROOT))]
+        log = out / "logs/recordings" / path.name
+        try:
+            with log.open("w") as f:
+                code = subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, text=True, cwd=ROOT, timeout=REPLAY_TIMEOUT).returncode
+        except subprocess.TimeoutExpired:
+            code = -1
+        recordings[f"{subsystem}/{path.stem}"] = parse_replay(log.read_text(errors="replace"), code)
+    return build_recordings_result(subsystem, module, kit, recordings, None, time.time() - started)
 
 
 def stream(cmd: list[str], log: Path) -> tuple[int, str]:
@@ -292,15 +414,20 @@ def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game
 def summary(result: dict) -> str:
     if result["verdict"] == "refused":
         return "refused: " + result["message"].splitlines()[0]
-    bad = [f"{n}: {v['status']}" + (f" ({v['reason']})" if "reason" in v else "") for n, v in {**result["scenarios"], **result["recordings"]}.items() if v["status"] != "equal"]
-    return f"{result['verdict']} ({len(bad)} not equal)" + "".join("\n  " + b for b in bad)
+    scenarios = result["scenarios"] if isinstance(result["scenarios"], dict) else {}
+    bad = [f"{n}: {v['status']}" + (f" ({v['reason']})" if "reason" in v else "") + (f" at call {v['call']}, {v['field']}" if "call" in v else "")
+           for n, v in {**scenarios, **result["recordings"]}.items() if v["status"] != "equal"]
+    scope = " on recordings; scenarios not judged" if result["scope"] == "recordings" else ""
+    return f"{result['verdict']}{scope} ({len(bad)} not equal)" + "".join("\n  " + b for b in bad)
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("module", type=Path)
     ap.add_argument("--subsystem", required=True)
-    ap.add_argument("--full", action="store_true", help="play the full --check instead of the tier")
+    route = ap.add_mutually_exclusive_group()
+    route.add_argument("--full", action="store_true", help="play the full --check instead of the tier")
+    route.add_argument("--recordings-only", action="store_true", help="judge on the recordings of tests/replay/SUBSYSTEM/ alone (the route of a blocked manifest entry)")
     ap.add_argument("--out", type=Path, default=ROOT / "build/oracle", help="the directory of the run: runtime/, logs/ and result.json (default build/oracle)")
     ap.add_argument("--build-dir", type=Path, default=ROOT / "build/modern")
     ap.add_argument("--game-dir")
@@ -308,7 +435,12 @@ def main() -> int:
     if not args.module.is_file():
         ap.error(f"{args.module} is not a file")
     try:
-        result = judge(args.module.resolve(), args.subsystem, args.full, args.build_dir.resolve(), args.out.resolve(), args.game_dir)
+        if args.recordings_only or blocked(args.subsystem):
+            if args.full:
+                ap.error(f"{args.subsystem}'s manifest entry is blocked: no scenario can load its module, so it is judged on its recordings alone")
+            result = judge_recordings(args.module.resolve(), args.subsystem, args.build_dir.resolve(), args.out.resolve())
+        else:
+            result = judge(args.module.resolve(), args.subsystem, args.full, args.build_dir.resolve(), args.out.resolve(), args.game_dir)
     except (Error, OSError) as e:
         print(f"oraclegate: {e}", file=sys.stderr)
         return 2

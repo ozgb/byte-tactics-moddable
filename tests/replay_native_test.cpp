@@ -771,10 +771,159 @@ const ReplayField* RngField(const char* name)
 
 void RestoreImportObject(const char* name, const char* value);
 
+const char* const kQueryImports[] = { "services.GetGafFrame" };
+
+struct UnreadArgument {
+    const char* import;
+    const char* vector;
+    int component;
+};
+
+const UnreadArgument kUnreadArguments[] = { { "los_radar.GetMapCellAtPosition", "pos=(", 1 } };
+
+bool IsImportNamed(const char* text, const char* name)
+{
+    size_t length = strcspn(text, " ");
+    return strlen(name) == length && strncmp(text, name, length) == 0;
+}
+
+bool IsQueryName(const char* text)
+{
+    for (const char* name : kQueryImports) {
+        if (IsImportNamed(text, name))
+            return true;
+    }
+    return false;
+}
+
+bool IsQueryLine(const char* line)
+{
+    return strncmp(line, "  i ", 4) == 0 && IsQueryName(line + 4);
+}
+
+int SkipQueryLines(int k)
+{
+    while (k < g_callEnd && IsQueryLine(g_lines[k])) {
+        k++;
+        while (k < g_callEnd && (strncmp(g_lines[k], "    c ", 6) == 0 || strncmp(g_lines[k], "  b ", 4) == 0 || (strncmp(g_lines[k], "  o ", 4) == 0 && !ClosingLine(g_lines[k]))))
+            k++;
+    }
+    return k;
+}
+
+int NextImportLine(int k)
+{
+    for (;;) {
+        while (k < g_callEnd && strncmp(g_lines[k], "  i ", 4) != 0 && strncmp(g_lines[k], "  o ", 4) != 0 && strncmp(g_lines[k], "  w ", 4) != 0)
+            k++;
+        if (k == g_callEnd || !IsQueryLine(g_lines[k]))
+            return k;
+        k = SkipQueryLines(k);
+    }
+}
+
+bool MaskUnread(const char* text, const UnreadArgument& u, char* out, size_t size)
+{
+    const char* result = strstr(text, " = ");
+    size_t length = result == nullptr ? strlen(text) : (size_t)(result - text);
+    if (length >= size)
+        return false;
+    memcpy(out, text, length);
+    out[length] = '\0';
+    char* p = strstr(out, u.vector);
+    if (p == nullptr)
+        return false;
+    p += strlen(u.vector);
+    for (int i = 0; i < u.component; i++) {
+        p = strpbrk(p, ",)");
+        if (p == nullptr || *p == ')')
+            return false;
+        p++;
+    }
+    char* end = strpbrk(p, ",)");
+    if (end == nullptr)
+        return false;
+    memmove(p + 1, end, strlen(end) + 1);
+    *p = '*';
+    return true;
+}
+
+bool EqualButUnread(const char* recorded, const char* actual)
+{
+    for (const UnreadArgument& u : kUnreadArguments) {
+        if (!IsImportNamed(actual, u.import) || !IsImportNamed(recorded, u.import))
+            continue;
+        char a[512];
+        char b[512];
+        return MaskUnread(recorded, u, a, sizeof a) && MaskUnread(actual, u, b, sizeof b) && strcmp(a, b) == 0;
+    }
+    return false;
+}
+
+int FindQueryLine(const char* actual, int from, int to)
+{
+    unsigned n = (unsigned)strlen(actual);
+    for (int k = from; k < to; k++) {
+        const char* line = g_lines[k];
+        if (strncmp(line, "  i ", 4) == 0 && strncmp(line + 4, actual, n) == 0 && (line[4 + n] == '\0' || strncmp(line + 4 + n, " = ", 3) == 0))
+            return k;
+    }
+    return -1;
+}
+
+char g_queryNames[MAX_OUTS][160];
+int g_queryAnswers;
+
+const char* EnterQuery(const ReplayText& actual)
+{
+    g_outCount = 0;
+    g_beforeCount = 0;
+    g_cbCount = 0;
+    int at = FindQueryLine(actual.Data(), g_callFirst + 1, g_callEnd);
+    if (at < 0)
+        at = FindQueryLine(actual.Data(), 0, g_lineCount);
+    if (at < 0) {
+        char key[96];
+        sprintf(key, "query %.*s", (int)strcspn(actual.Data(), " "), actual.Data());
+        Diff(key, "no answer to these arguments", actual.Data());
+        return "";
+    }
+    const char* recorded = g_lines[at] + 4;
+    unsigned n = (unsigned)strlen(actual.Data());
+    const char* result = recorded[n] == '\0' ? "" : recorded + n + 3;
+    char prefix[96];
+    _snprintf(prefix, sizeof prefix, "%s.", result);
+    prefix[sizeof prefix - 1] = '\0';
+    size_t prefixLength = strlen(prefix);
+    for (int k = at + 1; k < g_lineCount && strncmp(g_lines[k], "  o ", 4) == 0 && strncmp(g_lines[k] + 4, prefix, prefixLength) == 0; k++) {
+        const char* name = g_lines[k] + 4;
+        const char* space = strchr(name, ' ');
+        size_t length = space == nullptr ? 0 : (size_t)(space - name);
+        if (space == nullptr || length >= sizeof g_queryNames[0] || g_outCount == MAX_OUTS)
+            Fatal(g_file, g_callIndex, "a line of a query's answer that cannot be read", g_lines[k]);
+        memcpy(g_queryNames[g_outCount], name, length);
+        g_queryNames[g_outCount][length] = '\0';
+        g_outNames[g_outCount] = g_queryNames[g_outCount];
+        g_outValues[g_outCount] = space + 1;
+        g_outCount++;
+    }
+    for (int i = 0; i < g_outCount; i++) {
+        const ReplayField* f = RngField(g_outNames[i]);
+        if (f != nullptr)
+            RestoreField(*f, g_outValues[i]);
+        else
+            RestoreImportObject(g_outNames[i], g_outValues[i]);
+    }
+    g_queryAnswers++;
+    return result;
+}
+
 const char* Enter(const ReplayText& actual)
 {
     if (g_loading)
         return "";
+    if (IsQueryName(actual.Data()))
+        return EnterQuery(actual);
     int index = g_importIndex++;
     g_importsTotal++;
     g_outCount = 0;
@@ -785,9 +934,7 @@ const char* Enter(const ReplayText& actual)
     const char* space = strchr(actual.Data(), ' ');
     int nameLength = space == nullptr ? (int)strlen(actual.Data()) : (int)(space - actual.Data());
     sprintf(key, "import %d %.*s", index, nameLength, actual.Data());
-    int next = g_cursor;
-    while (next < g_callEnd && strncmp(g_lines[next], "  i ", 4) != 0 && strncmp(g_lines[next], "  o ", 4) != 0 && strncmp(g_lines[next], "  w ", 4) != 0)
-        next++;
+    int next = NextImportLine(g_cursor);
     if (next == g_callEnd || strncmp(g_lines[next], "  i ", 4) != 0) {
         Diff(key, "no such import call", actual.Data());
         return "";
@@ -835,7 +982,8 @@ const char* Enter(const ReplayText& actual)
     unsigned n = (unsigned)strlen(actual.Data());
     if (strncmp(recorded, actual.Data(), n) == 0 && (recorded[n] == '\0' || strncmp(recorded + n, " = ", 3) == 0))
         return recorded[n] == '\0' ? "" : recorded + n + 3;
-    Diff(key, recorded, actual.Data());
+    if (!EqualButUnread(recorded, actual.Data()))
+        Diff(key, recorded, actual.Data());
     return LastResult(recorded);
 }
 
@@ -3641,6 +3789,8 @@ void CompareCache(const ReplayCacheStart& before)
     replayed.Free();
 }
 
+void (*g_aroundSlot)(bool after);
+
 void ReplayCall(const char* file, Outcome& out)
 {
     char* header = g_lines[g_callFirst];
@@ -3705,12 +3855,16 @@ void ReplayCall(const char* file, Outcome& out)
     ReplayCacheStart cacheBefore;
     if (CachedSubsystem() && ReplayReadDebrisCache(cacheBefore) != nullptr)
         Fatal(file, g_callIndex, "the debris cache does not tile its arena before the call", slotText);
+    if (g_aroundSlot != nullptr)
+        g_aroundSlot(false);
     bool ran = RunSlot(g_subsystem, slotText);
+    if (g_aroundSlot != nullptr)
+        g_aroundSlot(true);
     ReplayAnswerHook() = nullptr;
     if (!ran)
         Fatal(file, g_callIndex, "a slot with no runner", slotText);
     for (int k = g_cursor; k < g_callEnd; k++) {
-        if (strncmp(g_lines[k], "  i ", 4) == 0) {
+        if (strncmp(g_lines[k], "  i ", 4) == 0 && !IsQueryLine(g_lines[k])) {
             char key[96];
             const char* nameEnd = strchr(g_lines[k] + 4, ' ');
             int nameLength = nameEnd == nullptr ? (int)strlen(g_lines[k] + 4) : (int)(nameEnd - (g_lines[k] + 4));
@@ -3777,7 +3931,7 @@ bool Mutate(int mutation)
         if (strncmp(g_lines[k], "call ", 5) == 0) {
             call++;
             imports = 0;
-        } else if (strncmp(g_lines[k], "  i ", 4) == 0) {
+        } else if (strncmp(g_lines[k], "  i ", 4) == 0 && !IsQueryLine(g_lines[k])) {
             if (mutation == MUT_ARGUMENT && strncmp(g_lines[k], anchor, anchorLength) == 0) {
                 sprintf(g_mutated, "%s", g_lines[k]);
                 char* digit = spawnImport ? strstr(g_mutated, "weapondef#") + 10 : strchr(g_mutated, ',') + 1;
@@ -5747,13 +5901,13 @@ void LoadReadsSelfTest()
     Check(model != nullptr && model->vertexCount == 12 && model->box_x == -50 && model->box_y == 7 && model->box_z == 8, "a 3DO model has its recorded box and vertex count");
     Check(GetObjectHeight(model) == 88, "its height replays");
     ReplayAnswerHook() = nullptr;
-    Check(g_diffs == 0 && g_importIndex == 6, "and nothing differs");
+    Check(g_diffs == 0 && g_importIndex == 4, "and nothing differs, the frames answered as queries outside the import order");
     BeginServices(body);
     LoadAnimGaf("logos");
     FindGafEntry((GafArchive*)gaf, "radar");
     GetGafFrame((FrameTable*)entry, 3);
     printf("a changed argument: %s\n%s", g_firstKey, g_detail.Data());
-    Check(g_diffs == 1 && strcmp(g_firstKey, "import 2 services.GetGafFrame") == 0, "a changed index is reported at its import");
+    Check(g_diffs == 1 && strcmp(g_firstKey, "query services.GetGafFrame") == 0, "a frame index with no recorded answer is reported at the query");
     BeginServices(body);
     LoadAnimGaf("other");
     Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 services.LoadAnimGaf") == 0, "and so is a changed name");
@@ -9170,6 +9324,89 @@ void TeamColourSourceSelfTest(const char* file)
     free(text);
 }
 
+void UnreadArgumentSelfTest()
+{
+    printf("an argument the callee does not read\n");
+    ResetBlock();
+    const char* body = "  i los_radar.GetMapCellAtPosition pos=(1048576,77,2097152) = null\n";
+    Vec3 pos;
+    pos.x = 1048576;
+    pos.y = -5;
+    pos.z = 2097152;
+    BeginServices(body);
+    Imp_los_radar_GetMapCellAtPosition(&pos);
+    Check(g_diffs == 0, "the y of a cell lookup's position is not compared");
+    pos.z = 2097153;
+    BeginServices(body);
+    Imp_los_radar_GetMapCellAtPosition(&pos);
+    printf("a changed z: %s\n%s", g_firstKey, g_detail.Data());
+    Check(g_diffs == 1 && strcmp(g_firstKey, "import 0 los_radar.GetMapCellAtPosition") == 0, "its x and z are");
+}
+
+int g_askIndex;
+
+void AskGafFrame(bool after)
+{
+    if (g_game->losTable == nullptr)
+        return;
+    GetGafFrame(g_game->losTable, g_askIndex);
+    if (after)
+        GetGafFrame(g_game->losTable, g_askIndex);
+}
+
+void GafQuerySelfTest(const char* file)
+{
+    printf("GetGafFrame answered as a query\n");
+    unsigned size = 0;
+    char* text = ReadWholeFile(file, &size);
+    const char* first = strstr(text, "\n  i services.GetGafFrame FrameTable#");
+    int index = -1;
+    if (first != nullptr)
+        sscanf(first, "\n  i services.GetGafFrame FrameTable#%*d %d", &index);
+    Check(index >= 0, "the recording asks for a frame");
+    if (index < 0) {
+        free(text);
+        return;
+    }
+    Outcome out;
+    g_queryAnswers = 0;
+    ReplayFile(file, out);
+    int recorded = g_queryAnswers;
+    printf("in the recorded order: %d calls, %d frames, %s\n", out.calls, recorded, out.diverged ? out.key : "equal");
+    Check(!out.diverged && recorded > 0, "a module that asks for its frames in the recorded order is equal");
+
+    g_aroundSlot = AskGafFrame;
+    g_askIndex = index;
+    g_queryAnswers = 0;
+    ReplayFile(file, out);
+    printf("asked before and twice after each slot's imports: %d frames, %s\n", g_queryAnswers, out.diverged ? out.key : "equal");
+    Check(!out.diverged && g_queryAnswers > recorded, "a module that asks more often and in another order is equal");
+    g_askIndex = 0x7fff;
+    ReplayFile(file, out);
+    printf("asked for a frame no line answers: call %d, %s\n", out.call, out.key);
+    Check(out.diverged && strcmp(out.key, "query services.GetGafFrame") == 0, "a frame the recording has no answer to is reported at the query");
+    g_aroundSlot = nullptr;
+
+    const char* end = first + 1;
+    do
+        end = strchr(end, '\n') + 1;
+    while (strncmp(end, "  o GafFrame#", 13) == 0);
+    unsigned length = (unsigned)(end - (first + 1));
+    char* block = (char*)malloc(length + 1);
+    memcpy(block, first + 1, length);
+    block[length] = '\0';
+    const char* call = strstr(text, "\ncall ");
+    const char* at = call == nullptr ? nullptr : strchr(call + 1, '\n') + 1;
+    unsigned changedLength = 0;
+    char* changed = Splice(text, size, at, 0, block, &changedLength);
+    g_queryAnswers = 0;
+    ReplayChangedText(changed, changedLength, out);
+    Check(!out.diverged && g_queryAnswers == recorded, "a module that asks less often than the recording does is equal");
+    free(changed);
+    free(block);
+    free(text);
+}
+
 int SelfTest(const char* file)
 {
     static const char* const names[] = { "", "an import with other arguments", "an extra import", "a missing import" };
@@ -9233,8 +9470,13 @@ int SelfTest(const char* file)
     SimVectorSelfTest();
     GameWriteSelfTest();
     RegionSelfTest();
+    UnreadArgumentSelfTest();
     if (file == nullptr)
         return 0;
+    if (strstr(file, "los_radar") != nullptr) {
+        GafQuerySelfTest(file);
+        return 0;
+    }
     if (strstr(file, "scripts") != nullptr) {
         LoadByteFlipSelfTest(file);
         SetCobWriteSelfTest(file);

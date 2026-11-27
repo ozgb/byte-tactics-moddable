@@ -1786,6 +1786,22 @@ draw returns the recorded result, and the stream words advance as the game's do,
 A call that differs is reported with the first import or field that differs and both values, and the file stops
 there. Each file is replayed twice and the two results must be identical.
 
+Two rules narrow the import comparison (`docs/module-abi.md`, section 15, names them in the oracle's result):
+
+- **Queries.** `services.GetGafFrame` is a pure query: its answer depends on its arguments alone. Whenever the module
+  calls it, the replayer answers from a recorded `i` line with the same arguments (in the current call first, then
+  anywhere in the file) and that line's `o` lines of the result, and does not count it as an import or compare where it
+  falls. Its recorded lines are skipped when the other imports are matched, and are never missing. Arguments no recorded
+  call has are reported at `query services.GetGafFrame`. `InitGafSequence` and `StepGafSequence` change their cursor and
+  stay in order.
+- **Unread arguments.** The `y` of `los_radar.GetMapCellAtPosition`'s `pos` is not compared: the lookup reads only `x`
+  and `z`, and the reclaim scan passes a position whose `y` it never sets.
+
+The los_radar self-test checks both on `console-sight`: the recording replays equal with its 26 frames, equal again when
+the module asks for the frame before each slot and twice after it (5699 calls, in another order), equal with an extra
+recorded frame it never asks for, and a frame index no line answers is reported at the query. Every `--self-test` also
+replays a cell lookup whose `y` changed, which is equal, and one whose `z` changed, which is reported at its import.
+
 `--self-test [FILE]` first round-trips a small graph of objects (a `Player` with two `Unit`s sharing a `UnitDef`)
 through the text form and reports a changed field at its `Kind#N.field`. It then does the same for each form of the text
 format, whether or not a recording uses it: the indexed tables (`Projectile#3.speed`, `MovementClass#5.maxSlope`), the sized arrays (whole lines,

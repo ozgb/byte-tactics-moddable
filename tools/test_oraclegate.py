@@ -5,6 +5,7 @@
 
 import json
 import os
+import re
 import subprocess
 import tempfile
 import unittest
@@ -146,12 +147,13 @@ class DigestVerdict(unittest.TestCase):
         suite = oraclegate.parse_suite("a: failed to run, playtest.py ended with:\n", 1, ["a"])
         self.assertEqual(suite["a"]["digest"], {"status": "not_judged"})
 
-    def test_the_result_has_format_3_and_the_top_level_digest_and_view(self):
-        self.assertEqual(oraclegate.FORMAT, 3)
+    def test_the_result_has_format_4_and_the_top_level_digest_and_view(self):
+        self.assertEqual(oraclegate.FORMAT, 4)
         suite = oraclegate.parse_suite("ok   a (10 ticks, 0:01) [digest differs from tick 4]\nok   b (10 ticks, 0:01)\n", 0, ["a", "b"])
         with tempfile.TemporaryDirectory() as tmp:
             result = oraclegate.build_result("wind_meteors", self.module(tmp), False, {}, suite, {"wind_meteors/x": {"status": "equal"}}, None, 1)
-        self.assertEqual(result["format"], 3)
+        self.assertEqual(result["format"], 4)
+        self.assertEqual(result["scope"], "scenarios")
         self.assertEqual(result["view"], "equal")
         self.assertEqual(result["verdict"], "equal")
         self.assertEqual(result["digest"], "differs")
@@ -202,6 +204,104 @@ class Recordings(unittest.TestCase):
         found = replay.divergence(STORED, STORED[: STORED.rindex("  w ")])
         self.assertEqual(found["status"], "differs")
         self.assertIsNone(found["field"])
+
+
+REPLAY_SECRET = "0x7a5e11"
+REPLAY_EQUAL = "tests/replay/wind_meteors/a.txt: 120 calls, 40 imports, identical on a second run\nreplay_native_test: all passed\n"
+REPLAY_DIVERGED = f"""DIVERGED tests/replay/wind_meteors/a.txt: first at call 2, SimGlobals.g_meteorScheduleGap
+call 0 1 UpdateWind ok imports=0 hash=0badf00d
+call 1 1 UpdateMeteors ok imports=2 hash=12345678
+call 2 2 UpdateMeteors DIFFERS
+    SimGlobals.g_meteorScheduleGap: recorded {REPLAY_SECRET}, replayed 155
+    SimGlobals.g_other: recorded 1, replayed 2
+replay_native_test: 1 failures
+"""
+
+
+class ReplayReport(unittest.TestCase):
+    def test_equal(self):
+        self.assertEqual(oraclegate.parse_replay(REPLAY_EQUAL, 0), {"status": "equal"})
+
+    def test_the_first_difference_has_the_modules_side_only(self):
+        found = oraclegate.parse_replay(REPLAY_DIVERGED, 1)
+        self.assertEqual(found, {"status": "differs", "call": 2, "tick": 2, "phase": "UpdateMeteors",
+                                 "field": "SimGlobals.g_meteorScheduleGap", "value": "155"})
+        self.assertNotIn(REPLAY_SECRET, json.dumps(found))
+
+    def test_wine_line_ends(self):
+        self.assertEqual(oraclegate.parse_replay(REPLAY_DIVERGED.replace("\n", "\r\n"), 1), oraclegate.parse_replay(REPLAY_DIVERGED, 1))
+        self.assertEqual(oraclegate.parse_replay(REPLAY_EQUAL.replace("\n", "\r\n"), 0), {"status": "equal"})
+
+    def test_an_import_key_keeps_its_index_and_name(self):
+        report = REPLAY_DIVERGED.replace("SimGlobals.g_meteorScheduleGap", "import 3 services.SimAlloc")
+        found = oraclegate.parse_replay(report, 1)
+        self.assertEqual((found["field"], found["value"]), ("import 3 services.SimAlloc", "155"))
+
+    def test_the_array_forms_give_the_replayed_side(self):
+        self.assertEqual(oraclegate.replayed_side(f"byte 4 of 16: recorded {REPLAY_SECRET[2:4]}, replayed 7f, 2 bytes differ"), "byte 4: 7f")
+        self.assertEqual(oraclegate.replayed_side("recorded 9 elements, replayed 8"), "8 elements")
+        self.assertEqual(oraclegate.replayed_side("recorded an array, replayed null"), "null")
+        self.assertEqual(oraclegate.replayed_side(f"recorded {REPLAY_SECRET}, replayed an array"), "an array")
+        self.assertEqual(oraclegate.replayed_side(f"recorded {REPLAY_SECRET}, replayed no call (missing)"), "no call (missing)")
+
+    def test_a_query_with_no_answer_names_the_query(self):
+        report = REPLAY_DIVERGED.replace("SimGlobals.g_meteorScheduleGap", "query services.GetGafFrame").replace(
+            f"recorded {REPLAY_SECRET}, replayed 155", "recorded no answer to these arguments, replayed services.GetGafFrame FrameTable#1 9")
+        found = oraclegate.parse_replay(report, 1)
+        self.assertEqual((found["field"], found["value"]), ("query services.GetGafFrame", "services.GetGafFrame FrameTable#1 9"))
+
+    def test_a_fatal_stop_is_failed_with_no_text(self):
+        report = f"FAIL: tests/replay/wind_meteors/a.txt: call 3: a slot with no runner: {REPLAY_SECRET}\n"
+        self.assertEqual(oraclegate.parse_replay(report, 2), {"status": "failed"})
+
+    def test_an_identical_line_with_a_failing_exit_is_failed(self):
+        self.assertEqual(oraclegate.parse_replay("FAIL: replaying twice gives the same result\n" + REPLAY_EQUAL, 1), {"status": "failed"})
+
+    def test_a_key_with_odd_characters_is_dropped(self):
+        found = oraclegate.parse_replay(REPLAY_DIVERGED.replace("SimGlobals.g_meteorScheduleGap", "a: b = c d e"), 1)
+        self.assertIsNone(found["field"])
+
+
+class RecordingsRoute(unittest.TestCase):
+    def module(self, tmp):
+        module = Path(tmp) / "m.wasm"
+        module.write_bytes(b"\0asm\1\0\0\0")
+        return module
+
+    def test_the_result_names_its_scope_and_rules(self):
+        recordings = {"los_radar/console-sight": {"status": "equal"}}
+        with tempfile.TemporaryDirectory() as tmp:
+            result = oraclegate.build_recordings_result("los_radar", self.module(tmp), {}, recordings, None, 3)
+        self.assertEqual((result["format"], result["scope"], result["scenarios"], result["verdict"]), (4, "recordings", "not_judged", "equal"))
+        self.assertEqual(result["rules"], {"queries": ["services.GetGafFrame"], "unread_arguments": ["los_radar.GetMapCellAtPosition pos.y"]})
+        self.assertEqual(oraclegate.summary(result), "equal on recordings; scenarios not judged (0 not equal)")
+
+    def test_a_difference_names_its_recording_and_call(self):
+        recordings = {"wind_meteors/a": oraclegate.parse_replay(REPLAY_DIVERGED, 1), "wind_meteors/b": {"status": "equal"}}
+        with tempfile.TemporaryDirectory() as tmp:
+            result = oraclegate.build_recordings_result("wind_meteors", self.module(tmp), {}, recordings, None, 3)
+        self.assertEqual(result["verdict"], "differs")
+        self.assertEqual(oraclegate.summary(result).splitlines()[1], "  wind_meteors/a: differs at call 2, SimGlobals.g_meteorScheduleGap")
+
+    def test_a_refused_module_has_no_recordings(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = oraclegate.build_recordings_result("los_radar", self.module(tmp), {}, None, "los_radar: the manifest has no size_budget", 1)
+        self.assertEqual(result["verdict"], "refused")
+        self.assertNotIn("recordings", result)
+
+    def test_the_rules_are_the_replayers(self):
+        source = (oraclegate.ROOT / "tests/replay_native_test.cpp").read_text()
+        for name in oraclegate.RULES["queries"]:
+            self.assertRegex(source, r"kQueryImports\[\] = \{[^}]*\"" + re.escape(name) + "\"")
+        for rule in oraclegate.RULES["unread_arguments"]:
+            name, vector = rule.split(" ")
+            self.assertIn(f'{{ "{name}", "{vector.split(".")[0]}=(", 1 }}', source)
+
+    def test_a_blocked_entry_takes_the_recordings_route(self):
+        self.assertTrue(oraclegate.blocked("los_radar"))
+        self.assertFalse(oraclegate.blocked("wind_meteors"))
+        with self.assertRaises(oraclegate.Error):
+            oraclegate.blocked("nope")
 
 
 class Refusal(unittest.TestCase):

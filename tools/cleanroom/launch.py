@@ -11,7 +11,8 @@ runs beside it: it reads a git bundle and the gate requests from the outbox as d
 
 --review starts a code review session: /work is mounted read-only, the broker pushes nothing, and
 the reviewer's report crosses as SESSION/review.md (broker.py, "Review hand-over"). --review-report
-FILE hands such a report to the next implementer session as /srv/inbox/review.md, byte for byte.
+R/review.md hands the report review session R took to the next implementer session as
+/srv/inbox/review.md, byte for byte; a file whose sha256 is not R/review.state is refused.
 
 Refusals, each exit status 2 before any VM exists: a mount that is, contains or sits inside this
 repository (except under build/scratch), another worktree of it, ~/.claude*, $CLAUDE_CONFIG_DIR, ~/.ta, ~/.ssh,
@@ -30,6 +31,7 @@ still there.
 
 import argparse
 import contextlib
+import hashlib
 import io
 import json
 import os
@@ -351,13 +353,21 @@ def broker_argv(session, game_dir=None, core_image=None, push=True):
 
 
 def hand_in_review(report, session):
-    """Copy a review report into the session inbox as review.md, or raise Refusal."""
+    """Copy a review session's R/review.md into the session inbox as review.md, or raise Refusal.
+
+    The report must be the one the broker took, with the sha256 its review.state records.
+    """
     path = Path(report)
-    if path.is_symlink() or not path.is_file():
-        raise Refusal(f"review report {path} is not a regular file")
+    if path.name != broker.REVIEW_NAME or path.is_symlink() or not path.is_file():
+        raise Refusal(f"review report {path} is not a review session's regular {broker.REVIEW_NAME}")
+    state = path.parent / broker.REVIEW_STATE
+    if state.is_symlink() or not state.is_file():
+        raise Refusal(f"review report {path} has no {broker.REVIEW_STATE} beside it")
     data = path.read_bytes()
-    if not data or len(data) > broker.MAX_REVIEW:
-        raise Refusal(f"review report {path} is empty or larger than {broker.MAX_REVIEW} bytes")
+    if len(data) > broker.MAX_REVIEW:
+        raise Refusal(f"review report {path} is larger than {broker.MAX_REVIEW} bytes")
+    if hashlib.sha256(data).hexdigest() != state.read_text().strip():
+        raise Refusal(f"review report {path} is not the report the broker took")
     broker.write_bytes_atomic(Path(session) / "inbox", broker.REVIEW_NAME, data)
 
 
@@ -469,7 +479,7 @@ def main(argv=None):
     ap.add_argument("--keep", action="store_true", help="leave the machine in place after the command")
     hand = ap.add_mutually_exclusive_group()
     hand.add_argument("--review", action="store_true", help="code review session: /work read-only, no push, the report crosses as SESSION/review.md")
-    hand.add_argument("--review-report", default=None, help="review report to hand the implementer as /srv/inbox/review.md")
+    hand.add_argument("--review-report", default=None, help="a review session's R/review.md, handed to the implementer as /srv/inbox/review.md")
     ap.add_argument("command", nargs="+", help="command to run in the VM, after --")
     args = ap.parse_args(argv)
     if args.session is None:

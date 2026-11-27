@@ -64,6 +64,8 @@ Then post one review: the verdict line for the current head SHA, the findings, a
 
 **Merge** on `approve`, without the `needs-human-review` label, when checks are green and the tree you tested is the tree that lands (`docs/team.md`, "Branches behind `moddable`"): `gh pr merge <PR> --merge --delete-branch`. A branch that is behind but doesn't overlap the missed commits is merged as it stands. Don't ask for an update that would only reset your approval. When it does overlap, the update is a must-change finding in your review, not a request after an `approve`. Then remove its worktree and go to step 2 for its issue.
 
+**Clean-room pull requests on ozgb/btm** (a spec and the implementation written from it) merge without the human, on the conditions of the `spec-writer` skill's "Hand over": the oracle verdict on the implementer's head is `equal`, the last sandboxed review round on that head raised no findings and every earlier finding is fixed or answered, phase 2's `approve` is on the spec's head, every session ran in the VM with a clean `--check-log`, and the implementer's pull request is source only with CI green. Merge the spec's first. Check these from the spec writer's hand-over comment, the session logs and the pull requests' files; don't review the implementer's code or comment on it, since you have read this repository's source.
+
 ### 2. Reconcile after a merge
 
 For each issue closed by a pull request you merged:

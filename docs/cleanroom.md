@@ -84,8 +84,9 @@ command by `--secret-env` and never written to disk (see Credentials).
 - **Code review:** `launch.py --review` starts a review session (#1218): `/work` is mounted read-only and the broker
   runs with `--no-push`. The reviewer writes `/srv/outbox/review.md`; the broker opens it as it opens a bundle
   (`O_NOFOLLOW`, a regular file of at most 1 MiB, UTF-8) and copies it to `SESSION/review.md`, once per distinct
-  report. `launch.py --review-report FILE` copies such a report, unchanged, into the next session's inbox as
-  `/srv/inbox/review.md`.
+  report. `launch.py --review-report R/review.md` copies the report review session R took, unchanged, into the next
+  session's inbox as `/srv/inbox/review.md`, and refuses any other file: one not named `review.md`, a symlink, or one
+  whose sha256 is not `R/review.state`. Reviews run in rounds until one raises no findings.
 - **Git:** the agent runs `git bundle create /srv/outbox/.btm.tmp BRANCH ...` and renames the
   file to `/srv/outbox/btm.bundle`. No repository is shared: the broker opens the bundle with
   `O_NOFOLLOW` through a descriptor of the outbox directory (a symlink is refused), checks that it

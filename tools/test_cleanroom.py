@@ -399,18 +399,35 @@ class LaunchRefusalTests(unittest.TestCase):
 
     def test_review_report_is_handed_in_byte_for_byte(self):
         with tempfile.TemporaryDirectory() as tmp:
+            reviewer = bk.prepare(Path(tmp) / "r")
             session = bk.prepare(Path(tmp) / "s")
-            report = Path(tmp) / "review.md"
-            report.write_bytes(b"# Findings\n1. x\n")
+            (reviewer / "outbox" / bk.REVIEW_NAME).write_bytes(b"# Findings\n1. x\n")
+            bk.take_review(reviewer)
+            report = reviewer / bk.REVIEW_NAME
             ln.hand_in_review(report, session)
             self.assertEqual((session / "inbox" / bk.REVIEW_NAME).read_bytes(), b"# Findings\n1. x\n")
-            link = Path(tmp) / "link.md"
+
+    def test_only_the_report_the_broker_took_is_handed_in(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            reviewer = bk.prepare(Path(tmp) / "r")
+            session = bk.prepare(Path(tmp) / "s")
+            (reviewer / "outbox" / bk.REVIEW_NAME).write_bytes(b"# Findings\n1. x\n")
+            bk.take_review(reviewer)
+            report = reviewer / bk.REVIEW_NAME
+            link = Path(tmp) / bk.REVIEW_NAME
             link.symlink_to(report)
-            with self.assertRaises(ln.Refusal):
-                ln.hand_in_review(link, session)
-            report.write_bytes(b"")
+            retyped = Path(tmp) / "other" / bk.REVIEW_NAME
+            retyped.parent.mkdir()
+            retyped.write_bytes(b"# Findings\n1. x\n")
+            renamed = reviewer / "notes.md"
+            renamed.write_bytes(report.read_bytes())
+            for path in (link, retyped, renamed):
+                with self.assertRaises(ln.Refusal):
+                    ln.hand_in_review(path, session)
+            report.write_bytes(b"# Findings\n1. x, edited\n")
             with self.assertRaises(ln.Refusal):
                 ln.hand_in_review(report, session)
+            self.assertFalse((session / "inbox" / bk.REVIEW_NAME).exists())
 
     def test_review_and_review_report_exclude_each_other(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):

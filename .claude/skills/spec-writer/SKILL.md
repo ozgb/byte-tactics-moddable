@@ -91,28 +91,30 @@ The engine core (#1207) runs the same way, with these differences:
 
 The oracle judges what the recordings and scenarios reach; the review catches what they don't. You can't review the module yourself: you have read the source, so any finding of yours would carry it into the implementation. A fresh session in the VM does it, and its report reaches the implementer only through the mailbox.
 
-1. Update `tree/` to the implementer's branch at the pull request's head.
-2. Write the prompt from [`code-reviewer-prompt.md`](code-reviewer-prompt.md), with the subsystem and the spec branch's head filled in.
+The review runs in rounds, until a round raises no findings. Each round:
+
+1. Update `tree/` to the implementer's branch at the pull request's head, and keep `.review/` in `tree/.git/info/exclude`.
+2. Write the prompt from [`code-reviewer-prompt.md`](code-reviewer-prompt.md), with the subsystem filled in and `<base>` set to the spec branch's head in the first round, and to the head the last round reviewed after that.
 3. Run the session with a new session directory R, `/work` read-only and nothing pushed:
 
    ```sh
    uv run tools/cleanroom/launch.py --review --tree T --datakit K --session R --image I --game-dir ~/.ta -- claude -p "$(cat PROMPT)" --dangerously-skip-permissions
    ```
 
-   The report crosses as `R/review.md`. Check R's proxy log as in step 6.
-4. Run an implementer session with the report handed in, unedited: the prompt from [`implementer-prompt.md`](implementer-prompt.md), and `--review-report R/review.md` on the `launch.py` line of step 6. The implementer fixes each finding or answers it in `IMPLEMENTATION-NOTES.md`, submits again and hands the branch over only when the verdict is still `equal`.
+   The report crosses as `R/review.md`. Check R's proxy log as in step 6. When the report has no findings, the review is done.
+4. Otherwise run an implementer session on the same tree, still on the implementer's branch (don't reset it to the spec branch as step 6 does): the prompt from [`implementer-prompt.md`](implementer-prompt.md), and `--review-report R/review.md` added to step 6's `launch.py` line. `launch.py` hands in only the report R's broker took, byte for byte. The implementer fixes each finding or answers it in `IMPLEMENTATION-NOTES.md`, submits again, and hands the branch over only on `equal`. Then start the next round on the new head.
 
-Don't relay, summarise or judge a finding to the implementer, and don't add to the report. When a finding shows a gap in the spec, fix the spec as in step 6.
+Don't relay, summarise or judge a finding to the implementer, and don't add to the report. You may act on the spec, never on the module: when a finding shows a gap in the spec, fix the spec as in step 6.
 
-This step is done when every finding is fixed or answered on the pushed branch, the verdict on its head is `equal`, and every session's proxy log is on the allowlist.
+This step is done when a round on the pushed head raises no findings, the verdict on that head is `equal`, and every session's proxy log is on the allowlist.
 
 ## 8. Hand over
 
 Comment on the spec's issue with:
 
 - the sessions in order, and each verdict;
-- the review's findings, and what became of each (the commit that fixed it, or the answer in `IMPLEMENTATION-NOTES.md`);
+- each review round's findings, and what became of each (the commit that fixed it, or the answer in `IMPLEMENTATION-NOTES.md`);
 - every spec change and the review that asked for it;
 - the gaps in the kit you worked around.
 
-File each kit gap as an issue. The maintainer merges the spec's pull request, then the implementer's, when the oracle verdict on the implementer's head is `equal`, phase 2's `approve` is on the spec's head, every session ran in the VM with a clean `--check-log`, and the implementer's pull request is source only with CI green.
+File each kit gap as an issue. The maintainer merges the spec's pull request, then the implementer's, without the human, when the oracle verdict on the implementer's head is `equal`, the last review round on that head raised no findings and every earlier finding is fixed or answered, phase 2's `approve` is on the spec's head, every session ran in the VM with a clean `--check-log`, and the implementer's pull request is source only with CI green.

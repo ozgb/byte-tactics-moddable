@@ -15,6 +15,6 @@ Rules:
 - Commit source only: add `*.wasm` and `target/` to .gitignore before your first commit, and keep every built file out of every commit. Never commit /work/.review/.
 - Commit on a branch named `impl/<subsystem>` in /work. Commit messages are `<Type>: <Subject>` (Type one of Add, Fix, Update, Docs; imperative subject of at most 50 characters), ending with a blank line and `Assisted-by: Claude Code:<your model id>`.
 - When the module is `equal`, or when you are blocked only on spec questions, hand the branch over: `git bundle create /srv/outbox/.btm.tmp impl/<subsystem> && mv /srv/outbox/.btm.tmp /srv/outbox/btm.bundle`.
-- If /srv/inbox/review.md exists, it is a code review of your module: fix each finding, or answer it in IMPLEMENTATION-NOTES.md with your reasons, and hand over only when the verdict on your last submission is `equal`.
+- If /srv/inbox/review.md exists, it is a code review of your module: fix each finding, or answer it in IMPLEMENTATION-NOTES.md with your reasons, and hand over only when the verdict on your last submission is `equal`, or when you are blocked only on spec questions.
 - At the end, write /work/IMPLEMENTATION-NOTES.md (committed): what you built, the verdicts you got in order, and every place the spec or kit was unclear.
 ```

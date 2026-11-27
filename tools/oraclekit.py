@@ -116,7 +116,7 @@ SIM_EVENTS_HEADER = "interfaces/sim_events.h"
 SERVICES_HEADER = "interfaces/services.h"
 FREE_FUNCTION = re.compile(r"^[ \t]*(?!//|#)([^\n;{}()]*?\b(\w+)[ \t]*\([^;{}]*\)[ \t]*;)", re.M)
 TERMS_SOURCE = "tools/oraclekit/sim_event_terms.csv"
-MODULE_SOURCE_FIELDS = ("cxx", "c")
+MODULE_SOURCE_FIELDS = ("cxx", "c", "blocked")
 SOURCE_NAME = re.compile(r"(?<![\w.-])(?:src|include|orig|lib|build|cmake)/|\.(?:cpp|c|h)\b")
 SOURCE_DIR = r"(?<![\w.-])(?:src|include|orig|lib|cmake)/(?:[\w./-]*\w)?"
 SOURCE_FILE = re.compile(SOURCE_DIR + r"|(?<![\w<])[\w./-]*\w\.(?:cpp|c|h|hpp|inc)\b(?![\w(>\[])")
@@ -192,6 +192,7 @@ CONTENTS = [
     ("file", "data/replay_schema.json", "the annotations of the replay format"),
     ("file", "docs/ai-ratings.md", "numeric details of the computer player's ratings"),
     ("file", "docs/schedule.md", "3.1c's order of effects: the tick, the passes, the class of each cross-subsystem call and the split points"),
+    ("file", "data/routes.csv", "the scheduler's route table: which subsystem receives each kind a subsystem publishes, and when"),
     ("file", "docs/files-gate.md", "the files gate: the commands a data loader answers and the files it writes"),
     ("file", "tools/filesfixtures.py", "builds the fixture game directories of the files gate, standard library only"),
     ("dir", "reference/files", "the files gate's vectors and the digests of its fixtures"),

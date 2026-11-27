@@ -773,46 +773,6 @@ void __stdcall Imp_mission_GetMissionParams(MissionParams* a0)
     (void)r;
 }
 
-void __stdcall Imp_pathfinding_CellsChanged(int a0, int a1, int a2, int a3, unsigned int a4, int a5)
-{
-    ReplayText t;
-    StartImport(t, "pathfinding.CellsChanged");
-    Space(t);
-    ReplayValue(t, a0);
-    Space(t);
-    ReplayValue(t, a1);
-    Space(t);
-    ReplayValue(t, a2);
-    Space(t);
-    ReplayValue(t, a3);
-    Space(t);
-    ReplayValue(t, a4);
-    Space(t);
-    ReplayValue(t, a5);
-    const char* r = Enter(t);
-    (void)r;
-}
-
-void __stdcall Imp_pathfinding_Submit(const PathRequest* a0)
-{
-    ReplayText t;
-    StartImport(t, "pathfinding.Submit");
-    Space(t);
-    AddValueStruct(t, ROK_PATHREQUESTREFS, a0);
-    const char* r = Enter(t);
-    (void)r;
-}
-
-void __stdcall Imp_pathfinding_Cancel(PathHandle a0)
-{
-    ReplayText t;
-    StartImport(t, "pathfinding.Cancel");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_PATHGOAL, ReplayRefPtr(a0), true);
-    const char* r = Enter(t);
-    (void)r;
-}
-
 unsigned int __stdcall Imp_scripts_ObjectStateSize(Object3do* a0)
 {
     ReplayText t;
@@ -1405,16 +1365,6 @@ unsigned int __stdcall Imp_movement_UnitTarget(Unit* a0)
     return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
 }
 
-int __stdcall Imp_movement_TargetType(unsigned int a0)
-{
-    ReplayText t;
-    StartImport(t, "movement.TargetType");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_ORDERFX, ReplayRefPtr(a0), true);
-    const char* r = Enter(t);
-    return ParseResult<int>(r);
-}
-
 unsigned int __stdcall Imp_movement_LoadTarget(int a0, unsigned int a1, HapiBank* a2, const char* a3)
 {
     ReplayText t;
@@ -1429,22 +1379,6 @@ unsigned int __stdcall Imp_movement_LoadTarget(int a0, unsigned int a1, HapiBank
     t.AddString((const char*)a3);
     const char* r = Enter(t);
     return ReplayRefOffset(ReplayResolveObject(r, nullptr, g_objects, AllocObject));
-}
-
-void __stdcall Imp_movement_SaveTarget(unsigned int a0, unsigned int a1, HapiBank* a2, const char* a3)
-{
-    ReplayText t;
-    StartImport(t, "movement.SaveTarget");
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_ORDERFX, ReplayRefPtr(a0), true);
-    Space(t);
-    ReplayAddObjectName(t, g_objects, ROK_ORDER, ReplayRefPtr(a1), true);
-    Space(t);
-    AddObject(t, OBJ_BANK, a2);
-    Space(t);
-    t.AddString((const char*)a3);
-    const char* r = Enter(t);
-    (void)r;
 }
 
 int __stdcall Imp_units_CanRepair(Unit* a0, Unit* a1)
@@ -1638,6 +1572,26 @@ unsigned char __stdcall Imp_targeting_ChooseWeapon(Unit* a0)
     return ParseResult<unsigned char>(r);
 }
 
+void __stdcall Imp_pathfinding_Submit(const PathRequest* a0)
+{
+    ReplayText t;
+    StartImport(t, "pathfinding.Submit");
+    Space(t);
+    AddValueStruct(t, ROK_PATHREQUESTREFS, a0);
+    const char* r = Enter(t);
+    (void)r;
+}
+
+void __stdcall Imp_pathfinding_Cancel(PathHandle a0)
+{
+    ReplayText t;
+    StartImport(t, "pathfinding.Cancel");
+    Space(t);
+    ReplayAddObjectName(t, g_objects, ROK_PATHGOAL, ReplayRefPtr(a0), true);
+    const char* r = Enter(t);
+    (void)r;
+}
+
 WeaponsSeam g_import_weapons;
 FilesSeam g_import_files;
 EconomyWorldView g_import_econworld;
@@ -1645,7 +1599,6 @@ NetworkSeam g_import_network;
 LosRadarSeam g_import_los_radar;
 MapSeam g_import_map;
 MissionSeam g_import_mission;
-PathfindingSeam g_import_pathfinding;
 ScriptsSeam g_import_scripts;
 OrdersSeam g_import_orders;
 EconomySeam g_import_economy;
@@ -1654,6 +1607,7 @@ FeaturesSeam g_import_features;
 MovementSeam g_import_movement;
 UnitsSeam g_import_units;
 TargetingSeam g_import_targeting;
+PathfindingSeam g_import_pathfinding;
 WindMeteorsSeam g_native_wind_meteors = {
     UpdateWindSlot,
     UpdateMeteors,
@@ -5293,10 +5247,6 @@ void BindSeams()
         g_import_mission.GetGameType = Imp_mission_GetGameType;
         g_import_mission.GetNameSlot = Imp_mission_GetNameSlot;
         g_import_mission.GetMissionParams = Imp_mission_GetMissionParams;
-        g_seams.pathfinding = &g_import_pathfinding;
-        g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
-        g_import_pathfinding.Submit = Imp_pathfinding_Submit;
-        g_import_pathfinding.Cancel = Imp_pathfinding_Cancel;
         g_seams.scripts = &g_import_scripts;
         g_import_scripts.ObjectStateSize = Imp_scripts_ObjectStateSize;
         g_import_scripts.GetAimFromPosition = Imp_scripts_GetAimFromPosition;
@@ -5448,9 +5398,7 @@ void BindSeams()
         g_import_movement.NewRingApproach = Imp_movement_NewRingApproach;
         g_import_movement.NewPointMarker = Imp_movement_NewPointMarker;
         g_import_movement.UnitTarget = Imp_movement_UnitTarget;
-        g_import_movement.TargetType = Imp_movement_TargetType;
         g_import_movement.LoadTarget = Imp_movement_LoadTarget;
-        g_import_movement.SaveTarget = Imp_movement_SaveTarget;
         g_seams.units = &g_import_units;
         g_import_units.CanRepair = Imp_units_CanRepair;
         g_import_units.CanReclaim = Imp_units_CanReclaim;
@@ -5613,10 +5561,6 @@ void BindSeams()
         g_import_los_radar.GetOriginCellAtPosition = Imp_los_radar_GetOriginCellAtPosition;
         g_import_los_radar.ClampWorldPosToTerrain = Imp_los_radar_ClampWorldPosToTerrain;
         g_import_los_radar.IsUnitVisibleToPlayer = Imp_los_radar_IsUnitVisibleToPlayer;
-        g_seams.pathfinding = &g_import_pathfinding;
-        g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
-        g_import_pathfinding.Submit = Imp_pathfinding_Submit;
-        g_import_pathfinding.Cancel = Imp_pathfinding_Cancel;
     }
     if (strcmp(g_subsystem, "scripts") == 0) {
         g_seams.map = &g_import_map;
@@ -5678,7 +5622,6 @@ void BindSeams()
         g_import_scripts.SetObjectState = Imp_scripts_SetObjectState;
         g_import_scripts.GetPieceAngles = Imp_scripts_GetPieceAngles;
         g_seams.pathfinding = &g_import_pathfinding;
-        g_import_pathfinding.CellsChanged = Imp_pathfinding_CellsChanged;
         g_import_pathfinding.Submit = Imp_pathfinding_Submit;
         g_import_pathfinding.Cancel = Imp_pathfinding_Cancel;
     }

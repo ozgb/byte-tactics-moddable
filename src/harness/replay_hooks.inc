@@ -713,20 +713,7 @@ void __stdcall RecPathfindingCellsChanged(int a0, int a1, int a2, int a3, unsign
         ArgValue(s_call, "classes", a4);
         ArgValue(s_call, "cause", a5);
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i pathfinding.CellsChanged");
-        ImportValue(line, a0);
-        ImportValue(line, a1);
-        ImportValue(line, a2);
-        ImportValue(line, a3);
-        ImportValue(line, a4);
-        ImportValue(line, a5);
-    }
     s_inner_pathfinding->CellsChanged(a0, a1, a2, a3, a4, a5);
-    if (scope.Import()) {
-        FinishImport(line, roots);
-    }
     if (scope.Open()) {
     }
 }
@@ -3007,16 +2994,7 @@ int __stdcall RecMovementTargetType(unsigned int a0)
     if (scope.Open()) {
         ArgObject(s_call, "target", ROK_ORDERFX, ReplayRefPtr(a0));
     }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i movement.TargetType");
-        ImportObject(line, ROK_ORDERFX, ReplayRefPtr(a0));
-    }
     int result = s_inner_movement->TargetType(a0);
-    if (scope.Import()) {
-        ImportResult(line, result);
-        FinishImport(line, roots);
-    }
     if (scope.Open()) {
         ArgValue(s_tail, "result", result, "o");
     }
@@ -4839,34 +4817,6 @@ unsigned int __stdcall RecMovementLoadTarget(int a0, unsigned int a1, HapiBank* 
     return result;
 }
 
-void __stdcall RecMovementSaveTarget(unsigned int a0, unsigned int a1, HapiBank* a2, const char* a3)
-{
-    ReplayRoots roots;
-    roots.Add(ROK_ORDERFX, ReplayRefPtr(a0));
-    roots.Add(ROK_ORDER, ReplayRefPtr(a1));
-    SlotScope scope(RSL_MOVEMENT_SAVETARGET, SUB_MOVEMENT, roots, false);
-    if (scope.Open()) {
-        ArgObject(s_call, "target", ROK_ORDERFX, ReplayRefPtr(a0));
-        ArgObject(s_call, "order", ROK_ORDER, ReplayRefPtr(a1));
-        ArgHandle(s_call, "file", OBJ_BANK, a2);
-        ArgValue(s_call, "name", (const char*)a3);
-    }
-    ReplayText line;
-    if (scope.Import()) {
-        line.Add("  i movement.SaveTarget");
-        ImportObject(line, ROK_ORDERFX, ReplayRefPtr(a0));
-        ImportObject(line, ROK_ORDER, ReplayRefPtr(a1));
-        ImportHandle(line, OBJ_BANK, a2);
-        ImportValue(line, (const char*)a3);
-    }
-    s_inner_movement->SaveTarget(a0, a1, a2, a3);
-    if (scope.Import()) {
-        FinishImport(line, roots);
-    }
-    if (scope.Open()) {
-    }
-}
-
 unsigned int __stdcall RecEconworldTick()
 {
     ReplayRoots roots;
@@ -5698,8 +5648,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_NETWORK_SENDFEATURERECLAIMED)
             return true;
-        if (slot == RSL_PATHFINDING_CELLSCHANGED)
-            return true;
         if (slot == RSL_SCRIPTS_OBJECTSTATESIZE)
             return true;
         return false;
@@ -5770,8 +5718,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_LOS_RADAR_GETMAPCELLATPOSITION)
             return true;
-        if (slot == RSL_LOS_RADAR_ISPOINTVISIBLE)
-            return true;
         if (slot == RSL_LOS_RADAR_SOUNDHEARDMASK)
             return true;
         if (slot == RSL_MAP_GETCELLMEANHEIGHT)
@@ -5838,11 +5784,7 @@ bool IsImportOf(unsigned owner, unsigned slot)
             return true;
         if (slot == RSL_MOVEMENT_UNITTARGET)
             return true;
-        if (slot == RSL_MOVEMENT_TARGETTYPE)
-            return true;
         if (slot == RSL_MOVEMENT_LOADTARGET)
-            return true;
-        if (slot == RSL_MOVEMENT_SAVETARGET)
             return true;
         if (slot == RSL_UNITS_CANREPAIR)
             return true;
@@ -5883,8 +5825,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
         if (slot == RSL_WEAPONS_WEAPONCANREACHUNIT)
             return true;
         if (slot == RSL_WEAPONS_GETWEAPONRANGE)
-            return true;
-        if (slot == RSL_WEAPONS_WEAPONCANREACHPOS)
             return true;
         if (slot == RSL_MAP_GETGROUNDHEIGHT)
             return true;
@@ -5987,8 +5927,6 @@ bool IsImportOf(unsigned owner, unsigned slot)
         return false;
     case SUB_MAP:
         if (slot == RSL_LOS_RADAR_GETMAPCELL)
-            return true;
-        if (slot == RSL_PATHFINDING_CELLSCHANGED)
             return true;
         return false;
     case SUB_SCRIPTS:
@@ -6162,7 +6100,7 @@ void HookSeams(const bool* on)
         s_rec_pathfinding.Submit = RecPathfindingSubmit;
     if (on[SUB_PATHFINDING] || on[SUB_MOVEMENT])
         s_rec_pathfinding.Cancel = RecPathfindingCancel;
-    if (on[SUB_PATHFINDING] || on[SUB_FEATURES] || on[SUB_MAP])
+    if (on[SUB_PATHFINDING])
         s_rec_pathfinding.CellsChanged = RecPathfindingCellsChanged;
     if (on[SUB_PATHFINDING])
         s_rec_pathfinding.Step = RecPathfindingStep;
@@ -6184,7 +6122,7 @@ void HookSeams(const bool* on)
         s_rec_weapons.WeaponCanReachUnit = RecWeaponsWeaponCanReachUnit;
     if (on[SUB_WEAPONS] || on[SUB_AI])
         s_rec_weapons.FindTargetableProjectile = RecWeaponsFindTargetableProjectile;
-    if (on[SUB_WEAPONS] || on[SUB_AI] || on[SUB_ORDERS])
+    if (on[SUB_WEAPONS] || on[SUB_AI])
         s_rec_weapons.WeaponCanReachPos = RecWeaponsWeaponCanReachPos;
     if (on[SUB_TARGETING])
         s_rec_targeting.Apply = RecTargetingApply;
@@ -6228,7 +6166,7 @@ void HookSeams(const bool* on)
         s_rec_los_radar.GetVisibleEnemiesInRadius = RecLosRadarGetVisibleEnemiesInRadius;
     if (on[SUB_LOS_RADAR])
         s_rec_los_radar.HasReadyUnitInRange = RecLosRadarHasReadyUnitInRange;
-    if (on[SUB_LOS_RADAR] || on[SUB_AI] || on[SUB_WEAPONS])
+    if (on[SUB_LOS_RADAR] || on[SUB_AI])
         s_rec_los_radar.IsPointVisible = RecLosRadarIsPointVisible;
     if (on[SUB_LOS_RADAR] || on[SUB_AI])
         s_rec_los_radar.GetSeenUnitsInRadius = RecLosRadarGetSeenUnitsInRadius;
@@ -6390,7 +6328,7 @@ void HookSeams(const bool* on)
         s_rec_movement.NewRingApproach = RecMovementNewRingApproach;
     if (on[SUB_MOVEMENT] || on[SUB_ORDERS])
         s_rec_movement.NewPointMarker = RecMovementNewPointMarker;
-    if (on[SUB_MOVEMENT] || on[SUB_ORDERS])
+    if (on[SUB_MOVEMENT])
         s_rec_movement.TargetType = RecMovementTargetType;
     if (on[SUB_MOVEMENT] || on[SUB_ORDERS])
         s_rec_movement.UnitTarget = RecMovementUnitTarget;
@@ -6594,8 +6532,6 @@ void HookSeams(const bool* on)
         s_rec_scripts.DeleteScript = RecScriptsDeleteScript;
     if (on[SUB_ORDERS])
         s_rec_movement.LoadTarget = RecMovementLoadTarget;
-    if (on[SUB_ORDERS])
-        s_rec_movement.SaveTarget = RecMovementSaveTarget;
     g_seams.wind_meteors = &s_rec_wind_meteors;
     g_seams.economy = &s_rec_economy;
     g_seams.features = &s_rec_features;

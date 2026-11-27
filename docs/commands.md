@@ -21,6 +21,10 @@ never repeats that.
   does a run played from the command log (section 2.2). That holds for the last of them too: when the interface ends
   the run after tick `N` (the exit menu's Yes publishes PLAYERS_LEAVE_GAME), its records are stamped `N + 1`, and the
   log's `end` line (section 2) says that the run ended without playing tick `N + 1`.
+- While the interface's records stamped `N + 1` are delivered, the tick counter (`ticks`) reads `N`, the tick the
+  interface acted after, as it did when the interface published them; it reads `N + 1` again for the scripted lines.
+  An order that one of these records creates therefore has `created` `N`, one below the record's tick, while an order
+  of a scripted `order` line of tick `N + 1` has `created` `N + 1`.
 - Every command publishes its events to the engine's outbox. An event published while no tick is running reaches
   the module that handles its kind at once: the module consumes it in its `Apply`, in the order of publication, before
   the next event of the command is published. An event that a handler publishes while it consumes one is delivered at
@@ -136,7 +140,8 @@ traces of the run that wrote it, without the presentation and without the scenar
 - **Delivery.** At the start of each tick, before its first phase, the run takes the file's lines of that tick in the
   file's order, which is the order of section 1 (the interface's records first, then the scripted lines). For each
   line it publishes each `<KIND> <hex>` pair's bytes, in order, to the engine's outbox, as one command: the kind is
-  the payload's first four bytes, and the name is not read. A line whose tick is below the tick being started, or that
+  the payload's first four bytes, and the name is not read. An `interface` line is published with the tick counter one
+  below the line's tick, by section 1, so the orders it creates have the `created` of the live click. A line whose tick is below the tick being started, or that
   is not in the format of section 2, stops the run with status 2. Lines after the last tick are not played.
 - **The end.** The last line must be `end <tick>`, and no line may be stamped later than `<tick> + 1` (status 2
   otherwise, before the first tick). At the start of tick `<tick> + 1` the run delivers that tick's lines, which
@@ -158,8 +163,7 @@ again: a run from the file delivers no `input` lines, so its menus never start t
 scenarios whose run from the file still differs, each with the hashed field and its issue: their run is played and
 its records judged, its traces are reported as `left` and not judged, and an entry whose run turns equal fails until
 it is removed. The selection's bits (`Unit.flags` 0x10 and `selectState`, 0xc0) are out of the trace and the view,
-so every run from the file has its scenario's `tick` rows. Eight `ui-` scenarios are listed: in their runs from the
-file a click's order has `created` one tick later, which the view publishes (`PlayerView.orders`, #1187). `ui-dialogs` ends in the exit menu after tick
+so every run from the file has its scenario's `tick` rows. No scenario is listed. `ui-dialogs` ends in the exit menu after tick
 61: its `PLAYERS_LEAVE_GAME` is stamped tick 62, and its run from the file publishes it and ends at `end 61`, with as
 many ticks as the scenario.
 

@@ -60,6 +60,8 @@ This step is done when phase 1 gives `approve`, or every point it raised is answ
 
 ## 6. The implementer
 
+When the spec has phase 2's `approve` and the gate can't yet judge the module (it waits on a gate route or another merge), don't hold the claim while it waits: release it (`docs/team.md`, "Issue states", Claimed) with a comment `Lead: Released, lead <name>.` that names the btm pull request and the blocker, and unassign yourself. The maintainer sets that blocker in `blocked_by`. Re-claim the issue, or any lead takes it, once the blocker lands, and start here.
+
 1. Update `tree/` to the spec branch, and add `.review/` to `tree/.git/info/exclude`.
 2. Write the prompt from [`implementer-prompt.md`](implementer-prompt.md), with the subsystem filled in.
 3. Run the session:

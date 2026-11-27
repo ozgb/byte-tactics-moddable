@@ -122,6 +122,8 @@
 0x49be60 DrawProjectiles
 0x49e830 GameMain
 0x49f6c0 PlayWavFromDisk
+0x4a9fd0 UpdateMenu
+0x4aa850 SetCurrentGuiContext
 0x4b5cc0 WindowProc
 0x4b66a0 GetFrameRate
 0x4b7f90 DrawFrame
@@ -153,6 +155,10 @@
 0x4c1d50 HandleVirtualKey
 0x4c22f0 SetCursorPosition
 0x4c2310 GetCursorPosition
+0x4c24b0 CaptureBackgroundAndDrawCursor
+0x4c25e0 RedrawMouseCursor
+0x4c2870 ShowSoftwareCursor
+0x4c2990 MouseThreadProc
 0x4c63a0 FlipScreen
 0x4c6890 FillSurface
 0x4c69f0 AllocSurface

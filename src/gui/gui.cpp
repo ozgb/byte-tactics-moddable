@@ -6539,6 +6539,8 @@ static inline void CloseTopScreen_inlined(Gui* gui)
 // The per-frame update of the current screen: tracks the mouse, runs the key
 // command handler, then gives every enabled entry its input handler by type
 // and closes the screen when an entry was chosen.
+unsigned int __stdcall HarnessMenuTicks(unsigned int live);
+
 // FUNCTION: 0x4a9fd0
 int __stdcall UpdateMenu(Gui* menu)
 {
@@ -6552,7 +6554,7 @@ int __stdcall UpdateMenu(Gui* menu)
     if (menu->layer == 0)
         return 0;
 
-    int now = GetTicks();
+    int now = HarnessMenuTicks(GetTicks());
     menu->animTimer = now - menu->time;
     menu->time = now;
     UpdateCursorAndMouse(menu);
@@ -6753,7 +6755,7 @@ void __stdcall SetCurrentGuiContext(Gui* ctx)
     ctx->str_ab6[0] = 0;
     ctx->str_bb6[0] = 0;
     ctx->pathsReady = 1;
-    ctx->time = GetTicks();
+    ctx->time = HarnessMenuTicks(GetTicks());
     ctx->animTimer = 0;
     ctx->inputEnabled = 1;
     ctx->gaf = 0;

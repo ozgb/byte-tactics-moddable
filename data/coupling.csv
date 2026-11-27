@@ -1016,6 +1016,7 @@ harness,orders,shared_write,Game::playerIndex,1
 harness,orders,shared_write,Player::type,3
 harness,pathfinding,shared_write,Player::type,1
 harness,platform,call,GetMemSetValue,1
+harness,platform,call,GetTickRate,1
 harness,platform,call,HapiBank::GetIntegerItem,1
 harness,platform,call,HapiBank::GetStringItem,1
 harness,platform,call,HapiBank::OpenAccount,1
@@ -2615,11 +2616,12 @@ presentation,harness,call,HarnessEventUnit,4
 presentation,harness,call,HarnessEventWords,3
 presentation,harness,call,HarnessFrameClockElapsedMs,1
 presentation,harness,call,HarnessFrameDrawn,1
-presentation,harness,call,HarnessGetCursorPos,2
+presentation,harness,call,HarnessGetCursorPos,5
 presentation,harness,call,HarnessKeyState,1
+presentation,harness,call,HarnessMenuTicks,2
 presentation,harness,call,HarnessSetCursorPos,1
 presentation,harness,call,HarnessSoundEvent,6
-presentation,harness,call,HarnessTestMode,1
+presentation,harness,call,HarnessTestMode,3
 presentation,harness,call,HarnessUiCancel,1
 presentation,harness,call,HarnessUiCommand,2
 presentation,harness,call,HarnessUiForgetAttacker,1

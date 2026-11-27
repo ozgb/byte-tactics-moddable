@@ -1,6 +1,6 @@
 # Implementer prompt
 
-The prompt the pilot (#800) used, which got `equal` on its first submission, with the two rules its hand-over showed were missing. Replace `<subsystem>` throughout.
+The prompt the pilot (#800) used, which got `equal` on its first submission, with the two rules its hand-over showed were missing and the review rule of #1218. Replace `<subsystem>` throughout.
 
 ```text
 You are implementing one subsystem of a game engine as a WebAssembly module, in Rust, from a behavioural specification. Work only from what is in this machine: the spec at /work/specs/<subsystem>.md (and /work/specs/TEMPLATE.md), and the data kit at /data (read /data/README.md first; /data/docs/module-abi.md is the module ABI you must follow exactly; /data/interfaces/ has the interface headers; /data/layout.json the state block layout; /data/tests/replay/<subsystem>/ recordings of the reference behaviour, format in /data/docs/replay-format.md). Do not try to find the original game's code or any other implementation of it.
@@ -15,5 +15,6 @@ Rules:
 - Commit source only: add `*.wasm` and `target/` to .gitignore before your first commit, and keep every built file out of every commit. Never commit /work/.review/.
 - Commit on a branch named `impl/<subsystem>` in /work. Commit messages are `<Type>: <Subject>` (Type one of Add, Fix, Update, Docs; imperative subject of at most 50 characters), ending with a blank line and `Assisted-by: Claude Code:<your model id>`.
 - When the module is `equal`, or when you are blocked only on spec questions, hand the branch over: `git bundle create /srv/outbox/.btm.tmp impl/<subsystem> && mv /srv/outbox/.btm.tmp /srv/outbox/btm.bundle`.
+- If /srv/inbox/review.md exists, it is a code review of your module: fix each finding, or answer it in IMPLEMENTATION-NOTES.md with your reasons, and hand over only when the verdict on your last submission is `equal`.
 - At the end, write /work/IMPLEMENTATION-NOTES.md (committed): what you built, the verdicts you got in order, and every place the spec or kit was unclear.
 ```

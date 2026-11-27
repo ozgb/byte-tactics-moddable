@@ -87,12 +87,32 @@ The engine core (#1207) runs the same way, with these differences:
 - **The verdict** is per group (`docs/core-gate.md`, "The verdict"). The broker runs every group, so a group the session leaves out (`files` until the Nanolathe port merges) still appears; judge the session on the others, and say which you left out and why on the issue before the first session.
 - **Time:** a full core gate runs every vector in its own VM exec, and a core is far more code than a module, so a session runs for hours. Poll the inbox and `broker.log` in the foreground.
 
-## 7. Hand over
+## 7. Code review in the sandbox
+
+The oracle judges what the recordings and scenarios reach; the review catches what they don't. You can't review the module yourself: you have read the source, so any finding of yours would carry it into the implementation. A fresh session in the VM does it, and its report reaches the implementer only through the mailbox.
+
+1. Update `tree/` to the implementer's branch at the pull request's head.
+2. Write the prompt from [`code-reviewer-prompt.md`](code-reviewer-prompt.md), with the subsystem and the spec branch's head filled in.
+3. Run the session with a new session directory R, `/work` read-only and nothing pushed:
+
+   ```sh
+   uv run tools/cleanroom/launch.py --review --tree T --datakit K --session R --image I --game-dir ~/.ta -- claude -p "$(cat PROMPT)" --dangerously-skip-permissions
+   ```
+
+   The report crosses as `R/review.md`. Check R's proxy log as in step 6.
+4. Run an implementer session with the report handed in, unedited: the prompt from [`implementer-prompt.md`](implementer-prompt.md), and `--review-report R/review.md` on the `launch.py` line of step 6. The implementer fixes each finding or answers it in `IMPLEMENTATION-NOTES.md`, submits again and hands the branch over only when the verdict is still `equal`.
+
+Don't relay, summarise or judge a finding to the implementer, and don't add to the report. When a finding shows a gap in the spec, fix the spec as in step 6.
+
+This step is done when every finding is fixed or answered on the pushed branch, the verdict on its head is `equal`, and every session's proxy log is on the allowlist.
+
+## 8. Hand over
 
 Comment on the spec's issue with:
 
 - the sessions in order, and each verdict;
+- the review's findings, and what became of each (the commit that fixed it, or the answer in `IMPLEMENTATION-NOTES.md`);
 - every spec change and the review that asked for it;
 - the gaps in the kit you worked around.
 
-File each kit gap as an issue. The human reviews the implementer's pull request and merges both.
+File each kit gap as an issue. The maintainer merges the spec's pull request, then the implementer's, when the oracle verdict on the implementer's head is `equal`, phase 2's `approve` is on the spec's head, every session ran in the VM with a clean `--check-log`, and the implementer's pull request is source only with CI green.

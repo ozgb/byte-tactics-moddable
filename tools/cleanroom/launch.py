@@ -1,12 +1,17 @@
 """Start a clean-room session VM: exact mounts, no network device, canary checks, then the agent.
 
     uv run tools/cleanroom/launch.py --tree DIR --datakit DIR --image FILE.smolmachine \\
-        [--session DIR] [--credential-file FILE] [--credential-kind oauth|api-key] [--game-dir DIR] [--keep] -- COMMAND [ARG ...]
+        [--session DIR] [--credential-file FILE] [--credential-kind oauth|api-key] [--game-dir DIR] [--keep]
+        [--review | --review-report FILE] -- COMMAND [ARG ...]
 
 The VM has no network device. Its only way out is a Unix socket to proxy.py on the host. It sees the
 clean-room tree (read-write at /work), the data kit (read-only at /data), the mailbox directories
 /srv/outbox (read-write) and /srv/inbox (read-only) and the proxy socket /srv/proxy.sock. broker.py
 runs beside it: it reads a git bundle and the gate requests from the outbox as data.
+
+--review starts a code review session: /work is mounted read-only, the broker pushes nothing, and
+the reviewer's report crosses as SESSION/review.md (broker.py, "Review hand-over"). --review-report
+FILE hands such a report to the next implementer session as /srv/inbox/review.md, byte for byte.
 
 Refusals, each exit status 2 before any VM exists: a mount that is, contains or sits inside this
 repository (except under build/scratch), another worktree of it, ~/.claude*, $CLAUDE_CONFIG_DIR, ~/.ta, ~/.ssh,
@@ -213,12 +218,12 @@ def check_scan_clean(manifest, *roots):
             raise Refusal(f"{root} holds a file of the canary manifest:\n{out.getvalue().strip()}")
 
 
-def create_argv(name, image, tree, datakit, session, sock, cpus=4, mem=4096):
+def create_argv(name, image, tree, datakit, session, sock, cpus=4, mem=4096, work_read_only=False):
     """Return the `smolvm machine create` argv for a session, with exactly the allowed mounts."""
     return [
         str(SMOLVM), "machine", "create", "--name", name, "--from", str(image),
         "--cpus", str(cpus), "--mem", str(mem),
-        "-v", f"{tree}:/work",
+        "-v", f"{tree}:/work:ro" if work_read_only else f"{tree}:/work",
         "-v", f"{datakit}:/data:ro",
         "-v", f"{session}/outbox:/srv/outbox",
         "-v", f"{session}/inbox:/srv/inbox:ro",
@@ -333,14 +338,27 @@ def remove_canary(name, runner=run):
     return runner(exec_in(name, ["test", "!", "-e", CANARY_DIR])).returncode
 
 
-def broker_argv(session, game_dir=None, core_image=None):
+def broker_argv(session, game_dir=None, core_image=None, push=True):
     """Return the argv that starts broker.py for this session, with --game-dir and --core-image when given."""
     argv = [sys.executable, str(HERE / "broker.py"), "serve", "--session", str(session)]
+    if not push:
+        argv.append("--no-push")
     if game_dir:
         argv += ["--game-dir", str(game_dir)]
     if core_image:
         argv += ["--core-image", str(core_image)]
     return argv
+
+
+def hand_in_review(report, session):
+    """Copy a review report into the session inbox as review.md, or raise Refusal."""
+    path = Path(report)
+    if path.is_symlink() or not path.is_file():
+        raise Refusal(f"review report {path} is not a regular file")
+    data = path.read_bytes()
+    if not data or len(data) > broker.MAX_REVIEW:
+        raise Refusal(f"review report {path} is empty or larger than {broker.MAX_REVIEW} bytes")
+    broker.write_bytes_atomic(Path(session) / "inbox", broker.REVIEW_NAME, data)
 
 
 def start_session(args):
@@ -371,6 +389,8 @@ def start_session(args):
     session.mkdir(parents=True, exist_ok=True)
     check_disjoint(("tree", tree), ("data kit", datakit), ("session", session))
     broker.prepare(session)
+    if args.review_report:
+        hand_in_review(args.review_report, session)
     manifest = session / "manifest.txt"
     mf.build(REPO, manifest, [])
     check_scan_clean(manifest, tree, datakit, session)
@@ -378,7 +398,7 @@ def start_session(args):
     name = f"cr-{os.getpid()}"
     sockdir = Path(tempfile.mkdtemp(prefix="cr-"))
     sock = sockdir / "p.sock"
-    argv = create_argv(name, image, tree, datakit, session, sock)
+    argv = create_argv(name, image, tree, datakit, session, sock, work_read_only=args.review)
     check_argv(argv)
     proxy_log = session / "proxy.log"
     procs = []
@@ -391,7 +411,7 @@ def start_session(args):
         procs.append(proxy)
         if not wait_for(sock):
             raise RuntimeError("the proxy did not start")
-        procs.append(subprocess.Popen(broker_argv(session, args.game_dir, image)))
+        procs.append(subprocess.Popen(broker_argv(session, args.game_dir, image, push=not args.review)))
         if run(argv).returncode:
             raise RuntimeError("machine create failed")
         created = True
@@ -447,6 +467,9 @@ def main(argv=None):
     ap.add_argument("--api-key-env", default=None, help=argparse.SUPPRESS)
     ap.add_argument("--game-dir", default=None, help="game directory the real gate plays on, when it is not in a Steam/GOG place")
     ap.add_argument("--keep", action="store_true", help="leave the machine in place after the command")
+    hand = ap.add_mutually_exclusive_group()
+    hand.add_argument("--review", action="store_true", help="code review session: /work read-only, no push, the report crosses as SESSION/review.md")
+    hand.add_argument("--review-report", default=None, help="review report to hand the implementer as /srv/inbox/review.md")
     ap.add_argument("command", nargs="+", help="command to run in the VM, after --")
     args = ap.parse_args(argv)
     if args.session is None:

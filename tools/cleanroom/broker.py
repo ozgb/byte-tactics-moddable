@@ -28,6 +28,10 @@ wind_meteors module) and `outbox/ID/ready` make a core request, opened and check
 `SESSION/gate/ID/` on the host (the core only ever runs inside a microVM that script starts) and lets only
 `out/result.json` cross, with `"gate": "coregate"`. Without `--core-image` a core request is answered with an error.
 
+Review hand-over: a code review session writes its report to `outbox/review.md`. The broker opens it as it
+opens a bundle, requires a regular file of at most 1 MiB in UTF-8, and copies it to `SESSION/review.md` by
+rename. Each distinct report is taken once.
+
 Push: after each sync the broker pushes every `refs/heads/impl/<name>` of the bare repository whose commit changed to
 `--btm-remote` and opens a pull request into `main` of `--btm-repo` for each new branch. It reads the token from
 `--btm-token-file` (default `~/.config/bt-cleanroom/btm-token`) at that moment, hands it to git through
@@ -65,6 +69,9 @@ MAX_CORE = 256 * 1024 * 1024
 ELF_MAGIC = b"\x7fELF"
 MAX_BUNDLE = 1024 * 1024 * 1024
 BUNDLE_NAME = "btm.bundle"
+REVIEW_NAME = "review.md"
+REVIEW_STATE = "review.state"
+MAX_REVIEW = 1024 * 1024
 STATE_NAME = "bundle.state"
 PUSH_STATE = "push.state"
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
@@ -236,6 +243,47 @@ def sync_refs(session):
         if fd is not None:
             os.close(fd)
         scratch.unlink(missing_ok=True)
+
+
+def write_bytes_atomic(directory, name, data):
+    """Write data to directory/name through a temporary name and a rename."""
+    tmp = Path(directory) / f".{name}.tmp"
+    tmp.write_bytes(data)
+    os.replace(tmp, Path(directory) / name)
+
+
+def take_review(session):
+    """Copy a new outbox/review.md to SESSION/review.md; return its sha256, or None when there is nothing new."""
+    session = Path(session)
+    state = session / REVIEW_STATE
+    fd = open_outbox(session)
+    try:
+        try:
+            file_fd, size = open_regular(REVIEW_NAME, fd)
+        except FileNotFoundError:
+            return None
+        except (ValueError, OSError) as err:
+            log(session, f"review refused: {err}")
+            return None
+        if size > MAX_REVIEW:
+            os.close(file_fd)
+            log(session, "review refused: too large")
+            return None
+        try:
+            data = read_limited(file_fd, MAX_REVIEW)
+            data.decode("utf-8")
+        except ValueError as err:
+            log(session, f"review refused: {err}")
+            return None
+    finally:
+        os.close(fd)
+    digest = hashlib.sha256(data).hexdigest()
+    if state.exists() and state.read_text().strip() == digest:
+        return None
+    write_bytes_atomic(session, REVIEW_NAME, data)
+    state.write_text(digest + "\n")
+    log(session, f"review: {digest[:12]}, {len(data)} bytes")
+    return digest
 
 
 def read_token(token_file):
@@ -624,8 +672,9 @@ def process_mailbox(session, gate=None, core_gate=None):
 
 
 def one_pass(session, push=None, gate=None, core_gate=None):
-    """Sync the bundle, push when `push` (a dict of push_branches options) is given, answer the mailbox."""
+    """Sync the bundle and the review, push when `push` (a dict of push_branches options) is given, answer the mailbox."""
     sync_refs(session)
+    take_review(session)
     if push:
         push_branches(session, **push)
     return process_mailbox(session, gate, core_gate)

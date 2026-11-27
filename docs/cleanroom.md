@@ -57,10 +57,10 @@ reports one.
 
 | In the VM | Host side | Direction |
 | --- | --- | --- |
-| `/work` | the clean-room tree | read-write |
+| `/work` | the clean-room tree | read-write (read-only with `--review`) |
 | `/data` | the data kit | read-only |
-| `/srv/outbox` | `SESSION/outbox` | read-write: gate requests and the git bundle |
-| `/srv/inbox` | `SESSION/inbox` | read-only: gate results, written by the broker only |
+| `/srv/outbox` | `SESSION/outbox` | read-write: gate requests, the git bundle and a review report |
+| `/srv/inbox` | `SESSION/inbox` | read-only: gate results, written by the broker only, and a handed-in review report |
 | `/srv/proxy.sock` | a Unix socket served by `proxy.py` | the only way out |
 
 The VM has no network device that reaches anything. `launch.py` starts `socat` in the VM so that
@@ -81,6 +81,11 @@ command by `--secret-env` and never written to disk (see Credentials).
   `sni_refused`. After the session `launch.py` runs
   `proxy.py --check-log`, which fails if any logged request is off the allowlist. The canary
   probes go to `SESSION/canary-proxy.log` (the log is rotated by SIGHUP once the canary passes).
+- **Code review:** `launch.py --review` starts a review session (#1218): `/work` is mounted read-only and the broker
+  runs with `--no-push`. The reviewer writes `/srv/outbox/review.md`; the broker opens it as it opens a bundle
+  (`O_NOFOLLOW`, a regular file of at most 1 MiB, UTF-8) and copies it to `SESSION/review.md`, once per distinct
+  report. `launch.py --review-report FILE` copies such a report, unchanged, into the next session's inbox as
+  `/srv/inbox/review.md`.
 - **Git:** the agent runs `git bundle create /srv/outbox/.btm.tmp BRANCH ...` and renames the
   file to `/srv/outbox/btm.bundle`. No repository is shared: the broker opens the bundle with
   `O_NOFOLLOW` through a descriptor of the outbox directory (a symlink is refused), checks that it

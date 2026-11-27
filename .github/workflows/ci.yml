@@ -362,7 +362,8 @@ jobs:
           bash -c "$link"
           uv run tools/x87lint.py --exe build/x87/TotalA.exe
           uv run tools/ftollint.py --exe build/x87/TotalA.exe
-          rm -rf build/x87 toolchain/thirdparty
+          rm -rf build/x87
+          [ -L toolchain ] || rm -rf toolchain/thirdparty
           df -h .
 
       - name: Cache Rust ${{ env.RUST_VERSION }}
@@ -439,7 +440,8 @@ jobs:
           uv run tools/corefixtures.py check
           uv run tools/test_coregate.py
           uv run tools/coregate.py --trusted --out build/core-gate
-          rm -rf build/files toolchain/thirdparty
+          rm -rf build/files
+          [ -L toolchain ] || rm -rf toolchain/thirdparty
 
       - name: Upload the replay binaries
         if: steps.changed.outputs.run == 'true'

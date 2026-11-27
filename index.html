@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Byte Tactics Clean Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: a patch bay. The finished reference on the left, btm's sockets on the right, one conduit per module between them with two gates (kit, spec) that must both close before the conduit carries. */
+:root {
+  --ground: #0b1118;
+  --panel: #111a24;
+  --rule: #1f2c3a;
+  --dim: #3a4b5e;
+  --muted: #7d8fa3;
+  --text: #dbe4ee;
+  --metal: #8fb8de;
+  --metal-deep: #2f5878;
+  --energy: #ffc24a;
+  --energy-soft: #ffc24a33;
+  --stale: #b8775a;
+  --display: "Chakra Petch", "Bahnschrift", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+html { background: var(--ground); }
+body { margin: 0; font-size: 14px; background: var(--ground); color: var(--text); font-family: var(--body); }
+[hidden] { display: none !important; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 32px; }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(22px, 3.2vw, 32px); letter-spacing: .02em; margin: 0; text-wrap: balance; }
+h1 span { color: var(--muted); font-weight: 500; }
+.gauges { display: flex; gap: 28px; flex-wrap: wrap; }
+.gauge { display: grid; gap: 6px; min-width: 150px; }
+.gauge .k { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.gauge .v { font-family: var(--display); font-size: 20px; font-variant-numeric: tabular-nums; }
+.gauge .v small { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: 6px; }
+.bar { height: 4px; background: var(--rule); position: relative; overflow: hidden; }
+.bar i { position: absolute; inset: 0 auto 0 0; background: var(--metal); }
+.bay { overflow-x: auto; border: 1px solid var(--rule); background: var(--panel); }
+svg { display: block; width: 100%; min-width: 760px; height: auto; }
+svg text { font-family: var(--mono); }
+.detail { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%); bottom: calc(var(--foot-h, 48px) + 14px); width: min(720px, calc(100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))); max-height: calc(100vh - var(--foot-h, 48px) - 40px); overflow-y: auto; box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 32px; padding: 18px 52px 20px 20px; background: var(--panel); border: 1px solid var(--dim); border-top: 2px solid var(--metal); box-shadow: 0 18px 50px #000a; }
+.detail.lit { border-top-color: var(--energy); }
+.close { position: absolute; right: 10px; top: 10px; width: 30px; height: 30px; display: grid; place-items: center; background: transparent; color: var(--muted); border: 1px solid var(--rule); font: 500 16px/1 var(--mono); cursor: pointer; }
+.close:hover, .close:focus-visible { color: var(--text); border-color: var(--metal); outline: none; }
+.detail h2 { font-family: var(--display); font-size: 20px; font-weight: 600; margin: 0 0 6px; }
+.detail .state { font-family: var(--mono); font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
+.detail .state b { font-weight: 500; color: var(--text); }
+.detail ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.detail a { color: var(--metal); text-decoration: none; }
+.detail a:hover, .detail a:focus-visible { text-decoration: underline; }
+.detail .live { color: var(--energy); }
+.tag { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-right: 6px; }
+footer { position: fixed; z-index: 15; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--ground) 92%, transparent); backdrop-filter: blur(6px); border-top: 1px solid var(--rule); align-items: center; display: flex; flex-wrap: wrap; gap: 10px 22px; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend svg { min-width: 0; width: auto; }
+.row { cursor: pointer; }
+.row:focus { outline: none; }
+.row:focus-visible .hit, .row.sel .hit { fill: #ffffff08; stroke: var(--dim); }
+.flow { stroke-dasharray: 3 11; animation: flow 1.1s linear infinite; }
+.pulse { animation: pulse 1.8s ease-in-out infinite; }
+@keyframes flow { to { stroke-dashoffset: -14; } }
+@keyframes pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .flow, .pulse { animation: none; } }
+@media (max-width: 640px) { .detail { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Byte Tactics <span>clean room</span></h1>
+    <div class="gauges" id="gauges"></div>
+  </header>
+  <div class="bay"><svg id="bay" viewBox="0 0 1000 900" role="img" aria-label="Conduits from byte-tactics-moddable to btm, one per module"></svg></div>
+  <section class="detail" id="detail" role="dialog" aria-label="Conduit details" hidden></section>
+  <footer id="foot">
+    <div class="legend" id="legend"></div>
+    <div id="stamp">Loading data.json</div>
+  </footer>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const W = 1000, TOP = 92, ROW = 40, GAP = 34;
+const X = { plateL: 24, plateR: 214, kit: 410, spec: 610, sockL: 786, sockR: 976 };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function el(tag, attrs, parent, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  if (text != null) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+const SPEC_WORD = { done: "written", stale: "stale", active: "being written", draft: "drafted", none: "not started" };
+const IMPL_WORD = { built: "equal on the gate", building: "built, being extended", active: "being implemented", draft: "port drafted", none: "empty" };
+const KIT_WORD = { ready: "ready", partial: "recordings only", none: "none" };
+
+function rowY(i, rows) {
+  const firstSub = rows.findIndex(r => r.group === "subsystem");
+  return TOP + i * ROW + (i >= firstSub ? GAP : 0);
+}
+
+function draw(data) {
+  const svg = document.getElementById("bay");
+  svg.textContent = "";
+  const rows = data.rows;
+  const H = rowY(rows.length - 1, rows) + ROW + 26;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const metal = css("--metal"), deep = css("--metal-deep"), energy = css("--energy"), dim = css("--dim"),
+        rule = css("--rule"), muted = css("--muted"), text = css("--text"), stale = css("--stale"), panel = css("--panel");
+
+  const defs = el("defs", {}, svg);
+  const glow = el("filter", { id: "glow", x: "-50%", y: "-200%", width: "200%", height: "500%" }, defs);
+  el("feGaussianBlur", { stdDeviation: "3", result: "b" }, glow);
+  const m = el("feMerge", {}, glow); el("feMergeNode", { in: "b" }, m); el("feMergeNode", { in: "SourceGraphic" }, m);
+  const hatch = el("pattern", { id: "hatch", width: "6", height: "6", patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, defs);
+  el("rect", { width: "6", height: "6", fill: panel }, hatch);
+  el("line", { x1: "0", y1: "0", x2: "0", y2: "6", stroke: deep, "stroke-width": "3" }, hatch);
+
+  const yEnd = H - 14;
+  el("rect", { x: 10, y: 14, width: X.plateR - X.plateL + 28, height: yEnd - 14, fill: "none", stroke: rule }, svg);
+  el("rect", { x: X.sockL - 14, y: 14, width: X.sockR - X.sockL + 28, height: yEnd - 14, fill: "none", stroke: rule, "stroke-dasharray": "4 4" }, svg);
+  el("text", { x: X.plateL, y: 40, fill: text, "font-size": 15, "font-weight": 500 }, svg, "byte-tactics-moddable");
+  el("text", { x: X.plateL, y: 58, fill: muted, "font-size": 10.5, "letter-spacing": ".08em" }, svg, "3.1C · THE REFERENCE");
+  el("text", { x: X.sockL, y: 40, fill: text, "font-size": 15, "font-weight": 500 }, svg, "ozgb/btm");
+  el("text", { x: X.sockL, y: 58, fill: muted, "font-size": 10.5, "letter-spacing": ".08em" }, svg, "RUST · CLEAN ROOM");
+  for (const [x, label] of [[X.kit, "ORACLE KIT"], [X.spec, "SPEC"]]) {
+    el("text", { x, y: 58, fill: muted, "font-size": 10.5, "letter-spacing": ".14em", "text-anchor": "middle" }, svg, label);
+    el("line", { x1: x, y1: 66, x2: x, y2: yEnd, stroke: rule, "stroke-dasharray": "1 5" }, svg);
+  }
+  const firstSub = rows.findIndex(r => r.group === "subsystem");
+  el("text", { x: 500, y: TOP - 14, fill: dim, "font-size": 10, "letter-spacing": ".2em", "text-anchor": "middle" }, svg, "ENGINE");
+  el("text", { x: 500, y: rowY(firstSub, rows) - 14, fill: dim, "font-size": 10, "letter-spacing": ".2em", "text-anchor": "middle" }, svg, "SIMULATION SUBSYSTEMS");
+
+  rows.forEach((r, i) => {
+    const y = rowY(i, rows), cy = y + ROW / 2 - 2;
+    const g = el("g", { class: "row", tabindex: 0, role: "button", "aria-label": `${r.label}: kit ${KIT_WORD[r.kit]}, spec ${SPEC_WORD[r.spec]}, btm ${IMPL_WORD[r.impl]}` }, svg);
+    g.dataset.id = r.id;
+    el("rect", { class: "hit", x: 4, y: y, width: W - 8, height: ROW - 4, fill: "transparent", stroke: "none" }, g);
+
+    const kitOk = r.kit === "ready", specOk = r.spec === "done";
+    const carried = kitOk && specOk;
+    const seg = (x1, x2, on) => el("line", { x1, y1: cy, x2, y2: cy, stroke: on ? metal : dim, "stroke-width": on ? 2 : 1, "stroke-dasharray": on ? "" : "2 5", opacity: on ? (carried ? 0.9 : 0.6) : 1 }, g);
+    seg(X.plateR, X.kit - 9, true);
+    seg(X.kit + 9, X.spec - 11, kitOk);
+    seg(X.spec + 11, X.sockL, carried);
+    if (r.active) {
+      el("line", { x1: X.plateR, y1: cy, x2: X.sockL, y2: cy, stroke: css("--energy-soft"), "stroke-width": 8 }, g);
+      el("line", { class: "flow", x1: X.plateR, y1: cy, x2: X.sockL, y2: cy, stroke: energy, "stroke-width": 2, filter: "url(#glow)" }, g);
+    }
+
+    el("rect", { x: X.plateL, y: y + 4, width: X.plateR - X.plateL, height: ROW - 12, fill: deep, stroke: metal, "stroke-opacity": .35 }, g);
+    el("text", { x: X.plateL + 10, y: cy + 4, fill: text, "font-size": 12.5 }, g, r.label);
+    el("circle", { cx: X.plateR, cy, r: 3, fill: metal }, g);
+
+    const k = el("g", {}, g);
+    const kfill = kitOk ? metal : panel;
+    el("rect", { x: X.kit - 8, y: cy - 8, width: 16, height: 16, fill: kfill, stroke: r.kit === "none" ? dim : metal }, k);
+    if (r.kit === "partial") el("rect", { x: X.kit - 8, y: cy, width: 16, height: 8, fill: metal, opacity: .55 }, k);
+    el("text", { x: X.kit + 16, y: cy + 4, fill: muted, "font-size": 10 }, g, kitOk ? r.kit_note : r.recordings ? `${r.recordings} rec` : "");
+
+    const d = `M ${X.spec} ${cy - 11} L ${X.spec + 11} ${cy} L ${X.spec} ${cy + 11} L ${X.spec - 11} ${cy} Z`;
+    const specStroke = { done: metal, stale: stale, active: energy, draft: energy, none: dim }[r.spec];
+    const specFill = { done: metal, stale: "url(#hatch)", active: panel, draft: panel, none: panel }[r.spec];
+    el("path", { d, fill: specFill, stroke: specStroke, "stroke-width": r.spec === "active" ? 2 : 1.2, class: r.spec === "active" ? "pulse" : "", opacity: r.spec === "draft" ? .6 : 1 }, g);
+    const specNote = r.spec_pin != null ? `v${r.spec_pin}` : r.spec === "active" ? "writing" : r.spec === "draft" ? "draft" : "";
+    el("text", { x: X.spec + 18, y: cy + 4, fill: r.spec === "stale" ? stale : r.spec === "active" ? energy : muted, "font-size": 10 }, g, specNote);
+
+    const sx = X.sockL, sw = X.sockR - X.sockL, sy = y + 4, sh = ROW - 12;
+    if (r.impl === "built") {
+      el("rect", { x: sx, y: sy, width: sw, height: sh, fill: metal }, g);
+      el("text", { x: sx + 10, y: cy + 4, fill: css("--ground"), "font-size": 12.5, "font-weight": 500 }, g, r.label);
+    } else {
+      const lit = r.impl === "active" || r.impl === "building";
+      el("rect", { x: sx, y: sy, width: sw, height: sh, fill: r.impl === "building" ? "url(#hatch)" : panel, stroke: lit ? energy : dim, "stroke-dasharray": r.impl === "none" ? "3 4" : "", class: lit ? "pulse" : "" }, g);
+      el("text", { x: sx + 10, y: cy + 4, fill: r.impl === "none" ? dim : text, "font-size": 12.5 }, g, r.label);
+    }
+    el("circle", { cx: sx, cy, r: 3, fill: carried ? metal : dim }, g);
+
+    g.addEventListener("click", () => select(r.id));
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(r.id); } });
+  });
+}
+
+let DATA;
+function select(id) {
+  const r = DATA.rows.find(x => x.id === id);
+  document.querySelectorAll(".row").forEach(g => g.classList.toggle("sel", g.dataset.id === id));
+  const det = document.getElementById("detail");
+  const links = [];
+  if (r.issue) links.push(`<li><span class="tag">issue</span><a href="${r.issue.url}" target="_blank" rel="noopener">#${r.issue.number} ${esc(r.issue.title)}</a>${r.issue.claimed ? ' <span class="live">claimed</span>' : ""}</li>`);
+  for (const p of r.prs) links.push(`<li><span class="tag">btm ${p.state.toLowerCase()}</span><a href="${p.url}" target="_blank" rel="noopener">#${p.number} ${esc(p.title)}</a>${p.live ? ' <span class="live">active</span>' : ""}</li>`);
+  det.innerHTML = `
+    <div>
+      <h2>${esc(r.label)}${r.active ? ' <span class="live" style="font-size:13px;font-family:var(--mono)">· lit</span>' : ""}</h2>
+      <div class="state">
+        <div>Oracle kit · <b>${KIT_WORD[r.kit]}</b> · ${esc(r.kit_note)}</div>
+        <div>Spec · <b>${SPEC_WORD[r.spec]}</b>${r.spec_pin != null ? ` · pinned to interfaces-v${r.spec_pin}` : ""}${r.spec === "stale" ? ` (core is on v${DATA.core_pin})` : ""}</div>
+        <div>btm module · <b>${IMPL_WORD[r.impl]}</b></div>
+      </div>
+    </div>
+    <ul>${links.join("") || '<li class="tag">No issue or pull request yet</li>'}</ul>
+    <button class="close" id="close" type="button" aria-label="Close details">×</button>`;
+  det.classList.toggle("lit", r.active);
+  det.hidden = false;
+  document.getElementById("close").addEventListener("click", dismiss);
+}
+function dismiss() {
+  document.getElementById("detail").hidden = true;
+  document.querySelectorAll(".row.sel").forEach(g => g.classList.remove("sel"));
+}
+document.addEventListener("click", e => {
+  if (!e.target.closest(".row, #detail")) dismiss();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") dismiss(); });
+new ResizeObserver(([entry]) => {
+  const h = Math.ceil(entry.target.getBoundingClientRect().height);
+  document.documentElement.style.setProperty("--foot-h", h + "px");
+  document.querySelector(".wrap").style.paddingBottom = (h + 24) + "px";
+}).observe(document.getElementById("foot"));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function gauges(d) {
+  const carried = d.rows.filter(r => r.kit === "ready" && r.spec === "done").length;
+  const built = d.rows.filter(r => r.impl === "built").length;
+  const lit = d.rows.filter(r => r.active).length;
+  const items = [
+    ["Milestone 1 · #2", d.milestones["2"].done, d.milestones["2"].total, "issues"],
+    ["Conduits open", carried, d.rows.length, `${lit} lit`],
+    ["btm modules equal", built, d.rows.length, ""],
+  ];
+  document.getElementById("gauges").innerHTML = items.map(([k, a, b, note]) => `
+    <div class="gauge"><div class="k">${k}</div>
+      <div class="v">${a}<span style="color:var(--muted)">/${b}</span><small>${note}</small></div>
+      <div class="bar"><i style="width:${b ? (100 * a / b).toFixed(1) : 0}%"></i></div></div>`).join("");
+}
+
+function legend() {
+  const sw = (inner) => `<svg width="22" height="16" viewBox="0 0 22 16">${inner}</svg>`;
+  const m = "var(--metal)", e = "var(--energy)", dm = "var(--dim)", p = "var(--panel)";
+  document.getElementById("legend").innerHTML = [
+    [sw(`<line x1="0" y1="8" x2="22" y2="8" stroke="${e}" stroke-width="2" stroke-dasharray="3 4"/>`), "lit: work in the last 48 h"],
+    [sw(`<rect x="4" y="1" width="14" height="14" fill="${m}"/>`), "kit ready"],
+    [sw(`<rect x="4" y="1" width="14" height="14" fill="${p}" stroke="${m}"/><rect x="4" y="8" width="14" height="7" fill="${m}" opacity=".55"/>`), "recordings only"],
+    [sw(`<path d="M11 1 L18 8 L11 15 L4 8Z" fill="${m}"/>`), "spec written"],
+    [sw(`<path d="M11 1 L18 8 L11 15 L4 8Z" fill="${p}" stroke="var(--stale)"/>`), "spec on old interfaces"],
+    [sw(`<rect x="1" y="3" width="20" height="10" fill="${m}"/>`), "module equal"],
+    [sw(`<rect x="1" y="3" width="20" height="10" fill="${p}" stroke="${dm}" stroke-dasharray="3 3"/>`), "empty socket"],
+  ].map(([s, t]) => `<span>${s}${t}</span>`).join("");
+}
+
+function ago(iso) {
+  const min = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (min < 60) return `${min} min ago`;
+  if (min < 48 * 60) return `${Math.round(min / 60)} h ago`;
+  return `${Math.round(min / 1440)} days ago`;
+}
+
+async function load() {
+  try {
+    const res = await fetch("data.json?t=" + Date.now());
+    DATA = await res.json();
+  } catch (err) {
+    document.getElementById("stamp").textContent = "Could not load data.json. The progress workflow publishes it.";
+    return;
+  }
+  draw(DATA);
+  gauges(DATA);
+  legend();
+  const stamp = () => document.getElementById("stamp").textContent =
+    `Updated ${ago(DATA.generated)} · interfaces-v${DATA.interfaces} · Milestone 2 (#180) ${DATA.milestones["180"].done}/${DATA.milestones["180"].total}`;
+  stamp();
+  setInterval(stamp, 60000);
+}
+load();
+</script>
+</body>
+</html>

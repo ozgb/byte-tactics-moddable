@@ -1,0 +1,494 @@
+{
+ "generated": "2026-11-27T18:00:12+00:00",
+ "interfaces": 64,
+ "core_pin": 59,
+ "milestones": {
+  "2": {
+   "done": 58,
+   "total": 62
+  },
+  "180": {
+   "done": 9,
+   "total": 27
+  }
+ },
+ "rows": [
+  {
+   "id": "core",
+   "label": "Engine core",
+   "group": "foundation",
+   "kit": "ready",
+   "kit_note": "core gate",
+   "recordings": null,
+   "spec": "done",
+   "spec_pin": 59,
+   "impl": "building",
+   "active": true,
+   "issue": {
+    "number": 1207,
+    "title": "Engine core: Run the clean-room implementer",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1207",
+    "claimed": true,
+    "state": "OPEN"
+   },
+   "prs": [
+    {
+     "number": 52,
+     "title": "Implementer: impl/engine-core",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/52",
+     "live": true
+    },
+    {
+     "number": 51,
+     "title": "Update: Move the core specs to interfaces-v64",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/51",
+     "live": true
+    },
+    {
+     "number": 48,
+     "title": "Implementer: impl/engine-core",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/48",
+     "live": false
+    },
+    {
+     "number": 47,
+     "title": "Update: Move the core specs to interfaces-v59",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/47",
+     "live": false
+    }
+   ]
+  },
+  {
+   "id": "runtime",
+   "label": "Runtime",
+   "group": "foundation",
+   "kit": "ready",
+   "kit_note": "runtime vectors",
+   "recordings": null,
+   "spec": "draft",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": null,
+   "prs": [
+    {
+     "number": 38,
+     "title": "Add: Specify the runtime",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/38",
+     "live": false
+    }
+   ]
+  },
+  {
+   "id": "files",
+   "label": "Data loading",
+   "group": "foundation",
+   "kit": "ready",
+   "kit_note": "files gate",
+   "recordings": null,
+   "spec": "done",
+   "spec_pin": null,
+   "impl": "draft",
+   "active": false,
+   "issue": null,
+   "prs": [
+    {
+     "number": 37,
+     "title": "Add: Port the map and presentation formats",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/37",
+     "live": false
+    },
+    {
+     "number": 31,
+     "title": "Add: Port data loading from Nanolathe",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/31",
+     "live": false
+    },
+    {
+     "number": 28,
+     "title": "Add: Import Nanolathe's data loading",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/28",
+     "live": false
+    }
+   ]
+  },
+  {
+   "id": "wind_meteors",
+   "label": "Wind & meteors",
+   "group": "subsystem",
+   "kit": "ready",
+   "kit_note": "scenario gate",
+   "recordings": 3,
+   "spec": "done",
+   "spec_pin": 59,
+   "impl": "built",
+   "active": false,
+   "issue": null,
+   "prs": [
+    {
+     "number": 50,
+     "title": "Implementer: impl/wind_meteors",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/50",
+     "live": false
+    },
+    {
+     "number": 49,
+     "title": "Update: Move wind_meteors to interfaces-v59",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/49",
+     "live": false
+    },
+    {
+     "number": 8,
+     "title": "Implementer: impl/wind-meteors",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/8",
+     "live": false
+    },
+    {
+     "number": 3,
+     "title": "Add: Spec template and the wind_meteors spec",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/3",
+     "live": false
+    }
+   ]
+  },
+  {
+   "id": "economy",
+   "label": "Economy",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "6 recordings, gate route waits on #1209",
+   "recordings": 6,
+   "spec": "stale",
+   "spec_pin": 7,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1201,
+    "title": "Spec: Move the economy spec and implement it",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1201",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": [
+    {
+     "number": 9,
+     "title": "Add: The economy spec",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/9",
+     "live": false
+    }
+   ]
+  },
+  {
+   "id": "targeting",
+   "label": "Targeting",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "9 recordings, gate route waits on #1209",
+   "recordings": 9,
+   "spec": "stale",
+   "spec_pin": 6,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1202,
+    "title": "Spec: Move the targeting spec and implement it",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1202",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": [
+    {
+     "number": 23,
+     "title": "Update: Move targeting to interfaces-v13",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/23",
+     "live": false
+    },
+    {
+     "number": 10,
+     "title": "Add: The targeting spec",
+     "state": "MERGED",
+     "url": "https://github.com/ozgb/btm/pull/10",
+     "live": false
+    }
+   ]
+  },
+  {
+   "id": "los_radar",
+   "label": "LOS & radar",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "3 recordings, gate route waits on #1209",
+   "recordings": 3,
+   "spec": "active",
+   "spec_pin": null,
+   "impl": "none",
+   "active": true,
+   "issue": {
+    "number": 1189,
+    "title": "Spec: Write the los and radar spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1189",
+    "claimed": true,
+    "state": "OPEN"
+   },
+   "prs": []
+  },
+  {
+   "id": "mission",
+   "label": "Mission",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "2 recordings, gate route waits on #1209",
+   "recordings": 2,
+   "spec": "active",
+   "spec_pin": null,
+   "impl": "none",
+   "active": true,
+   "issue": {
+    "number": 1190,
+    "title": "Spec: Write the mission spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1190",
+    "claimed": true,
+    "state": "OPEN"
+   },
+   "prs": [
+    {
+     "number": 45,
+     "title": "Add: Specify the mission",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/45",
+     "live": true
+    }
+   ]
+  },
+  {
+   "id": "pathfinding",
+   "label": "Pathfinding",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "5 recordings, gate route waits on #1209",
+   "recordings": 5,
+   "spec": "active",
+   "spec_pin": null,
+   "impl": "none",
+   "active": true,
+   "issue": {
+    "number": 1191,
+    "title": "Spec: Write the pathfinding spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1191",
+    "claimed": true,
+    "state": "OPEN"
+   },
+   "prs": [
+    {
+     "number": 44,
+     "title": "Add: Write the pathfinding spec",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/44",
+     "live": true
+    }
+   ]
+  },
+  {
+   "id": "map",
+   "label": "Map",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "5 recordings, gate route waits on #1209",
+   "recordings": 5,
+   "spec": "active",
+   "spec_pin": null,
+   "impl": "none",
+   "active": true,
+   "issue": {
+    "number": 1192,
+    "title": "Spec: Write the map spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1192",
+    "claimed": true,
+    "state": "OPEN"
+   },
+   "prs": [
+    {
+     "number": 46,
+     "title": "Add: Specify the map subsystem",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/46",
+     "live": true
+    }
+   ]
+  },
+  {
+   "id": "players",
+   "label": "Players",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "10 recordings, gate route waits on #1209",
+   "recordings": 10,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1193,
+    "title": "Spec: Write the players spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1193",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
+  },
+  {
+   "id": "features",
+   "label": "Features",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "4 recordings, gate route waits on #1209",
+   "recordings": 4,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1194,
+    "title": "Spec: Write the features spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1194",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
+  },
+  {
+   "id": "ai",
+   "label": "AI",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "2 recordings, gate route waits on #1209",
+   "recordings": 2,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1195,
+    "title": "Spec: Write the AI spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1195",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
+  },
+  {
+   "id": "weapons",
+   "label": "Weapons",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "9 recordings, gate route waits on #1209",
+   "recordings": 9,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1196,
+    "title": "Spec: Write the weapons spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1196",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
+  },
+  {
+   "id": "scripts",
+   "label": "Scripts",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "4 recordings, gate route waits on #1209",
+   "recordings": 4,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1197,
+    "title": "Spec: Write the scripts spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1197",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
+  },
+  {
+   "id": "movement",
+   "label": "Movement",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "6 recordings, gate route waits on #1209",
+   "recordings": 6,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1198,
+    "title": "Spec: Write the movement spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1198",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
+  },
+  {
+   "id": "orders",
+   "label": "Orders",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "8 recordings, gate route waits on #1209",
+   "recordings": 8,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1199,
+    "title": "Spec: Write the orders spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1199",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
+  },
+  {
+   "id": "units",
+   "label": "Units",
+   "group": "subsystem",
+   "kit": "partial",
+   "kit_note": "8 recordings, gate route waits on #1209",
+   "recordings": 8,
+   "spec": "none",
+   "spec_pin": null,
+   "impl": "none",
+   "active": false,
+   "issue": {
+    "number": 1200,
+    "title": "Spec: Write the units spec for btm",
+    "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1200",
+    "claimed": false,
+    "state": "OPEN"
+   },
+   "prs": []
+  }
+ ]
+}

@@ -123,7 +123,7 @@ An event of seven to twelve arguments is two records, as `docs/sim-events.md`, "
 
 | Call | Arguments | Value |
 | --- | --- | --- |
-| `deliver` | script | the lines of `commands.txt` (`docs/commands.md`, section 2) for the commands of the script, without its `bt-commands` and `units` lines, in the order the core delivers them: a list of strings |
+| `deliver` | script | the lines of `commands.txt` (`docs/commands.md`, section 2) for the commands of the script, without its `bt-commands`, `units` and `end` lines, in the order the core delivers them: a list of strings |
 
 A script is a text file whose first line is `bt-script 1`; every later line is one scripted line of a scenario, in the
 order of the scenario file, as `<line> <key> <tick>` followed by what the command publishes, as a line of

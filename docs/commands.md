@@ -18,7 +18,9 @@ never repeats that.
 - The interface's records (section 8) come first. The interface acts after tick `N` has finished, so its records of
   that moment precede tick `N + 1`: they are delivered before the `spawn` lines of tick `N + 1`, in the order the
   interface published them. A core delivers them at the start of tick `N + 1`, as it does the scripted lines, and so
-  does a run played from the command log (section 2.2).
+  does a run played from the command log (section 2.2). That holds for the last of them too: when the interface ends
+  the run after tick `N` (the exit menu's Yes publishes PLAYERS_LEAVE_GAME), its records are stamped `N + 1`, and the
+  log's `end` line (section 2) says that the run ended without playing tick `N + 1`.
 - Every command publishes its events to the engine's outbox. An event published while no tick is running reaches
   the module that handles its kind at once: the module consumes it in its `Apply`, in the order of publication, before
   the next event of the command is published. An event that a handler publishes while it consumes one is delivered at
@@ -37,14 +39,14 @@ A test-mode run writes `commands.txt` beside `trace.txt`. It is a diagnostic and
 its scripted lines are not a verdict and have no stored copy, and its interface records are judged in their decoded
 form (section 2.1). Its first line is
 
-    bt-commands 2
+    bt-commands 3
 
 and its second, written before the first command, is
 
     units <offset> <stride>
 
 the offset of unit 0 of the unit table in the state block and the size of a unit record, both in decimal: what a
-reader needs to turn a unit ref of a payload into a unit index. Every later line is one command, in the order the
+reader needs to turn a unit ref of a payload into a unit index. Every later line but the last is one command, in the order the
 commands were delivered: a scripted `spawn`, `order` or `console` line, or one event the interface published:
 
     <tick> <key> <line> <count>[ <KIND> <hex>]...
@@ -66,11 +68,21 @@ commands were delivered: a scripted `spawn`, `order` or `console` line, or one e
   nothing is a line with `count` 0 and no pairs.
 - The interface's records are every event published to the engine's outbox after a tick's simulation has finished
   and before the next tick starts, outside the scripted lines: section 8 lists them. After the last tick nothing is
-  recorded.
+  recorded, except when the interface itself ends the run: its records of that moment are stamped the tick after the
+  last.
 
-Format 1 had neither the `units` line nor the interface's records.
+Its last line, written when the run ends, is
 
-A core is played from the file by section 2.2: each line's events, at its tick, in the file's order.
+    end <tick>
+
+the last tick the run played, in decimal. Every line before it is stamped at most `<tick> + 1`, and a line stamped
+`<tick> + 1` is a record of the interface's last act, the one that ended the run. A run that reached its `ticks` or
+ended on the end-of-game state has no such line.
+
+Format 1 had neither the `units` line nor the interface's records, and format 2 had no `end` line.
+
+A core is played from the file by section 2.2: each line's events, at its tick, in the file's order, ending where the
+`end` line says.
 
 ### 2.1 The interface's records, decoded
 
@@ -126,9 +138,14 @@ traces of the run that wrote it, without the presentation and without the scenar
   line it publishes each `<KIND> <hex>` pair's bytes, in order, to the engine's outbox, as one command: the kind is
   the payload's first four bytes, and the name is not read. A line whose tick is below the tick being started, or that
   is not in the format of section 2, stops the run with status 2. Lines after the last tick are not played.
+- **The end.** The last line must be `end <tick>`, and no line may be stamped later than `<tick> + 1` (status 2
+  otherwise, before the first tick). At the start of tick `<tick> + 1` the run delivers that tick's lines, which
+  publish the interface's last act, and then ends without playing the tick, as the run that wrote the file ended: it
+  closes its outputs, writes `testmode: -testcommands ended the run after tick <tick>` and exits with status 0, and
+  does not fail for a frame it did not reach.
 - **Its own log.** The run writes `commands.txt` as any run does, each line with the key, line field and count of the
-  line it played. A file played to the end is written again byte for byte, so its decoded records (section 2.1) are
-  the stored ones.
+  line it played, and its `end` line. A file played to the end is written again byte for byte, so its decoded records
+  (section 2.1) are the stored ones.
 - **What it cannot carry.** A console command of section 4.3 is not an event and one of section 4.4 touches only the
   presentation: neither leaves anything in the file. The presentation, with no `input` lines, does nothing, so a write
   of the interface that is not an event and that the trace hashes makes the run differ from the scenario. That is
@@ -141,9 +158,9 @@ again: a run from the file delivers no `input` lines, so its menus never start t
 scenarios whose run from the file still differs, each with the hashed field and its issue: their run is played and
 its records judged, its traces are reported as `left` and not judged, and an entry whose run turns equal fails until
 it is removed. Every `ui-` scenario is listed for now. Bits 6 and 7 of `Unit.flags` (`selectState`), which the
-selection writes, are the only difference of each (#1132 masks them). The exception is `ui-dialogs`, whose run ends
-in the exit menu after tick 61: its `PLAYERS_LEAVE_GAME` is stamped tick 62, so the run from the file plays one tick
-more (#1136).
+selection writes, are the only difference of each (#1132 masks them). `ui-dialogs` ends in the exit menu after tick
+61: its `PLAYERS_LEAVE_GAME` is stamped tick 62, and its run from the file publishes it and ends at `end 61`, with as
+many ticks as the scenario.
 
 ## 3. Reading a console line
 

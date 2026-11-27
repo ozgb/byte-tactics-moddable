@@ -199,8 +199,7 @@ REPLAY_LEFT_OUT = {
     "ui-build-place": SELECT_STATE,
     "ui-click-select": SELECT_STATE,
     "ui-debug-keys": SELECT_STATE,
-    "ui-dialogs": SELECT_STATE + "; and the exit menu's Yes ends the run after tick 61, but its PLAYERS_LEAVE_GAME, stamped "
-                  "tick 62, makes the run from the file play tick 62 too (#1136)",
+    "ui-dialogs": SELECT_STATE,
     "ui-drag-select": SELECT_STATE,
     "ui-groups": SELECT_STATE,
     "ui-keys": SELECT_STATE,

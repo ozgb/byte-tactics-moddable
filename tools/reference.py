@@ -191,10 +191,7 @@ UI_LOGS: dict[str, str | None] = {}
 INTERFACE_LOGS: dict[str, str | None] = {}
 COMMAND_TEXTS: dict[str, str | None] = {}
 REPLAY_SUFFIX = "+commands"
-REPLAY_LEFT_OUT = {
-    "ui-dialogs": "the exit menu's Yes ends the run after tick 61, but its PLAYERS_LEAVE_GAME, stamped tick 62, makes the run "
-                  "from the file play tick 62 too (#1136)",
-}
+REPLAY_LEFT_OUT: dict[str, str] = {}
 EVENT_LOGS: dict[str, str | None] = {}
 SETUP_LOGS: dict[str, str | None] = {}
 DISPLAY_LOGS: dict[str, str | None] = {}

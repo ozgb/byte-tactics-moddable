@@ -3177,6 +3177,7 @@ ClearPlayerSlotInRemovePlayer,src/network/net_game.cpp,network,file:src/network/
 ClearTrackedProjectile,src/weapons/weapons.cpp,weapons,file:src/weapons/,
 ClearWindowedFlag,src/graphics/display.cpp,platform,presentation,platform
 CloakCostPayable,src/util/x87_compare.h,economy,folder:src/util/,economy
+CloseCommands,src/harness/harness.cpp,harness,folder:src/harness/,
 ClusterOf,src/ai/pathfind_hpa.cpp,pathfinding,file:src/ai/pathfind,
 CmdLimitSlot,src/game/console_commands.cpp,game,default:src/game/,
 CmdPlanSlot,src/game/console_commands.cpp,game,default:src/game/,
@@ -3570,6 +3571,7 @@ FindWeaponByNameImport,src/wasm/wind_meteors_glue.cpp,platform,folder:src/wasm/,
 FindWeaponByNameNative,src/seams/native.cpp,seams,folder:src/seams/,
 FinishImport,src/harness/replay.cpp,harness,folder:src/harness/,
 FinishNested,src/harness/replay.cpp,harness,folder:src/harness/,
+FinishRun,src/harness/harness.cpp,harness,folder:src/harness/,
 FinishSearch,src/ai/pathfind_hpa.cpp,pathfinding,file:src/ai/pathfind,
 FirstFeatureSpot,src/map/features.cpp,features,file:src/map/features,
 FirstJoinedId,src/network/net_game.cpp,network,file:src/network/,

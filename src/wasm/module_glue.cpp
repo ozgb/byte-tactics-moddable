@@ -18,6 +18,7 @@
 #include "../state/sim_globals.h"
 #include "../game/los_helpers.h"
 #include "../state/block.h"
+#include "../state/load_data.h"
 #include "../../interfaces/rand_stream.h"
 #include "modules.h"
 #include "module_glue.h"
@@ -341,6 +342,49 @@ IMPORT(FindSlotByDpidImport)
     return nullptr;
 }
 
+IMPORT(GetGafFrameImport)
+{
+    if (a[0].i32 == 0)
+        return nullptr;
+    NEED("GetGafFrame", 0);
+    a[0].i32 = (int)LoadGetGafFrame((unsigned)a[0].i32, a[1].i32);
+    return nullptr;
+}
+
+const unsigned kGafCursorSize = 12;
+
+const char* GafCursor(const char* import, unsigned address)
+{
+    if (!GlueInMemory(address))
+        return GlueImportError(import, "pointer argument 0 is outside the module memory");
+    if (kGafCursorSize > ModulesMemory()->size - address)
+        return GlueImportError(import, "the cursor runs past the module memory");
+    return nullptr;
+}
+
+IMPORT(InitGafSequenceImport)
+{
+    if (a[0].i32 == 0 || a[1].i32 == 0 || a[2].i32 < 0)
+        return nullptr;
+    const char* error = GafCursor("InitGafSequence", (unsigned)a[0].i32);
+    if (error != nullptr)
+        return error;
+    NEED("InitGafSequence", 1);
+    LoadInitGafSequence(GlueLinear(a[0].i32), (unsigned)a[1].i32, a[2].i32);
+    return nullptr;
+}
+
+IMPORT(StepGafSequenceImport)
+{
+    if (a[0].i32 == 0)
+        return nullptr;
+    const char* error = GafCursor("StepGafSequence", (unsigned)a[0].i32);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = LoadStepGafSequence(GlueLinear(a[0].i32));
+    return nullptr;
+}
+
 const unsigned kEffectCapacity = 128;
 
 int Routed(int outbox, int kind)
@@ -409,6 +453,9 @@ const GlueImport kServiceImports[] = {
     {"services", "SimCaptureAlloc", "ii>i", SimCaptureAllocImport},
     {"services", "GetSlotDpid", "i>i", GetSlotDpidImport},
     {"services", "FindSlotByDpid", "i>i", FindSlotByDpidImport},
+    {"services", "GetGafFrame", "ii>i", GetGafFrameImport},
+    {"services", "InitGafSequence", "iii>", InitGafSequenceImport},
+    {"services", "StepGafSequence", "i>i", StepGafSequenceImport},
     {"services", "Emit", "ii>", EmitImport},
 };
 

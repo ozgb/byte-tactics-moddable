@@ -32,7 +32,7 @@
    ["replay", "host/import_pointer_last.txt", "host/wind_meteors_import_pointer_last.wasm"]
   ],
   "results": [
-   ["replay", {"error": "fatal", "modules": ["wind_meteors"], "message": "import BuildDataPath: exception 0xc0000005"}]
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import BuildDataPath: pointer argument 3 is outside the module memory"}]
   ]},
  {"name": "import_buffer_size",
   "calls": [
@@ -46,7 +46,7 @@
    ["replay", "host/import_buffer_past.txt", "host/wind_meteors_import_buffer_past.wasm"]
   ],
   "results": [
-   ["replay", [["w SimGlobals.g_meteorNextStrikeTime 0", "w SimGlobals.g_meteorActive 0", "w SimGlobals.g_meteorStrikeEndTime 0", "w SimGlobals.g_meteorOrigin (0,0)", "w SimGlobals.g_meteorNextHitTime 0", "w SimGlobals.g_meteorTarget (0,0)", "w rng.main 0x00000001", "w rng.load 0x00000001", "w rng.seed 0x00000000"]]]
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import TdfRecord_GetFieldString: the buffer runs past the module memory"}]
   ]},
  {"name": "import_null_handle",
   "calls": [
@@ -102,7 +102,7 @@
    ["replay", "host/emit_past.txt", "host/wind_meteors_emit_past.wasm"]
   ],
   "results": [
-   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the kind is not in the module's publishes table"}]
+   ["replay", {"error": "import", "modules": ["wind_meteors"], "message": "import Emit: the effect runs past the module memory"}]
   ]},
  {"name": "emit_kind",
   "calls": [
@@ -180,5 +180,26 @@
   ],
   "results": [
    ["replay", [["o params.weapon \"\"", "o params.radius 1", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "gaf_frame_null_table",
+  "calls": [
+   ["replay", "host/gaf_frame_null_table.txt", "host/wind_meteors_gaf_frame_null_table.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "gaf_init_null_animation",
+  "calls": [
+   ["replay", "host/gaf_init_null_animation.txt", "host/wind_meteors_gaf_init_null_animation.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 458755", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "gaf_step_null_cursor",
+  "calls": [
+   ["replay", "host/gaf_step_null_cursor.txt", "host/wind_meteors_gaf_step_null_cursor.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
   ]}
 ]}

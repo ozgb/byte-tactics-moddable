@@ -339,6 +339,9 @@ data words at 0x30000 to 0x3000c and the eight slots, and does in one slot what 
 | `record_event_null_array` | `RecordSimEvent` of kind 1 with a null array and a count of 3 | `o params.radius 7`, with no `services.RecordSimEvent` line |
 | `capture_null_offset` | `SimCaptureAlloc(8, 0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.SimCaptureAlloc` line: a null offset address gives a null result |
 | `slot_dpid_above` | `GetSlotDpid(11)` | `o params.radius -1`, with no `services.GetSlotDpid` line: a slot above 10 gives the answer for none |
+| `gaf_frame_null_table` | `GetGafFrame(0, 0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.GetGafFrame` line: a null table gives a null frame |
+| `gaf_init_null_animation` | `InitGafSequence` of a cursor of 458755 (index 3, 7 ticks left) with a null animation, then `params.radius` set to the cursor's first word | `o params.radius 458755`, with no `services.InitGafSequence` line: the cursor is unchanged |
+| `gaf_step_null_cursor` | `StepGafSequence(0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.StepGafSequence` line: a null cursor gives 0 |
 | `emit_size`, `emit_past`, `emit_kind`, `emit_payload_size`, `emit_weapon` | `Emit` of a SPAWN of 3 bytes, of one that runs past the memory, of kind 81, of 40 bytes, and of weapon 256 | section 13's five `Emit` texts; a size of 3 is refused as outside an effect before its kind is read (section 9.3 gives the order of the checks) |
 
 The gate never gives the core the in-repo engine's wind_meteors module. The module is the one that comes with the

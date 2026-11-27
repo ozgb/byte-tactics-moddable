@@ -521,8 +521,9 @@ one byte of the record's layout; it is not an argument kind.
   loaded 3DO model data (a face's texture). It reads a frame table and its frames
   (`FrameTable.count`, a frame's size, offsets, transparency and pixels) and never writes them.
   Nothing traps a write: a wasm32 memory has no read-only pages, so this is the module's obligation,
-  not something the host enforces. The host maps frame tables into the shared memory outside the
-  state block (#1208). Of the modules, only los_radar reads frame data as simulation input (the
+  not something the host enforces. The host copies frame tables and frames into the `load_data` region
+  (section 2.1) when a field first points at one, and the fields hold the copy's address; the native
+  build maps nothing and its fields hold native pointers. Of the modules, only los_radar reads frame data as simulation input (the
   sight masks of `Game.losTable`). features uses a sequence only as a timer, and weapons' cursors and
   debris pictures are presentation state kept in the block. units reads one more such field,
   `ModelState.bitmap`, a unit's cached picture: that frame is not load data but the presentation's,
@@ -711,6 +712,11 @@ a kind of `interfaces/sim_events.h`, or with a null array and a count above 0; `
 address; `GetGafFrame` with a null table; `InitGafSequence` with a null cursor or animation, or a negative index;
 `StepGafSequence` with a null cursor; `GetSlotDpid` with a slot above 10. `SimAllocTagged` takes any tag, null
 included, since the tag changes nothing.
+
+**The GAF services take load data.** The table of `GetGafFrame` and the animation of `InitGafSequence` are addresses
+of the `load_data` region (sections 2.1 and 7.1), and a cursor's animation is one too. An address of the memory that is
+not a copy the host made ends the game as a load data error (section 13), not as an import trap; one outside the
+memory is the pointer trap of section 7.2.
 
 **Routes in the recordings.** A recording carries some calls a module makes to the engine under the engine's own
 service names (`docs/replay-format.md`): the scheduler's publishing call and its synchronous calls into another
@@ -947,6 +953,11 @@ Every error or trap ends the game, in this version. There is no recovery and no 
   `returned a buffer other than the one it was given`, `returned a weapon outside the sim block` (or an `object`, a
   `region` or a `pointer`, by the result's mode), `returned a pointer outside the module memory`, `the world view is not
   set`; `SimFree` adds `the pointer is outside the sim block`; `Emit` adds `the size is outside an effect`, `the effect runs past the module memory`, `the kind is not in the module's publishes table`, `the kind is not routed from the module's outbox` and `the size is not the payload's size of its kind`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is outside the table of weapons`).
+- **Load data errors** end the game with the text itself (not a trap text): `load_data: <hex> is not a load
+  address` (a GAF service was given an address of the memory that is no copy the host made), `load_data: the load
+  data changed at tick <tick>` (a module wrote a byte of a copy, which it must never do), `load_data: the region is
+  full` and `load_data: out of memory`; a manifest without a `load_data` region fails at start-up with
+  `the manifest has no load_data region`.
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`, `slot <name>: the region is not in the
   sim block`, `slot <name>: an object argument is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the

@@ -258,5 +258,35 @@
     "host/wind_meteors_alloc_tagged_null.wasm"
    ]
   ]
+ },
+ {
+  "name": "gaf_frame_null_table",
+  "calls": [
+   [
+    "replay",
+    "host/gaf_frame_null_table.txt",
+    "host/wind_meteors_gaf_frame_null_table.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "gaf_init_null_animation",
+  "calls": [
+   [
+    "replay",
+    "host/gaf_init_null_animation.txt",
+    "host/wind_meteors_gaf_init_null_animation.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "gaf_step_null_cursor",
+  "calls": [
+   [
+    "replay",
+    "host/gaf_step_null_cursor.txt",
+    "host/wind_meteors_gaf_step_null_cursor.wasm"
+   ]
+  ]
  }
 ]

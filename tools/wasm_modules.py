@@ -10,6 +10,7 @@
     uv run tools/wasm_modules.py adapters  # run the loader's adapters and refusals over tests/wasm/adapters
     uv run tools/wasm_modules.py fatal     # make an import end the game, and check the exit comes after the call
     uv run tools/wasm_modules.py glue-fatal [--exe EXE] [--game-dir DIR]   # the same through the real glue, under Wine
+    uv run tools/wasm_modules.py write-check [--exe EXE] [--game-dir DIR]  # a module writing a GAF frame ends the game, under Wine
 
 Both fixtures use the fixed-base convention (#562): each imports env.memory and
 env.__indirect_function_table, is linked with its own --global-base and --table-base
@@ -1359,6 +1360,59 @@ def run_glue_fatal(exe, game_dir):
     return 0
 
 
+WRITE_CHECK_MESSAGE = "load_data: the load data changed at tick"
+
+
+def run_write_check(exe, game_dir):
+    """Run the exe in test mode with a wind_meteors variant that writes a byte of a load data frame in every tick; LoadDataCheck must end the game with exit code 2."""
+    exe = os.path.abspath(exe)
+    if not os.path.exists(exe):
+        print(f"FAIL: {exe} is missing: build it first")
+        return 1
+    source = os.path.dirname(exe)
+    for name in ("wasmtime_host.dll", "modules.json", "wind_meteors.wasm"):
+        if not os.path.exists(os.path.join(source, name)):
+            print(f"FAIL: {name} is missing next to {exe}: cmake --build build/modern --target wasm_runtime")
+            return 1
+    build_variant(["BT_WRITE_CHECK=1"], "wind_meteors_write_check")
+    scratch = os.path.join(ROOT, "build", "scratch", "write-check")
+    shutil.rmtree(scratch, ignore_errors=True)
+    os.makedirs(scratch)
+    for name in os.listdir(source):
+        if name == os.path.basename(exe) or name in ("modules.json", "CMakeCache.txt", "commit.txt") or name.endswith((".dll", ".wasm")):
+            shutil.copy2(os.path.join(source, name), os.path.join(scratch, name))
+    shutil.copy2(os.path.join(OUT, "wind_meteors_write_check.wasm"), os.path.join(scratch, "wind_meteors.wasm"))
+    cmd = [sys.executable, os.path.join(ROOT, "tools", "playtest.py"), "--exe", os.path.join(scratch, os.path.basename(exe)),
+           "--testmode", GLUE_FATAL_SCENARIO, "--testmode-timeout", "120"]
+    if game_dir:
+        cmd += ["--game-dir", game_dir]
+    done = subprocess.run(cmd, capture_output=True, text=True)
+    found = re.search(r"^logs and screenshots: (.+)/$", done.stdout, re.M)
+    if not found:
+        print(f"FAIL: playtest.py gave no run directory (exit {done.returncode}):\n{done.stdout}{done.stderr}")
+        return 1
+    session = os.path.join(ROOT, found.group(1))
+    runs = [d for d in os.listdir(session) if os.path.isdir(os.path.join(session, d))]
+    if len(runs) != 1:
+        print(f"FAIL: expected one run in {session}, found {runs}")
+        return 1
+    run = os.path.join(session, runs[0])
+    with open(os.path.join(run, "result.json")) as f:
+        result = json.load(f)
+    log_path = os.path.join(run, "wine.log")
+    log = open(log_path, errors="replace").read() if os.path.exists(log_path) else ""
+    if result["exit_codes"] != [2]:
+        print(f"FAIL: the exit code was {result['exit_codes']}, expected [2] (kept: {run})")
+        return 1
+    if WRITE_CHECK_MESSAGE not in log:
+        print(f"FAIL: the log has no {WRITE_CHECK_MESSAGE!r} (kept: {run})")
+        return 1
+    shutil.rmtree(session)
+    shutil.rmtree(scratch)
+    print(f"write-check: exit code 2, {WRITE_CHECK_MESSAGE!r}, ok")
+    return 0
+
+
 def run_under_wasmtime(command):
     try:
         import wasmtime
@@ -1397,7 +1451,7 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "build-variant", "check", "check-module", "imports", "statics", "adapters", "fatal", "glue-fatal", "runtime"])
+    parser.add_argument("command", choices=["build", "build-variant", "check", "check-module", "imports", "statics", "adapters", "fatal", "glue-fatal", "write-check", "runtime"])
     parser.add_argument("module", nargs="?", help="check-module: the .wasm file to check; runtime: the directory to copy into")
     parser.add_argument("--exe", default=os.path.join(ROOT, "build", "modern", "TotalA.exe"), help="glue-fatal: the exe to run")
     parser.add_argument("--define", action="append", default=[], help="build-variant: NAME=VALUE for the wind_meteors compile")
@@ -1406,6 +1460,8 @@ def main():
     args = parser.parse_args()
     if args.command == "glue-fatal":
         return run_glue_fatal(args.exe, args.game_dir)
+    if args.command == "write-check":
+        return run_write_check(args.exe, args.game_dir)
     if args.command == "check-module":
         if not args.module or not args.name:
             print("check-module: needs a .wasm file and --name SUBSYSTEM", file=sys.stderr)

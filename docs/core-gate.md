@@ -293,7 +293,7 @@ The gate makes no `call` or `fuel` call that names a module not loaded, and no `
 
 | Call | Arguments | Value |
 | --- | --- | --- |
-| `replay` | recording, module | a list with one entry for each `call` line of the recording, in order: the list of the `w` lines, then the closing `o` lines (`docs/replay-format.md`, "Lines"), that the core's replay of that call gives, each a string without its indentation, as `"w SimGlobals.g_meteorScheduleGap 1800"` |
+| `replay` | recording, module | a list with one entry for each `call` line of the recording, in order: the list of the `i` lines of the imports the module calls that the recording has no line for, then the `w` lines, then the closing `o` lines (`docs/replay-format.md`, "Lines"), that the core's replay of that call gives, each a string without its indentation, as `"w SimGlobals.g_meteorScheduleGap 1800"` |
 
 The recording, in `reference/core/host/`, is a file of `tests/replay/wind_meteors/` with what the core must produce taken
 out: every `w` line and every closing `o` line (`docs/replay-format.md`, "Lines") is withheld, and the rest (the `call`
@@ -336,8 +336,8 @@ data words at 0x30000 to 0x3000c and the eight slots, and does in one slot what 
 | `alloc_zero` | `SimAlloc(0)` | `o params.radius 1`: the address it returns is not null (the recording's `services.SimAlloc 0` line has it) |
 | `alloc_tagged_null` | `SimAllocTagged` with a null tag and a size of 8 | `o params.radius 1`: a null tag is taken like any tag, and the address is not null |
 | `free_twice` | `SimAlloc(8)`, then `SimFree` of it twice | `o params.radius 7`, reached with one `services.SimFree` line: the second free of an address already returned does nothing and does not trap |
-| `record_event_kind` | `RecordSimEvent` of kind 36, a kind not of `interfaces/sim_events.h`, with no arguments | `o params.radius 7`, with no `services.RecordSimEvent` line: the call changes nothing |
-| `record_event_null_array` | `RecordSimEvent` of kind 1 with a null array and a count of 3 | `o params.radius 7`, with no `services.RecordSimEvent` line |
+| `record_event_kind` | `RecordSimEvent` of kind 36, a kind not of `interfaces/sim_events.h`, with no arguments | `o params.radius 7`, with no `i services.RecordSimEvent` line: the call changes nothing, so the engine never queues the event |
+| `record_event_null_array` | `RecordSimEvent` of kind 1 with a null array and a count of 3 | `o params.radius 7`, with no `i services.RecordSimEvent` line: the host refuses the call before the queue reads the array |
 | `capture_null_offset` | `SimCaptureAlloc(8, 0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.SimCaptureAlloc` line: a null offset address gives a null result |
 | `slot_dpid_above` | `GetSlotDpid(11)` | `o params.radius -1`, with no `services.GetSlotDpid` line: a slot above 10 gives the answer for none |
 | `gaf_frame_null_table` | `GetGafFrame(0, 0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.GetGafFrame` line: a null table gives a null frame |

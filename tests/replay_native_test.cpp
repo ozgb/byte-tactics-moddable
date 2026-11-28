@@ -305,6 +305,7 @@ bool g_core;
 bool g_loading;
 bool g_coreFault;
 bool g_coreDropped;
+ReplayText g_coreImports;
 ReplayText g_coreWrites;
 ReplayText g_coreClosings;
 
@@ -937,6 +938,11 @@ const char* Enter(const ReplayText& actual)
     int next = NextImportLine(g_cursor);
     if (next == g_callEnd || strncmp(g_lines[next], "  i ", 4) != 0) {
         Diff(key, "no such import call", actual.Data());
+        if (g_core) {
+            char name[96];
+            sprintf(name, "%.*s", nameLength < 95 ? nameLength : 95, actual.Data());
+            CoreJson(g_coreImports, "i", name, space == nullptr ? "" : space + 1);
+        }
         return "";
     }
     g_cursor = next + 1;
@@ -3803,6 +3809,7 @@ void ReplayCall(const char* file, Outcome& out)
     if (sets == nullptr)
         Fatal(file, g_callIndex, "unknown slot", slotText);
     sets = SetsOfKind(sets);
+    g_coreImports.Clear();
     g_coreWrites.Clear();
     g_coreClosings.Clear();
     g_diffs = 0;
@@ -3899,6 +3906,9 @@ void ReplayCall(const char* file, Outcome& out)
         if (g_callIndex != 0)
             out.core.AddChar(',');
         out.core.AddChar('[');
+        out.core.AddText(g_coreImports);
+        if (g_coreImports.Size() != 0 && g_coreWrites.Size() + g_coreClosings.Size() != 0)
+            out.core.AddChar(',');
         out.core.AddText(g_coreWrites);
         if (g_coreWrites.Size() != 0 && g_coreClosings.Size() != 0)
             out.core.AddChar(',');

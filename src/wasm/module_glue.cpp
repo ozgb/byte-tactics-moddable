@@ -306,6 +306,8 @@ IMPORT(SimFreeImport)
 IMPORT(RecordSimEventImport)
 {
     unsigned count = (unsigned)a[3].i32;
+    if ((unsigned)a[0].i32 > SIM_EVENT_RADAR_MAPPED || (count != 0 && a[2].i32 == 0))
+        return nullptr;
     if (count != 0) {
         NEED("RecordSimEvent", 2);
         if (count > (ModulesMemory()->size - (unsigned)a[2].i32) / sizeof(unsigned))

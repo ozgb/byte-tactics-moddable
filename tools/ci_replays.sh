@@ -54,3 +54,5 @@ done
 while IFS=$'\t' read -r log name variant expect field file; do
   run "$log" replay_native_test "$bindir/replay_native_test.exe" --wasm "$bindir/$variant.wasm" --expect "$expect" "$field" "$rec/$name/$file"
 done < <(rows wasm-inject)
+cp tests/wasm/fixtures/mission_pointer_fields.wasm "$bindir/"
+run replay_wasm_pointer_fields replay_native_test "$bindir/replay_native_test.exe" --wasm "$bindir/mission_pointer_fields.wasm" --no-budgets tests/wasm/fixtures/mission_pointer_fields.txt

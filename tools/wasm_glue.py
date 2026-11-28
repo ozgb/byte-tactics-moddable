@@ -163,6 +163,35 @@ class Schema:
         return names
 
 
+RECORD_POINTERS = None
+
+
+def record_pointers(base):
+    """[(field, is_text)] of the pointer fields of an interface header's plain-data struct: each holds a linear address on the module side."""
+    global RECORD_POINTERS
+    if RECORD_POINTERS is None:
+        RECORD_POINTERS = {}
+        for name in sorted(os.listdir(INTERFACES)):
+            if not name.endswith(".h"):
+                continue
+            text = wasm_modules.COMMENT.sub("", read(os.path.join(INTERFACES, name)))
+            for m in re.finditer(r"^struct (\w+) {(.*?)^};", text, re.M | re.S):
+                if m[1].endswith(("Seam", "View")) or "(" in m[2] or "{" in m[2]:
+                    continue
+                fields = []
+                for decl in m[2].split(";"):
+                    decl = " ".join(decl.split())
+                    if "*" not in decl:
+                        continue
+                    pm = re.match(r"^(?P<type>.*\*)\s*(?P<name>\w+)$", decl)
+                    if pm is None:
+                        sys.exit(f"interfaces/{name}: {m[1]}: the pointer field '{decl}' is not a plain pointer the glue can translate")
+                    fields.append((pm["name"], pm["type"].replace("const ", "").replace(" ", "") == "char*"))
+                if fields:
+                    RECORD_POINTERS[m[1]] = fields
+    return RECORD_POINTERS.get(base, [])
+
+
 def pointer(ctype):
     return ctype.rstrip().endswith("*")
 
@@ -451,8 +480,18 @@ def slot_thunk(w, subsystem, index, slot, glue):
                 direction = "in"
             w(f"    unsigned {name}At = GlueIn(glue, {index}, {name}, sizeof({base}), {0 if direction == 'out' else 1});")
             w(f"    slotArgs[{i}].i32 = (int){name}At;")
+            fields = record_pointers(base)
+            if direction == "inout" and any(text for _, text in fields):
+                sys.exit(f"{subsystem}.{slot.name}: argument {name} is copied both ways and has a char* field, which would point into scratch after the call")
+            if direction == "out" and fields:
+                w(f"    GlueZero({name}, {name}At, sizeof({base}));")
+            if direction != "out":
+                for field, text in fields:
+                    w(f"    GlueInPointer(glue, {index}, {name}, {name}At, offsetof({base}, {field}), {1 if text else 0});")
             if direction != "in":
                 after.append(f"    GlueOut((void*){name}, {name}At, sizeof({base}));")
+                for field, _ in fields:
+                    after.append(f"    GlueOutPointer(glue, {index}, (void*){name}, offsetof({base}, {field}));")
     w(f"    GlueCall(glue, {index}, slotArgs, {count});")
     for line in after:
         w(line)
@@ -563,6 +602,7 @@ def tables(manifest, all_seams):
     import routes
 
     w = Writer()
+    w("#include <stddef.h>")
     w("#include <wasmtime.h>")
     w("#include \"../units/unit_def.h\"")
     w("#include \"../../interfaces/host.h\"")

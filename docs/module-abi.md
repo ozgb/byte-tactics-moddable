@@ -583,7 +583,7 @@ behaviour is the contract the existing module was built against.
   `load`, `pending`, or a pointer with no mode) its address, `region` its address and the `g_region` word (8.2),
   `world` nothing (the host keeps the world view and a module reaches it through the view's imports), an `event` a
   scratch copy of at most the inbox's largest payload, a buffer with its length a scratch copy of that many elements,
-  and a pointer to a record a scratch copy of the record, copied back unless it is only read. An interface import's
+  and a pointer to a record a scratch copy of the record, copied back unless it is only read. Each pointer field of a copied record (a member of pointer type in the interface header's struct) is turned from a native pointer into a linear address on the way in and back into a native pointer on the way out, with 0 staying 0, and an address outside the memory is refused. An interface import's
   pointer argument is checked to lie in the memory, a `handle` one to be live, and an argument the callee writes a pointer
   through has that pointer turned back into an address.
 - **Publishing.** The host hands an `Emit` to the scheduler as the subsystem's native default publishes the same kind:

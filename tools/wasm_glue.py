@@ -481,6 +481,8 @@ def slot_thunk(w, subsystem, index, slot, glue):
             w(f"    unsigned {name}At = GlueIn(glue, {index}, {name}, sizeof({base}), {0 if direction == 'out' else 1});")
             w(f"    slotArgs[{i}].i32 = (int){name}At;")
             fields = record_pointers(base)
+            if direction == "inout" and any(text for _, text in fields):
+                sys.exit(f"{subsystem}.{slot.name}: argument {name} is copied both ways and has a char* field, which would point into scratch after the call")
             if direction == "out" and fields:
                 w(f"    GlueZero({name}, {name}At, sizeof({base}));")
             if direction != "out":

@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T08:05:04+00:00",
+ "generated": "2026-11-28T09:05:04+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -8,8 +8,8 @@
    "total": 65
   },
   "180": {
-   "done": 17,
-   "total": 39
+   "done": 19,
+   "total": 41
   }
  },
  "rows": [
@@ -192,16 +192,23 @@
    "recordings": 6,
    "spec": "active",
    "spec_pin": 7,
-   "impl": "none",
+   "impl": "active",
    "active": true,
    "issue": {
     "number": 1201,
     "title": "Spec: Move the economy spec and implement it",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1201",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [
+    {
+     "number": 64,
+     "title": "Implementer: impl/economy",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/64",
+     "live": true
+    },
     {
      "number": 63,
      "title": "Update: Move economy to interfaces-v72",
@@ -268,7 +275,7 @@
     "number": 1189,
     "title": "Spec: Write the los and radar spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1189",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [

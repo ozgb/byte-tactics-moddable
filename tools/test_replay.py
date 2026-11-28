@@ -6,6 +6,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import coupling
 import replay
@@ -30,7 +31,7 @@ class Scenario(unittest.TestCase):
     def test_the_stored_windows_name_a_recording_that_exists(self):
         for key, window in replay.stored_windows().items():
             subsystem, scenario = key.split("/")
-            self.assertTrue((replay.RECORDINGS / subsystem / (scenario + ".txt")).is_file(), key)
+            self.assertTrue(replay.stored_recording(subsystem, scenario).is_file(), key)
             self.assertLessEqual(window[0], window[1])
 
     def test_ticks(self):
@@ -144,6 +145,55 @@ class Subsystems(unittest.TestCase):
         self.assertEqual(replay.recorded_names(["wind_meteors"]), ["console-features", "meteors-earthquake", "meteors-hailstorm"])
         self.assertEqual(replay.plan_for(["wind_meteors"], None)["meteors-hailstorm"], ["wind_meteors"])
         self.assertEqual(replay.plan_for(["targeting"], ["x"]), {"x": ["targeting"]})
+
+
+class Long(unittest.TestCase):
+    """A recording in a directory below tests/replay/<subsystem>/ (long/) is checked, recorded and compared at its path."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name) / "replay"
+        (self.root / "mission/long").mkdir(parents=True)
+        (self.root / "mission/.scenarios").mkdir()
+        for name in ("mission/console-ilose.txt", "mission/long/mission-build-unit.txt", "mission/.scenarios/x.txt"):
+            (self.root / name).write_text(GOOD)
+        self.patches = [mock.patch.object(replay, "RECORDINGS", self.root), mock.patch.object(replay, "PLAYTESTS", self.root / "playtests.json"),
+                        mock.patch.object(replay, "WINDOWS", self.root / "windows.json")]
+        for p in self.patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self.patches:
+            p.stop()
+        self.tmp.cleanup()
+
+    def test_the_stored_recordings_include_long(self):
+        self.assertEqual([replay.recording_name(p) for p in replay.scenario_recordings("mission")], ["mission/console-ilose", "mission/long/mission-build-unit"])
+        self.assertEqual(replay.plan_for(["mission"], None), {"console-ilose": ["mission"], "mission-build-unit": ["mission"]})
+        self.assertEqual(replay.stored_recording("mission", "mission-build-unit"), self.root / "mission/long/mission-build-unit.txt")
+        self.assertEqual(replay.stored_recording("mission", "none"), self.root / "mission/none.txt")
+
+    def test_a_play_test_recording_under_long_is_left_out(self):
+        (self.root / "playtests.json").write_text('{"mission/long/mission-build-unit": "playtest.py"}')
+        self.assertEqual([replay.recording_name(p) for p in replay.scenario_recordings("mission")], ["mission/console-ilose"])
+
+    def test_two_stored_recordings_of_one_scenario_are_an_error(self):
+        (self.root / "mission/console-ilose.txt").rename(self.root / "mission/mission-build-unit.txt")
+        with self.assertRaisesRegex(replay.Error, "2 stored recordings of mission-build-unit"):
+            replay.stored_recording("mission", "mission-build-unit")
+
+    def test_a_long_recording_is_written_at_its_path(self):
+        out = Path(self.tmp.name) / "out"
+        with mock.patch.object(replay, "play_recording", lambda *a: {"mission": GOOD}), mock.patch.object(replay, "check_form", lambda *a: []), \
+                mock.patch.object(replay, "scenario_path", lambda name: Path(name + ".txt")):
+            replay.record(Path("x.exe"), {"mission-build-unit": ["mission"], "console-ilose": ["mission"]}, None, False, None, out, 1)
+        self.assertEqual(sorted(p.relative_to(out).as_posix() for p in out.rglob("*.txt")), ["mission/console-ilose.txt", "mission/long/mission-build-unit.txt"])
+
+    def test_compare_sees_long(self):
+        other = Path(self.tmp.name) / "other"
+        (other / "mission").mkdir(parents=True)
+        (other / "mission/console-ilose.txt").write_text(GOOD)
+        self.assertEqual(replay.compare(self.root, other), [f"only in {self.root}: mission/long/mission-build-unit.txt"])
 
 
 class Compare(unittest.TestCase):

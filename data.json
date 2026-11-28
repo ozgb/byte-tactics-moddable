@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-28T00:05:05+00:00",
+ "generated": "2026-11-28T01:05:05+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
   "2": {
-   "done": 60,
+   "done": 61,
    "total": 65
   },
   "180": {
@@ -491,7 +491,15 @@
     "claimed": true,
     "state": "OPEN"
    },
-   "prs": []
+   "prs": [
+    {
+     "number": 56,
+     "title": "Add: Specify the movement subsystem",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/56",
+     "live": true
+    }
+   ]
   },
   {
    "id": "orders",

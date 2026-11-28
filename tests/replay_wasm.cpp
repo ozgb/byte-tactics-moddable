@@ -4,6 +4,7 @@
 
 #include "../interfaces/host.h"
 #include "../src/state/block.h"
+#include "../src/state/load_data.h"
 #include "../src/wasm/modules.h"
 #include "../src/wasm/module_glue.h"
 #include "replay_wasm.h"
@@ -103,6 +104,7 @@ unsigned char* ReadModule(size_t* size)
 void Release()
 {
     if (s_loader != nullptr) {
+        LoadDataAttach(nullptr, 0, 0, nullptr);
         SimBlockAttach(nullptr);
         SimBlockReset();
         wl_destroy(s_loader);
@@ -214,6 +216,8 @@ void ReplayWasmReload()
     s_memory.scratch = layout->scratch_base;
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
+    if (layout->has_load_data)
+        LoadDataAttach(s_memory.base + layout->load_data_base, layout->load_data_base, layout->load_data_size, ModulesFatal);
 
     Check(GlueInstall(s_loader, 0));
     wl_module* module = wl_load_module_bytes(s_loader, s_glue->def->name, bytes, size);
@@ -232,6 +236,11 @@ void ReplayWasmReload()
 void ReplayWasmNoBudgets()
 {
     s_noBudgets = true;
+}
+
+unsigned char* ReplayWasmLinear(unsigned address)
+{
+    return s_memory.base + address;
 }
 
 void ReplayWasmUseSeam()

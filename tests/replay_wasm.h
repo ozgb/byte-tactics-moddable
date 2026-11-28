@@ -9,5 +9,6 @@ const char* ReplayWasmSubsystem();
 void ReplayWasmReload();
 void ReplayWasmUseSeam();
 void ReplayWasmNoBudgets();
+unsigned char* ReplayWasmLinear(unsigned address);
 
 #endif

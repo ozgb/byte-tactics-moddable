@@ -1188,6 +1188,18 @@ def check_target(out: Path) -> None:
         raise Refusal("refused: %s is not empty" % out)
 
 
+def source_paths(root: Path, contents=None, imports=None, lister=tracked) -> list[str]:
+    """Every tracked file the export reads, for the CI trigger that decides whether the export runs."""
+    imports = imports if imports is not None else (RUNTIME_IMPORTS if contents is None else {})
+    paths = set(select(root, contents, lister))
+    paths |= {MODULES, CODE_TABLES_SOURCE, README_SOURCE, TERMS_SOURCE, CLASS_WORDS, REPLAY_SCHEMA, "data/state_classes.csv"}
+    paths |= {"data/%s.csv" % name for name in COUPLING}
+    if imports:
+        paths |= set(imports) | {PROVENANCE_README, LICENSE_SOURCE}
+        paths |= {path for path, _ in lister(root, VECTORS_SOURCE)}
+    return sorted(paths)
+
+
 def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, lister=tracked, leaks=None, counts=None, imports=None) -> dict:
     """Write the kit to `out` and return its manifest. Nothing is written when the export is refused or leaks (`leaks` replaces leak_check in tests). `imports` is RUNTIME_IMPORTS unless the contents are injected, then none."""
     imports = imports if imports is not None else (RUNTIME_IMPORTS if contents is None else {})

@@ -1394,5 +1394,33 @@ class RuntimeKitTest(unittest.TestCase):
             self.assertIn("other.c", hits[0])
 
 
+class CiTriggerTest(unittest.TestCase):
+    TRIGGER = re.compile(r"grep -qE '(\^\(.*?\))'", re.S)
+
+    @staticmethod
+    def triggers(text: str) -> list[str]:
+        return CiTriggerTest.TRIGGER.findall(text)
+
+    @staticmethod
+    def stale(trigger: str, paths: list[str]) -> list[str]:
+        pattern = re.compile(trigger)
+        return [p for p in paths if not pattern.search(p)]
+
+    def test_both_triggers_match_every_file_the_export_reads(self):
+        text = (ROOT / ".github/workflows/ci.yml").read_text()
+        triggers = [t for t in self.triggers(text) if "tools/oraclekit" in t]
+        self.assertEqual(len(triggers), 2)
+        paths = oraclekit.source_paths(ROOT)
+        self.assertTrue(len(paths) > 20)
+        for trigger in triggers:
+            self.assertEqual(self.stale(trigger, paths), [])
+
+    def test_a_trigger_without_the_docs_paths_is_stale(self):
+        text = (ROOT / ".github/workflows/ci.yml").read_text()
+        trigger = next(t for t in self.triggers(text) if "tools/oraclekit" in t)
+        without = re.sub(r"\|docs/[^|)]*", "", trigger)
+        self.assertIn("docs/replay-format.md", self.stale(without, oraclekit.source_paths(ROOT)))
+
+
 if __name__ == "__main__":
     unittest.main()

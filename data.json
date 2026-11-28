@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T12:05:04+00:00",
+ "generated": "2026-11-28T13:05:05+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -8,8 +8,8 @@
    "total": 65
   },
   "180": {
-   "done": 25,
-   "total": 44
+   "done": 27,
+   "total": 48
   }
  },
  "rows": [
@@ -232,38 +232,38 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 9,
-   "spec": "active",
-   "spec_pin": 6,
-   "impl": "active",
-   "active": true,
+   "spec": "done",
+   "spec_pin": 75,
+   "impl": "built",
+   "active": false,
    "issue": {
     "number": 1202,
     "title": "Spec: Move the targeting spec and implement it",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1202",
     "claimed": true,
-    "state": "OPEN"
+    "state": "CLOSED"
    },
    "prs": [
     {
      "number": 66,
      "title": "Implementer: impl/targeting",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/66",
-     "live": true
+     "live": false
     },
     {
      "number": 65,
      "title": "Update: Move targeting to interfaces-v75",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/65",
-     "live": true
+     "live": false
     },
     {
      "number": 23,
      "title": "Update: Move targeting to interfaces-v13",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/23",
-     "live": true
+     "live": false
     },
     {
      "number": 10,
@@ -457,7 +457,7 @@
     "number": 1194,
     "title": "Spec: Write the features spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1194",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [

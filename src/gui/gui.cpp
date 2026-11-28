@@ -4998,9 +4998,9 @@ int __stdcall UpdateMenu(Gui* menu)
     point.y -= entries->y;
 
     int elapsed;
-    if ((int)GetTicks() - DAT_0051fbb4 > 0) {
+    if ((int)HarnessMenuTicks(GetTicks()) - DAT_0051fbb4 > 0) {
         elapsed = 1;
-        DAT_0051fbb4 = GetTicks();
+        DAT_0051fbb4 = HarnessMenuTicks(GetTicks());
     } else {
         elapsed = 0;
     }

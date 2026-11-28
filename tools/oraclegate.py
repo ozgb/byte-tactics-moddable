@@ -31,10 +31,16 @@ runs it with the largest fuel budget (`--no-budgets`, 2147483647 a tick). Its re
 summary line says so; every other result has `budgets: judged`. `--manifest` judges against another game manifest than
 wasm/modules.json (recordings route only): check-module, the replayer and the blocked test all read it.
 
+A scenario or recording that failed to run has a `reason`, one word of a closed set parsed from the run's output (none of its
+text): the host's `host-runtime`, `host-replayer` or `host-timeout`, the module's `module-load` or `module-trap` (each with a
+`class`: the loader's refusal or the trap's kind), or `unknown`. Before the first recording, the recordings route checks the
+host: the replayer and the wasmtime DLL are in the build, and `wine` starts the replayer (its usage line). When that fails it
+plays nothing and writes a result with only `error` (a fixed sentence), `reason`, `format` and `subsystem`, and exits 2.
+
 Every run first removes DIR/result.json, DIR/runtime and DIR/logs, so a run that stops with an error leaves no earlier result.
 
 Exit status: 0 when every scenario and recording is equal, 1 when one differs or failed to run, 2 when the loader refused
-the module or the arguments were wrong.
+the module, the host check failed or the arguments were wrong.
 """
 
 import argparse
@@ -49,6 +55,7 @@ from pathlib import Path
 
 import reference
 import replay
+import wasm_modules
 
 ROOT = Path(__file__).resolve().parent.parent
 FORMAT = 4
@@ -70,15 +77,54 @@ DIVERGENCE_FOR = re.compile(r"tracediff for (\S+): a = ")
 DIVERGENCE_AT = re.compile(r"first divergence: tick (\d+), phase (\S+)$")
 DIVERGENCE_FIELD = re.compile(r"first differing field: (\S+): a=(.*?) b=(.*)$")
 FAILED_TO_RUN = re.compile(r"(\S+): failed to run")
+EARLY = re.compile(r"^EARLY (\S+): ended at tick \d+ of \d+ \((.*?)\)(?:, host said [^:]+: (.*?))?(?: \[kept: [^\]]*\])?$")
 BLOCK_POINTER_SUMMARY = re.compile(r"(?:\[\w+\] )?\d+ problems with the pointers out of the block")
 REPLAY_DIVERGED = re.compile(r"^DIVERGED .*: first at call (\d+), (.+)$", re.M)
 REPLAY_IDENTICAL = re.compile(r": \d+ calls, \d+ imports, identical on a second run$", re.M)
 REPLAY_ARRAY_BYTE = re.compile(r"byte (\d+) of \d+: recorded \S*, replayed (\S*), \d+ bytes differ$")
 REPLAY_ARRAY_COUNT = re.compile(r"recorded \d+ elements, replayed (\d+)$")
+PREFLIGHT_TIMEOUT = 300
+REPLAYER_USAGE = "usage: replay_native_test"
+REPLAYER_BANNER = "replaying against the WASM module "
+HOST_ERRORS = {
+    "host-runtime": "the host could not start the replayer: wine or the wasmtime runtime did not start (a fault of the host, not of the module)",
+    "host-replayer": "the host's build has no replay_native_test.exe (a fault of the host, not of the module)",
+}
+WINE_MISSING_REPLAYER = re.compile(r"^wine: cannot find .*" + re.escape(REPLAYER), re.M | re.I)
+WINE_FAULT = re.compile(r"^(?:wine: |wineserver: |wine client error)", re.M)
+RUNTIME_FAULT = re.compile(r"cannot load \S*wasmtime_host\.dll$|\S*wasmtime_host\.dll has no export \S+$")
+REPLAYER_STOP = re.compile(r"^FAIL: .*?\.wasm: (.*)$", re.M)
+FATAL_PENDING = re.compile(r"^\S+: wl_call returned with a fatal pending$", re.M)
+TRAP = re.compile(r"^\S+ trapped(?: at tick \d+| before the match)?: (.*)$", re.S)
+OUT_OF_FUEL = re.compile(r"^\S+ ran out of fuel")
+IMPORT_REFUSAL = re.compile(r"(?:^|: )import \w+: ")
+GLUE_ERROR = re.compile(r"^slot \S+: |: the handle table is full")
+LOAD_REFUSALS = (
+    ("compile", re.compile(r"\bmodule \S+: compile failed: ")),
+    ("instantiate", re.compile(r"\bmodule \S+: instantiate failed: ")),
+    ("export", re.compile(r"\bmodule \S+: (?:no function export |no global export |no memory export |export \S+ is not an i32 address)")),
+    ("major", re.compile(r"\bmodule \S+: (?:built against interface |majors\.|the adapter for |\S+ \S+ of interface |import \S+ is adapted from major )")),
+)
+TRAP_CLASSES = (
+    ("stack", re.compile(r"call stack exhausted")),
+    ("unreachable", re.compile(r"unreachable")),
+    ("memory_access", re.compile(r"out of bounds memory access")),
+    ("divide", re.compile(r"divide by zero|integer overflow|invalid conversion to integer")),
+    ("table", re.compile(r"uninitialized element|indirect call|table access|table index")),
+    ("stack", re.compile(r"stack")),
+)
 
 
 class Error(Exception):
     pass
+
+
+class HostFault(Error):
+    """A fault of the host, not of the module: `reason` is a key of HOST_ERRORS, the message stays on the host."""
+
+    def __init__(self, reason: str, message: str):
+        super().__init__(message)
+        self.reason = reason
 
 
 def sha256(path: Path) -> str:
@@ -97,15 +143,22 @@ def kit_version() -> dict[str, str | None]:
     return {"interfaces": latest_tag("interfaces-v"), "reference_traces": latest_tag("reference-traces-v")}
 
 
+def manifest_entries(build: Path) -> list[dict]:
+    return json.loads((build / "modules.json").read_text())["modules"]
+
+
 def manifest_modules(build: Path) -> list[str]:
-    return [m["name"] for m in json.loads((build / "modules.json").read_text())["modules"]]
+    return [m["name"] for m in manifest_entries(build)]
 
 
 def blocked(subsystem: str, manifest: Path = MANIFEST) -> bool:
     """Whether the subsystem's entry of the game manifest is blocked: its default does not build to WASM, so no scenario can load a module of it, and it has no budgets."""
     for entry in json.loads(manifest.read_text())["modules"]:
         if entry["name"] == subsystem:
-            return "blocked" in entry
+            try:
+                return wasm_modules.is_blocked(entry)
+            except ValueError as e:
+                raise Error(f"{manifest}: {e}") from None
     raise Error(f"{manifest} has no module {subsystem}")
 
 
@@ -118,9 +171,9 @@ def clear_run(out: Path) -> None:
 
 def prepare_replay_runtime(build: Path, subsystem: str, module: Path, directory: Path, manifest: Path = MANIFEST) -> Path:
     """A fresh directory with the files `replay_native_test.exe --wasm` reads beside the module: the wasmtime DLL, the manifest and `module` as the subsystem's."""
-    for name in ("wasmtime_host.dll", REPLAYER):
+    for name, reason in (("wasmtime_host.dll", "host-runtime"), (REPLAYER, "host-replayer")):
         if not (build / name).is_file():
-            raise Error(f"the build has no {name}: build the replay_native_test and wasm_runtime targets")
+            raise HostFault(reason, f"the build has no {name}: build the replay_native_test and wasm_runtime targets")
     shutil.rmtree(directory, ignore_errors=True)
     directory.mkdir(parents=True)
     shutil.copy2(build / "wasmtime_host.dll", directory / "wasmtime_host.dll")
@@ -129,8 +182,79 @@ def prepare_replay_runtime(build: Path, subsystem: str, module: Path, directory:
     return directory / f"{subsystem}.wasm"
 
 
+def preflight(build: Path) -> None:
+    """Refuse to start, with a HostFault, when the build has no replayer or wasmtime DLL, or wine cannot start the replayer (its usage line)."""
+    for name, reason in ((REPLAYER, "host-replayer"), ("wasmtime_host.dll", "host-runtime")):
+        if not (build / name).is_file():
+            raise HostFault(reason, f"the build has no {name}: build the replay_native_test and wasm_runtime targets")
+    try:
+        r = subprocess.run(["wine", str(build / REPLAYER)], capture_output=True, text=True, errors="replace", stdin=subprocess.DEVNULL,
+                           cwd=ROOT, timeout=PREFLIGHT_TIMEOUT)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        raise HostFault("host-runtime", f"wine could not start {REPLAYER}: {e}") from None
+    if REPLAYER_USAGE not in r.stdout:
+        reason = "host-replayer" if WINE_MISSING_REPLAYER.search(r.stdout + r.stderr) else "host-runtime"
+        raise HostFault(reason, f"wine could not start {REPLAYER} (exit {r.returncode}): {(r.stdout + r.stderr).strip()[-MESSAGE_LIMIT:]}")
+
+
+def trap_class(text: str) -> str:
+    """The class of a trap from the engine's text: a word of TRAP_CLASSES, or `trap` for any other."""
+    if IMPORT_REFUSAL.match(text):
+        return "import"
+    head, found, cause = text.rpartition("wasm trap: ")
+    if not found:
+        return "trap"
+    cause = cause.splitlines()[0] if cause else ""
+    return next((name for name, pattern in TRAP_CLASSES if pattern.search(cause)), "trap")
+
+
+def stop_reason(text: str) -> dict:
+    """The reason of the stop message of a module (the replayer's or the game's): `module-trap` or `module-load` with its class, else `unknown`."""
+    if OUT_OF_FUEL.match(text):
+        return {"reason": "module-trap", "class": "out_of_fuel"}
+    if m := TRAP.match(text):
+        return {"reason": "module-trap", "class": trap_class(m[1])}
+    if IMPORT_REFUSAL.search(text):
+        return {"reason": "module-trap", "class": "import"}
+    if GLUE_ERROR.search(text):
+        return {"reason": "module-trap", "class": "glue"}
+    for name, pattern in LOAD_REFUSALS:
+        if pattern.search(text):
+            return {"reason": "module-load", "class": name}
+    return {"reason": "unknown"}
+
+
+def failure_reason(output: str, timed_out: bool = False) -> dict:
+    """Why a replayer run did not finish, as a word of a closed set (docs/module-abi.md, section 15), from its output; never a word of its text."""
+    if timed_out:
+        return {"reason": "host-timeout"}
+    if WINE_MISSING_REPLAYER.search(output):
+        return {"reason": "host-replayer"}
+    if REPLAYER_BANNER not in output and WINE_FAULT.search(output):
+        return {"reason": "host-runtime"}
+    stops = list(REPLAYER_STOP.finditer(output))
+    if not stops:
+        return {"reason": "unknown"}
+    stop = output[stops[-1].start(1):].strip()
+    if RUNTIME_FAULT.match(stop):
+        return {"reason": "host-runtime"}
+    found = stop_reason(stop)
+    if found["reason"] == "unknown" and FATAL_PENDING.search(output):
+        return {"reason": "module-trap", "class": "fatal"}
+    return found
+
+
+def game_failure_reason(text: str) -> dict:
+    """Why a game run of the scenario route did not finish: the reason of the first stop message of a module in its text, else `unknown`."""
+    for line in text.splitlines():
+        found = stop_reason(line.strip())
+        if found["reason"] != "unknown":
+            return found
+    return {"reason": "unknown"}
+
+
 def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) -> Path:
-    """A fresh runtime in `directory`: the build's files, the object list the block pointer check reads beside the map, the manifest and the other modules as built, `module` as the subsystem's."""
+    """A fresh runtime in `directory`: the build's files, the object list the block pointer check reads beside the map, the manifest and the other modules that are not blocked, as built, `module` as the subsystem's."""
     names = manifest_modules(build)
     if subsystem not in names:
         raise Error(f"the manifest has no module {subsystem} (it has {', '.join(names)})")
@@ -144,8 +268,9 @@ def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) 
     for name in RUNTIME_FILES:
         if (build / name).is_file():
             shutil.copy2(build / name, directory / name)
-    for name in names:
-        shutil.copy2(build / f"{name}.wasm", directory / f"{name}.wasm")
+    for entry in manifest_entries(build):
+        if not wasm_modules.is_blocked(entry):
+            shutil.copy2(build / f"{entry['name']}.wasm", directory / f"{entry['name']}.wasm")
     shutil.copyfile(module, directory / f"{subsystem}.wasm")
     return directory / "TotalA.exe"
 
@@ -216,7 +341,8 @@ def parse_suite(output: str, exit_code: int, expected: list[str]) -> dict[str, d
     digests: dict[str, dict] = {}
     views: dict[str, dict] = {}
     current = None
-    for line in output.splitlines():
+    lines = output.splitlines()
+    for at, line in enumerate(lines):
         if m := SCENARIO_LINE.match(line):
             name = m[2]
             if name in verdicts:
@@ -241,16 +367,24 @@ def parse_suite(output: str, exit_code: int, expected: list[str]) -> dict[str, d
             blocks[current].update(tick=int(m[1]), phase=clean_name(m[2]))
         elif current and (m := DIVERGENCE_FIELD.match(line.strip())) and "field" not in blocks[current]:
             blocks[current].update(field=clean_name(m[1]), value=clean_value(m[3]))
+        elif m := EARLY.match(line):
+            if m[1] in verdicts:
+                verdicts[m[1]] = {"status": "failed", **({"reason": "host-timeout"} if m[2] == "timeout" else game_failure_reason(m[3] or ""))}
         elif m := FAILED_TO_RUN.search(line):
             if m[1] in verdicts:
-                verdicts[m[1]] = {"status": "failed"}
+                block = [line[m.end():].lstrip(":, ")]
+                for more in lines[at + 1:]:
+                    if not more[:1].isspace():
+                        break
+                    block.append(more)
+                verdicts[m[1]] = {"status": "failed", **game_failure_reason("\n".join(block))}
     for name, block in blocks.items():
         if name in verdicts and verdicts[name].get("status") in ("differs", "not_judged"):
             verdicts[name] = {"status": "differs", "tick": None, "phase": None, "field": None, "value": None, **block}
     if exit_code == 0:
         for name in verdicts:
             if verdicts[name]["status"] == "not_judged":
-                verdicts[name] = {"status": "failed"}
+                verdicts[name] = {"status": "failed", "reason": "unknown"}
     for name, v in verdicts.items():
         v["digest"] = digests[name] if name in digests and v["status"] in ("equal", "differs") else {"status": "not_judged"}
         v["view"] = views[name] if name in views and v["status"] in ("equal", "differs") else {"status": "not_judged"}
@@ -313,7 +447,7 @@ def parse_replay(output: str, exit_code: int) -> dict:
         return found
     if exit_code == 0 and REPLAY_IDENTICAL.search(output):
         return {"status": "equal"}
-    return {"status": "failed"}
+    return {"status": "failed", **failure_reason(output, exit_code is None)}
 
 
 def verdict_of(suite: dict[str, dict], recordings: dict[str, dict]) -> str:
@@ -373,6 +507,7 @@ def judge_recordings(module: Path, subsystem: str, build: Path, out: Path, manif
     files = recording_files(subsystem)
     if not files:
         raise Error(f"tests/replay/{subsystem}/ has no recordings")
+    preflight(build)
     wasm = prepare_replay_runtime(build, subsystem, module, out / "runtime", manifest)
     (out / "logs/recordings").mkdir(parents=True)
     recordings = {}
@@ -383,7 +518,7 @@ def judge_recordings(module: Path, subsystem: str, build: Path, out: Path, manif
             with log.open("w") as f:
                 code = subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, text=True, cwd=ROOT, timeout=REPLAY_TIMEOUT).returncode
         except subprocess.TimeoutExpired:
-            code = -1
+            code = None
         recordings[f"{subsystem}/{path.stem}"] = parse_replay(log.read_text(errors="replace"), code)
     return build_recordings_result(subsystem, module, kit, recordings, None, time.time() - started, budgets)
 
@@ -419,12 +554,11 @@ def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game
     play = [sys.executable, str(ROOT / "tools/replay.py"), "--check", "--exe", str(exe), "--subsystem", subsystem, "--json", str(verdicts)]
     if game_dir:
         play += ["--game-dir", game_dir]
-    with (out / "logs/replay.txt").open("w") as f:
-        subprocess.run(play, stdout=f, stderr=subprocess.STDOUT, text=True, cwd=ROOT)
+    _, replay_text = stream(play, out / "logs/replay.txt")
     names = [f"{subsystem}/{p.stem}" for p in replay.scenario_recordings(subsystem)]
     recordings = parse_recordings(json.loads(verdicts.read_text())) if verdicts.is_file() else {}
     for name in names:
-        recordings.setdefault(name, {"status": "failed"})
+        recordings.setdefault(name, {"status": "failed", **game_failure_reason(replay_text)})
     return build_result(subsystem, module, full, kit, suite, recordings, None, time.time() - started)
 
 
@@ -432,7 +566,7 @@ def summary(result: dict) -> str:
     if result["verdict"] == "refused":
         return "refused: " + result["message"].splitlines()[0]
     scenarios = result["scenarios"] if isinstance(result["scenarios"], dict) else {}
-    bad = [f"{n}: {v['status']}" + (f" ({v['reason']})" if "reason" in v else "") + (f" at call {v['call']}, {v['field']}" if "call" in v else "")
+    bad = [f"{n}: {v['status']}" + (f" ({v['reason']}" + (f", {v['class']}" if "class" in v else "") + ")" if "reason" in v else "") + (f" at call {v['call']}, {v['field']}" if "call" in v else "")
            for n, v in {**scenarios, **result["recordings"]}.items() if v["status"] != "equal"]
     scope = " on recordings; scenarios not judged" if result["scope"] == "recordings" else ""
     scope += "; budgets not judged" if result.get("budgets") == "not_judged" else ""
@@ -464,6 +598,12 @@ def main() -> int:
             if args.manifest:
                 ap.error("--manifest judges on the recordings route only: add --recordings-only")
             result = judge(args.module.resolve(), args.subsystem, args.full, args.build_dir.resolve(), args.out.resolve(), args.game_dir)
+    except HostFault as e:
+        print(f"oraclegate: {e}", file=sys.stderr)
+        args.out.mkdir(parents=True, exist_ok=True)
+        error = {"format": FORMAT, "subsystem": args.subsystem, "error": HOST_ERRORS[e.reason], "reason": e.reason}
+        (args.out / "result.json").write_text(json.dumps(error, indent=1) + "\n")
+        return 2
     except (Error, OSError) as e:
         print(f"oraclegate: {e}", file=sys.stderr)
         return 2

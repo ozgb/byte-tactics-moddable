@@ -16,7 +16,7 @@
   (func (export "UpdateMeteors")
     (call $TdfFile_Construct (i32.const 196864))
     (drop (call $TdfFile_LoadFile (i32.const 196864) (i32.const 196896)))
-    (drop (call $TdfRecord_GetFieldString (i32.load (i32.const 196864)) (i32.const 269484028) (i32.const 196912) (i32.const 5) (i32.const 196960))))
+    (drop (call $TdfRecord_GetFieldString (i32.load (i32.const 196864)) (i32.const 336592892) (i32.const 196912) (i32.const 5) (i32.const 196960))))
   (func (export "Apply") (param i32 i32))
   (func (export "InitMeteors"))
   (func (export "EmptyShutdownPreCleanup"))

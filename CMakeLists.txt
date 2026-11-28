@@ -381,7 +381,7 @@ foreach(variant native inject)
   set(REPLAY_${variant}_OBJECTS "$<TARGET_OBJECTS:${module_target}>")
   set(REPLAY_${variant}_TARGETS ${module_target})
 endforeach()
-add_library(replay_native_test_objects OBJECT src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp src/host/win32/library.cpp src/host/win32/time.cpp src/wasm/wind_meteors_glue.cpp src/wasm/module_glue.cpp src/wasm/glue_tables.cpp src/harness/replay_text.cpp src/graphics/pcx.cpp src/util/int_map.cpp tests/replay_objects_fixtures.cpp tests/replay_vtables_fixtures.cpp src/data/vtables.cpp tests/replay_wasm.cpp tests/replay_native_test.cpp)
+add_library(replay_native_test_objects OBJECT src/state/load_data.cpp src/state/load_data_gaf.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp src/host/win32/library.cpp src/host/win32/time.cpp src/wasm/wind_meteors_glue.cpp src/wasm/module_glue.cpp src/wasm/glue_tables.cpp src/harness/replay_text.cpp src/graphics/pcx.cpp src/util/int_map.cpp tests/replay_objects_fixtures.cpp tests/replay_vtables_fixtures.cpp src/data/vtables.cpp tests/replay_wasm.cpp tests/replay_native_test.cpp)
 target_include_directories(replay_native_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(replay_native_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}" "${CMAKE_SOURCE_DIR}/lib/wasmloader" "${CMAKE_SOURCE_DIR}/third_party/wasmtime/include")
 target_compile_options(replay_native_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
@@ -411,7 +411,7 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(purecall_test DEPENDS "${CMAKE_BINARY_DIR}/purecall_test.exe")
 
-add_library(view_block_test_objects OBJECT src/harness/view_block.cpp src/harness/view_fill.cpp tests/view_block_test.cpp)
+add_library(view_block_test_objects OBJECT src/harness/view_block.cpp src/harness/view_fill.cpp src/state/load_data.cpp src/host/win32/threads.cpp tests/view_block_test.cpp)
 target_include_directories(view_block_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(view_block_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
 add_custom_command(
@@ -522,7 +522,7 @@ add_custom_command(
   DEPENDS economy_writer_test_objects bitexact $<TARGET_OBJECTS:economy_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(economy_writer_test DEPENDS "${CMAKE_BINARY_DIR}/economy_writer_test.exe")
-add_library(features_writer_test_objects OBJECT src/map/features.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/features_writer_test.cpp)
+add_library(features_writer_test_objects OBJECT src/map/features.cpp src/state/load_data.cpp src/state/load_data_gaf.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/features_writer_test.cpp)
 target_include_directories(features_writer_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(features_writer_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(features_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
@@ -544,7 +544,7 @@ add_custom_command(
   DEPENDS targeting_writer_test_objects bitexact $<TARGET_OBJECTS:targeting_writer_test_objects> "${CMAKE_BINARY_DIR}/KERNEL32.lib"
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(targeting_writer_test DEPENDS "${CMAKE_BINARY_DIR}/targeting_writer_test.exe")
-add_library(los_radar_writer_test_objects OBJECT src/map/line_of_sight.cpp src/map/line_of_sight_index.cpp src/game/players.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/los_radar_writer_test.cpp)
+add_library(los_radar_writer_test_objects OBJECT src/map/line_of_sight.cpp src/map/line_of_sight_index.cpp src/game/players.cpp src/state/load_data.cpp src/state/block.cpp src/host/win32/memory.cpp src/host/win32/threads.cpp tests/los_radar_writer_test.cpp)
 target_include_directories(los_radar_writer_test_objects PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(los_radar_writer_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(los_radar_writer_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
@@ -686,8 +686,7 @@ add_custom_target(wasm_runtime
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_host.py" build ${WASM_HOST_ARGS}
   COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" build
   COMMAND "${CMAKE_COMMAND}" -E copy "${WASM_HOST_DIR}/wasmtime_host.dll" "${CMAKE_BINARY_DIR}/wasmtime_host.dll"
-  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/build/wasm-modules/wind_meteors.wasm" "${CMAKE_BINARY_DIR}/wind_meteors.wasm"
-  COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/wasm/modules.json" "${CMAKE_BINARY_DIR}/modules.json"
+  COMMAND "${UV}" run --project "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/tools/wasm_modules.py" runtime "${CMAKE_BINARY_DIR}"
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   USES_TERMINAL)
 

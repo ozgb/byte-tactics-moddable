@@ -471,8 +471,7 @@ jobs:
             build/modern/replay_test.exe
             build/modern/replay_native_test.exe
             build/modern/replay_inject_test.exe
-            build/modern/wind_meteors.wasm
-            build/modern/wind_meteors_inject.wasm
+            build/modern/*.wasm
             build/modern/wasmtime_host.dll
             build/modern/modules.json
 

@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v54` is the fixed target for anyone writing a new
+The git tag `reference-traces-v57` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v54`**.
+code as a base. This page names the current tag: **`reference-traces-v57`**.
 
 ## What the tag holds
 
@@ -22,7 +22,7 @@ code as a base. This page names the current tag: **`reference-traces-v54`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v54
+git checkout reference-traces-v57
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -139,7 +139,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v54
+git checkout reference-traces-v57
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -213,12 +213,14 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v54`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v54`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
+`reference-traces-v57`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
 exported from and pairs it with the highest `reference-traces-v*` tag merged into that commit, so the two need not be on
 the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `reference-traces-v51`, and the kit at
 `interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it, the kits at `interfaces-v58` to
 `interfaces-v63` pair with `reference-traces-v53`, the kits at `interfaces-v64` and `interfaces-v65` pair with
-`reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it, as does the kit at `interfaces-v67`.
+`reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it, as do the kits at `interfaces-v67` and
+`interfaces-v68`, the kit at `interfaces-v69`, on the commit of `reference-traces-v56`, pairs with it, as does the kit at `interfaces-v70`,
+and the kit at `interfaces-v71`, on the commit of `reference-traces-v57`, pairs with it.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -485,7 +487,7 @@ the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `re
   commands, events, frames and views of the 98 are those of v51, and the saves decode equal to v51's.
 - `reference-traces-v53` (#1132): the 102 scenarios of v52 with the selection's visit mark, bits 6 and 7 of
   `Unit.flags` (`selectState`), out of the judged state and the view. The trace masks them out of the `Unit` table (mask
-  0xffffff2f, `docs/state.md`, "The selection"), and the view clears them from `ViewUnit.flags`, at view version 2.1
+  0xffffff2f), and the view clears them from `ViewUnit.flags`, at view version 2.1
   (`docs/view.md`), so a `ui-` scenario played from its command log gives its own `tick` rows (eight differed in the view's `orders[i].created` until #1187 gave the interface's records the live tick counter). The `tick` rows change only
   in the thirteen `ui-` scenarios, the only ones whose units get the mark. The view header carries the minor version, so every view file and every `view` row changes, and with
   them every digest. The commit line names 2d6f1c7c1, the reference tip with the view 2.1 fill (#1183). The trace
@@ -505,12 +507,28 @@ the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `re
   out of order or repeated, a dump with an order effect of class 6 and one with a mission condition of class 0 (each
   `{"error": "dump"}`), and one with no section 17; in `loader`, `nan_bitwise` and `fuel_set_trap`; in `host`,
   `fatal_error`. Its kit is `interfaces-v66`.
+- `reference-traces-v56` (#1208): the digests, sounds, UI logs, events, frames, views and saves of v55, and the core
+  gate's vectors of v55 with new ones added and three moved: in `loader`, the `load_data` region's refusals and
+  order (`manifest_load_data_*`, `manifest_layout_load_data_*`, `manifest_reaches_load_data`,
+  `manifest_order_scratch_load_data`) and the forms of `blocked` (`manifest_blocked_*`); in `host`, a fault of each
+  service of ABI minors 1 to 3 (`slot_dpid_above`, `capture_null_offset`, `record_event_kind`,
+  `record_event_null_array`, `free_twice`, `alloc_zero`, `alloc_tagged_null`, `gaf_frame_null_table`,
+  `gaf_init_null_animation`, `gaf_step_null_cursor`, `gaf_sequence_frame_null_cursor`). The memory grows to 5136 pages
+  for the load data, so `import_pointer_last`, `import_buffer_past` and `emit_past` take addresses at its new end, with
+  their results unchanged (`data/frozen_interfaces.csv`). Its kit is `interfaces-v69`.
+- `reference-traces-v57` (#1231): the 102 scenarios of v56 with `frontend-skirmish`'s display digest stored for the
+  first time, in `reference/display/frontend-skirmish.txt`: the loading frame (frame 274) starts with the minimap's
+  `pixels` items, since the sim events the load records are acted on when the load ends (`docs/sim-events.md`,
+  "Draining"), and a pressed button's fade in the menus steps by the frame clock. The commit line names 6d7e2ba2e,
+  the reference tip with that fade. The trace format is still `bt-trace 10`; the traces are those of v56 but for
+  their commit line, and the sounds, UI logs, interface commands, events, setup log, frames and views are those of
+  v56. The saves decode equal to v56's. Its kit is `interfaces-v71`.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v54 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v57 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

@@ -1,6 +1,7 @@
 #include "win_types.h"
 #include <string.h>
 #include "../../interfaces/host.h"
+#include "../../interfaces/ref.h"
 
 #include "../graphics/gaf_frame.h"
 #include "../util/mouse_event.h"
@@ -232,7 +233,7 @@ void __cdecl MouseThreadProc(int param)
     while (o->mouseThreadStop == 0) {
         int start = host_time_ms() + 0x21;
         LONG held = LockMouse();
-        if (o->cursorSprite != 0)
+        if (o->cursorSprite != 0 && !HarnessTestMode())
             RedrawMouseCursor(o);
         UnlockMouse(held);
         host_sleep_ms(max(1, start - (int)host_time_ms()));

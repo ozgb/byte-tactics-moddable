@@ -96,9 +96,11 @@ puts it (a scroll by the mouse puts it back where it started). In a test-mode ru
 is the harness's in every scenario, with input lines or without: the host's pointer and the
 host's own mouse and key events never reach the game. The frame dump leaves the
 cursor out; its picture is a decision of the presentation (the order the cursor would give),
-so it is judged here. The game steps an animated cursor by the wall clock, not by ticks or frames, so
-the line names the cursor's GAF entry, `<file>:<entry>`, without the frame. When the display
-shows no cursor the line is `cursor - - -`.
+so it is judged here. 3.1c steps an animated cursor by the wall clock, not by ticks or frames, so
+the line names the cursor's GAF entry, `<file>:<entry>`, without the frame. A test-mode run steps
+the menus' animated cursor on the frames it draws instead, 33 milliseconds a frame, as it counts
+the frame rate, so the cursor the menus draw is the same picture at a given frame on every run.
+When the display shows no cursor the line is `cursor - - -`.
 
 ### Names
 
@@ -306,14 +308,13 @@ the same for any two display lists, with `--end-of-tick` for the sorted comparis
 
 ## The replay
 
-The stored lists hold every pixel the frames draw: `tools/displayreplay.py --check
---game-dir ~/.ta` has the game draw each stored list from blank targets, with the game's
+The stored lists hold every pixel the frames draw: the reference's replay has the game draw each stored list from blank targets, with the game's
 data files, the `picture` lines and its own drawing items (the default software rasteriser
 at 640x480 and 256 colours), and checks that every frame it draws at a `frames` tick equals
 the stored frame dump (`reference/frames/<scenario>/<tick>.bin`) byte for byte, and that it
 drew every item. A frame that differs is a hole in the log, something the game drew that
-the list does not say, and is fixed in the log. `reference.py --check` runs the replay
-after the scenarios when it is given a game directory, and fails when a frame differs.
+the list does not say, and is fixed in the log. The reference's check runs the replay
+after the scenarios, and fails when a frame differs.
 
 The replay runs in test mode (`-testreplay <list>`): once the game has loaded the
 scenario, at the first frame of tick 1 or later, it puts the loop's GAF animations back at
@@ -321,8 +322,11 @@ their start and draws the list frame by frame, stepping them as each frame line'
 says. The frames are thus the oracle of the default rasteriser, and a host that draws in
 another way, at another size or with other colours, is judged on the display list alone.
 
-`tools/displayreplay.py --kinds` prints, for each kind, the stored lists that hold it, and
-fails when a kind is in none of them and is not one of those it names as left out.
+Every kind is in a stored list except three, which no stored list holds and so no frame judges:
+
+- `sprite_opaque`: drawn only by the map tiles, inside the terrain item's muted scope;
+- `lens`: needs a weapon with rendertype 2, and the stock data's only one (MINDGUN) is used by nothing;
+- `copy`: drawn only by GUI layers with a background copy, and in battle those are the options menus, which stop the ticks.
 
 When a digest differs in a scenario with no stored list for that frame, the check plays the
 reference build of the stored traces and the build under test with `-testdisplay <tick>` at
@@ -358,6 +362,9 @@ the log leaves out:
 - **Draws on the game's other threads.** While a game loads, the game makes pictures on a
   thread of its own (the minimap's small picture among them), and the cursor's thread draws
   the cursor. Only what the game draws on its main thread, the one that draws the frames, is
-  an item. The minimap's units drawn while the game loads are among these.
+  an item. The minimap's units drawn while the game loads are among these. In a test-mode run
+  the cursor's thread draws nothing on its own clock: the cursor is redrawn once for each
+  frame, as the frame is shown and before it ends, at the harness's mouse position, so what
+  that redraw writes into a target is a `pixels` item of that frame on every run.
 - **The options screen's backdrop.** When the options screen opens, the game copies the
   frame under it into a surface of its own with no drawing item.

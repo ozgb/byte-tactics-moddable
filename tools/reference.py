@@ -2356,9 +2356,6 @@ def copy_display(directory: Path) -> None:
             old.unlink()
         copied = 0
         for path in logs:
-            # TODO(#1166): store the display digest of a frontend scenario once the menu cursor is drawn on the frames, not the wall clock
-            if dest == DISPLAYS and (SCENARIOS / path.name).exists() and scenario_frontend(SCENARIOS / path.name):
-                continue
             if dest == DISPLAYLISTS:
                 (dest / f"{path.stem}{displayreplay.LIST_SUFFIX}").write_bytes(displayreplay.pack_list(path.read_text(encoding="latin-1")))
             else:

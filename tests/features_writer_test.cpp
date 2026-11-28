@@ -102,12 +102,16 @@ AnimSrc* __stdcall FindGafEntry(void*, const char*)
 {
     return 0;
 }
-void __stdcall InitGafSequence(Handle*, AnimSrc*, int) {}
+void __stdcall InitGafSequence(Handle*, GafEntry*, int) {}
 int __stdcall StepGafSequence(Handle*)
 {
     return 0;
 }
 GafFrame* __stdcall GetGafSequenceFrame(Handle*)
+{
+    return 0;
+}
+GafFrame* __stdcall GetGafFrame(FrameTable*, int)
 {
     return 0;
 }

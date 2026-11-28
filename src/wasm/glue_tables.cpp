@@ -5140,6 +5140,15 @@ const char* __cdecl GlueImportFeaturesGetFootprintCentre(wasmtime_val_raw_t* a)
     return nullptr;
 }
 
+const char* __cdecl GlueImportFeaturesPlace(wasmtime_val_raw_t* a)
+{
+    GLUE_NEED("features.Place", 0);
+    const FeaturesPlace* place = (const FeaturesPlace*)GlueLinear((unsigned)a[0].i32);
+    int result = ScheduleFeaturesPlace(place);
+    a[0].i32 = (int)result;
+    return nullptr;
+}
+
 const char* __cdecl GlueImportLosRadarClampWorldPosToTerrain(wasmtime_val_raw_t* a)
 {
     int x = (int)a[0].i32;
@@ -6342,6 +6351,7 @@ const GlueImport kGlueInterfaceImports[] = {
     {"features", "FindFeatureAtPos", "iii>i", GlueImportFeaturesFindFeatureAtPos},
     {"features", "GetCellFeature", "i>i", GlueImportFeaturesGetCellFeature},
     {"features", "GetFootprintCentre", "iii>", GlueImportFeaturesGetFootprintCentre},
+    {"features", "Place", "i>i", GlueImportFeaturesPlace},
     {"los_radar", "ClampWorldPosToTerrain", "iii>", GlueImportLosRadarClampWorldPosToTerrain},
     {"los_radar", "GetMapCell", "ii>i", GlueImportLosRadarGetMapCell},
     {"los_radar", "GetMapCellAtPosition", "i>i", GlueImportLosRadarGetMapCellAtPosition},

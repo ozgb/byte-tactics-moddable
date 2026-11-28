@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "../src/harness/replay_schema.h"
+#include "../src/state/load_data.h"
 #include "../src/files/files_bank.h"
 #include "../src/util/commands.h"
 #include "../src/util/engine_services.h"
@@ -305,6 +306,7 @@ bool g_core;
 bool g_loading;
 bool g_coreFault;
 bool g_coreDropped;
+ReplayText g_coreImports;
 ReplayText g_coreWrites;
 ReplayText g_coreClosings;
 
@@ -937,6 +939,11 @@ const char* Enter(const ReplayText& actual)
     int next = NextImportLine(g_cursor);
     if (next == g_callEnd || strncmp(g_lines[next], "  i ", 4) != 0) {
         Diff(key, "no such import call", actual.Data());
+        if (g_core) {
+            char name[96];
+            sprintf(name, "%.*s", nameLength < 95 ? nameLength : 95, actual.Data());
+            CoreJson(g_coreImports, "i", name, space == nullptr ? "" : space + 1);
+        }
         return "";
     }
     g_cursor = next + 1;
@@ -3809,6 +3816,7 @@ void ReplayCall(const char* file, Outcome& out)
     if (sets == nullptr)
         Fatal(file, g_callIndex, "unknown slot", slotText);
     sets = SetsOfKind(sets);
+    g_coreImports.Clear();
     g_coreWrites.Clear();
     g_coreClosings.Clear();
     g_diffs = 0;
@@ -3905,6 +3913,9 @@ void ReplayCall(const char* file, Outcome& out)
         if (g_callIndex != 0)
             out.core.AddChar(',');
         out.core.AddChar('[');
+        out.core.AddText(g_coreImports);
+        if (g_coreImports.Size() != 0 && g_coreWrites.Size() + g_coreClosings.Size() != 0)
+            out.core.AddChar(',');
         out.core.AddText(g_coreWrites);
         if (g_coreWrites.Size() != 0 && g_coreClosings.Size() != 0)
             out.core.AddChar(',');
@@ -8506,6 +8517,41 @@ void OutFormsSelfTest()
     Check(g_diffs == 0 && width == 12, "and a null pointer takes none");
 }
 
+void LoadDataReclaimSelfTest()
+{
+    const unsigned regionSize = 65536;
+    const unsigned base = 0x10100000;
+    unsigned char* region = (unsigned char*)calloc(regionSize, 1);
+    unsigned char* kept = (unsigned char*)calloc(64, 1);
+    LoadDataAttach(region, base, regionSize, nullptr);
+    LoadDataRegisterFrame(kept, 64);
+    unsigned keptAt = LoadAddress(kept);
+    unsigned first = 0;
+    for (int battle = 0; battle < 8; battle++) {
+        unsigned char* a = (unsigned char*)calloc(20000, 1);
+        unsigned char* b = (unsigned char*)calloc(20000, 1);
+        a[100] = (unsigned char)battle;
+        LoadDataRegisterFrame(a, 20000);
+        LoadDataRegisterFrame(b, 20000);
+        unsigned at = LoadAddress(a);
+        LoadAddress(b);
+        if (battle == 0)
+            first = at;
+        Check(at == first, "a battle's load data reuses the space the last battle freed");
+        Check(region[at - base + 100] == (unsigned char)battle, "the reused space holds the new copy");
+        Check(LoadNative(at + 100) == a + 100, "a load address of the new copy leads to its buffer");
+        LoadDataUnregister(a);
+        LoadDataUnregister(b);
+        free(a);
+        free(b);
+    }
+    Check(LoadNative(keptAt) == kept, "a buffer mapped before every battle stays mapped");
+    LoadDataUnregister(kept);
+    LoadDataAttach(nullptr, 0, 0, nullptr);
+    free(kept);
+    free(region);
+}
+
 void RegionSelfTest()
 {
     printf("a module's region\n");
@@ -9490,6 +9536,7 @@ int SelfTest(const char* file)
     SimVectorSelfTest();
     GameWriteSelfTest();
     RegionSelfTest();
+    LoadDataReclaimSelfTest();
     UnreadArgumentSelfTest();
     if (file == nullptr)
         return 0;

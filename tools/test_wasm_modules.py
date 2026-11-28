@@ -255,6 +255,18 @@ class LayoutTests(unittest.TestCase):
     def test_pages_must_hold_the_block(self):
         self.assertTrue(wm.check_layout(dict(self.PINS, memory_pages=527), self.RANGES))
 
+    LOAD = dict(PINS, load_data=[269484032, 67108864], memory_pages=5136)
+
+    def test_load_data_ending_the_memory_passes(self):
+        self.assertEqual(wm.check_layout(self.LOAD, self.RANGES), [])
+
+    def test_pages_must_end_at_the_load_data(self):
+        self.assertTrue(any("does not end at the load data" in p for p in wm.check_layout(dict(self.LOAD, memory_pages=4112), self.RANGES)))
+
+    def test_load_data_must_start_at_the_block_ceiling(self):
+        problems = wm.check_layout(dict(self.LOAD, load_data=[269484033, 67108863]), self.RANGES)
+        self.assertTrue(any("not at the block's ceiling" in p for p in problems))
+
 
 class Budgets(unittest.TestCase):
     def test_a_module_over_its_size_budget_fails(self):
@@ -503,6 +515,40 @@ class AdapterManifestTests(unittest.TestCase):
         text = wm.manifest_text(dict(ADAPTED, adapters=[RAND_ADAPTER, dict(RAND_ADAPTER, name="Log")]))
         self.assertIn('"adapters": [\n    {"interface": "services", "from_major": 1, "name": "Rand", "args": [0], "result": "pass"},\n', text)
         self.assertEqual(json.loads(text)["adapters"][1]["name"], "Log")
+
+
+class BlockedFormsTests(unittest.TestCase):
+    def test_a_reason_and_true_are_blocked_and_absent_is_not(self):
+        self.assertTrue(wm.is_blocked({"name": "m", "blocked": "not yet"}))
+        self.assertTrue(wm.is_blocked({"name": "m", "blocked": True}))
+        self.assertFalse(wm.is_blocked({"name": "m"}))
+
+    def test_any_other_value_is_a_manifest_fault(self):
+        for value in (False, "", 1, None, ["x"]):
+            with self.assertRaises(ValueError, msg=repr(value)):
+                wm.is_blocked({"name": "m", "blocked": value})
+
+    def test_a_true_entry_has_no_size_to_judge_and_no_copy(self):
+        self.assertEqual(wm.check_size({"name": "m", "blocked": True}, 10**9), [])
+        game = {"modules": [{"name": "alpha"}, {"name": "beta", "blocked": True}]}
+        self.assertEqual([e["name"] for e in wm.built_modules(game)], ["alpha"])
+
+
+class RuntimeCopyTests(unittest.TestCase):
+    GAME = {"modules": [{"name": "alpha"}, {"name": "beta", "blocked": "not yet"}]}
+
+    def test_copies_the_manifest_and_only_the_unblocked_modules(self):
+        with tempfile.TemporaryDirectory() as built, tempfile.TemporaryDirectory() as dest:
+            for name in ("alpha.wasm", "beta.wasm", "c.wasm"):
+                with open(os.path.join(built, name), "wb") as f:
+                    f.write(b"x")
+            self.assertEqual(wm.copy_runtime(self.GAME, built, os.path.join(dest, "out")), [])
+            self.assertEqual(sorted(os.listdir(os.path.join(dest, "out"))), ["alpha.wasm", "modules.json"])
+
+    def test_a_missing_built_file_is_reported_and_nothing_copied(self):
+        with tempfile.TemporaryDirectory() as built, tempfile.TemporaryDirectory() as dest:
+            self.assertEqual(wm.copy_runtime(self.GAME, built, dest), ["alpha.wasm"])
+            self.assertEqual(os.listdir(dest), [])
 
 
 BUILT = os.path.join(wm.OUT, "wind_meteors.wasm")

@@ -500,6 +500,8 @@ The key is looked up before the key lock and again after it, so a run that waite
 `--check` prints `cached pass from <date> at <commit>` and the stored lines and exits 0; this counts as a gate run, and the pull request body says "cached".
 `--no-cache` plays anyway. (A `--both-modes` run exits 1 until #654, so it caches nothing yet.)
 `uv run tools/wasm_modules.py glue-fatal --game-dir ~/.ta` (Wine only, not in CI) runs the exe on a bogus `meteor.tdf` and checks that the module's `FatalError` ends the game with exit code 2 after `wl_call` returned.
+
+`uv run tools/wasm_modules.py write-check --game-dir ~/.ta` (Wine only, not in CI) runs the exe with a wind_meteors variant (`BT_WRITE_CHECK`) that writes a byte of a load data frame every tick, and checks that `LoadDataCheck` ends the game with exit code 2 and `load_data: the load data changed at tick`.
 `--check` without `--exe` is an error, since `moddable` does not build the
 reference. Add `--game-dir <dir>` when the game is not in a Steam directory.
 

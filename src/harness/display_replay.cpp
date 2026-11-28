@@ -908,7 +908,7 @@ static void DrawShard(Surface* s, char** w)
     offset.y = atoi(w[2]);
     offset.z = atoi(w[3]);
     short angles[3] = {(short)atoi(w[4]), (short)atoi(w[5]), (short)atoi(w[6])};
-    DrawDebrisProjected(s, &offset, box, angles);
+    DrawDebrisProjectedNative(s, &offset, box, angles);
 }
 
 static void Draw(char** w, int n)

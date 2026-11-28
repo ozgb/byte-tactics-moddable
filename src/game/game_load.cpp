@@ -439,6 +439,7 @@ tail:
         g_game->pendingSaveStore = 0;
     }
     g_seams.players->RebuildAIFeatureCells();
+    DrainSimEvents();
 
     (*(volatile union LoadingFlags*)&g_game->loadingFlags).value |= 2;
 }

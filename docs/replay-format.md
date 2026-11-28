@@ -30,6 +30,10 @@ uv run tools/replay.py --compare DIR_A DIR_B
 `--subsystem` is repeatable and defaults to every subsystem that has a `tests/replay/<subsystem>/` directory.
 `--check` records again and fails when a recording of `tests/replay/` differs. `--compare` fails when two
 directories differ and names the first differing line. Record on a fresh Wine prefix, as the gate runs.
+`--check` compares as text, except for what a module's behaviour does not depend on (#1209): `services.GetGafFrame` is a query answered by its
+arguments, so its calls may come in any order and number, but a call whose arguments the stored recording has no answer to, or whose answer
+differs, is a difference (reported as the query). An answer names its frame `GafFrame#N`, numbered by first appearance ("Objects"), so only
+the calls that answer a frame already named are free: two calls that name new frames in the other order swap their numbers and differ; and the `y` of the position of `los_radar.GetMapCellAtPosition` is an unread argument.
 Both play a scenario once for each subsystem it records: a run records one call at a time, so with two `record`
 lines a call one subsystem makes into the other would be an import of the first and missing from the second's
 recording. A run fails instead, with "a call of a recorded subsystem made inside a call of another recorded
@@ -1811,7 +1815,7 @@ Two rules narrow the import comparison (`docs/module-abi.md`, section 15, names 
   anywhere in the file) and that line's `o` lines of the result, and does not count it as an import or compare where it
   falls. Its recorded lines are skipped when the other imports are matched, and are never missing. Arguments no recorded
   call has are reported at `query services.GetGafFrame`. `InitGafSequence` and `StepGafSequence` change their cursor and
-  stay in order.
+  `GetGafSequenceFrame` reads it, so they stay in order.
 - **Unread arguments.** The `y` of `los_radar.GetMapCellAtPosition`'s `pos` is not compared: the lookup reads only `x`
   and `z`, and the reclaim scan passes a position whose `y` it never sets.
 
@@ -2070,6 +2074,7 @@ the entry (`economy.wasm`, or `wind_meteors_inject.wasm` for wind_meteors), the 
 the recording's subsystem must be the same one. The engine slots of the entry (`engine`) are the native ones. A module's `Emit` is compared with the
 recording's `services.Emit` or `services.SchedPublish` line, whichever the subsystem's native default makes: an `Emit`
 line by the effect's fields and its size, a `SchedPublish` line by the outbox and the size, since it carries no payload. Each replay of a file loads the module afresh, so the two
-runs of a file start from the same state. A trap or a fuel overrun stops the run with `FAIL`.
+runs of a file start from the same state. A trap or a fuel overrun stops the run with `FAIL: <module file>: ` and
+`<module> trapped: <engine text>` or `<module> ran out of fuel: it burned more than its fuel_budget of <budget> in one tick`.
 `wind_meteors_inject.wasm` is the module built with the gap-scale injection of 31.0 (`wasm_modules.py build-variant`),
 and the divergence is reported at the same call and field as for the native one.

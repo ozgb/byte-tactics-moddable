@@ -121,7 +121,7 @@ fixed-point numbers (646, 1, 310). A group key (ctrl and a digit) is one `AI_SET
 player's units whose squad it sets, in unit order: the group's number for a selected unit, 0 for an unselected unit
 that was in the group.
 
-`tools/interfacelog.py` decodes a `commands.txt`. `tools/reference.py --check` decodes each run's file and compares
+The reference's check decodes each run's `commands.txt` and compares
 it, line by line, with the stored one, naming the first record that differs. A scenario with `input` lines must have
 a stored file, a scenario without them must have none and its run must have no interface record, and a stored file
 with no scenario fails.
@@ -340,7 +340,7 @@ Each command below says its guards and then its events, in publication order. "T
 - **`view <player>`.** PLAYERS_SET_VIEW with `player` as for `control`, always. The same test where players applies
   it; only `playerIndex` becomes it.
 
-  Both fields stay game state that the tick reads (`docs/state.md`, "Mixed cases and how to split them"): `control`
+  Both fields stay game state that the tick reads: `control`
   changes the player the simulation computes as this machine's, and `view` the player whose sight decides.
 
 ### 4.3 Commands that do nothing in a scenario
@@ -505,8 +505,7 @@ A core is judged on the scenarios marked `judged`: it turns each one's lines int
 equal the stored ones. A scenario is `left out` when it needs something the core does not have: the presentation (its
 `input` lines), saving and loading (not in the core spec), or a console command of the group `direct`, which is not an
 event.
-`tools/commands.py --check` keeps this table equal to the one of `reference/README.md` and refuses a judged scenario with
-one of those, and a scenario that uses a console command or an order kind that this page does not list.
+No judged scenario has one of those, or uses a console command or an order kind that this page does not list.
 
 | Scenario | Verdict | Reason |
 | --- | --- | --- |
@@ -639,11 +638,11 @@ at once. These are the events it publishes, besides the group commands of a clic
 - **The chat line** (Enter): a line that starts with `+` runs as a console line (section 3) and publishes what that
   command publishes (section 4) as the interface's events; any other line is a chat message and publishes nothing.
 - **The score panel**, on a frame it draws, when its pass over its own copy of the players' ranks closed a gap:
-  PLAYERS_COMPACT_RANKS (`docs/players-interface.md`, section 2, "The ranks"). No scenario shows the panel yet.
+  PLAYERS_COMPACT_RANKS (`docs/view.md`, "Players, economy and score"). No scenario shows the panel yet.
 
 The interface's events, the paths that publish them and the scenarios whose stored logs
-(`reference/commands/<scenario>.txt`) hold them. `tools/commands.py --check` fails when an event of the first column is
-in no stored log, or a stored log holds an interface event the table does not list.
+(`reference/commands/<scenario>.txt`) hold them. Every event of the first column is in a stored log, and no stored log
+holds an interface event the table does not list.
 
 | Interface event | Paths | Scenarios |
 | --- | --- | --- |

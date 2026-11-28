@@ -9,6 +9,7 @@
 #include "display.h"
 #include "../harness/harness.h"
 #include "../harness/display_game.h"
+#include "../gui/mouse.h"
 
 #pragma pack(push, 1)
 struct LockEntry {
@@ -275,6 +276,12 @@ static inline int RestoreSurfacesInline(Display* d)
     return 0;
 }
 
+static void RedrawCursorOnFrame(Display* d)
+{
+    if (HarnessTestMode() && d->cursorThreadEnabled == 1 && d->cursorSprite != nullptr)
+        RedrawMouseCursor(d);
+}
+
 // FUNCTION: 0x4c63a0
 void FlipScreen(void)
 {
@@ -284,6 +291,7 @@ void FlipScreen(void)
 
     if ((flags & 2) == 0) {
         long held = Lock();
+        RedrawCursorOnFrame(d);
         Surface* p = &d->cached;
         DrawSurface(p, d->overrideSurface, 0, 0);
         HarnessFrameDrawn(p->pixels, p->pitch, p->width, p->height, d->entries);
@@ -304,6 +312,7 @@ void FlipScreen(void)
             return;
 
         long held = Lock();
+        RedrawCursorOnFrame(d);
         int lr = host_frame_lock(HOST_FRAME_FRONT, &frame);
         if (lr == HOST_FRAME_OK) {
             out.width = d->width;

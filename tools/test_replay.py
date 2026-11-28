@@ -92,6 +92,57 @@ class Difference(unittest.TestCase):
         self.assertTrue(replay.first_difference(GOOD, GOOD + "call 3 UpdateWind\n").startswith("line 8:"))
 
 
+def frame(index: int, width: int = 19, number: int = 1) -> str:
+    return (f"  i services.GetGafFrame FrameTable#1 {index} = GafFrame#{number}\n  o GafFrame#{number}.width {width}\n"
+            f"  o GafFrame#{number}.pixelsOrLayers alloc#2\n")
+
+
+def freed(frames: str, pos: str = "(10,77,30)") -> str:
+    return ("bt-replay 2\nsubsystem los_radar 1.0\ncall 1 Scan\n  a size 8\n" + frames
+            + f"  i los_radar.GetMapCellAtPosition pos={pos} = Cell#5\n  w Projectile#0.positionX 10\n  o result 1\ncall 2 Scan\n  o result 0\n")
+
+
+class Freed(unittest.TestCase):
+    def test_gaf_frames_in_any_order_and_count_are_equal(self):
+        stored = freed(frame(4) + frame(5))
+        for played in (freed(frame(5) + frame(4)), freed(frame(4) + frame(4) + frame(5)), freed(frame(4)), freed("")):
+            self.assertIsNone(replay.first_difference(stored, played))
+            self.assertEqual(replay.divergence(stored, played), {"status": "equal"})
+
+    def test_frames_already_named_are_free_but_new_frames_keep_their_order(self):
+        stored = freed(frame(4, number=1) + frame(5, number=2) + frame(4, number=1) + frame(5, number=2))
+        again = freed(frame(4, number=1) + frame(5, number=2) + frame(5, number=2) + frame(4, number=1))
+        self.assertIsNone(replay.first_difference(stored, again))
+        swapped = freed(frame(5, number=1) + frame(4, number=2))
+        self.assertIn("query services.GetGafFrame at line 5", replay.first_difference(stored, swapped))
+
+    def test_a_gaf_frame_with_unknown_arguments_differs_at_the_query(self):
+        stored = freed(frame(4))
+        played = freed(frame(4) + frame(9))
+        self.assertIn("query services.GetGafFrame at line 8", replay.first_difference(stored, played))
+        found = replay.divergence(stored, played)
+        self.assertEqual((found["status"], found["line"], found["tick"], found["slot"], found["kind"], found["field"]), ("differs", 8, 1, "Scan", "i", "services.GetGafFrame"))
+
+    def test_a_changed_gaf_frame_result_differs(self):
+        stored = freed(frame(4))
+        played = freed(frame(4, width=20))
+        self.assertIn("differs", replay.first_difference(stored, played))
+        self.assertEqual(replay.divergence(stored, played)["status"], "differs")
+
+    def test_the_y_of_a_cell_position_is_free_but_not_x_or_z(self):
+        stored = freed("")
+        self.assertIsNone(replay.first_difference(stored, freed("", "(10,-5,30)")))
+        self.assertTrue(replay.first_difference(stored, freed("", "(10,77,31)")).startswith("line 5:"))
+        self.assertTrue(replay.first_difference(stored, freed("", "(11,77,30)")).startswith("line 5:"))
+
+    def test_other_differences_are_reported_as_before(self):
+        stored = freed(frame(4))
+        played = freed(frame(4) + frame(4)).replace("  o result 0", "  o result 1")
+        self.assertTrue(replay.first_difference(stored, played).startswith("line 15:"))
+        self.assertEqual(replay.divergence(stored, played)["tick"], 2)
+        self.assertTrue(replay.first_difference(stored, stored + "call 3 Scan\n").startswith("line 13:"))
+
+
 class Subsystems(unittest.TestCase):
     def test_every_simulation_subsystem_is_known(self):
         versions = replay.schema_versions()

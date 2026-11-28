@@ -12,11 +12,19 @@ native code (-modules=native). `--check` records into a temporary directory and 
 the one in tests/replay/ (not the play-test recordings that tests/replay/playtests.json lists); `--json FILE` also writes, per recording, `equal` or the first difference as the played run has it
 (call tick, slot, kind and name of the line, and its value; never the stored line), the form tools/oraclegate.py reads. `--compare` fails when two directories do not hold the same files with the same bytes, and
 names the first differing line.
+
+The comparison of `--check` frees what #1209 says a module's behaviour does not depend on: `services.GetGafFrame` is a query answered
+by its arguments, so its calls (and their answers) may come in any order and number, but a call with arguments the stored recording
+has no answer to, or an answer that differs, is a difference (reported as the query). An answer names its frame `GafFrame#N`, numbered
+by first appearance, so only the calls that answer a frame already named are free; two calls that name new frames in the other order
+differ; and the y of the position of
+`los_radar.GetMapCellAtPosition` is an unread argument. Everything else is compared as text.
 """
 
 import argparse
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -117,26 +125,78 @@ def scenario_ticks(text: str) -> int:
     raise Error("the scenario has no valid ticks line")
 
 
+QUERY_IMPORT = "  i services.GetGafFrame "
+UNREAD_Y = re.compile(r"^(  i los_radar\.GetMapCellAtPosition pos=\([^,)]*,)[^,)]*(,)")
+
+
+def reduce_recording(text: str) -> tuple[list[tuple[int, str, str]], list[tuple[int, str, str]]]:
+    """A recording without what the scenario route frees (#1209): its lines as (index, line, line as compared), where the y of
+    a GetMapCellAtPosition position is masked, and its GetGafFrame answers as (index, arguments, answer text), taken out of the lines."""
+    lines = text.split("\n")
+    kept = []
+    queries = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith(QUERY_IMPORT):
+            arguments, _, result = line.partition(" = ")
+            j = i + 1
+            prefix = f"  o {result}." if result else None
+            while j < len(lines) and (lines[j].startswith("    c ") or lines[j].startswith("  b ") or (prefix is not None and lines[j].startswith(prefix))):
+                j += 1
+            queries.append((i, arguments, "\n".join(lines[i:j])))
+            i = j
+            continue
+        kept.append((i, line, UNREAD_Y.sub(r"\1*\2", line)))
+        i += 1
+    return kept, queries
+
+
+def first_mismatch(stored: str, got: str) -> tuple[int, str] | None:
+    """The first difference as (index of the line of `got` it is at, 'line N: A / B' or the query it is), or None when only freed things differ."""
+    a, na = reduce_recording(stored)
+    b, nb = reduce_recording(got)
+    found = None
+    for k in range(max(len(a), len(b))):
+        x = a[k][2] if k < len(a) else None
+        y = b[k][2] if k < len(b) else None
+        if x != y:
+            at = b[k][0] if k < len(b) else len(got.split("\n"))
+            found = (at, f"line {at + 1}: {(a[k][1] if k < len(a) else '<end>')!r} / {(b[k][1] if k < len(b) else '<end>')!r}")
+            break
+    answers: dict[str, set[str]] = {}
+    for _, arguments, answer in na:
+        answers.setdefault(arguments, set()).add(answer)
+    for at, arguments, answer in nb:
+        if found is not None and at >= found[0]:
+            break
+        if arguments not in answers:
+            return at, f"query services.GetGafFrame at line {at + 1}: no answer to these arguments: {arguments.strip()!r}"
+        if answer not in answers[arguments]:
+            return at, f"query services.GetGafFrame at line {at + 1}: the answer to {arguments.strip()!r} differs"
+    return found
+
+
 def first_difference(a: str, b: str) -> str | None:
-    """The first line at which two recordings differ, as 'line N: A / B', or None when they are equal."""
+    """The first line at which two recordings differ, as 'line N: A / B' (or the GetGafFrame query that has no recorded answer), or None when they are equal
+    or differ only in what the scenario route frees: the order and count of GetGafFrame calls and the y of a GetMapCellAtPosition position."""
     if a == b:
         return None
-    la, lb = a.split("\n"), b.split("\n")
-    for i in range(max(len(la), len(lb))):
-        x = la[i] if i < len(la) else "<end>"
-        y = lb[i] if i < len(lb) else "<end>"
-        if x != y:
-            return f"line {i + 1}: {x!r} / {y!r}"
-    return "the files differ"
+    found = first_mismatch(a, b)
+    return None if found is None else found[1]
 
 
 def divergence(stored: str, got: str) -> dict:
     """The first difference of two recordings described from `got` alone: the line number, the tick and slot of the call it is in,
-    and the kind, name and value of the line (None for a line `got` does not have). {"status": "equal"} when they are the same."""
+    and the kind, name and value of the line (None for a line `got` does not have). {"status": "equal"} when they are the same
+    or differ only in what first_difference frees."""
     if stored == got:
         return {"status": "equal"}
-    a, b = stored.split("\n"), got.split("\n")
-    at = next((i for i in range(max(len(a), len(b))) if (a[i] if i < len(a) else None) != (b[i] if i < len(b) else None)), 0)
+    mismatch = first_mismatch(stored, got)
+    if mismatch is None:
+        return {"status": "equal"}
+    at = mismatch[0]
+    b = got.split("\n")
     call = next((b[j] for j in range(min(at, len(b) - 1), -1, -1) if b[j].startswith("call ")), "")
     ticks, _, slot = call[5:].partition(" ")
     line = b[at] if at < len(b) else None

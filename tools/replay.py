@@ -40,6 +40,7 @@ RECORDINGS = ROOT / "tests/replay"
 SCHEMA = ROOT / "data/replay_schema.json"
 WINDOWS = RECORDINGS / "windows.json"
 PLAYTESTS = RECORDINGS / "playtests.json"
+PHASES = RECORDINGS / "phases.json"
 FORMAT = 2
 RUN_SECONDS_BASE = 600
 RUN_TICKS_PER_SECOND = 25
@@ -115,13 +116,23 @@ def stored_windows() -> dict[str, tuple[int, int]]:
     return {k: (v[0], v[1]) for k, v in json.loads(WINDOWS.read_text()).items()}
 
 
-def with_record(text: str, subsystems: list[str] | str, window: tuple[int, int] | dict[str, tuple[int, int]] | None = None) -> str:
-    """The scenario text with a record line per subsystem at the end; a dict window is per subsystem."""
+def stored_phases() -> set[str]:
+    """The stored recordings that record the phase driver whole, not its slots: "<subsystem>/<scenario>"."""
+    if not PHASES.is_file():
+        return set()
+    return set(json.loads(PHASES.read_text()))
+
+
+def with_record(text: str, subsystems: list[str] | str, window: tuple[int, int] | dict[str, tuple[int, int]] | None = None,
+                phase: frozenset[str] | set[str] = frozenset()) -> str:
+    """The scenario text with a record line per subsystem at the end; a dict window is per subsystem, and a subsystem of
+    `phase` records its phase driver."""
     names = [subsystems] if isinstance(subsystems, str) else subsystems
     lines = ""
     for s in names:
         w = window.get(s) if isinstance(window, dict) else window
-        lines += f"record {s}\n" if w is None else f"record {s} {w[0]} {w[1]}\n"
+        tail = " phase" if s in phase else ""
+        lines += f"record {s}{tail}\n" if w is None else f"record {s} {w[0]} {w[1]}{tail}\n"
     return text + ("" if text.endswith("\n") else "\n") + lines
 
 
@@ -254,11 +265,11 @@ def check_form(text: str, subsystem: str = "wind_meteors") -> list[str]:
 
 
 def play_recording(exe: Path, scenario: Path, game_dir: str | None, native: bool, window: tuple[int, int] | dict[str, tuple[int, int]] | None,
-                   directory: Path, subsystems: list[str]) -> dict[str, str]:
+                   directory: Path, subsystems: list[str], phase: frozenset[str] | set[str] = frozenset()) -> dict[str, str]:
     """Play one scenario with a record line per subsystem and return the text of each recording it wrote."""
     directory.mkdir(parents=True, exist_ok=True)
     copy = directory / scenario.name
-    copy.write_text(with_record(scenario.read_text(), subsystems, window))
+    copy.write_text(with_record(scenario.read_text(), subsystems, window, phase))
     ticks = scenario_ticks(scenario.read_text())
     timeout = RUN_SECONDS_BASE + ticks / RUN_TICKS_PER_SECOND
     env = dict(os.environ, BT_NATIVE_MODULES="1" if native else "0")
@@ -288,19 +299,21 @@ def play_recording(exe: Path, scenario: Path, game_dir: str | None, native: bool
 
 
 def record(exe: Path, plan: dict[str, list[str]], game_dir: str | None, native: bool, window: tuple[int, int] | None,
-           out: Path, parallel: int) -> dict[tuple[str, str], str]:
+           out: Path, parallel: int, phase: bool = False) -> dict[tuple[str, str], str]:
     """Record the scenarios of the plan (scenario name -> subsystems) into `out`/<subsystem>/; the text by (subsystem, scenario)."""
     out.mkdir(parents=True, exist_ok=True)
     work = out / ".scenarios"
     results: dict[tuple[str, str], str] = {}
     stored = stored_windows()
+    phases = stored_phases()
 
     def one(name: str) -> None:
         scenario = scenario_path(name)
         texts: dict[str, str] = {}
         for s in plan[name]:
             chosen = window if window is not None else stored.get(f"{s}/{scenario.stem}")
-            texts.update(play_recording(exe, scenario, game_dir, native, chosen, work / f"{scenario.stem}-{s}", [s]))
+            whole = {s} if phase or f"{s}/{scenario.stem}" in phases else set()
+            texts.update(play_recording(exe, scenario, game_dir, native, chosen, work / f"{scenario.stem}-{s}", [s], whole))
         for subsystem, text in texts.items():
             problems = check_form(text, subsystem)
             if problems:
@@ -352,6 +365,7 @@ def main() -> int:
     ap.add_argument("--subsystem", action="append", default=[])
     ap.add_argument("--native-modules", action="store_true")
     ap.add_argument("--window", nargs=2, type=int, metavar=("FIRST", "LAST"))
+    ap.add_argument("--phase", action="store_true", help="--record: record each subsystem's phase driver whole")
     ap.add_argument("--json", type=Path, metavar="FILE", help="--check: write the verdict of each recording to FILE")
     ap.add_argument("--parallel", type=int, default=2)
     args = ap.parse_args()
@@ -382,7 +396,7 @@ def main() -> int:
             if not args.out:
                 ap.error("--record needs --out")
             plan = plan_for(subsystems, args.scenario)
-            results = record(exe, plan, args.game_dir, args.native_modules, window, args.out, args.parallel)
+            results = record(exe, plan, args.game_dir, args.native_modules, window, args.out, args.parallel, args.phase)
             for (subsystem, name), text in sorted(results.items()):
                 print(f"{subsystem}/{name}: {len(text.encode('latin-1'))} bytes, {text.count(chr(10) + 'call ') + 1} calls")
             return 0

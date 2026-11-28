@@ -72,8 +72,8 @@ any module is loaded. Modules do not create or grow them.
   | the state block, 32 MiB to 256 MiB | 0x100000 (1048576) | `block_base`, `block_size`, `block_max` |
 
   The memory holds the block at its ceiling: `block_base + block_max` equals `memory_pages * 65536`.
-  The block itself is as large as the match needs (`block_size` to `block_max`, a multiple of 65536,
-  `docs/state.md`, "The size of the block"): it starts at `block_base`, the engine tells modules
+  The block itself is as large as the match needs (`block_size` to `block_max`, a multiple of 65536):
+  it starts at `block_base`, the engine tells modules
   only addresses inside it, and the bytes after its end are never read or written. A module must not
   assume the block ends at the end of the memory. A manifest without `block_max` has a block of
   `block_size` bytes only.
@@ -1086,7 +1086,7 @@ where `tools/reference.py` reports it, and are `unknown` where it does not.
 
 **An error of the host.** When the host check of the recordings route fails, the run writes `DIR/result.json` with only
 `format`, `subsystem`, `reason` (`host-runtime` or `host-replayer`) and `error`, a fixed sentence for the reason that says the
-fault is the host's, and exits 2. The broker (`docs/cleanroom.md`) answers such a result with an `error` and its `reason`, never
+fault is the host's, and exits 2. The clean room's broker answers such a result with an `error` and its `reason`, never
 a verdict, and passes on no other text: an `error` result whose `reason` is not one of those two is answered with
 `reason: unknown`. The broker's own timeout is an `error` with `reason: host-timeout`. Only the first divergence of a run carries `phase`, `field` and `value` for a
 scenario: the others have their `tick`. A `value` is what the module produced; the reference's value, its memory and anything of

@@ -308,14 +308,13 @@ the same for any two display lists, with `--end-of-tick` for the sorted comparis
 
 ## The replay
 
-The stored lists hold every pixel the frames draw: `tools/displayreplay.py --check
---game-dir ~/.ta` has the game draw each stored list from blank targets, with the game's
+The stored lists hold every pixel the frames draw: the reference's replay has the game draw each stored list from blank targets, with the game's
 data files, the `picture` lines and its own drawing items (the default software rasteriser
 at 640x480 and 256 colours), and checks that every frame it draws at a `frames` tick equals
 the stored frame dump (`reference/frames/<scenario>/<tick>.bin`) byte for byte, and that it
 drew every item. A frame that differs is a hole in the log, something the game drew that
-the list does not say, and is fixed in the log. `reference.py --check` runs the replay
-after the scenarios when it is given a game directory, and fails when a frame differs.
+the list does not say, and is fixed in the log. The reference's check runs the replay
+after the scenarios, and fails when a frame differs.
 
 The replay runs in test mode (`-testreplay <list>`): once the game has loaded the
 scenario, at the first frame of tick 1 or later, it puts the loop's GAF animations back at
@@ -323,8 +322,7 @@ their start and draws the list frame by frame, stepping them as each frame line'
 says. The frames are thus the oracle of the default rasteriser, and a host that draws in
 another way, at another size or with other colours, is judged on the display list alone.
 
-`tools/displayreplay.py --kinds` prints, for each kind, the stored lists that hold it, and
-fails when a kind is in none of them and is not one of those it names as left out.
+Every kind is in a stored list, except those left out.
 
 When a digest differs in a scenario with no stored list for that frame, the check plays the
 reference build of the stored traces and the build under test with `-testdisplay <tick>` at

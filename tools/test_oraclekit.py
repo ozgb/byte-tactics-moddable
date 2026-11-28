@@ -23,6 +23,7 @@ OUTSIDE_URL = re.compile(r"^https?://github\.com/ozgb/byte-tactics-moddable/(blo
 SCHEME = re.compile(r"^[a-z][a-z0-9+.-]*:", re.I)
 FENCE = re.compile(r"^(```|~~~).*?^\1[^\n]*$", re.M | re.S)
 CODE_SPAN = re.compile(r"`[^`\n]*`")
+DOCUMENT_PATH = re.compile(r"(?<![\w/.-])(docs/[\w./-]*\w\.md)\b")
 INLINE_LINK = re.compile(r"!?\[[^\]\n]*\]\(\s*(<[^>\n]*>|[^)\s]*)[^)\n]*\)")
 REFERENCE_LINK = re.compile(r"^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]*>|\S+)", re.M)
 
@@ -139,6 +140,12 @@ def links_outside_the_kit(documents: dict[str, str], shipped: set[str]) -> list[
                 if relative.startswith("/") or resolved not in shipped:
                     problems.append("%s links to %s, which the kit does not ship" % (path, target))
     return problems
+
+
+def documents_named_outside_the_kit(documents: dict[str, str], shipped: set[str]) -> list[str]:
+    """One line per `docs/*.md` path a document (by kit path) names, in a link, a code span or plain text, that the kit does not ship."""
+    return ["%s names %s, which the kit does not ship" % (path, name)
+            for path, text in sorted(documents.items()) for name in sorted(set(DOCUMENT_PATH.findall(text))) if name not in shipped]
 
 
 def git(root: Path, *args: str) -> None:
@@ -497,6 +504,16 @@ class KitDocumentsTest(unittest.TestCase):
 
     def test_no_document_of_the_kit_links_outside_it(self):
         self.assertEqual(links_outside_the_kit(self.documents, self.shipped), [])
+
+    def test_no_document_of_the_kit_names_a_document_outside_it(self):
+        self.assertEqual(documents_named_outside_the_kit(self.documents, self.shipped), [])
+
+    def test_the_name_check_finds_documents_outside_the_kit(self):
+        shipped = {"docs/a.md", "docs/b.md"}
+        documents = {"docs/a.md": "`docs/b.md`, (`docs/c.md`, \"x\") and docs/d.md. [e](../docs/b.md) mydocs/f.md `docs/sub/g.md`"}
+        found = documents_named_outside_the_kit(documents, shipped)
+        self.assertEqual(found, ["docs/a.md names docs/c.md, which the kit does not ship", "docs/a.md names docs/d.md, which the kit does not ship",
+                                 "docs/a.md names docs/sub/g.md, which the kit does not ship"])
 
     def test_the_link_check_finds_links_outside_the_kit(self):
         shipped = {"docs/a.md", "docs/b.md", "data/x.json"}

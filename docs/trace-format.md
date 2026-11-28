@@ -376,7 +376,7 @@ row hashes:
 The excluded fields have no `units[i].<field>` line; the dump holds them under the record's prefix.
 
 `flags` (+0x110) is hashed with the mask 0xffffff2f: bit 0x10, the selection, and bits 6 and 7, its visit mark
-(`selectState`), are view state (`docs/state.md`, "The selection"), so two runs that differ only in what is selected
+(`selectState`), are view state, so two runs that differ only in what is selected
 or which units focusing has visited have equal rows. The dump prints the masked value.
 
 ### 7.2 projectiles (section 2)
@@ -504,7 +504,7 @@ for each entry G of globals.game, in order:   hash G
 END
 ```
 Dump: `game.<name>`. Masked fields are dumped as masked. `endGameFlags` is masked with 0xfffc: bits 0 and 1, the debug
-display and debug mode, are view state (`docs/state.md`, "The debug bits of endGameFlags").
+display and debug mode, are view state.
 
 ### 8.2 map cells (section 11)
 
@@ -790,7 +790,7 @@ count the targets of every class, and the other classes are movement's own. Noth
 even their `H32(id)` or class. Class 0 (an effect of none of the five types) still hashes `H32(id)`, its class and the type
 number. A class above 5 is none of the format's: the reference never writes one, and a dump that holds one fails, so it has no
 hash (section 11). The fields of the targets are only
-movement's (`docs/movement-interface.md`, section 5), and a wrong value of one shows through the unit's motion.
+movement's, and a wrong value of one shows through the unit's motion.
 
 ### 8.12 scripts (section 23)
 
@@ -1209,8 +1209,7 @@ for k in 0 .. n-1, in sending order:
 - A step records at most 64 packets; a run that sends more fails.
 
 Which packets a step sends, and when, is behaviour of the build, not of the state: two builds whose
-rows match can send the same packets in a different order within a step (`docs/economy-interface.md`,
-section 8). The lines are a diagnostic of what the receiver would see.
+rows match can send the same packets in a different order within a step. The lines are a diagnostic of what the receiver would see.
 
 ### 8.24 wind_meteors events (section 37, dumped only)
 

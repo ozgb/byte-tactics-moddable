@@ -42,7 +42,7 @@ section 8.1). They are equal from the match's start. The console's `control` com
 
 The simulation also reads both fields (line of sight, unit flags, which messages a command raises), so both are game
 state: `control` and `view` publish PLAYERS_SET_CONTROL and PLAYERS_SET_VIEW, and players writes the fields when it
-applies them (`docs/players-interface.md`). While `view` has made them differ, 3.1c draws the viewer's units with the controller's
+applies them. While `view` has made them differ, 3.1c draws the viewer's units with the controller's
 input, so the viewer's own units cannot be selected: `VIEW_RELATION_CONTROLLED` is clear on them.
 
 ## The world
@@ -354,7 +354,7 @@ On each frame it draws the score panel, 3.1c closes the gaps that defeated playe
 each place from 0 below the number of players, when no counted player holds it, every counted player above it moves
 down one. A counted player is one the panel lists: active, a human or a computer, not defeated (no units left after
 making one) and not only watching. A presentation runs that pass on its own copy of `rank` and draws from the copy;
-when the pass changed a place, it publishes `PLAYERS_COMPACT_RANKS` (`docs/players-interface.md`), and the simulation
+when the pass changed a place, it publishes `PLAYERS_COMPACT_RANKS`, and the simulation
 runs the same pass on its ranks.
 
 ## Messages
@@ -383,7 +383,7 @@ Presentation reads these and owns them; they are presentation state, not facts o
 - the selection: bit 0x10 of `Unit.flags`, taken out of the judged state by #1050, and the selection state bits 6 and
   7 (`selectState`), taken out by #1132; the view clears all three from `ViewUnit.flags` (version 2.1);
 - the build menu's page bits of `Unit.flags`, still hashed: unit creation sets them too, and no run from the command
-  log differs on them (`docs/state.md`);
+  log differs on them;
 - the camera, its position and the screen shake's offset;
 - the unit and the feature under the cursor (the hover unit), and the hot spots of the radar picture's blips;
 - the order mode the cursor is in, and the build placement's height;

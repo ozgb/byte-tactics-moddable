@@ -25,10 +25,11 @@ Los_radar's place in it:
   SHARE_MAPPING, SHARE_RADAR and SHARE_MAP, published by units, orders, map, players and the engine; and,
   since 3.2, SIGHT_RESET and SIGHT_LOAD, which units publishes (`LosRadarPublishSightReset`, `LosRadarPublishSightLoad`) as it sets a unit up and loads a saved game; and, since 5.1, SET_MODE, which the engine's console publishes (`los`, `lostype`, `mapping`, `nowisee`) in place of its writes to the line of sight bits of the game record, each before its RECALCULATE.
   Los_radar's handler (`LosRadarInbox`, `src/seams/los_radar_world.cpp`) passes each to `Apply`.
-- **Routes:** of the fourteen routes, every one that can be published inside the tick is synchronous except map's
+- **Routes:** of the fifteen routes, every one that can be published inside the tick is synchronous except map's
   CELL_HEIGHTS: three because the gate diverged with them queued, two by #952's rule, and three because no scenario
-  reaches them, so nothing has tested them queued (sections 4 and 8). The five routes from the engine's and economy's
-  outboxes are queued, and since they are published outside the tick they are delivered at once.
+  reaches them, so nothing has tested them queued (sections 4 and 8). The engine's
+  RECALCULATE, SET_MODE, SHARE_MAPPING and SHARE_RADAR are queued, and since they are published outside the tick they are
+  delivered at once.
 - **Runs:** the engine runs los_radar's passes where 3.1c ran them, in `SchedPlayersPhase` (`src/game/scheduler.cpp`):
   the `players.los` pass, `UpdateUnitLineOfSight` for each unit slot of a player that holds a unit, between
   `UpdatePlayerHead` and `UpdatePlayerBody`; for the viewing player, `RecordRadarUnits` after it, and

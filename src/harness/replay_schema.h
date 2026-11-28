@@ -5598,6 +5598,7 @@ static const unsigned char kReplayEconomyApplyReads[] = { 90 };
 static const unsigned char kReplayEconomyApplyWrites[] = { 90 };
 static const unsigned short kReplayEconomyApplyObjReads[] = { 30, 35, 625, 626, 627, 628, 631, 632, 633, 634, 637 };
 static const unsigned short kReplayEconomyApplyObjWrites[] = { 625, 626, 627, 631, 632, 633, 637 };
+static const unsigned short kReplayEconomySpendAllOf[] = { ROK_PLAYER };
 static const unsigned char kReplayEconomySpendReads[] = { 90 };
 static const unsigned char kReplayEconomySpendWrites[] = { 90 };
 static const unsigned short kReplayEconomySpendObjReads[] = { 30, 33, 34, 626, 632 };
@@ -5743,20 +5744,24 @@ static const unsigned char kReplayWeaponsFindTargetableProjectileReads[] = { 30 
 static const unsigned short kReplayWeaponsFindTargetableProjectileObjReads[] = { 66, 83, 88, 93, 107, 109, 111, 112, 113, 209, 214, 306, 307, 317, 319, 326 };
 static const unsigned char kReplayWeaponsWeaponCanReachPosReads[] = { 17, 28 };
 static const unsigned short kReplayWeaponsWeaponCanReachPosObjReads[] = { 66, 105, 112, 113, 146, 209, 210, 217, 221 };
+static const unsigned char kReplayTargetingApplyReads[] = { 26 };
 static const unsigned short kReplayTargetingApplyObjReads[] = { 52, 55, 57, 58, 59, 61, 62, 64, 65, 66, 67, 112, 113, 114 };
 static const unsigned short kReplayTargetingApplyObjWrites[] = { 55, 57, 58, 61, 62, 64, 65 };
+static const unsigned char kReplayTargetingGetWeaponTargetUnitReads[] = { 26 };
 static const unsigned short kReplayTargetingGetWeaponTargetUnitObjReads[] = { 57, 58, 59, 61, 62, 64, 65, 66, 67, 112, 113, 114 };
 static const unsigned short kReplayTargetingGetWeaponTargetUnitObjWrites[] = { 57, 58, 61, 62, 64, 65 };
-static const unsigned char kReplayTargetingGetWeaponTargetPosReads[] = { 17 };
+static const unsigned char kReplayTargetingGetWeaponTargetPosReads[] = { 17, 26 };
 static const unsigned short kReplayTargetingGetWeaponTargetPosObjReads[] = { 53, 54, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 108, 109, 110, 111, 112, 113, 114, 209, 210, 287, 288, 289 };
 static const unsigned short kReplayTargetingGetWeaponTargetPosObjWrites[] = { 57, 58, 61, 62, 64, 65 };
-static const unsigned char kReplayTargetingFindWeaponTargetReads[] = { 18, 87, 88, 89 };
+static const unsigned char kReplayTargetingFindWeaponTargetReads[] = { 18, 26, 87, 88, 89 };
 static const unsigned char kReplayTargetingFindWeaponTargetWrites[] = { 87, 88, 89 };
 static const unsigned short kReplayTargetingFindWeaponTargetObjReads[] = { 0, 22, 45, 53, 66, 97, 105, 106, 107, 109, 110, 111, 112, 113, 133, 134, 135, 136, 150, 162, 209, 301 };
-static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillReads[] = { 18, 87, 88, 89 };
+static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillReads[] = { 18, 26, 87, 88, 89 };
 static const unsigned char kReplayTargetingFindBestTargetIfFireAtWillWrites[] = { 87, 88, 89 };
 static const unsigned short kReplayTargetingFindBestTargetIfFireAtWillObjReads[] = { 0, 22, 45, 53, 66, 97, 105, 106, 107, 109, 110, 111, 112, 113, 133, 134, 135, 136, 150, 162, 209, 301 };
+static const unsigned char kReplayTargetingChooseWeaponReads[] = { 26 };
 static const unsigned short kReplayTargetingChooseWeaponObjReads[] = { 59, 67, 114 };
+static const unsigned char kReplayTargetingSavedTargetPairReads[] = { 26 };
 static const unsigned short kReplayTargetingSavedTargetPairObjReads[] = { 57, 58, 59, 61, 62, 64, 65, 66, 67, 112, 113, 114 };
 static const unsigned short kReplayTargetingSavedTargetPairObjWrites[] = { 57, 58, 61, 62, 64, 65 };
 static const unsigned short kReplayLosRadarApplyAllOf[] = { ROK_PLAYER, ROK_UNIT, ROK_CELL, ROK_PROJECTILE, ROK_EYE };
@@ -6082,7 +6087,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "Init", SUB_ECONOMY, nullptr, 0, kReplayEconomyInitWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Shutdown", SUB_ECONOMY, kReplayEconomyShutdownReads, 1, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "Apply", SUB_ECONOMY, kReplayEconomyApplyReads, 1, kReplayEconomyApplyWrites, 1, kReplayEconomyApplyObjReads, 11, kReplayEconomyApplyObjWrites, 7, kReplayEconomyApplyAllOf, 1 },
-    { "Spend", SUB_ECONOMY, kReplayEconomySpendReads, 1, kReplayEconomySpendWrites, 1, kReplayEconomySpendObjReads, 5, kReplayEconomySpendObjWrites, 4, nullptr, 0 },
+    { "Spend", SUB_ECONOMY, kReplayEconomySpendReads, 1, kReplayEconomySpendWrites, 1, kReplayEconomySpendObjReads, 5, kReplayEconomySpendObjWrites, 4, kReplayEconomySpendAllOf, 1 },
     { "UpdatePlayerEconomy", SUB_ECONOMY, kReplayEconomyUpdatePlayerEconomyReads, 1, kReplayEconomyUpdatePlayerEconomyWrites, 1, kReplayEconomyUpdatePlayerEconomyObjReads, 29, kReplayEconomyUpdatePlayerEconomyObjWrites, 26, kReplayEconomyUpdatePlayerEconomyAllOf, 1 },
     { "UpdateMetalExtraction", SUB_ECONOMY, kReplayEconomyUpdateMetalExtractionReads, 1, kReplayEconomyUpdateMetalExtractionWrites, 1, kReplayEconomyUpdateMetalExtractionObjReads, 1, kReplayEconomyUpdateMetalExtractionObjWrites, 1, nullptr, 0 },
     { "UpdateResourceSharing", SUB_ECONOMY, kReplayEconomyUpdateResourceSharingReads, 1, kReplayEconomyUpdateResourceSharingWrites, 1, kReplayEconomyUpdateResourceSharingObjReads, 6, nullptr, 0, kReplayEconomyUpdateResourceSharingAllOf, 1 },
@@ -6127,13 +6132,13 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "WeaponCanReachUnit", SUB_WEAPONS, kReplayWeaponsWeaponCanReachUnitReads, 2, nullptr, 0, kReplayWeaponsWeaponCanReachUnitObjReads, 14, nullptr, 0, nullptr, 0 },
     { "FindTargetableProjectile", SUB_WEAPONS, kReplayWeaponsFindTargetableProjectileReads, 1, nullptr, 0, kReplayWeaponsFindTargetableProjectileObjReads, 16, nullptr, 0, kReplayWeaponsFindTargetableProjectileAllOf, 1 },
     { "WeaponCanReachPos", SUB_WEAPONS, kReplayWeaponsWeaponCanReachPosReads, 2, nullptr, 0, kReplayWeaponsWeaponCanReachPosObjReads, 9, nullptr, 0, nullptr, 0 },
-    { "Apply", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingApplyObjReads, 14, kReplayTargetingApplyObjWrites, 7, nullptr, 0 },
-    { "GetWeaponTargetUnit", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingGetWeaponTargetUnitObjReads, 12, kReplayTargetingGetWeaponTargetUnitObjWrites, 6, nullptr, 0 },
-    { "GetWeaponTargetPos", SUB_TARGETING, kReplayTargetingGetWeaponTargetPosReads, 1, nullptr, 0, kReplayTargetingGetWeaponTargetPosObjReads, 26, kReplayTargetingGetWeaponTargetPosObjWrites, 6, nullptr, 0 },
-    { "FindWeaponTarget", SUB_TARGETING, kReplayTargetingFindWeaponTargetReads, 4, kReplayTargetingFindWeaponTargetWrites, 3, kReplayTargetingFindWeaponTargetObjReads, 22, nullptr, 0, nullptr, 0 },
-    { "FindBestTargetIfFireAtWill", SUB_TARGETING, kReplayTargetingFindBestTargetIfFireAtWillReads, 4, kReplayTargetingFindBestTargetIfFireAtWillWrites, 3, kReplayTargetingFindBestTargetIfFireAtWillObjReads, 22, nullptr, 0, nullptr, 0 },
-    { "ChooseWeapon", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingChooseWeaponObjReads, 3, nullptr, 0, nullptr, 0 },
-    { "SavedTargetPair", SUB_TARGETING, nullptr, 0, nullptr, 0, kReplayTargetingSavedTargetPairObjReads, 12, kReplayTargetingSavedTargetPairObjWrites, 6, nullptr, 0 },
+    { "Apply", SUB_TARGETING, kReplayTargetingApplyReads, 1, nullptr, 0, kReplayTargetingApplyObjReads, 14, kReplayTargetingApplyObjWrites, 7, nullptr, 0 },
+    { "GetWeaponTargetUnit", SUB_TARGETING, kReplayTargetingGetWeaponTargetUnitReads, 1, nullptr, 0, kReplayTargetingGetWeaponTargetUnitObjReads, 12, kReplayTargetingGetWeaponTargetUnitObjWrites, 6, nullptr, 0 },
+    { "GetWeaponTargetPos", SUB_TARGETING, kReplayTargetingGetWeaponTargetPosReads, 2, nullptr, 0, kReplayTargetingGetWeaponTargetPosObjReads, 26, kReplayTargetingGetWeaponTargetPosObjWrites, 6, nullptr, 0 },
+    { "FindWeaponTarget", SUB_TARGETING, kReplayTargetingFindWeaponTargetReads, 5, kReplayTargetingFindWeaponTargetWrites, 3, kReplayTargetingFindWeaponTargetObjReads, 22, nullptr, 0, nullptr, 0 },
+    { "FindBestTargetIfFireAtWill", SUB_TARGETING, kReplayTargetingFindBestTargetIfFireAtWillReads, 5, kReplayTargetingFindBestTargetIfFireAtWillWrites, 3, kReplayTargetingFindBestTargetIfFireAtWillObjReads, 22, nullptr, 0, nullptr, 0 },
+    { "ChooseWeapon", SUB_TARGETING, kReplayTargetingChooseWeaponReads, 1, nullptr, 0, kReplayTargetingChooseWeaponObjReads, 3, nullptr, 0, nullptr, 0 },
+    { "SavedTargetPair", SUB_TARGETING, kReplayTargetingSavedTargetPairReads, 1, nullptr, 0, kReplayTargetingSavedTargetPairObjReads, 12, kReplayTargetingSavedTargetPairObjWrites, 6, nullptr, 0 },
     { "Apply", SUB_LOS_RADAR, kReplayLosRadarApplyReads, 22, kReplayLosRadarApplyWrites, 6, kReplayLosRadarApplyObjReads, 76, kReplayLosRadarApplyObjWrites, 21, kReplayLosRadarApplyAllOf, 5 },
     { "GetMapCell", SUB_LOS_RADAR, kReplayLosRadarGetMapCellReads, 3, kReplayLosRadarGetMapCellWrites, 1, kReplayLosRadarGetMapCellObjReads, 4, nullptr, 0, kReplayLosRadarGetMapCellAllOf, 1 },
     { "GetMapCellAtPosition", SUB_LOS_RADAR, kReplayLosRadarGetMapCellAtPositionReads, 3, kReplayLosRadarGetMapCellAtPositionWrites, 1, kReplayLosRadarGetMapCellAtPositionObjReads, 4, nullptr, 0, kReplayLosRadarGetMapCellAtPositionAllOf, 1 },

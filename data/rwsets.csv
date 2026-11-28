@@ -54698,6 +54698,7 @@ address,function,file,kind,target
 ,HarnessExit,src/harness/harness.cpp,function,
 ,HarnessExit,src/harness/harness.cpp,global_escape,s_commit@src/harness/harness.cpp
 ,HarnessExit,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
+,HarnessExit,src/harness/harness.cpp,global_read,s_recordLine@src/harness/harness.cpp
 ,HarnessExit,src/harness/harness.cpp,global_read,s_recordSwitch@src/harness/harness.cpp
 ,HarnessFeaturesEvent,src/harness/harness.cpp,call,RecordEvent
 ,HarnessFeaturesEvent,src/harness/harness.cpp,function,
@@ -63113,6 +63114,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkReachTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamper@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamperTick@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_recordLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_roundTripCount@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_roundTrips@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_saveLine@src/harness/harness.cpp

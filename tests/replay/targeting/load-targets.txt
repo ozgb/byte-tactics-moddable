@@ -1,6 +1,7 @@
 bt-replay 2
 subsystem targeting 4.0
 call 150 Apply
+  r Game.poolCount 2501
   r Unit#1.id 1
   r Unit#1.netDirtyFlags 0
   r Unit#1.weapon0TargetX 0

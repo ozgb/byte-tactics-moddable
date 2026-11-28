@@ -6516,8 +6516,6 @@ const GlueRoute kGlueRoutes[] = {
     {SCHED_ECONOMY, 16},
     {SCHED_ECONOMY, 17},
     {SCHED_ECONOMY, 18},
-    {SCHED_ECONOMY, 134},
-    {SCHED_ECONOMY, 135},
     {SCHED_FEATURES, 4},
     {SCHED_FEATURES, 48},
     {SCHED_FEATURES, 49},

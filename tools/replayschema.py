@@ -4296,7 +4296,7 @@ def read_class_words(path: Path = CLASS_WORDS) -> list[dict]:
 def check_class_words(rows: list[dict], model: dict) -> list[str]:
     """Errors when the class word table does not list each vtable of every concrete kind exactly once, indexed 0 to n-1 in order."""
     errors = []
-    want = {(o["name"], b) for o in model["objects"] if o.get("vtable") or o.get("vptr") for b in [""] + o.get("vtable_secondary", [])}
+    want = {(o["name"], b) for o in model["objects"] if o.get("vtable") or o.get("vptr") for b in [""] + list(o.get("vtable_secondary") or [])}
     seen = set()
     for i, r in enumerate(rows):
         key = (r["class"], r["base"])
@@ -4319,7 +4319,7 @@ def render_class_words(rows: list[dict], model: dict) -> list[str]:
          "    if (capacity < %d)" % len(rows), "        return %d;" % len(rows)]
     for r in rows:
         o = kinds.get(r["class"])
-        if o is None or (r["base"] and r["base"] not in o.get("vtable_secondary", [])):
+        if o is None or (r["base"] and r["base"] not in list(o.get("vtable_secondary") or [])):
             continue
         word = "g_vtsec_%s_%s" % (o["type"], r["base"]) if r["base"] else "ReplayVtable(ROK_%s)" % upper(o["name"])
         L.append("    out[%s] = (unsigned)%s;" % (r["index"], word))
@@ -4573,7 +4573,6 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         errors += ["%s lists the service %s, which has no spec" % (sub, n) for n in spec.get("services", [])
                    if not any(x["name"] == n or x["name"].startswith(n + "_") for x in services)]
     class_words = read_class_words()
-    errors += check_class_words(class_words, model)
     files = {
         SCHEMA_H: render_schema(ann, model),
         FIXTURE_SCHEMA_H: render_fixture_schema(fixture_ann, fixture_model),
@@ -4610,9 +4609,10 @@ def main() -> None:
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     try:
-        files, errors, _ = generate(read_rows())
+        files, errors, model = generate(read_rows())
     except Error as e:
         sys.exit("replayschema: %s" % e)
+    errors += check_class_words(read_class_words(), model)
     for e in errors:
         print("replayschema: " + e, file=sys.stderr)
     if args.check:

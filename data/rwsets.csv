@@ -58311,6 +58311,7 @@ address,function,file,kind,target
 ,LoadDataAttach,src/state/load_data.cpp,function,
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_base
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_bump
+,LoadDataAttach,src/state/load_data.cpp,global_write,s_classWordsSize
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_fatal
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_region
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_size
@@ -58325,6 +58326,8 @@ address,function,file,kind,target
 ,LoadDataCheck,src/state/load_data.cpp,field_read,Mapped::size
 ,LoadDataCheck,src/state/load_data.cpp,function,
 ,LoadDataCheck,src/state/load_data.cpp,global_read,s_base
+,LoadDataCheck,src/state/load_data.cpp,global_read,s_classWordsHash
+,LoadDataCheck,src/state/load_data.cpp,global_read,s_classWordsSize
 ,LoadDataCheck,src/state/load_data.cpp,global_read,s_mapped
 ,LoadDataCheck,src/state/load_data.cpp,global_read,s_mappedCount
 ,LoadDataCheck,src/state/load_data.cpp,global_read,s_region
@@ -58366,6 +58369,19 @@ address,function,file,kind,target
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_bump
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_mappedCount
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_registeredCount
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,Fatal
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,HashBytes
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,Locked::~Locked
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,memcpy
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,memset
+,LoadDataWriteClassWords,src/state/load_data.cpp,function,
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_read,s_classWordsSize
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_read,s_mappedCount
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_read,s_region
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_read,s_size
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_write,s_bump
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_write,s_classWordsHash
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_write,s_classWordsSize
 ,LoadEntries,src/harness/replay_objects.cpp,call,operator new
 ,LoadEntries,src/harness/replay_objects.cpp,deref_read,*std::vector<LoadEntry >
 ,LoadEntries,src/harness/replay_objects.cpp,function,
@@ -67820,6 +67836,19 @@ address,function,file,kind,target
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,field_read,ReplayReach::object
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,function,
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
+,ReplayClassWords,src/harness/replay_vtables.cpp,call,ReplayVtable
+,ReplayClassWords,src/harness/replay_vtables.cpp,deref_write,*unsigned int
+,ReplayClassWords,src/harness/replay_vtables.cpp,function,
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_DefeatAllUnitsKilledOfType_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_DefeatAllUnitsKilled_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_DefeatAnyUnitPassesX_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_DefeatAnyUnitPassesZ_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryBuildUnitType_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryKillAllMobileUnits_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryKillAllOfType_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryMoveUnitToRadius_RadiusUnitVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryUnitTypePassesX_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryUnitTypePassesZ_UnitScanVisitor
 ,ReplayClearFailure,src/harness/replay_text.cpp,function,
 ,ReplayClearFailure,src/harness/replay_text.cpp,global_write,s_failure
 ,ReplayCommands,src/harness/harness.cpp,call,CommandBegin
@@ -71218,9 +71247,11 @@ address,function,file,kind,target
 ,Start,src/wasm/modules.cpp,call,GlueInstall
 ,Start,src/wasm/modules.cpp,call,GlueModules
 ,Start,src/wasm/modules.cpp,call,LoadDataAttach
+,Start,src/wasm/modules.cpp,call,LoadDataWriteClassWords
 ,Start,src/wasm/modules.cpp,call,LoadModule
 ,Start,src/wasm/modules.cpp,call,LoaderFatal
 ,Start,src/wasm/modules.cpp,call,ModulesFatal
+,Start,src/wasm/modules.cpp,call,ReplayClassWords
 ,Start,src/wasm/modules.cpp,call,SimBlockAttach
 ,Start,src/wasm/modules.cpp,call,SimBlockBase
 ,Start,src/wasm/modules.cpp,call,_stricmp

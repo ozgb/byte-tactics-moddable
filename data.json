@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T10:05:04+00:00",
+ "generated": "2026-11-28T11:05:05+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -8,8 +8,8 @@
    "total": 65
   },
   "180": {
-   "done": 20,
-   "total": 42
+   "done": 22,
+   "total": 43
   }
  },
  "rows": [
@@ -232,15 +232,15 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 9,
-   "spec": "stale",
+   "spec": "active",
    "spec_pin": 6,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1202,
     "title": "Spec: Move the targeting spec and implement it",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1202",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [
@@ -267,31 +267,31 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 3,
-   "spec": "active",
-   "spec_pin": null,
-   "impl": "active",
-   "active": true,
+   "spec": "done",
+   "spec_pin": 74,
+   "impl": "built",
+   "active": false,
    "issue": {
     "number": 1189,
     "title": "Spec: Write the los and radar spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1189",
     "claimed": true,
-    "state": "OPEN"
+    "state": "CLOSED"
    },
    "prs": [
     {
      "number": 60,
      "title": "Implementer: impl/los_radar",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/60",
-     "live": true
+     "live": false
     },
     {
      "number": 59,
      "title": "Add: Write the los_radar spec",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/59",
-     "live": true
+     "live": false
     }
    ]
   },
@@ -310,7 +310,7 @@
     "number": 1190,
     "title": "Spec: Write the mission spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1190",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [

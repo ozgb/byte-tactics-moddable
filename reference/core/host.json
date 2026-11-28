@@ -201,5 +201,12 @@
   ],
   "results": [
    ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "gaf_sequence_frame_null_cursor",
+  "calls": [
+   ["replay", "host/gaf_sequence_frame_null_cursor.txt", "host/wind_meteors_gaf_sequence_frame_null_cursor.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
   ]}
 ]}

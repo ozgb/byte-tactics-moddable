@@ -1796,7 +1796,7 @@ Two rules narrow the import comparison (`docs/module-abi.md`, section 15, names 
   anywhere in the file) and that line's `o` lines of the result, and does not count it as an import or compare where it
   falls. Its recorded lines are skipped when the other imports are matched, and are never missing. Arguments no recorded
   call has are reported at `query services.GetGafFrame`. `InitGafSequence` and `StepGafSequence` change their cursor and
-  stay in order.
+  `GetGafSequenceFrame` reads it, so they stay in order.
 - **Unread arguments.** The `y` of `los_radar.GetMapCellAtPosition`'s `pos` is not compared: the lookup reads only `x`
   and `z`, and the reclaim scan passes a position whose `y` it never sets.
 

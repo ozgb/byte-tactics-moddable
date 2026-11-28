@@ -288,5 +288,15 @@
     "host/wind_meteors_gaf_step_null_cursor.wasm"
    ]
   ]
+ },
+ {
+  "name": "gaf_sequence_frame_null_cursor",
+  "calls": [
+   [
+    "replay",
+    "host/gaf_sequence_frame_null_cursor.txt",
+    "host/wind_meteors_gaf_sequence_frame_null_cursor.wasm"
+   ]
+  ]
  }
 ]

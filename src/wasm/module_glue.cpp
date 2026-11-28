@@ -374,6 +374,24 @@ IMPORT(InitGafSequenceImport)
     return nullptr;
 }
 
+IMPORT(GetGafSequenceFrameImport)
+{
+    if (a[0].i32 == 0)
+        return nullptr;
+    const char* error = GafCursor("GetGafSequenceFrame", (unsigned)a[0].i32);
+    if (error != nullptr)
+        return error;
+    const char* cursor = (const char*)GlueLinear(a[0].i32);
+    unsigned short index = *(const unsigned short*)cursor;
+    unsigned animation = *(const unsigned*)(cursor + 8);
+    if (animation != 0 && index >= *(const unsigned short*)LoadNative(animation)) {
+        a[0].i32 = 0;
+        return nullptr;
+    }
+    a[0].i32 = (int)LoadAddress(LoadGetGafSequenceFrame(GlueLinear(a[0].i32)));
+    return nullptr;
+}
+
 IMPORT(StepGafSequenceImport)
 {
     if (a[0].i32 == 0)
@@ -456,6 +474,7 @@ const GlueImport kServiceImports[] = {
     {"services", "GetGafFrame", "ii>i", GetGafFrameImport},
     {"services", "InitGafSequence", "iii>", InitGafSequenceImport},
     {"services", "StepGafSequence", "i>i", StepGafSequenceImport},
+    {"services", "GetGafSequenceFrame", "i>i", GetGafSequenceFrameImport},
     {"services", "Emit", "ii>", EmitImport},
 };
 

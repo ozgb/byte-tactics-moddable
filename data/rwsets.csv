@@ -49617,6 +49617,16 @@ address,function,file,kind,target
 ,GetGafFrameImport,src/wasm/module_glue.cpp,field_read,wasmtime_val_raw::i32
 ,GetGafFrameImport,src/wasm/module_glue.cpp,field_write,wasmtime_val_raw::i32
 ,GetGafFrameImport,src/wasm/module_glue.cpp,function,
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,GafCursor
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,GlueLinear
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,LoadAddress
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,LoadGetGafSequenceFrame
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,LoadNative
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,deref_read,*unsigned int
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,deref_read,*unsigned short
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,field_read,wasmtime_val_raw::i32
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,field_write,wasmtime_val_raw::i32
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,function,
 ,GetGameTypeNative,src/seams/native.cpp,call,Mission::GetGameType
 ,GetGameTypeNative,src/seams/native.cpp,call,TheMission
 ,GetGameTypeNative,src/seams/native.cpp,function,
@@ -50591,6 +50601,13 @@ address,function,file,kind,target
 ,GlueImportFeaturesGetFootprintCentre,src/wasm/glue_tables.cpp,function,
 ,GlueImportFeaturesGetFootprintCentre,src/wasm/glue_tables.cpp,global_read,g_seams
 ,GlueImportFeaturesGetFootprintCentre,src/wasm/glue_tables.cpp,indirect_call,"indirect via void (*)(const Point16 *, Feature *, Vec3 *) __attribute__((stdcall)) [FeaturesSeam::GetFootprintCentre]"
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,call,GlueImportError
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,call,GlueInMemory
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,call,GlueLinear
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,call,ScheduleFeaturesPlace
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,field_write,wasmtime_val_raw::i32
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,function,
 ,GlueImportLosRadarClampWorldPosToTerrain,src/wasm/glue_tables.cpp,call,GlueImportError
 ,GlueImportLosRadarClampWorldPosToTerrain,src/wasm/glue_tables.cpp,call,GlueInMemory
 ,GlueImportLosRadarClampWorldPosToTerrain,src/wasm/glue_tables.cpp,call,GlueLinear
@@ -71190,7 +71207,7 @@ address,function,file,kind,target
 ,Start,src/wasm/modules.cpp,call,wl_load_manifest_file
 ,Start,src/wasm/modules.cpp,call,wl_memory_base
 ,Start,src/wasm/modules.cpp,call,wl_memory_size
-,Start,src/wasm/modules.cpp,call,wl_module_text
+,Start,src/wasm/modules.cpp,call,wl_module_blocked
 ,Start,src/wasm/modules.cpp,deref_read,*GlueModule
 ,Start,src/wasm/modules.cpp,deref_read,*char
 ,Start,src/wasm/modules.cpp,deref_write,*char

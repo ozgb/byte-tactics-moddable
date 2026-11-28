@@ -290,6 +290,7 @@
       "GetGafFrame": [["linear", "int"], "linear"],
       "InitGafSequence": [["linear", "linear", "int"], "void"],
       "StepGafSequence": [["linear"], "int"],
+      "GetGafSequenceFrame": [["linear"], "linear"],
       "GetSlotDpid": [["int"], "int"],
       "FindSlotByDpid": [["int"], "int"],
       "Emit": [["linear", "int"], "void"]
@@ -512,8 +513,10 @@
           "GameRand": [["int"], "int"],
           "RandomInt": [["int"], "int"],
           "SimAllocTagged": [["linear", "int"], "linear"],
+          "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
           "InitGafSequence": [["linear", "linear", "int"], "void"],
           "StepGafSequence": [["linear"], "int"],
+          "GetGafSequenceFrame": [["linear"], "linear"],
           "Emit": [["linear", "int"], "void"]
         }
       },
@@ -948,6 +951,7 @@
         "orders": 6,
         "scripts": 3,
         "economy": 5,
+        "features": 5,
         "services": 4
       },
       "data_base": 491520,
@@ -1019,6 +1023,9 @@
         "economy": {
           "UpdateMetalExtraction": [["int"], "void"],
           "RequestGranted": [["int", "int"], "int"]
+        },
+        "features": {
+          "Place": [["linear"], "int"]
         },
         "services": {
           "RandomInt": [["int"], "int"],

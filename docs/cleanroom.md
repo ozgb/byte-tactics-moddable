@@ -9,6 +9,13 @@ repository. The tooling is in `tools/cleanroom/` and runs on the host, outside t
   needs a password, so nothing here may depend on it). Check with `smolvm --version`.
 - `/dev/kvm` readable and writable by your user.
 - `uv`, and `git` on the host. Nothing is installed on the host for the VM's toolchain.
+- A `wine` that can make a win64 prefix (a wow64 build), first on `PATH`: the broker's gate requests run it, and
+  `launch.py` forces `WINEARCH=win64` for the broker. On a host whose default `wine` is a 32-bit loader only, every gate
+  request fails with `reason: host-runtime`. To tell, run `WINEARCH=win64 WINEPREFIX=$(mktemp -d) wine wineboot`: a
+  32-bit loader fails it. Put a wow64 `wine` first (for example `PATH=/usr/bin:$PATH`) and give the broker a fresh
+  `WINEPREFIX` of its own. A prefix first made as 32-bit fails under `WINEARCH=win64` with "wine: WINEARCH set to win64
+  but '<prefix>' is a 32-bit installation", so on such a host do not `export WINEARCH=win64` for replays that use a prefix
+  made without it; use a fresh prefix.
 
 ## Build the image
 

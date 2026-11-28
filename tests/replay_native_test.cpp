@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "../src/harness/replay_schema.h"
+#include "../src/state/load_data.h"
 #include "../src/files/files_bank.h"
 #include "../src/util/commands.h"
 #include "../src/util/engine_services.h"
@@ -8510,6 +8511,41 @@ void OutFormsSelfTest()
     Check(g_diffs == 0 && width == 12, "and a null pointer takes none");
 }
 
+void LoadDataReclaimSelfTest()
+{
+    const unsigned regionSize = 65536;
+    const unsigned base = 0x10100000;
+    unsigned char* region = (unsigned char*)calloc(regionSize, 1);
+    unsigned char* kept = (unsigned char*)calloc(64, 1);
+    LoadDataAttach(region, base, regionSize, nullptr);
+    LoadDataRegisterFrame(kept, 64);
+    unsigned keptAt = LoadAddress(kept);
+    unsigned first = 0;
+    for (int battle = 0; battle < 8; battle++) {
+        unsigned char* a = (unsigned char*)calloc(20000, 1);
+        unsigned char* b = (unsigned char*)calloc(20000, 1);
+        a[100] = (unsigned char)battle;
+        LoadDataRegisterFrame(a, 20000);
+        LoadDataRegisterFrame(b, 20000);
+        unsigned at = LoadAddress(a);
+        LoadAddress(b);
+        if (battle == 0)
+            first = at;
+        Check(at == first, "a battle's load data reuses the space the last battle freed");
+        Check(region[at - base + 100] == (unsigned char)battle, "the reused space holds the new copy");
+        Check(LoadNative(at + 100) == a + 100, "a load address of the new copy leads to its buffer");
+        LoadDataUnregister(a);
+        LoadDataUnregister(b);
+        free(a);
+        free(b);
+    }
+    Check(LoadNative(keptAt) == kept, "a buffer mapped before every battle stays mapped");
+    LoadDataUnregister(kept);
+    LoadDataAttach(nullptr, 0, 0, nullptr);
+    free(kept);
+    free(region);
+}
+
 void RegionSelfTest()
 {
     printf("a module's region\n");
@@ -9494,6 +9530,7 @@ int SelfTest(const char* file)
     SimVectorSelfTest();
     GameWriteSelfTest();
     RegionSelfTest();
+    LoadDataReclaimSelfTest();
     UnreadArgumentSelfTest();
     if (file == nullptr)
         return 0;

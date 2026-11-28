@@ -4,6 +4,7 @@
 
 #include "load_data.h"
 #include "../graphics/gaf_frame.h"
+#include "../../interfaces/host.h"
 
 namespace {
 
@@ -36,7 +37,20 @@ unsigned s_registeredCapacity;
 Mapped* s_mapped;
 unsigned s_mappedCount;
 unsigned s_mappedCapacity;
-unsigned s_live;
+void* s_lock;
+
+struct Locked {
+    Locked()
+    {
+        if (s_lock == nullptr)
+            s_lock = host_mutex_create();
+        host_mutex_lock(s_lock);
+    }
+    ~Locked()
+    {
+        host_mutex_unlock(s_lock);
+    }
+};
 
 void Fatal(const char* text)
 {
@@ -96,6 +110,7 @@ void Register(const void* buffer, unsigned size, int kind)
 {
     if (buffer == nullptr || size == 0)
         return;
+    Locked locked;
     unsigned lo = 0;
     unsigned hi = s_registeredCount;
     while (lo < hi) {
@@ -120,7 +135,7 @@ unsigned MapRegistered(unsigned at);
 unsigned Rebase(const Registered& r, unsigned linear, unsigned value)
 {
     unsigned offset = value - (unsigned)r.native;
-    if (value < (unsigned)r.native || offset >= r.size)
+    if (value < (unsigned)r.native || offset > r.size)
         FatalAddress("points outside its load data buffer", value);
     return linear + offset;
 }
@@ -194,7 +209,6 @@ unsigned MapRegistered(unsigned at)
     m.live = 1;
     unsigned index = s_mappedCount++;
     r.mapIndex = (int)index;
-    s_live++;
     Registered copyOfRegistered = r;
     if (r.kind == KIND_GAF)
         RelocateGaf(copy, copyOfRegistered, linear);
@@ -237,15 +251,16 @@ void __cdecl LoadDataRegisterFrame(const void* frame, unsigned size)
 
 void __cdecl LoadDataUnregister(const void* buffer)
 {
+    Locked locked;
     unsigned at = FindRegistered(buffer);
     if (at == (unsigned)-1 || s_registered[at].native != (const unsigned char*)buffer)
         return;
     int mapIndex = s_registered[at].mapIndex;
     if (mapIndex >= 0) {
         s_mapped[mapIndex].live = 0;
-        if (--s_live == 0) {
-            s_mappedCount = 0;
-            s_bump = 0;
+        while (s_mappedCount > 0 && !s_mapped[s_mappedCount - 1].live) {
+            s_mappedCount--;
+            s_bump = s_mapped[s_mappedCount].linear - s_base;
         }
     }
     memmove(s_registered + at, s_registered + at + 1, (s_registeredCount - at - 1) * sizeof(Registered));
@@ -257,6 +272,7 @@ void __cdecl LoadDataStoreByte(unsigned char* native, unsigned char value)
     *native = value;
     if (s_region == nullptr)
         return;
+    Locked locked;
     unsigned at = FindRegistered(native);
     if (at == (unsigned)-1 || s_registered[at].mapIndex < 0)
         return;
@@ -272,6 +288,7 @@ unsigned __cdecl LoadAddress(const void* native)
         return (unsigned)native;
     if (native == nullptr)
         return 0;
+    Locked locked;
     unsigned at = FindRegistered(native);
     if (at == (unsigned)-1)
         FatalAddress("is not load data", (unsigned)native);
@@ -281,7 +298,10 @@ unsigned __cdecl LoadAddress(const void* native)
 
 unsigned __cdecl LoadAddressIfLoadData(const void* native)
 {
-    if (s_region == nullptr || native == nullptr || FindRegistered(native) == (unsigned)-1)
+    if (s_region == nullptr || native == nullptr)
+        return (unsigned)native;
+    Locked locked;
+    if (FindRegistered(native) == (unsigned)-1)
         return (unsigned)native;
     return LoadAddress(native);
 }

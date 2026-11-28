@@ -58273,6 +58273,7 @@ address,function,file,kind,target
 ,LoadAIProfiles,src/ai/ai_player.cpp,indirect_call,indirect via const char *(*)(int) __attribute__((stdcall)) [MissionSeam::GetNameSlot]
 ,LoadAddress,src/state/load_data.cpp,call,FatalAddress
 ,LoadAddress,src/state/load_data.cpp,call,FindRegistered
+,LoadAddress,src/state/load_data.cpp,call,Locked::~Locked
 ,LoadAddress,src/state/load_data.cpp,call,MapRegistered
 ,LoadAddress,src/state/load_data.cpp,field_read,Registered::native
 ,LoadAddress,src/state/load_data.cpp,function,
@@ -58280,6 +58281,7 @@ address,function,file,kind,target
 ,LoadAddress,src/state/load_data.cpp,global_read,s_registered
 ,LoadAddressIfLoadData,src/state/load_data.cpp,call,FindRegistered
 ,LoadAddressIfLoadData,src/state/load_data.cpp,call,LoadAddress
+,LoadAddressIfLoadData,src/state/load_data.cpp,call,Locked::~Locked
 ,LoadAddressIfLoadData,src/state/load_data.cpp,function,
 ,LoadAddressIfLoadData,src/state/load_data.cpp,global_read,s_region
 ,LoadAfter,src/harness/replay_objects.cpp,call,LoadEntries
@@ -58325,6 +58327,7 @@ address,function,file,kind,target
 ,LoadDataRegisterTable,src/state/load_data.cpp,function,
 ,LoadDataStoreByte,src/state/load_data.cpp,call,FindRegistered
 ,LoadDataStoreByte,src/state/load_data.cpp,call,HashBytes
+,LoadDataStoreByte,src/state/load_data.cpp,call,Locked::~Locked
 ,LoadDataStoreByte,src/state/load_data.cpp,deref_read,*Mapped
 ,LoadDataStoreByte,src/state/load_data.cpp,deref_write,*unsigned char
 ,LoadDataStoreByte,src/state/load_data.cpp,field_read,Mapped::linear
@@ -58338,17 +58341,20 @@ address,function,file,kind,target
 ,LoadDataStoreByte,src/state/load_data.cpp,global_read,s_region
 ,LoadDataStoreByte,src/state/load_data.cpp,global_read,s_registered
 ,LoadDataUnregister,src/state/load_data.cpp,call,FindRegistered
+,LoadDataUnregister,src/state/load_data.cpp,call,Locked::~Locked
 ,LoadDataUnregister,src/state/load_data.cpp,call,memmove
+,LoadDataUnregister,src/state/load_data.cpp,field_read,Mapped::linear
+,LoadDataUnregister,src/state/load_data.cpp,field_read,Mapped::live
 ,LoadDataUnregister,src/state/load_data.cpp,field_read,Registered::mapIndex
 ,LoadDataUnregister,src/state/load_data.cpp,field_read,Registered::native
 ,LoadDataUnregister,src/state/load_data.cpp,field_write,Mapped::live
 ,LoadDataUnregister,src/state/load_data.cpp,function,
-,LoadDataUnregister,src/state/load_data.cpp,global_read,s_live
+,LoadDataUnregister,src/state/load_data.cpp,global_read,s_base
 ,LoadDataUnregister,src/state/load_data.cpp,global_read,s_mapped
+,LoadDataUnregister,src/state/load_data.cpp,global_read,s_mappedCount
 ,LoadDataUnregister,src/state/load_data.cpp,global_read,s_registered
 ,LoadDataUnregister,src/state/load_data.cpp,global_read,s_registeredCount
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_bump
-,LoadDataUnregister,src/state/load_data.cpp,global_write,s_live
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_mappedCount
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_registeredCount
 ,LoadEntries,src/harness/replay_objects.cpp,call,operator new
@@ -58656,6 +58662,14 @@ address,function,file,kind,target
 ,LockPosts,src/host/win32/headless.cpp,global_maybe_written,g_postLock
 ,LockPosts,src/host/win32/headless.cpp,global_maybe_written,g_postLockClaims
 ,LockPosts,src/host/win32/headless.cpp,global_maybe_written,g_postLockReady
+,Locked::Locked,src/state/load_data.cpp,call,host_mutex_create
+,Locked::Locked,src/state/load_data.cpp,call,host_mutex_lock
+,Locked::Locked,src/state/load_data.cpp,function,
+,Locked::Locked,src/state/load_data.cpp,global_read,s_lock
+,Locked::Locked,src/state/load_data.cpp,global_write,s_lock
+,Locked::~Locked,src/state/load_data.cpp,call,host_mutex_unlock
+,Locked::~Locked,src/state/load_data.cpp,function,
+,Locked::~Locked,src/state/load_data.cpp,global_read,s_lock
 ,Lod,src/map/line_of_sight.cpp,call,LodRaw
 ,Lod,src/map/line_of_sight.cpp,function,
 ,LodRaw,src/map/line_of_sight.cpp,field_read,SightQuery::sightDistance
@@ -59117,14 +59131,12 @@ address,function,file,kind,target
 ,MapRegistered,src/state/load_data.cpp,global_maybe_written,s_mappedCapacity
 ,MapRegistered,src/state/load_data.cpp,global_read,s_base
 ,MapRegistered,src/state/load_data.cpp,global_read,s_bump
-,MapRegistered,src/state/load_data.cpp,global_read,s_live
 ,MapRegistered,src/state/load_data.cpp,global_read,s_mapped
 ,MapRegistered,src/state/load_data.cpp,global_read,s_mappedCount
 ,MapRegistered,src/state/load_data.cpp,global_read,s_region
 ,MapRegistered,src/state/load_data.cpp,global_read,s_registered
 ,MapRegistered,src/state/load_data.cpp,global_read,s_size
 ,MapRegistered,src/state/load_data.cpp,global_write,s_bump
-,MapRegistered,src/state/load_data.cpp,global_write,s_live
 ,MapRegistered,src/state/load_data.cpp,global_write,s_mappedCount
 ,MapSlot,src/harness/harness.cpp,deref_read,*unsigned int
 ,MapSlot,src/harness/harness.cpp,function,
@@ -67092,6 +67104,7 @@ address,function,file,kind,target
 ,RegionViewOf,src/harness/replay.cpp,global_read,s_sub
 ,RegionViewOf,src/harness/replay.cpp,global_write,s_regionView
 ,Register,src/state/load_data.cpp,call,Grow
+,Register,src/state/load_data.cpp,call,Locked::~Locked
 ,Register,src/state/load_data.cpp,call,memmove
 ,Register,src/state/load_data.cpp,deref_read,*Registered
 ,Register,src/state/load_data.cpp,field_read,Registered::native

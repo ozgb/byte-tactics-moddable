@@ -978,8 +978,9 @@ game,platform,call,host_memory_status,1
 game,platform,call,host_message,2
 game,platform,call,host_music_close,1
 game,platform,call,host_music_open,1
-game,platform,call,host_mutex_lock,1
-game,platform,call,host_mutex_unlock,1
+game,platform,call,host_mutex_create,1
+game,platform,call,host_mutex_lock,2
+game,platform,call,host_mutex_unlock,2
 game,platform,call,host_net_guarantee_packets,1
 game,platform,call,host_net_register_application,1
 game,platform,call,host_pump_events,1

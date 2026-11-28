@@ -322,7 +322,11 @@ their start and draws the list frame by frame, stepping them as each frame line'
 says. The frames are thus the oracle of the default rasteriser, and a host that draws in
 another way, at another size or with other colours, is judged on the display list alone.
 
-Every kind is in a stored list, except those left out.
+Every kind is in a stored list except three, which no stored list holds and so no frame judges:
+
+- `sprite_opaque`: drawn only by the map tiles, inside the terrain item's muted scope;
+- `lens`: needs a weapon with rendertype 2, and the stock data's only one (MINDGUN) is used by nothing;
+- `copy`: drawn only by GUI layers with a background copy, and in battle those are the options menus, which stop the ticks.
 
 When a digest differs in a scenario with no stored list for that frame, the check plays the
 reference build of the stored traces and the build under test with `-testdisplay <tick>` at

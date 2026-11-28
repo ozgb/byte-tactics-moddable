@@ -91,7 +91,7 @@ HOST_ERRORS = {
 }
 WINE_MISSING_REPLAYER = re.compile(r"^wine: cannot find .*" + re.escape(REPLAYER), re.M | re.I)
 WINE_FAULT = re.compile(r"^(?:wine: |wineserver: |wine client error)", re.M)
-RUNTIME_FAULT = re.compile(r"cannot load \S*wasmtime_host\.dll|wasmtime_host\.dll has no export ")
+RUNTIME_FAULT = re.compile(r"cannot load \S*wasmtime_host\.dll$|\S*wasmtime_host\.dll has no export \S+$")
 REPLAYER_STOP = re.compile(r"^FAIL: .*?\.wasm: (.*)$", re.M)
 FATAL_PENDING = re.compile(r"^\S+: wl_call returned with a fatal pending$", re.M)
 TRAP = re.compile(r"^\S+ trapped(?: at tick \d+| before the match)?: (.*)$", re.S)
@@ -101,7 +101,7 @@ GLUE_ERROR = re.compile(r"^slot \S+: |: the handle table is full")
 LOAD_REFUSALS = (
     ("compile", re.compile(r"\bmodule \S+: compile failed: ")),
     ("instantiate", re.compile(r"\bmodule \S+: instantiate failed: ")),
-    ("export", re.compile(r"\bmodule \S+: (?:no function export |no global export |export \S+ is not an i32 address)")),
+    ("export", re.compile(r"\bmodule \S+: (?:no function export |no global export |no memory export |export \S+ is not an i32 address)")),
     ("major", re.compile(r"\bmodule \S+: (?:built against interface |majors\.|the adapter for |\S+ \S+ of interface |import \S+ is adapted from major )")),
 )
 TRAP_CLASSES = (
@@ -193,7 +193,10 @@ def trap_class(text: str) -> str:
     """The class of a trap from the engine's text: a word of TRAP_CLASSES, or `trap` for any other."""
     if IMPORT_REFUSAL.match(text):
         return "import"
-    cause = text.rpartition("wasm trap: ")[2]
+    head, found, cause = text.rpartition("wasm trap: ")
+    if not found:
+        return "trap"
+    cause = cause.splitlines()[0] if cause else ""
     return next((name for name, pattern in TRAP_CLASSES if pattern.search(cause)), "trap")
 
 
@@ -225,7 +228,7 @@ def failure_reason(output: str, timed_out: bool = False) -> dict:
     if not stops:
         return {"reason": "unknown"}
     stop = output[stops[-1].start(1):].strip()
-    if RUNTIME_FAULT.search(stop):
+    if RUNTIME_FAULT.match(stop):
         return {"reason": "host-runtime"}
     found = stop_reason(stop)
     if found["reason"] == "unknown" and FATAL_PENDING.search(output):

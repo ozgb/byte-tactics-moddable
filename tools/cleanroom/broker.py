@@ -636,8 +636,8 @@ def filter_result(path, request_id, code, gate="oraclegate"):
         result = json.loads(Path(path).read_text())
         if not isinstance(result, dict):
             raise ValueError("not an object")
-    except (OSError, ValueError) as err:
-        return {"gate": gate, "id": request_id, "error": f"the gate wrote no usable result (exit {code}): {err}"}
+    except (OSError, ValueError):
+        return {"gate": gate, "id": request_id, "error": f"the gate wrote no usable result (exit {code})"}
     if "error" in result:
         reason = result.get("reason") if result.get("reason") in HOST_REASONS else "unknown"
         return {"gate": gate, "id": request_id, "error": HOST_REASONS.get(reason, "the gate stopped with an error"), "reason": reason}

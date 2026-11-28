@@ -76,11 +76,16 @@ class Suite(unittest.TestCase):
         self.assertEqual(suite["console-features"], {"status": "failed", "reason": "unknown", "digest": {"status": "not_judged"}, "view": {"status": "not_judged"}})
         self.assertEqual(oraclegate.verdict_of(suite, {}), "failed")
 
-    def test_a_scenario_whose_module_trapped_says_so(self):
-        report = f"scenarios failed to run:\nconsole-features: failed to run, playtest.py ended with:\n    wind_meteors trapped at tick 4: wasm trap: out of bounds memory access {REFERENCE_VALUE}\n"
+    def test_a_scenario_whose_module_trapped_says_so_without_the_cause(self):
+        report = ("EARLY console-features: ended at tick 3 of 300 (exit code 2), host said wine.log: wind_meteors trapped at tick 4: "
+                  f"error while executing at wasm backtrace: {REFERENCE_VALUE} [kept: build/scratch/x]\n")
         suite = oraclegate.parse_suite(report, 1, ["console-features"])
-        self.assertEqual((suite["console-features"]["reason"], suite["console-features"]["class"]), ("module-trap", "memory_access"))
+        self.assertEqual((suite["console-features"]["reason"], suite["console-features"]["class"]), ("module-trap", "trap"))
         self.assertNotIn(REFERENCE_VALUE, json.dumps(suite))
+
+    def test_a_scenario_tail_without_a_stop_message_is_unknown(self):
+        report = "scenarios failed to run:\nconsole-features: failed to run, playtest.py ended with:\n    the game exited with code 2\n    logs and screenshots: x/\n"
+        self.assertEqual(oraclegate.parse_suite(report, 1, ["console-features"])["console-features"]["reason"], "unknown")
 
     def test_a_scenario_that_ended_early_names_its_reason(self):
         report = ("EARLY console-features: ended at tick 3 of 300 (exit code 2), host said wine.log: wind_meteors ran out of fuel at tick 4: "
@@ -307,6 +312,12 @@ REASONS = {
     "module-trap, handles": (BANNER + STOP + "wind_meteors: the handle table is full\n", 2, {"reason": "module-trap", "class": "glue"}),
     "module-trap, fatal": (BANNER + "wind_meteors: wl_call returned with a fatal pending\n" + STOP + f"{REPLAY_SECRET} is not a weapon\n", 2,
                            {"reason": "module-trap", "class": "fatal"}),
+    "module-trap, a cut backtrace": (BANNER + STOP + "wind_meteors trapped: " + (BACKTRACE.split("\n\nCaused by")[0] + "\n") +
+                                     "".join(f"    {n}:  0x{n:x} - wind_meteors.wasm!stack_push_unreachable_{n}\n" for n in range(1, 9))[:300], 2,
+                                     {"reason": "module-trap", "class": "trap"}),
+    "module-load, memory export": (BANNER + STOP + "module wind_meteors: no memory export memory\n", 2, {"reason": "module-load", "class": "export"}),
+    "module-trap, a fatal naming the DLL": (BANNER + "wind_meteors: wl_call returned with a fatal pending\n" + STOP + "cannot load wasmtime_host.dll, said the module\n", 2,
+                                        {"reason": "module-trap", "class": "fatal"}),
     "unknown, a crash": (BANNER + "wine: Unhandled page fault on read access to 00000000\n", 3, {"reason": "unknown"}),
     "unknown, a replayer stop": (BANNER + STOP + "the manifest has no fuel_budget\n", 2, {"reason": "unknown"}),
 }

@@ -1048,6 +1048,7 @@ class RealGateTests(unittest.TestCase):
         text = (self.session / "inbox" / "r2.json").read_text()
         self.assertIn("error", json.loads(text))
         self.assertNotIn("REFERENCE-VALUES", text)
+        self.assertEqual(json.loads(text)["error"], "the gate wrote no usable result (exit 3)")
 
     def test_timeout_is_an_error(self):
         sleeper = Path(self.tmp.name) / "sleep.py"

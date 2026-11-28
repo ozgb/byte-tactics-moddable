@@ -1065,7 +1065,10 @@ The recordings route names the replay rules it judged under in `rules`:
 | `reason`, `class` | in a scenario or recording whose `status` is `failed`: why it did not run to its end, below |
 
 A `status` is `equal`, `differs`, `failed` (the scenario did not run to its end) or `not_judged` (the run stopped at the first
-divergence before this scenario was reported).
+divergence before this scenario was reported). Only the first divergence of a run carries `phase`, `field` and `value` for a
+scenario: the others have their `tick`. A `value` is what the module produced; the reference's value, its memory and anything of
+the build other than the names of the traced fields are never in the file. The raw reports are kept in `DIR/logs/` for the host
+and are not part of the result.
 
 **Why a run failed.** A `failed` scenario or recording has a `reason`, one word of a closed set that says whose fault it is.
 It is parsed from the run's output, and no text of the output (no message of wine, the replayer, the engine or the module, and
@@ -1075,23 +1078,27 @@ no source name) is in the result.
 | --- | --- | --- |
 | `host-runtime` | the host's | wine did not start the program (its prefix does not load, say), or the replayer could not load `wasmtime_host.dll` |
 | `host-replayer` | the host's | wine found no `replay_native_test.exe` |
-| `host-timeout` | the host's | the run did not end in its time: the replayer's hour, or a scenario's timeout |
+| `host-timeout` | usually the host's (a module that stalls in native code also times out) | the run did not end in its time: the replayer's hour, or a scenario's timeout |
 | `module-load` | the module's | the loader refused the module (section 5.2); `class` is `compile`, `instantiate`, `export` or `major` (an interface-major refusal, section 10), the classes of `docs/core-gate.md`, "loader and fuel" |
 | `module-trap` | the module's | the module trapped or was stopped (section 13); `class` is `unreachable`, `memory_access`, `divide`, `table`, `stack` or `trap` (any other engine trap) for an engine trap, `out_of_fuel`, `import` (an import's refusal), `glue` (a glue error or a full handle table) or `fatal` (the module called `FatalError`) |
 | `unknown` | either | anything else: a crash of the process, a stop of the replayer that is none of the above, or a run that ended without a verdict |
 
 Only `module-load` and `module-trap` have a `class`. A module that traps on a recording gets `failed` with `reason:
-module-trap` and the trap's `class`; on the scenario route the same words come from the game's stop message (section 13)
-where `tools/reference.py` reports it, and are `unknown` where it does not.
+module-trap` and the trap's `class`. The class of an engine trap is read from the engine's cause line (`wasm trap: ...`),
+which comes after the backtrace; the loader keeps the first 400 characters of the message, so when a long backtrace cuts the
+cause off the class is `trap`, never a guess from the frames.
+
+On the scenario route the reason comes from the first line of the game's stop message (section 13), the one line
+`tools/reference.py` quotes for a run that ended early, or from the last lines of a run that failed to start. That line names
+`out_of_fuel`, `import` and `glue`, but an engine trap's cause is on a later line, so its class there is `trap`, and a run whose
+quoted lines hold no stop message is `unknown`. The recordings route gives the full class.
 
 **An error of the host.** When the host check of the recordings route fails, the run writes `DIR/result.json` with only
 `format`, `subsystem`, `reason` (`host-runtime` or `host-replayer`) and `error`, a fixed sentence for the reason that says the
 fault is the host's, and exits 2. The clean room's broker answers such a result with an `error` and its `reason`, never
 a verdict, and passes on no other text: an `error` result whose `reason` is not one of those two is answered with
-`reason: unknown`. The broker's own timeout is an `error` with `reason: host-timeout`. Only the first divergence of a run carries `phase`, `field` and `value` for a
-scenario: the others have their `tick`. A `value` is what the module produced; the reference's value, its memory and anything of
-the build other than the names of the traced fields are never in the file. The raw reports are kept in `DIR/logs/` for the host
-and are not part of the result.
+`reason: unknown`. The broker's own timeout is an `error` with `reason: host-timeout`. Any other run that writes no usable
+result is an `error` that names only the gate's exit status.
 
 A module that is equal on `state` and differs on `digest` kept the end-of-tick contract with another order of work inside the
 tick: the state at the end of each tick is 3.1c's, and some phase row in between is not. Format 1 had no `digest` and judged

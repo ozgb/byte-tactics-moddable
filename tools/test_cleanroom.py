@@ -29,6 +29,8 @@ import launch as ln
 import manifest as mf
 import proxy as px
 
+import oraclegate as og
+
 
 class AllowlistTests(unittest.TestCase):
     def test_comments_blanks_and_default_port(self):
@@ -1053,7 +1055,34 @@ class RealGateTests(unittest.TestCase):
         self.request("r3", "x")
         gate = bk.make_gate(self.session, [sys.executable, str(sleeper)], timeout=1)
         bk.process_mailbox(self.session, gate)
-        self.assertIn("timed out", json.loads((self.session / "inbox" / "r3.json").read_text())["error"])
+        answer = json.loads((self.session / "inbox" / "r3.json").read_text())
+        self.assertIn("timed out", answer["error"])
+        self.assertEqual(answer["reason"], "host-timeout")
+
+    def test_a_host_fault_crosses_as_an_error_naming_the_host(self):
+        script = Path(self.tmp.name) / "host_fault.py"
+        script.write_text(
+            "import json, sys\nfrom pathlib import Path\n"
+            "out = Path(sys.argv[sys.argv.index('--out') + 1])\n"
+            "(out / 'result.json').write_text(json.dumps({'format': 4, 'subsystem': 'x', 'reason': 'host-runtime',"
+            " 'error': 'wine: could not load kernel32.dll in /home/HOST-PATH', 'extra': 'LOG-ONLY-TEXT'}))\n"
+            "sys.exit(2)\n")
+        self.request("rf", "x")
+        bk.process_mailbox(self.session, bk.make_gate(self.session, [sys.executable, str(script)]))
+        text = (self.session / "inbox" / "rf.json").read_text()
+        self.assertEqual(json.loads(text), {"gate": "oraclegate", "id": "rf", "reason": "host-runtime", "error": bk.HOST_REASONS["host-runtime"]})
+        for secret in ("HOST-PATH", "LOG-ONLY-TEXT"):
+            self.assertNotIn(secret, text)
+
+    def test_an_error_with_another_reason_is_unknown(self):
+        path = Path(self.tmp.name) / "r.json"
+        path.write_text(json.dumps({"error": "/home/HOST-PATH", "reason": "free text"}))
+        result = bk.filter_result(path, "i", 2)
+        self.assertEqual(result["reason"], "unknown")
+        self.assertNotIn("HOST-PATH", json.dumps(result))
+
+    def test_the_host_reasons_are_oraclegates(self):
+        self.assertEqual(bk.HOST_REASONS, og.HOST_ERRORS)
 
     def test_filter_refuses_symlinks_non_objects_and_big_files(self):
         d = Path(self.tmp.name)

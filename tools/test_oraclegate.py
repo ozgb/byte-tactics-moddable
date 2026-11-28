@@ -3,10 +3,13 @@
     uv run tools/test_oraclegate.py
 """
 
+import contextlib
+import io
 import json
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest import mock
@@ -70,8 +73,21 @@ class Suite(unittest.TestCase):
     def test_a_scenario_that_failed_to_run(self):
         report = "scenarios failed to run:\nconsole-features: failed to run, playtest.py ended with:\n    the game exited with code 2\n"
         suite = oraclegate.parse_suite(report, 1, ["console-features"])
-        self.assertEqual(suite["console-features"], {"status": "failed", "digest": {"status": "not_judged"}, "view": {"status": "not_judged"}})
+        self.assertEqual(suite["console-features"], {"status": "failed", "reason": "unknown", "digest": {"status": "not_judged"}, "view": {"status": "not_judged"}})
         self.assertEqual(oraclegate.verdict_of(suite, {}), "failed")
+
+    def test_a_scenario_whose_module_trapped_says_so(self):
+        report = f"scenarios failed to run:\nconsole-features: failed to run, playtest.py ended with:\n    wind_meteors trapped at tick 4: wasm trap: out of bounds memory access {REFERENCE_VALUE}\n"
+        suite = oraclegate.parse_suite(report, 1, ["console-features"])
+        self.assertEqual((suite["console-features"]["reason"], suite["console-features"]["class"]), ("module-trap", "memory_access"))
+        self.assertNotIn(REFERENCE_VALUE, json.dumps(suite))
+
+    def test_a_scenario_that_ended_early_names_its_reason(self):
+        report = ("EARLY console-features: ended at tick 3 of 300 (exit code 2), host said wine.log: wind_meteors ran out of fuel at tick 4: "
+                  "it burned more than its fuel_budget of 9 in one tick [kept: build/scratch/x]\nEARLY allied-victory: ended at tick 9 of 900 (timeout)\n")
+        suite = oraclegate.parse_suite(report, 1, ["console-features", "allied-victory"])
+        self.assertEqual({k: suite["console-features"][k] for k in ("status", "reason", "class")}, {"status": "failed", "reason": "module-trap", "class": "out_of_fuel"})
+        self.assertEqual(suite["allied-victory"]["reason"], "host-timeout")
 
     def test_other_checks_failing_is_not_equal(self):
         suite = oraclegate.parse_suite("ok   a (10 ticks, 0:01)\n", 1, ["a"])
@@ -252,14 +268,137 @@ class ReplayReport(unittest.TestCase):
 
     def test_a_fatal_stop_is_failed_with_no_text(self):
         report = f"FAIL: tests/replay/wind_meteors/a.txt: call 3: a slot with no runner: {REPLAY_SECRET}\n"
-        self.assertEqual(oraclegate.parse_replay(report, 2), {"status": "failed"})
+        self.assertEqual(oraclegate.parse_replay(report, 2), {"status": "failed", "reason": "unknown"})
 
     def test_an_identical_line_with_a_failing_exit_is_failed(self):
-        self.assertEqual(oraclegate.parse_replay("FAIL: replaying twice gives the same result\n" + REPLAY_EQUAL, 1), {"status": "failed"})
+        self.assertEqual(oraclegate.parse_replay("FAIL: replaying twice gives the same result\n" + REPLAY_EQUAL, 1), {"status": "failed", "reason": "unknown"})
 
     def test_a_key_with_odd_characters_is_dropped(self):
         found = oraclegate.parse_replay(REPLAY_DIVERGED.replace("SimGlobals.g_meteorScheduleGap", "a: b = c d e"), 1)
         self.assertIsNone(found["field"])
+
+
+BANNER = "replaying against the WASM module Z:\\out\\runtime\\wind_meteors.wasm\n"
+STOP = "FAIL: Z:\\out\\runtime\\wind_meteors.wasm: "
+BACKTRACE = f"error while executing at wasm backtrace:\n    0:  0x1a2b - stack_{REPLAY_SECRET}\n\nCaused by:\n    wasm trap: "
+REASONS = {
+    "host-runtime, kernel32": ("wine: could not load kernel32.dll, status c0000135\n", 1, {"reason": "host-runtime"}),
+    "host-runtime, the DLL": (BANNER + STOP + "cannot load Z:\\out\\runtime\\wasmtime_host.dll\n", 2, {"reason": "host-runtime"}),
+    "host-replayer": ('wine: cannot find L"Z:\\build\\replay_native_test.exe"\n', 1, {"reason": "host-replayer"}),
+    "module-load, compile": (BANNER + STOP + f"module wind_meteors: compile failed: {REPLAY_SECRET}\n", 2, {"reason": "module-load", "class": "compile"}),
+    "module-load, instantiate": (BANNER + STOP + "module wind_meteors: instantiate failed: unknown import: `env::x` has not been defined\n", 2,
+                                 {"reason": "module-load", "class": "instantiate"}),
+    "module-load, export": (BANNER + STOP + "module wind_meteors: no function export UpdateWind\n", 2, {"reason": "module-load", "class": "export"}),
+    "module-load, major": (BANNER + STOP + "module wind_meteors: built against interface wind_meteors major 2, the manifest has 1\n", 2,
+                           {"reason": "module-load", "class": "major"}),
+    "module-trap, unreachable": (BANNER + STOP + "wind_meteors trapped: " + BACKTRACE + "wasm `unreachable` instruction executed\n", 2,
+                                 {"reason": "module-trap", "class": "unreachable"}),
+    "module-trap, memory": (BANNER + STOP + "wind_meteors trapped: " + BACKTRACE + "out of bounds memory access\n", 2, {"reason": "module-trap", "class": "memory_access"}),
+    "module-trap, divide": (BANNER + STOP + "wind_meteors trapped: " + BACKTRACE + "integer divide by zero\n", 2, {"reason": "module-trap", "class": "divide"}),
+    "module-trap, table": (BANNER + STOP + "wind_meteors trapped: " + BACKTRACE + "uninitialized element\n", 2, {"reason": "module-trap", "class": "table"}),
+    "module-trap, stack": (BANNER + STOP + "wind_meteors trapped: " + BACKTRACE + "call stack exhausted\n", 2, {"reason": "module-trap", "class": "stack"}),
+    "module-trap, other": (BANNER + STOP + "wind_meteors trapped: " + BACKTRACE + "something new\n", 2, {"reason": "module-trap", "class": "trap"}),
+    "module-trap, fuel": (BANNER + STOP + "wind_meteors ran out of fuel: it burned more than its fuel_budget of 9 in one tick\n", 2,
+                          {"reason": "module-trap", "class": "out_of_fuel"}),
+    "module-trap, import": (BANNER + STOP + "import SimFree: the pointer is outside the sim block\n", 2, {"reason": "module-trap", "class": "import"}),
+    "module-trap, trapped import": (BANNER + STOP + "wind_meteors trapped: import Emit: the kind is not in the module's publishes table\n", 2,
+                                    {"reason": "module-trap", "class": "import"}),
+    "module-trap, glue": (BANNER + STOP + "slot UpdateWind: the argument does not fit the scratch area\n", 2, {"reason": "module-trap", "class": "glue"}),
+    "module-trap, handles": (BANNER + STOP + "wind_meteors: the handle table is full\n", 2, {"reason": "module-trap", "class": "glue"}),
+    "module-trap, fatal": (BANNER + "wind_meteors: wl_call returned with a fatal pending\n" + STOP + f"{REPLAY_SECRET} is not a weapon\n", 2,
+                           {"reason": "module-trap", "class": "fatal"}),
+    "unknown, a crash": (BANNER + "wine: Unhandled page fault on read access to 00000000\n", 3, {"reason": "unknown"}),
+    "unknown, a replayer stop": (BANNER + STOP + "the manifest has no fuel_budget\n", 2, {"reason": "unknown"}),
+}
+
+
+class FailureReason(unittest.TestCase):
+    def test_each_reason(self):
+        for name, (output, code, want) in REASONS.items():
+            with self.subTest(name):
+                found = oraclegate.parse_replay(output, code)
+                self.assertEqual(found, {"status": "failed", **want})
+                self.assertEqual(oraclegate.parse_replay(output.replace("\n", "\r\n"), code), found)
+
+    def test_a_timeout_is_the_hosts(self):
+        self.assertEqual(oraclegate.parse_replay(BANNER, None), {"status": "failed", "reason": "host-timeout"})
+
+    def test_the_reasons_are_a_closed_set_and_name_no_text(self):
+        reasons = {"host-runtime", "host-replayer", "host-timeout", "module-load", "module-trap", "unknown"}
+        classes = {"compile", "instantiate", "export", "major", "unreachable", "memory_access", "divide", "table", "stack", "out_of_fuel", "import",
+                   "glue", "fatal", "trap"}
+        for name, (output, code, _) in REASONS.items():
+            found = oraclegate.parse_replay(output, code)
+            self.assertIn(found["reason"], reasons)
+            self.assertIn(found.get("class", "trap"), classes)
+            self.assertNotIn(REPLAY_SECRET, json.dumps(found))
+            self.assertLessEqual(set(found), {"status", "reason", "class"})
+
+    def test_the_summary_names_the_reason(self):
+        recordings = {"wind_meteors/a": oraclegate.parse_replay(*REASONS["module-trap, unreachable"][:2])}
+        with tempfile.TemporaryDirectory() as tmp:
+            module = Path(tmp) / "m.wasm"
+            module.write_bytes(b"\0asm\1\0\0\0")
+            result = oraclegate.build_recordings_result("wind_meteors", module, {}, recordings, None, 3)
+        self.assertEqual(oraclegate.summary(result).splitlines()[1], "  wind_meteors/a: failed (module-trap, unreachable)")
+
+
+class Preflight(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.build = Path(self.tmp.name)
+        for name in ("wasmtime_host.dll", oraclegate.REPLAYER):
+            (self.build / name).write_text("x")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_with(self, stdout="", stderr="", code=2, raises=None):
+        def fake(cmd, **kw):
+            self.assertEqual(cmd, ["wine", str(self.build / oraclegate.REPLAYER)])
+            if raises:
+                raise raises
+            return subprocess.CompletedProcess(cmd, code, stdout, stderr)
+        with mock.patch.object(oraclegate.subprocess, "run", side_effect=fake):
+            oraclegate.preflight(self.build)
+
+    def assertFault(self, reason, **kw):
+        with self.assertRaises(oraclegate.HostFault) as caught:
+            self.run_with(**kw)
+        self.assertEqual(caught.exception.reason, reason)
+
+    def test_the_usage_line_passes(self):
+        self.run_with("usage: replay_native_test [--wasm MODULE.wasm]\r\n")
+
+    def test_a_broken_prefix_is_the_runtimes(self):
+        self.assertFault("host-runtime", stderr="wine: could not load kernel32.dll, status c0000135\n", code=1)
+
+    def test_no_wine_is_the_runtimes(self):
+        self.assertFault("host-runtime", raises=FileNotFoundError("wine"))
+
+    def test_a_hung_wine_is_the_runtimes(self):
+        self.assertFault("host-runtime", raises=subprocess.TimeoutExpired("wine", 1))
+
+    def test_a_missing_replayer_is_the_replayers(self):
+        (self.build / oraclegate.REPLAYER).unlink()
+        self.assertFault("host-replayer")
+
+    def test_a_missing_dll_is_the_runtimes(self):
+        (self.build / "wasmtime_host.dll").unlink()
+        self.assertFault("host-runtime")
+
+    def test_a_host_fault_writes_an_error_result(self):
+        out = self.build / "out"
+        argv = ["oraclegate.py", str(self.build / "wasmtime_host.dll"), "--subsystem", "wind_meteors", "--recordings-only", "--out", str(out),
+                "--build-dir", str(self.build)]
+        fault = oraclegate.HostFault("host-runtime", f"wine: could not load kernel32.dll in {self.build}")
+        with mock.patch.object(sys, "argv", argv), mock.patch.object(oraclegate, "judge_recordings", side_effect=fault), \
+                contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(oraclegate.main(), 2)
+        result = json.loads((out / "result.json").read_text())
+        self.assertEqual(result, {"format": oraclegate.FORMAT, "subsystem": "wind_meteors", "reason": "host-runtime",
+                                  "error": oraclegate.HOST_ERRORS["host-runtime"]})
+        self.assertNotIn(str(self.build), json.dumps(result))
 
 
 class RecordingsRoute(unittest.TestCase):
@@ -330,6 +469,8 @@ class BlockedEntry(unittest.TestCase):
 
     def fake_run(self, cmd, **kw):
         self.calls.append(cmd)
+        if cmd[0] == "wine" and len(cmd) == 2:
+            return subprocess.CompletedProcess(cmd, 2, "usage: replay_native_test\n", "")
         if cmd[0] == "wine":
             kw["stdout"].write(f"{cmd[-1]}: 10 calls, 3 imports, identical on a second run\nreplay_native_test: all passed\n")
             return subprocess.CompletedProcess(cmd, 0)
@@ -347,7 +488,7 @@ class BlockedEntry(unittest.TestCase):
         self.assertEqual((result["scope"], result["scenarios"], result["budgets"], result["verdict"]), ("recordings", "not_judged", "not_judged", "equal"))
         self.assertEqual(sorted(result["recordings"]), [f"wind_meteors/{p.stem}" for p in oraclegate.recording_files("wind_meteors")])
         self.assertEqual(oraclegate.summary(result), "equal on recordings; scenarios not judged; budgets not judged (0 not equal)")
-        replays = [c for c in self.calls if c[0] == "wine"]
+        replays = [c for c in self.calls if c[0] == "wine" and len(c) > 2]
         self.assertTrue(replays and all("--no-budgets" in c for c in replays))
         check = next(c for c in self.calls if "check-module" in c)
         self.assertEqual(check[check.index("--manifest") + 1], str(self.manifest))

@@ -2050,6 +2050,7 @@ the entry (`economy.wasm`, or `wind_meteors_inject.wasm` for wind_meteors), the 
 the recording's subsystem must be the same one. The engine slots of the entry (`engine`) are the native ones. A module's `Emit` is compared with the
 recording's `services.Emit` or `services.SchedPublish` line, whichever the subsystem's native default makes: an `Emit`
 line by the effect's fields and its size, a `SchedPublish` line by the outbox and the size, since it carries no payload. Each replay of a file loads the module afresh, so the two
-runs of a file start from the same state. A trap or a fuel overrun stops the run with `FAIL`.
+runs of a file start from the same state. A trap or a fuel overrun stops the run with `FAIL: <module file>: ` and
+`<module> trapped: <engine text>` or `<module> ran out of fuel: it burned more than its fuel_budget of <budget> in one tick`.
 `wind_meteors_inject.wasm` is the module built with the gap-scale injection of 31.0 (`wasm_modules.py build-variant`),
 and the divergence is reported at the same call and field as for the native one.

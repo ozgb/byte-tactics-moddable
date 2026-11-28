@@ -122,6 +122,10 @@ command by `--secret-env` and never written to disk (see Credentials).
   directory outside the mailbox, with a timeout (`--gate-timeout`, default four hours). It copies only
   `out/result.json` to `SESSION/inbox/ID.json`: the reports in `out/logs/` and the runtime stay on the host, and a
   run that writes no usable result (or one over 1 MiB, or not a JSON object) answers with an `error` and no log text.
+  A result that is an error of the host (`docs/module-abi.md` section 15, "An error of the host": the replayer is missing or
+  wine can't start it) answers with an `error` and a `reason` (`host-runtime` or `host-replayer`) and no other text, and the
+  gate's timeout with an `error` and `reason: host-timeout`; a recording that failed to run has its own `reason` in the
+  result, which says whether the fault is the host's or the module's.
   The result is the one of `docs/module-abi.md` section 15: `verdict` `equal` when every scenario and recording is
   equal.
   A core request is `/srv/outbox/ID/core` (an x86_64 Linux executable), `/srv/outbox/ID/module.wasm` (its
@@ -206,7 +210,7 @@ Run these on the host, from a worktree of this repository, with `build/modern` b
 `~/.ta` as `--game-dir`). Do not set `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` in the shell.
 
 ```sh
-export UV_PYTHON=/usr/bin/python3.14 WINEARCH=win64 WINEDEBUG=-all
+export UV_PYTHON=/usr/bin/python3.14 WINEARCH=win64 WINEDEBUG=-all WINEPREFIX=$PWD/build/scratch/cleanroom-wine
 unset DISPLAY WAYLAND_DISPLAY
 D=build/scratch/cleanroom-first
 # 1. the image (once)
@@ -218,6 +222,10 @@ git clone https://github.com/ozgb/btm.git $D/tree
 uv run tools/cleanroom/launch.py --tree $D/tree --datakit $D/datakit --session $D/session \
     --image build/scratch/cleanroom-image/cleanroom.smolmachine --game-dir ~/.ta -- COMMAND
 ```
+
+Run the broker, and so the gate, in its own `WINEPREFIX` (as above): the recordings route runs `wine` in the broker's
+environment, and a broken default `~/.wine` (`wine: could not load kernel32.dll`) failed every recording of #1191's run. With
+the host check of `oraclegate.py` such a prefix is now an `error` with `reason: host-runtime`, not a `failed` verdict.
 
 The real gate needs `--game-dir` when the game is not in a Steam or GOG default place; without it the gate fails with
 "no Total Annihilation install found". `launch.py` forwards it to `broker.py --game-dir`.

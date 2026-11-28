@@ -12,6 +12,7 @@ call 4090 UpdateMotion
   r Unit#1.spatialBucket SpatialBucket#60
   r Unit#1.transportPiece 255
   r Unit#1.heading 8295
+  r Unit#1.pitch 0
   r Unit#1.list Order#1
   r Unit#1.flags 0x90e00321
   r Unit#1.carrier null
@@ -63,6 +64,7 @@ call 4090 UpdateMotion
   r Unit#3.spatialBucket SpatialBucket#90
   r Unit#3.transportPiece 255
   r Unit#3.heading -22428
+  r Unit#3.pitch 0
   r Unit#3.list Order#2
   r Unit#3.flags 0x10242326
   r Unit#3.carrier null
@@ -134,6 +136,7 @@ call 4090 UpdateMotion
   r Unit#4.spatialBucket SpatialBucket#61
   r Unit#4.transportPiece 255
   r Unit#4.heading -3144
+  r Unit#4.pitch 0
   r Unit#4.list Order#3
   r Unit#4.flags 0x10e42326
   r Unit#4.carrier null
@@ -215,6 +218,7 @@ call 4090 UpdateMotion
   r Unit#5.spatialBucket SpatialBucket#63
   r Unit#5.transportPiece 255
   r Unit#5.heading 27720
+  r Unit#5.pitch 0
   r Unit#5.list Order#4
   r Unit#5.flags 0x9024232a
   r Unit#5.carrier null
@@ -292,6 +296,7 @@ call 4090 UpdateMotion
   r Unit#6.spatialBucket SpatialBucket#61
   r Unit#6.transportPiece 1
   r Unit#6.heading -7598
+  r Unit#6.pitch 0
   r Unit#6.list Order#5
   r Unit#6.flags 0x90242321
   r Unit#6.carrier Unit#2
@@ -309,6 +314,7 @@ call 4090 UpdateMotion
   r Unit#2.spatialBucket SpatialBucket#61
   r Unit#2.transportPiece 255
   r Unit#2.heading -32768
+  r Unit#2.pitch 0
   r Unit#2.list Order#6
   r Unit#2.flags 0x3ce42321
   r Unit#2.carrier null
@@ -379,6 +385,7 @@ call 4090 UpdateMotion
   r Unit#251.spatialBucket SpatialBucket#247
   r Unit#251.transportPiece 255
   r Unit#251.heading -24575
+  r Unit#251.pitch 0
   r Unit#251.list Order#7
   r Unit#251.flags 0x90e40025
   r Unit#251.carrier null

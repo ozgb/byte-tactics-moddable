@@ -160,7 +160,7 @@ ATTACKED_SPEECH, MARK_DAMAGED).
 | CREATE 395 | `UnitsCreate` | `player` (a byte), `type` (16 bits), `pos[3]` (world coordinates, 16 fractional bits); names no unit; outcome 1 when a unit was made, 0 when none was |
 | KILL_ALL 396 | the header alone | none; names no unit |
 | RELOAD_TYPE 397 | `UnitsReloadType` | `type`: every unit of it is killed, then its definition is loaded again; names no unit; the only change to load-time data during play (section 5) |
-| FORGET_ATTACKER 398 | the header alone | the unit: sets `lastAttackerSlot` to 10, the `Unit` flags bit 0x4000 (`panel.flag_110`, the panel refresh) and `attacker` to 0; outcome 1, 0 for a null unit |
+| FORGET_ATTACKER 398 | the header alone | the unit: sets `lastAttackerSlot` to 10, the `Unit` flags bit 0x4000 (`panel.flag_110`, the dying flag) and `attacker` to 0; outcome 1, 0 for a null unit |
 
 ## 3. Effects out of units
 

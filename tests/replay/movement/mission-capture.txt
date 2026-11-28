@@ -1,0 +1,4554 @@
+bt-replay 2
+subsystem movement 5.0
+call 122 UpdateMotion
+  r Game.seaLevel 73
+  r Game.width_142a3 30
+  r Game.height_142a7 50
+  r Game.overflowBucket OverflowBucket#1
+  r Game.gravity 8155
+  r Unit#1.cell (107,62)
+  r Unit#1.footprint (3,3)
+  r Unit#1.id 1
+  r Unit#1.spatialBucket SpatialBucket#223
+  r Unit#1.transportPiece 255
+  r Unit#1.heading -30948
+  r Unit#1.pitch 217
+  r Unit#1.list Order#1
+  r Unit#1.flags 0x90240321
+  r Unit#1.carrier null
+  r Unit#1.def UnitDef#54
+  r Unit#1.player Player#0
+  r Unit#1.motion UnitMotion#1
+  r Unit#1.posX 113246208
+  r Unit#1.posY 7143424
+  r Unit#1.posZ 66060288
+  r SpatialBucket#223.bytes x:797b00000000
+  r Order#1.flags_42 147456
+  r Order#1.unit Unit#1
+  r UnitDef#54.draft 0
+  r UnitDef#54.flags1 0x00818089
+  r UnitDef#54.maxvelocity 78643
+  r UnitDef#54.altitude 0
+  r UnitDef#54.brakerate 1769
+  r UnitDef#54.acceleration 983
+  r UnitDef#54.bankscale 65536
+  r UnitDef#54.pitchscale 0
+  r UnitDef#54.moverate1 157286
+  r UnitDef#54.moverate2 157286
+  r UnitDef#54.turnrate 430
+  r Player#0.active 1
+  r Player#0.type 1
+  r UnitMotion#1.obj AiSearchGoal#1
+  r UnitMotion#1.velocityX 0
+  r UnitMotion#1.velocityY 0
+  r UnitMotion#1.velocityZ 0
+  r UnitMotion#1.speed 0
+  r UnitMotion#1.flags 1
+  r UnitMotion#1.turn 0
+  r UnitMotion#1.lastMoveTick 0
+  r UnitMotion#1.p2X 0
+  r UnitMotion#1.p2Y 0
+  r UnitMotion#1.p2Z 0
+  r AiSearchGoal#1.target null
+  r AiSearchGoal#1.owner Unit#1
+  r AiSearchGoal#1.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#1.count 0
+  r AiSearchGoal#1.repathClaimTick 0
+  r AiSearchGoal#1.flags 8
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#2.cell (109,58)
+  r Unit#2.footprint (3,3)
+  r Unit#2.id 2
+  r Unit#2.spatialBucket SpatialBucket#223
+  r Unit#2.transportPiece 255
+  r Unit#2.heading 30947
+  r Unit#2.pitch 3356
+  r Unit#2.list Order#2
+  r Unit#2.flags 0x90240321
+  r Unit#2.carrier null
+  r Unit#2.def UnitDef#53
+  r Unit#2.player Player#0
+  r Unit#2.motion UnitMotion#2
+  r Unit#2.posX 115343360
+  r Unit#2.posY 6946816
+  r Unit#2.posZ 61865984
+  r Order#2.flags_42 147456
+  r Order#2.unit Unit#2
+  r UnitDef#53.draft 0
+  r UnitDef#53.flags1 0x00818089
+  r UnitDef#53.maxvelocity 65536
+  r UnitDef#53.altitude 0
+  r UnitDef#53.brakerate 655
+  r UnitDef#53.acceleration 655
+  r UnitDef#53.bankscale 65536
+  r UnitDef#53.pitchscale 0
+  r UnitDef#53.moverate1 131072
+  r UnitDef#53.moverate2 131072
+  r UnitDef#53.turnrate 350
+  r UnitMotion#2.obj AiSearchGoal#2
+  r UnitMotion#2.velocityX 0
+  r UnitMotion#2.velocityY 0
+  r UnitMotion#2.velocityZ 0
+  r UnitMotion#2.speed 0
+  r UnitMotion#2.flags 1
+  r UnitMotion#2.turn 0
+  r UnitMotion#2.lastMoveTick 0
+  r UnitMotion#2.p2X 0
+  r UnitMotion#2.p2Y 0
+  r UnitMotion#2.p2Z 0
+  r AiSearchGoal#2.target null
+  r AiSearchGoal#2.owner Unit#2
+  r AiSearchGoal#2.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#2.count 0
+  r AiSearchGoal#2.repathClaimTick 0
+  r AiSearchGoal#2.flags 8
+  a unit Unit#2
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#3.cell (106,75)
+  r Unit#3.footprint (2,2)
+  r Unit#3.id 3
+  r Unit#3.spatialBucket SpatialBucket#283
+  r Unit#3.transportPiece 255
+  r Unit#3.heading -28132
+  r Unit#3.pitch 0
+  r Unit#3.list Order#3
+  r Unit#3.flags 0x90e00321
+  r Unit#3.carrier null
+  r Unit#3.def UnitDef#23
+  r Unit#3.player Player#0
+  r Unit#3.motion UnitMotion#3
+  r Unit#3.posX 112001803
+  r Unit#3.posY 6225920
+  r Unit#3.posZ 79281724
+  r SpatialBucket#283.bytes x:757b00000000
+  r Order#3.flags_42 4198913
+  r Order#3.unit Unit#3
+  r UnitDef#23.draft 0
+  r UnitDef#23.flags1 0x0495c0c8
+  r UnitDef#23.maxvelocity 78643
+  r UnitDef#23.altitude 0
+  r UnitDef#23.brakerate 19660
+  r UnitDef#23.acceleration 9830
+  r UnitDef#23.bankscale 65536
+  r UnitDef#23.pitchscale 0
+  r UnitDef#23.moverate1 157286
+  r UnitDef#23.moverate2 157286
+  r UnitDef#23.turnrate 1044
+  r UnitMotion#3.obj AiSearchGoal#3
+  r UnitMotion#3.velocityX 0
+  r UnitMotion#3.velocityY 0
+  r UnitMotion#3.velocityZ 0
+  r UnitMotion#3.speed 0
+  r UnitMotion#3.flags 1
+  r UnitMotion#3.turn 0
+  r UnitMotion#3.lastMoveTick 69
+  r UnitMotion#3.p2X 0
+  r UnitMotion#3.p2Y 0
+  r UnitMotion#3.p2Z 0
+  r AiSearchGoal#3.target null
+  r AiSearchGoal#3.owner Unit#3
+  r AiSearchGoal#3.points x:b006b004b006c004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#3.count 2
+  r AiSearchGoal#3.repathClaimTick 60
+  r AiSearchGoal#3.flags 8
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#4.cell (90,59)
+  r Unit#4.footprint (6,6)
+  r Unit#4.id 4
+  r Unit#4.spatialBucket SpatialBucket#221
+  r Unit#4.transportPiece 255
+  r Unit#4.heading -31312
+  r Unit#4.pitch 0
+  r Unit#4.list Order#4
+  r Unit#4.flags 0x10240321
+  r Unit#4.carrier null
+  r Unit#4.def UnitDef#80
+  r Unit#4.player Player#0
+  r Unit#4.motion UnitMotion#4
+  r Unit#4.posX 97517568
+  r Unit#4.posY 4784128
+  r Unit#4.posZ 65011712
+  r SpatialBucket#221.bytes x:494e00000000
+  r Order#4.flags_42 147456
+  r Order#4.unit Unit#4
+  r UnitDef#80.draft 0
+  r UnitDef#80.flags1 0x00888089
+  r UnitDef#80.maxvelocity 124518
+  r UnitDef#80.altitude 0
+  r UnitDef#80.brakerate 1179
+  r UnitDef#80.acceleration 589
+  r UnitDef#80.bankscale 65536
+  r UnitDef#80.pitchscale 0
+  r UnitDef#80.moverate1 249036
+  r UnitDef#80.moverate2 249036
+  r UnitDef#80.turnrate 128
+  r UnitMotion#4.obj AiSearchGoal#4
+  r UnitMotion#4.velocityX 0
+  r UnitMotion#4.velocityY 0
+  r UnitMotion#4.velocityZ 0
+  r UnitMotion#4.speed 0
+  r UnitMotion#4.flags 1
+  r UnitMotion#4.turn 0
+  r UnitMotion#4.lastMoveTick 0
+  r UnitMotion#4.p2X 0
+  r UnitMotion#4.p2Y 0
+  r UnitMotion#4.p2Z 0
+  r AiSearchGoal#4.target null
+  r AiSearchGoal#4.owner Unit#4
+  r AiSearchGoal#4.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#4.count 0
+  r AiSearchGoal#4.repathClaimTick 0
+  r AiSearchGoal#4.flags 8
+  a unit Unit#4
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#5.cell (92,61)
+  r Unit#5.footprint (3,3)
+  r Unit#5.id 5
+  r Unit#5.spatialBucket SpatialBucket#221
+  r Unit#5.transportPiece 255
+  r Unit#5.heading -31312
+  r Unit#5.pitch 0
+  r Unit#5.list Order#5
+  r Unit#5.flags 0x90260320
+  r Unit#5.carrier Unit#4
+  r Unit#5.def UnitDef#18
+  r Unit#5.player Player#0
+  r Unit#5.motion UnitMotion#5
+  r Unit#5.posX 97517568
+  r Unit#5.posY 4784128
+  r Unit#5.posZ 65011712
+  r Order#5.flags_42 36
+  r Order#5.unit Unit#5
+  r UnitDef#18.draft 0
+  r UnitDef#18.flags1 0x00818089
+  r UnitDef#18.maxvelocity 72089
+  r UnitDef#18.altitude 0
+  r UnitDef#18.brakerate 500
+  r UnitDef#18.acceleration 655
+  r UnitDef#18.bankscale 65536
+  r UnitDef#18.pitchscale 0
+  r UnitDef#18.moverate1 144178
+  r UnitDef#18.moverate2 144178
+  r UnitDef#18.turnrate 300
+  r UnitMotion#5.obj AiSearchGoal#5
+  r UnitMotion#5.velocityX 0
+  r UnitMotion#5.velocityY 0
+  r UnitMotion#5.velocityZ 0
+  r UnitMotion#5.speed 0
+  r UnitMotion#5.flags 0
+  r UnitMotion#5.turn 0
+  r UnitMotion#5.lastMoveTick 0
+  r UnitMotion#5.p2X 0
+  r UnitMotion#5.p2Y 0
+  r UnitMotion#5.p2Z 0
+  r AiSearchGoal#5.target null
+  r AiSearchGoal#5.owner Unit#5
+  r AiSearchGoal#5.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#5.count 0
+  r AiSearchGoal#5.repathClaimTick 0
+  r AiSearchGoal#5.flags 8
+  a unit Unit#5
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#5.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#6.cell (92,61)
+  r Unit#6.footprint (3,3)
+  r Unit#6.id 6
+  r Unit#6.spatialBucket SpatialBucket#221
+  r Unit#6.transportPiece 255
+  r Unit#6.heading -31312
+  r Unit#6.pitch 0
+  r Unit#6.list Order#6
+  r Unit#6.flags 0x90260320
+  r Unit#6.carrier Unit#4
+  r Unit#6.def UnitDef#18
+  r Unit#6.player Player#0
+  r Unit#6.motion UnitMotion#6
+  r Unit#6.posX 97517568
+  r Unit#6.posY 4784128
+  r Unit#6.posZ 65011712
+  r Order#6.flags_42 36
+  r Order#6.unit Unit#6
+  r UnitMotion#6.obj AiSearchGoal#6
+  r UnitMotion#6.velocityX 0
+  r UnitMotion#6.velocityY 0
+  r UnitMotion#6.velocityZ 0
+  r UnitMotion#6.speed 0
+  r UnitMotion#6.flags 0
+  r UnitMotion#6.turn 0
+  r UnitMotion#6.lastMoveTick 0
+  r UnitMotion#6.p2X 0
+  r UnitMotion#6.p2Y 0
+  r UnitMotion#6.p2Z 0
+  r AiSearchGoal#6.target null
+  r AiSearchGoal#6.owner Unit#6
+  r AiSearchGoal#6.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#6.count 0
+  r AiSearchGoal#6.repathClaimTick 0
+  r AiSearchGoal#6.flags 8
+  a unit Unit#6
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#6.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#7.cell (92,61)
+  r Unit#7.footprint (3,3)
+  r Unit#7.id 7
+  r Unit#7.spatialBucket SpatialBucket#221
+  r Unit#7.transportPiece 255
+  r Unit#7.heading -31312
+  r Unit#7.pitch 0
+  r Unit#7.list Order#7
+  r Unit#7.flags 0x90260320
+  r Unit#7.carrier Unit#4
+  r Unit#7.def UnitDef#18
+  r Unit#7.player Player#0
+  r Unit#7.motion UnitMotion#7
+  r Unit#7.posX 97517568
+  r Unit#7.posY 4784128
+  r Unit#7.posZ 65011712
+  r Order#7.flags_42 36
+  r Order#7.unit Unit#7
+  r UnitMotion#7.obj AiSearchGoal#7
+  r UnitMotion#7.velocityX 0
+  r UnitMotion#7.velocityY 0
+  r UnitMotion#7.velocityZ 0
+  r UnitMotion#7.speed 0
+  r UnitMotion#7.flags 0
+  r UnitMotion#7.turn 0
+  r UnitMotion#7.lastMoveTick 0
+  r UnitMotion#7.p2X 0
+  r UnitMotion#7.p2Y 0
+  r UnitMotion#7.p2Z 0
+  r AiSearchGoal#7.target null
+  r AiSearchGoal#7.owner Unit#7
+  r AiSearchGoal#7.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#7.count 0
+  r AiSearchGoal#7.repathClaimTick 0
+  r AiSearchGoal#7.flags 8
+  a unit Unit#7
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#7.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#8.cell (92,61)
+  r Unit#8.footprint (3,3)
+  r Unit#8.id 8
+  r Unit#8.spatialBucket SpatialBucket#221
+  r Unit#8.transportPiece 255
+  r Unit#8.heading -31312
+  r Unit#8.pitch 0
+  r Unit#8.list Order#8
+  r Unit#8.flags 0x90260320
+  r Unit#8.carrier Unit#4
+  r Unit#8.def UnitDef#18
+  r Unit#8.player Player#0
+  r Unit#8.motion UnitMotion#8
+  r Unit#8.posX 97517568
+  r Unit#8.posY 4784128
+  r Unit#8.posZ 65011712
+  r Order#8.flags_42 36
+  r Order#8.unit Unit#8
+  r UnitMotion#8.obj AiSearchGoal#8
+  r UnitMotion#8.velocityX 0
+  r UnitMotion#8.velocityY 0
+  r UnitMotion#8.velocityZ 0
+  r UnitMotion#8.speed 0
+  r UnitMotion#8.flags 0
+  r UnitMotion#8.turn 0
+  r UnitMotion#8.lastMoveTick 0
+  r UnitMotion#8.p2X 0
+  r UnitMotion#8.p2Y 0
+  r UnitMotion#8.p2Z 0
+  r AiSearchGoal#8.target null
+  r AiSearchGoal#8.owner Unit#8
+  r AiSearchGoal#8.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#8.count 0
+  r AiSearchGoal#8.repathClaimTick 0
+  r AiSearchGoal#8.flags 8
+  a unit Unit#8
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#8.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#9.cell (92,61)
+  r Unit#9.footprint (3,3)
+  r Unit#9.id 9
+  r Unit#9.spatialBucket SpatialBucket#221
+  r Unit#9.transportPiece 255
+  r Unit#9.heading -31312
+  r Unit#9.pitch 0
+  r Unit#9.list Order#9
+  r Unit#9.flags 0x90260320
+  r Unit#9.carrier Unit#4
+  r Unit#9.def UnitDef#18
+  r Unit#9.player Player#0
+  r Unit#9.motion UnitMotion#9
+  r Unit#9.posX 97517568
+  r Unit#9.posY 4784128
+  r Unit#9.posZ 65011712
+  r Order#9.flags_42 36
+  r Order#9.unit Unit#9
+  r UnitMotion#9.obj AiSearchGoal#9
+  r UnitMotion#9.velocityX 0
+  r UnitMotion#9.velocityY 0
+  r UnitMotion#9.velocityZ 0
+  r UnitMotion#9.speed 0
+  r UnitMotion#9.flags 0
+  r UnitMotion#9.turn 0
+  r UnitMotion#9.lastMoveTick 0
+  r UnitMotion#9.p2X 0
+  r UnitMotion#9.p2Y 0
+  r UnitMotion#9.p2Z 0
+  r AiSearchGoal#9.target null
+  r AiSearchGoal#9.owner Unit#9
+  r AiSearchGoal#9.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#9.count 0
+  r AiSearchGoal#9.repathClaimTick 0
+  r AiSearchGoal#9.flags 8
+  a unit Unit#9
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#9.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#10.cell (92,61)
+  r Unit#10.footprint (3,3)
+  r Unit#10.id 10
+  r Unit#10.spatialBucket SpatialBucket#221
+  r Unit#10.transportPiece 255
+  r Unit#10.heading -31312
+  r Unit#10.pitch 0
+  r Unit#10.list Order#10
+  r Unit#10.flags 0x90260320
+  r Unit#10.carrier Unit#4
+  r Unit#10.def UnitDef#18
+  r Unit#10.player Player#0
+  r Unit#10.motion UnitMotion#10
+  r Unit#10.posX 97517568
+  r Unit#10.posY 4784128
+  r Unit#10.posZ 65011712
+  r Order#10.flags_42 36
+  r Order#10.unit Unit#10
+  r UnitMotion#10.obj AiSearchGoal#10
+  r UnitMotion#10.velocityX 0
+  r UnitMotion#10.velocityY 0
+  r UnitMotion#10.velocityZ 0
+  r UnitMotion#10.speed 0
+  r UnitMotion#10.flags 0
+  r UnitMotion#10.turn 0
+  r UnitMotion#10.lastMoveTick 0
+  r UnitMotion#10.p2X 0
+  r UnitMotion#10.p2Y 0
+  r UnitMotion#10.p2Z 0
+  r AiSearchGoal#10.target null
+  r AiSearchGoal#10.owner Unit#10
+  r AiSearchGoal#10.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#10.count 0
+  r AiSearchGoal#10.repathClaimTick 0
+  r AiSearchGoal#10.flags 8
+  a unit Unit#10
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#10.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#11.cell (92,61)
+  r Unit#11.footprint (3,3)
+  r Unit#11.id 11
+  r Unit#11.spatialBucket SpatialBucket#221
+  r Unit#11.transportPiece 255
+  r Unit#11.heading -31312
+  r Unit#11.pitch 0
+  r Unit#11.list Order#11
+  r Unit#11.flags 0x90260320
+  r Unit#11.carrier Unit#4
+  r Unit#11.def UnitDef#18
+  r Unit#11.player Player#0
+  r Unit#11.motion UnitMotion#11
+  r Unit#11.posX 97517568
+  r Unit#11.posY 4784128
+  r Unit#11.posZ 65011712
+  r Order#11.flags_42 36
+  r Order#11.unit Unit#11
+  r UnitMotion#11.obj AiSearchGoal#11
+  r UnitMotion#11.velocityX 0
+  r UnitMotion#11.velocityY 0
+  r UnitMotion#11.velocityZ 0
+  r UnitMotion#11.speed 0
+  r UnitMotion#11.flags 0
+  r UnitMotion#11.turn 0
+  r UnitMotion#11.lastMoveTick 0
+  r UnitMotion#11.p2X 0
+  r UnitMotion#11.p2Y 0
+  r UnitMotion#11.p2Z 0
+  r AiSearchGoal#11.target null
+  r AiSearchGoal#11.owner Unit#11
+  r AiSearchGoal#11.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#11.count 0
+  r AiSearchGoal#11.repathClaimTick 0
+  r AiSearchGoal#11.flags 8
+  a unit Unit#11
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#11.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#12.cell (92,61)
+  r Unit#12.footprint (3,3)
+  r Unit#12.id 12
+  r Unit#12.spatialBucket SpatialBucket#221
+  r Unit#12.transportPiece 255
+  r Unit#12.heading -31312
+  r Unit#12.pitch 0
+  r Unit#12.list Order#12
+  r Unit#12.flags 0x90260320
+  r Unit#12.carrier Unit#4
+  r Unit#12.def UnitDef#18
+  r Unit#12.player Player#0
+  r Unit#12.motion UnitMotion#12
+  r Unit#12.posX 97517568
+  r Unit#12.posY 4784128
+  r Unit#12.posZ 65011712
+  r Order#12.flags_42 36
+  r Order#12.unit Unit#12
+  r UnitMotion#12.obj AiSearchGoal#12
+  r UnitMotion#12.velocityX 0
+  r UnitMotion#12.velocityY 0
+  r UnitMotion#12.velocityZ 0
+  r UnitMotion#12.speed 0
+  r UnitMotion#12.flags 0
+  r UnitMotion#12.turn 0
+  r UnitMotion#12.lastMoveTick 0
+  r UnitMotion#12.p2X 0
+  r UnitMotion#12.p2Y 0
+  r UnitMotion#12.p2Z 0
+  r AiSearchGoal#12.target null
+  r AiSearchGoal#12.owner Unit#12
+  r AiSearchGoal#12.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#12.count 0
+  r AiSearchGoal#12.repathClaimTick 0
+  r AiSearchGoal#12.flags 8
+  a unit Unit#12
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#12.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#13.cell (92,61)
+  r Unit#13.footprint (3,3)
+  r Unit#13.id 13
+  r Unit#13.spatialBucket SpatialBucket#221
+  r Unit#13.transportPiece 255
+  r Unit#13.heading -31312
+  r Unit#13.pitch 0
+  r Unit#13.list Order#13
+  r Unit#13.flags 0x90260320
+  r Unit#13.carrier Unit#4
+  r Unit#13.def UnitDef#18
+  r Unit#13.player Player#0
+  r Unit#13.motion UnitMotion#13
+  r Unit#13.posX 97517568
+  r Unit#13.posY 4784128
+  r Unit#13.posZ 65011712
+  r Order#13.flags_42 36
+  r Order#13.unit Unit#13
+  r UnitMotion#13.obj AiSearchGoal#13
+  r UnitMotion#13.velocityX 0
+  r UnitMotion#13.velocityY 0
+  r UnitMotion#13.velocityZ 0
+  r UnitMotion#13.speed 0
+  r UnitMotion#13.flags 0
+  r UnitMotion#13.turn 0
+  r UnitMotion#13.lastMoveTick 0
+  r UnitMotion#13.p2X 0
+  r UnitMotion#13.p2Y 0
+  r UnitMotion#13.p2Z 0
+  r AiSearchGoal#13.target null
+  r AiSearchGoal#13.owner Unit#13
+  r AiSearchGoal#13.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#13.count 0
+  r AiSearchGoal#13.repathClaimTick 0
+  r AiSearchGoal#13.flags 8
+  a unit Unit#13
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#13.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#14.cell (56,87)
+  r Unit#14.footprint (3,3)
+  r Unit#14.id 14
+  r Unit#14.spatialBucket SpatialBucket#337
+  r Unit#14.transportPiece 255
+  r Unit#14.heading -25851
+  r Unit#14.pitch 2960
+  r Unit#14.list Order#14
+  r Unit#14.flags 0x90240321
+  r Unit#14.carrier null
+  r Unit#14.def UnitDef#24
+  r Unit#14.player Player#0
+  r Unit#14.motion UnitMotion#14
+  r Unit#14.posX 59768832
+  r Unit#14.posY 1376256
+  r Unit#14.posZ 92274688
+  r SpatialBucket#337.bytes x:496900000000
+  r Order#14.flags_42 147456
+  r Order#14.unit Unit#14
+  r UnitDef#24.draft 0
+  r UnitDef#24.flags1 0x00818089
+  r UnitDef#24.maxvelocity 85196
+  r UnitDef#24.altitude 0
+  r UnitDef#24.brakerate 524
+  r UnitDef#24.acceleration 589
+  r UnitDef#24.bankscale 65536
+  r UnitDef#24.pitchscale 0
+  r UnitDef#24.moverate1 170392
+  r UnitDef#24.moverate2 170392
+  r UnitDef#24.turnrate 350
+  r UnitMotion#14.obj AiSearchGoal#14
+  r UnitMotion#14.velocityX 0
+  r UnitMotion#14.velocityY 0
+  r UnitMotion#14.velocityZ 0
+  r UnitMotion#14.speed 0
+  r UnitMotion#14.flags 1
+  r UnitMotion#14.turn 0
+  r UnitMotion#14.lastMoveTick 0
+  r UnitMotion#14.p2X 0
+  r UnitMotion#14.p2Y 0
+  r UnitMotion#14.p2Z 0
+  r AiSearchGoal#14.target null
+  r AiSearchGoal#14.owner Unit#14
+  r AiSearchGoal#14.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#14.count 0
+  r AiSearchGoal#14.repathClaimTick 0
+  r AiSearchGoal#14.flags 8
+  a unit Unit#14
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#15.cell (61,83)
+  r Unit#15.footprint (3,3)
+  r Unit#15.id 15
+  r Unit#15.spatialBucket SpatialBucket#307
+  r Unit#15.transportPiece 255
+  r Unit#15.heading -26397
+  r Unit#15.pitch 0
+  r Unit#15.list Order#15
+  r Unit#15.flags 0x90240321
+  r Unit#15.carrier null
+  r Unit#15.def UnitDef#24
+  r Unit#15.player Player#0
+  r Unit#15.motion UnitMotion#15
+  r Unit#15.posX 65011712
+  r Unit#15.posY 0
+  r Unit#15.posZ 88080384
+  r SpatialBucket#307.bytes x:496900000000
+  r Order#15.flags_42 147456
+  r Order#15.unit Unit#15
+  r UnitMotion#15.obj AiSearchGoal#15
+  r UnitMotion#15.velocityX 0
+  r UnitMotion#15.velocityY 0
+  r UnitMotion#15.velocityZ 0
+  r UnitMotion#15.speed 0
+  r UnitMotion#15.flags 1
+  r UnitMotion#15.turn 0
+  r UnitMotion#15.lastMoveTick 0
+  r UnitMotion#15.p2X 0
+  r UnitMotion#15.p2Y 0
+  r UnitMotion#15.p2Z 0
+  r AiSearchGoal#15.target null
+  r AiSearchGoal#15.owner Unit#15
+  r AiSearchGoal#15.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#15.count 0
+  r AiSearchGoal#15.repathClaimTick 0
+  r AiSearchGoal#15.flags 8
+  a unit Unit#15
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#16.cell (84,68)
+  r Unit#16.footprint (3,3)
+  r Unit#16.id 16
+  r Unit#16.spatialBucket SpatialBucket#250
+  r Unit#16.transportPiece 255
+  r Unit#16.heading -26943
+  r Unit#16.pitch 0
+  r Unit#16.list Order#16
+  r Unit#16.flags 0x90240321
+  r Unit#16.carrier null
+  r Unit#16.def UnitDef#24
+  r Unit#16.player Player#0
+  r Unit#16.motion UnitMotion#16
+  r Unit#16.posX 89128960
+  r Unit#16.posY 0
+  r Unit#16.posZ 72351744
+  r SpatialBucket#250.bytes x:494900000000
+  r Order#16.flags_42 147456
+  r Order#16.unit Unit#16
+  r UnitMotion#16.obj AiSearchGoal#16
+  r UnitMotion#16.velocityX 0
+  r UnitMotion#16.velocityY 0
+  r UnitMotion#16.velocityZ 0
+  r UnitMotion#16.speed 0
+  r UnitMotion#16.flags 1
+  r UnitMotion#16.turn 0
+  r UnitMotion#16.lastMoveTick 0
+  r UnitMotion#16.p2X 0
+  r UnitMotion#16.p2Y 0
+  r UnitMotion#16.p2Z 0
+  r AiSearchGoal#16.target null
+  r AiSearchGoal#16.owner Unit#16
+  r AiSearchGoal#16.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#16.count 0
+  r AiSearchGoal#16.repathClaimTick 0
+  r AiSearchGoal#16.flags 8
+  a unit Unit#16
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#17.cell (57,93)
+  r Unit#17.footprint (3,3)
+  r Unit#17.id 17
+  r Unit#17.spatialBucket SpatialBucket#337
+  r Unit#17.transportPiece 255
+  r Unit#17.heading -22756
+  r Unit#17.pitch -217
+  r Unit#17.list Order#17
+  r Unit#17.flags 0x90240321
+  r Unit#17.carrier null
+  r Unit#17.def UnitDef#24
+  r Unit#17.player Player#0
+  r Unit#17.motion UnitMotion#17
+  r Unit#17.posX 60817408
+  r Unit#17.posY 1441792
+  r Unit#17.posZ 98566144
+  r Order#17.flags_42 147456
+  r Order#17.unit Unit#17
+  r UnitMotion#17.obj AiSearchGoal#17
+  r UnitMotion#17.velocityX 0
+  r UnitMotion#17.velocityY 0
+  r UnitMotion#17.velocityZ 0
+  r UnitMotion#17.speed 0
+  r UnitMotion#17.flags 1
+  r UnitMotion#17.turn 0
+  r UnitMotion#17.lastMoveTick 0
+  r UnitMotion#17.p2X 0
+  r UnitMotion#17.p2Y 0
+  r UnitMotion#17.p2Z 0
+  r AiSearchGoal#17.target null
+  r AiSearchGoal#17.owner Unit#17
+  r AiSearchGoal#17.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#17.count 0
+  r AiSearchGoal#17.repathClaimTick 0
+  r AiSearchGoal#17.flags 8
+  a unit Unit#17
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#18.cell (68,78)
+  r Unit#18.footprint (3,3)
+  r Unit#18.id 18
+  r Unit#18.spatialBucket SpatialBucket#278
+  r Unit#18.transportPiece 255
+  r Unit#18.heading -28399
+  r Unit#18.pitch 0
+  r Unit#18.list Order#18
+  r Unit#18.flags 0x90240321
+  r Unit#18.carrier null
+  r Unit#18.def UnitDef#24
+  r Unit#18.player Player#0
+  r Unit#18.motion UnitMotion#18
+  r Unit#18.posX 72351744
+  r Unit#18.posY 0
+  r Unit#18.posZ 82837504
+  r SpatialBucket#278.bytes x:494b00000000
+  r Order#18.flags_42 147456
+  r Order#18.unit Unit#18
+  r UnitMotion#18.obj AiSearchGoal#18
+  r UnitMotion#18.velocityX 0
+  r UnitMotion#18.velocityY 0
+  r UnitMotion#18.velocityZ 0
+  r UnitMotion#18.speed 0
+  r UnitMotion#18.flags 1
+  r UnitMotion#18.turn 0
+  r UnitMotion#18.lastMoveTick 0
+  r UnitMotion#18.p2X 0
+  r UnitMotion#18.p2Y 0
+  r UnitMotion#18.p2Z 0
+  r AiSearchGoal#18.target null
+  r AiSearchGoal#18.owner Unit#18
+  r AiSearchGoal#18.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#18.count 0
+  r AiSearchGoal#18.repathClaimTick 0
+  r AiSearchGoal#18.flags 8
+  a unit Unit#18
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#19.cell (81,73)
+  r Unit#19.footprint (3,3)
+  r Unit#19.id 19
+  r Unit#19.spatialBucket SpatialBucket#280
+  r Unit#19.transportPiece 255
+  r Unit#19.heading -25123
+  r Unit#19.pitch 0
+  r Unit#19.list Order#19
+  r Unit#19.flags 0x90240321
+  r Unit#19.carrier null
+  r Unit#19.def UnitDef#24
+  r Unit#19.player Player#0
+  r Unit#19.motion UnitMotion#19
+  r Unit#19.posX 85983232
+  r Unit#19.posY 0
+  r Unit#19.posZ 77594624
+  r SpatialBucket#280.bytes x:494900000000
+  r Order#19.flags_42 147456
+  r Order#19.unit Unit#19
+  r UnitMotion#19.obj AiSearchGoal#19
+  r UnitMotion#19.velocityX 0
+  r UnitMotion#19.velocityY 0
+  r UnitMotion#19.velocityZ 0
+  r UnitMotion#19.speed 0
+  r UnitMotion#19.flags 1
+  r UnitMotion#19.turn 0
+  r UnitMotion#19.lastMoveTick 0
+  r UnitMotion#19.p2X 0
+  r UnitMotion#19.p2Y 0
+  r UnitMotion#19.p2Z 0
+  r AiSearchGoal#19.target null
+  r AiSearchGoal#19.owner Unit#19
+  r AiSearchGoal#19.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#19.count 0
+  r AiSearchGoal#19.repathClaimTick 0
+  r AiSearchGoal#19.flags 8
+  a unit Unit#19
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#20.cell (90,69)
+  r Unit#20.footprint (3,3)
+  r Unit#20.id 20
+  r Unit#20.spatialBucket SpatialBucket#251
+  r Unit#20.transportPiece 255
+  r Unit#20.heading -28764
+  r Unit#20.pitch 0
+  r Unit#20.list Order#20
+  r Unit#20.flags 0x90240321
+  r Unit#20.carrier null
+  r Unit#20.def UnitDef#24
+  r Unit#20.player Player#0
+  r Unit#20.motion UnitMotion#20
+  r Unit#20.posX 95420416
+  r Unit#20.posY 0
+  r Unit#20.posZ 73400320
+  r SpatialBucket#251.bytes x:495600000000
+  r Order#20.flags_42 147456
+  r Order#20.unit Unit#20
+  r UnitMotion#20.obj AiSearchGoal#20
+  r UnitMotion#20.velocityX 0
+  r UnitMotion#20.velocityY 0
+  r UnitMotion#20.velocityZ 0
+  r UnitMotion#20.speed 0
+  r UnitMotion#20.flags 1
+  r UnitMotion#20.turn 0
+  r UnitMotion#20.lastMoveTick 0
+  r UnitMotion#20.p2X 0
+  r UnitMotion#20.p2Y 0
+  r UnitMotion#20.p2Z 0
+  r AiSearchGoal#20.target null
+  r AiSearchGoal#20.owner Unit#20
+  r AiSearchGoal#20.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#20.count 0
+  r AiSearchGoal#20.repathClaimTick 0
+  r AiSearchGoal#20.flags 8
+  a unit Unit#20
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#21.cell (63,87)
+  r Unit#21.footprint (3,3)
+  r Unit#21.id 21
+  r Unit#21.spatialBucket SpatialBucket#338
+  r Unit#21.transportPiece 255
+  r Unit#21.heading -26943
+  r Unit#21.pitch 0
+  r Unit#21.list Order#21
+  r Unit#21.flags 0x90240321
+  r Unit#21.carrier null
+  r Unit#21.def UnitDef#24
+  r Unit#21.player Player#0
+  r Unit#21.motion UnitMotion#21
+  r Unit#21.posX 67108864
+  r Unit#21.posY 0
+  r Unit#21.posZ 92274688
+  r SpatialBucket#338.bytes x:494900000000
+  r Order#21.flags_42 147456
+  r Order#21.unit Unit#21
+  r UnitMotion#21.obj AiSearchGoal#21
+  r UnitMotion#21.velocityX 0
+  r UnitMotion#21.velocityY 0
+  r UnitMotion#21.velocityZ 0
+  r UnitMotion#21.speed 0
+  r UnitMotion#21.flags 1
+  r UnitMotion#21.turn 0
+  r UnitMotion#21.lastMoveTick 0
+  r UnitMotion#21.p2X 0
+  r UnitMotion#21.p2Y 0
+  r UnitMotion#21.p2Z 0
+  r AiSearchGoal#21.target null
+  r AiSearchGoal#21.owner Unit#21
+  r AiSearchGoal#21.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#21.count 0
+  r AiSearchGoal#21.repathClaimTick 0
+  r AiSearchGoal#21.flags 8
+  a unit Unit#21
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#22.cell (77,79)
+  r Unit#22.footprint (3,3)
+  r Unit#22.id 22
+  r Unit#22.spatialBucket SpatialBucket#309
+  r Unit#22.transportPiece 255
+  r Unit#22.heading -27671
+  r Unit#22.pitch 0
+  r Unit#22.list Order#22
+  r Unit#22.flags 0x90240321
+  r Unit#22.carrier null
+  r Unit#22.def UnitDef#24
+  r Unit#22.player Player#0
+  r Unit#22.motion UnitMotion#22
+  r Unit#22.posX 81788928
+  r Unit#22.posY 0
+  r Unit#22.posZ 83886080
+  r SpatialBucket#309.bytes x:494900000000
+  r Order#22.flags_42 147456
+  r Order#22.unit Unit#22
+  r UnitMotion#22.obj AiSearchGoal#22
+  r UnitMotion#22.velocityX 0
+  r UnitMotion#22.velocityY 0
+  r UnitMotion#22.velocityZ 0
+  r UnitMotion#22.speed 0
+  r UnitMotion#22.flags 1
+  r UnitMotion#22.turn 0
+  r UnitMotion#22.lastMoveTick 0
+  r UnitMotion#22.p2X 0
+  r UnitMotion#22.p2Y 0
+  r UnitMotion#22.p2Z 0
+  r AiSearchGoal#22.target null
+  r AiSearchGoal#22.owner Unit#22
+  r AiSearchGoal#22.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#22.count 0
+  r AiSearchGoal#22.repathClaimTick 0
+  r AiSearchGoal#22.flags 8
+  a unit Unit#22
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#23.cell (87,74)
+  r Unit#23.footprint (3,3)
+  r Unit#23.id 23
+  r Unit#23.spatialBucket SpatialBucket#281
+  r Unit#23.transportPiece 255
+  r Unit#23.heading -27489
+  r Unit#23.pitch 0
+  r Unit#23.list Order#23
+  r Unit#23.flags 0x90240321
+  r Unit#23.carrier null
+  r Unit#23.def UnitDef#24
+  r Unit#23.player Player#0
+  r Unit#23.motion UnitMotion#23
+  r Unit#23.posX 92274688
+  r Unit#23.posY 0
+  r Unit#23.posZ 78643200
+  r SpatialBucket#281.bytes x:495600000000
+  r Order#23.flags_42 147456
+  r Order#23.unit Unit#23
+  r UnitMotion#23.obj AiSearchGoal#23
+  r UnitMotion#23.velocityX 0
+  r UnitMotion#23.velocityY 0
+  r UnitMotion#23.velocityZ 0
+  r UnitMotion#23.speed 0
+  r UnitMotion#23.flags 1
+  r UnitMotion#23.turn 0
+  r UnitMotion#23.lastMoveTick 0
+  r UnitMotion#23.p2X 0
+  r UnitMotion#23.p2Y 0
+  r UnitMotion#23.p2Z 0
+  r AiSearchGoal#23.target null
+  r AiSearchGoal#23.owner Unit#23
+  r AiSearchGoal#23.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#23.count 0
+  r AiSearchGoal#23.repathClaimTick 0
+  r AiSearchGoal#23.flags 8
+  a unit Unit#23
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#24.cell (83,81)
+  r Unit#24.footprint (3,3)
+  r Unit#24.id 24
+  r Unit#24.spatialBucket SpatialBucket#310
+  r Unit#24.transportPiece 255
+  r Unit#24.heading -25487
+  r Unit#24.pitch 0
+  r Unit#24.list Order#24
+  r Unit#24.flags 0x90240321
+  r Unit#24.carrier null
+  r Unit#24.def UnitDef#24
+  r Unit#24.player Player#0
+  r Unit#24.motion UnitMotion#24
+  r Unit#24.posX 88080384
+  r Unit#24.posY 0
+  r Unit#24.posZ 85983232
+  r SpatialBucket#310.bytes x:494900000000
+  r Order#24.flags_42 147456
+  r Order#24.unit Unit#24
+  r UnitMotion#24.obj AiSearchGoal#24
+  r UnitMotion#24.velocityX 0
+  r UnitMotion#24.velocityY 0
+  r UnitMotion#24.velocityZ 0
+  r UnitMotion#24.speed 0
+  r UnitMotion#24.flags 1
+  r UnitMotion#24.turn 0
+  r UnitMotion#24.lastMoveTick 0
+  r UnitMotion#24.p2X 0
+  r UnitMotion#24.p2Y 0
+  r UnitMotion#24.p2Z 0
+  r AiSearchGoal#24.target null
+  r AiSearchGoal#24.owner Unit#24
+  r AiSearchGoal#24.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#24.count 0
+  r AiSearchGoal#24.repathClaimTick 0
+  r AiSearchGoal#24.flags 8
+  a unit Unit#24
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#25.cell (73,85)
+  r Unit#25.footprint (3,3)
+  r Unit#25.id 25
+  r Unit#25.spatialBucket SpatialBucket#309
+  r Unit#25.transportPiece 255
+  r Unit#25.heading -23120
+  r Unit#25.pitch 0
+  r Unit#25.list Order#25
+  r Unit#25.flags 0x90240321
+  r Unit#25.carrier null
+  r Unit#25.def UnitDef#24
+  r Unit#25.player Player#0
+  r Unit#25.motion UnitMotion#25
+  r Unit#25.posX 77594624
+  r Unit#25.posY 0
+  r Unit#25.posZ 90177536
+  r Order#25.flags_42 147456
+  r Order#25.unit Unit#25
+  r UnitMotion#25.obj AiSearchGoal#25
+  r UnitMotion#25.velocityX 0
+  r UnitMotion#25.velocityY 0
+  r UnitMotion#25.velocityZ 0
+  r UnitMotion#25.speed 0
+  r UnitMotion#25.flags 1
+  r UnitMotion#25.turn 0
+  r UnitMotion#25.lastMoveTick 0
+  r UnitMotion#25.p2X 0
+  r UnitMotion#25.p2Y 0
+  r UnitMotion#25.p2Z 0
+  r AiSearchGoal#25.target null
+  r AiSearchGoal#25.owner Unit#25
+  r AiSearchGoal#25.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#25.count 0
+  r AiSearchGoal#25.repathClaimTick 0
+  r AiSearchGoal#25.flags 8
+  a unit Unit#25
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#26.cell (53,12)
+  r Unit#26.footprint (6,6)
+  r Unit#26.id 26
+  r Unit#26.spatialBucket SpatialBucket#36
+  r Unit#26.transportPiece 255
+  r Unit#26.heading -24282
+  r Unit#26.pitch 0
+  r Unit#26.list Order#26
+  r Unit#26.flags 0x50240325
+  r Unit#26.carrier null
+  r Unit#26.def UnitDef#20
+  r Unit#26.player Player#0
+  r Unit#26.motion UnitMotion#26
+  r Unit#26.posX 58869880
+  r Unit#26.posY 4784128
+  r Unit#26.posZ 16084657
+  r SpatialBucket#36.bytes x:494900000000
+  r Order#26.flags_42 5123
+  r Order#26.unit Unit#26
+  r UnitDef#20.draft 0
+  r UnitDef#20.flags1 0x008c82c9
+  r UnitDef#20.maxvelocity 150732
+  r UnitDef#20.altitude 0
+  r UnitDef#20.brakerate 1310
+  r UnitDef#20.acceleration 655
+  r UnitDef#20.bankscale 65536
+  r UnitDef#20.pitchscale 0
+  r UnitDef#20.moverate1 301464
+  r UnitDef#20.moverate2 301464
+  r UnitDef#20.turnrate 64
+  r UnitMotion#26.obj AiSearchGoal#26
+  r UnitMotion#26.velocityX 57400
+  r UnitMotion#26.velocityY 0
+  r UnitMotion#26.velocityZ 54652
+  r UnitMotion#26.speed 79255
+  r UnitMotion#26.flags 1
+  r UnitMotion#26.turn -4
+  r UnitMotion#26.lastMoveTick 121
+  r UnitMotion#26.p2X 0
+  r UnitMotion#26.p2Y 0
+  r UnitMotion#26.p2Z 0
+  r AiSearchGoal#26.target ApproachRadius#1
+  r AiSearchGoal#26.owner Unit#26
+  r AiSearchGoal#26.points x:6003d000b0052003b00530030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#26.count 3
+  r AiSearchGoal#26.repathClaimTick 60
+  r AiSearchGoal#26.flags 9
+  r ApproachRadius#1.source Order#26
+  r ApproachRadius#1.pos (88,48)
+  r ApproachRadius#1.radius 4
+  a unit Unit#26
+  i services.SchedPublish 14 12
+  o Unit#26.heading -24286
+  o Unit#26.flags 0x50250325
+  i services.SchedPublish 14 20
+  o Unit#26.posX 58927754
+  o Unit#26.posZ 16139761
+  i services.SchedPublish 14 8
+  w UnitMotion#26.velocityX 57874
+  w UnitMotion#26.velocityZ 55104
+  w UnitMotion#26.speed 79910
+  w UnitMotion#26.lastMoveTick 122
+call 122 UpdateMotion
+  r Unit#27.cell (69,8)
+  r Unit#27.footprint (3,3)
+  r Unit#27.id 27
+  r Unit#27.spatialBucket SpatialBucket#38
+  r Unit#27.transportPiece 255
+  r Unit#27.heading -32768
+  r Unit#27.pitch 0
+  r Unit#27.list Order#27
+  r Unit#27.flags 0x90040326
+  r Unit#27.carrier null
+  r Unit#27.def UnitDef#47
+  r Unit#27.player Player#0
+  r Unit#27.motion UnitMotion#27
+  r Unit#27.posX 73400320
+  r Unit#27.posY 7929856
+  r Unit#27.posZ 9437184
+  r SpatialBucket#38.bytes x:494900000000
+  r Order#27.flags_42 37907
+  r Order#27.unit Unit#27
+  r UnitDef#47.draft 0
+  r UnitDef#47.flags1 0x00818881
+  r UnitDef#47.maxvelocity 635699
+  r UnitDef#47.altitude 150
+  r UnitDef#47.brakerate 393216
+  r UnitDef#47.acceleration 13107
+  r UnitDef#47.bankscale 65536
+  r UnitDef#47.pitchscale 0
+  r UnitDef#47.moverate1 524288
+  r UnitDef#47.moverate2 1271398
+  r UnitDef#47.turnrate 420
+  r UnitMotion#27.obj LiteGoal#1
+  r UnitMotion#27.velocityX 0
+  r UnitMotion#27.velocityY 65536
+  r UnitMotion#27.velocityZ 0
+  r UnitMotion#27.speed 65536
+  r UnitMotion#27.flags 2
+  r UnitMotion#27.turn 0
+  r UnitMotion#27.lastMoveTick 121
+  r UnitMotion#27.p2X 0
+  r UnitMotion#27.p2Y 129
+  r UnitMotion#27.p2Z 0
+  r LiteGoal#1.target PathOrder#1
+  r LiteGoal#1.owner Unit#27
+  r LiteGoal#1.posX 73400320
+  r LiteGoal#1.posY 9699328
+  r LiteGoal#1.posZ 9437184
+  r LiteGoal#1.velX 0
+  r LiteGoal#1.velY 0
+  r LiteGoal#1.velZ 0
+  r LiteGoal#1.heading -32768
+  r LiteGoal#1.netDirtyFlags 1
+  r PathOrder#1.source Order#27
+  r PathOrder#1.approachRadius 0
+  r PathOrder#1.altitude 75
+  r PathOrder#1.heading 0
+  r PathOrder#1.followOffset 0
+  r PathOrder#1.flags 40
+  r PathOrder#1.piece -1
+  r PathOrder#1.unit Unit#27
+  r PathOrder#1.posX 73400320
+  r PathOrder#1.posY 9699328
+  r PathOrder#1.posZ 9437184
+  r PathOrder#1.ref.owner null
+  a unit Unit#27
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#27.flags 0x90050326
+  o Unit#27.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#27.lastMoveTick 122
+  w UnitMotion#27.p2Y 122
+call 122 UpdateMotion
+  r Unit#28.cell (75,8)
+  r Unit#28.footprint (3,3)
+  r Unit#28.id 28
+  r Unit#28.spatialBucket SpatialBucket#39
+  r Unit#28.transportPiece 255
+  r Unit#28.heading -32768
+  r Unit#28.pitch 0
+  r Unit#28.list Order#28
+  r Unit#28.flags 0x90040326
+  r Unit#28.carrier null
+  r Unit#28.def UnitDef#47
+  r Unit#28.player Player#0
+  r Unit#28.motion UnitMotion#28
+  r Unit#28.posX 79691776
+  r Unit#28.posY 7929856
+  r Unit#28.posZ 9437184
+  r SpatialBucket#39.bytes x:494900000000
+  r Order#28.flags_42 37907
+  r Order#28.unit Unit#28
+  r UnitMotion#28.obj LiteGoal#2
+  r UnitMotion#28.velocityX 0
+  r UnitMotion#28.velocityY 65536
+  r UnitMotion#28.velocityZ 0
+  r UnitMotion#28.speed 65536
+  r UnitMotion#28.flags 2
+  r UnitMotion#28.turn 0
+  r UnitMotion#28.lastMoveTick 121
+  r UnitMotion#28.p2X 0
+  r UnitMotion#28.p2Y 129
+  r UnitMotion#28.p2Z 0
+  r LiteGoal#2.target PathOrder#2
+  r LiteGoal#2.owner Unit#28
+  r LiteGoal#2.posX 79691776
+  r LiteGoal#2.posY 9699328
+  r LiteGoal#2.posZ 9437184
+  r LiteGoal#2.velX 0
+  r LiteGoal#2.velY 0
+  r LiteGoal#2.velZ 0
+  r LiteGoal#2.heading -32768
+  r LiteGoal#2.netDirtyFlags 1
+  r PathOrder#2.source Order#28
+  r PathOrder#2.approachRadius 0
+  r PathOrder#2.altitude 75
+  r PathOrder#2.heading 0
+  r PathOrder#2.followOffset 0
+  r PathOrder#2.flags 40
+  r PathOrder#2.piece -1
+  r PathOrder#2.unit Unit#28
+  r PathOrder#2.posX 79691776
+  r PathOrder#2.posY 9699328
+  r PathOrder#2.posZ 9437184
+  r PathOrder#2.ref.owner null
+  a unit Unit#28
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#28.flags 0x90050326
+  o Unit#28.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#28.lastMoveTick 122
+  w UnitMotion#28.p2Y 122
+call 122 UpdateMotion
+  r Unit#29.cell (62,7)
+  r Unit#29.footprint (3,3)
+  r Unit#29.id 29
+  r Unit#29.spatialBucket SpatialBucket#37
+  r Unit#29.transportPiece 255
+  r Unit#29.heading -32768
+  r Unit#29.pitch 0
+  r Unit#29.list Order#29
+  r Unit#29.flags 0x90040326
+  r Unit#29.carrier null
+  r Unit#29.def UnitDef#47
+  r Unit#29.player Player#0
+  r Unit#29.motion UnitMotion#29
+  r Unit#29.posX 66060288
+  r Unit#29.posY 7929856
+  r Unit#29.posZ 8388608
+  r SpatialBucket#37.bytes x:494900000000
+  r Order#29.flags_42 37907
+  r Order#29.unit Unit#29
+  r UnitMotion#29.obj LiteGoal#3
+  r UnitMotion#29.velocityX 0
+  r UnitMotion#29.velocityY 65536
+  r UnitMotion#29.velocityZ 0
+  r UnitMotion#29.speed 65536
+  r UnitMotion#29.flags 2
+  r UnitMotion#29.turn 0
+  r UnitMotion#29.lastMoveTick 121
+  r UnitMotion#29.p2X 0
+  r UnitMotion#29.p2Y 129
+  r UnitMotion#29.p2Z 0
+  r LiteGoal#3.target PathOrder#3
+  r LiteGoal#3.owner Unit#29
+  r LiteGoal#3.posX 66060288
+  r LiteGoal#3.posY 9699328
+  r LiteGoal#3.posZ 8388608
+  r LiteGoal#3.velX 0
+  r LiteGoal#3.velY 0
+  r LiteGoal#3.velZ 0
+  r LiteGoal#3.heading -32768
+  r LiteGoal#3.netDirtyFlags 1
+  r PathOrder#3.source Order#29
+  r PathOrder#3.approachRadius 0
+  r PathOrder#3.altitude 75
+  r PathOrder#3.heading 0
+  r PathOrder#3.followOffset 0
+  r PathOrder#3.flags 40
+  r PathOrder#3.piece -1
+  r PathOrder#3.unit Unit#29
+  r PathOrder#3.posX 66060288
+  r PathOrder#3.posY 9699328
+  r PathOrder#3.posZ 8388608
+  r PathOrder#3.ref.owner null
+  a unit Unit#29
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#29.flags 0x90050326
+  o Unit#29.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#29.lastMoveTick 122
+  w UnitMotion#29.p2Y 122
+call 122 UpdateMotion
+  r Unit#30.cell (69,14)
+  r Unit#30.footprint (3,3)
+  r Unit#30.id 30
+  r Unit#30.spatialBucket SpatialBucket#38
+  r Unit#30.transportPiece 255
+  r Unit#30.heading -32768
+  r Unit#30.pitch 0
+  r Unit#30.list Order#30
+  r Unit#30.flags 0x90040326
+  r Unit#30.carrier null
+  r Unit#30.def UnitDef#47
+  r Unit#30.player Player#0
+  r Unit#30.motion UnitMotion#30
+  r Unit#30.posX 73400320
+  r Unit#30.posY 7929856
+  r Unit#30.posZ 15728640
+  r Order#30.flags_42 37907
+  r Order#30.unit Unit#30
+  r UnitMotion#30.obj LiteGoal#4
+  r UnitMotion#30.velocityX 0
+  r UnitMotion#30.velocityY 65536
+  r UnitMotion#30.velocityZ 0
+  r UnitMotion#30.speed 65536
+  r UnitMotion#30.flags 2
+  r UnitMotion#30.turn 0
+  r UnitMotion#30.lastMoveTick 121
+  r UnitMotion#30.p2X 0
+  r UnitMotion#30.p2Y 129
+  r UnitMotion#30.p2Z 0
+  r LiteGoal#4.target PathOrder#4
+  r LiteGoal#4.owner Unit#30
+  r LiteGoal#4.posX 73400320
+  r LiteGoal#4.posY 9699328
+  r LiteGoal#4.posZ 15728640
+  r LiteGoal#4.velX 0
+  r LiteGoal#4.velY 0
+  r LiteGoal#4.velZ 0
+  r LiteGoal#4.heading -32768
+  r LiteGoal#4.netDirtyFlags 1
+  r PathOrder#4.source Order#30
+  r PathOrder#4.approachRadius 0
+  r PathOrder#4.altitude 75
+  r PathOrder#4.heading 0
+  r PathOrder#4.followOffset 0
+  r PathOrder#4.flags 40
+  r PathOrder#4.piece -1
+  r PathOrder#4.unit Unit#30
+  r PathOrder#4.posX 73400320
+  r PathOrder#4.posY 9699328
+  r PathOrder#4.posZ 15728640
+  r PathOrder#4.ref.owner null
+  a unit Unit#30
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#30.flags 0x90050326
+  o Unit#30.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#30.lastMoveTick 122
+  w UnitMotion#30.p2Y 122
+call 122 UpdateMotion
+  r Unit#31.cell (3,13)
+  r Unit#31.footprint (2,2)
+  r Unit#31.id 31
+  r Unit#31.spatialBucket SpatialBucket#30
+  r Unit#31.transportPiece 255
+  r Unit#31.heading -32768
+  r Unit#31.pitch 0
+  r Unit#31.list Order#31
+  r Unit#31.flags 0x90240326
+  r Unit#31.carrier null
+  r Unit#31.def UnitDef#43
+  r Unit#31.player Player#0
+  r Unit#31.motion UnitMotion#31
+  r Unit#31.posX 4194304
+  r Unit#31.posY 7929856
+  r Unit#31.posZ 14680064
+  r SpatialBucket#30.bytes x:494904000000
+  r Order#31.flags_42 37907
+  r Order#31.unit Unit#31
+  r UnitDef#43.draft 0
+  r UnitDef#43.flags1 0x00818989
+  r UnitDef#43.maxvelocity 786432
+  r UnitDef#43.altitude 160
+  r UnitDef#43.brakerate 589824
+  r UnitDef#43.acceleration 29491
+  r UnitDef#43.bankscale 65536
+  r UnitDef#43.pitchscale 0
+  r UnitDef#43.moverate1 524288
+  r UnitDef#43.moverate2 1572864
+  r UnitDef#43.turnrate 820
+  r UnitMotion#31.obj LiteGoal#5
+  r UnitMotion#31.velocityX 0
+  r UnitMotion#31.velocityY 65536
+  r UnitMotion#31.velocityZ 0
+  r UnitMotion#31.speed 65536
+  r UnitMotion#31.flags 2
+  r UnitMotion#31.turn 0
+  r UnitMotion#31.lastMoveTick 121
+  r UnitMotion#31.p2X 0
+  r UnitMotion#31.p2Y 129
+  r UnitMotion#31.p2Z 0
+  r LiteGoal#5.target PathOrder#5
+  r LiteGoal#5.owner Unit#31
+  r LiteGoal#5.posX 4194304
+  r LiteGoal#5.posY 10027008
+  r LiteGoal#5.posZ 14680064
+  r LiteGoal#5.velX 0
+  r LiteGoal#5.velY 0
+  r LiteGoal#5.velZ 0
+  r LiteGoal#5.heading -32768
+  r LiteGoal#5.netDirtyFlags 1
+  r PathOrder#5.source Order#31
+  r PathOrder#5.approachRadius 0
+  r PathOrder#5.altitude 80
+  r PathOrder#5.heading 0
+  r PathOrder#5.followOffset 0
+  r PathOrder#5.flags 40
+  r PathOrder#5.piece -1
+  r PathOrder#5.unit Unit#31
+  r PathOrder#5.posX 4194304
+  r PathOrder#5.posY 10027008
+  r PathOrder#5.posZ 14680064
+  r PathOrder#5.ref.owner null
+  a unit Unit#31
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#31.flags 0x90250326
+  o Unit#31.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#31.lastMoveTick 122
+  w UnitMotion#31.p2Y 122
+call 122 UpdateMotion
+  r Unit#32.cell (11,14)
+  r Unit#32.footprint (2,2)
+  r Unit#32.id 32
+  r Unit#32.spatialBucket SpatialBucket#31
+  r Unit#32.transportPiece 255
+  r Unit#32.heading -32768
+  r Unit#32.pitch 0
+  r Unit#32.list Order#32
+  r Unit#32.flags 0x90240326
+  r Unit#32.carrier null
+  r Unit#32.def UnitDef#43
+  r Unit#32.player Player#0
+  r Unit#32.motion UnitMotion#32
+  r Unit#32.posX 12582912
+  r Unit#32.posY 7929856
+  r Unit#32.posZ 15728640
+  r SpatialBucket#31.bytes x:494900000000
+  r Order#32.flags_42 37907
+  r Order#32.unit Unit#32
+  r UnitMotion#32.obj LiteGoal#6
+  r UnitMotion#32.velocityX 0
+  r UnitMotion#32.velocityY 65536
+  r UnitMotion#32.velocityZ 0
+  r UnitMotion#32.speed 65536
+  r UnitMotion#32.flags 2
+  r UnitMotion#32.turn 0
+  r UnitMotion#32.lastMoveTick 121
+  r UnitMotion#32.p2X 0
+  r UnitMotion#32.p2Y 129
+  r UnitMotion#32.p2Z 0
+  r LiteGoal#6.target PathOrder#6
+  r LiteGoal#6.owner Unit#32
+  r LiteGoal#6.posX 12582912
+  r LiteGoal#6.posY 10027008
+  r LiteGoal#6.posZ 15728640
+  r LiteGoal#6.velX 0
+  r LiteGoal#6.velY 0
+  r LiteGoal#6.velZ 0
+  r LiteGoal#6.heading -32768
+  r LiteGoal#6.netDirtyFlags 1
+  r PathOrder#6.source Order#32
+  r PathOrder#6.approachRadius 0
+  r PathOrder#6.altitude 80
+  r PathOrder#6.heading 0
+  r PathOrder#6.followOffset 0
+  r PathOrder#6.flags 40
+  r PathOrder#6.piece -1
+  r PathOrder#6.unit Unit#32
+  r PathOrder#6.posX 12582912
+  r PathOrder#6.posY 10027008
+  r PathOrder#6.posZ 15728640
+  r PathOrder#6.ref.owner null
+  a unit Unit#32
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#32.flags 0x90250326
+  o Unit#32.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#32.lastMoveTick 122
+  w UnitMotion#32.p2Y 122
+call 122 UpdateMotion
+  r Unit#33.cell (6,16)
+  r Unit#33.footprint (2,2)
+  r Unit#33.id 33
+  r Unit#33.spatialBucket SpatialBucket#60
+  r Unit#33.transportPiece 255
+  r Unit#33.heading -32768
+  r Unit#33.pitch 0
+  r Unit#33.list Order#33
+  r Unit#33.flags 0x90240326
+  r Unit#33.carrier null
+  r Unit#33.def UnitDef#43
+  r Unit#33.player Player#0
+  r Unit#33.motion UnitMotion#33
+  r Unit#33.posX 7340032
+  r Unit#33.posY 7929856
+  r Unit#33.posZ 17825792
+  r SpatialBucket#60.bytes x:494904000000
+  r Order#33.flags_42 37907
+  r Order#33.unit Unit#33
+  r UnitMotion#33.obj LiteGoal#7
+  r UnitMotion#33.velocityX 0
+  r UnitMotion#33.velocityY 65536
+  r UnitMotion#33.velocityZ 0
+  r UnitMotion#33.speed 65536
+  r UnitMotion#33.flags 2
+  r UnitMotion#33.turn 0
+  r UnitMotion#33.lastMoveTick 121
+  r UnitMotion#33.p2X 0
+  r UnitMotion#33.p2Y 129
+  r UnitMotion#33.p2Z 0
+  r LiteGoal#7.target PathOrder#7
+  r LiteGoal#7.owner Unit#33
+  r LiteGoal#7.posX 7340032
+  r LiteGoal#7.posY 10027008
+  r LiteGoal#7.posZ 17825792
+  r LiteGoal#7.velX 0
+  r LiteGoal#7.velY 0
+  r LiteGoal#7.velZ 0
+  r LiteGoal#7.heading -32768
+  r LiteGoal#7.netDirtyFlags 1
+  r PathOrder#7.source Order#33
+  r PathOrder#7.approachRadius 0
+  r PathOrder#7.altitude 80
+  r PathOrder#7.heading 0
+  r PathOrder#7.followOffset 0
+  r PathOrder#7.flags 40
+  r PathOrder#7.piece -1
+  r PathOrder#7.unit Unit#33
+  r PathOrder#7.posX 7340032
+  r PathOrder#7.posY 10027008
+  r PathOrder#7.posZ 17825792
+  r PathOrder#7.ref.owner null
+  a unit Unit#33
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#33.flags 0x90250326
+  o Unit#33.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#33.lastMoveTick 122
+  w UnitMotion#33.p2Y 122
+call 122 UpdateMotion
+  r Unit#34.cell (16,12)
+  r Unit#34.footprint (3,3)
+  r Unit#34.id 34
+  r Unit#34.spatialBucket SpatialBucket#32
+  r Unit#34.transportPiece 255
+  r Unit#34.heading -22189
+  r Unit#34.pitch 0
+  r Unit#34.list Order#34
+  r Unit#34.flags 0x90240326
+  r Unit#34.carrier null
+  r Unit#34.def UnitDef#16
+  r Unit#34.player Player#0
+  r Unit#34.motion UnitMotion#34
+  r Unit#34.posX 18109229
+  r Unit#34.posY 7929856
+  r Unit#34.posZ 14460127
+  r SpatialBucket#32.bytes x:494900000000
+  r Order#34.flags_42 1027
+  r Order#34.unit Unit#34
+  r UnitDef#16.draft 0
+  r UnitDef#16.flags1 0x08818889
+  r UnitDef#16.maxvelocity 432537
+  r UnitDef#16.altitude 60
+  r UnitDef#16.brakerate 262144
+  r UnitDef#16.acceleration 10485
+  r UnitDef#16.bankscale 65536
+  r UnitDef#16.pitchscale 0
+  r UnitDef#16.moverate1 865074
+  r UnitDef#16.moverate2 865074
+  r UnitDef#16.turnrate 800
+  r UnitMotion#34.obj LiteGoal#8
+  r UnitMotion#34.velocityX 131127
+  r UnitMotion#34.velocityY 65536
+  r UnitMotion#34.velocityZ 81574
+  r UnitMotion#34.speed 167760
+  r UnitMotion#34.flags 2
+  r UnitMotion#34.turn 0
+  r UnitMotion#34.lastMoveTick 121
+  r UnitMotion#34.p2X 84912
+  r UnitMotion#34.p2Y 129
+  r UnitMotion#34.p2Z 52822
+  r LiteGoal#8.target PathOrder#8
+  r LiteGoal#8.owner Unit#34
+  r LiteGoal#8.posX 130547712
+  r LiteGoal#8.posY 8716288
+  r LiteGoal#8.posZ 84410368
+  r LiteGoal#8.velX 0
+  r LiteGoal#8.velY 0
+  r LiteGoal#8.velZ 0
+  r LiteGoal#8.heading -22189
+  r LiteGoal#8.netDirtyFlags 1
+  r PathOrder#8.source Order#34
+  r PathOrder#8.approachRadius 0
+  r PathOrder#8.altitude 0
+  r PathOrder#8.heading 0
+  r PathOrder#8.followOffset 0
+  r PathOrder#8.flags 32
+  r PathOrder#8.piece -1
+  r PathOrder#8.unit Unit#34
+  r PathOrder#8.posX 130547712
+  r PathOrder#8.posY 8716288
+  r PathOrder#8.posZ 84410368
+  r PathOrder#8.ref.owner null
+  a unit Unit#34
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#34.flags 0x90250326
+  o Unit#34.posX 18246080
+  o Unit#34.posY 7995392
+  o Unit#34.posZ 14545262
+  i services.SchedPublish 14 8
+  w UnitMotion#34.velocityX 136851
+  w UnitMotion#34.velocityZ 85135
+  w UnitMotion#34.speed 173986
+  w UnitMotion#34.lastMoveTick 122
+  w UnitMotion#34.p2X 86390
+  w UnitMotion#34.p2Y 122
+  w UnitMotion#34.p2Z 53741
+call 122 UpdateMotion
+  r Unit#35.cell (92,61)
+  r Unit#35.footprint (3,3)
+  r Unit#35.id 35
+  r Unit#35.spatialBucket SpatialBucket#221
+  r Unit#35.transportPiece 255
+  r Unit#35.heading -31312
+  r Unit#35.pitch 0
+  r Unit#35.list Order#35
+  r Unit#35.flags 0x90260300
+  r Unit#35.carrier Unit#4
+  r Unit#35.def UnitDef#18
+  r Unit#35.player Player#0
+  r Unit#35.motion UnitMotion#35
+  r Unit#35.posX 97517568
+  r Unit#35.posY 4784128
+  r Unit#35.posZ 65011712
+  r Order#35.flags_42 36
+  r Order#35.unit Unit#35
+  r UnitMotion#35.obj AiSearchGoal#27
+  r UnitMotion#35.velocityX 0
+  r UnitMotion#35.velocityY 0
+  r UnitMotion#35.velocityZ 0
+  r UnitMotion#35.speed 0
+  r UnitMotion#35.flags 0
+  r UnitMotion#35.turn 0
+  r UnitMotion#35.lastMoveTick 0
+  r UnitMotion#35.p2X 0
+  r UnitMotion#35.p2Y 0
+  r UnitMotion#35.p2Z 0
+  r AiSearchGoal#27.target null
+  r AiSearchGoal#27.owner Unit#35
+  r AiSearchGoal#27.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#27.count 0
+  r AiSearchGoal#27.repathClaimTick 0
+  r AiSearchGoal#27.flags 8
+  a unit Unit#35
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#35.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#36.cell (92,61)
+  r Unit#36.footprint (3,3)
+  r Unit#36.id 36
+  r Unit#36.spatialBucket SpatialBucket#221
+  r Unit#36.transportPiece 255
+  r Unit#36.heading -31312
+  r Unit#36.pitch 0
+  r Unit#36.list Order#36
+  r Unit#36.flags 0x90260300
+  r Unit#36.carrier Unit#4
+  r Unit#36.def UnitDef#18
+  r Unit#36.player Player#0
+  r Unit#36.motion UnitMotion#36
+  r Unit#36.posX 97517568
+  r Unit#36.posY 4784128
+  r Unit#36.posZ 65011712
+  r Order#36.flags_42 36
+  r Order#36.unit Unit#36
+  r UnitMotion#36.obj AiSearchGoal#28
+  r UnitMotion#36.velocityX 0
+  r UnitMotion#36.velocityY 0
+  r UnitMotion#36.velocityZ 0
+  r UnitMotion#36.speed 0
+  r UnitMotion#36.flags 0
+  r UnitMotion#36.turn 0
+  r UnitMotion#36.lastMoveTick 0
+  r UnitMotion#36.p2X 0
+  r UnitMotion#36.p2Y 0
+  r UnitMotion#36.p2Z 0
+  r AiSearchGoal#28.target null
+  r AiSearchGoal#28.owner Unit#36
+  r AiSearchGoal#28.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#28.count 0
+  r AiSearchGoal#28.repathClaimTick 0
+  r AiSearchGoal#28.flags 8
+  a unit Unit#36
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#36.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#37.cell (92,61)
+  r Unit#37.footprint (3,3)
+  r Unit#37.id 37
+  r Unit#37.spatialBucket SpatialBucket#221
+  r Unit#37.transportPiece 255
+  r Unit#37.heading -31312
+  r Unit#37.pitch 0
+  r Unit#37.list Order#37
+  r Unit#37.flags 0x90260300
+  r Unit#37.carrier Unit#4
+  r Unit#37.def UnitDef#18
+  r Unit#37.player Player#0
+  r Unit#37.motion UnitMotion#37
+  r Unit#37.posX 97517568
+  r Unit#37.posY 4784128
+  r Unit#37.posZ 65011712
+  r Order#37.flags_42 36
+  r Order#37.unit Unit#37
+  r UnitMotion#37.obj AiSearchGoal#29
+  r UnitMotion#37.velocityX 0
+  r UnitMotion#37.velocityY 0
+  r UnitMotion#37.velocityZ 0
+  r UnitMotion#37.speed 0
+  r UnitMotion#37.flags 0
+  r UnitMotion#37.turn 0
+  r UnitMotion#37.lastMoveTick 0
+  r UnitMotion#37.p2X 0
+  r UnitMotion#37.p2Y 0
+  r UnitMotion#37.p2Z 0
+  r AiSearchGoal#29.target null
+  r AiSearchGoal#29.owner Unit#37
+  r AiSearchGoal#29.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#29.count 0
+  r AiSearchGoal#29.repathClaimTick 0
+  r AiSearchGoal#29.flags 8
+  a unit Unit#37
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#37.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#38.cell (92,61)
+  r Unit#38.footprint (3,3)
+  r Unit#38.id 38
+  r Unit#38.spatialBucket SpatialBucket#221
+  r Unit#38.transportPiece 255
+  r Unit#38.heading -31312
+  r Unit#38.pitch 0
+  r Unit#38.list Order#38
+  r Unit#38.flags 0x90260300
+  r Unit#38.carrier Unit#4
+  r Unit#38.def UnitDef#18
+  r Unit#38.player Player#0
+  r Unit#38.motion UnitMotion#38
+  r Unit#38.posX 97517568
+  r Unit#38.posY 4784128
+  r Unit#38.posZ 65011712
+  r Order#38.flags_42 36
+  r Order#38.unit Unit#38
+  r UnitMotion#38.obj AiSearchGoal#30
+  r UnitMotion#38.velocityX 0
+  r UnitMotion#38.velocityY 0
+  r UnitMotion#38.velocityZ 0
+  r UnitMotion#38.speed 0
+  r UnitMotion#38.flags 0
+  r UnitMotion#38.turn 0
+  r UnitMotion#38.lastMoveTick 0
+  r UnitMotion#38.p2X 0
+  r UnitMotion#38.p2Y 0
+  r UnitMotion#38.p2Z 0
+  r AiSearchGoal#30.target null
+  r AiSearchGoal#30.owner Unit#38
+  r AiSearchGoal#30.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#30.count 0
+  r AiSearchGoal#30.repathClaimTick 0
+  r AiSearchGoal#30.flags 8
+  a unit Unit#38
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#38.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#39.cell (24,15)
+  r Unit#39.footprint (3,3)
+  r Unit#39.id 39
+  r Unit#39.spatialBucket SpatialBucket#63
+  r Unit#39.transportPiece 255
+  r Unit#39.heading -22187
+  r Unit#39.pitch 0
+  r Unit#39.list Order#39
+  r Unit#39.flags 0x90240326
+  r Unit#39.carrier null
+  r Unit#39.def UnitDef#16
+  r Unit#39.player Player#0
+  r Unit#39.motion UnitMotion#39
+  r Unit#39.posX 26497988
+  r Unit#39.posY 7929856
+  r Unit#39.posZ 17605691
+  r SpatialBucket#63.bytes x:494900000000
+  r Order#39.flags_42 1027
+  r Order#39.unit Unit#39
+  r UnitMotion#39.obj LiteGoal#9
+  r UnitMotion#39.velocityX 131143
+  r UnitMotion#39.velocityY 65536
+  r UnitMotion#39.velocityZ 81558
+  r UnitMotion#39.speed 167765
+  r UnitMotion#39.flags 2
+  r UnitMotion#39.turn 0
+  r UnitMotion#39.lastMoveTick 121
+  r UnitMotion#39.p2X 84922
+  r UnitMotion#39.p2Y 129
+  r UnitMotion#39.p2Z 52812
+  r LiteGoal#9.target PathOrder#9
+  r LiteGoal#9.owner Unit#39
+  r LiteGoal#9.posX 130547712
+  r LiteGoal#9.posY 8716288
+  r LiteGoal#9.posZ 82313216
+  r LiteGoal#9.velX 0
+  r LiteGoal#9.velY 0
+  r LiteGoal#9.velZ 0
+  r LiteGoal#9.heading -22187
+  r LiteGoal#9.netDirtyFlags 1
+  r PathOrder#9.source Order#39
+  r PathOrder#9.approachRadius 0
+  r PathOrder#9.altitude 0
+  r PathOrder#9.heading 0
+  r PathOrder#9.followOffset 0
+  r PathOrder#9.flags 32
+  r PathOrder#9.piece -1
+  r PathOrder#9.unit Unit#39
+  r PathOrder#9.posX 130547712
+  r PathOrder#9.posY 8716288
+  r PathOrder#9.posZ 82313216
+  r PathOrder#9.ref.owner null
+  a unit Unit#39
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#39.flags 0x90250326
+  o Unit#39.posX 26634856
+  o Unit#39.posY 7995392
+  o Unit#39.posZ 17690809
+  i services.SchedPublish 14 8
+  w UnitMotion#39.velocityX 136868
+  w UnitMotion#39.velocityZ 85118
+  w UnitMotion#39.speed 173991
+  w UnitMotion#39.lastMoveTick 122
+  w UnitMotion#39.p2X 86400
+  w UnitMotion#39.p2Y 122
+  w UnitMotion#39.p2Z 53731
+call 122 UpdateMotion
+  r Unit#40.cell (20,16)
+  r Unit#40.footprint (3,3)
+  r Unit#40.id 40
+  r Unit#40.spatialBucket SpatialBucket#62
+  r Unit#40.transportPiece 255
+  r Unit#40.heading -21932
+  r Unit#40.pitch 0
+  r Unit#40.list Order#40
+  r Unit#40.flags 0x90240326
+  r Unit#40.carrier null
+  r Unit#40.def UnitDef#16
+  r Unit#40.player Player#0
+  r Unit#40.motion UnitMotion#40
+  r Unit#40.posX 22323612
+  r Unit#40.posY 7929856
+  r Unit#40.posZ 18621500
+  r SpatialBucket#62.bytes x:494900000000
+  r Order#40.flags_42 1027
+  r Order#40.unit Unit#40
+  r UnitMotion#40.obj LiteGoal#10
+  r UnitMotion#40.velocityX 133104
+  r UnitMotion#40.velocityY 65536
+  r UnitMotion#40.velocityZ 78332
+  r UnitMotion#40.speed 167772
+  r UnitMotion#40.flags 2
+  r UnitMotion#40.turn 0
+  r UnitMotion#40.lastMoveTick 121
+  r UnitMotion#40.p2X 86192
+  r UnitMotion#40.p2Y 129
+  r UnitMotion#40.p2Z 50721
+  r LiteGoal#10.target PathOrder#10
+  r LiteGoal#10.owner Unit#40
+  r LiteGoal#10.posX 130547712
+  r LiteGoal#10.posY 8716288
+  r LiteGoal#10.posZ 82313216
+  r LiteGoal#10.velX 0
+  r LiteGoal#10.velY 0
+  r LiteGoal#10.velZ 0
+  r LiteGoal#10.heading -21932
+  r LiteGoal#10.netDirtyFlags 1
+  r PathOrder#10.source Order#40
+  r PathOrder#10.approachRadius 0
+  r PathOrder#10.altitude 0
+  r PathOrder#10.heading 0
+  r PathOrder#10.followOffset 0
+  r PathOrder#10.flags 32
+  r PathOrder#10.piece -1
+  r PathOrder#10.unit Unit#40
+  r PathOrder#10.posX 130547712
+  r PathOrder#10.posY 8716288
+  r PathOrder#10.posZ 82313216
+  r PathOrder#10.ref.owner null
+  a unit Unit#40
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#40.flags 0x90250326
+  o Unit#40.posX 22462526
+  o Unit#40.posY 7995392
+  o Unit#40.posZ 18703251
+  i services.SchedPublish 14 8
+  w UnitMotion#40.velocityX 138914
+  w UnitMotion#40.velocityZ 81751
+  w UnitMotion#40.speed 173997
+  w UnitMotion#40.lastMoveTick 122
+  w UnitMotion#40.p2X 87692
+  w UnitMotion#40.p2Y 122
+  w UnitMotion#40.p2Z 51603
+call 122 UpdateMotion
+  r Unit#41.cell (2,18)
+  r Unit#41.footprint (2,2)
+  r Unit#41.id 41
+  r Unit#41.spatialBucket SpatialBucket#60
+  r Unit#41.transportPiece 255
+  r Unit#41.heading -32768
+  r Unit#41.pitch 0
+  r Unit#41.list Order#41
+  r Unit#41.flags 0x90240326
+  r Unit#41.carrier null
+  r Unit#41.def UnitDef#43
+  r Unit#41.player Player#0
+  r Unit#41.motion UnitMotion#41
+  r Unit#41.posX 3145728
+  r Unit#41.posY 7929856
+  r Unit#41.posZ 19922944
+  r Order#41.flags_42 37907
+  r Order#41.unit Unit#41
+  r UnitMotion#41.obj LiteGoal#11
+  r UnitMotion#41.velocityX 0
+  r UnitMotion#41.velocityY 65536
+  r UnitMotion#41.velocityZ 0
+  r UnitMotion#41.speed 65536
+  r UnitMotion#41.flags 2
+  r UnitMotion#41.turn 0
+  r UnitMotion#41.lastMoveTick 121
+  r UnitMotion#41.p2X 0
+  r UnitMotion#41.p2Y 129
+  r UnitMotion#41.p2Z 0
+  r LiteGoal#11.target PathOrder#11
+  r LiteGoal#11.owner Unit#41
+  r LiteGoal#11.posX 3145728
+  r LiteGoal#11.posY 10027008
+  r LiteGoal#11.posZ 19922944
+  r LiteGoal#11.velX 0
+  r LiteGoal#11.velY 0
+  r LiteGoal#11.velZ 0
+  r LiteGoal#11.heading -32768
+  r LiteGoal#11.netDirtyFlags 1
+  r PathOrder#11.source Order#41
+  r PathOrder#11.approachRadius 0
+  r PathOrder#11.altitude 80
+  r PathOrder#11.heading 0
+  r PathOrder#11.followOffset 0
+  r PathOrder#11.flags 40
+  r PathOrder#11.piece -1
+  r PathOrder#11.unit Unit#41
+  r PathOrder#11.posX 3145728
+  r PathOrder#11.posY 10027008
+  r PathOrder#11.posZ 19922944
+  r PathOrder#11.ref.owner null
+  a unit Unit#41
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#41.flags 0x90250326
+  o Unit#41.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#41.lastMoveTick 122
+  w UnitMotion#41.p2Y 122
+call 122 UpdateMotion
+  r Unit#42.cell (6,22)
+  r Unit#42.footprint (2,2)
+  r Unit#42.id 42
+  r Unit#42.spatialBucket SpatialBucket#60
+  r Unit#42.transportPiece 255
+  r Unit#42.heading -32768
+  r Unit#42.pitch 0
+  r Unit#42.list Order#42
+  r Unit#42.flags 0x90240326
+  r Unit#42.carrier null
+  r Unit#42.def UnitDef#43
+  r Unit#42.player Player#0
+  r Unit#42.motion UnitMotion#42
+  r Unit#42.posX 7340032
+  r Unit#42.posY 7929856
+  r Unit#42.posZ 24117248
+  r Order#42.flags_42 37907
+  r Order#42.unit Unit#42
+  r UnitMotion#42.obj LiteGoal#12
+  r UnitMotion#42.velocityX 0
+  r UnitMotion#42.velocityY 65536
+  r UnitMotion#42.velocityZ 0
+  r UnitMotion#42.speed 65536
+  r UnitMotion#42.flags 2
+  r UnitMotion#42.turn 0
+  r UnitMotion#42.lastMoveTick 121
+  r UnitMotion#42.p2X 0
+  r UnitMotion#42.p2Y 129
+  r UnitMotion#42.p2Z 0
+  r LiteGoal#12.target PathOrder#12
+  r LiteGoal#12.owner Unit#42
+  r LiteGoal#12.posX 7340032
+  r LiteGoal#12.posY 10027008
+  r LiteGoal#12.posZ 24117248
+  r LiteGoal#12.velX 0
+  r LiteGoal#12.velY 0
+  r LiteGoal#12.velZ 0
+  r LiteGoal#12.heading -32768
+  r LiteGoal#12.netDirtyFlags 1
+  r PathOrder#12.source Order#42
+  r PathOrder#12.approachRadius 0
+  r PathOrder#12.altitude 80
+  r PathOrder#12.heading 0
+  r PathOrder#12.followOffset 0
+  r PathOrder#12.flags 40
+  r PathOrder#12.piece -1
+  r PathOrder#12.unit Unit#42
+  r PathOrder#12.posX 7340032
+  r PathOrder#12.posY 10027008
+  r PathOrder#12.posZ 24117248
+  r PathOrder#12.ref.owner null
+  a unit Unit#42
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#42.flags 0x90250326
+  o Unit#42.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#42.lastMoveTick 122
+  w UnitMotion#42.p2Y 122
+call 122 UpdateMotion
+  r Unit#43.cell (64,12)
+  r Unit#43.footprint (3,3)
+  r Unit#43.id 43
+  r Unit#43.spatialBucket SpatialBucket#38
+  r Unit#43.transportPiece 255
+  r Unit#43.heading -32768
+  r Unit#43.pitch 0
+  r Unit#43.list Order#43
+  r Unit#43.flags 0x90040326
+  r Unit#43.carrier null
+  r Unit#43.def UnitDef#47
+  r Unit#43.player Player#0
+  r Unit#43.motion UnitMotion#43
+  r Unit#43.posX 68157440
+  r Unit#43.posY 7929856
+  r Unit#43.posZ 13631488
+  r Order#43.flags_42 37907
+  r Order#43.unit Unit#43
+  r UnitMotion#43.obj LiteGoal#13
+  r UnitMotion#43.velocityX 0
+  r UnitMotion#43.velocityY 65536
+  r UnitMotion#43.velocityZ 0
+  r UnitMotion#43.speed 65536
+  r UnitMotion#43.flags 2
+  r UnitMotion#43.turn 0
+  r UnitMotion#43.lastMoveTick 121
+  r UnitMotion#43.p2X 0
+  r UnitMotion#43.p2Y 129
+  r UnitMotion#43.p2Z 0
+  r LiteGoal#13.target PathOrder#13
+  r LiteGoal#13.owner Unit#43
+  r LiteGoal#13.posX 68157440
+  r LiteGoal#13.posY 9699328
+  r LiteGoal#13.posZ 13631488
+  r LiteGoal#13.velX 0
+  r LiteGoal#13.velY 0
+  r LiteGoal#13.velZ 0
+  r LiteGoal#13.heading -32768
+  r LiteGoal#13.netDirtyFlags 1
+  r PathOrder#13.source Order#43
+  r PathOrder#13.approachRadius 0
+  r PathOrder#13.altitude 75
+  r PathOrder#13.heading 0
+  r PathOrder#13.followOffset 0
+  r PathOrder#13.flags 40
+  r PathOrder#13.piece -1
+  r PathOrder#13.unit Unit#43
+  r PathOrder#13.posX 68157440
+  r PathOrder#13.posY 9699328
+  r PathOrder#13.posZ 13631488
+  r PathOrder#13.ref.owner null
+  a unit Unit#43
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#43.flags 0x90050326
+  o Unit#43.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#43.lastMoveTick 122
+  w UnitMotion#43.p2Y 122
+call 122 UpdateMotion
+  r Unit#44.cell (72,17)
+  r Unit#44.footprint (3,3)
+  r Unit#44.id 44
+  r Unit#44.spatialBucket SpatialBucket#69
+  r Unit#44.transportPiece 255
+  r Unit#44.heading -32768
+  r Unit#44.pitch 0
+  r Unit#44.list Order#44
+  r Unit#44.flags 0x90040326
+  r Unit#44.carrier null
+  r Unit#44.def UnitDef#47
+  r Unit#44.player Player#0
+  r Unit#44.motion UnitMotion#44
+  r Unit#44.posX 76546048
+  r Unit#44.posY 7929856
+  r Unit#44.posZ 18874368
+  r SpatialBucket#69.bytes x:494900000000
+  r Order#44.flags_42 37907
+  r Order#44.unit Unit#44
+  r UnitMotion#44.obj LiteGoal#14
+  r UnitMotion#44.velocityX 0
+  r UnitMotion#44.velocityY 65536
+  r UnitMotion#44.velocityZ 0
+  r UnitMotion#44.speed 65536
+  r UnitMotion#44.flags 2
+  r UnitMotion#44.turn 0
+  r UnitMotion#44.lastMoveTick 121
+  r UnitMotion#44.p2X 0
+  r UnitMotion#44.p2Y 129
+  r UnitMotion#44.p2Z 0
+  r LiteGoal#14.target PathOrder#14
+  r LiteGoal#14.owner Unit#44
+  r LiteGoal#14.posX 76546048
+  r LiteGoal#14.posY 9699328
+  r LiteGoal#14.posZ 18874368
+  r LiteGoal#14.velX 0
+  r LiteGoal#14.velY 0
+  r LiteGoal#14.velZ 0
+  r LiteGoal#14.heading -32768
+  r LiteGoal#14.netDirtyFlags 1
+  r PathOrder#14.source Order#44
+  r PathOrder#14.approachRadius 0
+  r PathOrder#14.altitude 75
+  r PathOrder#14.heading 0
+  r PathOrder#14.followOffset 0
+  r PathOrder#14.flags 40
+  r PathOrder#14.piece -1
+  r PathOrder#14.unit Unit#44
+  r PathOrder#14.posX 76546048
+  r PathOrder#14.posY 9699328
+  r PathOrder#14.posZ 18874368
+  r PathOrder#14.ref.owner null
+  a unit Unit#44
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#44.flags 0x90050326
+  o Unit#44.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#44.lastMoveTick 122
+  w UnitMotion#44.p2Y 122
+call 122 UpdateMotion
+  r Unit#45.cell (64,16)
+  r Unit#45.footprint (3,3)
+  r Unit#45.id 45
+  r Unit#45.spatialBucket SpatialBucket#68
+  r Unit#45.transportPiece 255
+  r Unit#45.heading -32768
+  r Unit#45.pitch 0
+  r Unit#45.list Order#45
+  r Unit#45.flags 0x90040326
+  r Unit#45.carrier null
+  r Unit#45.def UnitDef#47
+  r Unit#45.player Player#0
+  r Unit#45.motion UnitMotion#45
+  r Unit#45.posX 68157440
+  r Unit#45.posY 7929856
+  r Unit#45.posZ 17825792
+  r SpatialBucket#68.bytes x:494900000000
+  r Order#45.flags_42 37907
+  r Order#45.unit Unit#45
+  r UnitMotion#45.obj LiteGoal#15
+  r UnitMotion#45.velocityX 0
+  r UnitMotion#45.velocityY 65536
+  r UnitMotion#45.velocityZ 0
+  r UnitMotion#45.speed 65536
+  r UnitMotion#45.flags 2
+  r UnitMotion#45.turn 0
+  r UnitMotion#45.lastMoveTick 121
+  r UnitMotion#45.p2X 0
+  r UnitMotion#45.p2Y 129
+  r UnitMotion#45.p2Z 0
+  r LiteGoal#15.target PathOrder#15
+  r LiteGoal#15.owner Unit#45
+  r LiteGoal#15.posX 68157440
+  r LiteGoal#15.posY 9699328
+  r LiteGoal#15.posZ 17825792
+  r LiteGoal#15.velX 0
+  r LiteGoal#15.velY 0
+  r LiteGoal#15.velZ 0
+  r LiteGoal#15.heading -32768
+  r LiteGoal#15.netDirtyFlags 1
+  r PathOrder#15.source Order#45
+  r PathOrder#15.approachRadius 0
+  r PathOrder#15.altitude 75
+  r PathOrder#15.heading 0
+  r PathOrder#15.followOffset 0
+  r PathOrder#15.flags 40
+  r PathOrder#15.piece -1
+  r PathOrder#15.unit Unit#45
+  r PathOrder#15.posX 68157440
+  r PathOrder#15.posY 9699328
+  r PathOrder#15.posZ 17825792
+  r PathOrder#15.ref.owner null
+  a unit Unit#45
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#45.flags 0x90050326
+  o Unit#45.posY 7995392
+  i services.SchedPublish 14 8
+  w UnitMotion#45.lastMoveTick 122
+  w UnitMotion#45.p2Y 122
+call 122 UpdateMotion
+  r Unit#46.cell (23,9)
+  r Unit#46.footprint (3,3)
+  r Unit#46.id 46
+  r Unit#46.spatialBucket SpatialBucket#33
+  r Unit#46.transportPiece 255
+  r Unit#46.heading -22576
+  r Unit#46.pitch 0
+  r Unit#46.list Order#46
+  r Unit#46.flags 0x90240326
+  r Unit#46.carrier null
+  r Unit#46.def UnitDef#16
+  r Unit#46.player Player#0
+  r Unit#46.motion UnitMotion#46
+  r Unit#46.posX 25417543
+  r Unit#46.posY 7929856
+  r Unit#46.posZ 11363327
+  r SpatialBucket#33.bytes x:494900000000
+  r Order#46.flags_42 1027
+  r Order#46.unit Unit#46
+  r UnitMotion#46.obj LiteGoal#16
+  r UnitMotion#46.velocityX 128006
+  r UnitMotion#46.velocityY 65536
+  r UnitMotion#46.velocityZ 86391
+  r UnitMotion#46.speed 167761
+  r UnitMotion#46.flags 2
+  r UnitMotion#46.turn 0
+  r UnitMotion#46.lastMoveTick 121
+  r UnitMotion#46.p2X 82892
+  r UnitMotion#46.p2Y 129
+  r UnitMotion#46.p2Z 55940
+  r LiteGoal#16.target PathOrder#16
+  r LiteGoal#16.owner Unit#46
+  r LiteGoal#16.posX 130547712
+  r LiteGoal#16.posY 8716288
+  r LiteGoal#16.posZ 82313216
+  r LiteGoal#16.velX 0
+  r LiteGoal#16.velY 0
+  r LiteGoal#16.velZ 0
+  r LiteGoal#16.heading -22576
+  r LiteGoal#16.netDirtyFlags 1
+  r PathOrder#16.source Order#46
+  r PathOrder#16.approachRadius 0
+  r PathOrder#16.altitude 0
+  r PathOrder#16.heading 0
+  r PathOrder#16.followOffset 0
+  r PathOrder#16.flags 32
+  r PathOrder#16.piece -1
+  r PathOrder#16.unit Unit#46
+  r PathOrder#16.posX 130547712
+  r PathOrder#16.posY 8716288
+  r PathOrder#16.posZ 82313216
+  r PathOrder#16.ref.owner null
+  a unit Unit#46
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#46.flags 0x90250326
+  o Unit#46.posX 25551137
+  o Unit#46.posY 7995392
+  o Unit#46.posZ 11453489
+  i services.SchedPublish 14 8
+  w UnitMotion#46.velocityX 133594
+  w UnitMotion#46.velocityZ 90162
+  w UnitMotion#46.speed 173987
+  w UnitMotion#46.lastMoveTick 122
+  w UnitMotion#46.p2X 84335
+  w UnitMotion#46.p2Y 122
+  w UnitMotion#46.p2Z 56913
+call 122 UpdateMotion
+  r Unit#47.cell (14,18)
+  r Unit#47.footprint (3,3)
+  r Unit#47.id 47
+  r Unit#47.spatialBucket SpatialBucket#61
+  r Unit#47.transportPiece 255
+  r Unit#47.heading -21536
+  r Unit#47.pitch 0
+  r Unit#47.list Order#47
+  r Unit#47.flags 0x90240326
+  r Unit#47.carrier null
+  r Unit#47.def UnitDef#16
+  r Unit#47.player Player#0
+  r Unit#47.motion UnitMotion#47
+  r Unit#47.posX 16061340
+  r Unit#47.posY 7929856
+  r Unit#47.posZ 20666587
+  r SpatialBucket#61.bytes x:494900000000
+  r Order#47.flags_42 1027
+  r Order#47.unit Unit#47
+  r UnitMotion#47.obj LiteGoal#17
+  r UnitMotion#47.velocityX 135977
+  r UnitMotion#47.velocityY 65536
+  r UnitMotion#47.velocityZ 73208
+  r UnitMotion#47.speed 167762
+  r UnitMotion#47.flags 2
+  r UnitMotion#47.turn 0
+  r UnitMotion#47.lastMoveTick 121
+  r UnitMotion#47.p2X 88053
+  r UnitMotion#47.p2Y 129
+  r UnitMotion#47.p2Z 47403
+  r LiteGoal#17.target PathOrder#17
+  r LiteGoal#17.owner Unit#47
+  r LiteGoal#17.posX 130547712
+  r LiteGoal#17.posY 8716288
+  r LiteGoal#17.posZ 82313216
+  r LiteGoal#17.velX 0
+  r LiteGoal#17.velY 0
+  r LiteGoal#17.velZ 0
+  r LiteGoal#17.heading -21536
+  r LiteGoal#17.netDirtyFlags 1
+  r PathOrder#17.source Order#47
+  r PathOrder#17.approachRadius 0
+  r PathOrder#17.altitude 0
+  r PathOrder#17.heading 0
+  r PathOrder#17.followOffset 0
+  r PathOrder#17.flags 32
+  r PathOrder#17.piece -1
+  r PathOrder#17.unit Unit#47
+  r PathOrder#17.posX 130547712
+  r PathOrder#17.posY 8716288
+  r PathOrder#17.posZ 82313216
+  r PathOrder#17.ref.owner null
+  a unit Unit#47
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#47.flags 0x90250326
+  o Unit#47.posX 16203253
+  o Unit#47.posY 7995392
+  o Unit#47.posZ 20742992
+  i services.SchedPublish 14 8
+  w UnitMotion#47.velocityX 141913
+  w UnitMotion#47.velocityZ 76405
+  w UnitMotion#47.speed 173988
+  w UnitMotion#47.lastMoveTick 122
+  w UnitMotion#47.p2X 89586
+  w UnitMotion#47.p2Y 122
+  w UnitMotion#47.p2Z 48229
+call 122 UpdateMotion
+  r Unit#48.cell (80,88)
+  r Unit#48.footprint (3,3)
+  r Unit#48.id 48
+  r Unit#48.spatialBucket SpatialBucket#340
+  r Unit#48.transportPiece 255
+  r Unit#48.heading -25123
+  r Unit#48.pitch 0
+  r Unit#48.list Order#48
+  r Unit#48.flags 0x90240321
+  r Unit#48.carrier null
+  r Unit#48.def UnitDef#24
+  r Unit#48.player Player#0
+  r Unit#48.motion UnitMotion#48
+  r Unit#48.posX 84934656
+  r Unit#48.posY 0
+  r Unit#48.posZ 93323264
+  r SpatialBucket#340.bytes x:494900000000
+  r Order#48.flags_42 147456
+  r Order#48.unit Unit#48
+  r UnitMotion#48.obj AiSearchGoal#31
+  r UnitMotion#48.velocityX 0
+  r UnitMotion#48.velocityY 0
+  r UnitMotion#48.velocityZ 0
+  r UnitMotion#48.speed 0
+  r UnitMotion#48.flags 1
+  r UnitMotion#48.turn 0
+  r UnitMotion#48.lastMoveTick 0
+  r UnitMotion#48.p2X 0
+  r UnitMotion#48.p2Y 0
+  r UnitMotion#48.p2Z 0
+  r AiSearchGoal#31.target null
+  r AiSearchGoal#31.owner Unit#48
+  r AiSearchGoal#31.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#31.count 0
+  r AiSearchGoal#31.repathClaimTick 0
+  r AiSearchGoal#31.flags 8
+  a unit Unit#48
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#49.cell (93,78)
+  r Unit#49.footprint (3,3)
+  r Unit#49.id 49
+  r Unit#49.spatialBucket SpatialBucket#281
+  r Unit#49.transportPiece 255
+  r Unit#49.heading -30584
+  r Unit#49.pitch 0
+  r Unit#49.list Order#49
+  r Unit#49.flags 0x90240321
+  r Unit#49.carrier null
+  r Unit#49.def UnitDef#24
+  r Unit#49.player Player#0
+  r Unit#49.motion UnitMotion#49
+  r Unit#49.posX 98566144
+  r Unit#49.posY 0
+  r Unit#49.posZ 82837504
+  r Order#49.flags_42 147456
+  r Order#49.unit Unit#49
+  r UnitMotion#49.obj AiSearchGoal#32
+  r UnitMotion#49.velocityX 0
+  r UnitMotion#49.velocityY 0
+  r UnitMotion#49.velocityZ 0
+  r UnitMotion#49.speed 0
+  r UnitMotion#49.flags 1
+  r UnitMotion#49.turn 0
+  r UnitMotion#49.lastMoveTick 0
+  r UnitMotion#49.p2X 0
+  r UnitMotion#49.p2Y 0
+  r UnitMotion#49.p2Z 0
+  r AiSearchGoal#32.target null
+  r AiSearchGoal#32.owner Unit#49
+  r AiSearchGoal#32.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#32.count 0
+  r AiSearchGoal#32.repathClaimTick 0
+  r AiSearchGoal#32.flags 8
+  a unit Unit#49
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#50.cell (49,127)
+  r Unit#50.footprint (3,3)
+  r Unit#50.id 50
+  r Unit#50.spatialBucket SpatialBucket#486
+  r Unit#50.transportPiece 255
+  r Unit#50.heading -15110
+  r Unit#50.pitch 0
+  r Unit#50.list Order#50
+  r Unit#50.flags 0x90240321
+  r Unit#50.carrier null
+  r Unit#50.def UnitDef#24
+  r Unit#50.player Player#0
+  r Unit#50.motion UnitMotion#50
+  r Unit#50.posX 52428800
+  r Unit#50.posY 0
+  r Unit#50.posZ 134217728
+  r SpatialBucket#486.bytes x:494900000000
+  r Order#50.flags_42 147456
+  r Order#50.unit Unit#50
+  r UnitMotion#50.obj AiSearchGoal#33
+  r UnitMotion#50.velocityX 0
+  r UnitMotion#50.velocityY 0
+  r UnitMotion#50.velocityZ 0
+  r UnitMotion#50.speed 0
+  r UnitMotion#50.flags 1
+  r UnitMotion#50.turn 0
+  r UnitMotion#50.lastMoveTick 0
+  r UnitMotion#50.p2X 0
+  r UnitMotion#50.p2Y 0
+  r UnitMotion#50.p2Z 0
+  r AiSearchGoal#33.target null
+  r AiSearchGoal#33.owner Unit#50
+  r AiSearchGoal#33.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#33.count 0
+  r AiSearchGoal#33.repathClaimTick 0
+  r AiSearchGoal#33.flags 8
+  a unit Unit#50
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#51.cell (53,134)
+  r Unit#51.footprint (3,3)
+  r Unit#51.id 51
+  r Unit#51.spatialBucket SpatialBucket#486
+  r Unit#51.transportPiece 255
+  r Unit#51.heading -21118
+  r Unit#51.pitch 0
+  r Unit#51.list Order#51
+  r Unit#51.flags 0x90240321
+  r Unit#51.carrier null
+  r Unit#51.def UnitDef#24
+  r Unit#51.player Player#0
+  r Unit#51.motion UnitMotion#51
+  r Unit#51.posX 56623104
+  r Unit#51.posY 0
+  r Unit#51.posZ 141557760
+  r Order#51.flags_42 147456
+  r Order#51.unit Unit#51
+  r UnitMotion#51.obj AiSearchGoal#34
+  r UnitMotion#51.velocityX 0
+  r UnitMotion#51.velocityY 0
+  r UnitMotion#51.velocityZ 0
+  r UnitMotion#51.speed 0
+  r UnitMotion#51.flags 1
+  r UnitMotion#51.turn 0
+  r UnitMotion#51.lastMoveTick 0
+  r UnitMotion#51.p2X 0
+  r UnitMotion#51.p2Y 0
+  r UnitMotion#51.p2Z 0
+  r AiSearchGoal#34.target null
+  r AiSearchGoal#34.owner Unit#51
+  r AiSearchGoal#34.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#34.count 0
+  r AiSearchGoal#34.repathClaimTick 0
+  r AiSearchGoal#34.flags 8
+  a unit Unit#51
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#52.cell (45,132)
+  r Unit#52.footprint (3,3)
+  r Unit#52.id 52
+  r Unit#52.spatialBucket SpatialBucket#485
+  r Unit#52.transportPiece 255
+  r Unit#52.heading -25123
+  r Unit#52.pitch 0
+  r Unit#52.list Order#52
+  r Unit#52.flags 0x90240321
+  r Unit#52.carrier null
+  r Unit#52.def UnitDef#24
+  r Unit#52.player Player#0
+  r Unit#52.motion UnitMotion#52
+  r Unit#52.posX 48234496
+  r Unit#52.posY 0
+  r Unit#52.posZ 139460608
+  r SpatialBucket#485.bytes x:494900000000
+  r Order#52.flags_42 147456
+  r Order#52.unit Unit#52
+  r UnitMotion#52.obj AiSearchGoal#35
+  r UnitMotion#52.velocityX 0
+  r UnitMotion#52.velocityY 0
+  r UnitMotion#52.velocityZ 0
+  r UnitMotion#52.speed 0
+  r UnitMotion#52.flags 1
+  r UnitMotion#52.turn 0
+  r UnitMotion#52.lastMoveTick 0
+  r UnitMotion#52.p2X 0
+  r UnitMotion#52.p2Y 0
+  r UnitMotion#52.p2Z 0
+  r AiSearchGoal#35.target null
+  r AiSearchGoal#35.owner Unit#52
+  r AiSearchGoal#35.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#35.count 0
+  r AiSearchGoal#35.repathClaimTick 0
+  r AiSearchGoal#35.flags 8
+  a unit Unit#52
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#53.cell (47,137)
+  r Unit#53.footprint (3,3)
+  r Unit#53.id 53
+  r Unit#53.spatialBucket SpatialBucket#516
+  r Unit#53.transportPiece 255
+  r Unit#53.heading -13108
+  r Unit#53.pitch 0
+  r Unit#53.list Order#53
+  r Unit#53.flags 0x90240321
+  r Unit#53.carrier null
+  r Unit#53.def UnitDef#24
+  r Unit#53.player Player#0
+  r Unit#53.motion UnitMotion#53
+  r Unit#53.posX 50331648
+  r Unit#53.posY 0
+  r Unit#53.posZ 144703488
+  r SpatialBucket#516.bytes x:494900000000
+  r Order#53.flags_42 147456
+  r Order#53.unit Unit#53
+  r UnitMotion#53.obj AiSearchGoal#36
+  r UnitMotion#53.velocityX 0
+  r UnitMotion#53.velocityY 0
+  r UnitMotion#53.velocityZ 0
+  r UnitMotion#53.speed 0
+  r UnitMotion#53.flags 1
+  r UnitMotion#53.turn 0
+  r UnitMotion#53.lastMoveTick 0
+  r UnitMotion#53.p2X 0
+  r UnitMotion#53.p2Y 0
+  r UnitMotion#53.p2Z 0
+  r AiSearchGoal#36.target null
+  r AiSearchGoal#36.owner Unit#53
+  r AiSearchGoal#36.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#36.count 0
+  r AiSearchGoal#36.repathClaimTick 0
+  r AiSearchGoal#36.flags 8
+  a unit Unit#53
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#54.cell (158,44)
+  r Unit#54.footprint (5,5)
+  r Unit#54.id 54
+  r Unit#54.spatialBucket SpatialBucket#170
+  r Unit#54.transportPiece 255
+  r Unit#54.heading -31312
+  r Unit#54.pitch 0
+  r Unit#54.list Order#54
+  r Unit#54.flags 0x90240321
+  r Unit#54.carrier null
+  r Unit#54.def UnitDef#25
+  r Unit#54.player Player#0
+  r Unit#54.motion UnitMotion#54
+  r Unit#54.posX 167772160
+  r Unit#54.posY 4784128
+  r Unit#54.posZ 48234496
+  r SpatialBucket#170.bytes x:494900000000
+  r Order#54.flags_42 147456
+  r Order#54.unit Unit#54
+  r UnitDef#25.draft 0
+  r UnitDef#25.flags1 0x008d8089
+  r UnitDef#25.maxvelocity 163840
+  r UnitDef#25.altitude 0
+  r UnitDef#25.brakerate 3276
+  r UnitDef#25.acceleration 1310
+  r UnitDef#25.bankscale 65536
+  r UnitDef#25.pitchscale 0
+  r UnitDef#25.moverate1 327680
+  r UnitDef#25.moverate2 327680
+  r UnitDef#25.turnrate 128
+  r UnitMotion#54.obj AiSearchGoal#37
+  r UnitMotion#54.velocityX 0
+  r UnitMotion#54.velocityY 0
+  r UnitMotion#54.velocityZ 0
+  r UnitMotion#54.speed 0
+  r UnitMotion#54.flags 1
+  r UnitMotion#54.turn 0
+  r UnitMotion#54.lastMoveTick 0
+  r UnitMotion#54.p2X 0
+  r UnitMotion#54.p2Y 0
+  r UnitMotion#54.p2Z 0
+  r AiSearchGoal#37.target null
+  r AiSearchGoal#37.owner Unit#54
+  r AiSearchGoal#37.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#37.count 0
+  r AiSearchGoal#37.repathClaimTick 0
+  r AiSearchGoal#37.flags 8
+  a unit Unit#54
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#254.cell (124,227)
+  r Unit#254.footprint (2,2)
+  r Unit#254.id 254
+  r Unit#254.spatialBucket SpatialBucket#855
+  r Unit#254.transportPiece 255
+  r Unit#254.heading 0
+  r Unit#254.pitch 0
+  r Unit#254.list Order#55
+  r Unit#254.flags 0x10e40001
+  r Unit#254.carrier null
+  r Unit#254.def UnitDef#103
+  r Unit#254.player Player#1
+  r Unit#254.motion UnitMotion#55
+  r Unit#254.posX 131072000
+  r Unit#254.posY 5570560
+  r Unit#254.posZ 239075328
+  r SpatialBucket#855.bytes x:5b5d00000000
+  r Order#55.flags_42 5
+  r Order#55.unit Unit#254
+  r UnitDef#103.draft 0
+  r UnitDef#103.flags1 0x009080c9
+  r UnitDef#103.maxvelocity 58982
+  r UnitDef#103.altitude 0
+  r UnitDef#103.brakerate 13107
+  r UnitDef#103.acceleration 7012
+  r UnitDef#103.bankscale 65536
+  r UnitDef#103.pitchscale 0
+  r UnitDef#103.moverate1 117964
+  r UnitDef#103.moverate2 117964
+  r UnitDef#103.turnrate 965
+  r Player#1.active 1
+  r Player#1.type 2
+  r UnitMotion#55.obj AiSearchGoal#38
+  r UnitMotion#55.velocityX 0
+  r UnitMotion#55.velocityY 0
+  r UnitMotion#55.velocityZ 0
+  r UnitMotion#55.speed 0
+  r UnitMotion#55.flags 1
+  r UnitMotion#55.turn 0
+  r UnitMotion#55.lastMoveTick 0
+  r UnitMotion#55.p2X 0
+  r UnitMotion#55.p2Y 0
+  r UnitMotion#55.p2Z 0
+  r AiSearchGoal#38.target null
+  r AiSearchGoal#38.owner Unit#254
+  r AiSearchGoal#38.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#38.count 0
+  r AiSearchGoal#38.repathClaimTick 0
+  r AiSearchGoal#38.flags 8
+  a unit Unit#254
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#255.cell (157,217)
+  r Unit#255.footprint (2,2)
+  r Unit#255.id 255
+  r Unit#255.spatialBucket SpatialBucket#829
+  r Unit#255.transportPiece 255
+  r Unit#255.heading 0
+  r Unit#255.pitch 0
+  r Unit#255.list Order#56
+  r Unit#255.flags 0x10e40001
+  r Unit#255.carrier null
+  r Unit#255.def UnitDef#103
+  r Unit#255.player Player#1
+  r Unit#255.motion UnitMotion#56
+  r Unit#255.posX 165675008
+  r Unit#255.posY 5505024
+  r Unit#255.posZ 228589568
+  r SpatialBucket#829.bytes x:5b6e00000000
+  r Order#56.flags_42 5
+  r Order#56.unit Unit#255
+  r UnitMotion#56.obj AiSearchGoal#39
+  r UnitMotion#56.velocityX 0
+  r UnitMotion#56.velocityY 0
+  r UnitMotion#56.velocityZ 0
+  r UnitMotion#56.speed 0
+  r UnitMotion#56.flags 1
+  r UnitMotion#56.turn 0
+  r UnitMotion#56.lastMoveTick 0
+  r UnitMotion#56.p2X 0
+  r UnitMotion#56.p2Y 0
+  r UnitMotion#56.p2Z 0
+  r AiSearchGoal#39.target null
+  r AiSearchGoal#39.owner Unit#255
+  r AiSearchGoal#39.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#39.count 0
+  r AiSearchGoal#39.repathClaimTick 0
+  r AiSearchGoal#39.flags 8
+  a unit Unit#255
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#260.cell (119,259)
+  r Unit#260.footprint (2,2)
+  r Unit#260.id 260
+  r Unit#260.spatialBucket SpatialBucket#974
+  r Unit#260.transportPiece 255
+  r Unit#260.heading -24607
+  r Unit#260.pitch 0
+  r Unit#260.list Order#57
+  r Unit#260.flags 0x90240005
+  r Unit#260.carrier null
+  r Unit#260.def UnitDef#90
+  r Unit#260.player Player#1
+  r Unit#260.motion UnitMotion#57
+  r Unit#260.posX 125376265
+  r Unit#260.posY 5701632
+  r Unit#260.posZ 272154772
+  r SpatialBucket#974.bytes x:5b8800000000
+  r Order#57.flags_42 37907
+  r Order#57.unit Unit#260
+  r UnitDef#90.draft 0
+  r UnitDef#90.flags1 0x00918089
+  r UnitDef#90.maxvelocity 112721
+  r UnitDef#90.altitude 0
+  r UnitDef#90.brakerate 12000
+  r UnitDef#90.acceleration 5999
+  r UnitDef#90.bankscale 65536
+  r UnitDef#90.pitchscale 0
+  r UnitDef#90.moverate1 225442
+  r UnitDef#90.moverate2 225442
+  r UnitDef#90.turnrate 1100
+  r UnitMotion#57.obj AiSearchGoal#40
+  r UnitMotion#57.velocityX 79711
+  r UnitMotion#57.velocityY 0
+  r UnitMotion#57.velocityZ 79711
+  r UnitMotion#57.speed 112721
+  r UnitMotion#57.flags 1
+  r UnitMotion#57.turn 0
+  r UnitMotion#57.lastMoveTick 121
+  r UnitMotion#57.p2X 0
+  r UnitMotion#57.p2Y 0
+  r UnitMotion#57.p2Z 0
+  r AiSearchGoal#40.target ApproachRadius#2
+  r AiSearchGoal#40.owner Unit#260
+  r AiSearchGoal#40.points x:400700101008d0103008d0100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#40.count 3
+  r AiSearchGoal#40.repathClaimTick 70
+  r AiSearchGoal#40.flags 9
+  r ApproachRadius#2.source Order#57
+  r ApproachRadius#2.pos (130,268)
+  r ApproachRadius#2.radius 0
+  a unit Unit#260
+  i services.SchedPublish 14 20
+  o Unit#260.flags 0x90250005
+  o Unit#260.posX 125455976
+  o Unit#260.posZ 272234483
+  i services.SchedPublish 14 8
+  w UnitMotion#57.lastMoveTick 122
+call 122 UpdateMotion
+  r Unit#262.cell (134,335)
+  r Unit#262.footprint (2,2)
+  r Unit#262.id 262
+  r Unit#262.spatialBucket SpatialBucket#1246
+  r Unit#262.transportPiece 255
+  r Unit#262.heading 17079
+  r Unit#262.pitch 0
+  r Unit#262.list Order#58
+  r Unit#262.flags 0x10e80025
+  r Unit#262.carrier null
+  r Unit#262.def UnitDef#103
+  r Unit#262.player Player#1
+  r Unit#262.motion UnitMotion#58
+  r Unit#262.posX 141177912
+  r Unit#262.posY 5505024
+  r Unit#262.posZ 351975787
+  r SpatialBucket#1246.bytes x:545b00000000
+  r Order#58.flags_42 1062153
+  r Order#58.unit Unit#262
+  r UnitMotion#58.obj AiSearchGoal#41
+  r UnitMotion#58.velocityX -58874
+  r UnitMotion#58.velocityY 0
+  r UnitMotion#58.velocityZ 3614
+  r UnitMotion#58.speed 58982
+  r UnitMotion#58.flags 1
+  r UnitMotion#58.turn -8
+  r UnitMotion#58.lastMoveTick 121
+  r UnitMotion#58.p2X 0
+  r UnitMotion#58.p2Y 0
+  r UnitMotion#58.p2Z 0
+  r AiSearchGoal#41.target PointMarker#1
+  r AiSearchGoal#41.owner Unit#262
+  r AiSearchGoal#41.points x:80080015100800150008f0140000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#41.count 3
+  r AiSearchGoal#41.repathClaimTick 91
+  r AiSearchGoal#41.flags 9
+  r PointMarker#1.source Order#58
+  r PointMarker#1.x1 122
+  r PointMarker#1.x2 127
+  r PointMarker#1.y1 329
+  r PointMarker#1.y2 334
+  a unit Unit#262
+  i services.SchedPublish 14 12
+  o Unit#262.heading 17072
+  o Unit#262.flags 0x10e90025
+  i services.SchedPublish 14 20
+  o Unit#262.posX 141119038
+  o Unit#262.posZ 351979401
+  i services.SchedPublish 14 8
+  w UnitMotion#58.turn -7
+  w UnitMotion#58.lastMoveTick 122
+call 122 UpdateMotion
+  r Unit#263.cell (123,147)
+  r Unit#263.footprint (2,2)
+  r Unit#263.id 263
+  r Unit#263.spatialBucket SpatialBucket#555
+  r Unit#263.transportPiece 255
+  r Unit#263.heading 0
+  r Unit#263.pitch 0
+  r Unit#263.list Order#59
+  r Unit#263.flags 0x90240001
+  r Unit#263.carrier null
+  r Unit#263.def UnitDef#105
+  r Unit#263.player Player#1
+  r Unit#263.motion UnitMotion#59
+  r Unit#263.posX 130023424
+  r Unit#263.posY 5505024
+  r Unit#263.posZ 155189248
+  r SpatialBucket#555.bytes x:678700000000
+  r Order#59.flags_42 5
+  r Order#59.unit Unit#263
+  r UnitDef#105.draft 0
+  r UnitDef#105.flags1 0x00918089
+  r UnitDef#105.maxvelocity 81920
+  r UnitDef#105.altitude 0
+  r UnitDef#105.brakerate 9830
+  r UnitDef#105.acceleration 6553
+  r UnitDef#105.bankscale 65536
+  r UnitDef#105.pitchscale 0
+  r UnitDef#105.moverate1 163840
+  r UnitDef#105.moverate2 163840
+  r UnitDef#105.turnrate 1011
+  r UnitMotion#59.obj AiSearchGoal#42
+  r UnitMotion#59.velocityX 0
+  r UnitMotion#59.velocityY 0
+  r UnitMotion#59.velocityZ 0
+  r UnitMotion#59.speed 0
+  r UnitMotion#59.flags 1
+  r UnitMotion#59.turn 0
+  r UnitMotion#59.lastMoveTick 0
+  r UnitMotion#59.p2X 0
+  r UnitMotion#59.p2Y 0
+  r UnitMotion#59.p2Z 0
+  r AiSearchGoal#42.target null
+  r AiSearchGoal#42.owner Unit#263
+  r AiSearchGoal#42.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#42.count 0
+  r AiSearchGoal#42.repathClaimTick 0
+  r AiSearchGoal#42.flags 8
+  a unit Unit#263
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#264.cell (91,151)
+  r Unit#264.footprint (2,2)
+  r Unit#264.id 264
+  r Unit#264.spatialBucket SpatialBucket#581
+  r Unit#264.transportPiece 255
+  r Unit#264.heading 0
+  r Unit#264.pitch 0
+  r Unit#264.list Order#60
+  r Unit#264.flags 0x90240001
+  r Unit#264.carrier null
+  r Unit#264.def UnitDef#105
+  r Unit#264.player Player#1
+  r Unit#264.motion UnitMotion#60
+  r Unit#264.posX 96468992
+  r Unit#264.posY 5505024
+  r Unit#264.posZ 159383552
+  r SpatialBucket#581.bytes x:5e7c00000000
+  r Order#60.flags_42 5
+  r Order#60.unit Unit#264
+  r UnitMotion#60.obj AiSearchGoal#43
+  r UnitMotion#60.velocityX 0
+  r UnitMotion#60.velocityY 0
+  r UnitMotion#60.velocityZ 0
+  r UnitMotion#60.speed 0
+  r UnitMotion#60.flags 1
+  r UnitMotion#60.turn 0
+  r UnitMotion#60.lastMoveTick 0
+  r UnitMotion#60.p2X 0
+  r UnitMotion#60.p2Y 0
+  r UnitMotion#60.p2Z 0
+  r AiSearchGoal#43.target null
+  r AiSearchGoal#43.owner Unit#264
+  r AiSearchGoal#43.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#43.count 0
+  r AiSearchGoal#43.repathClaimTick 0
+  r AiSearchGoal#43.flags 8
+  a unit Unit#264
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#265.cell (134,172)
+  r Unit#265.footprint (2,2)
+  r Unit#265.id 265
+  r Unit#265.spatialBucket SpatialBucket#646
+  r Unit#265.transportPiece 255
+  r Unit#265.heading 0
+  r Unit#265.pitch 0
+  r Unit#265.list Order#61
+  r Unit#265.flags 0x90280021
+  r Unit#265.carrier null
+  r Unit#265.def UnitDef#105
+  r Unit#265.player Player#1
+  r Unit#265.motion UnitMotion#61
+  r Unit#265.posX 141557760
+  r Unit#265.posY 5505024
+  r Unit#265.posZ 181403648
+  r SpatialBucket#646.bytes x:575e00000000
+  r Order#61.flags_42 147456
+  r Order#61.unit Unit#265
+  r UnitMotion#61.obj AiSearchGoal#44
+  r UnitMotion#61.velocityX 0
+  r UnitMotion#61.velocityY 0
+  r UnitMotion#61.velocityZ 0
+  r UnitMotion#61.speed 0
+  r UnitMotion#61.flags 1
+  r UnitMotion#61.turn 0
+  r UnitMotion#61.lastMoveTick 0
+  r UnitMotion#61.p2X 0
+  r UnitMotion#61.p2Y 0
+  r UnitMotion#61.p2Z 0
+  r AiSearchGoal#44.target null
+  r AiSearchGoal#44.owner Unit#265
+  r AiSearchGoal#44.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#44.count 0
+  r AiSearchGoal#44.repathClaimTick 0
+  r AiSearchGoal#44.flags 8
+  a unit Unit#265
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#266.cell (145,195)
+  r Unit#266.footprint (2,2)
+  r Unit#266.id 266
+  r Unit#266.spatialBucket SpatialBucket#738
+  r Unit#266.transportPiece 255
+  r Unit#266.heading 0
+  r Unit#266.pitch 0
+  r Unit#266.list Order#62
+  r Unit#266.flags 0x90280021
+  r Unit#266.carrier null
+  r Unit#266.def UnitDef#105
+  r Unit#266.player Player#1
+  r Unit#266.motion UnitMotion#62
+  r Unit#266.posX 153092096
+  r Unit#266.posY 5505024
+  r Unit#266.posZ 205520896
+  r SpatialBucket#738.bytes x:555900000000
+  r Order#62.flags_42 147456
+  r Order#62.unit Unit#266
+  r UnitMotion#62.obj AiSearchGoal#45
+  r UnitMotion#62.velocityX 0
+  r UnitMotion#62.velocityY 0
+  r UnitMotion#62.velocityZ 0
+  r UnitMotion#62.speed 0
+  r UnitMotion#62.flags 1
+  r UnitMotion#62.turn 0
+  r UnitMotion#62.lastMoveTick 0
+  r UnitMotion#62.p2X 0
+  r UnitMotion#62.p2Y 0
+  r UnitMotion#62.p2Z 0
+  r AiSearchGoal#45.target null
+  r AiSearchGoal#45.owner Unit#266
+  r AiSearchGoal#45.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#45.count 0
+  r AiSearchGoal#45.repathClaimTick 0
+  r AiSearchGoal#45.flags 8
+  a unit Unit#266
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#267.cell (163,213)
+  r Unit#267.footprint (2,2)
+  r Unit#267.id 267
+  r Unit#267.spatialBucket SpatialBucket#800
+  r Unit#267.transportPiece 255
+  r Unit#267.heading 0
+  r Unit#267.pitch 0
+  r Unit#267.list Order#63
+  r Unit#267.flags 0x90240001
+  r Unit#267.carrier null
+  r Unit#267.def UnitDef#105
+  r Unit#267.player Player#1
+  r Unit#267.motion UnitMotion#63
+  r Unit#267.posX 171966464
+  r Unit#267.posY 5505024
+  r Unit#267.posZ 224395264
+  r SpatialBucket#800.bytes x:545b00000000
+  r Order#63.flags_42 5
+  r Order#63.unit Unit#267
+  r UnitMotion#63.obj AiSearchGoal#46
+  r UnitMotion#63.velocityX 0
+  r UnitMotion#63.velocityY 0
+  r UnitMotion#63.velocityZ 0
+  r UnitMotion#63.speed 0
+  r UnitMotion#63.flags 1
+  r UnitMotion#63.turn 0
+  r UnitMotion#63.lastMoveTick 0
+  r UnitMotion#63.p2X 0
+  r UnitMotion#63.p2Y 0
+  r UnitMotion#63.p2Z 0
+  r AiSearchGoal#46.target null
+  r AiSearchGoal#46.owner Unit#267
+  r AiSearchGoal#46.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#46.count 0
+  r AiSearchGoal#46.repathClaimTick 0
+  r AiSearchGoal#46.flags 8
+  a unit Unit#267
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#268.cell (128,304)
+  r Unit#268.footprint (2,2)
+  r Unit#268.id 268
+  r Unit#268.spatialBucket SpatialBucket#1156
+  r Unit#268.transportPiece 255
+  r Unit#268.heading 0
+  r Unit#268.pitch 0
+  r Unit#268.list Order#64
+  r Unit#268.flags 0x90240001
+  r Unit#268.carrier null
+  r Unit#268.def UnitDef#105
+  r Unit#268.player Player#1
+  r Unit#268.motion UnitMotion#64
+  r Unit#268.posX 135266304
+  r Unit#268.posY 5570560
+  r Unit#268.posZ 319815680
+  r SpatialBucket#1156.bytes x:597900000000
+  r Order#64.flags_42 5
+  r Order#64.unit Unit#268
+  r UnitMotion#64.obj AiSearchGoal#47
+  r UnitMotion#64.velocityX 0
+  r UnitMotion#64.velocityY 0
+  r UnitMotion#64.velocityZ 0
+  r UnitMotion#64.speed 0
+  r UnitMotion#64.flags 1
+  r UnitMotion#64.turn 0
+  r UnitMotion#64.lastMoveTick 0
+  r UnitMotion#64.p2X 0
+  r UnitMotion#64.p2Y 0
+  r UnitMotion#64.p2Z 0
+  r AiSearchGoal#47.target null
+  r AiSearchGoal#47.owner Unit#268
+  r AiSearchGoal#47.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#47.count 0
+  r AiSearchGoal#47.repathClaimTick 0
+  r AiSearchGoal#47.flags 8
+  a unit Unit#268
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#269.cell (150,330)
+  r Unit#269.footprint (2,2)
+  r Unit#269.id 269
+  r Unit#269.spatialBucket SpatialBucket#1248
+  r Unit#269.transportPiece 255
+  r Unit#269.heading 0
+  r Unit#269.pitch 0
+  r Unit#269.list Order#65
+  r Unit#269.flags 0x90240001
+  r Unit#269.carrier null
+  r Unit#269.def UnitDef#105
+  r Unit#269.player Player#1
+  r Unit#269.motion UnitMotion#65
+  r Unit#269.posX 158334976
+  r Unit#269.posY 5505024
+  r Unit#269.posZ 347078656
+  r SpatialBucket#1248.bytes x:5b8000000000
+  r Order#65.flags_42 5
+  r Order#65.unit Unit#269
+  r UnitMotion#65.obj AiSearchGoal#48
+  r UnitMotion#65.velocityX 0
+  r UnitMotion#65.velocityY 0
+  r UnitMotion#65.velocityZ 0
+  r UnitMotion#65.speed 0
+  r UnitMotion#65.flags 1
+  r UnitMotion#65.turn 0
+  r UnitMotion#65.lastMoveTick 0
+  r UnitMotion#65.p2X 0
+  r UnitMotion#65.p2Y 0
+  r UnitMotion#65.p2Z 0
+  r AiSearchGoal#48.target null
+  r AiSearchGoal#48.owner Unit#269
+  r AiSearchGoal#48.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#48.count 0
+  r AiSearchGoal#48.repathClaimTick 0
+  r AiSearchGoal#48.flags 8
+  a unit Unit#269
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#270.cell (108,163)
+  r Unit#270.footprint (2,2)
+  r Unit#270.id 270
+  r Unit#270.spatialBucket SpatialBucket#613
+  r Unit#270.transportPiece 255
+  r Unit#270.heading 4263
+  r Unit#270.pitch 0
+  r Unit#270.list Order#66
+  r Unit#270.flags 0x90240005
+  r Unit#270.carrier null
+  r Unit#270.def UnitDef#90
+  r Unit#270.player Player#1
+  r Unit#270.motion UnitMotion#66
+  r Unit#270.posX 114289213
+  r Unit#270.posY 5570560
+  r Unit#270.posZ 171800657
+  r SpatialBucket#613.bytes x:5b7c00000000
+  r Order#66.flags_42 37907
+  r Order#66.unit Unit#270
+  r UnitMotion#66.obj AiSearchGoal#49
+  r UnitMotion#66.velocityX -44417
+  r UnitMotion#66.velocityY 0
+  r UnitMotion#66.velocityZ -103598
+  r UnitMotion#66.speed 112721
+  r UnitMotion#66.flags 1
+  r UnitMotion#66.turn -1100
+  r UnitMotion#66.lastMoveTick 121
+  r UnitMotion#66.p2X 0
+  r UnitMotion#66.p2Y 0
+  r UnitMotion#66.p2Z 0
+  r AiSearchGoal#49.target ApproachRadius#3
+  r AiSearchGoal#49.owner Unit#270
+  r AiSearchGoal#49.points x:d006400ad0061009500690085006f007e0066007e006e006e006e006e006e006e006e0060000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#49.count 6
+  r AiSearchGoal#49.repathClaimTick 108
+  r AiSearchGoal#49.flags 9
+  r ApproachRadius#3.source Order#66
+  r ApproachRadius#3.pos (109,109)
+  r ApproachRadius#3.radius 0
+  a unit Unit#270
+  i services.SchedPublish 14 12
+  o Unit#270.heading 3163
+  o Unit#270.flags 0x90250005
+  i services.SchedPublish 14 20
+  o Unit#270.posX 114256492
+  o Unit#270.posZ 171692793
+  i services.SchedPublish 14 8
+  w UnitMotion#66.velocityX -32721
+  w UnitMotion#66.velocityZ -107864
+  w UnitMotion#66.lastMoveTick 122
+call 122 UpdateMotion
+  r Unit#276.cell (215,370)
+  r Unit#276.footprint (5,5)
+  r Unit#276.id 276
+  r Unit#276.spatialBucket SpatialBucket#1407
+  r Unit#276.transportPiece 255
+  r Unit#276.heading 0
+  r Unit#276.pitch 0
+  r Unit#276.list Order#67
+  r Unit#276.flags 0x90240001
+  r Unit#276.carrier null
+  r Unit#276.def UnitDef#106
+  r Unit#276.player Player#1
+  r Unit#276.motion UnitMotion#67
+  r Unit#276.posX 227540992
+  r Unit#276.posY 4784128
+  r Unit#276.posZ 390070272
+  r SpatialBucket#1407.bytes x:494900000000
+  r Order#67.flags_42 5
+  r Order#67.unit Unit#276
+  r UnitDef#106.draft 0
+  r UnitDef#106.flags1 0x008d8089
+  r UnitDef#106.maxvelocity 157286
+  r UnitDef#106.altitude 0
+  r UnitDef#106.brakerate 3276
+  r UnitDef#106.acceleration 655
+  r UnitDef#106.bankscale 65536
+  r UnitDef#106.pitchscale 0
+  r UnitDef#106.moverate1 314572
+  r UnitDef#106.moverate2 314572
+  r UnitDef#106.turnrate 128
+  r UnitMotion#67.obj AiSearchGoal#50
+  r UnitMotion#67.velocityX 0
+  r UnitMotion#67.velocityY 0
+  r UnitMotion#67.velocityZ 0
+  r UnitMotion#67.speed 0
+  r UnitMotion#67.flags 1
+  r UnitMotion#67.turn 0
+  r UnitMotion#67.lastMoveTick 0
+  r UnitMotion#67.p2X 0
+  r UnitMotion#67.p2Y 0
+  r UnitMotion#67.p2Z 0
+  r AiSearchGoal#50.target null
+  r AiSearchGoal#50.owner Unit#276
+  r AiSearchGoal#50.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#50.count 0
+  r AiSearchGoal#50.repathClaimTick 0
+  r AiSearchGoal#50.flags 8
+  a unit Unit#276
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#277.cell (206,379)
+  r Unit#277.footprint (5,5)
+  r Unit#277.id 277
+  r Unit#277.spatialBucket SpatialBucket#1436
+  r Unit#277.transportPiece 255
+  r Unit#277.heading 0
+  r Unit#277.pitch 0
+  r Unit#277.list Order#68
+  r Unit#277.flags 0x90240001
+  r Unit#277.carrier null
+  r Unit#277.def UnitDef#106
+  r Unit#277.player Player#1
+  r Unit#277.motion UnitMotion#68
+  r Unit#277.posX 218103808
+  r Unit#277.posY 4784128
+  r Unit#277.posZ 399507456
+  r SpatialBucket#1436.bytes x:494900000000
+  r Order#68.flags_42 5
+  r Order#68.unit Unit#277
+  r UnitMotion#68.obj AiSearchGoal#51
+  r UnitMotion#68.velocityX 0
+  r UnitMotion#68.velocityY 0
+  r UnitMotion#68.velocityZ 0
+  r UnitMotion#68.speed 0
+  r UnitMotion#68.flags 1
+  r UnitMotion#68.turn 0
+  r UnitMotion#68.lastMoveTick 0
+  r UnitMotion#68.p2X 0
+  r UnitMotion#68.p2Y 0
+  r UnitMotion#68.p2Z 0
+  r AiSearchGoal#51.target null
+  r AiSearchGoal#51.owner Unit#277
+  r AiSearchGoal#51.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#51.count 0
+  r AiSearchGoal#51.repathClaimTick 0
+  r AiSearchGoal#51.flags 8
+  a unit Unit#277
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#278.cell (196,375)
+  r Unit#278.footprint (4,4)
+  r Unit#278.id 278
+  r Unit#278.spatialBucket SpatialBucket#1434
+  r Unit#278.transportPiece 255
+  r Unit#278.heading 0
+  r Unit#278.pitch 0
+  r Unit#278.list Order#69
+  r Unit#278.flags 0x90240001
+  r Unit#278.carrier null
+  r Unit#278.def UnitDef#140
+  r Unit#278.player Player#1
+  r Unit#278.motion UnitMotion#69
+  r Unit#278.posX 207618048
+  r Unit#278.posY 4784128
+  r Unit#278.posZ 395313152
+  r SpatialBucket#1434.bytes x:494900000000
+  r Order#69.flags_42 513
+  r Order#69.unit Unit#278
+  r UnitDef#140.draft 0
+  r UnitDef#140.flags1 0x00898089
+  r UnitDef#140.maxvelocity 235929
+  r UnitDef#140.altitude 0
+  r UnitDef#140.brakerate 1310
+  r UnitDef#140.acceleration 6553
+  r UnitDef#140.bankscale 65536
+  r UnitDef#140.pitchscale 0
+  r UnitDef#140.moverate1 471858
+  r UnitDef#140.moverate2 471858
+  r UnitDef#140.turnrate 519
+  r UnitMotion#69.obj AiSearchGoal#52
+  r UnitMotion#69.velocityX 0
+  r UnitMotion#69.velocityY 0
+  r UnitMotion#69.velocityZ 0
+  r UnitMotion#69.speed 0
+  r UnitMotion#69.flags 1
+  r UnitMotion#69.turn 0
+  r UnitMotion#69.lastMoveTick 0
+  r UnitMotion#69.p2X 0
+  r UnitMotion#69.p2Y 0
+  r UnitMotion#69.p2Z 0
+  r AiSearchGoal#52.target null
+  r AiSearchGoal#52.owner Unit#278
+  r AiSearchGoal#52.points x:600c9017800c5017000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#52.count 2
+  r AiSearchGoal#52.repathClaimTick 0
+  r AiSearchGoal#52.flags 8
+  a unit Unit#278
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#279.cell (192,376)
+  r Unit#279.footprint (4,4)
+  r Unit#279.id 279
+  r Unit#279.spatialBucket SpatialBucket#1434
+  r Unit#279.transportPiece 255
+  r Unit#279.heading -6747
+  r Unit#279.pitch 0
+  r Unit#279.list Order#70
+  r Unit#279.flags 0x90240001
+  r Unit#279.carrier null
+  r Unit#279.def UnitDef#140
+  r Unit#279.player Player#1
+  r Unit#279.motion UnitMotion#70
+  r Unit#279.posX 203235712
+  r Unit#279.posY 4784128
+  r Unit#279.posZ 396807610
+  r Order#70.flags_42 513
+  r Order#70.unit Unit#279
+  r UnitMotion#70.obj AiSearchGoal#53
+  r UnitMotion#70.velocityX 0
+  r UnitMotion#70.velocityY 0
+  r UnitMotion#70.velocityZ 0
+  r UnitMotion#70.speed 0
+  r UnitMotion#70.flags 1
+  r UnitMotion#70.turn 0
+  r UnitMotion#70.lastMoveTick 78
+  r UnitMotion#70.p2X 0
+  r UnitMotion#70.p2Y 0
+  r UnitMotion#70.p2Z 0
+  r AiSearchGoal#53.target null
+  r AiSearchGoal#53.owner Unit#279
+  r AiSearchGoal#53.points x:1d0ca617500cc017000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#53.count 2
+  r AiSearchGoal#53.repathClaimTick 0
+  r AiSearchGoal#53.flags 8
+  a unit Unit#279
+  i services.SchedPublish 14 8
+call 122 UpdateMotion
+  r Unit#280.cell (219,365)
+  r Unit#280.footprint (4,4)
+  r Unit#280.id 280
+  r Unit#280.spatialBucket SpatialBucket#1377
+  r Unit#280.transportPiece 255
+  r Unit#280.heading -16497
+  r Unit#280.pitch 0
+  r Unit#280.list Order#71
+  r Unit#280.flags 0x90240005
+  r Unit#280.carrier null
+  r Unit#280.def UnitDef#140
+  r Unit#280.player Player#1
+  r Unit#280.motion UnitMotion#71
+  r Unit#280.posX 231343691
+  r Unit#280.posY 4784128
+  r Unit#280.posZ 384825040
+  r SpatialBucket#1377.bytes x:494900000000
+  r Order#71.flags_42 513
+  r Order#71.unit Unit#280
+  r UnitMotion#71.obj AiSearchGoal#54
+  r UnitMotion#71.velocityX 108819
+  r UnitMotion#71.velocityY 0
+  r UnitMotion#71.velocityZ 1342
+  r UnitMotion#71.speed 108832
+  r UnitMotion#71.flags 1
+  r UnitMotion#71.turn 0
+  r UnitMotion#71.lastMoveTick 121
+  r UnitMotion#71.p2X 0
+  r UnitMotion#71.p2Y 0
+  r UnitMotion#71.p2Z 0
+  r AiSearchGoal#54.target null
+  r AiSearchGoal#54.owner Unit#280
+  r AiSearchGoal#54.points x:c80def16000ec016000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#54.count 2
+  r AiSearchGoal#54.repathClaimTick 0
+  r AiSearchGoal#54.flags 8
+  a unit Unit#280
+  i services.SchedPublish 14 20
+  o Unit#280.flags 0x90250005
+  o Unit#280.posX 231451200
+  o Unit#280.posZ 384826366
+  i services.SchedPublish 14 8
+  w UnitMotion#71.velocityX 107509
+  w UnitMotion#71.velocityZ 1326
+  w UnitMotion#71.speed 107522
+  w UnitMotion#71.lastMoveTick 122
+call 122 UpdateMotion
+  r Unit#281.cell (198,356)
+  r Unit#281.footprint (4,4)
+  r Unit#281.id 281
+  r Unit#281.spatialBucket SpatialBucket#1345
+  r Unit#281.transportPiece 255
+  r Unit#281.heading 0
+  r Unit#281.pitch 0
+  r Unit#281.list Order#72
+  r Unit#281.flags 0x90240001
+  r Unit#281.carrier null
+  r Unit#281.def UnitDef#140
+  r Unit#281.player Player#1
+  r Unit#281.motion UnitMotion#72
+  r Unit#281.posX 209715200
+  r Unit#281.posY 4784128
+  r Unit#281.posZ 375390208
+  r SpatialBucket#1345.bytes x:494900000000
+  r Order#72.flags_42 5
+  r Order#72.unit Unit#281
+  r UnitMotion#72.obj AiSearchGoal#55
+  r UnitMotion#72.velocityX 0
+  r UnitMotion#72.velocityY 0
+  r UnitMotion#72.velocityZ 0
+  r UnitMotion#72.speed 0
+  r UnitMotion#72.flags 1
+  r UnitMotion#72.turn 0
+  r UnitMotion#72.lastMoveTick 0
+  r UnitMotion#72.p2X 0
+  r UnitMotion#72.p2Y 0
+  r UnitMotion#72.p2Z 0
+  r AiSearchGoal#55.target null
+  r AiSearchGoal#55.owner Unit#281
+  r AiSearchGoal#55.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  r AiSearchGoal#55.count 0
+  r AiSearchGoal#55.repathClaimTick 0
+  r AiSearchGoal#55.flags 8
+  a unit Unit#281
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#2
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#4
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#5.flags 0x90260320
+  a unit Unit#5
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#5.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#6.flags 0x90260320
+  a unit Unit#6
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#6.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#7.flags 0x90260320
+  a unit Unit#7
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#7.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#8.flags 0x90260320
+  a unit Unit#8
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#8.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#9.flags 0x90260320
+  a unit Unit#9
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#9.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#10.flags 0x90260320
+  a unit Unit#10
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#10.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#11.flags 0x90260320
+  a unit Unit#11
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#11.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#12.flags 0x90260320
+  a unit Unit#12
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#12.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#13.flags 0x90260320
+  a unit Unit#13
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#13.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#14
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#15
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#16
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#17
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#18
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#19
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#20
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#21
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#22
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#23
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#24
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#25
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#26.flags 0x50240325
+  a unit Unit#26
+  i services.SchedPublish 14 12
+  o Unit#26.heading -24290
+  o Unit#26.flags 0x50250325
+  i services.SchedPublish 14 20
+  o Unit#26.posX 58986103
+  o Unit#26.posZ 16195317
+  i services.SchedPublish 14 8
+  w UnitMotion#26.velocityX 58349
+  w UnitMotion#26.velocityZ 55556
+  w UnitMotion#26.speed 80565
+  w UnitMotion#26.lastMoveTick 123
+call 123 UpdateMotion
+  r Unit#27.flags 0x90040326
+  a unit Unit#27
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#27.flags 0x90050326
+  o Unit#27.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#27.lastMoveTick 123
+  w UnitMotion#27.p2Y 115
+call 123 UpdateMotion
+  r Unit#28.flags 0x90040326
+  a unit Unit#28
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#28.flags 0x90050326
+  o Unit#28.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#28.lastMoveTick 123
+  w UnitMotion#28.p2Y 115
+call 123 UpdateMotion
+  r Unit#29.flags 0x90040326
+  a unit Unit#29
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#29.flags 0x90050326
+  o Unit#29.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#29.lastMoveTick 123
+  w UnitMotion#29.p2Y 115
+call 123 UpdateMotion
+  r Unit#30.flags 0x90040326
+  a unit Unit#30
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#30.flags 0x90050326
+  o Unit#30.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#30.lastMoveTick 123
+  w UnitMotion#30.p2Y 115
+call 123 UpdateMotion
+  r Unit#31.flags 0x90240326
+  a unit Unit#31
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#31.flags 0x90250326
+  o Unit#31.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#31.lastMoveTick 123
+  w UnitMotion#31.p2Y 115
+call 123 UpdateMotion
+  r Unit#32.flags 0x90240326
+  a unit Unit#32
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#32.flags 0x90250326
+  o Unit#32.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#32.lastMoveTick 123
+  w UnitMotion#32.p2Y 115
+call 123 UpdateMotion
+  r Unit#33.flags 0x90240326
+  a unit Unit#33
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#33.flags 0x90250326
+  o Unit#33.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#33.lastMoveTick 123
+  w UnitMotion#33.p2Y 115
+call 123 UpdateMotion
+  r Unit#34.flags 0x90240326
+  a unit Unit#34
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#34.flags 0x90250326
+  o Unit#34.posX 18388516
+  o Unit#34.posY 8060928
+  o Unit#34.posZ 14633872
+  i services.SchedPublish 14 8
+  w UnitMotion#34.velocityX 142436
+  w UnitMotion#34.velocityZ 88610
+  w UnitMotion#34.speed 180096
+  w UnitMotion#34.lastMoveTick 123
+  w UnitMotion#34.p2X 87655
+  w UnitMotion#34.p2Y 115
+  w UnitMotion#34.p2Z 54528
+call 123 UpdateMotion
+  r Unit#35.flags 0x90260300
+  a unit Unit#35
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#35.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#36.flags 0x90260300
+  a unit Unit#36
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#36.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#37.flags 0x90260300
+  a unit Unit#37
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#37.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#38.flags 0x90260300
+  a unit Unit#38
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#38.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#39.flags 0x90240326
+  a unit Unit#39
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#39.flags 0x90250326
+  o Unit#39.posX 26777310
+  o Unit#39.posY 8060928
+  o Unit#39.posZ 17779401
+  i services.SchedPublish 14 8
+  w UnitMotion#39.velocityX 142454
+  w UnitMotion#39.velocityZ 88592
+  w UnitMotion#39.speed 180101
+  w UnitMotion#39.lastMoveTick 123
+  w UnitMotion#39.p2X 87665
+  w UnitMotion#39.p2Y 115
+  w UnitMotion#39.p2Z 54518
+call 123 UpdateMotion
+  r Unit#40.flags 0x90240326
+  a unit Unit#40
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#40.flags 0x90250326
+  o Unit#40.posX 22607109
+  o Unit#40.posY 8060928
+  o Unit#40.posZ 18788339
+  i services.SchedPublish 14 8
+  w UnitMotion#40.velocityX 144583
+  w UnitMotion#40.velocityZ 85088
+  w UnitMotion#40.speed 180108
+  w UnitMotion#40.lastMoveTick 123
+  w UnitMotion#40.p2X 88976
+  w UnitMotion#40.p2Y 115
+  w UnitMotion#40.p2Z 52359
+call 123 UpdateMotion
+  r Unit#41.flags 0x90240326
+  a unit Unit#41
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#41.flags 0x90250326
+  o Unit#41.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#41.lastMoveTick 123
+  w UnitMotion#41.p2Y 115
+call 123 UpdateMotion
+  r Unit#42.flags 0x90240326
+  a unit Unit#42
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#42.flags 0x90250326
+  o Unit#42.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#42.lastMoveTick 123
+  w UnitMotion#42.p2Y 115
+call 123 UpdateMotion
+  r Unit#43.flags 0x90040326
+  a unit Unit#43
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#43.flags 0x90050326
+  o Unit#43.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#43.lastMoveTick 123
+  w UnitMotion#43.p2Y 115
+call 123 UpdateMotion
+  r Unit#44.flags 0x90040326
+  a unit Unit#44
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#44.flags 0x90050326
+  o Unit#44.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#44.lastMoveTick 123
+  w UnitMotion#44.p2Y 115
+call 123 UpdateMotion
+  r Unit#45.flags 0x90040326
+  a unit Unit#45
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#45.flags 0x90050326
+  o Unit#45.posY 8060928
+  i services.SchedPublish 14 8
+  w UnitMotion#45.lastMoveTick 123
+  w UnitMotion#45.p2Y 115
+call 123 UpdateMotion
+  r Unit#46.flags 0x90240326
+  a unit Unit#46
+  i services.SchedPublish 14 16
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#16 46 (23,10) 2 = 1
+  o SimGlobals.g_lastPlaceMetalSum 774
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  o Unit#46.cell (23,10)
+  o Unit#46.posX 25690183
+  o Unit#46.posY 8060928
+  o Unit#46.posZ 11547331
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#46.velocityX 139046
+  w UnitMotion#46.velocityZ 93842
+  w UnitMotion#46.speed 180097
+  w UnitMotion#46.lastMoveTick 123
+  w UnitMotion#46.p2X 85569
+  w UnitMotion#46.p2Y 115
+  w UnitMotion#46.p2Z 57747
+call 123 UpdateMotion
+  r Unit#47.flags 0x90240326
+  a unit Unit#47
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#47.flags 0x90250326
+  o Unit#47.posX 16350958
+  o Unit#47.posY 8060928
+  o Unit#47.posZ 20822515
+  i services.SchedPublish 14 8
+  w UnitMotion#47.velocityX 147705
+  w UnitMotion#47.velocityZ 79523
+  w UnitMotion#47.speed 180098
+  w UnitMotion#47.lastMoveTick 123
+  w UnitMotion#47.p2X 90898
+  w UnitMotion#47.p2Y 115
+  w UnitMotion#47.p2Z 48935
+call 123 UpdateMotion
+  a unit Unit#48
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#49
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#50
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#51
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#52
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#53
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#54
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#254
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#255
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#260.flags 0x90240005
+  a unit Unit#260
+  i services.SchedPublish 14 20
+  o Unit#260.flags 0x90250005
+  o Unit#260.posX 125535687
+  o Unit#260.posZ 272314194
+  i services.SchedPublish 14 8
+  w UnitMotion#57.lastMoveTick 123
+call 123 UpdateMotion
+  r Unit#262.flags 0x10e80025
+  a unit Unit#262
+  i services.SchedPublish 14 12
+  o Unit#262.heading 17065
+  o Unit#262.flags 0x10e90025
+  i services.SchedPublish 14 20
+  o Unit#262.posX 141060164
+  o Unit#262.posZ 351983015
+  i services.SchedPublish 14 8
+  w UnitMotion#58.lastMoveTick 123
+call 123 UpdateMotion
+  a unit Unit#263
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#264
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#265
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#266
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#267
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#268
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#269
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#270.flags 0x90240005
+  a unit Unit#270
+  i services.SchedPublish 14 12
+  o Unit#270.heading 2063
+  o Unit#270.flags 0x90250005
+  i services.SchedPublish 14 20
+  o Unit#270.posX 114234504
+  o Unit#270.posZ 171582232
+  i services.SchedPublish 14 8
+  w UnitMotion#66.velocityX -21988
+  w UnitMotion#66.velocityZ -110561
+  w UnitMotion#66.lastMoveTick 123
+call 123 UpdateMotion
+  a unit Unit#276
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#277
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#278
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  a unit Unit#279
+  i services.SchedPublish 14 8
+call 123 UpdateMotion
+  r Unit#280.flags 0x90240005
+  a unit Unit#280
+  i services.SchedPublish 14 20
+  o Unit#280.flags 0x90250005
+  o Unit#280.posX 231557399
+  o Unit#280.posZ 384827675
+  i services.SchedPublish 14 8
+  w UnitMotion#71.velocityX 106199
+  w UnitMotion#71.velocityZ 1309
+  w UnitMotion#71.speed 106212
+  w UnitMotion#71.lastMoveTick 123
+call 123 UpdateMotion
+  a unit Unit#281
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#1
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#2
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#3
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#4
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#5.flags 0x90260320
+  a unit Unit#5
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#5.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#6.flags 0x90260320
+  a unit Unit#6
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#6.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#7.flags 0x90260320
+  a unit Unit#7
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#7.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#8.flags 0x90260320
+  a unit Unit#8
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#8.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#9.flags 0x90260320
+  a unit Unit#9
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#9.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#10.flags 0x90260320
+  a unit Unit#10
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#10.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#11.flags 0x90260320
+  a unit Unit#11
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#11.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#12.flags 0x90260320
+  a unit Unit#12
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#12.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#13.flags 0x90260320
+  a unit Unit#13
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#13.flags 0x90270320
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#14
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#15
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#16
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#17
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#18
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#19
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#20
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#21
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#22
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#23
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#24
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#25
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#26.flags 0x50240325
+  a unit Unit#26
+  i services.SchedPublish 14 12
+  o Unit#26.heading -24294
+  o Unit#26.flags 0x50250325
+  i services.SchedPublish 14 20
+  o Unit#26.posX 59044926
+  o Unit#26.posZ 16251324
+  i services.SchedPublish 14 8
+  w UnitMotion#26.velocityX 58823
+  w UnitMotion#26.velocityZ 56007
+  w UnitMotion#26.speed 81220
+  w UnitMotion#26.lastMoveTick 124
+call 124 UpdateMotion
+  r Unit#27.flags 0x90040326
+  a unit Unit#27
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#27.flags 0x90050326
+  o Unit#27.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#27.lastMoveTick 124
+  w UnitMotion#27.p2Y 109
+call 124 UpdateMotion
+  r Unit#28.flags 0x90040326
+  a unit Unit#28
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#28.flags 0x90050326
+  o Unit#28.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#28.lastMoveTick 124
+  w UnitMotion#28.p2Y 109
+call 124 UpdateMotion
+  r Unit#29.flags 0x90040326
+  a unit Unit#29
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#29.flags 0x90050326
+  o Unit#29.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#29.lastMoveTick 124
+  w UnitMotion#29.p2Y 109
+call 124 UpdateMotion
+  r Unit#30.flags 0x90040326
+  a unit Unit#30
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#30.flags 0x90050326
+  o Unit#30.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#30.lastMoveTick 124
+  w UnitMotion#30.p2Y 109
+call 124 UpdateMotion
+  r Unit#31.flags 0x90240326
+  a unit Unit#31
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#31.flags 0x90250326
+  o Unit#31.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#31.lastMoveTick 124
+  w UnitMotion#31.p2Y 109
+call 124 UpdateMotion
+  r Unit#32.flags 0x90240326
+  a unit Unit#32
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#32.flags 0x90250326
+  o Unit#32.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#32.lastMoveTick 124
+  w UnitMotion#32.p2Y 109
+call 124 UpdateMotion
+  r Unit#33.flags 0x90240326
+  a unit Unit#33
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#33.flags 0x90250326
+  o Unit#33.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#33.lastMoveTick 124
+  w UnitMotion#33.p2Y 109
+call 124 UpdateMotion
+  r Unit#34.flags 0x90240326
+  a unit Unit#34
+  i services.SchedPublish 14 16
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#16 34 (16,13) 2 = 1
+  o SimGlobals.g_lastPlaceMetalSum 774
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  o Unit#34.cell (16,13)
+  o Unit#34.posX 18536402
+  o Unit#34.posY 8126464
+  o Unit#34.posZ 14725872
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#34.velocityX 147886
+  w UnitMotion#34.velocityZ 92000
+  w UnitMotion#34.speed 186089
+  w UnitMotion#34.lastMoveTick 124
+  w UnitMotion#34.p2X 88721
+  w UnitMotion#34.p2Y 109
+  w UnitMotion#34.p2Z 55191
+call 124 UpdateMotion
+  r Unit#35.flags 0x90260300
+  a unit Unit#35
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#35.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#36.flags 0x90260300
+  a unit Unit#36
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#36.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#37.flags 0x90260300
+  a unit Unit#37
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#37.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#38.flags 0x90260300
+  a unit Unit#38
+  i scripts.GetPiecePosition Unit#4 -1 = (97517568,4784128,65011712)
+  i services.SchedPublish 14 24
+  o Unit#38.flags 0x90270300
+  i scripts.GetPieceAngles Unit#4 -1 = (13,34224,0)
+  i services.SchedPublish 14 20
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#39.flags 0x90240326
+  a unit Unit#39
+  i services.SchedPublish 14 16
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#16 39 (24,16) 2 = 1
+  o SimGlobals.g_lastPlaceMetalSum 774
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  o Unit#39.cell (24,16)
+  o Unit#39.posX 26925215
+  o Unit#39.posY 8126464
+  o Unit#39.posZ 17871383
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#39.velocityX 147905
+  w UnitMotion#39.velocityZ 91982
+  w UnitMotion#39.speed 186095
+  w UnitMotion#39.lastMoveTick 124
+  w UnitMotion#39.p2X 88732
+  w UnitMotion#39.p2Y 109
+  w UnitMotion#39.p2Z 55181
+call 124 UpdateMotion
+  r Unit#40.flags 0x90240326
+  a unit Unit#40
+  i services.SchedPublish 14 16
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#16 40 (20,17) 2 = 1
+  o SimGlobals.g_lastPlaceMetalSum 774
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  o Unit#40.cell (20,17)
+  o Unit#40.posX 22757224
+  o Unit#40.posY 8126464
+  o Unit#40.posZ 18876683
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#40.velocityX 150115
+  w UnitMotion#40.velocityZ 88344
+  w UnitMotion#40.speed 186102
+  w UnitMotion#40.lastMoveTick 124
+  w UnitMotion#40.p2X 90058
+  w UnitMotion#40.p2Y 109
+  w UnitMotion#40.p2Z 52996
+call 124 UpdateMotion
+  r Unit#41.flags 0x90240326
+  a unit Unit#41
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#41.flags 0x90250326
+  o Unit#41.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#41.lastMoveTick 124
+  w UnitMotion#41.p2Y 109
+call 124 UpdateMotion
+  r Unit#42.flags 0x90240326
+  a unit Unit#42
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#42.flags 0x90250326
+  o Unit#42.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#42.lastMoveTick 124
+  w UnitMotion#42.p2Y 109
+call 124 UpdateMotion
+  r Unit#43.flags 0x90040326
+  a unit Unit#43
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#43.flags 0x90050326
+  o Unit#43.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#43.lastMoveTick 124
+  w UnitMotion#43.p2Y 109
+call 124 UpdateMotion
+  r Unit#44.flags 0x90040326
+  a unit Unit#44
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#44.flags 0x90050326
+  o Unit#44.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#44.lastMoveTick 124
+  w UnitMotion#44.p2Y 109
+call 124 UpdateMotion
+  r Unit#45.flags 0x90040326
+  a unit Unit#45
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#45.flags 0x90050326
+  o Unit#45.posY 8126464
+  i services.SchedPublish 14 8
+  w UnitMotion#45.lastMoveTick 124
+  w UnitMotion#45.p2Y 109
+call 124 UpdateMotion
+  a unit Unit#46
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#46.flags 0x90250326
+  o Unit#46.posX 25834549
+  o Unit#46.posY 8126464
+  o Unit#46.posZ 11644764
+  i services.SchedPublish 14 8
+  w UnitMotion#46.velocityX 144366
+  w UnitMotion#46.velocityZ 97433
+  w UnitMotion#46.speed 186090
+  w UnitMotion#46.lastMoveTick 124
+  w UnitMotion#46.p2X 86610
+  w UnitMotion#46.p2Y 109
+  w UnitMotion#46.p2Z 58450
+call 124 UpdateMotion
+  r Unit#47.flags 0x90240326
+  a unit Unit#47
+  i services.SchedPublish 14 16
+  i services.SchedPublish 14 20
+  o Unit#47.flags 0x90250326
+  o Unit#47.posX 16504314
+  o Unit#47.posY 8126464
+  o Unit#47.posZ 20905082
+  i services.SchedPublish 14 8
+  w UnitMotion#47.velocityX 153356
+  w UnitMotion#47.velocityZ 82567
+  w UnitMotion#47.speed 186092
+  w UnitMotion#47.lastMoveTick 124
+  w UnitMotion#47.p2X 92003
+  w UnitMotion#47.p2Y 109
+  w UnitMotion#47.p2Z 49532
+call 124 UpdateMotion
+  a unit Unit#48
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#49
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#50
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#51
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#52
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#53
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#54
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#254
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#255
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#260.flags 0x90240005
+  r Unit#260.posY 5636096
+  a unit Unit#260
+  i services.SchedPublish 14 20
+  o Unit#260.flags 0x90250005
+  o Unit#260.posX 125615398
+  o Unit#260.posZ 272393905
+  i services.SchedPublish 14 8
+  w UnitMotion#57.lastMoveTick 124
+call 124 UpdateMotion
+  r Unit#262.flags 0x10e80025
+  a unit Unit#262
+  i services.SchedPublish 14 12
+  o Unit#262.heading 17058
+  o Unit#262.flags 0x10e90025
+  i services.ScheduleMapCanPlaceUnitFootprint UnitDef#103 262 (133,335) 1 = 1
+  o SimGlobals.g_lastPlaceMetalSum 774
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 32
+  o Unit#262.cell (133,335)
+  o Unit#262.posX 141001290
+  o Unit#262.posZ 351986629
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 12
+  i services.SchedPublish 14 8
+  i services.SchedPublish 14 8
+  w UnitMotion#58.lastMoveTick 124
+call 124 UpdateMotion
+  a unit Unit#263
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#264
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#265
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#266
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#267
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#268
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#269
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#270.flags 0x90240005
+  a unit Unit#270
+  i services.SchedPublish 14 12
+  o Unit#270.heading 963
+  o Unit#270.flags 0x90250005
+  i services.SchedPublish 14 20
+  o Unit#270.posX 114224831
+  o Unit#270.posZ 171469924
+  i services.SchedPublish 14 8
+  w UnitMotion#66.velocityX -9673
+  w UnitMotion#66.velocityZ -112308
+  w UnitMotion#66.lastMoveTick 124
+call 124 UpdateMotion
+  a unit Unit#276
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#277
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#278
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  a unit Unit#279
+  i services.SchedPublish 14 8
+call 124 UpdateMotion
+  r Unit#280.flags 0x90240005
+  a unit Unit#280
+  i services.SchedPublish 14 20
+  o Unit#280.flags 0x90250005
+  o Unit#280.posX 231662288
+  o Unit#280.posZ 384828968
+  i services.SchedPublish 14 8
+  w UnitMotion#71.velocityX 104889
+  w UnitMotion#71.velocityZ 1293
+  w UnitMotion#71.speed 104902
+  w UnitMotion#71.lastMoveTick 124
+call 124 UpdateMotion
+  a unit Unit#281
+  i services.SchedPublish 14 8

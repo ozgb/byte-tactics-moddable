@@ -1030,6 +1030,7 @@
         "services": {
           "RandomInt": [["int"], "int"],
           "SimAlloc": [["int"], "linear"],
+          "SimFree": [["linear"], "void"],
           "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
           "GetSlotDpid": [["int"], "int"],
           "FindSlotByDpid": [["int"], "int"],
@@ -1103,6 +1104,7 @@
         },
         "services": {
           "RandomInt": [["int"], "int"],
+          "SimAlloc": [["int"], "linear"],
           "RecordSimEvent": [["int", "int", "linear", "int"], "void"],
           "Emit": [["linear", "int"], "void"]
         }

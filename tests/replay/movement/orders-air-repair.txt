@@ -12,6 +12,7 @@ call 668 UpdateMotion
   r Unit#1.spatialBucket SpatialBucket#32
   r Unit#1.transportPiece 255
   r Unit#1.heading 0
+  r Unit#1.pitch 0
   r Unit#1.list Order#1
   r Unit#1.flags 0x90c00021
   r Unit#1.carrier null
@@ -63,6 +64,7 @@ call 668 UpdateMotion
   r Unit#4.spatialBucket SpatialBucket#87
   r Unit#4.transportPiece 255
   r Unit#4.heading -32705
+  r Unit#4.pitch 0
   r Unit#4.list Order#2
   r Unit#4.flags 0x10e40026
   r Unit#4.carrier null
@@ -125,6 +127,7 @@ call 668 UpdateMotion
   r Unit#2.spatialBucket SpatialBucket#59
   r Unit#2.transportPiece 255
   r Unit#2.heading -32705
+  r Unit#2.pitch 0
   r Unit#2.list null
   r Unit#2.flags 0x70280021
   r Unit#2.carrier null
@@ -169,6 +172,7 @@ call 668 UpdateMotion
   r Unit#251.spatialBucket SpatialBucket#334
   r Unit#251.transportPiece 255
   r Unit#251.heading 0
+  r Unit#251.pitch 0
   r Unit#251.list Order#3
   r Unit#251.flags 0x90e00321
   r Unit#251.carrier null

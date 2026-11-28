@@ -407,6 +407,13 @@ def record_check_log(session, proxy_log, allow, runner=run):
     return result.returncode == 0
 
 
+def check_host_build(build):
+    """Refuse, before the VM starts, when the build the broker gates from lacks the replayer or the wasmtime DLL."""
+    for name in ("replay_native_test.exe", "wasmtime_host.dll"):
+        if not (build / name).is_file():
+            raise Refusal(f"{build / name} does not exist: build it with `cmake --build build/modern --target replay_native_test wasm_runtime`")
+
+
 def start_session(args):
     """Validate, start everything, run the agent; return the agent's exit status."""
     home = Path.home()
@@ -427,6 +434,7 @@ def start_session(args):
     image = Path(args.image).resolve()
     if not image.is_file():
         raise Refusal(f"image {image} does not exist: build it as docs/cleanroom.md says")
+    check_host_build(REPO / "build" / "modern")
     if not SMOLVM.exists():
         raise Refusal(f"{SMOLVM} is not installed")
     if not os.access("/dev/kvm", os.R_OK | os.W_OK):

@@ -292,6 +292,18 @@ class LaunchRefusalTests(unittest.TestCase):
             with self.assertRaises(ln.Refusal):
                 self.mount(bad)
 
+    def test_refuses_a_build_without_the_replayer(self):
+        build = self.repo / "build" / "modern"
+        build.mkdir(parents=True)
+        with self.assertRaises(ln.Refusal):
+            ln.check_host_build(build)
+        (build / "wasmtime_host.dll").write_bytes(b"")
+        with self.assertRaises(ln.Refusal) as caught:
+            ln.check_host_build(build)
+        self.assertIn("replay_native_test", str(caught.exception))
+        (build / "replay_native_test.exe").write_bytes(b"")
+        ln.check_host_build(build)
+
     def test_refuses_a_missing_directory(self):
         with self.assertRaises(ln.Refusal):
             self.mount(self.repo / "nope")

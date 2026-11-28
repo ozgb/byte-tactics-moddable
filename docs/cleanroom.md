@@ -206,8 +206,9 @@ the path doesn't exist in the VM, in the same way as `~/.config/gh`.
 
 ## First real session
 
-Run these on the host, from a worktree of this repository, with `build/modern` built (the real gate needs it, and
-`~/.ta` as `--game-dir`). Do not set `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` in the shell.
+Run these on the host, from a worktree of this repository, with `build/modern` built and the `replay_native_test` and `wasm_runtime` targets built
+(`cmake --build build/modern --target replay_native_test wasm_runtime`; the real gate needs both, and `launch.py` refuses to start
+without them), and `~/.ta` as `--game-dir`. Do not set `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` in the shell.
 
 ```sh
 export UV_PYTHON=/usr/bin/python3.14 WINEARCH=win64 WINEDEBUG=-all WINEPREFIX=$PWD/build/scratch/cleanroom-wine

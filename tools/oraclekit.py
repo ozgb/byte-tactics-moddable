@@ -1188,12 +1188,23 @@ def check_target(out: Path) -> None:
         raise Refusal("refused: %s is not empty" % out)
 
 
+STATE_CLASSES = "data/state_classes.csv"
+EXPLICIT_SOURCES = frozenset({MODULES, CODE_TABLES_SOURCE, README_SOURCE, TERMS_SOURCE, CLASS_WORDS, REPLAY_SCHEMA, STATE_CLASSES,
+                              *("data/%s.csv" % name for name in COUPLING)})
+
+
+def explicit(root: Path, path: str) -> bytes:
+    """A file of HEAD that the export reads outside the contents table; it must be in EXPLICIT_SOURCES, which the CI trigger covers."""
+    if path not in EXPLICIT_SOURCES:
+        raise ValueError("%s is read by the export but not in EXPLICIT_SOURCES" % path)
+    return blob(root, path)
+
+
 def source_paths(root: Path, contents=None, imports=None, lister=tracked) -> list[str]:
     """Every tracked file the export reads, for the CI trigger that decides whether the export runs."""
     imports = imports if imports is not None else (RUNTIME_IMPORTS if contents is None else {})
     paths = set(select(root, contents, lister))
-    paths |= {MODULES, CODE_TABLES_SOURCE, README_SOURCE, TERMS_SOURCE, CLASS_WORDS, REPLAY_SCHEMA, "data/state_classes.csv"}
-    paths |= {"data/%s.csv" % name for name in COUPLING}
+    paths |= EXPLICIT_SOURCES
     if imports:
         paths |= set(imports) | {PROVENANCE_README, LICENSE_SOURCE}
         paths |= {path for path, _ in lister(root, VECTORS_SOURCE)}
@@ -1212,14 +1223,14 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     files.update(extra)
     files[LAYOUT] = (json.dumps(layout, indent=1, sort_keys=False) + "\n").encode()
     try:
-        files[MODULES] = kit_modules(blob(root, MODULES))
+        files[MODULES] = kit_modules(explicit(root, MODULES))
     except subprocess.CalledProcessError:
         raise Refusal("refused: %s has no tracked file" % MODULES)
     check_names(files)
     index = None
     if SCHEMA in files:
         try:
-            names = code_table_names(blob(root, CODE_TABLES_SOURCE))
+            names = code_table_names(explicit(root, CODE_TABLES_SOURCE))
         except subprocess.CalledProcessError:
             raise Refusal("refused: %s has no tracked file" % CODE_TABLES_SOURCE)
         index = speclint.source_index(root, speclint.DEFAULT_RUN)
@@ -1230,16 +1241,16 @@ def export(root: Path, out: Path, untagged: bool, layout: dict, contents=None, l
     if SIM_EVENTS_PAGE in files and listed(SIM_EVENTS_PAGE, contents):
         page = files[SIM_EVENTS_PAGE].decode()
         try:
-            rows = term_rows(blob(root, TERMS_SOURCE))
+            rows = term_rows(explicit(root, TERMS_SOURCE))
         except subprocess.CalledProcessError:
             raise Refusal("refused: %s has no tracked file" % TERMS_SOURCE)
         files[SIM_EVENTS_TABLE] = kinds_table(files[SIM_EVENTS_HEADER].decode(), page)
         files[SIM_EVENTS_PAGE] = kit_page(page, rows)
-    names = Names(allowed_identifiers(files), interface_slots(root), state_classes(blob(root, "data/state_classes.csv")))
-    files.update(coupling_files(lambda path: blob(root, path), names))
+    names = Names(allowed_identifiers(files), interface_slots(root), state_classes(explicit(root, STATE_CLASSES)))
+    files.update(coupling_files(lambda path: explicit(root, path), names))
     if counts is not None:
         counts.update(names.counts)
-    files[README] = blob(root, README_SOURCE)
+    files[README] = explicit(root, README_SOURCE)
     hits = leaks(files, root) if leaks else leak_check(files, root, index=index, imported=frozenset(extra) - {p for p in extra if p.startswith(VECTORS_DIR + "/")})
     if hits:
         raise Refusal("refused: the kit leaks the decompilation:\n" + "\n".join(hits))

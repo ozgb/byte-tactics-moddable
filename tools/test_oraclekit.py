@@ -1415,6 +1415,11 @@ class CiTriggerTest(unittest.TestCase):
         for trigger in triggers:
             self.assertEqual(self.stale(trigger, paths), [])
 
+    def test_an_unlisted_read_is_refused_and_the_listed_ones_are_in_source_paths(self):
+        with self.assertRaises(ValueError):
+            oraclekit.explicit(ROOT, "docs/other.md")
+        self.assertLessEqual(oraclekit.EXPLICIT_SOURCES, set(oraclekit.source_paths(ROOT)))
+
     def test_a_trigger_without_the_docs_paths_is_stale(self):
         text = (ROOT / ".github/workflows/ci.yml").read_text()
         trigger = next(t for t in self.triggers(text) if "tools/oraclekit" in t)

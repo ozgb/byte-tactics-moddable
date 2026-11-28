@@ -31940,9 +31940,11 @@ address,function,file,kind,target
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,call,operator=
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,call,sprintf
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,deref_read,*MouseEventWords
+0x499890,MainFrameTick,src/ingame/screenshots.cpp,deref_read,*unsigned short
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,deref_write,*MouseEventWords
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,deref_write,*int
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_escape,Game::lastTick
+0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_escape,Game::loadingFlags
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_escape,Game::menu_519
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_escape,Game::path
 0x499890,MainFrameTick,src/ingame/screenshots.cpp,field_escape,Game::view

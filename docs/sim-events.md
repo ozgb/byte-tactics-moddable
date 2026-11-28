@@ -53,7 +53,7 @@ The queue is 131088 bytes. The pending events are the records numbered from `hea
 
 **Empty at the start and end.** The queue is empty at the start of a match, after a load, and after each drain. It is not part of a saved game and is in no trace, so it never changes a digest.
 
-**Draining.** The presentation drains the queue (acts on every pending record, then leaves the queue empty) at these points, in every mode:
+**Draining.** The presentation drains the queue (acts on every pending record, then leaves the queue empty) at these points, in every mode. While a match loads, the thread that loads it is the only one that drains: the drain at the start of each frame is skipped from the start of the load until the load is marked finished.
 
 - at the end of a match load, on the thread that loads it, before the load is marked finished, so that what the load recorded is acted on before the first frame of the match is drawn (the reference acts on it there, during the load);
 - at the start of each frame, before the speech queue is first read;

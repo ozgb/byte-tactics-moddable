@@ -31373,6 +31373,7 @@ address,function,file,kind,target
 0x497180,LoadMatch,src/game/game_load.cpp,call,BroadcastPlayerInfo
 0x497180,LoadMatch,src/game/game_load.cpp,call,CenterCameraOnStartPosition
 0x497180,LoadMatch,src/game/game_load.cpp,call,CreateMissionUnits
+0x497180,LoadMatch,src/game/game_load.cpp,call,DrainSimEvents
 0x497180,LoadMatch,src/game/game_load.cpp,call,FindHostSlot
 0x497180,LoadMatch,src/game/game_load.cpp,call,GameRand
 0x497180,LoadMatch,src/game/game_load.cpp,call,GameSrand

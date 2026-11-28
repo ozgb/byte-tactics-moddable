@@ -49,12 +49,13 @@ The queue is 131088 bytes. The pending events are the records numbered from `hea
 
 **Order.** Events are recorded in the order the logic produces them, and the order is the same on every machine. Within one phase the pending events are in record order, and a phase's events come before the next phase's. The presentation takes the records oldest first. A two-record event is read as one event, at the place of its first record.
 
-**Overflow.** When an event does not fit, no part of it is recorded. In a test-mode run, the run ends with a fatal error that says the sim event queue is full, so that a scenario can never lose an event without being seen. When playing, `dropped` counts the event and the logic goes on. The largest count the reference scenarios record in one step is 123 records, and the largest count pending at a drain is 352 (the first drain after a match load, which holds one plume for each geothermal vent of the map).
+**Overflow.** When an event does not fit, no part of it is recorded. In a test-mode run, the run ends with a fatal error that says the sim event queue is full, so that a scenario can never lose an event without being seen. When playing, `dropped` counts the event and the logic goes on. The largest count the reference scenarios record in one step is 123 records, and the largest count pending at a drain is 352 (the drain at the end of a match load, which holds one plume for each geothermal vent of the map).
 
 **Empty at the start and end.** The queue is empty at the start of a match, after a load, and after each drain. It is not part of a saved game and is in no trace, so it never changes a digest.
 
 **Draining.** The presentation drains the queue (acts on every pending record, then leaves the queue empty) at these points, in every mode:
 
+- at the end of a match load, on the thread that loads it, before the load is marked finished, so that what the load recorded is acted on before the first frame of the match is drawn (the reference acts on it there, during the load);
 - at the start of each frame, before the speech queue is first read;
 - at the start of the call that runs the steps of a frame, before the first step, for what was recorded outside a step;
 - inside each step, after each of the phases 1 to 7, so that the events of a phase are drained before the next phase runs (the drain after phase 7 is before the camera follows and before the particles update);

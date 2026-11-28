@@ -18,6 +18,7 @@
 #include "../state/sim_globals.h"
 #include "../game/los_helpers.h"
 #include "../state/block.h"
+#include "../state/load_data.h"
 #include "../../interfaces/rand_stream.h"
 #include "modules.h"
 #include "module_glue.h"
@@ -276,12 +277,29 @@ IMPORT(SimAllocTaggedImport)
     return error;
 }
 
+struct LiveProbe {
+    const void* address;
+    int found;
+};
+
+void __cdecl ProbeLive(void* payload, unsigned int, void* context)
+{
+    LiveProbe* probe = (LiveProbe*)context;
+    if (payload == probe->address)
+        probe->found = 1;
+}
+
 IMPORT(SimFreeImport)
 {
     void* p = GlueLinear((unsigned)a[0].i32);
-    if (p != nullptr && !SimOwns(p))
+    if (p == nullptr)
+        return nullptr;
+    if (!SimOwns(p))
         return GlueImportError("SimFree", "the pointer is outside the sim block");
-    SimFree(p);
+    LiveProbe probe = {p, 0};
+    SimBlockForEach(ProbeLive, &probe);
+    if (probe.found)
+        SimFree(p);
     return nullptr;
 }
 
@@ -293,6 +311,9 @@ IMPORT(RecordSimEventImport)
         if (count > (ModulesMemory()->size - (unsigned)a[2].i32) / sizeof(unsigned))
             return GlueImportError("RecordSimEvent", "the buffer runs past the module memory");
     }
+    unsigned kind = (unsigned)a[0].i32;
+    if (kind > SIM_EVENT_RADAR_MAPPED || kind == 24 || (count != 0 && a[2].i32 == 0))
+        return nullptr;
     RecordSimEvent((SimEventKind)a[0].i32, (unsigned)a[1].i32, (const unsigned*)GlueLinear(a[2].i32), count);
     return nullptr;
 }
@@ -300,6 +321,10 @@ IMPORT(RecordSimEventImport)
 IMPORT(SimCaptureAllocImport)
 {
     NEED("SimCaptureAlloc", 1);
+    if (a[1].i32 == 0) {
+        a[0].i32 = 0;
+        return nullptr;
+    }
     if (ModulesMemory()->size - (unsigned)a[1].i32 < sizeof(unsigned))
         return GlueImportError("SimCaptureAlloc", "the buffer runs past the module memory");
     unsigned address;
@@ -310,13 +335,74 @@ IMPORT(SimCaptureAllocImport)
 
 IMPORT(GetSlotDpidImport)
 {
-    a[0].i32 = GetSlotDpid((unsigned char)a[0].i32);
+    a[0].i32 = (unsigned)a[0].i32 > 10 ? -1 : GetSlotDpid((unsigned char)a[0].i32);
     return nullptr;
 }
 
 IMPORT(FindSlotByDpidImport)
 {
     a[0].i32 = FindSlotByDpid(a[0].i32);
+    return nullptr;
+}
+
+IMPORT(GetGafFrameImport)
+{
+    if (a[0].i32 == 0)
+        return nullptr;
+    NEED("GetGafFrame", 0);
+    a[0].i32 = (int)LoadGetGafFrame((unsigned)a[0].i32, a[1].i32);
+    return nullptr;
+}
+
+const unsigned kGafCursorSize = 12;
+
+const char* GafCursor(const char* import, unsigned address)
+{
+    if (!GlueInMemory(address))
+        return GlueImportError(import, "pointer argument 0 is outside the module memory");
+    if (kGafCursorSize > ModulesMemory()->size - address)
+        return GlueImportError(import, "the cursor runs past the module memory");
+    return nullptr;
+}
+
+IMPORT(InitGafSequenceImport)
+{
+    if (a[0].i32 == 0 || a[1].i32 == 0 || a[2].i32 < 0)
+        return nullptr;
+    const char* error = GafCursor("InitGafSequence", (unsigned)a[0].i32);
+    if (error != nullptr)
+        return error;
+    NEED("InitGafSequence", 1);
+    LoadInitGafSequence(GlueLinear(a[0].i32), (unsigned)a[1].i32, a[2].i32);
+    return nullptr;
+}
+
+IMPORT(GetGafSequenceFrameImport)
+{
+    if (a[0].i32 == 0)
+        return nullptr;
+    const char* error = GafCursor("GetGafSequenceFrame", (unsigned)a[0].i32);
+    if (error != nullptr)
+        return error;
+    const char* cursor = (const char*)GlueLinear(a[0].i32);
+    unsigned short index = *(const unsigned short*)cursor;
+    unsigned animation = *(const unsigned*)(cursor + 8);
+    if (animation != 0 && index >= *(const unsigned short*)LoadNative(animation)) {
+        a[0].i32 = 0;
+        return nullptr;
+    }
+    a[0].i32 = (int)LoadAddress(LoadGetGafSequenceFrame(GlueLinear(a[0].i32)));
+    return nullptr;
+}
+
+IMPORT(StepGafSequenceImport)
+{
+    if (a[0].i32 == 0)
+        return nullptr;
+    const char* error = GafCursor("StepGafSequence", (unsigned)a[0].i32);
+    if (error != nullptr)
+        return error;
+    a[0].i32 = LoadStepGafSequence(GlueLinear(a[0].i32));
     return nullptr;
 }
 
@@ -388,6 +474,10 @@ const GlueImport kServiceImports[] = {
     {"services", "SimCaptureAlloc", "ii>i", SimCaptureAllocImport},
     {"services", "GetSlotDpid", "i>i", GetSlotDpidImport},
     {"services", "FindSlotByDpid", "i>i", FindSlotByDpidImport},
+    {"services", "GetGafFrame", "ii>i", GetGafFrameImport},
+    {"services", "InitGafSequence", "iii>", InitGafSequenceImport},
+    {"services", "StepGafSequence", "i>i", StepGafSequenceImport},
+    {"services", "GetGafSequenceFrame", "i>i", GetGafSequenceFrameImport},
     {"services", "Emit", "ii>", EmitImport},
 };
 

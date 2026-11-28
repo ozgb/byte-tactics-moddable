@@ -297,6 +297,20 @@ class RecordingsRoute(unittest.TestCase):
             name, vector = rule.split(" ")
             self.assertIn(f'{{ "{name}", "{vector.split(".")[0]}=(", 1 }}', source)
 
+    def test_a_blocked_true_entry_of_the_kit_is_blocked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = Path(tmp) / "modules.json"
+            manifest.write_text(json.dumps({"modules": [{"name": "a", "blocked": True}, {"name": "b"}]}))
+            self.assertTrue(oraclegate.blocked("a", manifest))
+            self.assertFalse(oraclegate.blocked("b", manifest))
+
+    def test_a_malformed_blocked_entry_is_an_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = Path(tmp) / "modules.json"
+            manifest.write_text(json.dumps({"modules": [{"name": "a", "blocked": False}]}))
+            with self.assertRaisesRegex(oraclegate.Error, "blocked must be a reason or true"):
+                oraclegate.blocked("a", manifest)
+
     def test_a_blocked_entry_takes_the_recordings_route(self):
         self.assertTrue(oraclegate.blocked("los_radar"))
         self.assertFalse(oraclegate.blocked("wind_meteors"))
@@ -472,6 +486,11 @@ class PrepareRuntime(unittest.TestCase):
         exe = oraclegate.prepare_runtime(self.build, "wind_meteors", self.module, self.dir / "runtime")
         self.assertEqual((exe.parent / "objs/objects.rsp").read_text(), "/abs/a.obj\n")
         self.assertTrue((exe.parent / "TotalA.map").is_file())
+
+    def test_a_blocked_entry_has_no_wasm_copied(self):
+        (self.build / "modules.json").write_text(json.dumps({"modules": [{"name": "wind_meteors"}, {"name": "econ", "blocked": "not yet"}]}))
+        exe = oraclegate.prepare_runtime(self.build, "wind_meteors", self.module, self.dir / "runtime")
+        self.assertEqual(sorted(p.name for p in exe.parent.glob("*.wasm")), ["wind_meteors.wasm"])
 
     def test_a_build_without_the_object_list_is_an_error(self):
         (self.build / "objs/objects.rsp").unlink()

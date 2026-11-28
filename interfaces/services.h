@@ -7,7 +7,7 @@
 // Major version of the services interface, changed when a declaration is removed or its signature changes.
 #define SERVICES_VERSION_MAJOR 4
 // Minor version of the services interface, changed when a declaration is added.
-#define SERVICES_VERSION_MINOR 2
+#define SERVICES_VERSION_MINOR 3
 
 // Advances the named random stream of the game logic (LIBCMT rand) and returns the next value, 0 to 0x7fff; the stream's state is in the block.
 int __cdecl GameRand(RandStream stream);
@@ -81,6 +81,8 @@ GafFrame* __stdcall GetGafFrame(FrameTable* table, int index);
 void __stdcall InitGafSequence(Handle* player, GafEntry* entry, int index);
 // Advances a sequence by a tick and returns 1 when it moved to the next frame (or ended), 0 when it stayed or has no entry.
 int __stdcall StepGafSequence(Handle* player);
+// Returns the frame a sequence shows, the entry's frame at the cursor's index, or null when the cursor has no entry.
+GafFrame* __stdcall GetGafSequenceFrame(Handle* player);
 
 // Returns the network id of a player slot, or -1 when the slot is 10 or holds no player.
 int __stdcall GetSlotDpid(unsigned char index);

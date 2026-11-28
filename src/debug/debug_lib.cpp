@@ -8,6 +8,7 @@
 #include <new>
 #include <stdio.h>
 #include "../state/block.h"
+#include "../state/load_data.h"
 #include "../../interfaces/host.h"
 #include "command_line.h"
 
@@ -264,6 +265,7 @@ void __cdecl GameFreeThunk(void* p)
 void __cdecl GameFree(void* p)
 {
     DlFree(p);
+    LoadDataUnregister(p);
     if (SimOwns(p)) {
         SimFree(p);
         return;

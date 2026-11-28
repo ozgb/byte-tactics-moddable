@@ -9,11 +9,11 @@ Debris::pos,Debris::pos,43,DrawExplosions
 Debris::ref1,Debris::ref1,22,DrawExplosions|GetGafSequenceFrame
 Debris::ref2,Debris::ref2,22,DrawExplosions|GetGafSequenceFrame
 DebrisCache::InitSimCache: GameAllocIgnoreTag CMemoryCache CCH,the debris model cache,21,DrawExplodedPiece|DrawExplodedPieceFaces
-DebrisPiece::faceCount,DebrisPiece::faceCount,8,DrawDebrisProjected
-DebrisPiece::faces,DebrisPiece::faces,8,DrawDebrisProjected
-DebrisPiece::firstFace,DebrisPiece::firstFace,8,DrawDebrisProjected
-DebrisPiece::vertexCount,DebrisPiece::vertexCount,8,DrawDebrisProjected
-DebrisPiece::verts,DebrisPiece::verts,8,DrawDebrisProjected
+DebrisPiece::faceCount,DebrisPiece::faceCount,8,DrawDebrisProjected|DrawDebrisProjectedNative
+DebrisPiece::faces,DebrisPiece::faces,8,DrawDebrisProjected|DrawDebrisProjectedNative
+DebrisPiece::firstFace,DebrisPiece::firstFace,8,DrawDebrisProjected|DrawDebrisProjectedNative
+DebrisPiece::vertexCount,DebrisPiece::vertexCount,8,DrawDebrisProjected|DrawDebrisProjectedNative
+DebrisPiece::verts,DebrisPiece::verts,8,DrawDebrisProjected|DrawDebrisProjectedNative
 Feature::anim,Feature::anim,11,GetGafSequenceFrame
 Feature::animTable,Feature::animTable,99,BlitFeatureGaf
 Feature::drawn,Feature::drawn,0,BlitFeatureGaf

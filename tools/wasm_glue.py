@@ -629,7 +629,7 @@ def tables(manifest, all_seams):
         w()
         outbox = f"SCHED_{subsystem.upper()}" if subsystem != "mission" else "-1"
         w(f"const GlueModuleDef k{p}Def = {{\"{subsystem}\", {outbox}, k{p}Slots, {len(exports)}, s_{camel(subsystem)}Funcs, "
-          f"s_{camel(subsystem)}Timing, {p}UseSeam, {p}TimeNative, {1 if 'blocked' in entry else 0}, "
+          f"s_{camel(subsystem)}Timing, {p}UseSeam, {p}TimeNative, {1 if wasm_modules.is_blocked(entry) else 0}, "
           f"{0 if 'Emit' in recorded_services(subsystem) else 1}}};")
         w(f"GlueModule {glue} = {{&k{p}Def}};")
         w()

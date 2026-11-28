@@ -332,7 +332,6 @@ struct GafArchive;
 struct Object3do;
 struct CobScriptHeader;
 
-GafFrame* __stdcall GetGafSequenceFrame(Handle* player);
 GafEntry* __stdcall FindGafEntry(GafArchive* gaf, const char* name);
 GafArchive* __stdcall LoadGaf(const char* path);
 void* __stdcall Load3do(char* path);

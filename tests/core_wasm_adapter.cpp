@@ -111,11 +111,12 @@ const char* ClassOfLoaderError(const char* text, Names* names)
         return "instantiate";
     if (Has(text, "no function export") || Has(text, "no global export") || Has(text, "is not an i32 address"))
         return "export";
-    if (Has(text, "reaches the block") || Has(text, "reaches the scratch"))
+    if (Has(text, "reaches the block") || Has(text, "reaches the scratch") || Has(text, "reaches the load data"))
         return "window_reaches";
     if (Has(text, "does not fit the memory or table") || Has(text, "is outside the memory"))
         return "window";
-    if (Has(text, "does not fit the memory") || Has(text, "does not fit below the block") || Has(text, "block_max is below"))
+    if (Has(text, "does not fit the memory") || Has(text, "does not fit below the block")
+        || Has(text, "does not lie above the block") || Has(text, "block_max is below"))
         return "layout";
     if (Has(text, "modules must be a non-empty list") || Has(text, "every module needs a name") || Has(text, "is listed twice")
         || Has(text, "must be a list of names"))

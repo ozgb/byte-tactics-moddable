@@ -126,6 +126,87 @@
   ]
  },
  {
+  "name": "manifest_load_data_shape",
+  "calls": [
+   [
+    "manifest",
+    "loader/load_data_shape.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_load_data_negative",
+  "calls": [
+   [
+    "manifest",
+    "loader/load_data_negative.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_layout_load_data_memory",
+  "calls": [
+   [
+    "manifest",
+    "loader/layout_load_data_memory.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_layout_load_data_block",
+  "calls": [
+   [
+    "manifest",
+    "loader/layout_load_data_block.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_layout_load_data_scratch",
+  "calls": [
+   [
+    "manifest",
+    "loader/layout_load_data_scratch.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_load_data_ok",
+  "calls": [
+   [
+    "manifest",
+    "loader/load_data_ok.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_load_data_empty",
+  "calls": [
+   [
+    "manifest",
+    "loader/load_data_empty.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_reaches_load_data",
+  "calls": [
+   [
+    "manifest",
+    "loader/reaches_load_data.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_order_scratch_load_data",
+  "calls": [
+   [
+    "manifest",
+    "loader/order_scratch_load_data.json"
+   ]
+  ]
+ },
+ {
   "name": "manifest_no_modules",
   "calls": [
    [
@@ -1314,6 +1395,42 @@
    [
     "manifest",
     "loader/size_budget_fraction.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_blocked_true",
+  "calls": [
+   [
+    "manifest",
+    "loader/blocked_true.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_blocked_reason",
+  "calls": [
+   [
+    "manifest",
+    "loader/blocked_reason.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_blocked_false",
+  "calls": [
+   [
+    "manifest",
+    "loader/blocked_false.json"
+   ]
+  ]
+ },
+ {
+  "name": "manifest_blocked_number",
+  "calls": [
+   [
+    "manifest",
+    "loader/blocked_number.json"
    ]
   ]
  },

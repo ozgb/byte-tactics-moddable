@@ -49,6 +49,7 @@ from pathlib import Path
 
 import reference
 import replay
+import wasm_modules
 
 ROOT = Path(__file__).resolve().parent.parent
 FORMAT = 4
@@ -97,15 +98,22 @@ def kit_version() -> dict[str, str | None]:
     return {"interfaces": latest_tag("interfaces-v"), "reference_traces": latest_tag("reference-traces-v")}
 
 
+def manifest_entries(build: Path) -> list[dict]:
+    return json.loads((build / "modules.json").read_text())["modules"]
+
+
 def manifest_modules(build: Path) -> list[str]:
-    return [m["name"] for m in json.loads((build / "modules.json").read_text())["modules"]]
+    return [m["name"] for m in manifest_entries(build)]
 
 
 def blocked(subsystem: str, manifest: Path = MANIFEST) -> bool:
     """Whether the subsystem's entry of the game manifest is blocked: its default does not build to WASM, so no scenario can load a module of it, and it has no budgets."""
     for entry in json.loads(manifest.read_text())["modules"]:
         if entry["name"] == subsystem:
-            return "blocked" in entry
+            try:
+                return wasm_modules.is_blocked(entry)
+            except ValueError as e:
+                raise Error(f"{manifest}: {e}") from None
     raise Error(f"{manifest} has no module {subsystem}")
 
 
@@ -130,7 +138,7 @@ def prepare_replay_runtime(build: Path, subsystem: str, module: Path, directory:
 
 
 def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) -> Path:
-    """A fresh runtime in `directory`: the build's files, the object list the block pointer check reads beside the map, the manifest and the other modules as built, `module` as the subsystem's."""
+    """A fresh runtime in `directory`: the build's files, the object list the block pointer check reads beside the map, the manifest and the other modules that are not blocked, as built, `module` as the subsystem's."""
     names = manifest_modules(build)
     if subsystem not in names:
         raise Error(f"the manifest has no module {subsystem} (it has {', '.join(names)})")
@@ -144,8 +152,9 @@ def prepare_runtime(build: Path, subsystem: str, module: Path, directory: Path) 
     for name in RUNTIME_FILES:
         if (build / name).is_file():
             shutil.copy2(build / name, directory / name)
-    for name in names:
-        shutil.copy2(build / f"{name}.wasm", directory / f"{name}.wasm")
+    for entry in manifest_entries(build):
+        if not wasm_modules.is_blocked(entry):
+            shutil.copy2(build / f"{entry['name']}.wasm", directory / f"{entry['name']}.wasm")
     shutil.copyfile(module, directory / f"{subsystem}.wasm")
     return directory / "TotalA.exe"
 

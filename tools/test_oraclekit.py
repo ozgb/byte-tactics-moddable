@@ -1005,6 +1005,11 @@ class ReplaySchemaKitTest(unittest.TestCase):
         self.assertEqual(kit["annotations"]["services"], [{"name": "SimAlloc"}])
         self.assertEqual(list(kit["annotations"]["callbacks"]), ["UnitVisitor"])
 
+    def test_a_subsystem_loses_the_undeclared_services_it_lists(self):
+        schema = json.dumps({"annotations": {"subsystems": {"units": {"services": ["RandomInt", "ScheduleFeaturesPlace"]}}}}).encode()
+        kit = json.loads(oraclekit.kit_schema(schema, {}, {"ScheduleFeaturesPlace"}))
+        self.assertEqual(kit["annotations"]["subsystems"]["units"]["services"], ["RandomInt"])
+
     def test_a_load_kind_loses_the_functions_that_load_it(self):
         schema = json.dumps({"annotations": {"loads": {"cob": {"type": "ScriptTable", "loader": ["LoadCobScript"], "holders": [{"kind": "UnitDef", "member": "data"}]}}}}).encode()
         kit = json.loads(oraclekit.kit_schema(schema, {}))

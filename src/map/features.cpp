@@ -102,6 +102,7 @@ struct Model {
 #include "../util/engine_services.h"
 #include "../../interfaces/features.h"
 #include "../state/sim_globals.h"
+#include "../state/load_data.h"
 #pragma pack(pop)
 
 #include "string_ref_view.h"
@@ -350,7 +351,7 @@ static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf*
 {
     int ok = rec->GetFieldString(seqname, key, 0x100, g_emptyText);
     if (ok)
-        *out = (AnimSrc*)FindOptionalGafEntry(anims, 0, seqname);
+        *out = (AnimSrc*)LoadAddress(FindOptionalGafEntry(anims, 0, seqname));
     else
         *out = nullptr;
 }
@@ -359,9 +360,10 @@ static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, 
 {
     int ok = rec->GetFieldString(seqname, key, 0x100, g_emptyText);
     if (ok) {
-        *out = (AnimSrc*)FindOptionalGafEntry(anims, 0, seqname);
-        if (*out)
-            (*out)->kind = 0;
+        AnimSrc* entry = (AnimSrc*)FindOptionalGafEntry(anims, 0, seqname);
+        if (entry)
+            LoadDataStoreByte(&entry->kind, 0);
+        *out = (AnimSrc*)LoadAddress(entry);
     } else {
         *out = nullptr;
     }
@@ -457,9 +459,9 @@ int __stdcall LoadFeatureType(const char* name)
     def->shadowAnim.src = nullptr;
     if (def->animating) {
         if (def->seq)
-            InitGafSequence(&def->anim, def->seq, 0);
+            LoadInitGafSequence(&def->anim, (unsigned)def->seq, 0);
         if (def->seqshad)
-            InitGafSequence(&def->shadowAnim, def->seqshad, 0);
+            LoadInitGafSequence(&def->shadowAnim, (unsigned)def->seqshad, 0);
     }
     return g_game->featureCount++;
 }
@@ -594,9 +596,9 @@ void __stdcall StartFeatureBurning(int x, int z, int flag)
     s->feature = cell->feature;
     cell->spot = i;
     cell->flags |= 1;
-    InitGafSequence(&s->anim, f->seqburn, 0);
+    LoadInitGafSequence(&s->anim, (unsigned)f->seqburn, 0);
     if (f->seqburnshad != 0) {
-        InitGafSequence(&s->shadow, f->seqburnshad, 0);
+        LoadInitGafSequence(&s->shadow, (unsigned)f->seqburnshad, 0);
         s->hasShadow = 1;
     } else {
         s->hasShadow = 0;
@@ -647,9 +649,9 @@ void __stdcall KillFeature(int x, int z, int flag)
         s->bit4 = flag != 0;
         cell->spot = i;
         cell->flags |= 1;
-        InitGafSequence(&s->anim, pair.anim, 0);
+        LoadInitGafSequence(&s->anim, (unsigned)pair.anim, 0);
         if (pair.shadow != 0) {
-            InitGafSequence(&s->shadow, pair.shadow, 0);
+            LoadInitGafSequence(&s->shadow, (unsigned)pair.shadow, 0);
             s->hasShadow = 1;
         } else {
             s->hasShadow = 0;
@@ -909,7 +911,7 @@ static inline int Rand(unsigned short n)
 static inline SmokePos SmokeAt(Spot* spot, Feature* f)
 {
     SmokePos p = FootprintCentreSmoke(&spot->cell, f);
-    GafFrame* frame = GetGafSequenceFrame(&spot->anim);
+    GafFrame* frame = (GafFrame*)LoadGetGafSequenceFrame(&spot->anim);
     unsigned short w = frame->width;
     p.x.f.whole += Rand(w >> 1) - (unsigned short)frame->xOffset + (unsigned short)(w >> 2);
     unsigned short h = frame->height;
@@ -925,8 +927,8 @@ void __stdcall AnimateFeatureType(int k)
 {
     Feature* types = g_game->features;
     if (types[k].animating) {
-        StepGafSequence(&types[k].anim);
-        StepGafSequence(&types[k].shadowAnim);
+        LoadStepGafSequence(&types[k].anim);
+        LoadStepGafSequence(&types[k].shadowAnim);
     }
 }
 
@@ -985,9 +987,9 @@ int __stdcall UpdateFeatureSpot(int i)
             SmokePos q = SmokeAt(spot, f);
             RecordWhiteSmoke(Vec3{q.x.value, q.y.value, q.z.value}, 5);
         }
-        StepGafSequence(&spot->anim);
+        LoadStepGafSequence(&spot->anim);
         if (spot->flags & 4)
-            StepGafSequence(&spot->shadow);
+            LoadStepGafSequence(&spot->shadow);
         if (spot->anim.src == 0) {
             BurnOut(spot);
         } else if (spot->timer > 0 && !(spot->flags & 8)) {
@@ -995,9 +997,9 @@ int __stdcall UpdateFeatureSpot(int i)
                 SpreadFire(f, &spot->cell);
         }
     } else {
-        StepGafSequence(&spot->anim);
+        LoadStepGafSequence(&spot->anim);
         if (spot->flags & 4)
-            StepGafSequence(&spot->shadow);
+            LoadStepGafSequence(&spot->shadow);
         if (spot->anim.src == 0)
             ReplaceFeatureWithDead(spot->cell.x, spot->cell.y, 0);
     }

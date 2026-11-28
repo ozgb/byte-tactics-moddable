@@ -12,7 +12,7 @@
   (data (i32.const 196944) "MeteorWeapon\00")
   (func (export "UpdateWind") (param i32))
   (func (export "UpdateMeteors")
-    (drop (call $BuildDataPath (i32.const 0) (i32.const 0) (i32.const 0) (i32.const 269484032))))
+    (drop (call $BuildDataPath (i32.const 0) (i32.const 0) (i32.const 0) (i32.const 336592896))))
   (func (export "Apply") (param i32 i32))
   (func (export "InitMeteors"))
   (func (export "EmptyShutdownPreCleanup"))

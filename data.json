@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T11:05:05+00:00",
+ "generated": "2026-11-28T12:05:04+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -8,8 +8,8 @@
    "total": 65
   },
   "180": {
-   "done": 22,
-   "total": 43
+   "done": 25,
+   "total": 44
   }
  },
  "rows": [
@@ -234,7 +234,7 @@
    "recordings": 9,
    "spec": "active",
    "spec_pin": 6,
-   "impl": "none",
+   "impl": "active",
    "active": true,
    "issue": {
     "number": 1202,
@@ -245,11 +245,25 @@
    },
    "prs": [
     {
+     "number": 66,
+     "title": "Implementer: impl/targeting",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/66",
+     "live": true
+    },
+    {
+     "number": 65,
+     "title": "Update: Move targeting to interfaces-v75",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/65",
+     "live": true
+    },
+    {
      "number": 23,
      "title": "Update: Move targeting to interfaces-v13",
      "state": "OPEN",
      "url": "https://github.com/ozgb/btm/pull/23",
-     "live": false
+     "live": true
     },
     {
      "number": 10,
@@ -302,31 +316,31 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 2,
-   "spec": "active",
-   "spec_pin": null,
-   "impl": "active",
-   "active": true,
+   "spec": "done",
+   "spec_pin": 75,
+   "impl": "built",
+   "active": false,
    "issue": {
     "number": 1190,
     "title": "Spec: Write the mission spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1190",
     "claimed": true,
-    "state": "OPEN"
+    "state": "CLOSED"
    },
    "prs": [
     {
      "number": 62,
      "title": "Implementer: impl/mission",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/62",
-     "live": true
+     "live": false
     },
     {
      "number": 45,
      "title": "Add: Specify the mission",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/45",
-     "live": true
+     "live": false
     }
    ]
   },
@@ -443,7 +457,7 @@
     "number": 1194,
     "title": "Spec: Write the features spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1194",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [

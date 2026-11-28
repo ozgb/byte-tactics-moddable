@@ -4,6 +4,7 @@
 
 #include "../interfaces/host.h"
 #include "../src/state/block.h"
+#include "../src/state/load_data.h"
 #include "../src/harness/replay_objects.h"
 #include "../src/wasm/modules.h"
 #include "../src/wasm/module_glue.h"
@@ -12,6 +13,7 @@
 namespace {
 
 ModuleMemory s_memory;
+unsigned s_loadDataBase;
 GlueModule* s_glue;
 char s_wasmPath[320];
 char s_directory[320];
@@ -106,6 +108,7 @@ unsigned char* ReadModule(size_t* size)
 void Release()
 {
     if (s_loader != nullptr) {
+        LoadDataAttach(nullptr, 0, 0, nullptr);
         SimBlockAttach(nullptr);
         SimBlockReset();
         wl_destroy(s_loader);
@@ -228,11 +231,13 @@ void ReplayWasmReload()
     SimBlockAttach(s_memory.base + layout->block_base);
     if (!layout->has_load_data)
         Stop("the manifest has no load_data region");
+    s_loadDataBase = layout->load_data_base;
+    LoadDataAttach(s_memory.base + layout->load_data_base, layout->load_data_base, layout->load_data_size, ModulesFatal);
     unsigned classWords[256];
     unsigned classWordCount = ReplayClassWords(classWords, sizeof classWords / sizeof classWords[0]);
-    if (classWordCount > sizeof classWords / sizeof classWords[0] || classWordCount * 4 > layout->load_data_size)
+    if (classWordCount > sizeof classWords / sizeof classWords[0])
         Stop("the class word table is too long");
-    memcpy(s_memory.base + layout->load_data_base, classWords, classWordCount * 4);
+    LoadDataWriteClassWords(classWords, classWordCount);
     s_classWordsBytes = classWordCount * 4;
     s_classWordsHash = ClassWordsHash();
 
@@ -258,6 +263,16 @@ bool ReplayWasmClassWordsIntact()
 void ReplayWasmNoBudgets()
 {
     s_noBudgets = true;
+}
+
+unsigned char* ReplayWasmLinear(unsigned address)
+{
+    return s_memory.base + address;
+}
+
+unsigned ReplayWasmLoadDataBase()
+{
+    return s_loadDataBase;
 }
 
 void ReplayWasmUseSeam()

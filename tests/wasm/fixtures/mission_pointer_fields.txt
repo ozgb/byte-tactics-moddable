@@ -1,0 +1,46 @@
+bt-replay 2
+subsystem mission 2.0
+call 0 CountMissionFeatures
+  r Mission#0.featureCount 1
+  o result 1
+call 0 GetMissionFeature
+  r Mission#0.features Mission#0.features[0]
+  r Mission#0.features[0].name "IceMetal03"
+  r Mission#0.features[0].x 257
+  r Mission#0.features[0].y 106
+  a index 0
+  o out.name "IceMetal03"
+  o out.x 257
+  o out.y 106
+  o result 1
+call 0 CountMissionUnits
+  r Mission#0.unitCount 1
+  o result 1
+call 0 GetMissionUnit
+  r Mission#0.units Mission#0.units[0]
+  r Mission#0.units[0].name "ARMCK"
+  r Mission#0.units[0].ident ""
+  r Mission#0.units[0].initialMission null
+  r Mission#0.units[0].x 249561088
+  r Mission#0.units[0].y 16056320
+  r Mission#0.units[0].z 46137344
+  r Mission#0.units[0].angle -31312
+  r Mission#0.units[0].health 100
+  r Mission#0.units[0].creationCountdown 0
+  r Mission#0.units[0].buildPriority 0
+  r Mission#0.units[0].player 1
+  r Mission#0.units[0].flags 0
+  a index 0
+  o out.name "ARMCK"
+  o out.ident ""
+  o out.initialMission null
+  o out.x 249561088
+  o out.y 16056320
+  o out.z 46137344
+  o out.angle -31312
+  o out.health 100
+  o out.creationCountdown 0
+  o out.buildPriority 0
+  o out.player 1
+  o out.flags 0
+  o result 1

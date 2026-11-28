@@ -1,6 +1,6 @@
 """Build the WebAssembly fixtures of the core gate's loader, fuel and host groups, standard library and wasm-tools only.
 
-    uv run tools/corefixtures.py build     # rebuild every reference/core/{loader,fuel,host}/NAME.wasm from its NAME.wat
+    uv run tools/corefixtures.py build     # rebuild every reference/core/{loader,fuel,host}/NAME.wasm and tests/wasm/fixtures/NAME.wasm from its NAME.wat
     uv run tools/corefixtures.py check     # exit 1 when a committed .wasm differs from a rebuild
 
 The fuel and host groups' modules also get the fuel pass of docs/module-abi.md, section 11 (tools/wasm_fuel.py). wasm-tools is
@@ -15,7 +15,8 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CORE = os.path.join(ROOT, "reference", "core")
 GROUPS = ("loader", "fuel", "host")
-METERED = ("fuel", "host")
+METERED = ("fuel", "host", "fixtures")
+TEST_FIXTURES = os.path.join(ROOT, "tests", "wasm", "fixtures")
 WASM_TOOLS = os.path.join(ROOT, "build", "tools", "bin", "wasm-tools")
 
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -44,6 +45,9 @@ def fixtures():
         for name in sorted(os.listdir(directory)):
             if name.endswith(".wat"):
                 yield group, os.path.join(directory, name)
+    for name in sorted(os.listdir(TEST_FIXTURES)):
+        if name.endswith(".wat"):
+            yield "fixtures", os.path.join(TEST_FIXTURES, name)
 
 
 def main():

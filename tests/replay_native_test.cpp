@@ -391,6 +391,8 @@ void SyncLoadObjects()
         LoadObject& o = g_loadObjects[i];
         unsigned char* copy = ReplayWasmLinear(LoadAddress(o.native));
         memcpy(copy, o.native, o.size);
+        if (o.kind == ROK_FRAMETABLE)
+            ((FrameTable*)copy)->entries = nullptr;
         if (o.kind != ROK_GAFFRAME)
             continue;
         const GafFrame* frame = (const GafFrame*)o.native;
@@ -8657,7 +8659,10 @@ void LoadDataMapSelfTest()
     FrameTable* table = (FrameTable*)ReplayResolveObject("FrameTable#1", nullptr, g_objects, AllocObject);
     unsigned linear = (unsigned)g_game->losTable;
     Check(table != nullptr && linear != (unsigned)table && LoadNative(linear) == table, "the field holds the table's load address, not the replayer's");
+    table->entries = table;
+    SyncLoadObjects();
     Check(*(const unsigned short*)ReplayWasmLinear(linear) == 5, "and the module reads the recorded count there");
+    Check(((const FrameTable*)ReplayWasmLinear(linear))->entries == nullptr, "but no native address in its entries");
     unsigned classWords[256];
     unsigned classWordCount = ReplayClassWords(classWords, sizeof classWords / sizeof classWords[0]);
     Check(classWordCount != 0 && linear >= ReplayWasmLoadDataBase() + classWordCount * 4 && memcmp(ReplayWasmLinear(ReplayWasmLoadDataBase()), classWords, classWordCount * 4) == 0, "above the class word table, which stays at the region's base");

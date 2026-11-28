@@ -4946,6 +4946,15 @@ const char* HarnessMapName()
     return s_map;
 }
 
+#include "../graphics/display.h"
+
+unsigned int __stdcall HarnessMenuTicks(unsigned int live)
+{
+    if (!HarnessTestMode())
+        return live;
+    return s_frameClockMs * GetTickRate() / 1000;
+}
+
 unsigned int HarnessFrameClockElapsedMs()
 {
     unsigned elapsed = s_frameClockMs - s_frameClockRead;

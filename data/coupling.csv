@@ -1994,7 +1994,8 @@ harness,platform,call,AllocHandle,1
 harness,platform,call,EnterHarnessTestMode,1
 harness,platform,call,GetAllocLock,1
 harness,platform,call,GetMemSetValue,1
-harness,platform,call,HarnessTestMode,20
+harness,platform,call,GetTickRate,1
+harness,platform,call,HarnessTestMode,21
 harness,platform,call,IsMemSet,1
 harness,platform,call,LoadFontByName,1
 harness,platform,call,LoadObject3d,1
@@ -5549,6 +5550,7 @@ presentation,harness,call,HarnessEventLogOpen,1
 presentation,harness,call,HarnessEventText,1
 presentation,harness,call,HarnessFrameClockElapsedMs,1
 presentation,harness,call,HarnessFrameDrawn,1
+presentation,harness,call,HarnessMenuTicks,2
 presentation,harness,call,HarnessSimEventOtherThread,1
 presentation,harness,call,HarnessSimEventPhase,1
 presentation,harness,call,HarnessSoundEvent,6
@@ -5788,7 +5790,7 @@ presentation,platform,call,GetSlotDpid,2
 presentation,platform,call,GetTickRate,2
 presentation,platform,call,GetTicks,23
 presentation,platform,call,HandleHostEvent,1
-presentation,platform,call,HarnessTestMode,1
+presentation,platform,call,HarnessTestMode,3
 presentation,platform,call,LoadBitmapByName,4
 presentation,platform,call,LoadRadarPic,1
 presentation,platform,call,LoadSoundByName,1

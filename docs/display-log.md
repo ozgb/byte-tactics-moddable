@@ -96,9 +96,11 @@ puts it (a scroll by the mouse puts it back where it started). In a test-mode ru
 is the harness's in every scenario, with input lines or without: the host's pointer and the
 host's own mouse and key events never reach the game. The frame dump leaves the
 cursor out; its picture is a decision of the presentation (the order the cursor would give),
-so it is judged here. The game steps an animated cursor by the wall clock, not by ticks or frames, so
-the line names the cursor's GAF entry, `<file>:<entry>`, without the frame. When the display
-shows no cursor the line is `cursor - - -`.
+so it is judged here. 3.1c steps an animated cursor by the wall clock, not by ticks or frames, so
+the line names the cursor's GAF entry, `<file>:<entry>`, without the frame. A test-mode run steps
+the menus' animated cursor on the frames it draws instead, 33 milliseconds a frame, as it counts
+the frame rate, so the cursor the menus draw is the same picture at a given frame on every run.
+When the display shows no cursor the line is `cursor - - -`.
 
 ### Names
 
@@ -358,6 +360,9 @@ the log leaves out:
 - **Draws on the game's other threads.** While a game loads, the game makes pictures on a
   thread of its own (the minimap's small picture among them), and the cursor's thread draws
   the cursor. Only what the game draws on its main thread, the one that draws the frames, is
-  an item. The minimap's units drawn while the game loads are among these.
+  an item. The minimap's units drawn while the game loads are among these. In a test-mode run
+  the cursor's thread draws nothing on its own clock: the cursor is redrawn once for each
+  frame, as the frame is shown and before it ends, at the harness's mouse position, so what
+  that redraw writes into a target is a `pixels` item of that frame on every run.
 - **The options screen's backdrop.** When the options screen opens, the game copies the
   frame under it into a surface of its own with no drawing item.

@@ -3570,6 +3570,18 @@ class EventForms(unittest.TestCase):
         with self.assertRaises(rs.Error):
             rs.check_event_kinds("targeting", kinds)
 
+    def test_a_kind_in_two_tables_is_refused(self):
+        ann = rs.without_events(annotations())
+        events = copy.deepcopy(rs.EVENTS)
+        events["features"]["kinds"][100] = None
+        with mock.patch.object(rs, "EVENTS", events), mock.patch.object(rs, "check_event_kinds", lambda sub, kinds: None):
+            with self.assertRaisesRegex(rs.Error, r"the event kind 100 is a kind of both (targeting and features|features and targeting): an effect is written by the table that holds its kind"):
+                rs.with_events(ann)
+
+    def test_the_kinds_of_the_tables_are_unique(self):
+        kinds = [k for spec in rs.EVENTS.values() for k in spec["kinds"]]
+        self.assertEqual(len(kinds), len(set(kinds)))
+
     def test_a_payload_is_a_value_kind_of_the_header_fields_then_its_own(self):
         objects = rs.with_events(annotations())["objects"]
         names = [f["name"] for f in objects["TargetingSetPos"]["fields"]]

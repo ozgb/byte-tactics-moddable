@@ -350,7 +350,7 @@ Each command below says its guards and then its events, in publication order. "T
   events belong to the multiplayer of Milestone 3. When it is set:
   `sharemetal` and `shareenergy` flip the local player's metal or energy sharing switch, add a line to the message log
   and send the player's info to the other machines; `shareall` does both and then publishes LOS_RADAR_SHARE_MAPPING and
-  LOS_RADAR_SHARE_RADAR for the local player; `setsharemetal n` and `setshareenergy n` set the local player's metal or
+  LOS_RADAR_SHARE_RADAR for the local player from the engine's outbox, as the console's `ShareMapping` and `ShareRadar` do; `setsharemetal n` and `setshareenergy n` set the local player's metal or
   energy share level to the smaller of argument 1 and the player's storage capacity of that resource, and add a line to
   the message log.
 

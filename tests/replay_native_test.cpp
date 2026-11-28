@@ -1701,7 +1701,7 @@ void* ParseHandle(unsigned kind, const char* text)
 }
 
 enum { MAX_SNAPSHOTS = 64, CAPTURE_ARENA_BYTES = 1 << 20 };
-unsigned char g_captureArena[CAPTURE_ARENA_BYTES];
+unsigned char* g_captureArena;
 unsigned g_captureUsed;
 unsigned char* g_snapshotData[MAX_SNAPSHOTS];
 unsigned g_snapshotBytes[MAX_SNAPSHOTS];
@@ -3231,6 +3231,7 @@ void ResetBlock()
     g_known.Reset();
     g_objects.Reset();
     g_captureUsed = 0;
+    g_captureArena = (unsigned char*)SimAlloc(CAPTURE_ARENA_BYTES);
     g_region.ptr = nullptr;
     g_region.size = 0;
     ForgetLoads();

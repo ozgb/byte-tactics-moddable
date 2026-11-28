@@ -22,13 +22,14 @@ to 67 and 80, targeting 96 to 99 and 112, los_radar 128 to 139 (effects would ta
 
 Los_radar's place in it:
 - **Events into los_radar:** UPDATE_UNIT, REMOVE_UNIT, REVEAL_UNIT, ADD_EYEBALL, CELL_HEIGHTS, RECALCULATE,
-  SHARE_MAPPING, SHARE_RADAR and SHARE_MAP, published by units, orders, map, players, economy and the engine; and,
+  SHARE_MAPPING, SHARE_RADAR and SHARE_MAP, published by units, orders, map, players and the engine; and,
   since 3.2, SIGHT_RESET and SIGHT_LOAD, which units publishes (`LosRadarPublishSightReset`, `LosRadarPublishSightLoad`) as it sets a unit up and loads a saved game; and, since 5.1, SET_MODE, which the engine's console publishes (`los`, `lostype`, `mapping`, `nowisee`) in place of its writes to the line of sight bits of the game record, each before its RECALCULATE.
   Los_radar's handler (`LosRadarInbox`, `src/seams/los_radar_world.cpp`) passes each to `Apply`.
-- **Routes:** of the fourteen routes, every one that can be published inside the tick is synchronous except map's
+- **Routes:** of the fifteen routes, every one that can be published inside the tick is synchronous except map's
   CELL_HEIGHTS: three because the gate diverged with them queued, two by #952's rule, and three because no scenario
-  reaches them, so nothing has tested them queued (sections 4 and 8). The five routes from the engine's and economy's
-  outboxes are queued, and since they are published outside the tick they are delivered at once.
+  reaches them, so nothing has tested them queued (sections 4 and 8). The engine's
+  RECALCULATE, SET_MODE, SHARE_MAPPING and SHARE_RADAR are queued, and since they are published outside the tick they are
+  delivered at once.
 - **Runs:** the engine runs los_radar's passes where 3.1c ran them, in `SchedPlayersPhase` (`src/game/scheduler.cpp`):
   the `players.los` pass, `UpdateUnitLineOfSight` for each unit slot of a player that holds a unit, between
   `UpdatePlayerHead` and `UpdatePlayerBody`; for the viewing player, `RecordRadarUnits` after it, and
@@ -61,7 +62,7 @@ Los_radar's place in it:
 | the console (`CmdLOS`, `CmdLOSType`, `CmdMapping`, `CmdNowISee`) | writes to the line of sight bits of the game record | SET_MODE from the engine, before the RECALCULATE |
 | the console (`CmdLOS`, `CmdLOSType`, `CmdMapping`, `CmdNowISee`), the load of a match (`LoadMatch`) | `RecalculateLineOfSight` | RECALCULATE from the engine |
 | the console (`ShareMapping`, `ShareRadar`) | `CmdShareMapping`, `CmdShareRadar` (slots) | SHARE_MAPPING, SHARE_RADAR from the engine |
-| the console (`ShareAll`, economy's code) | `CmdShareMapping`, `CmdShareRadar` | SHARE_MAPPING, SHARE_RADAR from economy |
+| the console (`ShareAll`, economy's code) | `CmdShareMapping`, `CmdShareRadar` | SHARE_MAPPING, SHARE_RADAR from the engine |
 | the network: a share-map packet (`HandleNetPackets`), the share dialog (`HandleShareDialogEvent`) | `ShareMapInfo`, inline in 3.1c's units code | SHARE_MAP from the engine |
 | players: the viewing player's radar snapshot, sensors and mapped snapshot | `RecordRadarUnits`, `UpdateSensorRadarAndCloak`, `RecordRadarMapped` | the engine's passes (section 1) |
 | the tail of a tick | `ExpireEyeballs` | the engine's pass (section 1) |
@@ -208,7 +209,7 @@ los_radar's state as 3.1c did.
 | units ADD_EYEBALL | synchronous | #952's rule. A unit's death adds an eyeball of the viewing player at its place, in the units phase among others, and later in the phase orders, unit scripts and map read the viewing player's sight through the same queries as above. |
 | map CELL_HEIGHTS | queued | It writes `high` and `low` from the cells' `height`, which nothing writes in the tick (`data/rwsets.csv` has no write of `Cell::height`; `LoadTntMap` fills it at load, and `UpdateAllCellHeightRanges` then sets every cell's range). So the recompute writes the values the cells already hold, and no read in the phase can see a difference while it is pending. |
 | players RECALCULATE | synchronous | Untested: no scenario publishes it (section 8). The argument against queueing it stands too, by #952's rule: the body of a player's update publishes it when the defeated local player's commander is placed again (the commander death option 2) or the defeated local player becomes a watcher, and the next players' updates in the same phase read sight through `IsUnitVisibleToPlayer` (ai's visible list) before any delivery of los_radar's inbox. |
-| engine RECALCULATE, SET_MODE, SHARE_MAPPING, SHARE_RADAR, SHARE_MAP; economy SHARE_MAPPING, SHARE_RADAR | queued, delivered at once | Published outside the tick (the console, the load of a match, the share dialog), so #970's rule delivers each at once, in 3.1c's order. |
+| engine RECALCULATE, SET_MODE, SHARE_MAPPING, SHARE_RADAR, SHARE_MAP | queued, delivered at once | Published outside the tick (the console, the load of a match, the share dialog), so #970's rule delivers each at once, in 3.1c's order. |
 | engine SHARE_MAP | synchronous | Untested. The share-map packet is handled in the net phase, inside the tick, and no scenario receives one, so the route takes 3.1c's order. |
 
 The engine's SHARE_MAP row is both: the table holds one row, synchronous, which matters only inside the tick; the
@@ -356,7 +357,7 @@ and was left out):
 | units ADD_EYEBALL | 174, synchronous, in 25 | 2, in 1 |
 | map CELL_HEIGHTS | 1845, queued, in 57 | 335, in 26 |
 | engine RECALCULATE | none | 95, in 88 (the load of a match) |
-| players UPDATE_UNIT, players RECALCULATE, engine SHARE_MAP, SHARE_MAPPING, SHARE_RADAR, economy SHARE_MAPPING, SHARE_RADAR | none | none |
+| players UPDATE_UNIT, players RECALCULATE, engine SHARE_MAP, SHARE_MAPPING, SHARE_RADAR | none | none |
 
 Only CELL_HEIGHTS is ever pending in the tick. Los_radar's inbox held at most 4 events (sensors-floating-teeth-los-off,
 tick 10), all CELL_HEIGHTS of units placed in one update; the capacity is 1024. Every synchronous publish and every

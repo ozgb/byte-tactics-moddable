@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T01:05:05+00:00",
+ "generated": "2026-11-28T02:05:04+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -372,7 +372,7 @@
     "number": 1193,
     "title": "Spec: Write the players spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1193",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
@@ -488,7 +488,7 @@
     "number": 1198,
     "title": "Spec: Write the movement spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1198",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
@@ -508,15 +508,15 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 8,
-   "spec": "none",
+   "spec": "active",
    "spec_pin": null,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1199,
     "title": "Spec: Write the orders spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1199",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": []
@@ -528,15 +528,15 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 8,
-   "spec": "none",
+   "spec": "active",
    "spec_pin": null,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1200,
     "title": "Spec: Write the units spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1200",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": []

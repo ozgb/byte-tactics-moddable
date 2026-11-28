@@ -59,7 +59,9 @@ void MainFrameTick()
     UpdateMenu(g_game->menu_519);
     PeekMouseEvent((MouseEvent *)&second);
     UpdateCdCategoryByActivity();
-    DrainSimEvents();
+    unsigned short loading = *(volatile unsigned short*)&g_game->loadingFlags;
+    if (!(loading & 1) || (loading & 2))
+        DrainSimEvents();
     PlayNextSpeech();
     if (first.fields[4] == second.fields[4])
         PopMouseEvent((*(MouseEventWords*)&g_game->view).fields);

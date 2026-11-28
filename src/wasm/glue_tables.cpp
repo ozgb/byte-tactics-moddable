@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <wasmtime.h>
 #include "../units/unit_def.h"
 #include "../../interfaces/host.h"
@@ -4750,8 +4751,12 @@ int __stdcall GlueMissionGetMissionUnit(int index, MissionUnitInfo* out)
     slotArgs[0].i32 = (int)index;
     unsigned outAt = GlueIn(glue, 9, out, sizeof(MissionUnitInfo), 0);
     slotArgs[1].i32 = (int)outAt;
+    GlueZero(out, outAt, sizeof(MissionUnitInfo));
     GlueCall(glue, 9, slotArgs, 2);
     GlueOut((void*)out, outAt, sizeof(MissionUnitInfo));
+    GlueOutPointer(glue, 9, (void*)out, offsetof(MissionUnitInfo, name));
+    GlueOutPointer(glue, 9, (void*)out, offsetof(MissionUnitInfo, ident));
+    GlueOutPointer(glue, 9, (void*)out, offsetof(MissionUnitInfo, initialMission));
     GlueScratchRelease(mark);
     return (int)slotArgs[0].i32;
 }
@@ -4776,8 +4781,10 @@ int __stdcall GlueMissionGetMissionFeature(int index, MissionFeatureInfo* out)
     slotArgs[0].i32 = (int)index;
     unsigned outAt = GlueIn(glue, 11, out, sizeof(MissionFeatureInfo), 0);
     slotArgs[1].i32 = (int)outAt;
+    GlueZero(out, outAt, sizeof(MissionFeatureInfo));
     GlueCall(glue, 11, slotArgs, 2);
     GlueOut((void*)out, outAt, sizeof(MissionFeatureInfo));
+    GlueOutPointer(glue, 11, (void*)out, offsetof(MissionFeatureInfo, name));
     GlueScratchRelease(mark);
     return (int)slotArgs[0].i32;
 }

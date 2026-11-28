@@ -7,6 +7,7 @@
 #include "../harness/replay_services.h"
 #include "../harness/display_game.h"
 #include "../util/ftol.h"
+#include "../state/load_data.h"
 
 // FUNCTION: 0x4b7e60
 void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
@@ -593,7 +594,8 @@ void* __stdcall LoadGaf(char* name)
 {
     ReplayImport call(RI_LOAD_GAF);
     call.Ptr(name);
-    int* base = (int*)HAPI_LoadFile(name, 0);
+    int size;
+    int* base = (int*)HAPI_LoadFile(name, &size);
     if (base == 0)
         return call.Result((void*)nullptr);
 
@@ -617,6 +619,7 @@ void* __stdcall LoadGaf(char* name)
             } while (j < (int)p->count);
         }
     }
+    LoadDataRegister(base, size);
     DisplayLogGaf(name, base);
     return call.Result((void*)base);
 }

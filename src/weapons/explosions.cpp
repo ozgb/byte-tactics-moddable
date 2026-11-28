@@ -97,6 +97,7 @@ static int g_explosion0Duration, g_explosion0StartSize, g_explosion0EndSize, g_e
 #include "../graphics/gaf.h"
 #include "../graphics/gaf_frame.h"
 #include "../state/game_rand.h"
+#include "../state/load_data.h"
 #include "../state/sim_effects.h"
 void __stdcall InitGafSequence(GafRef* ref, GafSequence* src, int index);
 void __stdcall EmitWhiteSmoke(void* buf, int arg);
@@ -125,10 +126,13 @@ inline Explosion* MakeExplosion(int count, int start, int end)
     result->count = count;
     result->flags = 0;
     for (int i = 0; i < count; ++i) {
-        result->frames[i].image = BuildExplosionFrame(radius);
+        GafFrame* image = BuildExplosionFrame(radius);
+        LoadDataRegisterFrame(image, image->width * image->height + sizeof(GafFrame));
+        result->frames[i].image = image;
         result->frames[i].duration = 2;
         radius += step;
     }
+    LoadDataRegisterTable(result, 0x28 + count * 8);
     return result;
 }
 
@@ -164,11 +168,11 @@ void InitExplosions()
     g_explosion0Duration = 24; g_explosion0StartSize = 64; g_explosion0EndSize = 8;
     g_explosion1Duration = 30; g_explosion1StartSize = 128; g_explosion1EndSize = 16;
     g_explosion2Duration = 30; g_explosion2StartSize = 200; g_explosion2EndSize = 32;
-    (*(Explosion * (*)[3])&g_game->lists)[0] = MakeExplosion(g_explosion0Duration / 2, g_explosion0StartSize, g_explosion0EndSize);
+    g_game->lists[0] = (void*)LoadAddress(MakeExplosion(g_explosion0Duration / 2, g_explosion0StartSize, g_explosion0EndSize));
     g_game->shade = 20;
-    (*(Explosion * (*)[3])&g_game->lists)[1] = MakeExplosion(g_explosion1Duration / 2, g_explosion1StartSize, g_explosion1EndSize);
+    g_game->lists[1] = (void*)LoadAddress(MakeExplosion(g_explosion1Duration / 2, g_explosion1StartSize, g_explosion1EndSize));
     g_game->shade = 50;
-    (*(Explosion * (*)[3])&g_game->lists)[2] = MakeExplosion(g_explosion2Duration / 2, g_explosion2StartSize, g_explosion2EndSize);
+    g_game->lists[2] = (void*)LoadAddress(MakeExplosion(g_explosion2Duration / 2, g_explosion2StartSize, g_explosion2EndSize));
     g_game->shade = 100;
     InitDebrisPieces();
 }
@@ -191,13 +195,14 @@ void FreeExplosions(void)
     if (g_game->explosionLensFrame != 0) {
         g_debrisMemCache.FreeCache();
         for (int i = 0; i < 3; i++) {
-            if ((*(Explosion * (*)[3])&g_game->lists)[i] != 0) {
-                for (int j = 0; j < (*(Explosion * (*)[3])&g_game->lists)[i]->count; j++) {
-                    GameFreeThunk((*(Explosion * (*)[3])&g_game->lists)[i]->frames[j].image);
-                    (*(Explosion * (*)[3])&g_game->lists)[i]->frames[j].image = 0;
+            Explosion* list = (Explosion*)LoadNative((unsigned)g_game->lists[i]);
+            if (list != 0) {
+                for (int j = 0; j < list->count; j++) {
+                    GameFreeThunk(list->frames[j].image);
+                    list->frames[j].image = 0;
                 }
-                GameFreeThunk((*(Explosion * (*)[3])&g_game->lists)[i]);
-                (*(Explosion * (*)[3])&g_game->lists)[i] = 0;
+                GameFreeThunk(list);
+                g_game->lists[i] = 0;
             }
         }
         GameFreeThunk(g_game->explosionLensFrame);
@@ -213,11 +218,11 @@ void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int fl
         DebrisView* e = (DebrisView*)(pCount + 1) + (*pCount)++;
         e->pos = *pos;
         if (src != 0)
-            InitGafSequence(&e->ref1, src, 0);
+            LoadInitGafSequence(&e->ref1, (unsigned)src, 0);
         else
             e->ref1.src = 0;
         if (index >= 0)
-            InitGafSequence(&e->ref2, *(GafSequence**)((char*)pCount + index * 4 + 0x6274), 0);
+            LoadInitGafSequence(&e->ref2, (unsigned)*(GafSequence**)((char*)pCount + index * 4 + 0x6274), 0);
         else
             e->ref2.src = 0;
         if (flag == 0 && *(short*)((char*)&pos->y + 2) > (short)g_game->seaLevel)
@@ -242,7 +247,7 @@ void __stdcall DrawExplosions(void* surface)
         int x = pos.x.whole + 128;
         int y = pos.z.whole - (pos.y.whole >> 1) + 32;
         if (PointInRect(g_game->viewport, x, y) && d->ref2.src)
-            DrawFrameShadow((Surface *)surface, (GafFrame *)GetGafSequenceFrame(&d->ref2), x, y);
+            DrawFrameShadow((Surface *)surface, (GafFrame *)LoadGetGafSequenceFrame(&d->ref2), x, y);
     }
     d = (DebrisView*)(pCount + 1);
     for (i = 0; i < *pCount; ++i, d++) {
@@ -256,7 +261,7 @@ void __stdcall DrawExplosions(void* surface)
                 Vec3 offset = {pos.x.value, pos.y.value, pos.z.value};
                 DrawDebrisProjected(surface, &offset, d->obj.get(), &d->angle_x);
             }
-            if (d->ref1.src) DrawFrame(surface, GetGafSequenceFrame(&d->ref1), x, y);
+            if (d->ref1.src) DrawFrame(surface, LoadGetGafSequenceFrame(&d->ref1), x, y);
         }
     }
 }
@@ -398,9 +403,9 @@ void UpdateExplosions()
             }
         }
         if (d->ref1.src != 0)
-            StepGafSequence(&d->ref1);
+            LoadStepGafSequence(&d->ref1);
         if (d->ref2.src != 0)
-            StepGafSequence(&d->ref2);
+            LoadStepGafSequence(&d->ref2);
     }
 
     int removed = 1;
@@ -765,9 +770,17 @@ void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
                 o->faces[m].flags = desc->faces[i].flags;
                 o->faces[m].color = desc->faces[i].color;
                 int flags = o->faces[m].flags.raw;
-                if (!(flags & 1) && (flags & 2) && (flags & 4)) {
-                    o->faces[m].tex.pic = GetGafFrame(o->faces[m].tex.src, ((Player*)unit->player)->info->color);
-                    o->faces[m].flags.raw &= ~2;
+                if (!(flags & 1)) {
+                    if (flags & 2) {
+                        unsigned table = LoadAddress(o->faces[m].tex.src);
+                        if (flags & 4) {
+                            o->faces[m].tex.pic = (void*)LoadGetGafFrame(table, ((Player*)unit->player)->info->color);
+                            o->faces[m].flags.raw &= ~2;
+                        }
+                        o->faces[m].tex.src = (GafSequence*)table;
+                    } else {
+                        o->faces[m].tex.pic = (void*)LoadAddress(o->faces[m].tex.pic);
+                    }
                 }
             }
         }

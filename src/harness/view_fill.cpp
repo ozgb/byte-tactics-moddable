@@ -1,4 +1,5 @@
 #include <string.h>
+#include "../state/load_data.h"
 
 #include "../../interfaces/view.h"
 #include "view_block.h"
@@ -872,6 +873,20 @@ static int FillFace(PlayerView* v, int colour, unsigned flags, unsigned pic, uns
     return out->texture != VIEW_NO_TEXTURE;
 }
 
+static unsigned DebrisFacePic(const ViewReportFace* f)
+{
+    if ((f->flags & (FACE_FLAT | FACE_SEQUENCE)) != 0)
+        return f->pic;
+    return (unsigned)LoadNative(f->pic);
+}
+
+static unsigned DebrisFaceSrc(const ViewReportFace* f)
+{
+    if ((f->flags & FACE_FLAT) != 0 || (f->flags & FACE_SEQUENCE) == 0)
+        return f->src;
+    return (unsigned)LoadNative(f->src);
+}
+
 int ViewFillDebrisGeometry(PlayerView* v, ViewDebris* out, const ViewReportPiece* piece)
 {
     ViewGeometryMark mark;
@@ -895,7 +910,7 @@ int ViewFillDebrisGeometry(PlayerView* v, ViewDebris* out, const ViewReportPiece
     }
     for (q = piece->firstFace != -1 ? 1 : 0; q < faceCount; q++) {
         const ViewReportFace* f = &piece->faces[q];
-        if (!FillFace(v, f->color, f->flags, f->pic, f->src, f->count < 0 ? 0 : (unsigned)f->count, Plain(f->indices), -1))
+        if (!FillFace(v, f->color, f->flags, DebrisFacePic(f), DebrisFaceSrc(f), f->count < 0 ? 0 : (unsigned)f->count, Plain(f->indices), -1))
             goto fail;
     }
     ViewGeometryEnd(v, &mark, &out->firstVertex, &out->vertexCount, &out->firstFace, &out->faceCount);

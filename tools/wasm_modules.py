@@ -2,6 +2,7 @@
 
     uv run tools/wasm_modules.py build     # build/wasm-modules/c.wasm, rust.wasm and wind_meteors.wasm
     uv run tools/wasm_modules.py build-variant --define NAME=VALUE --name NAME   # wind_meteors.wasm built with the defines, as build/wasm-modules/NAME.wasm
+    uv run tools/wasm_modules.py runtime DIR   # modules.json and the built .wasm of every manifest entry that is not blocked, copied into DIR
     uv run tools/wasm_modules.py check     # run both fixtures in one wasmtime memory and table
     uv run tools/wasm_modules.py check-module FILE.wasm --name SUBSYSTEM [--manifest M]   # the window, imports, exports, kinds and size of one built file
     uv run tools/wasm_modules.py imports   # check every built module's imports and exports
@@ -9,6 +10,7 @@
     uv run tools/wasm_modules.py adapters  # run the loader's adapters and refusals over tests/wasm/adapters
     uv run tools/wasm_modules.py fatal     # make an import end the game, and check the exit comes after the call
     uv run tools/wasm_modules.py glue-fatal [--exe EXE] [--game-dir DIR]   # the same through the real glue, under Wine
+    uv run tools/wasm_modules.py write-check [--exe EXE] [--game-dir DIR]  # a module writing a GAF frame ends the game, under Wine
 
 Both fixtures use the fixed-base convention (#562): each imports env.memory and
 env.__indirect_function_table, is linked with its own --global-base and --table-base
@@ -214,9 +216,31 @@ def build_variant(defines, name):
             build_game_module(entry, game, defines, name)
 
 
+def is_blocked(entry):
+    """Whether a manifest entry is blocked: its "blocked" is a reason (a non-empty string) or true, as the loader reads it. Absent is not blocked; any other value is a manifest fault."""
+    if "blocked" not in entry:
+        return False
+    value = entry["blocked"]
+    if value is True or (isinstance(value, str) and value):
+        return True
+    raise ValueError(f"{entry.get('name')}: blocked must be a reason or true, not {value!r}")
+
+
 def built_modules(game):
-    """The entries of a manifest whose default builds to WASM: an entry with "blocked" holds the reason it does not yet."""
-    return [entry for entry in game["modules"] if "blocked" not in entry]
+    """The entries of a manifest whose default builds to WASM."""
+    return [entry for entry in game["modules"] if not is_blocked(entry)]
+
+
+def copy_runtime(game, out, dest):
+    """Copy the manifest and the built .wasm of every non-blocked entry into dest; the names of the files missing from out are returned instead when any is."""
+    missing = [f"{entry['name']}.wasm" for entry in built_modules(game) if not os.path.exists(os.path.join(out, f"{entry['name']}.wasm"))]
+    if missing:
+        return missing
+    os.makedirs(dest, exist_ok=True)
+    shutil.copyfile(GAME_MODULES, os.path.join(dest, "modules.json"))
+    for entry in built_modules(game):
+        shutil.copyfile(os.path.join(out, f"{entry['name']}.wasm"), os.path.join(dest, f"{entry['name']}.wasm"))
+    return []
 
 
 def game_manifest():
@@ -573,7 +597,17 @@ def check_layout(pins, ranges):
         for other_name, other_low, other_high in named[index + 1:]:
             if low < other_high and other_low < high:
                 problems.append(f"{name}: {low:#x}..{high:#x} overlaps {other_name}'s {other_low:#x}..{other_high:#x}")
-    if pins["memory_pages"] * 65536 != base + size:
+    load_data = pins.get("load_data")
+    if load_data:
+        load_low, load_size = load_data
+        for name, low, high in named:
+            if high > load_low:
+                problems.append(f"{name}: {low:#x}..{high:#x} reaches the load data at {load_low:#x}")
+        if load_low != base + size:
+            problems.append(f"load_data starts at {load_low:#x}, not at the block's ceiling {base + size:#x}")
+        if pins["memory_pages"] * 65536 != load_low + load_size:
+            problems.append(f"memory_pages {pins['memory_pages']} does not end at the load data: {load_low + load_size:#x} bytes needed")
+    elif pins["memory_pages"] * 65536 != base + size:
         problems.append(f"memory_pages {pins['memory_pages']} does not hold the block: {base + size:#x} bytes needed")
     return problems
 
@@ -664,7 +698,7 @@ def check_tools_game(pins):
 
 def check_size(entry, size):
     """Reasons a module's .wasm of the given size is over its manifest size_budget; none for a blocked entry, which has no budgets to judge."""
-    if "blocked" in entry:
+    if is_blocked(entry):
         return []
     budget = entry.get("size_budget")
     if not isinstance(budget, int) or budget <= 0:
@@ -1342,6 +1376,59 @@ def run_glue_fatal(exe, game_dir):
     return 0
 
 
+WRITE_CHECK_MESSAGE = "load_data: the load data changed at tick"
+
+
+def run_write_check(exe, game_dir):
+    """Run the exe in test mode with a wind_meteors variant that writes a byte of a load data frame in every tick; LoadDataCheck must end the game with exit code 2."""
+    exe = os.path.abspath(exe)
+    if not os.path.exists(exe):
+        print(f"FAIL: {exe} is missing: build it first")
+        return 1
+    source = os.path.dirname(exe)
+    for name in ("wasmtime_host.dll", "modules.json", "wind_meteors.wasm"):
+        if not os.path.exists(os.path.join(source, name)):
+            print(f"FAIL: {name} is missing next to {exe}: cmake --build build/modern --target wasm_runtime")
+            return 1
+    build_variant(["BT_WRITE_CHECK=1"], "wind_meteors_write_check")
+    scratch = os.path.join(ROOT, "build", "scratch", "write-check")
+    shutil.rmtree(scratch, ignore_errors=True)
+    os.makedirs(scratch)
+    for name in os.listdir(source):
+        if name == os.path.basename(exe) or name in ("modules.json", "CMakeCache.txt", "commit.txt") or name.endswith((".dll", ".wasm")):
+            shutil.copy2(os.path.join(source, name), os.path.join(scratch, name))
+    shutil.copy2(os.path.join(OUT, "wind_meteors_write_check.wasm"), os.path.join(scratch, "wind_meteors.wasm"))
+    cmd = [sys.executable, os.path.join(ROOT, "tools", "playtest.py"), "--exe", os.path.join(scratch, os.path.basename(exe)),
+           "--testmode", GLUE_FATAL_SCENARIO, "--testmode-timeout", "120"]
+    if game_dir:
+        cmd += ["--game-dir", game_dir]
+    done = subprocess.run(cmd, capture_output=True, text=True)
+    found = re.search(r"^logs and screenshots: (.+)/$", done.stdout, re.M)
+    if not found:
+        print(f"FAIL: playtest.py gave no run directory (exit {done.returncode}):\n{done.stdout}{done.stderr}")
+        return 1
+    session = os.path.join(ROOT, found.group(1))
+    runs = [d for d in os.listdir(session) if os.path.isdir(os.path.join(session, d))]
+    if len(runs) != 1:
+        print(f"FAIL: expected one run in {session}, found {runs}")
+        return 1
+    run = os.path.join(session, runs[0])
+    with open(os.path.join(run, "result.json")) as f:
+        result = json.load(f)
+    log_path = os.path.join(run, "wine.log")
+    log = open(log_path, errors="replace").read() if os.path.exists(log_path) else ""
+    if result["exit_codes"] != [2]:
+        print(f"FAIL: the exit code was {result['exit_codes']}, expected [2] (kept: {run})")
+        return 1
+    if WRITE_CHECK_MESSAGE not in log:
+        print(f"FAIL: the log has no {WRITE_CHECK_MESSAGE!r} (kept: {run})")
+        return 1
+    shutil.rmtree(session)
+    shutil.rmtree(scratch)
+    print(f"write-check: exit code 2, {WRITE_CHECK_MESSAGE!r}, ok")
+    return 0
+
+
 def run_under_wasmtime(command):
     try:
         import wasmtime
@@ -1380,8 +1467,8 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["build", "build-variant", "check", "check-module", "imports", "statics", "adapters", "fatal", "glue-fatal"])
-    parser.add_argument("module", nargs="?", help="check-module: the .wasm file to check")
+    parser.add_argument("command", choices=["build", "build-variant", "check", "check-module", "imports", "statics", "adapters", "fatal", "glue-fatal", "write-check", "runtime"])
+    parser.add_argument("module", nargs="?", help="check-module: the .wasm file to check; runtime: the directory to copy into")
     parser.add_argument("--exe", default=os.path.join(ROOT, "build", "modern", "TotalA.exe"), help="glue-fatal: the exe to run")
     parser.add_argument("--define", action="append", default=[], help="build-variant: NAME=VALUE for the wind_meteors compile")
     parser.add_argument("--name", help="build-variant: the variant's name, build/wasm-modules/NAME.wasm; check-module: the subsystem the file is for")
@@ -1390,11 +1477,22 @@ def main():
     args = parser.parse_args()
     if args.command == "glue-fatal":
         return run_glue_fatal(args.exe, args.game_dir)
+    if args.command == "write-check":
+        return run_write_check(args.exe, args.game_dir)
     if args.command == "check-module":
         if not args.module or not args.name:
             print("check-module: needs a .wasm file and --name SUBSYSTEM", file=sys.stderr)
             return CANNOT_CHECK
         return run_check_module(args.module, args.name, args.manifest)
+    if args.command == "runtime":
+        if not args.module:
+            print("runtime: needs the directory to copy into", file=sys.stderr)
+            return 2
+        missing = copy_runtime(game_manifest(), OUT, args.module)
+        if missing:
+            print(f"FAIL: {', '.join(missing)} missing from {OUT}: uv run tools/wasm_modules.py build", file=sys.stderr)
+            return 1
+        return 0
     if args.command == "build":
         build()
         return 0

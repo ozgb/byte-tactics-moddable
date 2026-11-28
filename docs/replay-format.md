@@ -26,6 +26,10 @@ uv run tools/replay.py --compare DIR_A DIR_B
 `--subsystem` is repeatable and defaults to every subsystem that has a `tests/replay/<subsystem>/` directory.
 `--check` records again and fails when a recording of `tests/replay/` differs. `--compare` fails when two
 directories differ and names the first differing line. Record on a fresh Wine prefix, as the gate runs.
+`--check` compares as text, except for what a module's behaviour does not depend on (#1209): `services.GetGafFrame` is a query answered by its
+arguments, so its calls may come in any order and number, but a call whose arguments the stored recording has no answer to, or whose answer
+differs, is a difference (reported as the query). An answer names its frame `GafFrame#N`, numbered by first appearance ("Objects"), so only
+the calls that answer a frame already named are free: two calls that name new frames in the other order swap their numbers and differ; and the `y` of the position of `los_radar.GetMapCellAtPosition` is an unread argument.
 Both play a scenario once for each subsystem it records: a run records one call at a time, so with two `record`
 lines a call one subsystem makes into the other would be an import of the first and missing from the second's
 recording. A run fails instead, with "a call of a recorded subsystem made inside a call of another recorded
@@ -1793,7 +1797,7 @@ Two rules narrow the import comparison (`docs/module-abi.md`, section 15, names 
   anywhere in the file) and that line's `o` lines of the result, and does not count it as an import or compare where it
   falls. Its recorded lines are skipped when the other imports are matched, and are never missing. Arguments no recorded
   call has are reported at `query services.GetGafFrame`. `InitGafSequence` and `StepGafSequence` change their cursor and
-  stay in order.
+  `GetGafSequenceFrame` reads it, so they stay in order.
 - **Unread arguments.** The `y` of `los_radar.GetMapCellAtPosition`'s `pos` is not compared: the lookup reads only `x`
   and `z`, and the reclaim scan passes a position whose `y` it never sets.
 

@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v54` is the fixed target for anyone writing a new
+The git tag `reference-traces-v56` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v54`**.
+code as a base. This page names the current tag: **`reference-traces-v56`**.
 
 ## What the tag holds
 
@@ -213,12 +213,13 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v54`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v54`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
+`reference-traces-v56`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
 exported from and pairs it with the highest `reference-traces-v*` tag merged into that commit, so the two need not be on
 the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `reference-traces-v51`, and the kit at
 `interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it, the kits at `interfaces-v58` to
 `interfaces-v63` pair with `reference-traces-v53`, the kits at `interfaces-v64` and `interfaces-v65` pair with
-`reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it, as do the kits at `interfaces-v67`, `interfaces-v68` and `interfaces-v71`.
+`reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it, as do the kits at `interfaces-v67` and
+`interfaces-v68`, and the kit at `interfaces-v69`, on the commit of `reference-traces-v56`, pairs with it, as does the kit at `interfaces-v70`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -505,6 +506,15 @@ the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `re
   out of order or repeated, a dump with an order effect of class 6 and one with a mission condition of class 0 (each
   `{"error": "dump"}`), and one with no section 17; in `loader`, `nan_bitwise` and `fuel_set_trap`; in `host`,
   `fatal_error`. Its kit is `interfaces-v66`.
+- `reference-traces-v56` (#1208): the digests, sounds, UI logs, events, frames, views and saves of v55, and the core
+  gate's vectors of v55 with new ones added and three moved: in `loader`, the `load_data` region's refusals and
+  order (`manifest_load_data_*`, `manifest_layout_load_data_*`, `manifest_reaches_load_data`,
+  `manifest_order_scratch_load_data`) and the forms of `blocked` (`manifest_blocked_*`); in `host`, a fault of each
+  service of ABI minors 1 to 3 (`slot_dpid_above`, `capture_null_offset`, `record_event_kind`,
+  `record_event_null_array`, `free_twice`, `alloc_zero`, `alloc_tagged_null`, `gaf_frame_null_table`,
+  `gaf_init_null_animation`, `gaf_step_null_cursor`, `gaf_sequence_frame_null_cursor`). The memory grows to 5136 pages
+  for the load data, so `import_pointer_last`, `import_buffer_past` and `emit_past` take addresses at its new end, with
+  their results unchanged (`data/frozen_interfaces.csv`). Its kit is `interfaces-v69`.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it

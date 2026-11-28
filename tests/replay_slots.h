@@ -3644,6 +3644,22 @@ void After_map_PassMapInBounds()
     CompareResult(g_result_map_PassMapInBounds);
 }
 
+void Run_map_RefreshMovedUnits()
+{
+    int p0 = ArgScalar<int>("moveClass");
+    Unit* p1 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.map->RefreshMovedUnits(p0, p1);
+}
+
+void Run_map_RefreshUnitIfStale()
+{
+    int p0 = ArgScalar<int>("moveClass");
+    Unit* p1 = (Unit*)ArgObject("unit", ROK_UNIT);
+    SetClosing(nullptr);
+    g_seams.map->RefreshUnitIfStale(p0, p1);
+}
+
 int g_result_scripts_Apply;
 
 void Run_scripts_Apply()
@@ -4768,6 +4784,14 @@ bool RunSlot(const char* subsystem, const char* slot)
     }
     if (strcmp(subsystem, "map") == 0 && strcmp(slot, "PassMapInBounds") == 0) {
         Run_map_PassMapInBounds();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "RefreshMovedUnits") == 0) {
+        Run_map_RefreshMovedUnits();
+        return true;
+    }
+    if (strcmp(subsystem, "map") == 0 && strcmp(slot, "RefreshUnitIfStale") == 0) {
+        Run_map_RefreshUnitIfStale();
         return true;
     }
     if (strcmp(subsystem, "scripts") == 0 && strcmp(slot, "Apply") == 0) {

@@ -276,9 +276,35 @@ void AddSiteMember(ReplayText& t, const ReplayInsideSite& s, unsigned index)
 
 static_assert(ROK_COUNT <= REPLAY_OBJECT_KINDS, "every kind of the schema has a row of the object table");
 
+namespace {
+
+unsigned OutsideKind(unsigned kind)
+{
+    for (unsigned i = 0; i < kReplayOutsideKindCount; i++) {
+        if (kReplayOutsideKinds[i][0] == kind)
+            return kReplayOutsideKinds[i][1];
+    }
+    return kReplayObjectKindCount;
+}
+
+bool OutsideTable(unsigned kind, const void* p)
+{
+    unsigned char* base;
+    unsigned count;
+    unsigned stride;
+    if (!TableSpan(kind, &base, &count, &stride))
+        return true;
+    const unsigned char* at = (const unsigned char*)p;
+    return at < base || at >= base + (unsigned long long)count * stride;
+}
+
+}
+
 bool ReplayKindFits(unsigned declared, unsigned actual)
 {
     if (declared == actual)
+        return true;
+    if (actual == OutsideKind(declared))
         return true;
     const ReplayObjectKind& base = kReplayObjectKinds[declared];
     for (unsigned i = 0; i < base.polyCount; i++) {
@@ -310,6 +336,8 @@ unsigned ReplayConcreteKind(unsigned kind, const void* p)
         ReplayFail(message);
         return kReplayObjectKindCount;
     }
+    if (p != nullptr && base.polyCount == 0 && OutsideKind(kind) != kReplayObjectKindCount && OutsideTable(kind, p))
+        return OutsideKind(kind);
     if (base.polyCount == 0 || p == nullptr)
         return kind;
     const void* vptr = *(const void* const*)p;

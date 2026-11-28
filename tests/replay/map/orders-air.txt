@@ -39821,6 +39821,13 @@ call 1029 GetGroundHeight
 call 1030 GetGroundHeight
   a pos (39194597,20558683)
   o result 1
+call 1030 RefreshMovedUnits
+  r Game.unitsEnd Unit#2500
+  r Unit#1.flags 0x90e00325
+  r Unit#3.flags 0x10242221
+  a moveClass 2
+  a unit Unit#1
+  w PassMap#2.lastTick 1000
 call 1030 PassMapInBounds
   a moveClass 2
   a x 36
@@ -40041,6 +40048,11 @@ call 1030 PassMapGet
   a x 34
   a y 18
   o result 3
+call 1030 RefreshUnitIfStale
+  a moveClass 2
+  a unit Unit#1
+  i services.SchedPublish 7 32
+  w PassMap#2.cells 258:57f5ffff07f4ffff07f4ffff07f4ffff
 call 1030 GetGroundHeight
   a pos (19922944,10485760)
   o result 1
@@ -41093,10 +41105,7 @@ call 1045 Apply
   r Unit#1.posX 39319089
   r Unit#1.posZ 21223530
   r Unit#2.cargo Unit#3
-  r Unit#3.flags 0x10242221
   r Unit#3.carrier Unit#2
-  r PassMap#2.cells 258:57f5ffff07f4ffff07f4ffff07f4ffff
-  r PassMap#2.lastTick 1000
   a event.kind 161
   a event.unit Unit#1
   a size 8
@@ -61489,13 +61498,22 @@ call 1350 GetGroundHeight
 call 1351 GetGroundHeight
   a pos (198139435,91876561)
   o result 1
+call 1351 RefreshMovedUnits
+  r Unit#251.flags 0x90e40025
+  r Unit#1.flags 0x90e00321
+  a moveClass 2
+  a unit Unit#251
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  i services.SchedPublish 7 32
+  w PassMap#2.cells 260:57f5ffff07f4ffff05d4ffff 265:00d0ffff00d0ffff00d0ffff00d0ffff 1306:f4ffff01f4ffff01f57f5501ff7f0000ff7f0000
+  w PassMap#2.lastTick 1321
 call 1351 PassMapInBounds
   a moveClass 2
   a x 188
   a y 87
   o result 1
 call 1351 PassMapGet
-  r PassMap#2.cells 260:57f5ffff07f4ffff05d4ffff 265:00d0ffff00d0ffff00d0ffff00d0ffff 1306:f4ffff01f4ffff01f57f5501ff7f0000ff7f0000
   a moveClass 2
   a x 188
   a y 87
@@ -64745,6 +64763,11 @@ call 1351 PassMapInBounds
   a x 184
   a y 32
   o result 1
+call 1351 RefreshUnitIfStale
+  a moveClass 2
+  a unit Unit#251
+  i services.SchedPublish 7 32
+  w PassMap#2.cells 1306:f457f501f407f401f5075401ff070000ff570000
 call 1351 GetGroundHeight
   a pos (19922944,10485760)
   o result 1
@@ -65797,11 +65820,8 @@ call 1366 Apply
   r Unit#251.posX 197677085
   r Unit#251.posZ 92514280
   r Unit#1.cobStateFlags 1
-  r Unit#1.flags 0x90e00321
   r Unit#1.posX 40492961
   r Unit#1.posZ 21206452
-  r PassMap#2.cells 1306:f457f501f407f401f5075401ff070000ff570000
-  r PassMap#2.lastTick 1321
   a event.kind 161
   a event.unit Unit#251
   a size 8
@@ -75664,13 +75684,20 @@ call 1502 GetGroundHeight
 call 1502 GetGroundHeight
   a pos (191981180,85247632)
   o result 1
+call 1502 RefreshMovedUnits
+  r Unit#1.flags 0x90e00325
+  r Unit#3.flags 0x10242326
+  a moveClass 2
+  a unit Unit#1
+  i services.SchedPublish 7 32
+  w PassMap#2.cells 260:ffffffffffffffff55d5ffff
+  w PassMap#2.lastTick 1472
 call 1502 PassMapInBounds
   a moveClass 2
   a x 38
   a y 19
   o result 1
 call 1502 PassMapGet
-  r PassMap#2.cells 260:ffffffffffffffff55d5ffff
   a moveClass 2
   a x 38
   a y 19
@@ -75835,6 +75862,11 @@ call 1502 PassMapGet
   a x 36
   a y 20
   o result 3
+call 1502 RefreshUnitIfStale
+  a moveClass 2
+  a unit Unit#1
+  i services.SchedPublish 7 32
+  w PassMap#2.cells 260:57f5ffff07f4ffff05d4ffff
 call 1502 GetGroundHeight
   a pos (19922944,10485760)
   o result 1
@@ -76708,13 +76740,9 @@ call 1514 Apply
   r Unit#251.posX 191971665
   r Unit#251.posZ 84476378
   r Unit#1.cobStateFlags 0
-  r Unit#1.flags 0x90e00325
   r Unit#1.posX 40630353
   r Unit#1.posZ 20509713
-  r Unit#3.flags 0x10242326
   r Unit#3.posY 998325
-  r PassMap#2.cells 260:57f5ffff07f4ffff05d4ffff
-  r PassMap#2.lastTick 1472
   a event.kind 161
   a event.unit Unit#251
   a size 8
@@ -78184,6 +78212,13 @@ call 1532 GetGroundHeight
 call 1532 GetGroundHeight
   a pos (191955230,83144212)
   o result 1
+call 1532 RefreshMovedUnits
+  r Unit#4.flags 0x10e42321
+  r Unit#251.flags 0x90e40025
+  a moveClass 2
+  a unit Unit#1
+  i services.SchedPublish 7 32
+  w PassMap#2.lastTick 1502
 call 1532 PassMapInBounds
   a moveClass 2
   a x 37
@@ -79864,6 +79899,9 @@ call 1532 PassMapGet
   a x 39
   a y 11
   o result 3
+call 1532 RefreshUnitIfStale
+  a moveClass 2
+  a unit Unit#1
 call 1532 GetGroundHeight
   a pos (19922944,10485760)
   o result 1
@@ -80158,11 +80196,8 @@ call 1536 Apply
   r Unit#1.posX 39457962
   r Unit#1.posZ 19424189
   r Unit#3.posY 2374581
-  r Unit#4.flags 0x10e42321
-  r Unit#251.flags 0x90e40025
   r Unit#251.posX 191952635
   r Unit#251.posZ 82933870
-  r PassMap#2.lastTick 1502
   a event.kind 161
   a event.unit Unit#1
   a size 8

@@ -356,6 +356,78 @@ void* AllocObject(unsigned size)
     return p;
 }
 
+struct LoadObject {
+    unsigned char* native;
+    unsigned size;
+    unsigned kind;
+    unsigned char* pixels;
+    unsigned pixelSize;
+};
+
+std::vector<LoadObject> g_loadObjects;
+
+void MapLoadObject(void* object, unsigned kind)
+{
+    if (!ReplayWasmActive() || object == nullptr || (kind != ROK_FRAMETABLE && kind != ROK_GAFFRAME))
+        return;
+    for (size_t i = 0; i < g_loadObjects.size(); i++) {
+        if (g_loadObjects[i].native == object)
+            return;
+    }
+    LoadObject o = { (unsigned char*)object, kReplayObjectKinds[kind].size, kind, nullptr, 0 };
+    LoadDataRegisterFrame(object, o.size);
+    g_loadObjects.push_back(o);
+}
+
+void MapLoadTarget(const ReplayObjectField& f, const char* value)
+{
+    if (ReplayWasmActive() && f.kind == RK_PTR && (f.target == ROK_FRAMETABLE || f.target == ROK_GAFFRAME) && strcmp(value, "null") != 0)
+        MapLoadObject(ReplayResolveObject(value, nullptr, g_objects, AllocObject), f.target);
+}
+
+void SyncLoadObjects()
+{
+    for (size_t i = 0; i < g_loadObjects.size(); i++) {
+        LoadObject& o = g_loadObjects[i];
+        unsigned char* copy = ReplayWasmLinear(LoadAddress(o.native));
+        memcpy(copy, o.native, o.size);
+        if (o.kind == ROK_FRAMETABLE)
+            ((FrameTable*)copy)->entries = nullptr;
+        if (o.kind != ROK_GAFFRAME)
+            continue;
+        const GafFrame* frame = (const GafFrame*)o.native;
+        unsigned pixelSize = frame->pixelsOrLayers == nullptr ? 0u : (unsigned)frame->width * frame->height;
+        if (pixelSize > o.pixelSize) {
+            if (o.pixels != nullptr) {
+                LoadDataUnregister(o.pixels);
+                free(o.pixels);
+            }
+            o.pixels = (unsigned char*)calloc(pixelSize, 1);
+            o.pixelSize = pixelSize;
+            LoadDataRegisterFrame(o.pixels, pixelSize);
+        }
+        unsigned pixels = 0;
+        if (pixelSize != 0) {
+            pixels = LoadAddress(o.pixels);
+            memcpy(ReplayWasmLinear(pixels), frame->pixelsOrLayers, pixelSize);
+        }
+        ((GafFrame*)copy)->pixelsOrLayers = (unsigned char*)pixels;
+        ((GafFrame*)copy)->scratch = nullptr;
+    }
+}
+
+void ForgetLoadObjects()
+{
+    for (size_t i = 0; i < g_loadObjects.size(); i++) {
+        LoadDataUnregister(g_loadObjects[i].native);
+        if (g_loadObjects[i].pixels != nullptr) {
+            LoadDataUnregister(g_loadObjects[i].pixels);
+            free(g_loadObjects[i].pixels);
+        }
+    }
+    g_loadObjects.clear();
+}
+
 char* g_text;
 char* g_lines[MAX_LINES];
 int g_lineCount;
@@ -670,6 +742,7 @@ bool RestoreField(const ReplayField& f, const char* value)
     if (f.kind == RK_ARRAY)
         return ReplayApplyArray(ReplayFieldView(f), BlockBase(f), f.name, value, g_known, true, AllocObject);
     g_known.Set(f.name, value);
+    MapLoadTarget(ReplayFieldView(f), value);
     return ReplayRestoreObjectField(ReplayFieldView(f), BlockBase(f), value, g_objects, AllocObject);
 }
 
@@ -1103,13 +1176,18 @@ bool ApplyReachField(void* object, unsigned kind, const char* suffix)
     const ReplayObjectField* f = ReplayFindObjectField(kind, suffix + 1);
     if (object != nullptr && value != nullptr && f != nullptr && f->kind == RK_BLOB)
         return ReplayApplyBlob(*f, object, suffix, value, g_known, true, g_objects, AllocObject);
-    return object == nullptr || value == nullptr || f == nullptr || ReplayRestoreObjectField(*f, object, value, g_objects, AllocObject);
+    if (object == nullptr || value == nullptr || f == nullptr)
+        return true;
+    MapLoadTarget(*f, value);
+    return ReplayRestoreObjectField(*f, object, value, g_objects, AllocObject);
 }
 
 void ApplyReach(void* object, unsigned kind, const char* suffix)
 {
     if (!ApplyReachField(object, kind, suffix))
         Fatal(g_file, g_callIndex, "a value that cannot be restored", suffix);
+    MapLoadObject(object, kind);
+    SyncLoadObjects();
 }
 
 const char* ArgLine(const char* name)
@@ -3218,6 +3296,7 @@ void LoadInputs(const char* file, int end)
 
 void ResetBlock()
 {
+    ForgetLoadObjects();
     if (ReplayWasmActive())
         ReplayWasmReload();
     else
@@ -3407,6 +3486,7 @@ bool RestoreObjectLine(const char* name, const char* value, const char* file, co
     }
     if (f->object == ROK_EXPLODEDSLOT && f->kind == RK_REF)
         AdoptCachedPiece(*f, p, value);
+    MapLoadTarget(*f, value);
     if (!ReplayRestoreObjectField(*f, p, value, g_objects, AllocObject))
         Fatal(file, g_callIndex, "a value that cannot be restored", value);
     g_known.Set(name, value);
@@ -3910,6 +3990,7 @@ void ReplayCall(const char* file, Outcome& out)
     ReplayCacheStart cacheBefore;
     if (CachedSubsystem() && ReplayReadDebrisCache(cacheBefore) != nullptr)
         Fatal(file, g_callIndex, "the debris cache does not tile its arena before the call", slotText);
+    SyncLoadObjects();
     if (g_aroundSlot != nullptr)
         g_aroundSlot(false);
     bool ran = RunSlot(g_subsystem, slotText);
@@ -6002,8 +6083,8 @@ void GafCursorSelfTest()
     Handle* cursor = (Handle*)ReplayResolveObject("Handle#1", nullptr, g_objects, AllocObject);
     InitGafSequence(cursor, entry, 0);
     Check(cursor->index == 0 && cursor->value == 4 && cursor->kind == 1, "a cursor started has the recorded index, value and kind");
-    Check(cursor->src == entry && entry != nullptr, "and its src is the replayer's own copy of the entry, not a block offset");
-    Check(StepGafSequence(cursor) == 1 && cursor->index == 1 && cursor->value == 7 && cursor->src == entry, "a step replays its result and its fields");
+    Check(cursor->src == (GafEntry*)LoadAddressIfLoadData(entry) && entry != nullptr, "and its src is the entry's address, not a block offset");
+    Check(StepGafSequence(cursor) == 1 && cursor->index == 1 && cursor->value == 7 && cursor->src == (GafEntry*)LoadAddressIfLoadData(entry), "a step replays its result and its fields");
     Check(StepGafSequence(cursor) == 1 && cursor->kind == 0 && cursor->src == nullptr, "a cursor that ran out has a null src");
     Check(g_diffs == 0 && g_importIndex == 5, "and nothing differs");
 
@@ -6058,7 +6139,7 @@ void RawPointerSelfTest()
     Handle* rebuilt = (Handle*)ReplayResolveObject("Handle#1", nullptr, g_objects, AllocObject);
     FrameTable* rebuiltTable = (FrameTable*)ReplayResolveObject("FrameTable#1", nullptr, g_objects, AllocObject);
     Check(rebuilt != nullptr && rebuiltTable != nullptr && rebuilt->index == 2 && rebuilt->value == 9 && rebuilt->kind == 1, "the object is rebuilt");
-    Check(rebuilt->src == (GafEntry*)rebuiltTable, "its ptr is the address of the replayer's own copy");
+    Check(rebuilt->src == (GafEntry*)LoadAddressIfLoadData(rebuiltTable), "its ptr is the address of the replayer's own copy");
     Recorder again;
     unsigned short againKinds[1] = { ROK_HANDLE };
     void* againRoots[1] = { rebuilt };
@@ -6157,7 +6238,7 @@ void MaskedViewSelfTest()
     FrameTable* rebuiltFrames = (FrameTable*)ReplayResolveObject("FrameTable#1", nullptr, g_objects, AllocObject);
     UnitDef* rebuiltDef = (UnitDef*)ReplayResolveObject("UnitDef#1", nullptr, g_objects, AllocObject);
     Check(rebuilt->flags == 0x0101 && rebuilt->linked.scale == 1.5f, "the other view is restored");
-    Check(rebuilt->linked.table == rebuiltFrames && rebuilt->linked.def.get() == rebuiltDef, "with its ptr and its ref");
+    Check(rebuilt->linked.table == (FrameTable*)LoadAddressIfLoadData(rebuiltFrames) && rebuilt->linked.def.get() == rebuiltDef, "with its ptr and its ref");
     BeginCompare();
     CompareObjects(&sets);
     Check(g_diffs == 0, "and compares equal");
@@ -6400,7 +6481,7 @@ void UnnamedPtrSelfTest()
     Handle* rebuiltCursor = (Handle*)ReplayResolveObject("Handle#1", nullptr, g_objects, AllocObject);
     FrameTable* empty = (FrameTable*)ReplayResolveObject("FrameTable#1", nullptr, g_objects, AllocObject);
     Check(empty != nullptr && empty->count == 0, "the replayer makes an empty object of the kind");
-    Check(rebuilt->linked.table == empty && (FrameTable*)rebuiltCursor->src == empty, "and both ptrs hold its address");
+    Check(rebuilt->linked.table == (FrameTable*)LoadAddressIfLoadData(empty) && (FrameTable*)rebuiltCursor->src == (FrameTable*)LoadAddressIfLoadData(empty), "and both ptrs hold its address");
     g_rootKinds[0] = ROK_FIXTUREVIEW;
     g_rootObjects[0] = rebuilt;
     g_rootKinds[1] = ROK_HANDLE;
@@ -8560,8 +8641,48 @@ void OutFormsSelfTest()
     Check(g_diffs == 0 && width == 12, "and a null pointer takes none");
 }
 
+void LoadDataMapSelfTest()
+{
+    if (!ReplayWasmActive())
+        return;
+    printf("load data in the module memory\n");
+    ResetBlock();
+    BeginServices(
+        "  i services.GetGafFrame FrameTable#1 4 = GafFrame#1\n"
+        "  o GafFrame#1.width 2\n"
+        "  o GafFrame#1.height 2\n"
+        "  o GafFrame#1.xOffset -1\n"
+        "  o GafFrame#1.yOffset 1\n"
+        "  o GafFrame#1.transparency 9\n"
+        "  o GafFrame#1.pixelsOrLayers alloc#2\n"
+        "  o GafFrame#1.pixelsOrLayers[] [4] 0:0102ff09\n");
+    Check(RestoreField(*FindBlockField("Game.losTable"), "FrameTable#1"), "a ptr to a frame table restores");
+    Check(RestoreObjectLine("FrameTable#1.count", "5", "self-test", nullptr, "  r FrameTable#1.count 5"), "and so does the table's count");
+    SyncLoadObjects();
+    FrameTable* table = (FrameTable*)ReplayResolveObject("FrameTable#1", nullptr, g_objects, AllocObject);
+    unsigned linear = (unsigned)g_game->losTable;
+    Check(table != nullptr && linear != (unsigned)table && LoadNative(linear) == table, "the field holds the table's load address, not the replayer's");
+    table->entries = table;
+    SyncLoadObjects();
+    Check(*(const unsigned short*)ReplayWasmLinear(linear) == 5, "and the module reads the recorded count there");
+    Check(((const FrameTable*)ReplayWasmLinear(linear))->entries == nullptr, "but no native address in its entries");
+    unsigned classWords[256];
+    unsigned classWordCount = ReplayClassWords(classWords, sizeof classWords / sizeof classWords[0]);
+    Check(classWordCount != 0 && linear >= ReplayWasmLoadDataBase() + classWordCount * 4 && memcmp(ReplayWasmLinear(ReplayWasmLoadDataBase()), classWords, classWordCount * 4) == 0, "above the class word table, which stays at the region's base");
+    ReplayAnswerHook() = ReplayAnswerImport;
+    unsigned frame = LoadGetGafFrame(linear, 4);
+    ReplayAnswerHook() = nullptr;
+    Check(g_diffs == 0 && frame != 0 && LoadNative(frame) == g_objects.Pointer(ROK_GAFFRAME, 1), "GetGafFrame answers with the frame's load address");
+    const GafFrame* copy = (const GafFrame*)ReplayWasmLinear(frame);
+    Check(copy->width == 2 && copy->height == 2 && copy->xOffset == -1 && copy->yOffset == 1 && copy->transparency == 9, "where the module reads the recorded size, offsets and transparency");
+    const unsigned char* pixels = ReplayWasmLinear((unsigned)copy->pixelsOrLayers);
+    Check(copy->pixelsOrLayers != nullptr && pixels[0] == 1 && pixels[1] == 2 && pixels[2] == 0xff && pixels[3] == 9, "and whose pixels are the recorded ones, at their load address");
+    ResetBlock();
+}
+
 void LoadDataReclaimSelfTest()
 {
+    ForgetLoadObjects();
     const unsigned regionSize = 65536;
     const unsigned base = 0x10100000;
     unsigned char* region = (unsigned char*)calloc(regionSize, 1);
@@ -9601,6 +9722,7 @@ int SelfTest(const char* file)
     SimVectorSelfTest();
     GameWriteSelfTest();
     RegionSelfTest();
+    LoadDataMapSelfTest();
     LoadDataReclaimSelfTest();
     LoadDataClassWordsSelfTest();
     UnreadArgumentSelfTest();

@@ -2389,6 +2389,34 @@ int __stdcall RecMapPassMapInBounds(int a0, unsigned int a1, unsigned int a2)
     return result;
 }
 
+void __stdcall RecMapRefreshMovedUnits(int a0, Unit* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_MAP_REFRESHMOVEDUNITS, SUB_MAP, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "moveClass", a0);
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+    }
+    s_inner_map->RefreshMovedUnits(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
+void __stdcall RecMapRefreshUnitIfStale(int a0, Unit* a1)
+{
+    ReplayRoots roots;
+    roots.Add(ROK_UNIT, a1);
+    SlotScope scope(RSL_MAP_REFRESHUNITIFSTALE, SUB_MAP, roots);
+    if (scope.Open()) {
+        ArgValue(s_call, "moveClass", a0);
+        ArgObject(s_call, "unit", ROK_UNIT, a1);
+    }
+    s_inner_map->RefreshUnitIfStale(a0, a1);
+    if (scope.Open()) {
+    }
+}
+
 int __stdcall RecScriptsApply(const ScriptsEventHeader* a0, unsigned int a1)
 {
     if (a0 != nullptr && a1 >= sizeof(*a0) && (a0->kind == SCRIPTS_FREE_STATE || a0->kind == SCRIPTS_INIT_STATE))
@@ -6284,6 +6312,10 @@ void HookSeams(const bool* on)
         s_rec_map.PassMapGet = RecMapPassMapGet;
     if (on[SUB_MAP])
         s_rec_map.PassMapInBounds = RecMapPassMapInBounds;
+    if (on[SUB_MAP])
+        s_rec_map.RefreshMovedUnits = RecMapRefreshMovedUnits;
+    if (on[SUB_MAP])
+        s_rec_map.RefreshUnitIfStale = RecMapRefreshUnitIfStale;
     if (on[SUB_SCRIPTS])
         s_rec_scripts.Apply = RecScriptsApply;
     if (on[SUB_SCRIPTS] || on[SUB_WEAPONS] || on[SUB_ORDERS] || on[SUB_UNITS])

@@ -425,6 +425,14 @@ The replayer's table is outside the block, so a ref to it is the difference of t
 frees such a table frees the replayer's memory, which is why the module's allocator makes it. The replayer calls the exe's `operator new`, so such a table is for native replays; a WASM
 module has an allocator of its own that the host does not call.
 
+### A pointer of a table kind outside its table
+
+A table kind can name a kind of the same type with no table as its `outside` kind: `"SpatialBucket": {..., "outside": "OverflowBucket"}`. A pointer of the
+table kind that is not inside the table (a ref field, an argument or a walked object) is then the outside kind, by the name that kind's own first sight gave it:
+`w Unit#5.spatialBucket OverflowBucket#1`, the overflow bucket that `Game.overflowBucket` names, where it would otherwise be `SpatialBucket#?`. The walk reaches
+it as the outside kind, with that kind's fields, and the replayer accepts the outside kind wherever the table kind is expected. `replayschema.py --check`
+fails for an `outside` on a kind with no table, or naming a kind that is not a state kind of the same type with no table.
+
 ### A pointer into the object itself
 
 A field of kind `self` points into the object that holds it. `{"name": "screen", "kind": "self", "member": "screenPos"}` is `Eye.screen`, a `Ref` to the same
@@ -1745,7 +1753,12 @@ los_radar:
 
 map:
 
-- `Apply` of RECLAIM_FOOTPRINT and LOAD_PATH_LOCK_STAMP: `LoadUnit` publishes them for the units of a loaded game (RECLAIM_FOOTPRINT only for a unit with bit 4 of `cobStateFlags`), and no map recording loads one.
+- `Apply` of RECLAIM_FOOTPRINT: `LoadUnit` publishes it for a unit of a loaded game with bit 4 of `cobStateFlags`, and no saved game of a scenario has one (`ForceNeighborFootprintReclaim` is reached by no scenario of `tools/coverage.py`).
+- The outcomes 0 of `Apply` but the refusal of SET_YARD: the size checks, the null unit, a negative PASS_MAPS size, the refusals of BUCKET_UNLINK and BUCKET_PREPEND, LOAD_PATH_LOCK_STAMP without motion and the unknown kinds. No publisher sends such an event in any scenario.
+- `PickRandomReclaimableResourcesInRadius` (`record: false`, #1267): scenarios reach it (`orders-air`, `mission-kill-of-type`), but the recorder has no slot form for its `Vec3**` and `float*` results, and its WASM glue passes the caller's stack pointers as objects.
+- `CanBuildAt` with a player (the visibility test): only the control panel passes a player, and it calls map's `CanBuildAt` directly (`presentation,map,call,CanBuildAt` in `data/coupling.csv`), not through the seam the recorder hooks.
+- `GetGroundHeight`'s -1: the calls off the map come from callers that do not go through the seam (particles and model rendering, in `orders-air-fights`) or from the feature placement at tick 0 (`mission-radius`, a run of 2700 ticks).
+- The truncation of the draft level to a byte (`Game.seaLevel` - `UnitDef.draft` outside 0 to 255): no unit of a scenario has a draft above the sea level. A level from the draft that returns 1 is in `six-hundred-isles`.
 
 scripts:
 
@@ -1903,12 +1916,17 @@ wine build/modern/replay_inject_test.exe --expect 63 result tests/replay/map/ord
 ```
 
 The recordings of map 5.0 (map 7.0 recordings call the pass map slots `PassMapGet` and `PassMapInBounds`; map 7.1 recordings, of #1019, write the path lock stamp in ADD_UNIT where 7.0 published PLACED to movement), which the modern build runs as native code in every mode (it has no WASM module yet), where `Apply` is called with each event map is given: `ui-build-place` (the whole run: `BuildAllPassMaps` at load, `Apply` with PASS_MAPS, ADD_UNIT and REMOVE_UNIT, `CanBuildAt`, `CanPlaceUnitFootprint`, `SnapWorldPosToFootprint`, `GetGroundHeight`, `PassMapGet`, `PassMapInBounds`), `orders-air`, ticks 1020 to 1585 only
-(`Apply` with ADD_UNIT, REMOVE_UNIT, SET_YARD, BUCKET_UNLINK and BUCKET_PREPEND, `CanPlaceFootprintAt`, `CanBuildAt`, `CanPlaceUnitFootprint`, `GetGroundHeight`, `PassMapGet`, `PassMapInBounds`) and `orders-air-repair`, ticks 380 to 385 only (`Apply` with ADD_UNIT, REMOVE_UNIT and CLEAR_UNIT, `IsPadSlotFree`, `CanPlaceUnitFootprint`, `GetCellMeanHeight`, `GetGroundHeight`), `console-features`, ticks 159 to 162 only (`Apply` with SET_SEA_LEVEL, the `+sealevel 20` of tick 160), and `console-units`, ticks 109 to 112 only (`Apply` with SET_EDGE, the `+edge 10 10` of tick 110). `RefreshMovedUnits` and `RefreshUnitIfStale`, map's pass-map refreshes since 5.0, are not recorded yet (`record: false`, #660 part 3): they write units' stamps and publish CELLS_CHANGED, which the recorder has no form for.
+(`Apply` with ADD_UNIT, REMOVE_UNIT, SET_YARD, BUCKET_UNLINK and BUCKET_PREPEND, `CanPlaceFootprintAt`, `CanBuildAt`, `CanPlaceUnitFootprint`, `GetGroundHeight`, `PassMapGet`, `PassMapInBounds`) and `orders-air-repair`, ticks 380 to 385 only (`Apply` with ADD_UNIT, REMOVE_UNIT and CLEAR_UNIT, `IsPadSlotFree`, `CanPlaceUnitFootprint`, `GetCellMeanHeight`, `GetGroundHeight`), `console-features`, ticks 159 to 162 only (`Apply` with SET_SEA_LEVEL, the `+sealevel 20` of tick 160), and `console-units`, ticks 109 to 112 only (`Apply` with SET_EDGE, the `+edge 10 10` of tick 110). The recordings of #1262 hold the paths those do not:
+`load-midgame`, ticks 900 to 902 of the game `save-midgame` saves at tick 900, loaded (`Apply` of LOAD_PATH_LOCK_STAMP twice at tick 900, with stamps 874 and 888, ADD_UNIT 4 times and PASS_MAPS 544 times),
+`sensors-los-off`, ticks 1520 to 1522 (the refusal of SET_YARD at tick 1521, `Apply` outcome 0), `orders-guard-attacked`, ticks 200 to 202 (ADD_UNIT of a unit off the map at tick 201,
+which `SetOwner` puts in the overflow bucket: `w Unit#5.spatialBucket OverflowBucket#1`), `edges-economy-targeting`, ticks 114 to 118 (a CLEAR_UNIT each tick whose unit overlapped another, so the re-claim
+writes the other unit's flags and cells: `w Unit#516.flags` and `w Cell#4084.unit 516` at tick 114, and `GetGroundHeight` on uneven ground with a fraction, first at tick 115) and `six-hundred-isles`, ticks 90 and 91 (`CanPlaceUnitFootprint` of a structure on water at tick 90,
+whose level is the draft's, `w SimGlobals.g_lastPlaceHeight 76`, sea level 80 less a draft of 4, and 237 `CanBuildAt` of the computer players). `RefreshMovedUnits` and `RefreshUnitIfStale`, map's pass-map refreshes, are recorded since #1262, in `orders-air`, `ui-build-place`, `load-midgame`, `sensors-los-off`, `edges-economy-targeting` and `six-hundred-isles`.
 A window cannot start at tick 0, so only a whole run holds the load-time `BuildAllPassMaps`. The first call that names a field of `Cell` writes it for every cell of the table (a map of 224 by 102 cells is 22,848 elements of each field, a few lines a field as runs, "A table recorded as changed elements"),
-which is most of each file, and after that only the cells a call changed. RECLAIM_FOOTPRINT and LOAD_PATH_LOCK_STAMP are in no recording ("Not recorded").
+which is most of each file, and after that only the cells a call changed. RECLAIM_FOOTPRINT is in no recording ("Not recorded").
 The spatial grid `Game.cells_1429f` is the table of `SpatialBucket` (`width_142a3` times `height_142a7` buckets, included under `pack1:` because the game lays a bucket out in 10 bytes, and listed before `Cell` so that the units
 of a chain are recorded whole before a cell's `occupant` reaches them with a limit), `Game.overflowBucket` is a `ref` to `OverflowBucket`, a kind of the same type with no table, and the unit a cell holds is reached through its
-`occupant` field (a `unitid` over `unit`). A unit whose bucket is the overflow bucket is written `SpatialBucket#?` and cannot be replayed: no committed recording has one. The replayer defines `operator delete` over `SimFree`, as the game does.
+`occupant` field (a `unitid` over `unit`). A unit whose bucket is the overflow bucket is written `OverflowBucket#1`, the `outside` kind of `SpatialBucket` ("A pointer of a table kind outside its table"). The replayer defines `operator delete` over `SimFree`, as the game does.
 
 `replay_inject_test.exe` is also built with the feature-HP injection of 20000 (the damage test of the feature damage, a feature killed by the damage it has taken, compared with 20000 more), and the divergence is reported at call 404 of `commander-death` and at the first import that differs, `import 1 los_radar.GetMapCell` (a feature that is not killed makes no kill call):
 

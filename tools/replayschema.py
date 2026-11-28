@@ -975,6 +975,22 @@ def check_inside(ann: dict) -> tuple[dict, list[str]]:
     return sites, errors
 
 
+def check_outside(ann: dict) -> list[str]:
+    """Errors for `outside`: the kind without a table that names a pointer of a table kind outside its table."""
+    errors = []
+    for name, spec in ann["objects"].items():
+        if "outside" not in spec:
+            continue
+        other = ann["objects"].get(spec["outside"])
+        if not is_global_table(spec):
+            errors.append("%s: only a kind with a table has an `outside` kind" % name)
+        elif other is None:
+            errors.append("%s: the `outside` kind %s is not a kind" % (name, spec["outside"]))
+        elif other["type"] != spec["type"] or other.get("table") or other.get("inside") or other.get("kinds") or other["scope"] != "state":
+            errors.append("%s: the `outside` kind %s is a state kind of the type %s with no table" % (name, spec["outside"], spec["type"]))
+    return errors
+
+
 def check_vptr(ann: dict) -> list[str]:
     """Errors for `vptr`: the global that holds the vtable of a kind whose first word the code sets by hand."""
     errors = []
@@ -1930,7 +1946,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     for kind in kind_names:
         spec = ann["objects"][kind]
         entry = {"name": kind, "type": spec["type"], "scope": spec["scope"], "table": spec.get("table"), "inside": spec.get("inside")}
-        for key in ("vtable", "vtable_declared", "vtable_symbol", "vtable_secondary", "vptr", "vptr_unset", "kinds", "delta"):
+        for key in ("vtable", "vtable_declared", "vtable_symbol", "vtable_secondary", "vptr", "vptr_unset", "kinds", "delta", "outside"):
             if spec.get(key):
                 entry[key] = spec[key]
         if spec.get("vtable_symbol"):
@@ -2007,7 +2023,7 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
     errors += resolve_field_reaches(ann, object_fields, object_index, reach_table)
     errors += resolve_conditions(ann, object_fields, object_index)
     sites, inside_errors = check_inside(ann)
-    errors += inside_errors + check_elements(ann) + check_vptr(ann)
+    errors += inside_errors + check_elements(ann) + check_vptr(ann) + check_outside(ann)
     errors += check_delta(ann) + check_ctype(ann) + check_blobs(ann)
     by_function: dict[str, list[dict]] = {}
     for r in rows:
@@ -2651,6 +2667,8 @@ def schema_body(ann: dict, model: dict, guard: str) -> str:
         L.append('    { "%s", %s, %s, %s, %d, %d, %d, %d, %d, %d },' % (o["name"], size, scope[o["scope"]], table_id.get(o["name"], "RT_ORDER"), inside_first, inside_count, first, count, int(o.get("delta") is True), int(bool(o.get("vptr_unset")))))
     L += ["};", "static const unsigned kReplayObjectKindCount = %d;" % len(objects), "",
           "static const unsigned short kReplayPolyKinds[] = { %s };" % (", ".join(poly_kinds) or "0"), "",
+          "static const unsigned short kReplayOutsideKinds[][2] = { %s };" % (", ".join("{ %s, %s }" % (kind_id[o["name"]], kind_id[o["outside"]]) for o in objects if o.get("outside")) or "{ 0, 0 }"),
+          "static const unsigned kReplayOutsideKindCount = %d;" % sum(1 for o in objects if o.get("outside")), "",
           "enum ReplayCallbackId {"]
     L += ["    RCB_%s," % upper(c["name"]) for c in model["callbacks"]]
     L += ["    RCB_COUNT", "};", ""]

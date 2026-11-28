@@ -1757,7 +1757,7 @@ map:
 - The outcomes 0 of `Apply` but the refusal of SET_YARD: the size checks, the null unit, a negative PASS_MAPS size, the refusals of BUCKET_UNLINK and BUCKET_PREPEND, LOAD_PATH_LOCK_STAMP without motion and the unknown kinds. No publisher sends such an event in any scenario.
 - `PickRandomReclaimableResourcesInRadius` (`record: false`, #1267): scenarios reach it (`orders-air`, `mission-kill-of-type`), but the recorder has no slot form for its `Vec3**` and `float*` results, and its WASM glue passes the caller's stack pointers as objects.
 - `CanBuildAt` with a player (the visibility test): only the control panel passes a player, and it calls map's `CanBuildAt` directly (`presentation,map,call,CanBuildAt` in `data/coupling.csv`), not through the seam the recorder hooks.
-- `GetGroundHeight`'s -1: the calls off the map come from callers that do not go through the seam (particles and model rendering, in `orders-air-fights`) or from the feature placement at tick 0 (`mission-radius`, a run of 2700 ticks).
+- `GetGroundHeight`'s -1: the only call off the map through the seam is the feature placement at tick 0 of `mission-radius`, whose whole run of 12,000 ticks cannot be recorded (the recording run times out after 1080 s), and a window cannot start at tick 0. The call off the map at tick 1000 of `orders-air-fights` comes from a caller that does not go through the seam.
 - The truncation of the draft level to a byte (`Game.seaLevel` - `UnitDef.draft` outside 0 to 255): no unit of a scenario has a draft above the sea level. A level from the draft that returns 1 is in `six-hundred-isles`.
 
 scripts:

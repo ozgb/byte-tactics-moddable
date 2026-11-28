@@ -727,6 +727,41 @@ void GlueOut(void* native, unsigned address, unsigned size)
         memcpy(native, ModulesMemory()->base + address, size);
 }
 
+void GlueZero(const void* native, unsigned address, unsigned size)
+{
+    if (native != nullptr && !SimOwns(native))
+        memset(ModulesMemory()->base + address, 0, size);
+}
+
+void GlueInPointer(GlueModule* glue, unsigned slot, const void* native, unsigned address, unsigned offset, int text)
+{
+    if (native == nullptr || SimOwns(native))
+        return;
+    void** field = (void**)(ModulesMemory()->base + address + offset);
+    void* held = *field;
+    if (held == nullptr)
+        return;
+    if (SimOwns(held))
+        *field = (void*)(size_t)LinearOffset(held);
+    else if (text)
+        *field = (void*)(size_t)GlueText(glue, slot, (const char*)held);
+    else
+        GlueStop(glue, slot, "a record's pointer field is not in the sim block");
+}
+
+void GlueOutPointer(GlueModule* glue, unsigned slot, void* native, unsigned offset)
+{
+    if (native == nullptr || SimOwns(native))
+        return;
+    void** field = (void**)((char*)native + offset);
+    unsigned address = (unsigned)(size_t)*field;
+    if (address == 0)
+        return;
+    if (!GlueInMemory(address))
+        GlueStop(glue, slot, "wrote a pointer outside the module memory into a record");
+    *field = GlueLinear(address);
+}
+
 unsigned GlueObject(GlueModule* glue, unsigned slot, const void* native)
 {
     if (native == nullptr)

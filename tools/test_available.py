@@ -139,6 +139,22 @@ class ClaimTest(unittest.TestCase):
         comments = [claim("north", "1"), release("north", "2"), claim("north", "3")]
         self.assertEqual(available.standing_claims(comments), ["north"])
 
+    def test_no_full_stop_after_the_name(self):
+        comments = [claim("north", "1"), {"body": "Lead: Claimed by x, lead south", "createdAt": "2"},
+                    {"body": "Lead: Released, lead north", "createdAt": "3"}]
+        self.assertEqual(available.standing_claims(comments), ["south"])
+        comments.append({"body": "Lead: Released, lead south (session usage limit reached)", "createdAt": "4"})
+        self.assertEqual(available.standing_claims(comments), [])
+
+    def test_1202_history(self):
+        lines = ["Claimed by Claude Code / claude-opus-5-5, lead lead-h. Branch issue-1202.",
+                 "Released, lead lead-h. Done locally",
+                 "Claimed by Claude Code / claude-opus-5-5, lead lead-c. Branch issue-1202.",
+                 "Released, lead lead-c (session usage limit reached). Done: just started",
+                 "Released, lead lead-c"]
+        comments = [{"body": "Lead: " + b, "createdAt": f"2026-11-28T0{i}:00:00Z"} for i, b in enumerate(lines)]
+        self.assertEqual(available.standing_claims(comments), [])
+
     def test_other_comments_ignored(self):
         comments = [{"body": "Maintainer: the lead takes this now, lead x.", "createdAt": "1"},
                     {"body": "Lead: took it, lead north.", "createdAt": "2"}]

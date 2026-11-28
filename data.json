@@ -1,15 +1,15 @@
 {
- "generated": "2026-11-28T03:05:05+00:00",
+ "generated": "2026-11-28T04:05:05+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
   "2": {
-   "done": 62,
+   "done": 63,
    "total": 65
   },
   "180": {
    "done": 12,
-   "total": 34
+   "total": 35
   }
  },
  "rows": [
@@ -190,15 +190,15 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 6,
-   "spec": "active",
+   "spec": "stale",
    "spec_pin": 7,
    "impl": "none",
-   "active": true,
+   "active": false,
    "issue": {
     "number": 1201,
     "title": "Spec: Move the economy spec and implement it",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1201",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
@@ -338,7 +338,7 @@
    "recordings": 5,
    "spec": "active",
    "spec_pin": null,
-   "impl": "none",
+   "impl": "active",
    "active": true,
    "issue": {
     "number": 1192,
@@ -348,6 +348,13 @@
     "state": "OPEN"
    },
    "prs": [
+    {
+     "number": 57,
+     "title": "Implementer: impl/map",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/57",
+     "live": true
+    },
     {
      "number": 46,
      "title": "Add: Specify the map subsystem",

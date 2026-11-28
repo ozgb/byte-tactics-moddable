@@ -91,6 +91,10 @@ CORE_NOT_CONFIGURED = "the core gate is not configured: the broker has no --core
 ASKPASS = Path(__file__).resolve().parent / "askpass.sh"
 GATE_TIMEOUT = 4 * 3600
 MAX_RESULT = 1024 * 1024
+HOST_REASONS = {
+    "host-runtime": "the host could not start the replayer: wine or the wasmtime runtime did not start (a fault of the host, not of the module)",
+    "host-replayer": "the host's build has no replay_native_test.exe (a fault of the host, not of the module)",
+}
 DEFAULT_TOKEN_FILE = Path.home() / ".config" / "bt-cleanroom" / "btm-token"
 DEFAULT_REPO = "ozgb/btm"
 DEFAULT_API = "https://api.github.com"
@@ -584,7 +588,7 @@ def make_gate(session, command=None, timeout=GATE_TIMEOUT, game_dir=None):
                 cwd=ROOT, capture_output=True, text=True, timeout=timeout,
             )
         except subprocess.TimeoutExpired:
-            return {"gate": "oraclegate", "id": request_id, "error": f"the gate timed out after {timeout}s"}
+            return {"gate": "oraclegate", "id": request_id, "error": f"the gate timed out after {timeout}s", "reason": "host-timeout"}
         (work / "gate.log").write_text(run.stdout + run.stderr)
         return filter_result(out / "result.json", request_id, run.returncode)
 
@@ -632,8 +636,11 @@ def filter_result(path, request_id, code, gate="oraclegate"):
         result = json.loads(Path(path).read_text())
         if not isinstance(result, dict):
             raise ValueError("not an object")
-    except (OSError, ValueError) as err:
-        return {"gate": gate, "id": request_id, "error": f"the gate wrote no usable result (exit {code}): {err}"}
+    except (OSError, ValueError):
+        return {"gate": gate, "id": request_id, "error": f"the gate wrote no usable result (exit {code})"}
+    if "error" in result:
+        reason = result.get("reason") if result.get("reason") in HOST_REASONS else "unknown"
+        return {"gate": gate, "id": request_id, "error": HOST_REASONS.get(reason, "the gate stopped with an error"), "reason": reason}
     return {**result, "gate": gate, "id": request_id}
 
 

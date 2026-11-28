@@ -459,7 +459,7 @@ it is stored.
 
 **The form.** A core is one file: an x86_64 Linux executable (ELF, 64-bit, little-endian, machine 62), statically linked
 (musl), so that it needs nothing of the machine it runs in but the kernel. It is built in the clean-room image
-(`docs/cleanroom.md`) and comes with the wind_meteors module the `host` group runs it against.
+and comes with the wind_meteors module the `host` group runs it against.
 
 **The sandbox.** The gate runs it only inside a microVM of that image, the sandbox of the clean room, never on the host:
 
@@ -471,7 +471,7 @@ it is stored.
   runs, and nothing after. It reads each `OUT` without following a link the core made, through descriptors of the
   inputs directory taken before the first run, and compares it with the stored vectors on the host. The stored values
   never enter the machine, and only `result.json` crosses back to the clean room, as for a module
-  (`docs/module-abi.md`, section 15, and `docs/cleanroom.md`, "Gate").
+  (`docs/module-abi.md`, section 15).
 
 **How a run can fail.** Each run of a vector gets one of these, and the others of its group still run:
 

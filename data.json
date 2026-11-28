@@ -1,11 +1,11 @@
 {
- "generated": "2026-11-27T23:05:04+00:00",
+ "generated": "2026-11-28T00:05:05+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
   "2": {
    "done": 60,
-   "total": 64
+   "total": 65
   },
   "180": {
    "done": 11,
@@ -303,7 +303,7 @@
    "recordings": 5,
    "spec": "active",
    "spec_pin": null,
-   "impl": "none",
+   "impl": "active",
    "active": true,
    "issue": {
     "number": 1191,
@@ -313,6 +313,13 @@
     "state": "OPEN"
    },
    "prs": [
+    {
+     "number": 55,
+     "title": "Implementer: impl/pathfinding",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/55",
+     "live": true
+    },
     {
      "number": 44,
      "title": "Add: Write the pathfinding spec",

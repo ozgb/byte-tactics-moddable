@@ -275,7 +275,7 @@ manifest per run.
 | `stack_size` | bytes of every module stack | host and checks (the loader checks only that it is a non-negative integer) |
 | `block_base`, `block_size`, `block_max` | the state block: `block_base` needs `block_size` (a `block_size` without `block_base` is ignored, and there is no block); `block_max`, optional, at least `block_size` (the default), is the most the block can grow to | loader |
 | `scratch` | `[base, size]` of the scratch area | loader |
-| `load_data` | `[base, size]` of the load data region, optional: it starts at or above the block's ceiling and the scratch area's end, and fits the memory | loader |
+| `load_data` | `[base, size]` of the load data region, optional: its size is above 0, it starts at or above the block's ceiling and the scratch area's end, and fits the memory | loader |
 | `majors`, `signatures`, `adapters` | section 10 | loader |
 | `modules` | a non-empty list of module entries | loader, required |
 | `tools` | the pinned tool versions: `clang`, `wasm-tools` (game manifest); `clang`, `rustc`, `wasmtime` (fixture manifest) | checks |
@@ -348,7 +348,7 @@ them at start-up (section 13). When a manifest has more than one fault, the load
 - A manifest that is not valid JSON (a number with a fraction or an exponent included, section 4.1) or not an
   object; a required field missing; a value that is not a non-negative integer (`stack_size`, and a module's
   `fuel_budget` and `size_budget`, included); `memory_pages` or `window` zero, or `memory_pages` over 65536; a
-  `fuel_budget` of 0 (section 11.3); a `scratch` or a `load_data` that is not `[base, size]`.
+  `fuel_budget` of 0 (section 11.3); a `scratch` or a `load_data` that is not `[base, size]`, or a `load_data` of size 0.
 - A block that does not fit the memory; a scratch area that does not fit the memory or that passes
   the block base; a load data region that does not fit the memory or that starts below the block's
   ceiling or the scratch area's end.
@@ -703,7 +703,7 @@ signatures are below.
 | `FindSlotByDpid` | `[int] -> int` | returns the lowest slot, 0 to 9, whose network id (as `GetSlotDpid` gives it) is the argument, or 10 when none is or the argument is -1 |
 | `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; `Emit` takes any kind a route carries from that outbox, the same set the native `SchedPublish` delivers; the host refuses, as an import error and in this order, a pointer outside the module memory, a size outside 4 to 128 bytes (an effect holds at least its kind, and at most an inbox entry), an effect that runs past the module memory, a kind not in the entry's `publishes` table, a kind of that table that no route takes from the module's outbox (the checks refuse such a manifest, so only one edited by hand gets this far), and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect exactly as `SchedPublish` does, as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
 
-**A malformed argument changes nothing and does not trap** (ozgb/btm#25). The default modules never pass one, so no
+**A malformed argument changes nothing and does not trap, except as below** (ozgb/btm#25). The default modules never pass one, so no
 recording shows what it does, and this is the contract: an address the import does not trap on (section 7.2) that is not
 what the argument must be, or a number outside its range, makes the call return 0 (null, for an address; `-1` for
 `GetSlotDpid` and `10` for `FindSlotByDpid`, their answers for none) and write nothing. For each service above:

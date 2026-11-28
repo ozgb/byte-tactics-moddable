@@ -254,7 +254,8 @@ counter's initial value, 9223372036854775807, which its calls lower as they burn
 | --- | --- |
 | `manifest_load_data_shape`, `manifest_load_data_negative` | a `load_data` that is not `[base, size]` (one number), or has a negative size: `manifest` |
 | `manifest_layout_load_data_memory`, `manifest_layout_load_data_block`, `manifest_layout_load_data_scratch` | a `load_data` that does not fit the memory, starts below the block's ceiling, or starts below the scratch area's end: `layout` |
-| `manifest_load_data_ok`, `manifest_load_data_empty` | a `load_data` that starts at the block's ceiling, and one of size 0: accepted (`null`) |
+| `manifest_load_data_ok` | a `load_data` that starts at the block's ceiling: accepted (`null`) |
+| `manifest_load_data_empty` | a `load_data` of size 0: `manifest`, a region with no room for a copy |
 | `manifest_order_scratch_load_data` | a scratch area that does not fit the memory with a malformed `load_data`: `layout`, step 3 before step 4 |
 
 **Which error comes first.** When a manifest holds more than one fault, the error is the first fault in this order:
@@ -265,7 +266,7 @@ counter's initial value, 9223372036854775807, which its calls lower as they burn
 2. the block, when `block_base` is present: `block_base` and `block_size` (`manifest`), then `block_max`, then whether
    the block fits the memory (`layout`);
 3. `scratch`: its form (`manifest`), then whether it fits the memory and lies below the block base (`layout`);
-4. `load_data`, when present: its form, `[base, size]` of two non-negative integers (`manifest`), then whether it fits the
+4. `load_data`, when present: its form, `[base, size]` of two non-negative integers with a size above 0 (`manifest`), then whether it fits the
    memory and starts at or above the block's ceiling (`block_base + block_max`) and the scratch area's end (`layout`);
 5. `modules` (`module_entry`), then each entry in the manifest's order, each one whole before the next: an object with
    a name, `data_base` and then `table_base` (missing: `module_entry`; negative: `manifest`), `fuel_budget` and then

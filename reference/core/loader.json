@@ -144,7 +144,7 @@
    ["manifest", "loader/load_data_empty.json"]
   ],
   "results": [
-   ["manifest", null]
+   ["manifest", {"error": "manifest", "modules": []}]
   ]},
  {"name": "manifest_reaches_load_data",
   "calls": [

@@ -304,6 +304,13 @@ class RecordingsRoute(unittest.TestCase):
             self.assertTrue(oraclegate.blocked("a", manifest))
             self.assertFalse(oraclegate.blocked("b", manifest))
 
+    def test_a_malformed_blocked_entry_is_an_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = Path(tmp) / "modules.json"
+            manifest.write_text(json.dumps({"modules": [{"name": "a", "blocked": False}]}))
+            with self.assertRaisesRegex(oraclegate.Error, "blocked must be a reason or true"):
+                oraclegate.blocked("a", manifest)
+
     def test_a_blocked_entry_takes_the_recordings_route(self):
         self.assertTrue(oraclegate.blocked("los_radar"))
         self.assertFalse(oraclegate.blocked("wind_meteors"))

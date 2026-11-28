@@ -110,7 +110,10 @@ def blocked(subsystem: str, manifest: Path = MANIFEST) -> bool:
     """Whether the subsystem's entry of the game manifest is blocked: its default does not build to WASM, so no scenario can load a module of it, and it has no budgets."""
     for entry in json.loads(manifest.read_text())["modules"]:
         if entry["name"] == subsystem:
-            return wasm_modules.is_blocked(entry)
+            try:
+                return wasm_modules.is_blocked(entry)
+            except ValueError as e:
+                raise Error(f"{manifest}: {e}") from None
     raise Error(f"{manifest} has no module {subsystem}")
 
 

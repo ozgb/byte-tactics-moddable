@@ -497,8 +497,8 @@ int wl_load_manifest_text(wl_loader* loader, const char* text, size_t size, cons
     if (load_data) {
         unsigned long long end;
         if (load_data->kind != WL_JSON_ARRAY || wl_json_count(load_data) != 2 || load_data->first->kind != WL_JSON_NUMBER
-            || load_data->first->next->kind != WL_JSON_NUMBER || load_data->first->number < 0 || load_data->first->next->number < 0) {
-            set_error(loader, "%s: load_data must be [base, size]", name);
+            || load_data->first->next->kind != WL_JSON_NUMBER || load_data->first->number < 0 || load_data->first->next->number <= 0) {
+            set_error(loader, "%s: load_data must be [base, size] with a size above 0", name);
             goto bad;
         }
         layout.has_load_data = 1;

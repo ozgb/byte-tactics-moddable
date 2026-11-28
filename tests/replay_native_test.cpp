@@ -2557,7 +2557,13 @@ const char* __stdcall GetNumPlayersSlot()
 
 void __stdcall UpdateFeaturesSlot(void)
 {
-    abort();
+    int types = FeatureTypeCount();
+    for (int k = 0; k < types; k++)
+        AnimateFeatureType(k);
+    ScanFeatureCell();
+    int i = FirstFeatureSpot();
+    while (i != -1)
+        i = UpdateFeatureSpot(i);
 }
 
 void __cdecl UpdateWindSlot(RandStream stream)

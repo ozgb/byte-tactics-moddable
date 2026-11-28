@@ -20538,8 +20538,8 @@ call 709 Apply
   a size 48
   i scripts.ObjectStateSize Object3do#304 = 88
   i services.SimAllocTagged "Object State" 88 = ModelState#1
-  i services.SchedPublish 5 12
-  i services.SchedPublish 5 20
+  i services.Emit (49,ModelState#1,321) 12
+  i services.Emit (50,47,20,2,2) 20
   w Pool#0.usedHead 2
   w Pool#0.freeHead 3
   w Cell#4527.feature 321

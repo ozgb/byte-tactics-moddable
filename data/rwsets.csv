@@ -7490,8 +7490,8 @@ address,function,file,kind,target
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,global_read,g_game
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,global_read,g_seams
 0x423710,ReplaceFeatureWithDead,src/map/features.cpp,indirect_call,"indirect via Cell *(*)(int, int) __attribute__((stdcall)) [LosRadarSeam::GetMapCell]"
+0x4237d0,ReclaimFeature,src/map/features.cpp,call,EconEmitIncome
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,EconHandleOf
-0x4237d0,ReclaimFeature,src/map/features.cpp,call,EconPublish
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,GetFeature
 0x4237d0,ReclaimFeature,src/map/features.cpp,call,KillFeature
 0x4237d0,ReclaimFeature,src/map/features.cpp,field_read,Cell::flags
@@ -47027,6 +47027,14 @@ address,function,file,kind,target
 ,DumpValue,src/harness/harness.cpp,function,
 ,DumpValue,src/harness/harness.cpp,global_read,s_dump@src/harness/harness.cpp
 ,DumpValue,src/harness/harness.cpp,global_read,s_targetNames@src/harness/harness.cpp
+,EconEmitIncome,src/game/economy_events.h,call,EconHeader
+,EconEmitIncome,src/game/economy_events.h,call,EmitFrom
+,EconEmitIncome,src/game/economy_events.h,call,operator=
+,EconEmitIncome,src/game/economy_events.h,field_write,EconomyIncome::energy
+,EconEmitIncome,src/game/economy_events.h,field_write,EconomyIncome::h
+,EconEmitIncome,src/game/economy_events.h,field_write,EconomyIncome::metal
+,EconEmitIncome,src/game/economy_events.h,field_write,EconomyIncome::resources
+,EconEmitIncome,src/game/economy_events.h,function,
 ,EconHandleOf,src/game/economy_events.h,field_read,Ref<Unit>::offset
 ,EconHandleOf,src/game/economy_events.h,function,
 ,EconHeader,src/game/economy_events.h,field_write,EconomyEventHeader::kind
@@ -55025,6 +55033,7 @@ address,function,file,kind,target
 ,HasNextMission,src/frontend/endgame.cpp,global_read,g_seams
 ,HasNextMission,src/frontend/endgame.cpp,indirect_call,indirect via int (*)() __attribute__((stdcall)) [MissionSeam::GetGameType]
 ,HasNextMission,src/frontend/endgame.cpp,indirect_call,indirect via int (*)(int) __attribute__((stdcall)) [MissionSeam::MissionExists]
+,HasPhaseSlot,src/harness/replay_hooks.inc,function,
 ,HasSwitch,src/wasm/modules.cpp,call,_strnicmp
 ,HasSwitch,src/wasm/modules.cpp,call,isspace
 ,HasSwitch,src/wasm/modules.cpp,call,memcpy
@@ -55496,6 +55505,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FeaturesSeam::Place
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FeaturesSeam::ScanFeatureCell
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FeaturesSeam::UpdateFeatureSpot
+,HookSeams,src/harness/replay_hooks.inc,field_write,FeaturesSeam::UpdateFeatures
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FilesSeam::AddArchive
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FilesSeam::BankClose
 ,HookSeams,src/harness/replay_hooks.inc,field_write,FilesSeam::BankGetBoxSize
@@ -55775,6 +55785,7 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFeaturesPlace
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFeaturesScanFeatureCell
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFeaturesUpdateFeatureSpot
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFeaturesUpdateFeatures
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFilesAddArchive
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFilesBankClose
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecFilesBankGetBoxSize
@@ -62656,8 +62667,8 @@ address,function,file,kind,target
 ,PublishDepth::~PublishDepth,src/game/scheduler.cpp,function,
 ,PublishDepth::~PublishDepth,src/game/scheduler.cpp,global_read,s_publishDepth@src/game/scheduler.cpp
 ,PublishDepth::~PublishDepth,src/game/scheduler.cpp,global_write,s_publishDepth@src/game/scheduler.cpp
+,PublishEffect,src/map/features.cpp,call,EmitFrom
 ,PublishEffect,src/map/features.cpp,call,HarnessFeaturesEvent
-,PublishEffect,src/map/features.cpp,call,SchedPublish
 ,PublishEffect,src/map/features.cpp,function,
 ,PublishWindMeteors,src/game/wind_meteors_events.h,call,SchedPublish
 ,PublishWindMeteors,src/game/wind_meteors_events.h,call,memset
@@ -63912,6 +63923,13 @@ address,function,file,kind,target
 ,RecFeaturesUpdateFeatureSpot,src/harness/replay_hooks.inc,global_read,s_inner_features
 ,RecFeaturesUpdateFeatureSpot,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecFeaturesUpdateFeatureSpot,src/harness/replay_hooks.inc,indirect_call,indirect via int (*const)(int) __attribute__((stdcall)) [FeaturesSeam::UpdateFeatureSpot]
+,RecFeaturesUpdateFeatures,src/harness/replay_hooks.inc,call,RecordsPhase
+,RecFeaturesUpdateFeatures,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecFeaturesUpdateFeatures,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecFeaturesUpdateFeatures,src/harness/replay_hooks.inc,field_read,FeaturesSeam::UpdateFeatures
+,RecFeaturesUpdateFeatures,src/harness/replay_hooks.inc,function,
+,RecFeaturesUpdateFeatures,src/harness/replay_hooks.inc,global_read,s_inner_features
+,RecFeaturesUpdateFeatures,src/harness/replay_hooks.inc,indirect_call,indirect via void (*const)() __attribute__((stdcall)) [FeaturesSeam::UpdateFeatures]
 ,RecFilesAddArchive,src/harness/replay_hooks.inc,call,ArgValue
 ,RecFilesAddArchive,src/harness/replay_hooks.inc,call,SlotScope::Open
 ,RecFilesAddArchive,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
@@ -67043,6 +67061,9 @@ address,function,file,kind,target
 ,RecordWhiteSmoke,src/state/sim_effects.h,function,
 ,Recording::Recording,src/harness/replay.cpp,function,
 ,RecordsAlways,src/harness/replay_hooks.inc,function,
+,RecordsPhase,src/harness/replay.cpp,field_read,Recording::phase
+,RecordsPhase,src/harness/replay.cpp,function,
+,RecordsPhase,src/harness/replay.cpp,global_read,s_rec
 ,RectArea,src/harness/display_game.cpp,call,DlCutRect
 ,RectArea,src/harness/display_game.cpp,call,GetDisplay
 ,RectArea,src/harness/display_game.cpp,deref_write,*int
@@ -67439,7 +67460,7 @@ address,function,file,kind,target
 ,ReplayAddCacheLines,src/harness/replay_objects.cpp,field_read,ReplayCacheStart::cur
 ,ReplayAddCacheLines,src/harness/replay_objects.cpp,function,
 ,ReplayAddEffect,src/harness/replay_objects.cpp,call,ReplayAddValue
-,ReplayAddEffect,src/harness/replay_objects.cpp,call,ReplayEventObject
+,ReplayAddEffect,src/harness/replay_objects.cpp,call,ReplayEffectObject
 ,ReplayAddEffect,src/harness/replay_objects.cpp,call,ReplayFail
 ,ReplayAddEffect,src/harness/replay_objects.cpp,call,ReplayText::Add
 ,ReplayAddEffect,src/harness/replay_objects.cpp,call,memcpy
@@ -67988,6 +68009,7 @@ address,function,file,kind,target
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,global_read,kReplayPolyKinds@src/harness/replay_schema.h
+,ReplayConfigure,src/harness/replay.cpp,call,HasPhaseSlot
 ,ReplayConfigure,src/harness/replay.cpp,call,ReplayBeginHook
 ,ReplayConfigure,src/harness/replay.cpp,call,ReplayEndHook
 ,ReplayConfigure,src/harness/replay.cpp,call,ReplayLoadHook
@@ -67999,6 +68021,7 @@ address,function,file,kind,target
 ,ReplayConfigure,src/harness/replay.cpp,field_read,ReplaySubsystem::slotCount
 ,ReplayConfigure,src/harness/replay.cpp,field_write,Recording::first
 ,ReplayConfigure,src/harness/replay.cpp,field_write,Recording::last
+,ReplayConfigure,src/harness/replay.cpp,field_write,Recording::phase
 ,ReplayConfigure,src/harness/replay.cpp,field_write,Recording::windowed
 ,ReplayConfigure,src/harness/replay.cpp,fn_ref,RecordLoad
 ,ReplayConfigure,src/harness/replay.cpp,fn_ref,ReplayImportBegin
@@ -68018,6 +68041,14 @@ address,function,file,kind,target
 ,ReplayDeltaTable,src/harness/replay_objects.cpp,function,
 ,ReplayEachFace,src/harness/replay_objects.cpp,call,WalkFaces
 ,ReplayEachFace,src/harness/replay_objects.cpp,function,
+,ReplayEffectObject,src/harness/replay_objects.cpp,field_read,ReplayEventKind::kind
+,ReplayEffectObject,src/harness/replay_objects.cpp,field_read,ReplayEventKind::object
+,ReplayEffectObject,src/harness/replay_objects.cpp,field_read,ReplayEventTable::count
+,ReplayEffectObject,src/harness/replay_objects.cpp,field_read,ReplayEventTable::first
+,ReplayEffectObject,src/harness/replay_objects.cpp,field_read,ReplayEventTable::header
+,ReplayEffectObject,src/harness/replay_objects.cpp,function,
+,ReplayEffectObject,src/harness/replay_objects.cpp,global_read,kReplayEventKinds@src/harness/replay_schema.h
+,ReplayEffectObject,src/harness/replay_objects.cpp,global_read,kReplayEventTables@src/harness/replay_schema.h
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,EmitArray
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,EmitCStrings
 ,ReplayEmitField,src/harness/replay_objects.cpp,call,EmitRefs

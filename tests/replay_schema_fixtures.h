@@ -3521,9 +3521,9 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "pos1", offsetof(FeaturesReclaim, pos[1]), sizeof(((FeaturesReclaim*)nullptr)->pos[1]), ROK_FEATURESRECLAIM, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "pos2", offsetof(FeaturesReclaim, pos[2]), sizeof(((FeaturesReclaim*)nullptr)->pos[2]), ROK_FEATURESRECLAIM, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(FeaturesFreeState, h.kind), sizeof(((FeaturesFreeState*)nullptr)->h.kind), ROK_FEATURESFREESTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "state", offsetof(FeaturesFreeState, state), sizeof(((FeaturesFreeState*)nullptr)->state), ROK_FEATURESFREESTATE, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "state", offsetof(FeaturesFreeState, state), sizeof(((FeaturesFreeState*)nullptr)->state), ROK_FEATURESFREESTATE, RK_REF, ROK_MODELSTATE, 0, 0, {}, 0, 0 },
     { "kind", offsetof(FeaturesInitState, h.kind), sizeof(((FeaturesInitState*)nullptr)->h.kind), ROK_FEATURESINITSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
-    { "state", offsetof(FeaturesInitState, state), sizeof(((FeaturesInitState*)nullptr)->state), ROK_FEATURESINITSTATE, RK_U32, 0, 0, 0, {}, 0, 0 },
+    { "state", offsetof(FeaturesInitState, state), sizeof(((FeaturesInitState*)nullptr)->state), ROK_FEATURESINITSTATE, RK_REF, ROK_MODELSTATE, 0, 0, {}, 0, 0 },
     { "feature", offsetof(FeaturesInitState, feature), sizeof(((FeaturesInitState*)nullptr)->feature), ROK_FEATURESINITSTATE, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "kind", offsetof(FeaturesPassMaps, h.kind), sizeof(((FeaturesPassMaps*)nullptr)->h.kind), ROK_FEATURESPASSMAPS, RK_I32, 0, 0, 0, {}, 0, 0 },
     { "x", offsetof(FeaturesPassMaps, x), sizeof(((FeaturesPassMaps*)nullptr)->x), ROK_FEATURESPASSMAPS, RK_I32, 0, 0, 0, {}, 0, 0 },
@@ -3653,7 +3653,7 @@ static const ReplayObjectField kReplayObjectFields[] = {
     { "mark", offsetof(FixtureLap, mark), sizeof(((FixtureLap*)nullptr)->mark), ROK_FIXTURELAP, RK_I16, 0, 0, 0, {}, 0, 0 },
 };
 static const unsigned kReplayObjectFieldCount = 1894;
-static const unsigned kReplayWalkableFieldCount = 316;
+static const unsigned kReplayWalkableFieldCount = 318;
 
 static const unsigned short kReplayReachFields[] = { 53, 108, 287, 288, 289, 1021, 481, 489, 1022, 97, 106, 0, 22, 108, 290, 137, 143, 146, 150, 151, 154, 155, 159, 162, 163, 164, 169, 170, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 103, 1798, 45, 48, 49, 50, 52, 54, 74, 97, 103, 105, 106, 107, 109, 110, 111, 112, 113, 66, 145, 150, 160, 164, 174, 188, 175, 176, 159, 177, 0, 22, 97, 105, 45, 53, 109, 111, 150 };
 
@@ -5704,6 +5704,7 @@ enum ReplaySlotId {
     RSL_ECONOMY_REQUESTGRANTED,
     RSL_ECONOMY_GETENERGYUSE,
     RSL_ECONOMY_UNITACCOUNT,
+    RSL_FEATURES_UPDATEFEATURES,
     RSL_FEATURES_GETCELLFEATURE,
     RSL_FEATURES_GETFOOTPRINTCENTRE,
     RSL_FEATURES_APPLY,
@@ -6026,6 +6027,11 @@ static const unsigned char kReplayEconomyGetEnergyUseReads[] = { 94 };
 static const unsigned char kReplayEconomyGetEnergyUseWrites[] = { 94 };
 static const unsigned char kReplayEconomyUnitAccountReads[] = { 94 };
 static const unsigned char kReplayEconomyUnitAccountWrites[] = { 94 };
+static const unsigned short kReplayFeaturesUpdateFeaturesAllOf[] = { ROK_CELL, ROK_FEATURE, ROK_SPOT, ROK_POOL };
+static const unsigned char kReplayFeaturesUpdateFeaturesReads[] = { 0, 1, 2, 5, 7, 17, 19, 28, 37, 91, 92, 93 };
+static const unsigned char kReplayFeaturesUpdateFeaturesWrites[] = { 37, 91, 92, 93 };
+static const unsigned short kReplayFeaturesUpdateFeaturesObjReads[] = { 48, 49, 264, 266, 269, 270, 271, 272, 275, 445, 446, 447, 448, 459, 462, 463, 468, 469, 474, 475, 476, 477, 481, 482, 483, 485, 486, 487, 488, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 503, 504, 505, 506, 507, 509, 510, 511, 1022 };
+static const unsigned short kReplayFeaturesUpdateFeaturesObjWrites[] = { 269, 270, 271, 272, 275, 474, 475, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 502, 503, 504, 505, 506, 509, 510, 511 };
 static const unsigned char kReplayFeaturesGetCellFeatureReads[] = { 1, 2 };
 static const unsigned short kReplayFeaturesGetCellFeatureObjReads[] = { 269, 270, 271 };
 static const unsigned short kReplayFeaturesGetFootprintCentreObjReads[] = { 48, 49, 462 };
@@ -6497,6 +6503,7 @@ static const ReplaySlotSets kReplaySlots[] = {
     { "RequestGranted", SUB_ECONOMY, kReplayEconomyRequestGrantedReads, 1, kReplayEconomyRequestGrantedWrites, 1, kReplayEconomyRequestGrantedObjReads, 2, nullptr, 0, nullptr, 0 },
     { "GetEnergyUse", SUB_ECONOMY, kReplayEconomyGetEnergyUseReads, 1, kReplayEconomyGetEnergyUseWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
     { "UnitAccount", SUB_ECONOMY, kReplayEconomyUnitAccountReads, 1, kReplayEconomyUnitAccountWrites, 1, nullptr, 0, nullptr, 0, nullptr, 0 },
+    { "UpdateFeatures", SUB_FEATURES, kReplayFeaturesUpdateFeaturesReads, 12, kReplayFeaturesUpdateFeaturesWrites, 4, kReplayFeaturesUpdateFeaturesObjReads, 50, kReplayFeaturesUpdateFeaturesObjWrites, 27, kReplayFeaturesUpdateFeaturesAllOf, 4 },
     { "GetCellFeature", SUB_FEATURES, kReplayFeaturesGetCellFeatureReads, 2, nullptr, 0, kReplayFeaturesGetCellFeatureObjReads, 3, nullptr, 0, nullptr, 0 },
     { "GetFootprintCentre", SUB_FEATURES, nullptr, 0, nullptr, 0, kReplayFeaturesGetFootprintCentreObjReads, 3, nullptr, 0, nullptr, 0 },
     { "Apply", SUB_FEATURES, kReplayFeaturesApplyReads, 8, kReplayFeaturesApplyWrites, 3, kReplayFeaturesApplyObjReads, 46, kReplayFeaturesApplyObjWrites, 22, kReplayFeaturesApplyAllOf, 5 },
@@ -6787,23 +6794,23 @@ static const unsigned kReplayKindSetCount = 1;
 static const ReplaySubsystem kReplaySubsystems[] = {
     { "wind_meteors", 3, 1, 1, 0, 8, RET_WIND_METEORS, 0, 0 },
     { "economy", 5, 0, 1, 8, 11, RET_ECONOMY, 0, 0 },
-    { "features", 5, 1, 1, 19, 10, RET_FEATURES, 0, 0 },
-    { "ai", 6, 1, 1, 29, 11, RET_AI, 0, 0 },
-    { "pathfinding", 4, 1, 1, 40, 8, RET_COUNT, 0, 0 },
-    { "weapons", 4, 0, 1, 48, 9, RET_WEAPONS, 0, 0 },
-    { "targeting", 4, 0, 1, 57, 7, RET_TARGETING, 0, 0 },
-    { "los_radar", 5, 1, 1, 64, 22, RET_LOS_RADAR, 0, 0 },
-    { "orders", 6, 2, 1, 86, 7, RET_ORDERS, 1, 1 },
-    { "units", 7, 2, 1, 93, 22, RET_UNITS, 1, 0 },
-    { "players", 5, 4, 1, 115, 9, RET_PLAYERS, 0, 0 },
-    { "map", 9, 2, 1, 124, 11, RET_MAP, 0, 0 },
-    { "scripts", 3, 0, 1, 135, 13, RET_SCRIPTS, 0, 0 },
-    { "movement", 5, 0, 1, 148, 13, RET_MOVEMENT, 1, 0 },
-    { "mission", 2, 0, 1, 161, 12, RET_COUNT, 0, 0 },
-    { "files", 3, 0, 0, 173, 58, RET_COUNT, 0, 0 },
-    { "network", 2, 0, 0, 231, 22, RET_COUNT, 0, 0 },
-    { "econworld", 5, 0, 1, 253, 0, RET_COUNT, 0, 0 },
-    { "pathworld", 4, 1, 1, 253, 0, RET_COUNT, 0, 0 },
+    { "features", 5, 1, 1, 19, 11, RET_FEATURES, 0, 0 },
+    { "ai", 6, 1, 1, 30, 11, RET_AI, 0, 0 },
+    { "pathfinding", 4, 1, 1, 41, 8, RET_COUNT, 0, 0 },
+    { "weapons", 4, 0, 1, 49, 9, RET_WEAPONS, 0, 0 },
+    { "targeting", 4, 0, 1, 58, 7, RET_TARGETING, 0, 0 },
+    { "los_radar", 5, 1, 1, 65, 22, RET_LOS_RADAR, 0, 0 },
+    { "orders", 6, 2, 1, 87, 7, RET_ORDERS, 1, 1 },
+    { "units", 7, 2, 1, 94, 22, RET_UNITS, 1, 0 },
+    { "players", 5, 4, 1, 116, 9, RET_PLAYERS, 0, 0 },
+    { "map", 9, 2, 1, 125, 11, RET_MAP, 0, 0 },
+    { "scripts", 3, 0, 1, 136, 13, RET_SCRIPTS, 0, 0 },
+    { "movement", 5, 0, 1, 149, 13, RET_MOVEMENT, 1, 0 },
+    { "mission", 2, 0, 1, 162, 12, RET_COUNT, 0, 0 },
+    { "files", 3, 0, 0, 174, 58, RET_COUNT, 0, 0 },
+    { "network", 2, 0, 0, 232, 22, RET_COUNT, 0, 0 },
+    { "econworld", 5, 0, 1, 254, 0, RET_COUNT, 0, 0 },
+    { "pathworld", 4, 1, 1, 254, 0, RET_COUNT, 0, 0 },
 };
 static const unsigned kReplaySubsystemCount = SUB_COUNT;
 

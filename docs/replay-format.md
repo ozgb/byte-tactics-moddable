@@ -12,11 +12,15 @@ A recording does not depend on the module mode: the same file comes from `-modul
 
 A scenario line `record <subsystem>` makes the run write `replay-<subsystem>.txt` when it ends without
 failure, at its last tick or when the game leaves through its own exit menu (`ui-dialogs`), so the calls of the match's
-unload (`Shutdown`) are in the file. `record <subsystem> <first tick> <last tick>` records only the calls whose tick is in the window.
+unload (`Shutdown`) are in the file. `record <subsystem> <first tick> <last tick>` records only the calls whose tick is in the window (tick 0 holds the
+calls the match load makes, such as the features the map places). A `phase` at the end of the line, `record features phase` or
+`record features 1 20 phase`, records the subsystem's phase driver whole (see The phase driver).
 Every simulation subsystem (the members of `Seams`) is accepted, and a scenario may carry several `record` lines,
 one per subsystem, each with its own file and window. `tools/replay.py` adds the lines to copies of the
 scenarios; `reference/scenarios/` never holds them. A stored recording that covers only a window is listed in
-`tests/replay/windows.json` (`"<subsystem>/<scenario>": [first, last]`), and `--check` records it with that window.
+`tests/replay/windows.json` (`"<subsystem>/<scenario>": [first, last]`), and `--check` records it with that window. A
+stored recording of the phase driver is listed in `tests/replay/phases.json` (`["<subsystem>/<scenario>"]`), and `--check`
+records it with `phase`; `--record --phase` records every scenario it plays that way.
 
 ```sh
 uv run tools/replay.py --record --exe build/modern/TotalA.exe --out DIR [--subsystem NAME]... [--native-modules] [SCENARIO...]
@@ -40,8 +44,8 @@ subsystem is not recorded", when such a call happens.
 
 A subsystem that only a network game reaches (`UpdateResourceSharing` returns unless `Game.netGameFlags` bit 0 is set, and a
 transfer needs a remote partner) is recorded in a play-test instead of a scenario. A normal run (no `-testmode`) of an exe built
-from this tree takes the switch `-record <subsystem>[:<first tick>:<last tick>]`, which does what the `record` line does (the
-window is optional) and writes `replay-<subsystem>.txt` when the game exits through its main loop. A run without the switch is
+from this tree takes the switch `-record <subsystem>[:<first tick>:<last tick>][:phase]`, which does what the `record` line does (the
+window and `phase` are optional) and writes `replay-<subsystem>.txt` when the game exits through its main loop. A run without the switch is
 unchanged. The play-test passes it to instance 1:
 
 ```sh
@@ -692,8 +696,10 @@ of a struct of the module's interface header, and for one named twice.
 
 The `Emit` service, which a module calls to publish an effect, is one `value` followed by the `size` as an `int`
 (`i services.Emit (80,227,136162080,88473600,172703296,-139810,-983040,139810,1) 36`). The value is the payload as the
-value of the payload struct of the effect's kind in the recorded subsystem's event table, chosen by the kind (the effect's first
-`int`). It is made from the first `size` bytes of the effect, the rest zero (the annotation's `size` names the argument), so a
+value of the payload struct of the effect's kind, chosen by the kind (the effect's first `int`) in the event table that holds it:
+the recorded subsystem's own, or another subsystem's for an effect routed there, such as the INCOME effect features publishes
+to economy (`i services.Emit (4,0,Unit#1,1,f32:0x437a0000,f32:0x00000000) 24`). A kind is in one table only, which
+`replayschema.py` checks. It is made from the first `size` bytes of the effect, the rest zero (the annotation's `size` names the argument), so a
 shorter effect is never read past its end.
 
 ## Polymorphic objects
@@ -1474,6 +1480,18 @@ outside one writes nothing. The generated `unrecorded` entry of the subsystem li
 replayer's native table keeps its `native` symbol in place. The tool rejects `"record": false` with no `"reason"` and a
 `"reason"` on a recorded slot.
 
+### The phase driver
+
+A slot the scheduler calls once a tick and that only calls other slots of its subsystem in order is a phase driver. It is annotated
+`"phase"` with the slots it calls, in order: features' `UpdateFeatures` is
+`"phase": ["FeatureTypeCount", "AnimateFeatureType", "ScanFeatureCell", "FirstFeatureSpot", "UpdateFeatureSpot"]`. The tool makes it a
+recorded slot with no argument and no result, whose functions and read and write sets are the union of the slots it names, and
+rejects a `phase` on a slot with arguments or a result, and one that names a slot of another subsystem, an unrecorded slot or
+another phase driver. A run records it only when its `record` line ends in `phase`: then each tick is one `call <tick>
+UpdateFeatures` line, and the slots it calls are inside it, so their imports and writes are the driver's. In any other run the
+driver writes no line and the slots it calls are recorded on their own, as before. A module replays the phase recording through
+its own driver, and the native replayer through the native slots in the same order.
+
 `uv run tools/replayschema.py` also writes the recorder's tables, the recording copy of every seam table with its argument
 hooks and the import hooks, and the slot runners, import stubs and native seam tables of the replayer. The services imports (`GameRand`, `RandomInt`, `FatalError`, `BuildDataPath`, the TDF and command classes) are the `services`
 annotation: each entry names its declaration, in `interfaces/services.h` or in the engine header that holds the services no
@@ -1667,17 +1685,18 @@ targeting:
 
 features:
 
-- `Apply` of REMOVE and `Place`: no recorded window removes a feature by event or places one through the synchronous slot. Placing a feature is reached through `Apply` of PLACE (`orders-air-fights`, a model with a spot), and removing one through the replacement of a dead feature.
-- The start of a fire and the burning half of `UpdateFeatureSpot` (the smoke, the spread, the burn-out), and `ScanFeatureCell` seeding a feature: no recorded window holds a flamable feature hit by a fire-starting weapon, and no feature of these maps has a seed chance above 0.
+- `ScanFeatureCell` seeding a feature: a scan seeds only when its draw of 100 is below the type's `reproduce` chance, and every feature type of 3.1c has `reproduce` 0 (each `Feature#N.seedChance` the recordings read is 0), so no scan can seed. The scans that draw are in `edges-targeting-lead`.
+- The burning half and the fall of a model in `UpdateFeatureSpot` as a slot of its own: `edges-targeting-lead`, which holds them, is the phase recording, so they are in its `UpdateFeatures` calls.
 - The network branches of the feature damage and the reclaim (`Game.netGameFlags`-dependent game type 3, `network.SendFeatureReclaimed`): the recordings are of games of type 2.
-- `FreeFeaturePool` and the other load slots (`LoadFeatureFileList`, `FreeFeatureFileList`, `NopAfterFeatureEnum`, `ResolveFeatureLinks`, `InitFeatureAnimPool`, `PlaceMissionFeatures`, `StampFeatureMetal`, `FindOrLoadFeatureType`, `LoadFeatures`) are `load class`; `SaveFeatures` is a query of a saved game, outside the tick; `UpdateFeatures` is the scheduler's phase driver, which calls the slots below it, each recorded on its own.
+- `FreeFeaturePool` and the other load slots (`LoadFeatureFileList`, `FreeFeatureFileList`, `NopAfterFeatureEnum`, `ResolveFeatureLinks`, `InitFeatureAnimPool`, `PlaceMissionFeatures`, `StampFeatureMetal`, `FindOrLoadFeatureType`, `LoadFeatures`) are `load class`; `SaveFeatures` is a query of a saved game, outside the tick.
 
 mission:
 
-- `GetMissionIndex` and `HasMissionName` are recorded slots that no committed recording calls (the campaign menus ask for them, not a match). `MissionExists` is `unrecorded`: it reads the campaign file through `TdfFile`.
+- `GetMissionIndex` is a recorded slot that no scenario reaches: its two callers (`CollectEndGameStats` of game type 1, and the restart in `build_placement.cpp`) run when the game leaves a match, and a test-mode run ends at game over or leaves the program, never through the end screen or a campaign restart. A scenario could reach the restart through F2, the exit menu's Restart and the restart dialog (`options.cpp`), but the game then returns to the campaign menu, which a run can only leave by driving that menu's frames to its end (a new scenario, with the reference traces that go with it). `HasMissionName` is the same: its four callers are the multiplayer map selector and battle room (`multi.cpp`), which need the network lobby that no scenario covers. `MissionExists` is `unrecorded`: it reads the campaign file through `TdfFile`.
 - Every slot that loads or frees a mission (`SetMissionType`, `FreeOtaEnumCacheAndMission`, `LoadCampaign`, `LoadMissionByName`, `RefreshMapList`, `SelectMission`, `AdvanceMission`, `SelectSchema`, `SetMissionUnitPosition`) is `load class`; they build the mission's record from the map's files and the TDF parser, which the recording would have to hold as services.
 - `GetCampaignName`, `GetCampaignMissionName`, `CountMissions`, `GetBriefing`, `GetDescription`, `GetPlanet`, `GetTerrainSizeTier`, `GetTranslatedName`, `GetMemory`, `GetNumPlayers`, `GetTerrainLength` and `ComputeMapChecksum` are unrecorded ("a query no match makes: it serves the menus and the map list"): they read the names and the map list of the menus, and no scenario reaches them in a match (`data/coverage.csv`: `menu`, `campaign-menu`, `map-check`).
-- `GetMissionUnit` and `GetMissionFeature` with an index past the count (result 0, the out struct untouched): the callers loop to the count.
+- `GetMissionUnit` and `GetMissionFeature` with an index past the count (result 0, the out struct untouched): no engine caller passes one. `CreateMissionUnits` loops to `CountMissionUnits`, `FindMissionUnit` clamps its count to it and `PlaceMissionFeatures` loops to `CountMissionFeatures`, so 3.1c has no behaviour there to conform to. `GetNameSlot` with an index outside 0 to 8 is the same: every caller passes a literal from 0 to 8 (`names` holds 9).
+- `GetStartPosition` with no matching rule (result 0, the out struct untouched): all 225 campaign missions of the install have a start position 0, so `CenterCameraOnStartPosition` always finds one (game type 1 recordings return 1); `SpawnCommanderAtStartPos` ends in `FatalError` on a miss, which ends the run before it writes a recording; and the game type 3 spawn in `game_load.cpp` is always given a position the map has, since a map with fewer start positions than slots exits the scenario with status 2.
 
 weapons:
 
@@ -1916,12 +1935,14 @@ of a chain are recorded whole before a cell's `occupant` reaches them with a lim
 wine build/modern/replay_inject_test.exe --expect 404 "import 1 los_radar.GetMapCell" tests/replay/features/commander-death.txt
 ```
 
-The recordings of features 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), each in a window of ticks. The first call that names a field of `Cell` writes it for every cell of the table (about 43 KB of each file, as runs), and the first that names a `Feature` or a `Spot` every element of those tables:
+The recordings of features 5.0, which the modern build runs as native code in every mode (it has no WASM module yet), each in a window of ticks but one. The first call that names a field of `Cell` writes it for every cell of the table (about 43 KB of each file, as runs), and the first that names a `Feature` or a `Spot` every element of those tables. Its effects are `services.Emit` lines with their payload: FREE_STATE and INIT_STATE name the piece state (`ModelState#1`), PASS_MAPS and AREA_DAMAGE are numbers, and the INCOME of a reclaim is economy's payload.
 
-- `commander-death`, ticks 181 to 186 (2,637 calls): the death of the commander at tick 182 is 30 DAMAGE events (`Apply`: 29 kill their feature, outcome 1, and one does not), each kill places a spot with the death animation (`services.InitGafSequence`, `los_radar.GetMapCell`, the pool's lists and the cell's flags written), then `UpdateFeatureSpot` (145 calls, `services.StepGafSequence`) walks the used list, and the phase's `FeatureTypeCount`, `AnimateFeatureType` (399 types a tick), `ScanFeatureCell`, `FirstFeatureSpot` and `GetCellFeature` are called every tick.
-- `orders-air-fights`, ticks 708 to 713 (2,435 calls; `Apply`: 2 DAMAGE and 1 PLACE, all outcome 1): DAMAGE at tick 709 that kill features, and a PLACE of a feature with a model (`FEATURES_HAS_POS | FEATURES_HAS_ROT`, a spot with its piece state: `scripts.ObjectStateSize`, `services.SimAllocTagged "Object State"`, and the INIT_STATE and PASS_MAPS effects through `services.SchedPublish`), and 11 `UpdateFeatureSpot` calls.
-- `orders-reclaim-feature`, ticks 243 to 248 (2,425 calls; `Apply`: 1 RECLAIM, outcome 1): the commander reclaims the tree the console placed. `FindFeatureAtPos` (the reclaim order's check, every other tick: `cell` and `size` written, and, as it reads the cell `los_radar.GetMapCell` gives and the cell its offsets lead to, all-of over `Cell`), then at tick 245 RECLAIM names the unit (`a event.unit Unit#1`) and the position: two INCOME effects through `services.SchedPublish`, the kill of the feature with its reclaim spot (`services.InitGafSequence`), and `mission.GetGameType`; then `UpdateFeatureSpot` steps the spot.
-- `console-features`, ticks 89 to 92 (1,614 calls): the REMOVE_ALL of `+burnall` at tick 90 (`Apply`, outcome 1).
+- `commander-death`, ticks 181 to 250 (30,168 calls): the death of the commander at tick 182 is 30 DAMAGE events (`Apply`: 29 kill their feature, outcome 1, and one does not), each kill places a spot with the death animation (`services.InitGafSequence`, `los_radar.GetMapCell`, the pool's lists and the cell's flags written), then `UpdateFeatureSpot` (1,884 calls, `services.StepGafSequence`) walks the used list until the death animations end at ticks 241 and 250, where each spot is replaced by its dead feature (`los_radar.GetMapCell` and the PASS_MAPS effects), and the phase's `FeatureTypeCount`, `AnimateFeatureType` (399 types a tick), `ScanFeatureCell`, `FirstFeatureSpot` and `GetCellFeature` are called every tick.
+- `orders-air-fights`, ticks 708 to 713 (2,435 calls; `Apply`: 2 DAMAGE and 1 PLACE, all outcome 1): DAMAGE at tick 709 that kill features, and a PLACE of a feature with a model (`FEATURES_HAS_POS | FEATURES_HAS_ROT`, a spot with its piece state: `scripts.ObjectStateSize`, `services.SimAllocTagged "Object State"`, and the INIT_STATE and PASS_MAPS effects, `i services.Emit (49,ModelState#1,321) 12`), and 11 `UpdateFeatureSpot` calls.
+- `orders-reclaim-feature`, ticks 243 to 248 (2,425 calls; `Apply`: 1 RECLAIM, outcome 1): the commander reclaims the tree the console placed. `FindFeatureAtPos` (the reclaim order's check, every other tick: `cell` and `size` written, and, as it reads the cell `los_radar.GetMapCell` gives and the cell its offsets lead to, all-of over `Cell`), then at tick 245 RECLAIM names the unit (`a event.unit Unit#1`) and the position: two INCOME effects (`i services.Emit (4,0,Unit#1,1,f32:0x437a0000,f32:0x00000000) 24` and the metal one), the kill of the feature with its reclaim spot (`services.InitGafSequence`), and `mission.GetGameType`; then `UpdateFeatureSpot` steps the spot.
+- `console-features`, ticks 40 to 92 (21,367 calls; `Apply`: 1 REMOVE, 1 PLACE and 1 REMOVE_ALL): the `+burnone` of tick 40 is a REMOVE with `force` 1 (`a event.force 1`), which clears the cell and the spots and emits its effect, the `+feature Tree1` of tick 50 a PLACE, and the `+burnall` of tick 90 a REMOVE_ALL (outcome 1); the phase's slots run every tick between them.
+- `mission-build-unit`, ticks 0 to 1 (479 calls): the 131 PLACE events of the match load at tick 0 (`Apply`), among them a geothermal vent (`a event.feature 16`, with its ground height and `services.RecordSimEvent 10`), and at tick 1 the phase's slots, with `AnimateFeatureType` stepping the vent's animation (`services.StepGafSequence Feature#16.anim`).
+- `edges-targeting-lead`, the whole run with `phase` (`tests/replay/phases.json`; 3,205 calls): `UpdateFeatures` at each of the 1,300 ticks, the 550 PLACE events of tick 0 and 11 DAMAGE events. The DAMAGE at tick 116 sets a tree on fire (`services.RandomInt`, `network.SendFeatureBurning`); the phase then burns it (the smoke every third tick: `services.GetGafSequenceFrame`, `services.GameRand`, `map.GetGroundHeight`, `services.RecordSimEvent`), spreads the fire at tick 261 (the AREA_DAMAGE effect and a second fire) and burns both out at ticks 307 and 453 (the burnt feature placed, PASS_MAPS). A death animation ends at tick 522, and the scans draw from tick 322 (`services.RandomInt`). `Place` (9 calls, from tick 161) places the corpses of units that die over water (`FEATURES_HAS_POS | FEATURES_HAS_ROT | FEATURES_SINK`), each a model with its piece state, which the phase lets fall to the ground (`map.GetCellMeanHeight`).
 
 `replay_inject_test.exe` is also built with the start-shift injection of 15 (the 16 of `rules[i].x << 16` in `Mission::GetStartPosition`), and the divergence is reported at call 239 of `console-ilose` and at `out.x` (recorded 36700160, replayed 18350080):
 

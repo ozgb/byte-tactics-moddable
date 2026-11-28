@@ -221,7 +221,8 @@ the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `re
 `reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it, as do the kits at `interfaces-v67` and
 `interfaces-v68`, the kit at `interfaces-v69`, on the commit of `reference-traces-v56`, pairs with it, as does the kit at `interfaces-v70`,
 and the kit at `interfaces-v71`, on the commit of `reference-traces-v57`, pairs with it, as do the kits at `interfaces-v72` and
-`interfaces-v73`, and the kits at `interfaces-v74`, `interfaces-v75` and `interfaces-v78`, on the commit of `reference-traces-v58`, pair with it.
+`interfaces-v73`, and the kits at `interfaces-v74` and `interfaces-v75`, on the commit of `reference-traces-v58`, pair with it, as do
+the kits at `interfaces-v76` and `interfaces-v78`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.

@@ -587,7 +587,7 @@ behaviour is the contract the existing module was built against.
   pointer argument is checked to lie in the memory, a `handle` one to be live, and an argument the callee writes a pointer
   through has that pointer turned back into an address.
 - **Publishing.** The host hands an `Emit` to the scheduler as the subsystem's native default publishes the same kind:
-  wind_meteors and targeting as an effect (their recordings' `services.Emit` lines), every other module as a publish of
+  wind_meteors, targeting and features as an effect (their recordings' `services.Emit` lines), every other module as a publish of
   its outbox (their recordings' `services.SchedPublish` lines, with the outbox and the size), so a replay compares a
   module's `Emit` with the line its recording has.
 

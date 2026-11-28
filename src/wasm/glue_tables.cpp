@@ -799,7 +799,7 @@ void FeaturesTimeNative()
     g_seams.features = &s_featuresTimed;
 }
 
-const GlueModuleDef kFeaturesDef = {"features", SCHED_FEATURES, kFeaturesSlots, 11, s_featuresFuncs, s_featuresTiming, FeaturesUseSeam, FeaturesTimeNative, 1, 1};
+const GlueModuleDef kFeaturesDef = {"features", SCHED_FEATURES, kFeaturesSlots, 11, s_featuresFuncs, s_featuresTiming, FeaturesUseSeam, FeaturesTimeNative, 1, 0};
 GlueModule s_featuresGlue = {&kFeaturesDef};
 
 const char* const kAiSlots[] = {

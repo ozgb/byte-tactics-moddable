@@ -19245,8 +19245,8 @@ call 245 Apply
   o Cell#3624.metal 3
   i los_radar.GetMapCell 40 16 = Cell#3624
   o Cell#3624.metal 3
-  i services.SchedPublish 5 24
-  i services.SchedPublish 5 24
+  i services.Emit (4,0,Unit#1,1,f32:0x437a0000,f32:0x00000000) 24
+  i services.Emit (4,0,Unit#1,2,f32:0x00000000,f32:0x00000000) 24
   i los_radar.GetMapCell 40 16 = Cell#3624
   o Cell#3624.metal 3
   i services.InitGafSequence Spot#0.anim FrameTable#3 0

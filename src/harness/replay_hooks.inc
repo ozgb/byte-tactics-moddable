@@ -303,6 +303,17 @@ void __stdcall RecEconomyUnitAccount(EconUnit a0, EconAccount* a1)
     }
 }
 
+void __stdcall RecFeaturesUpdateFeatures()
+{
+    ReplayRoots roots;
+    SlotScope scope(RSL_FEATURES_UPDATEFEATURES, SUB_FEATURES, roots, RecordsPhase(SUB_FEATURES));
+    if (scope.Open()) {
+    }
+    s_inner_features->UpdateFeatures();
+    if (scope.Open()) {
+    }
+}
+
 unsigned short __stdcall RecFeaturesGetCellFeature(Cell* a0)
 {
     ReplayRoots roots;
@@ -6080,6 +6091,8 @@ void HookSeams(const bool* on)
         s_rec_economy.GetEnergyUse = RecEconomyGetEnergyUse;
     if (on[SUB_ECONOMY])
         s_rec_economy.UnitAccount = RecEconomyUnitAccount;
+    if (on[SUB_FEATURES])
+        s_rec_features.UpdateFeatures = RecFeaturesUpdateFeatures;
     if (on[SUB_FEATURES] || on[SUB_ORDERS] || on[SUB_MAP])
         s_rec_features.GetCellFeature = RecFeaturesGetCellFeature;
     if (on[SUB_FEATURES] || on[SUB_WEAPONS])
@@ -6650,4 +6663,9 @@ bool RecordsAlways(unsigned slot)
     if (slot == RSL_PLAYERS_REGIONSIZE || slot == RSL_PLAYERS_INIT)
         return true;
     return false;
+}
+
+bool HasPhaseSlot(unsigned sub)
+{
+    return sub == SUB_FEATURES;
 }

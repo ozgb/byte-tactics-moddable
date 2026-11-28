@@ -211,8 +211,13 @@ def with_events(ann: dict) -> dict:
     ann = copy.deepcopy(ann)
     ann["events"] = {}
     refs = event_refs(ann)
+    owners: dict[int, str] = {}
     for sub, spec in EVENTS.items():
         check_event_kinds(sub, spec["kinds"])
+        for kind in spec["kinds"]:
+            if kind in owners:
+                raise Error("the event kind %d is a kind of both %s and %s: an effect is written by the table that holds its kind" % (kind, owners[kind], sub))
+            owners[kind] = sub
         structs = interface_structs(sub)
         for name in dict.fromkeys([spec["header"]] + [x for x in spec["kinds"].values() if x]):
             if name not in structs:
@@ -1365,6 +1370,21 @@ def resolve_conditions(ann: dict, object_fields: list, object_index: dict) -> li
     return errors
 
 
+def check_phase(where: str, phase, slot: dict, names: list[str], notes: dict) -> list[str]:
+    """Errors for `phase`: the phase driver takes no argument and returns nothing, and names the recorded slots of its subsystem it calls, in order."""
+    if not isinstance(phase, list) or not phase or not all(isinstance(n, str) for n in phase):
+        return ["%s: `phase` lists the slots the phase driver calls" % where]
+    errors = []
+    if slot["params"] or slot["ret"] != "void":
+        errors.append("%s: a phase driver takes no argument and returns nothing" % where)
+    for n in phase:
+        if n not in names or n == slot["name"]:
+            errors.append("%s: `phase` names %s, which is no other slot of the interface" % (where, n))
+        elif notes.get(n, {}).get("record") is False or "phase" in notes.get(n, {}):
+            errors.append("%s: `phase` names %s, which is no recorded slot" % (where, n))
+    return errors
+
+
 def functions_of(slot: dict, subsystem: str, assignment: dict[str, list[str]], note: dict) -> list[str]:
     if "functions" in note:
         return note["functions"]
@@ -2094,7 +2114,14 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
                     if "%s.%s" % (sub, s["name"]) not in imported_any:
                         continue
             skipped = s["name"] in unrecorded
-            functions = [] if skipped else functions_of(s, sub, assignment, note)
+            phase = None if skipped else note.get("phase")
+            if phase is not None:
+                errors += check_phase("%s.%s" % (sub, s["name"]), phase, s, names, notes)
+                phase_notes = [notes.get(n, {}) for n in phase if isinstance(phase, list) and n in names]
+                functions = list(dict.fromkeys(fn for n, n_note in zip(phase, phase_notes) for fn in functions_of({"name": n}, sub, assignment, n_note)))
+                note = dict(note, reads=sorted({r for n_note in [note] + phase_notes for r in n_note.get("reads", [])}))
+            else:
+                functions = [] if skipped else functions_of(s, sub, assignment, note)
             if skipped:
                 called.update(seam_calls(functions_of(s, sub, assignment, note), by_function, members))
             if not functions and not skipped:
@@ -2259,6 +2286,8 @@ def build(ann: dict, rows: list[dict[str, str]], assignment: dict[str, list[str]
             }
             if "playsAs" in note:
                 entry["playsAs"] = note["playsAs"]
+            if phase is not None:
+                entry["phase"] = list(phase)
             for a in args:
                 if a.get("root") is not None and (a["mode"] != "scalar" or a["type"] not in INTEGER_ARGS or "table" not in ann["objects"].get(a["root"], {})):
                     errors.append("%s.%s(%s): root %s needs an integer argument and a kind with a table" % (sub, s["name"], a["name"], a["root"]))
@@ -2952,6 +2981,11 @@ def render_hooks(ann: dict, model: dict) -> str:
         L.append("    if (slot == RSL_%s_%s || slot == RSL_%s_%s)" % (upper(sub), upper(region["size"]), upper(sub), upper(region["init"])))
         L.append("        return true;")
     L += ["    return false;", "}", ""]
+    phased = [sub for sub, spec in subsystems.items() if not spec.get("world") and any(s.get("phase") for s in spec["slots"].values())]
+    L.append("bool HasPhaseSlot(unsigned sub)")
+    L.append("{")
+    L.append("    return %s;" % (" || ".join("sub == SUB_%s" % upper(sub) for sub in phased) or "false"))
+    L += ["}", ""]
     return "\n".join(L)
 
 
@@ -3048,6 +3082,8 @@ def wrapper(sub: str, spec: dict, slot: str, s: dict, objects: dict, is_import: 
     if kinded is not None and not unrecorded:
         a = s["args"][kinded]
         L.append("    SlotScope scope(%s, SUB_%s, roots, true, a%d != nullptr && a%d >= sizeof(*a%d) ? (int)a%d->kind : -1);" % (rid, upper(sub), kinded, a["sizeIndex"], kinded, kinded))
+    elif s.get("phase") and not unrecorded:
+        L.append("    SlotScope scope(%s, SUB_%s, roots, RecordsPhase(SUB_%s));" % (rid, upper(sub), upper(sub)))
     else:
         L.append("    SlotScope scope(%s, SUB_%s, roots%s);" % (rid, upper(sub), ", false" if unrecorded else ""))
     for i, a in enumerate(s["args"]):

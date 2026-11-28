@@ -2847,6 +2847,18 @@ unsigned ReplayEventObject(unsigned table, int kind)
     return t.header;
 }
 
+unsigned ReplayEffectObject(unsigned table, int kind)
+{
+    for (unsigned id = 0; id < RET_COUNT; id++) {
+        const ReplayEventTable& other = kReplayEventTables[id];
+        for (unsigned i = 0; i < other.count; i++) {
+            if (kReplayEventKinds[other.first + i].kind == kind)
+                return kReplayEventKinds[other.first + i].object;
+        }
+    }
+    return kReplayEventTables[table].header;
+}
+
 void ReplayAddEvent(ReplayText& t, const char* name, unsigned table, const void* p, unsigned size, ReplayObjectTable& objects)
 {
     unsigned char copy[REPLAY_EVENT_MAX];
@@ -2929,7 +2941,7 @@ void ReplayAddEffect(ReplayText& t, unsigned table, const void* p, unsigned size
     unsigned char copy[REPLAY_EVENT_MAX];
     memset(copy, 0, sizeof copy);
     memcpy(copy, p, size < sizeof copy ? size : sizeof copy);
-    ReplayAddValue(t, ReplayEventObject(table, *(int*)copy), copy, objects);
+    ReplayAddValue(t, ReplayEffectObject(table, *(int*)copy), copy, objects);
 }
 
 unsigned ReplaySubsystemEvents(const char* subsystem)

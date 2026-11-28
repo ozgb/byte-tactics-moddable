@@ -39,6 +39,16 @@ inline void EconPublish(int outbox, int kind, int player, EconUnit unit, unsigne
     SchedPublish(outbox, &event, sizeof(event));
 }
 
+inline void EconEmitIncome(int outbox, int player, EconUnit unit, unsigned int resources, float energy, float metal)
+{
+    EconomyIncome event;
+    event.h = EconHeader(ECONOMY_INCOME, player, unit);
+    event.resources = resources;
+    event.energy = energy;
+    event.metal = metal;
+    EmitFrom(outbox, &event, sizeof(event));
+}
+
 inline void EconPublishLoad(int outbox, int player, EconUnit unit, const EconAccount& account)
 {
     EconomyLoad event;

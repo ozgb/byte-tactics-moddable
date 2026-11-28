@@ -84,8 +84,8 @@ void __stdcall CmdShareAll(int unused)
     if (g_game->netGameFlags & 1) {
         CmdShareMetal(unused);
         CmdShareEnergy(unused);
-        LosRadarPublishShareMapping(SCHED_ECONOMY, g_game->localPlayer);
-        LosRadarPublishShareRadar(SCHED_ECONOMY, g_game->localPlayer);
+        LosRadarPublishShareMapping(SCHED_ENGINE, g_game->localPlayer);
+        LosRadarPublishShareRadar(SCHED_ENGINE, g_game->localPlayer);
     }
 }
 

@@ -7891,6 +7891,16 @@
     "note": "the players array: every player is a root of the call"
    },
    {
+    "kind": "field_maybe_written",
+    "target": "Game::players",
+    "rule": "all-of",
+    "object": "Player",
+    "functions": [
+     "EconomySpend"
+    ],
+    "note": "a spend pays from the stock of the player its record names, passed by address: every player is a root of the call"
+   },
+   {
     "kind": "field_escape",
     "target": "Unit::footprint",
     "rule": "fields",
@@ -15963,7 +15973,15 @@
      "Emit"
     ],
     "slots": {
+     "GetWeaponTargetUnit": {
+      "reads": [
+       "Game.poolCount"
+      ]
+     },
      "Apply": {
+      "reads": [
+       "Game.poolCount"
+      ],
       "native": "ApplyTargetingSlot",
       "functions": [
        "SetWeaponTargetUnit",
@@ -15981,6 +15999,9 @@
       }
      },
      "GetWeaponTargetPos": {
+      "reads": [
+       "Game.poolCount"
+      ],
       "functions": [
        "GetWeaponTargetPos",
        "ScaleBodyOffset",
@@ -15996,12 +16017,18 @@
       }
      },
      "FindWeaponTarget": {
+      "reads": [
+       "Game.poolCount"
+      ],
       "functions": [
        "FindWeaponTarget",
        "UnitTypeSet::Contains"
       ]
      },
      "FindBestTargetIfFireAtWill": {
+      "reads": [
+       "Game.poolCount"
+      ],
       "functions": [
        "FindBestTargetIfFireAtWill",
        "FindWeaponTarget",
@@ -16009,9 +16036,15 @@
       ]
      },
      "ChooseWeapon": {
+      "reads": [
+       "Game.poolCount"
+      ],
       "native": "ChooseWeaponSlot"
      },
      "SavedTargetPair": {
+      "reads": [
+       "Game.poolCount"
+      ],
       "functions": [
        "SavedTargetPair"
       ]
@@ -22788,7 +22821,7 @@
     "Init": {"conv": "__stdcall", "ret": "void", "functions": ["EconomyInit"], "reads": [], "writes": ["region"], "objectReads": [], "objectWrites": [], "allOf": [], "args": [{"name": "map", "type": "EconMapInfo*", "line": "map", "mode": "value", "kind": "EconMapInfo", "byPointer": true}, {"name": "world", "type": "EconomyWorldView*", "line": "world", "mode": "world", "seam": "econworld"}, {"name": "region", "type": "void*", "line": "region", "mode": "region"}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": null, "native": "EconomyInit"},
     "Shutdown": {"conv": "__stdcall", "ret": "void*", "functions": ["EconomyShutdown"], "reads": ["region"], "writes": [], "objectReads": [], "objectWrites": [], "allOf": [], "args": [], "result": {"type": "void*", "mode": "region"}, "native": "EconomyShutdown"},
     "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["EconomyApply", "AccountOf", "HandicapOf", "RequestOn", "ResetAccount", "UnitAccountOf", "RequestEnergyAndMetalOn", "RequestEnergyOn", "RequestMetalOn", "StallsAllowRequest", "PlayerAccountOf"], "reads": ["region"], "writes": ["region"], "objectReads": ["Player.econ", "Player.index", "UnitResources.energyMake", "UnitResources.energyUse", "UnitResources.energyUsePaid", "UnitResources.energyStall", "UnitResources.metalMake", "UnitResources.metalUse", "UnitResources.metalUsePaid", "UnitResources.metalStall", "UnitResources.player"], "objectWrites": ["UnitResources.energyMake", "UnitResources.energyUse", "UnitResources.energyUsePaid", "UnitResources.metalMake", "UnitResources.metalUse", "UnitResources.metalUsePaid", "UnitResources.player"], "allOf": ["Player"], "args": [{"name": "event", "type": "EconomyEventHeader*", "line": "event", "mode": "event", "events": "economy", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "EconomyApply"},
-    "Spend": {"conv": "__stdcall", "ret": "int", "functions": ["EconomySpend", "AccountOf", "SpendOn", "SpendEnergyAndMetalOn", "SpendEnergyOn", "SpendMetalOn", "PlayerAccountOf", "UnitAccountOf"], "reads": ["region"], "writes": ["region"], "objectReads": ["Player.econ", "Player.energy", "Player.metal", "UnitResources.energyUse", "UnitResources.metalUse"], "objectWrites": ["Player.energy", "Player.metal", "UnitResources.energyUse", "UnitResources.metalUse"], "allOf": [], "args": [{"name": "spend", "type": "EconomySpend*", "line": "spend", "mode": "value", "kind": "EconomySpend", "byPointer": true}], "result": {"type": "int", "mode": "scalar"}, "native": "EconomySpend"},
+    "Spend": {"conv": "__stdcall", "ret": "int", "functions": ["EconomySpend", "AccountOf", "SpendOn", "SpendEnergyAndMetalOn", "SpendEnergyOn", "SpendMetalOn", "PlayerAccountOf", "UnitAccountOf"], "reads": ["region"], "writes": ["region"], "objectReads": ["Player.econ", "Player.energy", "Player.metal", "UnitResources.energyUse", "UnitResources.metalUse"], "objectWrites": ["Player.energy", "Player.metal", "UnitResources.energyUse", "UnitResources.metalUse"], "allOf": ["Player"], "args": [{"name": "spend", "type": "EconomySpend*", "line": "spend", "mode": "value", "kind": "EconomySpend", "byPointer": true}], "result": {"type": "int", "mode": "scalar"}, "native": "EconomySpend"},
     "UpdatePlayerEconomy": {"conv": "__stdcall", "ret": "void", "functions": ["EconomyUpdatePlayer", "AddIncomeW", "CloakCostPayable", "EmitCloak", "HandicapOf", "PlayerAccountOf", "SettleResourceAccount", "UnitAccountOf", "UseEnergy", "UseEnergyD", "RequestEnergyOn", "EffectHeader"], "reads": ["region"], "writes": ["region"], "objectReads": ["Player.energyIncome", "Player.energyUsage", "Player.energyCapacity", "Player.metalIncome", "Player.metalUsage", "Player.metalCapacity", "Player.totalEnergyProduced", "Player.totalMetalProduced", "Player.totalEnergyConsumed", "Player.totalMetalConsumed", "Player.energyWasted", "Player.metalWasted", "Player.energyStorageBonus", "Player.metalStorageBonus", "Player.econ", "Player.energy", "Player.metal", "UnitResources.energyMake", "UnitResources.energyUse", "UnitResources.energyUsePaid", "UnitResources.energyStall", "UnitResources.energyMakePrev", "UnitResources.energyUsePrev", "UnitResources.metalMake", "UnitResources.metalUse", "UnitResources.metalUsePaid", "UnitResources.metalStall", "UnitResources.metalMakePrev", "UnitResources.metalUsePrev"], "objectWrites": ["Player.energyIncome", "Player.energyUsage", "Player.energyCapacity", "Player.metalIncome", "Player.metalUsage", "Player.metalCapacity", "Player.totalEnergyProduced", "Player.totalMetalProduced", "Player.totalEnergyConsumed", "Player.totalMetalConsumed", "Player.energyWasted", "Player.metalWasted", "Player.energy", "Player.metal", "UnitResources.energyMake", "UnitResources.energyUse", "UnitResources.energyUsePaid", "UnitResources.energyStall", "UnitResources.energyMakePrev", "UnitResources.energyUsePrev", "UnitResources.metalMake", "UnitResources.metalUse", "UnitResources.metalUsePaid", "UnitResources.metalStall", "UnitResources.metalMakePrev", "UnitResources.metalUsePrev"], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "EconomyUpdatePlayer"},
     "UpdateMetalExtraction": {"conv": "__stdcall", "ret": "void", "functions": ["EconomyUpdateMetalExtraction", "EmitExtractor", "UnitOfHandle", "EffectHeader"], "reads": ["region"], "writes": ["region"], "objectReads": ["Unit.extraction"], "objectWrites": ["Unit.extraction"], "allOf": [], "args": [{"name": "unit", "type": "EconUnit", "line": "unit", "mode": "object", "kind": "Unit", "ref": true}], "result": null, "native": "EconomyUpdateMetalExtraction"},
     "UpdateResourceSharing": {"conv": "__stdcall", "ret": "void", "functions": ["EconomyUpdateResourceSharing", "EmitShare", "EnergyRecipientPoorer", "IsRecipient", "MetalRecipientPoorer", "ShareEnergyAmount", "ShareMetalAmount", "ShareAmount", "EffectHeader"], "reads": ["region"], "writes": ["region"], "objectReads": ["Player.energyCapacity", "Player.metalCapacity", "Player.shareMetal", "Player.shareEnergy", "Player.energy", "Player.metal"], "objectWrites": [], "allOf": ["Player"], "args": [{"name": "player", "type": "int", "line": "player", "mode": "scalar"}], "result": null, "native": "EconomyUpdateResourceSharing"},
@@ -22858,13 +22891,13 @@
   "targeting": {
    "header": {"interface": "interfaces/targeting.h", "struct": "TargetingSeam", "version": [4, 0], "status": "complete", "imports": ["los_radar.GetVisibleEnemiesInRadius", "weapons.GetWeaponRange", "weapons.WeaponCanReachUnit", "map.GetGroundHeight", "scripts.GetSweetSpot"], "issue": 669},
    "slots": {
-    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["SetWeaponTargetUnit", "SetWeaponTargetPos", "ClearWeaponTarget", "ResetWeaponTarget", "PublishCleared"], "reads": [], "writes": [], "objectReads": ["Unit.id", "Unit.netDirtyFlags", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags"], "objectWrites": ["Unit.netDirtyFlags", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "event", "type": "TargetingEventHeader*", "line": "event", "mode": "event", "events": "targeting", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyTargetingSlot"},
-    "GetWeaponTargetUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["GetWeaponTargetUnit"], "reads": [], "writes": [], "objectReads": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "GetWeaponTargetUnit"},
-    "GetWeaponTargetPos": {"conv": "__stdcall", "ret": "int", "functions": ["GetWeaponTargetPos", "ScaleBodyOffset", "PublishCleared"], "reads": ["Game.seaLevel"], "writes": [], "objectReads": ["Unit.unitDefIndex", "Unit.killCount", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon0TargetUnit", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1TargetUnit", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon2TargetUnit", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags", "weapondef.flags", "weapondef.speed", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "out", "when": "result != 0"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetWeaponTargetPos"},
-    "FindWeaponTarget": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindWeaponTarget", "UnitTypeSet::Contains"], "reads": ["Game.uiOptionFlags", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.weapon2Def", "Unit.flags", "Unit.def", "Unit.player", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2", "UnitDef.flags1", "UnitDef.range", "weapondef.flags", "UnitTypeSet.bits"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "unsigned char", "line": "weapon", "mode": "scalar"}, {"name": "useRange", "type": "int", "line": "useRange", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindWeaponTarget"},
-    "FindBestTargetIfFireAtWill": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindBestTargetIfFireAtWill", "FindWeaponTarget", "UnitTypeSet::Contains"], "reads": ["Game.uiOptionFlags", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.weapon2Def", "Unit.flags", "Unit.def", "Unit.player", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2", "UnitDef.flags1", "UnitDef.range", "weapondef.flags", "UnitTypeSet.bits"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindBestTargetIfFireAtWill"},
-    "ChooseWeapon": {"conv": "__stdcall", "ret": "unsigned char", "functions": ["Unit::ChooseWeapon"], "reads": [], "writes": [], "objectReads": ["Unit.weapon0Flags", "Unit.weapon2Flags", "Unit.weapon1Flags"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "unsigned char", "mode": "scalar"}, "native": "ChooseWeaponSlot"},
-    "SavedTargetPair": {"conv": "__stdcall", "ret": "int", "functions": ["SavedTargetPair"], "reads": [], "writes": [], "objectReads": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "SavedTargetPair"}
+    "Apply": {"conv": "__stdcall", "ret": "int", "functions": ["SetWeaponTargetUnit", "SetWeaponTargetPos", "ClearWeaponTarget", "ResetWeaponTarget", "PublishCleared"], "reads": ["Game.poolCount"], "writes": [], "objectReads": ["Unit.id", "Unit.netDirtyFlags", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags"], "objectWrites": ["Unit.netDirtyFlags", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "event", "type": "TargetingEventHeader*", "line": "event", "mode": "event", "events": "targeting", "size": "size", "sizeIndex": 1}, {"name": "size", "type": "unsigned int", "line": "size", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "ApplyTargetingSlot"},
+    "GetWeaponTargetUnit": {"conv": "__stdcall", "ret": "Unit*", "functions": ["GetWeaponTargetUnit"], "reads": ["Game.poolCount"], "writes": [], "objectReads": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "GetWeaponTargetUnit"},
+    "GetWeaponTargetPos": {"conv": "__stdcall", "ret": "int", "functions": ["GetWeaponTargetPos", "ScaleBodyOffset", "PublishCleared"], "reads": ["Game.seaLevel", "Game.poolCount"], "writes": [], "objectReads": ["Unit.unitDefIndex", "Unit.killCount", "Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon0TargetUnit", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon1TargetUnit", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon2TargetUnit", "Unit.motion", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags", "weapondef.flags", "weapondef.speed", "UnitMotion.velocityX", "UnitMotion.velocityY", "UnitMotion.velocityZ"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "pos", "type": "Vec3*", "line": "pos", "mode": "struct", "kind": "Vec3", "dir": "out", "when": "result != 0"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "GetWeaponTargetPos"},
+    "FindWeaponTarget": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindWeaponTarget", "UnitTypeSet::Contains"], "reads": ["Game.uiOptionFlags", "Game.poolCount", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.weapon2Def", "Unit.flags", "Unit.def", "Unit.player", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2", "UnitDef.flags1", "UnitDef.range", "weapondef.flags", "UnitTypeSet.bits"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "unsigned char", "line": "weapon", "mode": "scalar"}, {"name": "useRange", "type": "int", "line": "useRange", "mode": "scalar"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindWeaponTarget"},
+    "FindBestTargetIfFireAtWill": {"conv": "__stdcall", "ret": "Unit*", "functions": ["FindBestTargetIfFireAtWill", "FindWeaponTarget", "UnitTypeSet::Contains"], "reads": ["Game.uiOptionFlags", "Game.poolCount", "rng.main", "rng.load", "rng.seed"], "writes": ["rng.main", "rng.load", "rng.seed"], "objectReads": ["Player.active", "Player.type", "Unit.activateFlags", "Unit.unitDefIndex", "Unit.weapon2Def", "Unit.flags", "Unit.def", "Unit.player", "Unit.playerIndex", "Unit.posX", "Unit.posY", "Unit.posZ", "Unit.weapon0Def", "Unit.weapon1Def", "UnitDef.categories", "UnitDef.weaponCategories0", "UnitDef.weaponCategories1", "UnitDef.weaponCategories2", "UnitDef.flags1", "UnitDef.range", "weapondef.flags", "UnitTypeSet.bits"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "Unit*", "mode": "object", "kind": "Unit"}, "native": "FindBestTargetIfFireAtWill"},
+    "ChooseWeapon": {"conv": "__stdcall", "ret": "unsigned char", "functions": ["Unit::ChooseWeapon"], "reads": ["Game.poolCount"], "writes": [], "objectReads": ["Unit.weapon0Flags", "Unit.weapon2Flags", "Unit.weapon1Flags"], "objectWrites": [], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}], "result": {"type": "unsigned char", "mode": "scalar"}, "native": "ChooseWeaponSlot"},
+    "SavedTargetPair": {"conv": "__stdcall", "ret": "int", "functions": ["SavedTargetPair"], "reads": ["Game.poolCount"], "writes": [], "objectReads": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon0Flags", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ", "Unit.weapon2Def", "Unit.weapon2Flags", "Unit.weapon0Def", "Unit.weapon1Def", "Unit.weapon1Flags"], "objectWrites": ["Unit.weapon0TargetX", "Unit.weapon0TargetZ", "Unit.weapon1TargetX", "Unit.weapon1TargetZ", "Unit.weapon2TargetX", "Unit.weapon2TargetZ"], "allOf": [], "args": [{"name": "unit", "type": "Unit*", "line": "unit", "mode": "object", "kind": "Unit"}, {"name": "weapon", "type": "int", "line": "weapon", "mode": "scalar"}], "result": {"type": "int", "mode": "scalar"}, "native": "SavedTargetPair"}
    }
   },
   "los_radar": {

@@ -3388,6 +3388,8 @@ call 39 UnitAccount
   o out.metalUseprev f32:0x00000000
 call 40 Spend
   a spend (3,0,null,2,f32:0x00000000,f32:0x424c0000)
+  w Player#0.metal f32:0x00000000
+  w UnitResources#1.metalUse f32:0x424c0000
   o result 1
 call 40 Apply
   r Player#0.index 0
@@ -3400,7 +3402,6 @@ call 40 Apply
   r Player#7.index 10
   r Player#8.index 10
   r Player#9.index 10
-  r UnitResources#1.metalUse f32:0x424c0000
   r UnitResources#1.player Player#0
   r UnitResources#2.player Player#1
   a event.kind 4
@@ -3566,9 +3567,10 @@ call 49 UnitAccount
   o out.metalUseprev f32:0x00000000
 call 50 Spend
   a spend (3,0,null,1,f32:0x42c80000,f32:0x00000000)
+  w Player#0.energy f32:0x44610000
+  w UnitResources#1.energyUse f32:0x42c80000
   o result 1
 call 50 Apply
-  r UnitResources#1.energyUse f32:0x42c80000
   a event.kind 4
   a event.player 1
   a event.unit null
@@ -3731,8 +3733,6 @@ call 59 UnitAccount
   o out.metalMakeprev f32:0x3f800000
   o out.metalUseprev f32:0x00000000
 call 60 UpdatePlayerEconomy
-  r Player#0.energy f32:0x44610000
-  r Player#0.metal f32:0x00000000
   a player 0
   i econworld.PlayerInfo 0 = (1,1,0,1,0,0,0,1,1)
   i econworld.LastUnit 0 = Unit#250
@@ -10420,9 +10420,10 @@ call 99 UnitAccount
   o out.metalUseprev f32:0x00000000
 call 100 Spend
   a spend (3,1,null,2,f32:0x00000000,f32:0x42c80000)
+  w Player#1.metal f32:0x44610000
+  w UnitResources#2.metalUse f32:0x42c80000
   o result 1
 call 100 Apply
-  r UnitResources#2.metalUse f32:0x42c80000
   a event.kind 4
   a event.player 0
   a event.unit null
@@ -10734,7 +10735,6 @@ call 119 UnitAccount
   o out.metalMakeprev f32:0x3f800000
   o out.metalUseprev f32:0x00000000
 call 120 UpdatePlayerEconomy
-  r Player#1.metal f32:0x44610000
   a player 0
   i econworld.PlayerInfo 0 = (1,1,0,1,0,0,0,1,1)
   i econworld.LastUnit 0 = Unit#250

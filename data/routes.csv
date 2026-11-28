@@ -104,8 +104,6 @@ engine,LOS_RADAR_RECALCULATE,133,los_radar,queued
 engine,LOS_RADAR_SET_MODE,139,los_radar,queued
 engine,LOS_RADAR_SHARE_MAPPING,134,los_radar,queued
 engine,LOS_RADAR_SHARE_RADAR,135,los_radar,queued
-economy,LOS_RADAR_SHARE_MAPPING,134,los_radar,queued
-economy,LOS_RADAR_SHARE_RADAR,135,los_radar,queued
 engine,LOS_RADAR_SHARE_MAP,136,los_radar,synchronous
 units,MAP_ADD_UNIT,160,map,synchronous
 movement,MAP_ADD_UNIT,160,map,synchronous

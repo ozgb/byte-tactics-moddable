@@ -454,7 +454,7 @@
           "SendShareMapInfo": [["int", "int"], "void"]
         }
       },
-      "publishes": {"16": 16, "17": 16, "18": 28, "134": 8, "135": 8}
+      "publishes": {"16": 16, "17": 16, "18": 28}
     },
     {
       "name": "features",

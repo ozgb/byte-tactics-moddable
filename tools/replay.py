@@ -15,7 +15,9 @@ names the first differing line.
 
 The comparison of `--check` frees what #1209 says a module's behaviour does not depend on: `services.GetGafFrame` is a query answered
 by its arguments, so its calls (and their answers) may come in any order and number, but a call with arguments the stored recording
-has no answer to, or an answer that differs, is a difference (reported as the query); and the y of the position of
+has no answer to, or an answer that differs, is a difference (reported as the query). An answer names its frame `GafFrame#N`, numbered
+by first appearance, so only the calls that answer a frame already named are free; two calls that name new frames in the other order
+differ; and the y of the position of
 `los_radar.GetMapCellAtPosition` is an unread argument. Everything else is compared as text.
 """
 

@@ -82,8 +82,9 @@ class Difference(unittest.TestCase):
         self.assertTrue(replay.first_difference(GOOD, GOOD + "call 3 UpdateWind\n").startswith("line 8:"))
 
 
-def frame(index: int, width: int = 19) -> str:
-    return f"  i services.GetGafFrame FrameTable#1 {index} = GafFrame#1\n  o GafFrame#1.width {width}\n  o GafFrame#1.pixelsOrLayers alloc#2\n"
+def frame(index: int, width: int = 19, number: int = 1) -> str:
+    return (f"  i services.GetGafFrame FrameTable#1 {index} = GafFrame#{number}\n  o GafFrame#{number}.width {width}\n"
+            f"  o GafFrame#{number}.pixelsOrLayers alloc#2\n")
 
 
 def freed(frames: str, pos: str = "(10,77,30)") -> str:
@@ -97,6 +98,13 @@ class Freed(unittest.TestCase):
         for played in (freed(frame(5) + frame(4)), freed(frame(4) + frame(4) + frame(5)), freed(frame(4)), freed("")):
             self.assertIsNone(replay.first_difference(stored, played))
             self.assertEqual(replay.divergence(stored, played), {"status": "equal"})
+
+    def test_frames_already_named_are_free_but_new_frames_keep_their_order(self):
+        stored = freed(frame(4, number=1) + frame(5, number=2) + frame(4, number=1) + frame(5, number=2))
+        again = freed(frame(4, number=1) + frame(5, number=2) + frame(5, number=2) + frame(4, number=1))
+        self.assertIsNone(replay.first_difference(stored, again))
+        swapped = freed(frame(5, number=1) + frame(4, number=2))
+        self.assertIn("query services.GetGafFrame at line 5", replay.first_difference(stored, swapped))
 
     def test_a_gaf_frame_with_unknown_arguments_differs_at_the_query(self):
         stored = freed(frame(4))

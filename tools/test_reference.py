@@ -1007,6 +1007,44 @@ class ScanRunTest(unittest.TestCase):
         self.assertEqual(self.run_scenario({}, 8, False, [])[0], [t + 600 / reference.RUN_TICKS_PER_SECOND])
         self.assertEqual(self.run_scenario(None, 1, False, [])[0], [t + 600 / reference.RUN_TICKS_PER_SECOND])
 
+    def test_ticks_per_second_reaches_the_timeout(self):
+        t = reference.RUN_SECONDS_BASE
+        with mock.patch.object(reference, "RUN_TICKS_PER_SECOND", 10):
+            self.assertEqual(self.run_scenario({}, 8, False, [])[0], [t + 600 / 10])
+            self.assertEqual(self.run_scenario({}, 1, False, [])[0], [t + 600 / (reference.RUN_TICKS_PER_SECOND_SCAN_EVERY_TICK * 10 / 25)])
+
+    def test_the_ticks_per_second_option_sets_the_rate(self):
+        before = reference.RUN_TICKS_PER_SECOND
+        seen = []
+        with mock.patch.object(reference, "check_traces", lambda *a: seen.append(reference.RUN_TICKS_PER_SECOND)), \
+                mock.patch.object(reference, "cached_pass", lambda key: None), \
+                mock.patch.object(reference, "store_pass", lambda *a: None), \
+                mock.patch.object(sys, "argv", ["reference.py", "--check", "--exe", __file__, "--no-lock", "--no-cache",
+                                                "--ticks-per-second", "10"]):
+            try:
+                reference.main()
+            finally:
+                reference.RUN_TICKS_PER_SECOND = before
+        self.assertEqual(seen, [10])
+
+    def test_traces_passes_the_rate_to_the_reference_branch(self):
+        cmds = []
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(reference, "reference_branch", lambda: Path(tmp)), \
+                mock.patch.object(reference.subprocess, "run", lambda cmd, **k: cmds.append(cmd) or mock.Mock(returncode=1)), \
+                contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            reference.write_traces(None, 4, 10)
+        self.assertEqual(cmds[0][-2:], ["--ticks-per-second", "10"])
+
+    def test_without_the_option_the_rate_is_unchanged(self):
+        self.assertEqual(reference.run_timeout(600), reference.RUN_SECONDS_BASE + 600 / 25)
+        self.assertEqual(reference.run_timeout(600, True), reference.RUN_SECONDS_BASE + 600 / 6)
+        for argv in (["--check", "--exe", __file__, "--ticks-per-second", "0"],):
+            with mock.patch.object(sys, "argv", ["reference.py", *argv]), contextlib.redirect_stderr(io.StringIO()), \
+                    self.assertRaises(SystemExit) as raised:
+                reference.main()
+            self.assertEqual(raised.exception.code, 2)
+
     def test_retry_any_retries_a_game_fault_once(self):
         fault = "scenario: playtest.py: dialog-r6025 pure virtual"
         timeouts, err, out = self.run_scenario({}, 1, True, [fault, fault])

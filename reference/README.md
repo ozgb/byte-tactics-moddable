@@ -483,6 +483,11 @@ many games. `--parallel` still caps one gate's runs. A tier gate keeps its pool 
 seconds, the others 15 or less), and one exclusive lock left the other slots idle while the next gate waited: with slots, three tier gates
 started together finish in about 100 seconds against about 160 one after the other (measured on #760 with 20 CPUs: 6 slots 170 seconds, 10 slots 100, 14 slots 88 with each run slower under the load, so
 the default stays at half the CPUs). A run that has to wait prints once, `waiting for a run slot, held by the gates of <pid> (<worktree>), ...`.
+A run times out, and counts as a hang, after `RUN_SECONDS_BASE` (120) seconds plus its ticks at 25 ticks a second, or 6 with the
+block pointer scan on every tick. A slower machine (about 12 ticks a second for a reference game on an i7-13700H under Xvfb, #1240)
+gives `--ticks-per-second N` to `--check` or `--traces`, which sets the 25 and scales the 6 with it; `--traces` passes it on to the
+reference branch's `--traces`, which also tries a timed-out run once more. A timeout changes no output, only whether a slow run fails,
+so the option is not part of the gate's cache key.
 A scenario with a `load` line starts as soon as the scenario it loads has finished (ahead of the scenarios not yet started), so
 `load-midgame` no longer waits for `eight-pincushion-teams`.
 A second `--check` with the same cache key waits for the first on a key lock (`bt-gate-key-<key>.lock`) and then reports its cached pass (below),

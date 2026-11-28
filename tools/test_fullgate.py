@@ -332,6 +332,8 @@ class CommentTextTest(unittest.TestCase):
     def test_replay_differences_and_a_run_that_did_not_finish(self):
         text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP), (1, REPLAY_BAD))
         self.assertTrue(text.endswith("match setup: 15 of 15 ok, replay: 1 of 2 equal, replay exit 1"))
+        long = "mission/console-ilose.txt: equal\nmission/long/mission-build-unit.txt: differs, line 9: 'a' / 'b'\n"
+        self.assertEqual(fullgate.replay_result(long), "1 of 2 equal")
         text = fullgate.comment_text("abc1234", (0, BOTH_MODES), (0, ROUND_TRIP), (0, COVERAGE), (0, MATCH_SETUP),
                                      (1, "replay: playtest.py failed for x.exe (exit 1):\n"))
         self.assertTrue(text.endswith("replay: not finished, replay exit 1"))

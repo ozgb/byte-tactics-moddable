@@ -30,7 +30,7 @@ highest one reachable from it, and no file under `reference/` other than a `.md`
 | `docs/module-abi.md` | the module ABI | itself |
 | `wasm/modules.json` | the module manifest of the game: the loader's numbers, the signatures and each module's entry | `docs/module-abi.md`, section 4 |
 | `tools/wasm_fuel.py` | the fuel pass: meters a finished module by the rule of ABI 11, standard library and `wasm-tools` only | `docs/module-abi.md`, section 11 |
-| `tests/replay/` | the stored per-module replay recordings | `docs/replay-format.md` |
+| `tests/replay/` | the stored per-module replay recordings; the gate judges every one below a subsystem's directory, `long/` included | `docs/replay-format.md`, `docs/module-abi.md` section 15 |
 | `data/replay_schema.json` | the annotations and the fields, objects and slots the recordings name, without the fields that name the source or serve only the replayer's checks, and without the services and callbacks no recording of the kit calls | `docs/replay-format.md`, "The schema and its annotations" |
 | `docs/sim-events.md` | the sim event queue: the record, the queue, each kind of event and when the logic records it, with a `Terms` section at its end (below) | itself |
 | `interfaces/sim_events.csv` | the kinds of sim event as a table (below) | `docs/sim-events.md` |

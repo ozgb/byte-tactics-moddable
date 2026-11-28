@@ -373,9 +373,9 @@ class Writer:
 EVENT_CAPS = None
 
 
-def event_cap(events, header_type):
+def event_cap(header_type):
     import traceschema
-    module = next((m for m in traceschema.EVENT_MODULES if m.key == camel(events)), None)
+    module = next((m for m in traceschema.EVENT_MODULES if m.header == header_type), None)
     if module is None:
         return f"sizeof({header_type})"
     sizes = [f"sizeof({module.header})"]
@@ -402,7 +402,7 @@ def slot_thunk(w, subsystem, index, slot, glue):
     for i, ((ctype, name), spec) in enumerate(zip(slot.params, slot.specs)):
         mode = spec.get("mode")
         if mode == "event" and "sizeIndex" in spec:
-            cap = event_cap(spec.get("events", subsystem), pointee(ctype).replace("const ", ""))
+            cap = event_cap(pointee(ctype).replace("const ", ""))
             size = slot.params[spec["sizeIndex"]][1]
             w(f"    unsigned {name}Size = {size} > {cap} ? (unsigned){cap} : (unsigned){size};")
             capped[spec["sizeIndex"]] = f"{name}Size"

@@ -785,6 +785,9 @@ def kit_schema(data: bytes, names: dict[tuple[str, str], str], undeclared: set[s
             annotations["services"] = kit_services(annotations["services"], services_header)
     for service in annotations.get("services", []):
         drop(service, SERVICE_SOURCE_FIELDS)
+    for spec in annotations.get("subsystems", {}).values():
+        if "services" in spec:
+            spec["services"] = [name for name in spec["services"] if name not in undeclared]
     for load in annotations.get("loads", {}).values():
         drop(load, ("loader",))
     entries = set()

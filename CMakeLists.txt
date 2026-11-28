@@ -411,7 +411,7 @@ add_custom_command(
   VERBATIM COMMAND_EXPAND_LISTS)
 add_custom_target(purecall_test DEPENDS "${CMAKE_BINARY_DIR}/purecall_test.exe")
 
-add_library(view_block_test_objects OBJECT src/harness/view_block.cpp src/harness/view_fill.cpp src/state/load_data.cpp tests/view_block_test.cpp)
+add_library(view_block_test_objects OBJECT src/harness/view_block.cpp src/harness/view_fill.cpp src/state/load_data.cpp src/host/win32/threads.cpp tests/view_block_test.cpp)
 target_include_directories(view_block_test_objects SYSTEM PRIVATE "${MSVC5_INCLUDE}")
 target_compile_options(view_block_test_objects PRIVATE ${GAME_COMPILE_OPTIONS})
 add_custom_command(

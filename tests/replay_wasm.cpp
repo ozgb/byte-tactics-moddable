@@ -4,6 +4,7 @@
 
 #include "../interfaces/host.h"
 #include "../src/state/block.h"
+#include "../src/harness/replay_objects.h"
 #include "../src/wasm/modules.h"
 #include "../src/wasm/module_glue.h"
 #include "replay_wasm.h"
@@ -214,6 +215,13 @@ void ReplayWasmReload()
     s_memory.scratch = layout->scratch_base;
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
+    if (!layout->has_load_data)
+        Stop("the manifest has no load_data region");
+    unsigned classWords[256];
+    unsigned classWordCount = ReplayClassWords(classWords, sizeof classWords / sizeof classWords[0]);
+    if (classWordCount > sizeof classWords / sizeof classWords[0] || classWordCount * 4 > layout->load_data_size)
+        Stop("the class word table is too long");
+    memcpy(s_memory.base + layout->load_data_base, classWords, classWordCount * 4);
 
     Check(GlueInstall(s_loader, 0));
     wl_module* module = wl_load_module_bytes(s_loader, s_glue->def->name, bytes, size);

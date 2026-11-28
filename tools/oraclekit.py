@@ -487,6 +487,8 @@ def record_entry(text: str, name: str, size: int) -> dict:
             vptr = True
         elif f.name == "base)":
             bases.append({"type": clean_type(f.type.replace(" (primary", "")), "offset": f.start})
+        elif f.name == "(base)":
+            bases.append({"type": clean_type(f.type), "offset": f.start})
         elif re.match(r"^[A-Za-z_]\w*$", f.name):
             item = {"name": f.name, "offset": f.start, "size": None, "type": clean_type(f.type)}
             if f.bits:
@@ -557,7 +559,29 @@ def generate_layout(root: Path, build_dir: Path, run=None) -> dict:
         raise SystemExit("oraclekit: %d of %d field sizes could not be read from clang" % (total - unsized, total))
     for role, name in ROLES.items():
         records[name]["role"] = role
-    return {"layout_version": 1, "records": records}
+    return {"layout_version": 1, "records": records, "class_words": class_words(root, records)}
+
+
+CLASS_WORDS = "data/class_words.csv"
+REPLAY_SCHEMA = "data/replay_schema.json"
+
+
+def class_words(root: Path, records: dict[str, dict]) -> list[dict]:
+    """The class word table of docs/module-abi.md, 7.1, in data/class_words.csv's order: each word's index, the kind that holds it, and its offset in the object (with the base whose word it is when that is not 0)."""
+    types = {o["name"]: o["type"] for o in json.loads((root / REPLAY_SCHEMA).read_text())["objects"]}
+    out = []
+    for row in csv.DictReader(io.StringIO((root / CLASS_WORDS).read_text())):
+        entry = {"index": int(row["index"]), "class": row["class"], "offset": 0}
+        if row["base"]:
+            found = [b["offset"] for b in records.get(types.get(row["class"], ""), {}).get("bases", []) if b["type"] == row["base"]]
+            if len(found) != 1:
+                raise SystemExit("oraclekit: %s: the layout has no base %s of %s" % (CLASS_WORDS, row["base"], row["class"]))
+            entry["base"] = row["base"]
+            entry["offset"] = found[0]
+        out.append(entry)
+    if [e["index"] for e in out] != list(range(len(out))):
+        raise SystemExit("oraclekit: %s: the indexes do not run from 0 in row order" % CLASS_WORDS)
+    return out
 
 
 def csv_rows(data: bytes) -> tuple[list[str], list[dict[str, str]]]:

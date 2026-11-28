@@ -312,3 +312,59 @@ unsigned ReplayExtraVtables(unsigned kind, ReplayExtraVtable* out)
         return 0;
     }
 }
+
+unsigned ReplayClassWords(unsigned* out, unsigned capacity)
+{
+    if (capacity < 49)
+        return 49;
+    out[0] = (unsigned)ReplayVtable(ROK_AISEARCHGOAL);
+    out[1] = (unsigned)ReplayVtable(ROK_AIRMANEUVERORDER);
+    out[2] = (unsigned)ReplayVtable(ROK_APPROACHRADIUS);
+    out[3] = (unsigned)ReplayVtable(ROK_ASSAULTTIMER);
+    out[4] = (unsigned)ReplayVtable(ROK_BUILDTIMER);
+    out[5] = (unsigned)ReplayVtable(ROK_COBSCRIPT);
+    out[6] = (unsigned)ReplayVtable(ROK_DEFEATALLUNITSKILLED);
+    out[7] = (unsigned)g_vtsec_DefeatAllUnitsKilled_UnitScanVisitor;
+    out[8] = (unsigned)ReplayVtable(ROK_DEFEATALLUNITSKILLEDOFTYPE);
+    out[9] = (unsigned)g_vtsec_DefeatAllUnitsKilledOfType_UnitScanVisitor;
+    out[10] = (unsigned)ReplayVtable(ROK_DEFEATANYUNITPASSESX);
+    out[11] = (unsigned)g_vtsec_DefeatAnyUnitPassesX_UnitScanVisitor;
+    out[12] = (unsigned)ReplayVtable(ROK_DEFEATANYUNITPASSESZ);
+    out[13] = (unsigned)g_vtsec_DefeatAnyUnitPassesZ_UnitScanVisitor;
+    out[14] = (unsigned)ReplayVtable(ROK_DEFEATCOMMANDERKILLED);
+    out[15] = (unsigned)ReplayVtable(ROK_DEFEATDEATHTIMERRUNSOUT);
+    out[16] = (unsigned)ReplayVtable(ROK_DEFEATUNITTYPEKILLED);
+    out[17] = (unsigned)ReplayVtable(ROK_ESCORTTIMER);
+    out[18] = (unsigned)ReplayVtable(ROK_LITEGOAL);
+    out[19] = (unsigned)ReplayVtable(ROK_ORDER);
+    out[20] = (unsigned)ReplayVtable(ROK_PACKEDPOSGOAL);
+    out[21] = (unsigned)ReplayVtable(ROK_PATHORDER);
+    out[22] = (unsigned)ReplayVtable(ROK_PATHORDERATTACH);
+    out[23] = (unsigned)ReplayVtable(ROK_PATROLGOAL);
+    out[24] = (unsigned)ReplayVtable(ROK_PLAINORDERFX);
+    out[25] = (unsigned)ReplayVtable(ROK_PLAINTIMER);
+    out[26] = (unsigned)ReplayVtable(ROK_POINTMARKER);
+    out[27] = (unsigned)ReplayVtable(ROK_RINGAPPROACH);
+    out[28] = (unsigned)ReplayVtable(ROK_SCOUTTIMER);
+    out[29] = (unsigned)ReplayVtable(ROK_SPATIALTIMER);
+    out[30] = (unsigned)ReplayVtable(ROK_SQUADSCOUTTIMER);
+    out[31] = (unsigned)ReplayVtable(ROK_VICTORYBUILDUNITTYPE);
+    out[32] = (unsigned)g_vtsec_VictoryBuildUnitType_UnitScanVisitor;
+    out[33] = (unsigned)ReplayVtable(ROK_VICTORYCAPTUREUNITTYPE);
+    out[34] = (unsigned)ReplayVtable(ROK_VICTORYDESTROYALLUNITS);
+    out[35] = (unsigned)ReplayVtable(ROK_VICTORYKILLALLMOBILEUNITS);
+    out[36] = (unsigned)g_vtsec_VictoryKillAllMobileUnits_UnitScanVisitor;
+    out[37] = (unsigned)ReplayVtable(ROK_VICTORYKILLALLOFTYPE);
+    out[38] = (unsigned)g_vtsec_VictoryKillAllOfType_UnitScanVisitor;
+    out[39] = (unsigned)ReplayVtable(ROK_VICTORYKILLENEMYCOMMANDER);
+    out[40] = (unsigned)ReplayVtable(ROK_VICTORYKILLUNITTYPE);
+    out[41] = (unsigned)ReplayVtable(ROK_VICTORYMOVEUNITTORADIUS);
+    out[42] = (unsigned)g_vtsec_VictoryMoveUnitToRadius_RadiusUnitVisitor;
+    out[43] = (unsigned)ReplayVtable(ROK_VICTORYTIMERRUNSOUT);
+    out[44] = (unsigned)ReplayVtable(ROK_VICTORYUNITTYPEPASSESX);
+    out[45] = (unsigned)g_vtsec_VictoryUnitTypePassesX_UnitScanVisitor;
+    out[46] = (unsigned)ReplayVtable(ROK_VICTORYUNITTYPEPASSESZ);
+    out[47] = (unsigned)g_vtsec_VictoryUnitTypePassesZ_UnitScanVisitor;
+    out[48] = (unsigned)ReplayVtable(ROK_WEAPONAIMCOBCB);
+    return 49;
+}

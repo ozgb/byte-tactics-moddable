@@ -6,7 +6,8 @@
 Inputs: interfaces/<subsystem>.h of every simulation subsystem (the members of `Seams`), data/subsystems.csv (which
 functions are behind a slot), data/rwsets.csv (what they read and write), the layout of `Game`, and the `annotations`
 key of data/replay_schema.json, which holds what no header says: the tracked block fields, the object kinds and their
-fields, the hand rules, and per subsystem the slot annotations (functions, how each pointer argument is recorded).
+fields, the hand rules, and per subsystem the slot annotations (functions, how each pointer argument is recorded), and
+data/class_words.csv, the index of each vtable of a concrete kind in the class word table (docs/module-abi.md, 7.1).
 
 Outputs:
 
@@ -22,7 +23,7 @@ Outputs:
     src/harness/replay_services.h   the ids and names of the services imports (GameRand, RandomInt, the TDF and command classes)
     src/harness/replay_services.inc the recorder's lines for them
     tests/replay_services.h         the replayer's answers for them
-    src/harness/replay_vtables.cpp  the vtable of each concrete kind of a polymorphic base
+    src/harness/replay_vtables.cpp  the vtable of each concrete kind of a polymorphic base, and the class word table
     src/harness/replay_callbacks.h  the recorder's thunk classes for the callback interfaces
     tests/replay_callbacks.h        the replayer's players for the callbacks an import made, and its classes for the callbacks a module holds
 
@@ -63,6 +64,7 @@ FIXTURES_JSON = ROOT / "tests/replay_fixtures.json"
 FIXTURE_SCHEMA_H = ROOT / "tests/replay_schema_fixtures.h"
 FIXTURE_VTABLES_CPP = ROOT / "tests/replay_vtables_fixtures.cpp"
 FIXTURE_HOOKS_INC = ROOT / "tests/replay_fixture_hooks.inc"
+CLASS_WORDS = ROOT / "data/class_words.csv"
 SIM_GLOBALS_H = ROOT / "src/state/sim_globals.h"
 FORMAT = 2
 
@@ -4285,7 +4287,47 @@ def declaring_header(name: str) -> str:
     return ""
 
 
-def render_vtables(model: dict, fixtures: bool = False) -> str:
+def read_class_words(path: Path = CLASS_WORDS) -> list[dict]:
+    """The rows of data/class_words.csv: index, class (a concrete kind) and base (empty for the word at offset 0)."""
+    with open(path, newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def check_class_words(rows: list[dict], model: dict) -> list[str]:
+    """Errors when the class word table does not list each vtable of every concrete kind exactly once, indexed 0 to n-1 in order."""
+    errors = []
+    want = {(o["name"], b) for o in model["objects"] if o.get("vtable") or o.get("vptr") for b in [""] + o.get("vtable_secondary", [])}
+    seen = set()
+    for i, r in enumerate(rows):
+        key = (r["class"], r["base"])
+        if r["index"] != str(i):
+            errors.append("%s: row %d has the index %s; indexes run from 0 in row order" % (CLASS_WORDS.name, i, r["index"]))
+        if key not in want:
+            errors.append("%s: %s%s is no vtable of a concrete kind" % (CLASS_WORDS.name, r["class"], " (%s)" % r["base"] if r["base"] else ""))
+        elif key in seen:
+            errors.append("%s: %s%s is listed twice" % (CLASS_WORDS.name, r["class"], " (%s)" % r["base"] if r["base"] else ""))
+        seen.add(key)
+    errors += ["%s: %s%s has no row; append one with the next index" % (CLASS_WORDS.name, n, " (%s)" % b if b else "")
+               for n, b in sorted(want - seen)]
+    return errors
+
+
+def render_class_words(rows: list[dict], model: dict) -> list[str]:
+    """ReplayClassWords: the word a native object of each class holds, in the order of data/class_words.csv."""
+    kinds = {o["name"]: o for o in model["objects"] if o.get("vtable") or o.get("vptr")}
+    L = ["", "unsigned ReplayClassWords(unsigned* out, unsigned capacity)", "{",
+         "    if (capacity < %d)" % len(rows), "        return %d;" % len(rows)]
+    for r in rows:
+        o = kinds.get(r["class"])
+        if o is None or (r["base"] and r["base"] not in o.get("vtable_secondary", [])):
+            continue
+        word = "g_vtsec_%s_%s" % (o["type"], r["base"]) if r["base"] else "ReplayVtable(ROK_%s)" % upper(o["name"])
+        L.append("    out[%s] = (unsigned)%s;" % (r["index"], word))
+    L += ["    return %d;" % len(rows), "}"]
+    return L
+
+
+def render_vtables(model: dict, fixtures: bool = False, class_words: list[dict] | None = None) -> str:
     """The vtable of each concrete kind, by kind id: the externs are here and not in a header."""
     kinds = [o for o in model["objects"] if o.get("vtable") or o.get("vptr")]
     if fixtures:
@@ -4313,6 +4355,7 @@ def render_vtables(model: dict, fixtures: bool = False) -> str:
                 L.append("        out[%d].vtable = g_vtsec_%s_%s;" % (i, o["type"], b))
             L.append("        return %d;" % len(o["vtable_secondary"]))
     L += ["    default:", "        return 0;", "    }", "}"]
+    L += render_class_words(class_words if class_words is not None else read_class_words(), model)
     return "\n".join(L) + "\n"
 
 
@@ -4529,16 +4572,18 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
     for sub, spec in ann["subsystems"].items():
         errors += ["%s lists the service %s, which has no spec" % (sub, n) for n in spec.get("services", [])
                    if not any(x["name"] == n or x["name"].startswith(n + "_") for x in services)]
+    class_words = read_class_words()
+    errors += check_class_words(class_words, model)
     files = {
         SCHEMA_H: render_schema(ann, model),
         FIXTURE_SCHEMA_H: render_fixture_schema(fixture_ann, fixture_model),
-        FIXTURE_VTABLES_CPP: render_vtables(fixture_model, True),
+        FIXTURE_VTABLES_CPP: render_vtables(fixture_model, True, class_words),
         HOOKS_H: render_hooks(ann, model),
         SLOTS_H: render_slots(ann, model),
         SERVICES_H: render_service_ids(services, ann.get("loads", {})),
         SERVICES_INC: render_service_end(services),
         SERVICES_SLOTS: render_service_answers(services, linked_services(services)),
-        VTABLES_CPP: render_vtables(model),
+        VTABLES_CPP: render_vtables(model, False, class_words),
         CALLBACKS_H: render_callbacks(model),
         CALLBACKS_SLOTS: render_callback_players(model),
         SHAPES_SLOTS: render_shapes(fixture_ann),

@@ -29,6 +29,8 @@ unsigned char* s_region;
 unsigned s_base;
 unsigned s_size;
 unsigned s_bump;
+unsigned s_classWordsSize;
+unsigned s_classWordsHash;
 void (__stdcall* s_fatal)(const char* text);
 
 Registered* s_registered;
@@ -232,6 +234,22 @@ void __cdecl LoadDataAttach(unsigned char* native, unsigned base, unsigned size,
     s_size = size;
     s_fatal = fatal;
     s_bump = 0;
+    s_classWordsSize = 0;
+}
+
+void __cdecl LoadDataWriteClassWords(const unsigned* words, unsigned count)
+{
+    Locked locked;
+    unsigned size = (count * 4 + 7) & ~7u;
+    if (s_region == nullptr || s_mappedCount > 0 || s_classWordsSize > 0)
+        Fatal("load_data: the class words come first in the region");
+    if (count > s_size / 4 || size > s_size)
+        Fatal("load_data: the region is full");
+    memcpy(s_region, words, count * 4);
+    memset(s_region + count * 4, 0, size - count * 4);
+    s_classWordsSize = size;
+    s_classWordsHash = HashBytes(s_region, size);
+    s_bump = size;
 }
 
 void __cdecl LoadDataRegister(const void* buffer, unsigned size)
@@ -356,12 +374,15 @@ void __cdecl LoadDataCheck(unsigned tick)
     if (s_region == nullptr)
         return;
     Locked locked;
-    for (unsigned i = 0; i < s_mappedCount; i++) {
+    bool changed = s_classWordsSize > 0 && HashBytes(s_region, s_classWordsSize) != s_classWordsHash;
+    for (unsigned i = 0; i < s_mappedCount && !changed; i++) {
         const Mapped& m = s_mapped[i];
-        if (m.live && HashBytes(s_region + (m.linear - s_base), (m.size + 7) & ~7u) != m.hash) {
-            char text[100];
-            sprintf(text, "load_data: the load data changed at tick %u", tick);
-            Fatal(text);
-        }
+        if (m.live && HashBytes(s_region + (m.linear - s_base), (m.size + 7) & ~7u) != m.hash)
+            changed = true;
+    }
+    if (changed) {
+        char text[100];
+        sprintf(text, "load_data: the load data changed at tick %u", tick);
+        Fatal(text);
     }
 }

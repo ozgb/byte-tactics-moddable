@@ -1278,6 +1278,35 @@ class Polymorphic(unittest.TestCase):
         self.assertTrue(any("OrderTableEntry.notify: a code field names a table" in e for e in self.errors(ann)))
 
 
+class ClassWords(unittest.TestCase):
+    MODEL = {"objects": [{"name": "A", "type": "A", "vtable": "g_a"}, {"name": "B", "type": "B", "vtable": "g_b", "vtable_secondary": ["S"]},
+                         {"name": "Plain", "type": "Plain"}]}
+
+    def rows(self, *rows):
+        return [{"index": i, "class": c, "base": b} for i, c, b in rows]
+
+    def test_a_table_that_lists_each_vtable_once_in_index_order_passes(self):
+        self.assertEqual(rs.check_class_words(self.rows(("0", "A", ""), ("1", "B", ""), ("2", "B", "S")), self.MODEL), [])
+
+    def test_a_missing_vtable_a_repeat_a_stray_row_and_a_wrong_index_are_errors(self):
+        errors = rs.check_class_words(self.rows(("0", "A", ""), ("1", "A", ""), ("3", "Plain", "")), self.MODEL)
+        self.assertEqual(len(errors), 5, errors)
+        self.assertTrue(any("A is listed twice" in e for e in errors))
+        self.assertTrue(any("Plain is no vtable" in e for e in errors))
+        self.assertTrue(any("row 2 has the index 3" in e for e in errors))
+        self.assertTrue(any("B has no row" in e for e in errors) and any("B (S) has no row" in e for e in errors))
+
+    def test_the_generated_table_writes_each_word_at_its_index(self):
+        lines = rs.render_class_words(self.rows(("0", "B", "S"), ("1", "A", "")), self.MODEL)
+        self.assertIn("    out[0] = (unsigned)g_vtsec_B_S;", lines)
+        self.assertIn("    out[1] = (unsigned)ReplayVtable(ROK_A);", lines)
+        self.assertIn("    return 2;", lines)
+
+    def test_the_real_table_matches_the_schema(self):
+        model = {"objects": json.loads((rs.ROOT / "data/replay_schema.json").read_text())["objects"]}
+        self.assertEqual(rs.check_class_words(rs.read_class_words(), model), [])
+
+
 class Callbacks(unittest.TestCase):
     """N6: an import that calls back into the subsystem records each call under its i line, and the stub makes them in order."""
 

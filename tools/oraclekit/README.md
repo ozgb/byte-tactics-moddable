@@ -87,7 +87,7 @@ decision for #180, not for the clean room.
 ## From the ABI document to layout.json
 
 `layout.json` holds, for every struct the state block holds, its size and each field's name, offset, size
-and type (a bit-field has `bit_offset` and `bit_width` in place of a size; `bases` and `vptr` appear when the
+and type (a bit-field has `bit_offset` and `bit_width` in place of a size; `bases`, each with its offset, and `vptr` appear when the
 record has them). A field whose type is an unnamed union or struct (`WeaponDef::(unnamed)`) lists the bit-fields
 inside it as `bits`: each is `{name, bit, width}`, with `bit` counted from the first bit of the field (`WeaponDef.flags`
 has `meteor` at bit 5). It carries no cross-references to the decompilation (the export leaves out `data/layout_refs.csv`).
@@ -103,6 +103,12 @@ has `meteor` at bit 5). It carries no cross-references to the decompilation (the
 | `weapon` | `WeaponDef` | the result of `weapons.FindWeaponByName`, section 9.2 |
 
 A pointer field stored in the block is a `Ref<T>`: a 32-bit block offset (section 7.1).
+
+`class_words` lists the class word table that starts the `load_data` region (section 7.1), in index order: each entry
+is `{index, class, offset}`, with `base` added when the word is that of a second base of the class rather than the
+first word. `class` is the object kind, as the recordings name objects; the table holds the word at `load_data` base +
+4 × `index`. An index never changes, so a module may build its indexes in. A class that is gone keeps its entry as
+`{index, class, removed: true}`, with no offset, and its word is 0.
 
 ## The sim event queue
 

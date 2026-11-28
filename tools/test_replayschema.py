@@ -1278,6 +1278,72 @@ class Polymorphic(unittest.TestCase):
         self.assertTrue(any("OrderTableEntry.notify: a code field names a table" in e for e in self.errors(ann)))
 
 
+class ClassWords(unittest.TestCase):
+    MODEL = {"objects": [{"name": "A", "type": "A", "vtable": "g_a"}, {"name": "B", "type": "B", "vtable": "g_b", "vtable_secondary": ["S"]},
+                         {"name": "Plain", "type": "Plain"}]}
+
+    def rows(self, *rows):
+        return [{"index": r[0], "class": r[1], "base": r[2], "removed": r[3] if len(r) > 3 else ""} for r in rows]
+
+    def test_a_table_that_lists_each_vtable_once_in_index_order_passes(self):
+        self.assertEqual(rs.check_class_words(self.rows(("0", "A", ""), ("1", "B", ""), ("2", "B", "S")), self.MODEL), [])
+
+    def test_a_missing_vtable_a_repeat_a_stray_row_and_a_wrong_index_are_errors(self):
+        errors = rs.check_class_words(self.rows(("0", "A", ""), ("1", "A", ""), ("3", "Plain", "")), self.MODEL)
+        self.assertEqual(len(errors), 5, errors)
+        self.assertTrue(any("A is listed twice" in e for e in errors))
+        self.assertTrue(any("Plain is no vtable" in e for e in errors))
+        self.assertTrue(any("row 2 has the index 3" in e for e in errors))
+        self.assertTrue(any("B has no row" in e for e in errors) and any("B (S) has no row" in e for e in errors))
+
+    def test_the_generated_table_writes_each_word_at_its_index(self):
+        lines = rs.render_class_words(self.rows(("0", "B", "S"), ("1", "A", "")), self.MODEL)
+        self.assertIn("    out[0] = (unsigned)g_vtsec_B_S;", lines)
+        self.assertIn("    out[1] = (unsigned)ReplayVtable(ROK_A);", lines)
+        self.assertIn("    return 2;", lines)
+
+    def test_a_removed_row_keeps_its_index_and_names_no_vtable(self):
+        self.assertEqual(rs.check_class_words(self.rows(("0", "Gone", "", "yes"), ("1", "A", ""), ("2", "B", ""), ("3", "B", "S")), self.MODEL), [])
+        errors = rs.check_class_words(self.rows(("0", "A", "", "yes"), ("1", "A", ""), ("2", "B", ""), ("3", "B", "S")), self.MODEL)
+        self.assertTrue(any("A is removed but is a vtable" in e for e in errors), errors)
+        self.assertIn("    out[0] = 0;", rs.render_class_words(self.rows(("0", "Gone", "", "yes"), ("1", "A", "")), self.MODEL))
+
+    def test_two_swapped_rows_of_the_tagged_table_are_refused(self):
+        tagged = self.rows(("0", "A", ""), ("1", "B", ""))
+        swapped = self.rows(("0", "B", ""), ("1", "A", ""), ("2", "B", "S"))
+        errors = rs.check_class_words_kept(swapped, tagged, "interfaces-v9")
+        self.assertEqual(len(errors), 2, errors)
+        self.assertTrue(all("an index never changes" in e for e in errors), errors)
+        self.assertEqual(rs.check_class_words_kept(self.rows(("0", "A", ""), ("1", "B", ""), ("2", "B", "S")), tagged, "interfaces-v9"), [])
+
+    def test_a_dropped_or_revived_row_of_the_tagged_table_is_refused(self):
+        tagged = self.rows(("0", "Gone", "", "yes"), ("1", "A", ""))
+        self.assertTrue(any("is gone" in e for e in rs.check_class_words_kept(self.rows(("0", "Gone", "", "yes")), tagged, "interfaces-v9")))
+        self.assertTrue(any("stays removed" in e for e in rs.check_class_words_kept(self.rows(("0", "Gone", ""), ("1", "A", "")), tagged, "interfaces-v9")))
+
+    def test_a_table_from_before_the_removed_column_reads(self):
+        self.assertEqual(rs.parse_class_words("index,class,base\n0,A,\n"), self.rows(("0", "A", "")))
+
+    def test_rendering_an_unknown_row_fails(self):
+        with self.assertRaises(rs.Error):
+            rs.render_class_words(self.rows(("0", "Plain", "")), self.MODEL)
+        with self.assertRaises(rs.Error):
+            rs.render_class_words(self.rows(("0", "A", "S")), self.MODEL)
+
+    def test_a_kind_that_loses_its_vtable_is_an_error_of_the_schema(self):
+        ann = annotations()
+        del ann["objects"]["PathOrder"]["vtable"]
+        self.assertTrue(any("class_words.csv: PathOrder is no vtable" in e for e in generate(ann)[1]))
+
+    def test_the_real_table_keeps_the_newest_tagged_table(self):
+        tag, tagged = rs.tagged_class_words()
+        self.assertEqual(rs.check_class_words_kept(rs.read_class_words(), tagged, tag), [])
+
+    def test_the_real_table_matches_the_schema(self):
+        model = {"objects": json.loads((rs.ROOT / "data/replay_schema.json").read_text())["objects"]}
+        self.assertEqual(rs.check_class_words(rs.read_class_words(), model), [])
+
+
 class Callbacks(unittest.TestCase):
     """N6: an import that calls back into the subsystem records each call under its i line, and the stub makes them in order."""
 

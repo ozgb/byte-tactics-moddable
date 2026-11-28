@@ -463,6 +463,64 @@ class FuelPassTest(unittest.TestCase):
             self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
 
 
+BASES_DUMP = """*** Dumping AST Record Layout
+         0 | class V
+         0 |   class M (primary base)
+         0 |     (M vftable pointer)
+         4 |     int a
+         8 |   class S (base)
+         8 |     (S vftable pointer)
+        12 |   int b
+           | [sizeof=16, align=4,
+           |  nvsize=16, nvalign=4]
+"""
+CLASS_SCHEMA = json.dumps({"objects": [{"name": "V", "type": "V"}, {"name": "PlainM", "type": "M"}]})
+
+
+class ClassWordsTest(unittest.TestCase):
+    def test_a_base_after_the_primary_is_listed_with_its_offset(self):
+        entry = oraclekit.record_entry(BASES_DUMP, "V", 16)
+        self.assertEqual(entry["bases"], [{"type": "M", "offset": 0}, {"type": "S", "offset": 8}])
+        self.assertEqual([(f["name"], f["offset"]) for f in entry["fields"]], [("b", 12)])
+
+    def class_words(self, rows: str, records: dict) -> list[dict]:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "data").mkdir()
+            (root / oraclekit.CLASS_WORDS).write_text("index,class,base,removed\n" + rows)
+            (root / oraclekit.REPLAY_SCHEMA).write_text(CLASS_SCHEMA)
+            return oraclekit.class_words(root, records)
+
+    def test_the_words_keep_the_order_of_the_table_and_take_a_base_offset_from_the_layout(self):
+        records = {"V": {"bases": [{"type": "M", "offset": 0}, {"type": "S", "offset": 8}]}}
+        self.assertEqual(self.class_words("0,V,\n1,V,S\n2,PlainM,\n", records),
+                         [{"index": 0, "class": "V", "offset": 0}, {"index": 1, "class": "V", "offset": 8, "base": "S"},
+                          {"index": 2, "class": "PlainM", "offset": 0}])
+
+    def test_a_base_the_layout_does_not_list_stops_the_export(self):
+        with self.assertRaises(SystemExit) as e:
+            self.class_words("0,V,\n1,V,T\n", {"V": {"bases": [{"type": "S", "offset": 8}]}})
+        self.assertIn("no base T of V", str(e.exception))
+
+    def test_indexes_out_of_row_order_stop_the_export(self):
+        with self.assertRaises(SystemExit):
+            self.class_words("1,V,\n0,PlainM,\n", {})
+
+    def test_a_removed_class_keeps_its_index_with_no_offset(self):
+        self.assertEqual(self.class_words("0,Gone,,yes\n1,V,\n", {}),
+                         [{"index": 0, "class": "Gone", "removed": True}, {"index": 1, "class": "V", "offset": 0}])
+
+    def test_the_real_layout_lists_every_word_of_the_table(self):
+        words = real_layout()["class_words"]
+        rows = (ROOT / oraclekit.CLASS_WORDS).read_text().splitlines()[1:]
+        self.assertEqual(len(words), len(rows))
+        self.assertEqual([w["index"] for w in words], list(range(len(rows))))
+        by = {(w["class"], w.get("base")): w for w in words}
+        self.assertEqual(by[("VictoryKillAllMobileUnits", "UnitScanVisitor")]["offset"], 12)
+        self.assertEqual(by[("LiteGoal", None)]["offset"], 0)
+        self.assertEqual(oraclekit.names_source(json.dumps(words).encode()), [])
+
+
 class UnnamedBitsTest(unittest.TestCase):
     def test_the_bits_of_an_unnamed_union_are_listed_under_the_field(self):
         entry = oraclekit.record_entry(UNNAMED_DUMP, "W", 12)

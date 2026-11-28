@@ -10,6 +10,7 @@
 #include "../../interfaces/host.h"
 #include "../state/block.h"
 #include "../state/load_data.h"
+#include "../harness/replay_objects.h"
 #include "../game/los_helpers.h"
 #include "wasmloader.h"
 #include "modules.h"
@@ -266,6 +267,11 @@ void Start(const char* only)
     if (!layout->has_load_data)
         LoaderFatal("modules", "the manifest has no load_data region");
     LoadDataAttach(s_memory.base + layout->load_data_base, layout->load_data_base, layout->load_data_size, ModulesFatal);
+    unsigned classWords[256];
+    unsigned classWordCount = ReplayClassWords(classWords, sizeof classWords / sizeof classWords[0]);
+    if (classWordCount > sizeof classWords / sizeof classWords[0])
+        LoaderFatal("modules", "the class word table is too long");
+    LoadDataWriteClassWords(classWords, classWordCount);
 
     if (!GlueInstall(s_loader, s_timing))
         LoaderFatal("modules", wl_error(s_loader));

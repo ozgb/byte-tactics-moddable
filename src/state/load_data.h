@@ -3,6 +3,8 @@
 
 void __cdecl LoadDataAttach(unsigned char* native, unsigned base, unsigned size, void (__stdcall* fatal)(const char* text));
 
+void __cdecl LoadDataWriteClassWords(const unsigned* words, unsigned count);
+
 void __cdecl LoadDataRegister(const void* buffer, unsigned size);
 
 void __cdecl LoadDataRegisterTable(const void* table, unsigned size);

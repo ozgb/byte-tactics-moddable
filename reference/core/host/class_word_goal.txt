@@ -1,0 +1,6 @@
+bt-replay 2
+subsystem movement 5.0
+call 0 HasNetState
+  r Unit#1.motion UnitMotion#1
+  r UnitMotion#1.obj LiteGoal#1
+  a unit Unit#1

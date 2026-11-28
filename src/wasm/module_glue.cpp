@@ -306,13 +306,14 @@ IMPORT(SimFreeImport)
 IMPORT(RecordSimEventImport)
 {
     unsigned count = (unsigned)a[3].i32;
-    if ((unsigned)a[0].i32 > SIM_EVENT_RADAR_MAPPED || (count != 0 && a[2].i32 == 0))
-        return nullptr;
     if (count != 0) {
         NEED("RecordSimEvent", 2);
         if (count > (ModulesMemory()->size - (unsigned)a[2].i32) / sizeof(unsigned))
             return GlueImportError("RecordSimEvent", "the buffer runs past the module memory");
     }
+    unsigned kind = (unsigned)a[0].i32;
+    if (kind > SIM_EVENT_RADAR_MAPPED || kind == 24 || (count != 0 && a[2].i32 == 0))
+        return nullptr;
     RecordSimEvent((SimEventKind)a[0].i32, (unsigned)a[1].i32, (const unsigned*)GlueLinear(a[2].i32), count);
     return nullptr;
 }

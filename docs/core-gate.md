@@ -294,7 +294,7 @@ The gate makes no `call` or `fuel` call that names a module not loaded, and no `
 
 | Call | Arguments | Value |
 | --- | --- | --- |
-| `replay` | recording, module | a list with one entry for each `call` line of the recording, in order: the list of the `i` lines of the imports the module calls that the recording has no line for, then the `w` lines, then the closing `o` lines (`docs/replay-format.md`, "Lines"), that the core's replay of that call gives, each a string without its indentation, as `"w SimGlobals.g_meteorScheduleGap 1800"` |
+| `replay` | recording, module | a list with one entry for each `call` line of the recording, in order: the list of the `i` lines of the imports the module calls once the recording's import lines for that call have run out (an import that differs from the next recorded line is a mismatch instead, which the list does not show), then the `w` lines, then the closing `o` lines (`docs/replay-format.md`, "Lines"), that the core's replay of that call gives, each a string without its indentation, as `"w SimGlobals.g_meteorScheduleGap 1800"` |
 
 The recording, in `reference/core/host/`, is a file of `tests/replay/wind_meteors/` with what the core must produce taken
 out: every `w` line and every closing `o` line (`docs/replay-format.md`, "Lines") is withheld, and the rest (the `call`

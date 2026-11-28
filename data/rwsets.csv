@@ -58316,6 +58316,7 @@ address,function,file,kind,target
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_size
 ,LoadDataCheck,src/state/load_data.cpp,call,Fatal
 ,LoadDataCheck,src/state/load_data.cpp,call,HashBytes
+,LoadDataCheck,src/state/load_data.cpp,call,Locked::~Locked
 ,LoadDataCheck,src/state/load_data.cpp,call,sprintf
 ,LoadDataCheck,src/state/load_data.cpp,deref_read,*Mapped
 ,LoadDataCheck,src/state/load_data.cpp,field_read,Mapped::hash
@@ -58470,11 +58471,13 @@ address,function,file,kind,target
 ,LoadModule,src/wasm/modules.cpp,global_write,s_loadedCount
 ,LoadNative,src/state/load_data.cpp,call,FatalAddress
 ,LoadNative,src/state/load_data.cpp,call,FindMapped
+,LoadNative,src/state/load_data.cpp,call,Locked::~Locked
 ,LoadNative,src/state/load_data.cpp,field_read,Mapped::linear
 ,LoadNative,src/state/load_data.cpp,field_read,Mapped::native
 ,LoadNative,src/state/load_data.cpp,function,
 ,LoadNative,src/state/load_data.cpp,global_read,s_region
 ,LoadNativeIfLoadData,src/state/load_data.cpp,call,FindMapped
+,LoadNativeIfLoadData,src/state/load_data.cpp,call,Locked::~Locked
 ,LoadNativeIfLoadData,src/state/load_data.cpp,field_read,Mapped::linear
 ,LoadNativeIfLoadData,src/state/load_data.cpp,field_read,Mapped::native
 ,LoadNativeIfLoadData,src/state/load_data.cpp,function,

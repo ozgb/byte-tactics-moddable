@@ -335,6 +335,7 @@ void* __cdecl LoadNative(unsigned address)
 {
     if (s_region == nullptr || address == 0)
         return (void*)address;
+    Locked locked;
     const Mapped* m = FindMapped(address);
     if (m == nullptr)
         FatalAddress("is not a load address", address);
@@ -345,6 +346,7 @@ void* __cdecl LoadNativeIfLoadData(unsigned address)
 {
     if (s_region == nullptr || address == 0)
         return (void*)address;
+    Locked locked;
     const Mapped* m = FindMapped(address);
     return m == nullptr ? (void*)address : (void*)(m->native + (address - m->linear));
 }
@@ -353,6 +355,7 @@ void __cdecl LoadDataCheck(unsigned tick)
 {
     if (s_region == nullptr)
         return;
+    Locked locked;
     for (unsigned i = 0; i < s_mappedCount; i++) {
         const Mapped& m = s_mapped[i];
         if (m.live && HashBytes(s_region + (m.linear - s_base), (m.size + 7) & ~7u) != m.hash) {

@@ -1330,6 +1330,11 @@ class ClassWords(unittest.TestCase):
         with self.assertRaises(rs.Error):
             rs.render_class_words(self.rows(("0", "A", "S")), self.MODEL)
 
+    def test_a_kind_that_loses_its_vtable_is_an_error_of_the_schema(self):
+        ann = annotations()
+        del ann["objects"]["PathOrder"]["vtable"]
+        self.assertTrue(any("class_words.csv: PathOrder is no vtable" in e for e in generate(ann)[1]))
+
     def test_the_real_table_keeps_the_newest_tagged_table(self):
         tag, tagged = rs.tagged_class_words()
         self.assertEqual(rs.check_class_words_kept(rs.read_class_words(), tagged, tag), [])

@@ -1832,9 +1832,9 @@ static ProjectedFaceView ViewFace(Face* f, bool loadData)
     return v;
 }
 
-template <class Prim>
+template <class Prim, bool loadData>
 static void DrawProjectedFaces(void* surface, Vec3* offset, short* angles, Vec3* v, int vertexCount,
-                               Prim* e, int faceCount, int firstFace, bool loadData)
+                               Prim* e, int faceCount, int firstFace)
 {
     Vec3* scratch = (Vec3 *)g_game->xform;
     Point* points = (Point *)g_game->projected;
@@ -1884,7 +1884,7 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     if (DisplayLogWants())
         DisplayLogProjectile(surface, offset, obj, angles);
     DisplayLogScope displayScope;
-    DrawProjectedFaces(surface, offset, angles, obj->verts, obj->count, obj->prims, obj->faceCount, obj->firstFace, false);
+    DrawProjectedFaces<ProjectedPrimitive, false>(surface, offset, angles, obj->verts, obj->count, obj->prims, obj->faceCount, obj->firstFace);
 }
 
 void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
@@ -1897,7 +1897,7 @@ void __stdcall DrawDebrisProjected(void* surface, Vec3* offset,
     Face* faces = piece->faces.get();
     if (verts == nullptr || faces == nullptr)
         return;
-    DrawProjectedFaces(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace, true);
+    DrawProjectedFaces<Face, true>(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace);
 }
 
 void __stdcall DrawDebrisProjectedNative(void* surface, Vec3* offset,
@@ -1907,7 +1907,7 @@ void __stdcall DrawDebrisProjectedNative(void* surface, Vec3* offset,
     Face* faces = piece->faces.get();
     if (verts == nullptr || faces == nullptr)
         return;
-    DrawProjectedFaces(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace, false);
+    DrawProjectedFaces<Face, false>(surface, offset, angles, verts, piece->vertexCount, faces, piece->faceCount, piece->firstFace);
 }
 
 // FUNCTION: 0x46bc60

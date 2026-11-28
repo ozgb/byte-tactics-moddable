@@ -1283,7 +1283,7 @@ class ClassWords(unittest.TestCase):
                          {"name": "Plain", "type": "Plain"}]}
 
     def rows(self, *rows):
-        return [{"index": i, "class": c, "base": b} for i, c, b in rows]
+        return [{"index": r[0], "class": r[1], "base": r[2], "removed": r[3] if len(r) > 3 else ""} for r in rows]
 
     def test_a_table_that_lists_each_vtable_once_in_index_order_passes(self):
         self.assertEqual(rs.check_class_words(self.rows(("0", "A", ""), ("1", "B", ""), ("2", "B", "S")), self.MODEL), [])
@@ -1301,6 +1301,38 @@ class ClassWords(unittest.TestCase):
         self.assertIn("    out[0] = (unsigned)g_vtsec_B_S;", lines)
         self.assertIn("    out[1] = (unsigned)ReplayVtable(ROK_A);", lines)
         self.assertIn("    return 2;", lines)
+
+    def test_a_removed_row_keeps_its_index_and_names_no_vtable(self):
+        self.assertEqual(rs.check_class_words(self.rows(("0", "Gone", "", "yes"), ("1", "A", ""), ("2", "B", ""), ("3", "B", "S")), self.MODEL), [])
+        errors = rs.check_class_words(self.rows(("0", "A", "", "yes"), ("1", "A", ""), ("2", "B", ""), ("3", "B", "S")), self.MODEL)
+        self.assertTrue(any("A is removed but is a vtable" in e for e in errors), errors)
+        self.assertIn("    out[0] = 0;", rs.render_class_words(self.rows(("0", "Gone", "", "yes"), ("1", "A", "")), self.MODEL))
+
+    def test_two_swapped_rows_of_the_tagged_table_are_refused(self):
+        tagged = self.rows(("0", "A", ""), ("1", "B", ""))
+        swapped = self.rows(("0", "B", ""), ("1", "A", ""), ("2", "B", "S"))
+        errors = rs.check_class_words_kept(swapped, tagged, "interfaces-v9")
+        self.assertEqual(len(errors), 2, errors)
+        self.assertTrue(all("an index never changes" in e for e in errors), errors)
+        self.assertEqual(rs.check_class_words_kept(self.rows(("0", "A", ""), ("1", "B", ""), ("2", "B", "S")), tagged, "interfaces-v9"), [])
+
+    def test_a_dropped_or_revived_row_of_the_tagged_table_is_refused(self):
+        tagged = self.rows(("0", "Gone", "", "yes"), ("1", "A", ""))
+        self.assertTrue(any("is gone" in e for e in rs.check_class_words_kept(self.rows(("0", "Gone", "", "yes")), tagged, "interfaces-v9")))
+        self.assertTrue(any("stays removed" in e for e in rs.check_class_words_kept(self.rows(("0", "Gone", ""), ("1", "A", "")), tagged, "interfaces-v9")))
+
+    def test_a_table_from_before_the_removed_column_reads(self):
+        self.assertEqual(rs.parse_class_words("index,class,base\n0,A,\n"), self.rows(("0", "A", "")))
+
+    def test_rendering_an_unknown_row_fails(self):
+        with self.assertRaises(rs.Error):
+            rs.render_class_words(self.rows(("0", "Plain", "")), self.MODEL)
+        with self.assertRaises(rs.Error):
+            rs.render_class_words(self.rows(("0", "A", "S")), self.MODEL)
+
+    def test_the_real_table_keeps_the_newest_tagged_table(self):
+        tag, tagged = rs.tagged_class_words()
+        self.assertEqual(rs.check_class_words_kept(rs.read_class_words(), tagged, tag), [])
 
     def test_the_real_table_matches_the_schema(self):
         model = {"objects": json.loads((rs.ROOT / "data/replay_schema.json").read_text())["objects"]}

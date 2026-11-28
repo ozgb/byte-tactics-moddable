@@ -540,12 +540,18 @@ one byte of the record's layout; it is not an argument kind.
   today). Each entry names the object kind (`class`, as the recordings name objects) and the offset
   in the object of the word (`offset`): 0 for the first word, or, for a class that has a second base
   with code of its own, that base's offset and its name (`base`); such a class has two entries, the
-  word at 0 and the base's word. An index never changes: a new class is appended. The words are
-  opaque: a module compares an object's word with an entry to learn its class, and copies an entry
+  word at 0 and the base's word. The table covers the object kinds of the replay recordings that
+  have a word: the concrete classes a recording names. It leaves out three classes with a word that
+  no recording names as an object: `Callback` (a script's completion handler, which a recording names
+  as a callback), and `PacketManager` and `PacketReceiver` (the network's one instance of each, in the
+  sim globals, which no module reads as an object). An index never changes: a new class is
+  appended, and a class that is gone keeps its entry, with `removed` set and no `offset`, and its
+  word is 0. The words are opaque: a module compares an object's word with an entry to learn its class, and copies an entry
   into an object it makes so that the engine's slots recognise it; it never computes with a word or
   calls through it, and never writes the table. The host hashes the table with the load data, so a
   write to it ends the game (section 13). A replay writes the table of the build that replays, so a
-  recording, which names an object by its class, stays the same from build to build.
+  recording, which names an object by its class, stays the same from build to build, and a call
+  that writes the table fails the replay.
 - In Milestone 2 every module is WASM and every object the simulation uses is already in the shared
   memory, so no translation happens: the caller passes the address of the object where it lives. The
   two rules together mean that a pointer into the block is an offset when it is stored and an address

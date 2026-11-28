@@ -107,7 +107,8 @@ A pointer field stored in the block is a `Ref<T>`: a 32-bit block offset (sectio
 `class_words` lists the class word table that starts the `load_data` region (section 7.1), in index order: each entry
 is `{index, class, offset}`, with `base` added when the word is that of a second base of the class rather than the
 first word. `class` is the object kind, as the recordings name objects; the table holds the word at `load_data` base +
-4 × `index`. An index never changes, so a module may build its indexes in.
+4 × `index`. An index never changes, so a module may build its indexes in. A class that is gone keeps its entry as
+`{index, class, removed: true}`, with no offset, and its word is 0.
 
 ## The sim event queue
 

@@ -42,6 +42,7 @@ import argparse
 import copy
 import csv
 import functools
+import io
 import json
 import os
 import re
@@ -4288,13 +4289,22 @@ def declaring_header(name: str) -> str:
 
 
 def read_class_words(path: Path = CLASS_WORDS) -> list[dict]:
-    """The rows of data/class_words.csv: index, class (a concrete kind) and base (empty for the word at offset 0)."""
+    """The rows of data/class_words.csv: index, class (a concrete kind), base (empty for the word at offset 0) and removed (`yes` for a class that is gone)."""
     with open(path, newline="") as f:
-        return list(csv.DictReader(f))
+        return parse_class_words(f.read())
+
+
+def parse_class_words(text: str) -> list[dict]:
+    """The rows of a class word table's text; a table from before the removed column has no removed rows."""
+    return [{"index": r["index"], "class": r["class"], "base": r["base"], "removed": r.get("removed") or ""} for r in csv.DictReader(io.StringIO(text))]
+
+
+def class_word_label(r: dict) -> str:
+    return r["class"] + (" (%s)" % r["base"] if r["base"] else "")
 
 
 def check_class_words(rows: list[dict], model: dict) -> list[str]:
-    """Errors when the class word table does not list each vtable of every concrete kind exactly once, indexed 0 to n-1 in order."""
+    """Errors when the class word table does not list each vtable of every concrete kind exactly once, indexed 0 to n-1 in order; a removed row names no vtable."""
     errors = []
     want = {(o["name"], b) for o in model["objects"] if o.get("vtable") or o.get("vptr") for b in [""] + list(o.get("vtable_secondary") or [])}
     seen = set()
@@ -4302,25 +4312,60 @@ def check_class_words(rows: list[dict], model: dict) -> list[str]:
         key = (r["class"], r["base"])
         if r["index"] != str(i):
             errors.append("%s: row %d has the index %s; indexes run from 0 in row order" % (CLASS_WORDS.name, i, r["index"]))
+        if r.get("removed") not in ("", None, "yes"):
+            errors.append("%s: %s has removed `%s`; it is empty or yes" % (CLASS_WORDS.name, class_word_label(r), r["removed"]))
+        if r.get("removed") == "yes":
+            if key in want:
+                errors.append("%s: %s is removed but is a vtable of a concrete kind; append a new row for it" % (CLASS_WORDS.name, class_word_label(r)))
+            continue
         if key not in want:
-            errors.append("%s: %s%s is no vtable of a concrete kind" % (CLASS_WORDS.name, r["class"], " (%s)" % r["base"] if r["base"] else ""))
+            errors.append("%s: %s is no vtable of a concrete kind; a removed class keeps its row with removed yes" % (CLASS_WORDS.name, class_word_label(r)))
         elif key in seen:
-            errors.append("%s: %s%s is listed twice" % (CLASS_WORDS.name, r["class"], " (%s)" % r["base"] if r["base"] else ""))
+            errors.append("%s: %s is listed twice" % (CLASS_WORDS.name, class_word_label(r)))
         seen.add(key)
     errors += ["%s: %s%s has no row; append one with the next index" % (CLASS_WORDS.name, n, " (%s)" % b if b else "")
                for n, b in sorted(want - seen)]
     return errors
 
 
+def check_class_words_kept(rows: list[dict], tagged: list[dict], tag: str) -> list[str]:
+    """Errors when the rows of the table at an interfaces tag are not a prefix of the table: an index never changes, and a removed row stays removed."""
+    errors = []
+    for i, old in enumerate(tagged):
+        if i >= len(rows):
+            errors.append("%s: row %d (%s) of %s is gone; an index never changes, so a removed class keeps its row with removed yes" % (CLASS_WORDS.name, i, class_word_label(old), tag))
+            continue
+        new = rows[i]
+        if (new["index"], new["class"], new["base"]) != (old["index"], old["class"], old["base"]):
+            errors.append("%s: row %d is %s but %s at %s; an index never changes, so append new classes" % (CLASS_WORDS.name, i, class_word_label(new), class_word_label(old), tag))
+        elif old["removed"] == "yes" and new["removed"] != "yes":
+            errors.append("%s: %s is removed at %s; a removed row stays removed" % (CLASS_WORDS.name, class_word_label(new), tag))
+    return errors
+
+
+def tagged_class_words() -> tuple[str, list[dict]]:
+    """The newest interfaces-v* tag and its class word table, or no rows when there is no tag or the tag has no table."""
+    import subprocess
+    run = lambda *a: subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True)
+    tags = run("tag", "-l", "interfaces-v*", "--sort=-v:refname").stdout.split()
+    if not tags:
+        return "", []
+    shown = run("show", "%s:%s" % (tags[0], CLASS_WORDS.relative_to(ROOT).as_posix()))
+    return tags[0], parse_class_words(shown.stdout) if shown.returncode == 0 else []
+
+
 def render_class_words(rows: list[dict], model: dict) -> list[str]:
-    """ReplayClassWords: the word a native object of each class holds, in the order of data/class_words.csv."""
+    """ReplayClassWords: the word a native object of each class holds, in the order of data/class_words.csv; a removed class's word is 0."""
     kinds = {o["name"]: o for o in model["objects"] if o.get("vtable") or o.get("vptr")}
     L = ["", "unsigned ReplayClassWords(unsigned* out, unsigned capacity)", "{",
          "    if (capacity < %d)" % len(rows), "        return %d;" % len(rows)]
     for r in rows:
+        if r.get("removed") == "yes":
+            L.append("    out[%s] = 0;" % r["index"])
+            continue
         o = kinds.get(r["class"])
         if o is None or (r["base"] and r["base"] not in list(o.get("vtable_secondary") or [])):
-            continue
+            raise Error("%s: %s is no vtable of a concrete kind; a removed class keeps its row with removed yes" % (CLASS_WORDS.name, class_word_label(r)))
         word = "g_vtsec_%s_%s" % (o["type"], r["base"]) if r["base"] else "ReplayVtable(ROK_%s)" % upper(o["name"])
         L.append("    out[%s] = (unsigned)%s;" % (r["index"], word))
     L += ["    return %d;" % len(rows), "}"]
@@ -4612,7 +4657,10 @@ def main() -> None:
         files, errors, model = generate(read_rows())
     except Error as e:
         sys.exit("replayschema: %s" % e)
-    errors += check_class_words(read_class_words(), model)
+    class_words = read_class_words()
+    errors += check_class_words(class_words, model)
+    tag, tagged = tagged_class_words()
+    errors += check_class_words_kept(class_words, tagged, tag)
     for e in errors:
         print("replayschema: " + e, file=sys.stderr)
     if args.check:

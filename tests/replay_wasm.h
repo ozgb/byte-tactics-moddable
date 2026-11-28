@@ -9,5 +9,6 @@ const char* ReplayWasmSubsystem();
 void ReplayWasmReload();
 void ReplayWasmUseSeam();
 void ReplayWasmNoBudgets();
+bool ReplayWasmClassWordsIntact();
 
 #endif

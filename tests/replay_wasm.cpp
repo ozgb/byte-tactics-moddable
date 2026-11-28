@@ -20,6 +20,8 @@ int s_active;
 bool s_noBudgets;
 const long kLargestFuelBudget = 2147483647;
 void (*s_trapHook)(const char* errorClass, const char* text);
+unsigned s_classWordsBytes;
+unsigned s_classWordsHash;
 
 }
 
@@ -109,6 +111,15 @@ void Release()
         wl_destroy(s_loader);
         s_loader = nullptr;
     }
+}
+
+unsigned ClassWordsHash()
+{
+    const unsigned char* bytes = s_memory.base + wl_get_layout(s_loader)->load_data_base;
+    unsigned hash = 2166136261u;
+    for (unsigned i = 0; i < s_classWordsBytes; i++)
+        hash = (hash ^ bytes[i]) * 16777619u;
+    return hash;
 }
 
 void Check(int ok)
@@ -222,6 +233,8 @@ void ReplayWasmReload()
     if (classWordCount > sizeof classWords / sizeof classWords[0] || classWordCount * 4 > layout->load_data_size)
         Stop("the class word table is too long");
     memcpy(s_memory.base + layout->load_data_base, classWords, classWordCount * 4);
+    s_classWordsBytes = classWordCount * 4;
+    s_classWordsHash = ClassWordsHash();
 
     Check(GlueInstall(s_loader, 0));
     wl_module* module = wl_load_module_bytes(s_loader, s_glue->def->name, bytes, size);
@@ -235,6 +248,11 @@ void ReplayWasmReload()
     }
     Check(GlueBind(s_glue, s_loader, module, (unsigned)fuelBudget));
     GlueFuelClose(s_glue, &used);
+}
+
+bool ReplayWasmClassWordsIntact()
+{
+    return s_loader == nullptr || ClassWordsHash() == s_classWordsHash;
 }
 
 void ReplayWasmNoBudgets()

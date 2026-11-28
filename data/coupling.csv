@@ -290,8 +290,9 @@ features,files,call,HapiBank::ReadBox,1
 features,files,call,HapiBank::SeekBox,2
 features,files,call,HapiBank::SetIntegerItem,1
 features,files,call,HapiBank::WriteBox,1
+features,game,call,EconEmitIncome,1
 features,game,call,EconHandleOf,1
-features,game,call,EconPublish,1
+features,game,call,EmitFrom,1
 features,game,call,FeaturesHeaderOf,4
 features,game,call,FeaturesPublishPlaceAt,1
 features,game,call,FeaturesPublishRemoveAll,1
@@ -301,7 +302,6 @@ features,game,call,RecordSoundAtName,1
 features,game,call,RecordTimedSubParticles,1
 features,game,call,RecordWhiteSmoke,1
 features,game,call,SchedFeaturesPhase,1
-features,game,call,SchedPublish,1
 features,game,call,SimAllocTagged,2
 features,game,call,SimRealloc,1
 features,game,call,StepGafSequence,2
@@ -1747,6 +1747,7 @@ harness,game,shared_write,FeaturesSeam::FirstFeatureSpot,1
 harness,game,shared_write,FeaturesSeam::GetCellFeature,1
 harness,game,shared_write,FeaturesSeam::ScanFeatureCell,1
 harness,game,shared_write,FeaturesSeam::UpdateFeatureSpot,1
+harness,game,shared_write,FeaturesSeam::UpdateFeatures,1
 harness,game,shared_write,Game::difficulty,4
 harness,game,shared_write,Game::localPlayer,15
 harness,game,shared_write,Game::mode_391f1,12
@@ -2050,6 +2051,7 @@ harness,platform,shared_write,FeaturesSeam::GetFootprintCentre,4
 harness,platform,shared_write,FeaturesSeam::Place,3
 harness,platform,shared_write,FeaturesSeam::ScanFeatureCell,3
 harness,platform,shared_write,FeaturesSeam::UpdateFeatureSpot,3
+harness,platform,shared_write,FeaturesSeam::UpdateFeatures,3
 harness,platform,shared_write,GafFrame::pixelsOrLayers,1
 harness,platform,shared_write,Game::ticks,2
 harness,platform,shared_write,LosRadarSeam::Apply,3
@@ -2379,6 +2381,7 @@ harness,seams,shared_write,FeaturesSeam::GetFootprintCentre,1
 harness,seams,shared_write,FeaturesSeam::Place,2
 harness,seams,shared_write,FeaturesSeam::ScanFeatureCell,1
 harness,seams,shared_write,FeaturesSeam::UpdateFeatureSpot,1
+harness,seams,shared_write,FeaturesSeam::UpdateFeatures,1
 harness,seams,shared_write,FilesSeam::Close,1
 harness,seams,shared_write,FilesSeam::FindFirst,1
 harness,seams,shared_write,FilesSeam::FindNext,1
@@ -4319,6 +4322,7 @@ platform,harness,shared_write,FeaturesSeam::GetFootprintCentre,2
 platform,harness,shared_write,FeaturesSeam::Place,2
 platform,harness,shared_write,FeaturesSeam::ScanFeatureCell,2
 platform,harness,shared_write,FeaturesSeam::UpdateFeatureSpot,2
+platform,harness,shared_write,FeaturesSeam::UpdateFeatures,2
 platform,harness,shared_write,Fixed::whole,1
 platform,harness,shared_write,Game::count_148e7,1
 platform,harness,shared_write,Game::data_148eb,1
@@ -6452,6 +6456,7 @@ seams,harness,shared_write,FeaturesSeam::GetFootprintCentre,2
 seams,harness,shared_write,FeaturesSeam::Place,2
 seams,harness,shared_write,FeaturesSeam::ScanFeatureCell,2
 seams,harness,shared_write,FeaturesSeam::UpdateFeatureSpot,2
+seams,harness,shared_write,FeaturesSeam::UpdateFeatures,2
 seams,harness,shared_write,FilesSeam::Close,2
 seams,harness,shared_write,FilesSeam::FindFirst,2
 seams,harness,shared_write,FilesSeam::FindNext,2

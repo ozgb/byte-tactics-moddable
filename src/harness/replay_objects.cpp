@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "../state/load_data.h"
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -839,6 +840,15 @@ void FixSelf(unsigned kind, void* object)
 
 }
 
+namespace {
+
+const void* LoadSideNative(unsigned kind, const void* p)
+{
+    return kind == ROK_FRAMETABLE || kind == ROK_GAFFRAME ? LoadNativeIfLoadData((unsigned)p) : p;
+}
+
+}
+
 unsigned ReplayLengthOf(const ReplayLength& length, const void* object)
 {
     unsigned long long n = (unsigned long long)FactorValue(length.first, object) * FactorValue(length.second, object);
@@ -847,6 +857,7 @@ unsigned ReplayLengthOf(const ReplayLength& length, const void* object)
 
 void ReplayAddObjectName(ReplayText& t, ReplayObjectTable& table, unsigned kind, const void* p, bool assign)
 {
+    p = LoadSideNative(kind, p);
     if (p == nullptr) {
         t.Add("null");
         return;
@@ -909,7 +920,7 @@ const unsigned char* ConditionSource(const ReplayCondition& c, const unsigned ch
     if (via.kind == RK_REF)
         return BlockAt(*(const unsigned*)at);
     if (via.kind == RK_PTR)
-        return *(const unsigned char* const*)at;
+        return (const unsigned char*)LoadSideNative(via.target, *(const unsigned char* const*)at);
     unsigned index = via.size == 1 ? *at : via.size == 2 ? *(const unsigned short*)at : *(const unsigned*)at;
     unsigned char* base;
     unsigned count;
@@ -1338,7 +1349,7 @@ bool ReplayRestoreObjectField(const ReplayObjectField& f, void* object, const ch
             if (target == nullptr || !ReplayKindFits(f.target, kind))
                 return false;
         }
-        *(void**)at = target;
+        *(void**)at = f.target == ROK_FRAMETABLE || f.target == ROK_GAFFRAME ? (void*)LoadAddressIfLoadData(target) : target;
         break;
     }
     case RK_LOAD: {
@@ -1447,6 +1458,7 @@ bool InWalkFields(const unsigned short* fields, unsigned count, unsigned field)
 
 void Visit(ReplayReach& reach, ReplayObjectTable& table, bool assign, unsigned short kind, void* object, const unsigned short* limit, unsigned limitCount)
 {
+    object = (void*)LoadSideNative(kind, object);
     if (object == nullptr || kReplayObjectKinds[kind].scope == RS_VALUE)
         return;
     if (s_walkSkip != nullptr && s_walkSkip(object))

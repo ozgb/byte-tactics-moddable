@@ -1,0 +1,4 @@
+bt-replay 2
+subsystem wind_meteors 3.1
+call 0 LoadMeteorDefaults
+  i services.SimAlloc 0 = alloc#1

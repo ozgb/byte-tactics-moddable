@@ -131,5 +131,82 @@
   ],
   "results": [
    ["replay", {"error": "fatal", "modules": ["wind_meteors"], "message": "meteor stop"}]
+  ]},
+ {"name": "slot_dpid_above",
+  "calls": [
+   ["replay", "host/slot_dpid_above.txt", "host/wind_meteors_slot_dpid_above.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius -1", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "capture_null_offset",
+  "calls": [
+   ["replay", "host/capture_null_offset.txt", "host/wind_meteors_capture_null_offset.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "record_event_kind",
+  "calls": [
+   ["replay", "host/record_event_kind.txt", "host/wind_meteors_record_event_kind.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 7", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "record_event_null_array",
+  "calls": [
+   ["replay", "host/record_event_null_array.txt", "host/wind_meteors_record_event_null_array.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 7", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "free_twice",
+  "calls": [
+   ["replay", "host/free_twice.txt", "host/wind_meteors_free_twice.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 7", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "alloc_zero",
+  "calls": [
+   ["replay", "host/alloc_zero.txt", "host/wind_meteors_alloc_zero.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 1", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "alloc_tagged_null",
+  "calls": [
+   ["replay", "host/alloc_tagged_null.txt", "host/wind_meteors_alloc_tagged_null.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 1", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "gaf_frame_null_table",
+  "calls": [
+   ["replay", "host/gaf_frame_null_table.txt", "host/wind_meteors_gaf_frame_null_table.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "gaf_init_null_animation",
+  "calls": [
+   ["replay", "host/gaf_init_null_animation.txt", "host/wind_meteors_gaf_init_null_animation.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 458755", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "gaf_step_null_cursor",
+  "calls": [
+   ["replay", "host/gaf_step_null_cursor.txt", "host/wind_meteors_gaf_step_null_cursor.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "gaf_sequence_frame_null_cursor",
+  "calls": [
+   ["replay", "host/gaf_sequence_frame_null_cursor.txt", "host/wind_meteors_gaf_sequence_frame_null_cursor.wasm"]
+  ],
+  "results": [
+   ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
   ]}
 ]}

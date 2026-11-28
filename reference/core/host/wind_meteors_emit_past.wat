@@ -13,7 +13,7 @@
   (data (i32.const 197120) "\50\00\00\00\00\00\00\00\01\00\00\00\02\00\00\00\03\00\00\00\04\00\00\00\05\00\00\00\06\00\00\00\01\00\00\00")
   (func (export "UpdateWind") (param i32))
   (func (export "UpdateMeteors")
-    (call $Emit (i32.const 269484000) (i32.const 36)))
+    (call $Emit (i32.const 336592864) (i32.const 36)))
   (func (export "Apply") (param i32 i32))
   (func (export "InitMeteors"))
   (func (export "EmptyShutdownPreCleanup"))

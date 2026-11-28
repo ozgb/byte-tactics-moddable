@@ -1,0 +1,45 @@
+{
+ "memory_pages": 4,
+ "table_size": 16,
+ "window": 4096,
+ "table_slots": 4,
+ "stack_size": 1024,
+ "scratch": [
+  131072,
+  65536
+ ],
+ "load_data": [
+  163840,
+  65536
+ ],
+ "modules": [
+  {
+   "name": "a",
+   "data_base": 4096,
+   "table_base": 0,
+   "exports": [
+    "add",
+    "store",
+    "load",
+    "noop"
+   ],
+   "data": [
+    "g_word"
+   ]
+  },
+  {
+   "name": "b",
+   "data_base": 8192,
+   "table_base": 4,
+   "exports": [
+    "add",
+    "store",
+    "load",
+    "noop"
+   ],
+   "data": [
+    "g_word"
+   ]
+  }
+ ]
+}

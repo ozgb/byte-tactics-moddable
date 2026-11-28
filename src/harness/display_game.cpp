@@ -1,4 +1,5 @@
 #include "win_types.h"
+#include "../state/load_data.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -745,11 +746,11 @@ void DisplayLogShard(void* dst, Vec3* offset, DebrisPiece* piece, const short* a
         if (f->nverts == 4) {
             const GafFrame* pic = nullptr;
             if (f->flags.bits.b != 0) {
-                const char* table = (const char*)f->tex.src;
+                const char* table = (const char*)LoadNative((unsigned)f->tex.src);
                 if (table != nullptr)
                     pic = *(const GafFrame* const*)(table + 0x28 + (int)f->tex.index * 8);
             } else {
-                pic = (const GafFrame*)f->tex.pic;
+                pic = (const GafFrame*)LoadNative((unsigned)f->tex.pic);
             }
             if (pic != nullptr) {
                 DlPicture p;

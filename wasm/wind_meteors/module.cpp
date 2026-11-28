@@ -35,6 +35,9 @@ IMPORT("services", "HapiBank_OpenAccount") int service_HapiBank_OpenAccount(Hapi
 IMPORT("services", "HapiBank_SetIntegerItem") int service_HapiBank_SetIntegerItem(HapiBank* self, const char* name, int value);
 IMPORT("services", "Emit") void service_Emit(const void* effect, unsigned int size);
 IMPORT("services", "HapiBank_GetIntegerItem") int service_HapiBank_GetIntegerItem(HapiBank* self, const char* name, int def);
+#ifdef BT_WRITE_CHECK
+IMPORT("services", "GetGafFrame") unsigned service_GetGafFrame(unsigned table, int index);
+#endif
 IMPORT("weapons", "FindWeaponByName") WeaponDef* weapons_FindWeaponByName(const char* name);
 }
 
@@ -99,7 +102,15 @@ Seams g_seams = {
 
 extern "C" {
 EXPORT("UpdateWind") void export_UpdateWind(RandStream stream) { s_windMeteors.UpdateWind(stream); }
-EXPORT("UpdateMeteors") void export_UpdateMeteors(void) { s_windMeteors.UpdateMeteors(); }
+EXPORT("UpdateMeteors") void export_UpdateMeteors(void)
+{
+    s_windMeteors.UpdateMeteors();
+#ifdef BT_WRITE_CHECK
+    unsigned char* frame = (unsigned char*)service_GetGafFrame((unsigned)g_game->losTable, 0);
+    if (frame != nullptr)
+        *(volatile unsigned char*)frame ^= 1;
+#endif
+}
 EXPORT("Apply") void export_Apply(const WindMeteorsEventHeader* event, unsigned int size) { s_windMeteors.Apply(event, size); }
 EXPORT("InitMeteors") void export_InitMeteors(void) { s_windMeteors.InitMeteors(); }
 EXPORT("EmptyShutdownPreCleanup") void export_EmptyShutdownPreCleanup(void) { s_windMeteors.EmptyShutdownPreCleanup(); }

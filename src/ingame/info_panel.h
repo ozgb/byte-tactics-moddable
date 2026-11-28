@@ -39,5 +39,6 @@ void __stdcall DrawUnitInfoPanel(void* surface);
 void __stdcall DrawProfileBarLine(int surface, const char* text, int index);
 
 void __stdcall DrawDebrisProjected(void* surface, Vec3* offset, DebrisPiece* piece, short* angles);
+void __stdcall DrawDebrisProjectedNative(void* surface, Vec3* offset, DebrisPiece* piece, short* angles);
 
 #endif

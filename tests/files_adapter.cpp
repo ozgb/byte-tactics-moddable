@@ -95,6 +95,8 @@ int __stdcall ComputeChecksum(unsigned char* data, int len)
 
 void __cdecl AllocNotifyNop(int) {}
 
+void __cdecl LoadDataRegister(const void*, unsigned) {}
+
 void __stdcall ChdirToExeDirectory()
 {
     _chdir(s_gameDir);

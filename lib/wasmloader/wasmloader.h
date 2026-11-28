@@ -49,6 +49,9 @@ typedef struct wl_layout {
     unsigned block_max;
     unsigned scratch_base;
     unsigned scratch_size;
+    int has_load_data;
+    unsigned load_data_base;
+    unsigned load_data_size;
 } wl_layout;
 
 wl_loader* WL_CALL wl_create(const wl_config* config, char* error, size_t error_size);
@@ -62,6 +65,7 @@ size_t WL_CALL wl_manifest_module_count(const wl_loader* loader);
 const char* WL_CALL wl_manifest_module_name(const wl_loader* loader, size_t index);
 int WL_CALL wl_module_int(const wl_loader* loader, const char* module, const char* key, long* value);
 const char* WL_CALL wl_module_text(const wl_loader* loader, const char* module, const char* key);
+int WL_CALL wl_module_blocked(const wl_loader* loader, const char* module);
 int WL_CALL wl_module_publishes(const wl_loader* loader, const char* module, int kind, long* size);
 
 int WL_CALL wl_create_memory(wl_loader* loader);

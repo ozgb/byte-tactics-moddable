@@ -6636,11 +6636,11 @@ address,function,file,kind,target
 0x420610,FreeMemoryCache,src/frontend/endgame.cpp,global_maybe_written,g_debrisMemCache
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,BuildLensFrame
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,InitDebrisPieces
+0x420620,InitExplosions,src/weapons/explosions.cpp,call,LoadAddress
 0x420620,InitExplosions,src/weapons/explosions.cpp,call,MakeExplosion
-0x420620,InitExplosions,src/weapons/explosions.cpp,deref_read,*Explosion
-0x420620,InitExplosions,src/weapons/explosions.cpp,field_escape,Game::lists
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Game::count_1491b
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Game::explosionLensFrame
+0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Game::lists
 0x420620,InitExplosions,src/weapons/explosions.cpp,field_write,Game::shade
 0x420620,InitExplosions,src/weapons/explosions.cpp,function,
 0x420620,InitExplosions,src/weapons/explosions.cpp,global_read,g_explosion0Duration@src/weapons/explosions.cpp
@@ -6669,17 +6669,18 @@ address,function,file,kind,target
 0x420920,AllocExplodePieceObject,src/weapons/explosions.cpp,global_read,g_game
 0x420960,FreeExplosions,src/weapons/explosions.cpp,call,DebrisCache::FreeCache
 0x420960,FreeExplosions,src/weapons/explosions.cpp,call,GameFreeThunk
-0x420960,FreeExplosions,src/weapons/explosions.cpp,deref_read,*Explosion
-0x420960,FreeExplosions,src/weapons/explosions.cpp,field_escape,Game::lists
+0x420960,FreeExplosions,src/weapons/explosions.cpp,call,LoadNative
 0x420960,FreeExplosions,src/weapons/explosions.cpp,field_read,Explosion::count
 0x420960,FreeExplosions,src/weapons/explosions.cpp,field_read,Game::explosionLensFrame
+0x420960,FreeExplosions,src/weapons/explosions.cpp,field_read,Game::lists
 0x420960,FreeExplosions,src/weapons/explosions.cpp,field_read,ImageFrame::image
 0x420960,FreeExplosions,src/weapons/explosions.cpp,field_write,Game::explosionLensFrame
+0x420960,FreeExplosions,src/weapons/explosions.cpp,field_write,Game::lists
 0x420960,FreeExplosions,src/weapons/explosions.cpp,field_write,ImageFrame::image
 0x420960,FreeExplosions,src/weapons/explosions.cpp,function,
 0x420960,FreeExplosions,src/weapons/explosions.cpp,global_maybe_written,g_debrisMemCache
 0x420960,FreeExplosions,src/weapons/explosions.cpp,global_read,g_game
-0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,InitGafSequence
+0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,LoadInitGafSequence
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,RecordSmoke
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,call,operator=
 0x420a30,AddExplosionEffect,src/weapons/explosions.cpp,deref_read,*GafSequence
@@ -6701,7 +6702,7 @@ address,function,file,kind,target
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawExplodedPiece
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawFrame
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,DrawFrameShadow
-0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,GetGafSequenceFrame
+0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,LoadGetGafSequenceFrame
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,PointInRect
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,get
 0x420b00,DrawExplosions,src/weapons/explosions.cpp,call,operator ExplodedPiece *
@@ -6767,7 +6768,7 @@ address,function,file,kind,target
 0x420e50,ExplodeUnitPieces,src/weapons/explosions.cpp,field_write,ExplodedPiece::vel_z
 0x420e50,ExplodeUnitPieces,src/weapons/explosions.cpp,function,
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,AddExplosionEffect
-0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,StepGafSequence
+0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,LoadStepGafSequence
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,UpdateExplodedPiece
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator ExplodedPiece *
 0x420f30,UpdateExplosions,src/weapons/explosions.cpp,call,operator!=
@@ -7000,7 +7001,8 @@ address,function,file,kind,target
 0x421620,StartExplodePiece,src/weapons/explosions.cpp,global_read,g_quirks
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,AllocExplodePieceObject
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,CrossProduct
-0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,GetGafFrame
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,LoadAddress
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,LoadGetGafFrame
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,NormalizeVector
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,PosPlus
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,call,RandomInt
@@ -7036,6 +7038,7 @@ address,function,file,kind,target
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,Face::tex
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,Face::vindex
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,FaceFlags::raw
+0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,GafRef::pic
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,GafRef::src
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,Game::gravity
 0x421700,BreakPieceIntoDebris,src/weapons/explosions.cpp,field_read,Object3D::faceCount
@@ -7234,10 +7237,10 @@ address,function,file,kind,target
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,BuildDataPath
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,FatalError
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,FindFeatureFile
-0x4224b0,LoadFeatureType,src/map/features.cpp,call,InitGafSequence
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadFeatureSeq
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadFeatureSeqOnce
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadGaf
+0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadInitGafSequence
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,LoadObject3d
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,SimRealloc
 0x4224b0,LoadFeatureType,src/map/features.cpp,call,TdfRecord::GetFieldDouble
@@ -7389,7 +7392,7 @@ address,function,file,kind,target
 0x4232f0,MoveFeatureSpot,src/map/features.cpp,function,
 0x4232f0,MoveFeatureSpot,src/map/features.cpp,global_read,g_game
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,AllocFeatureSpot
-0x4233a0,StartFeatureBurning,src/map/features.cpp,call,InitGafSequence
+0x4233a0,StartFeatureBurning,src/map/features.cpp,call,LoadInitGafSequence
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,RandomInt
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,RecordSoundAtName
 0x4233a0,StartFeatureBurning,src/map/features.cpp,call,operator Feature *
@@ -7429,7 +7432,7 @@ address,function,file,kind,target
 0x4233a0,StartFeatureBurning,src/map/features.cpp,indirect_call,"indirect via void (*)(int, int) __attribute__((stdcall)) [NetworkSeam::SendFeatureBurning]"
 0x4233a0,StartFeatureBurning,src/map/features.cpp,mask_field,Cell::flags 0x1
 0x423550,KillFeature,src/map/features.cpp,call,AllocFeatureSpot
-0x423550,KillFeature,src/map/features.cpp,call,InitGafSequence
+0x423550,KillFeature,src/map/features.cpp,call,LoadInitGafSequence
 0x423550,KillFeature,src/map/features.cpp,call,ReplaceFeatureWithDead
 0x423550,KillFeature,src/map/features.cpp,call,operator Feature *
 0x423550,KillFeature,src/map/features.cpp,call,operator Spot *
@@ -7618,12 +7621,12 @@ address,function,file,kind,target
 0x423c50,PlaceFeature,src/map/features.cpp,indirect_call,indirect via unsigned int (*)(Object3do *) __attribute__((stdcall)) [ScriptsSeam::ObjectStateSize]
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,BurnOut
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,FeatureVec3
+0x424050,UpdateFeatureSpot,src/map/features.cpp,call,LoadStepGafSequence
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,MoveFeatureSpot
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,RecordWhiteSmoke
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,ReplaceFeatureWithDead
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,SmokeAt
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,SpreadFire
-0x424050,UpdateFeatureSpot,src/map/features.cpp,call,StepGafSequence
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,Vec3NonZero
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,operator Feature *
 0x424050,UpdateFeatureSpot,src/map/features.cpp,call,operator Spot *
@@ -8575,6 +8578,7 @@ address,function,file,kind,target
 0x429850,FindGafSequence,src/game/data_files.cpp,function,
 0x429870,LoadGameResources,src/game/data_files.cpp,call,BuildDataPath
 0x429870,LoadGameResources,src/game/data_files.cpp,call,FindGafEntry
+0x429870,LoadGameResources,src/game/data_files.cpp,call,LoadAddress
 0x429870,LoadGameResources,src/game/data_files.cpp,call,LoadAnimGaf
 0x429870,LoadGameResources,src/game/data_files.cpp,call,TdfFile::LoadFile
 0x429870,LoadGameResources,src/game/data_files.cpp,call,TdfFile::ResetCurrentRecord
@@ -8590,17 +8594,9 @@ address,function,file,kind,target
 0x429870,LoadGameResources,src/game/data_files.cpp,field_escape,Game::sidePanelTopSeq
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::alfboom1
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::cursorsGaf
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::explode2
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::explode3
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::explode4
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::explode5
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::fog
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::fxGaf
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::igTitles
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::nuke1
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::src1
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::src2
-0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::src3
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,Game::vismasks
 0x429870,LoadGameResources,src/game/data_files.cpp,field_read,TdfFile::current
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,FrameFlagView::flag
@@ -8631,10 +8627,6 @@ address,function,file,kind,target
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::cursorTooFar
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::cursorUnload
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::cursorsGaf
-0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::explode2
-0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::explode3
-0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::explode4
-0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::explode5
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::fire1
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::flamestreamGaf
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::fog
@@ -8655,16 +8647,15 @@ address,function,file,kind,target
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::image_14817
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::losTable
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::nuclogo
-0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::nuke1
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::panelTop
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::pathIcon
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::radlogo
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::radlogohigh
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::smoke1
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::smoke2
+0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::sources
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::src1
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::src2
-0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::src3
 0x429870,LoadGameResources,src/game/data_files.cpp,field_write,Game::vismasks
 0x429870,LoadGameResources,src/game/data_files.cpp,function,
 0x429870,LoadGameResources,src/game/data_files.cpp,global_maybe_written,g_emptyText
@@ -9569,7 +9560,9 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,FatalError
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,FindGafEntry
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,Load3do
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,LoadAddress
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,LoadAnimGaf
+0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,LoadDataStoreByte
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,LoadSoundByName
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,MirrorObject
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,Ne
@@ -9589,7 +9582,6 @@ address,function,file,kind,target
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,operator=
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,call,strcpy
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_write,*int
-0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,deref_write,*unsigned char
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_escape,DamageTableEntry::value
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_escape,Game::weapons
 0x42e440,LoadWeaponType,src/weapons/weapon_types.cpp,field_escape,WeaponDef::modelName
@@ -21653,8 +21645,8 @@ address,function,file,kind,target
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,DrawFrame
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,DrawFrameBlended
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,DrawUnit
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,GetGafFrame
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,GetGafSequenceFrame
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,LoadGetGafFrameNative
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,LoadGetGafSequenceFrame
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,get
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,operator Feature *
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,operator FeatureSpot *
@@ -21662,11 +21654,11 @@ address,function,file,kind,target
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,call,operator=
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,deref_escape,*Feature
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,deref_escape,*FeatureSpot
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,Feature::anim
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,Feature::name
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,Feature::shadowAnim
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,FeatureSpot::anim
-0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_escape,FeatureSpot::shadow
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_maybe_written,Feature::anim
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_maybe_written,Feature::shadowAnim
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_maybe_written,FeatureSpot::anim
+0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_maybe_written,FeatureSpot::shadow
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_read,Cell::feature
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_read,Cell::flags
 0x46a610,BlitFeatureGaf,src/ingame/info_panel.cpp,field_read,Cell::height
@@ -25746,6 +25738,7 @@ address,function,file,kind,target
 0x4815f0,GetOriginCellAtPosition,src/map/line_of_sight.cpp,global_read,g_game
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,AddLineOfSight
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,GetGafFrame
+0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,LosTableNative
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,SightCellOf
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,call,SightFrameOf
@@ -25768,7 +25761,6 @@ address,function,file,kind,target
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,GafFrame::xOffset
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,GafFrame::yOffset
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::height
-0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::losTable
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::seaLevel
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::units
 0x4816a0,RecalculateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::unitsEnd
@@ -25816,6 +25808,7 @@ address,function,file,kind,target
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosLine::GetLosLineStepCount
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosTable::GetLosLine
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosTable::GetLosLineCount
+0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosTableNative
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosTables::GetLosTable
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,LosTables::GetLosTableCount
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,call,get
@@ -25841,7 +25834,6 @@ address,function,file,kind,target
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,field_read,GafFrame::transparency
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,field_read,GafFrame::width
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,field_read,Game::height
-0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,field_read,Game::losTable
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,field_read,Game::playerIndex
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,field_read,Game::visibilityMask
 0x481930,RevealAroundUnit,src/map/line_of_sight.cpp,field_read,Game::width
@@ -25866,6 +25858,7 @@ address,function,file,kind,target
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,call,LosLine::GetLosLineStepCount
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,call,LosTable::GetLosLine
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,call,LosTable::GetLosLineCount
+0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,call,LosTableNative
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,call,LosTables::GetLosTable
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,call,LosTables::GetLosTableCount
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,call,get
@@ -25882,7 +25875,6 @@ address,function,file,kind,target
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,field_read,GafFrame::transparency
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,field_read,GafFrame::width
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,field_read,Game::height
-0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,field_read,Game::losTable
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,field_read,Game::playerIndex
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,field_read,Game::width
 0x481d50,RemoveLineOfSight,src/map/line_of_sight.cpp,field_read,Grid::cells
@@ -25947,6 +25939,7 @@ address,function,file,kind,target
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,call,LosLine::GetLosLineStepCount
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,call,LosTable::GetLosLine
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,call,LosTable::GetLosLineCount
+0x482270,AddLineOfSight,src/map/line_of_sight.cpp,call,LosTableNative
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,call,LosTables::GetLosTable
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,call,LosTables::GetLosTableCount
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,call,get
@@ -25963,7 +25956,6 @@ address,function,file,kind,target
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,field_read,GafFrame::transparency
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,field_read,GafFrame::width
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,field_read,Game::height
-0x482270,AddLineOfSight,src/map/line_of_sight.cpp,field_read,Game::losTable
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,field_read,Game::playerIndex
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,field_read,Game::width
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,field_read,Grid::cells
@@ -25988,6 +25980,7 @@ address,function,file,kind,target
 0x482270,AddLineOfSight,src/map/line_of_sight.cpp,member_write,Game::bits_142f1_2
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,AddLineOfSight
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,GetGafFrame
+0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,LosTableNative
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,RemoveLineOfSight
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,call,abs
@@ -26001,7 +25994,6 @@ address,function,file,kind,target
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,field_read,FrameTable::count
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,field_read,GafFrame::xOffset
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,field_read,GafFrame::yOffset
-0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,field_read,Game::losTable
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,field_read,Grid::height
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,field_read,Grid::width
 0x4825b0,UpdateLineOfSight,src/map/line_of_sight.cpp,field_read,MapViewFlags::raw
@@ -26036,6 +26028,7 @@ address,function,file,kind,target
 0x4827b0,UpdateUnitLineOfSight,src/map/line_of_sight.cpp,global_read,g_game
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,AddLineOfSight
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,GetGafFrame
+0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,LosTableNative
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,UpdateLineOfSight
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,call,operator short *
@@ -26046,7 +26039,6 @@ address,function,file,kind,target
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,field_read,FrameTable::count
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,field_read,GafFrame::xOffset
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,field_read,GafFrame::yOffset
-0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,field_read,Game::losTable
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,field_read,MapViewFlags::rawByte
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,field_read,SightQuery::cacheCell
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,field_read,SightQuery::frameIdx
@@ -26057,6 +26049,7 @@ address,function,file,kind,target
 0x482830,InitUnitSightCircleReveal,src/map/line_of_sight.cpp,global_read,g_game
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,AddLineOfSight
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,GetGafFrame
+0x482910,AddEyeball,src/map/line_of_sight.cpp,call,LosTableNative
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,UpdateLineOfSight
 0x482910,AddEyeball,src/map/line_of_sight.cpp,call,operator Eye *
@@ -26078,7 +26071,6 @@ address,function,file,kind,target
 0x482910,AddEyeball,src/map/line_of_sight.cpp,field_read,GafFrame::yOffset
 0x482910,AddEyeball,src/map/line_of_sight.cpp,field_read,Game::count_14277
 0x482910,AddEyeball,src/map/line_of_sight.cpp,field_read,Game::eyes
-0x482910,AddEyeball,src/map/line_of_sight.cpp,field_read,Game::losTable
 0x482910,AddEyeball,src/map/line_of_sight.cpp,field_read,Game::playerIndex
 0x482910,AddEyeball,src/map/line_of_sight.cpp,field_read,Game::seaLevel
 0x482910,AddEyeball,src/map/line_of_sight.cpp,field_read,Game::ticks
@@ -26102,6 +26094,7 @@ address,function,file,kind,target
 0x482910,AddEyeball,src/map/line_of_sight.cpp,global_read,kEyeCapacity
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,AddLineOfSight
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,GetGafFrame
+0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,LosTableNative
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,RevealAroundUnit
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,SightCellOf
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,call,SightFrameOf
@@ -26116,7 +26109,6 @@ address,function,file,kind,target
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,field_read,FrameTable::count
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,field_read,GafFrame::xOffset
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,field_read,GafFrame::yOffset
-0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,field_read,Game::losTable
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,field_read,Game::seaLevel
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,field_read,MapViewFlags::raw
 0x482ac0,RevealNewUnit,src/map/line_of_sight.cpp,field_read,SightQuery::cacheCell
@@ -38107,6 +38099,7 @@ address,function,file,kind,target
 0x4b8bf0,AdvanceGafSequence,src/graphics/gaf.cpp,function,
 0x4b8c60,LoadGaf,src/graphics/gaf.cpp,call,DisplayLogGaf
 0x4b8c60,LoadGaf,src/graphics/gaf.cpp,call,HAPI_LoadFile
+0x4b8c60,LoadGaf,src/graphics/gaf.cpp,call,LoadDataRegister
 0x4b8c60,LoadGaf,src/graphics/gaf.cpp,call,ReplayImport::Ptr
 0x4b8c60,LoadGaf,src/graphics/gaf.cpp,call,ReplayImport::~ReplayImport
 0x4b8c60,LoadGaf,src/graphics/gaf.cpp,call,Result
@@ -42188,6 +42181,7 @@ address,function,file,kind,target
 0x4d85b0,GameFree,src/debug/debug_lib.cpp,call,GetAllocLock
 0x4d85b0,GameFree,src/debug/debug_lib.cpp,call,GetBlockSize
 0x4d85b0,GameFree,src/debug/debug_lib.cpp,call,IsMemFussy
+0x4d85b0,GameFree,src/debug/debug_lib.cpp,call,LoadDataUnregister
 0x4d85b0,GameFree,src/debug/debug_lib.cpp,call,SimFree
 0x4d85b0,GameFree,src/debug/debug_lib.cpp,call,SimOwns
 0x4d85b0,GameFree,src/debug/debug_lib.cpp,call,free
@@ -43636,7 +43630,7 @@ address,function,file,kind,target
 ,Angle,src/orders/vtol_orders.cpp,field_read,Vec3::x
 ,Angle,src/orders/vtol_orders.cpp,field_read,Vec3::z
 ,Angle,src/orders/vtol_orders.cpp,function,
-,AnimateFeatureType,src/map/features.cpp,call,StepGafSequence
+,AnimateFeatureType,src/map/features.cpp,call,LoadStepGafSequence
 ,AnimateFeatureType,src/map/features.cpp,call,operator Feature *
 ,AnimateFeatureType,src/map/features.cpp,field_maybe_written,Feature::anim
 ,AnimateFeatureType,src/map/features.cpp,field_maybe_written,Feature::shadowAnim
@@ -45251,6 +45245,7 @@ address,function,file,kind,target
 ,ComputeMapChecksumNative,src/seams/native.cpp,call,TheMission
 ,ComputeMapChecksumNative,src/seams/native.cpp,function,
 ,ConditionSource,src/harness/replay_objects.cpp,call,BlockAt
+,ConditionSource,src/harness/replay_objects.cpp,call,LoadSideNative
 ,ConditionSource,src/harness/replay_objects.cpp,call,TableSpan
 ,ConditionSource,src/harness/replay_objects.cpp,deref_read,*unsigned char
 ,ConditionSource,src/harness/replay_objects.cpp,deref_read,*unsigned int
@@ -45260,6 +45255,7 @@ address,function,file,kind,target
 ,ConditionSource,src/harness/replay_objects.cpp,field_read,ReplayObjectField::kind
 ,ConditionSource,src/harness/replay_objects.cpp,field_read,ReplayObjectField::offset
 ,ConditionSource,src/harness/replay_objects.cpp,field_read,ReplayObjectField::size
+,ConditionSource,src/harness/replay_objects.cpp,field_read,ReplayObjectField::target
 ,ConditionSource,src/harness/replay_objects.cpp,function,
 ,ConditionSource,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
 ,ConditionWord,src/harness/replay_objects.cpp,deref_read,*int
@@ -45525,6 +45521,14 @@ address,function,file,kind,target
 ,DebrisCache::Install,src/weapons/debris_cache.cpp,field_write,DebrisCache::cap
 ,DebrisCache::Install,src/weapons/debris_cache.cpp,field_write,DebrisCache::cur
 ,DebrisCache::Install,src/weapons/debris_cache.cpp,function,
+,DebrisFacePic,src/harness/view_fill.cpp,call,LoadNative
+,DebrisFacePic,src/harness/view_fill.cpp,field_read,ViewReportFace::flags
+,DebrisFacePic,src/harness/view_fill.cpp,field_read,ViewReportFace::pic
+,DebrisFacePic,src/harness/view_fill.cpp,function,
+,DebrisFaceSrc,src/harness/view_fill.cpp,call,LoadNative
+,DebrisFaceSrc,src/harness/view_fill.cpp,field_read,ViewReportFace::flags
+,DebrisFaceSrc,src/harness/view_fill.cpp,field_read,ViewReportFace::src
+,DebrisFaceSrc,src/harness/view_fill.cpp,function,
 ,DecodeQuoted,src/harness/replay_objects.cpp,deref_read,*char
 ,DecodeQuoted,src/harness/replay_objects.cpp,deref_write,*unsigned char
 ,DecodeQuoted,src/harness/replay_objects.cpp,function,
@@ -45965,6 +45969,7 @@ address,function,file,kind,target
 ,DisplayLogShard,src/harness/display_game.cpp,call,DlPutName
 ,DisplayLogShard,src/harness/display_game.cpp,call,DlPutPicture
 ,DisplayLogShard,src/harness/display_game.cpp,call,DlPutRaw
+,DisplayLogShard,src/harness/display_game.cpp,call,LoadNative
 ,DisplayLogShard,src/harness/display_game.cpp,call,PictureOf
 ,DisplayLogShard,src/harness/display_game.cpp,call,PutInt
 ,DisplayLogShard,src/harness/display_game.cpp,call,get
@@ -46741,6 +46746,14 @@ address,function,file,kind,target
 ,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::vertexCount
 ,DrawDebrisProjected,src/ingame/info_panel.cpp,field_read,DebrisPiece::verts
 ,DrawDebrisProjected,src/ingame/info_panel.cpp,function,
+,DrawDebrisProjectedNative,src/ingame/info_panel.cpp,call,DrawProjectedFaces
+,DrawDebrisProjectedNative,src/ingame/info_panel.cpp,call,get
+,DrawDebrisProjectedNative,src/ingame/info_panel.cpp,field_read,DebrisPiece::faceCount
+,DrawDebrisProjectedNative,src/ingame/info_panel.cpp,field_read,DebrisPiece::faces
+,DrawDebrisProjectedNative,src/ingame/info_panel.cpp,field_read,DebrisPiece::firstFace
+,DrawDebrisProjectedNative,src/ingame/info_panel.cpp,field_read,DebrisPiece::vertexCount
+,DrawDebrisProjectedNative,src/ingame/info_panel.cpp,field_read,DebrisPiece::verts
+,DrawDebrisProjectedNative,src/ingame/info_panel.cpp,function,
 ,DrawFlags,src/ingame/info_panel.cpp,field_read,Game::visualFlagsByte
 ,DrawFlags,src/ingame/info_panel.cpp,function,
 ,DrawFlags,src/ingame/info_panel.cpp,global_read,g_game
@@ -46917,7 +46930,7 @@ address,function,file,kind,target
 ,DrawResourcePanel,src/ingame/info_panel.cpp,field_write,Rect::right
 ,DrawResourcePanel,src/ingame/info_panel.cpp,function,
 ,DrawResourcePanel,src/ingame/info_panel.cpp,global_read,g_game
-,DrawShard,src/harness/display_replay.cpp,call,DrawDebrisProjected
+,DrawShard,src/harness/display_replay.cpp,call,DrawDebrisProjectedNative
 ,DrawShard,src/harness/display_replay.cpp,call,Picture
 ,DrawShard,src/harness/display_replay.cpp,call,Skip
 ,DrawShard,src/harness/display_replay.cpp,call,atoi
@@ -47770,6 +47783,15 @@ address,function,file,kind,target
 ,Fatal,src/state/block.cpp,global_read,g_base
 ,Fatal,src/state/block.cpp,global_read,kSimBlockBytes
 ,Fatal,src/state/block.cpp,global_read,kSimBlockCeilingBytes
+,Fatal,src/state/load_data.cpp,call,exit
+,Fatal,src/state/load_data.cpp,call,fputs
+,Fatal,src/state/load_data.cpp,function,
+,Fatal,src/state/load_data.cpp,global_maybe_written,_iob
+,Fatal,src/state/load_data.cpp,global_read,s_fatal
+,Fatal,src/state/load_data.cpp,indirect_call,indirect via void (*)(const char *) __attribute__((stdcall)) [s_fatal]
+,FatalAddress,src/state/load_data.cpp,call,Fatal
+,FatalAddress,src/state/load_data.cpp,call,sprintf
+,FatalAddress,src/state/load_data.cpp,function,
 ,FatalErrorImport,src/wasm/module_glue.cpp,call,GlueImportError
 ,FatalErrorImport,src/wasm/module_glue.cpp,call,GlueInMemory
 ,FatalErrorImport,src/wasm/module_glue.cpp,call,GlueLinear
@@ -48519,6 +48541,15 @@ address,function,file,kind,target
 ,FindLobbyHostPlayerId,src/network/net_game.cpp,field_read,PlayerInfo::flags_97
 ,FindLobbyHostPlayerId,src/network/net_game.cpp,function,
 ,FindLobbyHostPlayerId,src/network/net_game.cpp,global_read,g_game
+,FindMapped,src/state/load_data.cpp,deref_read,*Mapped
+,FindMapped,src/state/load_data.cpp,field_read,Mapped::linear
+,FindMapped,src/state/load_data.cpp,field_read,Mapped::live
+,FindMapped,src/state/load_data.cpp,field_read,Mapped::size
+,FindMapped,src/state/load_data.cpp,function,
+,FindMapped,src/state/load_data.cpp,global_read,s_base
+,FindMapped,src/state/load_data.cpp,global_read,s_mapped
+,FindMapped,src/state/load_data.cpp,global_read,s_mappedCount
+,FindMapped,src/state/load_data.cpp,global_read,s_size
 ,FindNth,src/harness/harness.cpp,call,FailLine
 ,FindNth,src/harness/harness.cpp,call,FindDefIndex
 ,FindNth,src/harness/harness.cpp,call,GameAt
@@ -48586,6 +48617,12 @@ address,function,file,kind,target
 ,FindReadyPlayer,src/network/net_game.cpp,field_read,PlayerInfo::host
 ,FindReadyPlayer,src/network/net_game.cpp,function,
 ,FindReadyPlayer,src/network/net_game.cpp,global_read,g_game
+,FindRegistered,src/state/load_data.cpp,deref_read,*Registered
+,FindRegistered,src/state/load_data.cpp,field_read,Registered::native
+,FindRegistered,src/state/load_data.cpp,field_read,Registered::size
+,FindRegistered,src/state/load_data.cpp,function,
+,FindRegistered,src/state/load_data.cpp,global_read,s_registered
+,FindRegistered,src/state/load_data.cpp,global_read,s_registeredCount
 ,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,call,SameTargetPos
 ,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,call,operator Projectile *
 ,FindRemoteProjectileForPacket,src/weapons/weapons.cpp,call,operator->
@@ -49352,6 +49389,12 @@ address,function,file,kind,target
 ,GafCurrentDuration,src/graphics/gaf.cpp,field_read,GafSequencePlayerSigned::index
 ,GafCurrentDuration,src/graphics/gaf.cpp,field_read,GafSequencePlayerSigned::src
 ,GafCurrentDuration,src/graphics/gaf.cpp,function,
+,GafCursor,src/wasm/module_glue.cpp,call,GlueImportError
+,GafCursor,src/wasm/module_glue.cpp,call,GlueInMemory
+,GafCursor,src/wasm/module_glue.cpp,call,ModulesMemory
+,GafCursor,src/wasm/module_glue.cpp,field_read,ModuleMemory::size
+,GafCursor,src/wasm/module_glue.cpp,function,
+,GafCursor,src/wasm/module_glue.cpp,global_read,kGafCursorSize
 ,GafDurationAt,src/graphics/gaf.cpp,field_read,GafDurationEntry::value
 ,GafDurationAt,src/graphics/gaf.cpp,function,
 ,GafFile,src/harness/display_replay.cpp,call,LoadGaf
@@ -49572,6 +49615,22 @@ address,function,file,kind,target
 ,GetGadgetRect_inlined,src/gui/dialogs.cpp,field_write,DialogRect::right
 ,GetGadgetRect_inlined,src/gui/dialogs.cpp,field_write,DialogRect::top
 ,GetGadgetRect_inlined,src/gui/dialogs.cpp,function,
+,GetGafFrameImport,src/wasm/module_glue.cpp,call,GlueImportError
+,GetGafFrameImport,src/wasm/module_glue.cpp,call,GlueInMemory
+,GetGafFrameImport,src/wasm/module_glue.cpp,call,LoadGetGafFrame
+,GetGafFrameImport,src/wasm/module_glue.cpp,field_read,wasmtime_val_raw::i32
+,GetGafFrameImport,src/wasm/module_glue.cpp,field_write,wasmtime_val_raw::i32
+,GetGafFrameImport,src/wasm/module_glue.cpp,function,
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,GafCursor
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,GlueLinear
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,LoadAddress
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,LoadGetGafSequenceFrame
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,call,LoadNative
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,deref_read,*unsigned int
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,deref_read,*unsigned short
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,field_read,wasmtime_val_raw::i32
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,field_write,wasmtime_val_raw::i32
+,GetGafSequenceFrameImport,src/wasm/module_glue.cpp,function,
 ,GetGameTypeNative,src/seams/native.cpp,call,Mission::GetGameType
 ,GetGameTypeNative,src/seams/native.cpp,call,TheMission
 ,GetGameTypeNative,src/seams/native.cpp,function,
@@ -50546,6 +50605,13 @@ address,function,file,kind,target
 ,GlueImportFeaturesGetFootprintCentre,src/wasm/glue_tables.cpp,function,
 ,GlueImportFeaturesGetFootprintCentre,src/wasm/glue_tables.cpp,global_read,g_seams
 ,GlueImportFeaturesGetFootprintCentre,src/wasm/glue_tables.cpp,indirect_call,"indirect via void (*)(const Point16 *, Feature *, Vec3 *) __attribute__((stdcall)) [FeaturesSeam::GetFootprintCentre]"
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,call,GlueImportError
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,call,GlueInMemory
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,call,GlueLinear
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,call,ScheduleFeaturesPlace
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,field_write,wasmtime_val_raw::i32
+,GlueImportFeaturesPlace,src/wasm/glue_tables.cpp,function,
 ,GlueImportLosRadarClampWorldPosToTerrain,src/wasm/glue_tables.cpp,call,GlueImportError
 ,GlueImportLosRadarClampWorldPosToTerrain,src/wasm/glue_tables.cpp,call,GlueInMemory
 ,GlueImportLosRadarClampWorldPosToTerrain,src/wasm/glue_tables.cpp,call,GlueLinear
@@ -54152,6 +54218,13 @@ address,function,file,kind,target
 ,Grow,src/harness/display_replay.cpp,global_read,kMaxTargets@src/harness/display_replay.cpp
 ,Grow,src/harness/display_replay.cpp,global_read,s_targetCount@src/harness/display_replay.cpp
 ,Grow,src/harness/display_replay.cpp,global_write,s_targetCount@src/harness/display_replay.cpp
+,Grow,src/state/load_data.cpp,call,Fatal
+,Grow,src/state/load_data.cpp,call,realloc
+,Grow,src/state/load_data.cpp,deref_read,*unsigned int
+,Grow,src/state/load_data.cpp,deref_read,*void
+,Grow,src/state/load_data.cpp,deref_write,*unsigned int
+,Grow,src/state/load_data.cpp,deref_write,*void
+,Grow,src/state/load_data.cpp,function,
 ,Guard::Guard,src/state/block.cpp,call,Fatal
 ,Guard::Guard,src/state/block.cpp,call,Prepare
 ,Guard::Guard,src/state/block.cpp,call,host_mutex_lock
@@ -54936,6 +55009,8 @@ address,function,file,kind,target
 ,HashBytes,src/harness/display_replay.cpp,call,memcpy
 ,HashBytes,src/harness/display_replay.cpp,deref_read,*unsigned char
 ,HashBytes,src/harness/display_replay.cpp,function,
+,HashBytes,src/state/load_data.cpp,deref_read,*unsigned int
+,HashBytes,src/state/load_data.cpp,function,
 ,HashEnd,src/harness/display_log.cpp,field_read,DlHash::buf
 ,HashEnd,src/harness/display_log.cpp,field_read,DlHash::h
 ,HashEnd,src/harness/display_log.cpp,field_read,DlHash::n
@@ -56563,6 +56638,13 @@ address,function,file,kind,target
 ,InitDebrisPieces,src/weapons/explosions.cpp,global_maybe_written,g_debrisMemCache
 ,InitDebrisPieces,src/weapons/explosions.cpp,global_read,g_game
 ,InitDebrisPieces,src/weapons/explosions.cpp,mask_field,FaceFlags::raw 0x1
+,InitGafSequenceImport,src/wasm/module_glue.cpp,call,GafCursor
+,InitGafSequenceImport,src/wasm/module_glue.cpp,call,GlueImportError
+,InitGafSequenceImport,src/wasm/module_glue.cpp,call,GlueInMemory
+,InitGafSequenceImport,src/wasm/module_glue.cpp,call,GlueLinear
+,InitGafSequenceImport,src/wasm/module_glue.cpp,call,LoadInitGafSequence
+,InitGafSequenceImport,src/wasm/module_glue.cpp,field_read,wasmtime_val_raw::i32
+,InitGafSequenceImport,src/wasm/module_glue.cpp,function,
 ,InitMotionProjectile,src/weapons/weapons.cpp,field_read,Unit::heading
 ,InitMotionProjectile,src/weapons/weapons.cpp,field_write,Angles16::heading
 ,InitMotionProjectile,src/weapons/weapons.cpp,field_write,Projectile::speed
@@ -58197,6 +58279,19 @@ address,function,file,kind,target
 ,LoadAIProfiles,src/ai/ai_player.cpp,global_read,g_game
 ,LoadAIProfiles,src/ai/ai_player.cpp,global_read,g_seams
 ,LoadAIProfiles,src/ai/ai_player.cpp,indirect_call,indirect via const char *(*)(int) __attribute__((stdcall)) [MissionSeam::GetNameSlot]
+,LoadAddress,src/state/load_data.cpp,call,FatalAddress
+,LoadAddress,src/state/load_data.cpp,call,FindRegistered
+,LoadAddress,src/state/load_data.cpp,call,Locked::~Locked
+,LoadAddress,src/state/load_data.cpp,call,MapRegistered
+,LoadAddress,src/state/load_data.cpp,field_read,Registered::native
+,LoadAddress,src/state/load_data.cpp,function,
+,LoadAddress,src/state/load_data.cpp,global_read,s_region
+,LoadAddress,src/state/load_data.cpp,global_read,s_registered
+,LoadAddressIfLoadData,src/state/load_data.cpp,call,FindRegistered
+,LoadAddressIfLoadData,src/state/load_data.cpp,call,LoadAddress
+,LoadAddressIfLoadData,src/state/load_data.cpp,call,Locked::~Locked
+,LoadAddressIfLoadData,src/state/load_data.cpp,function,
+,LoadAddressIfLoadData,src/state/load_data.cpp,global_read,s_region
 ,LoadAfter,src/harness/replay_objects.cpp,call,LoadEntries
 ,LoadAfter,src/harness/replay_objects.cpp,call,operator[]
 ,LoadAfter,src/harness/replay_objects.cpp,call,size
@@ -58213,6 +58308,64 @@ address,function,file,kind,target
 ,LoadContaining,src/harness/replay_objects.cpp,field_read,LoadEntry::base
 ,LoadContaining,src/harness/replay_objects.cpp,field_read,LoadEntry::size
 ,LoadContaining,src/harness/replay_objects.cpp,function,
+,LoadDataAttach,src/state/load_data.cpp,function,
+,LoadDataAttach,src/state/load_data.cpp,global_write,s_base
+,LoadDataAttach,src/state/load_data.cpp,global_write,s_bump
+,LoadDataAttach,src/state/load_data.cpp,global_write,s_fatal
+,LoadDataAttach,src/state/load_data.cpp,global_write,s_region
+,LoadDataAttach,src/state/load_data.cpp,global_write,s_size
+,LoadDataCheck,src/state/load_data.cpp,call,Fatal
+,LoadDataCheck,src/state/load_data.cpp,call,HashBytes
+,LoadDataCheck,src/state/load_data.cpp,call,Locked::~Locked
+,LoadDataCheck,src/state/load_data.cpp,call,sprintf
+,LoadDataCheck,src/state/load_data.cpp,deref_read,*Mapped
+,LoadDataCheck,src/state/load_data.cpp,field_read,Mapped::hash
+,LoadDataCheck,src/state/load_data.cpp,field_read,Mapped::linear
+,LoadDataCheck,src/state/load_data.cpp,field_read,Mapped::live
+,LoadDataCheck,src/state/load_data.cpp,field_read,Mapped::size
+,LoadDataCheck,src/state/load_data.cpp,function,
+,LoadDataCheck,src/state/load_data.cpp,global_read,s_base
+,LoadDataCheck,src/state/load_data.cpp,global_read,s_mapped
+,LoadDataCheck,src/state/load_data.cpp,global_read,s_mappedCount
+,LoadDataCheck,src/state/load_data.cpp,global_read,s_region
+,LoadDataRegister,src/state/load_data.cpp,call,Register
+,LoadDataRegister,src/state/load_data.cpp,function,
+,LoadDataRegisterFrame,src/state/load_data.cpp,call,Register
+,LoadDataRegisterFrame,src/state/load_data.cpp,function,
+,LoadDataRegisterTable,src/state/load_data.cpp,call,Register
+,LoadDataRegisterTable,src/state/load_data.cpp,function,
+,LoadDataStoreByte,src/state/load_data.cpp,call,FindRegistered
+,LoadDataStoreByte,src/state/load_data.cpp,call,HashBytes
+,LoadDataStoreByte,src/state/load_data.cpp,call,Locked::~Locked
+,LoadDataStoreByte,src/state/load_data.cpp,deref_read,*Mapped
+,LoadDataStoreByte,src/state/load_data.cpp,deref_write,*unsigned char
+,LoadDataStoreByte,src/state/load_data.cpp,field_read,Mapped::linear
+,LoadDataStoreByte,src/state/load_data.cpp,field_read,Mapped::native
+,LoadDataStoreByte,src/state/load_data.cpp,field_read,Mapped::size
+,LoadDataStoreByte,src/state/load_data.cpp,field_read,Registered::mapIndex
+,LoadDataStoreByte,src/state/load_data.cpp,field_write,Mapped::hash
+,LoadDataStoreByte,src/state/load_data.cpp,function,
+,LoadDataStoreByte,src/state/load_data.cpp,global_read,s_base
+,LoadDataStoreByte,src/state/load_data.cpp,global_read,s_mapped
+,LoadDataStoreByte,src/state/load_data.cpp,global_read,s_region
+,LoadDataStoreByte,src/state/load_data.cpp,global_read,s_registered
+,LoadDataUnregister,src/state/load_data.cpp,call,FindRegistered
+,LoadDataUnregister,src/state/load_data.cpp,call,Locked::~Locked
+,LoadDataUnregister,src/state/load_data.cpp,call,memmove
+,LoadDataUnregister,src/state/load_data.cpp,field_read,Mapped::linear
+,LoadDataUnregister,src/state/load_data.cpp,field_read,Mapped::live
+,LoadDataUnregister,src/state/load_data.cpp,field_read,Registered::mapIndex
+,LoadDataUnregister,src/state/load_data.cpp,field_read,Registered::native
+,LoadDataUnregister,src/state/load_data.cpp,field_write,Mapped::live
+,LoadDataUnregister,src/state/load_data.cpp,function,
+,LoadDataUnregister,src/state/load_data.cpp,global_read,s_base
+,LoadDataUnregister,src/state/load_data.cpp,global_read,s_mapped
+,LoadDataUnregister,src/state/load_data.cpp,global_read,s_mappedCount
+,LoadDataUnregister,src/state/load_data.cpp,global_read,s_registered
+,LoadDataUnregister,src/state/load_data.cpp,global_read,s_registeredCount
+,LoadDataUnregister,src/state/load_data.cpp,global_write,s_bump
+,LoadDataUnregister,src/state/load_data.cpp,global_write,s_mappedCount
+,LoadDataUnregister,src/state/load_data.cpp,global_write,s_registeredCount
 ,LoadEntries,src/harness/replay_objects.cpp,call,operator new
 ,LoadEntries,src/harness/replay_objects.cpp,deref_read,*std::vector<LoadEntry >
 ,LoadEntries,src/harness/replay_objects.cpp,function,
@@ -58222,15 +58375,17 @@ address,function,file,kind,target
 ,LoadFail,src/harness/replay_objects.cpp,call,_snprintf
 ,LoadFail,src/harness/replay_objects.cpp,function,
 ,LoadFeatureSeq,src/map/features.cpp,call,FindOptionalGafEntry
+,LoadFeatureSeq,src/map/features.cpp,call,LoadAddress
 ,LoadFeatureSeq,src/map/features.cpp,call,TdfRecord::GetFieldString
 ,LoadFeatureSeq,src/map/features.cpp,deref_write,*AnimSrc
 ,LoadFeatureSeq,src/map/features.cpp,function,
 ,LoadFeatureSeq,src/map/features.cpp,global_maybe_written,g_emptyText
 ,LoadFeatureSeqOnce,src/map/features.cpp,call,FindOptionalGafEntry
+,LoadFeatureSeqOnce,src/map/features.cpp,call,LoadAddress
+,LoadFeatureSeqOnce,src/map/features.cpp,call,LoadDataStoreByte
 ,LoadFeatureSeqOnce,src/map/features.cpp,call,TdfRecord::GetFieldString
-,LoadFeatureSeqOnce,src/map/features.cpp,deref_read,*AnimSrc
 ,LoadFeatureSeqOnce,src/map/features.cpp,deref_write,*AnimSrc
-,LoadFeatureSeqOnce,src/map/features.cpp,field_write,AnimSrc::kind
+,LoadFeatureSeqOnce,src/map/features.cpp,field_maybe_written,AnimSrc::kind
 ,LoadFeatureSeqOnce,src/map/features.cpp,function,
 ,LoadFeatureSeqOnce,src/map/features.cpp,global_maybe_written,g_emptyText
 ,LoadForget,src/harness/replay_objects.cpp,call,LoadEntries
@@ -58246,12 +58401,29 @@ address,function,file,kind,target
 ,LoadForget,src/harness/replay_objects.cpp,field_read,LoadEntry::kind
 ,LoadForget,src/harness/replay_objects.cpp,field_read,LoadEntry::load
 ,LoadForget,src/harness/replay_objects.cpp,function,
+,LoadGetGafFrame,src/state/load_data_gaf.cpp,call,GetGafFrame
+,LoadGetGafFrame,src/state/load_data_gaf.cpp,call,LoadAddress
+,LoadGetGafFrame,src/state/load_data_gaf.cpp,call,LoadNative
+,LoadGetGafFrame,src/state/load_data_gaf.cpp,function,
+,LoadGetGafFrameNative,src/state/load_data_gaf.cpp,call,GetGafFrame
+,LoadGetGafFrameNative,src/state/load_data_gaf.cpp,call,LoadNative
+,LoadGetGafFrameNative,src/state/load_data_gaf.cpp,function,
+,LoadGetGafSequenceFrame,src/state/load_data_gaf.cpp,call,GetGafSequenceFrame
+,LoadGetGafSequenceFrame,src/state/load_data_gaf.cpp,call,LoadNative
+,LoadGetGafSequenceFrame,src/state/load_data_gaf.cpp,field_read,Handle::src
+,LoadGetGafSequenceFrame,src/state/load_data_gaf.cpp,field_write,Handle::src
+,LoadGetGafSequenceFrame,src/state/load_data_gaf.cpp,function,
 ,LoadHolderElement,src/harness/replay_objects.cpp,call,BlockAt
 ,LoadHolderElement,src/harness/replay_objects.cpp,deref_read,*unsigned int
 ,LoadHolderElement,src/harness/replay_objects.cpp,field_read,ReplayLoadHolder::how
 ,LoadHolderElement,src/harness/replay_objects.cpp,field_read,ReplayLoadHolder::offset
 ,LoadHolderElement,src/harness/replay_objects.cpp,function,
 ,LoadHolderElement,src/harness/replay_objects.cpp,global_read,g_game
+,LoadInitGafSequence,src/state/load_data_gaf.cpp,call,InitGafSequence
+,LoadInitGafSequence,src/state/load_data_gaf.cpp,call,LoadNative
+,LoadInitGafSequence,src/state/load_data_gaf.cpp,field_read,Handle::src
+,LoadInitGafSequence,src/state/load_data_gaf.cpp,field_write,Handle::src
+,LoadInitGafSequence,src/state/load_data_gaf.cpp,function,
 ,LoadInsert,src/harness/replay_objects.cpp,call,LoadAfter
 ,LoadInsert,src/harness/replay_objects.cpp,call,LoadEntries
 ,LoadInsert,src/harness/replay_objects.cpp,call,LoadForget
@@ -58297,6 +58469,19 @@ address,function,file,kind,target
 ,LoadModule,src/wasm/modules.cpp,global_read,s_loadedCount
 ,LoadModule,src/wasm/modules.cpp,global_read,s_loader
 ,LoadModule,src/wasm/modules.cpp,global_write,s_loadedCount
+,LoadNative,src/state/load_data.cpp,call,FatalAddress
+,LoadNative,src/state/load_data.cpp,call,FindMapped
+,LoadNative,src/state/load_data.cpp,call,Locked::~Locked
+,LoadNative,src/state/load_data.cpp,field_read,Mapped::linear
+,LoadNative,src/state/load_data.cpp,field_read,Mapped::native
+,LoadNative,src/state/load_data.cpp,function,
+,LoadNative,src/state/load_data.cpp,global_read,s_region
+,LoadNativeIfLoadData,src/state/load_data.cpp,call,FindMapped
+,LoadNativeIfLoadData,src/state/load_data.cpp,call,Locked::~Locked
+,LoadNativeIfLoadData,src/state/load_data.cpp,field_read,Mapped::linear
+,LoadNativeIfLoadData,src/state/load_data.cpp,field_read,Mapped::native
+,LoadNativeIfLoadData,src/state/load_data.cpp,function,
+,LoadNativeIfLoadData,src/state/load_data.cpp,global_read,s_region
 ,LoadOnline,src/host/win32/net.cpp,call,LoadLibraryA
 ,LoadOnline,src/host/win32/net.cpp,call,host_file_exe_path
 ,LoadOnline,src/host/win32/net.cpp,call,strchr
@@ -58357,6 +58542,8 @@ address,function,file,kind,target
 ,LoadSame,src/harness/replay_objects.cpp,function,
 ,LoadScriptStateNative,src/seams/native.cpp,call,CobScript::LoadScriptState
 ,LoadScriptStateNative,src/seams/native.cpp,function,
+,LoadSideNative,src/harness/replay_objects.cpp,call,LoadNativeIfLoadData
+,LoadSideNative,src/harness/replay_objects.cpp,function,
 ,LoadSideRect,src/game/side_data.cpp,call,FatalError
 ,LoadSideRect,src/game/side_data.cpp,call,TdfFile::GetCurrentRecord
 ,LoadSideRect,src/game/side_data.cpp,call,TdfFile::SelectRecord
@@ -58366,6 +58553,11 @@ address,function,file,kind,target
 ,LoadSideRect,src/game/side_data.cpp,deref_write,*int
 ,LoadSideRect,src/game/side_data.cpp,field_read,TdfFile::current
 ,LoadSideRect,src/game/side_data.cpp,function,
+,LoadStepGafSequence,src/state/load_data_gaf.cpp,call,LoadNative
+,LoadStepGafSequence,src/state/load_data_gaf.cpp,call,StepGafSequence
+,LoadStepGafSequence,src/state/load_data_gaf.cpp,field_read,Handle::src
+,LoadStepGafSequence,src/state/load_data_gaf.cpp,field_write,Handle::src
+,LoadStepGafSequence,src/state/load_data_gaf.cpp,function,
 ,LoadUnitMotion,src/units/unit_save.cpp,call,HapiBank::OpenNamedBox
 ,LoadUnitMotion,src/units/unit_save.cpp,call,HapiBank::ReadBox
 ,LoadUnitMotion,src/units/unit_save.cpp,call,HapiBank::SeekBox
@@ -58481,6 +58673,14 @@ address,function,file,kind,target
 ,LockPosts,src/host/win32/headless.cpp,global_maybe_written,g_postLock
 ,LockPosts,src/host/win32/headless.cpp,global_maybe_written,g_postLockClaims
 ,LockPosts,src/host/win32/headless.cpp,global_maybe_written,g_postLockReady
+,Locked::Locked,src/state/load_data.cpp,call,host_mutex_create
+,Locked::Locked,src/state/load_data.cpp,call,host_mutex_lock
+,Locked::Locked,src/state/load_data.cpp,function,
+,Locked::Locked,src/state/load_data.cpp,global_read,s_lock
+,Locked::Locked,src/state/load_data.cpp,global_write,s_lock
+,Locked::~Locked,src/state/load_data.cpp,call,host_mutex_unlock
+,Locked::~Locked,src/state/load_data.cpp,function,
+,Locked::~Locked,src/state/load_data.cpp,global_read,s_lock
 ,Lod,src/map/line_of_sight.cpp,call,LodRaw
 ,Lod,src/map/line_of_sight.cpp,function,
 ,LodRaw,src/map/line_of_sight.cpp,field_read,SightQuery::sightDistance
@@ -58704,6 +58904,10 @@ address,function,file,kind,target
 ,LosTable::SetNumLines,src/map/los_lines.h,call,BlockVector::Resize
 ,LosTable::SetNumLines,src/map/los_lines.h,call,LosLine::~LosLine
 ,LosTable::SetNumLines,src/map/los_lines.h,function,
+,LosTableNative,src/map/line_of_sight.cpp,call,LoadNative
+,LosTableNative,src/map/line_of_sight.cpp,field_read,Game::losTable
+,LosTableNative,src/map/line_of_sight.cpp,function,
+,LosTableNative,src/map/line_of_sight.cpp,global_read,g_game
 ,LosUnitIndexOf,src/map/line_of_sight_index.cpp,call,operator bool
 ,LosUnitIndexOf,src/map/line_of_sight_index.cpp,call,operator->
 ,LosUnitIndexOf,src/map/line_of_sight_index.cpp,field_escape,LosUnitIndex::players
@@ -58760,6 +58964,10 @@ address,function,file,kind,target
 ,MakeDirectoryPath,src/files/files_api.h,indirect_call,indirect via void (*)(const char *) __attribute__((stdcall)) [FilesSeam::MakeDirectoryPath]
 ,MakeExplosion,src/weapons/explosions.cpp,call,BuildExplosionFrame
 ,MakeExplosion,src/weapons/explosions.cpp,call,GameAllocIgnoreTag
+,MakeExplosion,src/weapons/explosions.cpp,call,LoadDataRegisterFrame
+,MakeExplosion,src/weapons/explosions.cpp,call,LoadDataRegisterTable
+,MakeExplosion,src/weapons/explosions.cpp,field_read,GafFrame::height
+,MakeExplosion,src/weapons/explosions.cpp,field_read,GafFrame::width
 ,MakeExplosion,src/weapons/explosions.cpp,field_write,Explosion::count
 ,MakeExplosion,src/weapons/explosions.cpp,field_write,Explosion::flags
 ,MakeExplosion,src/weapons/explosions.cpp,field_write,ImageFrame::duration
@@ -58907,6 +59115,40 @@ address,function,file,kind,target
 ,MapRange,src/ai/ai_player.cpp,field_read,Game::mapWidth
 ,MapRange,src/ai/ai_player.cpp,function,
 ,MapRange,src/ai/ai_player.cpp,global_read,g_game
+,MapRegistered,src/state/load_data.cpp,call,Fatal
+,MapRegistered,src/state/load_data.cpp,call,Grow
+,MapRegistered,src/state/load_data.cpp,call,HashBytes
+,MapRegistered,src/state/load_data.cpp,call,RelocateGaf
+,MapRegistered,src/state/load_data.cpp,call,RelocateTable
+,MapRegistered,src/state/load_data.cpp,call,memcpy
+,MapRegistered,src/state/load_data.cpp,call,memset
+,MapRegistered,src/state/load_data.cpp,deref_read,*Mapped
+,MapRegistered,src/state/load_data.cpp,deref_read,*Registered
+,MapRegistered,src/state/load_data.cpp,deref_read,*unsigned int
+,MapRegistered,src/state/load_data.cpp,deref_write,*unsigned int
+,MapRegistered,src/state/load_data.cpp,field_read,Mapped::linear
+,MapRegistered,src/state/load_data.cpp,field_read,Registered::kind
+,MapRegistered,src/state/load_data.cpp,field_read,Registered::mapIndex
+,MapRegistered,src/state/load_data.cpp,field_read,Registered::native
+,MapRegistered,src/state/load_data.cpp,field_read,Registered::size
+,MapRegistered,src/state/load_data.cpp,field_write,Mapped::hash
+,MapRegistered,src/state/load_data.cpp,field_write,Mapped::linear
+,MapRegistered,src/state/load_data.cpp,field_write,Mapped::live
+,MapRegistered,src/state/load_data.cpp,field_write,Mapped::native
+,MapRegistered,src/state/load_data.cpp,field_write,Mapped::size
+,MapRegistered,src/state/load_data.cpp,field_write,Registered::mapIndex
+,MapRegistered,src/state/load_data.cpp,function,
+,MapRegistered,src/state/load_data.cpp,global_escape,s_mapped
+,MapRegistered,src/state/load_data.cpp,global_maybe_written,s_mappedCapacity
+,MapRegistered,src/state/load_data.cpp,global_read,s_base
+,MapRegistered,src/state/load_data.cpp,global_read,s_bump
+,MapRegistered,src/state/load_data.cpp,global_read,s_mapped
+,MapRegistered,src/state/load_data.cpp,global_read,s_mappedCount
+,MapRegistered,src/state/load_data.cpp,global_read,s_region
+,MapRegistered,src/state/load_data.cpp,global_read,s_registered
+,MapRegistered,src/state/load_data.cpp,global_read,s_size
+,MapRegistered,src/state/load_data.cpp,global_write,s_bump
+,MapRegistered,src/state/load_data.cpp,global_write,s_mappedCount
 ,MapSlot,src/harness/harness.cpp,deref_read,*unsigned int
 ,MapSlot,src/harness/harness.cpp,function,
 ,MapTimeNative,src/wasm/glue_tables.cpp,call,operator=
@@ -59429,6 +59671,7 @@ address,function,file,kind,target
 ,ModelState::OwnerView,src/graphics/model_types.h,function,
 ,ModulesCheckStatics,src/wasm/modules.cpp,call,CheckStatics
 ,ModulesCheckStatics,src/wasm/modules.cpp,call,GlueFuelClose
+,ModulesCheckStatics,src/wasm/modules.cpp,call,LoadDataCheck
 ,ModulesCheckStatics,src/wasm/modules.cpp,call,ModulesFatal
 ,ModulesCheckStatics,src/wasm/modules.cpp,call,TimingTick
 ,ModulesCheckStatics,src/wasm/modules.cpp,call,fclose
@@ -62327,6 +62570,9 @@ address,function,file,kind,target
 ,Probe,src/harness/block_scan.cpp,global_read,g_spans
 ,Probe,src/harness/block_scan.cpp,global_read,kPageShift
 ,Probe,src/harness/block_scan.cpp,global_write,g_hits
+,ProbeLive,src/wasm/module_glue.cpp,field_read,LiveProbe::address
+,ProbeLive,src/wasm/module_glue.cpp,field_write,LiveProbe::found
+,ProbeLive,src/wasm/module_glue.cpp,function,
 ,ProbeWord,src/harness/block_scan.cpp,call,Probe
 ,ProbeWord,src/harness/block_scan.cpp,function,
 ,ProbeWord,src/harness/block_scan.cpp,global_read,g_spanMax
@@ -63048,6 +63294,10 @@ address,function,file,kind,target
 ,ReallocLocked,src/state/block.cpp,global_read,kChunkHeader
 ,ReallocLocked,src/state/block.cpp,global_read,kFreeBit
 ,ReallocLocked,src/state/block.cpp,global_read,kMinChunk
+,Rebase,src/state/load_data.cpp,call,FatalAddress
+,Rebase,src/state/load_data.cpp,field_read,Registered::native
+,Rebase,src/state/load_data.cpp,field_read,Registered::size
+,Rebase,src/state/load_data.cpp,function,
 ,RebuildSpans,src/harness/block_scan.cpp,call,Inside
 ,RebuildSpans,src/harness/block_scan.cpp,call,qsort
 ,RebuildSpans,src/harness/block_scan.cpp,deref_read,*Entry
@@ -66869,6 +67119,21 @@ address,function,file,kind,target
 ,RegionViewOf,src/harness/replay.cpp,global_read,s_regions
 ,RegionViewOf,src/harness/replay.cpp,global_read,s_sub
 ,RegionViewOf,src/harness/replay.cpp,global_write,s_regionView
+,Register,src/state/load_data.cpp,call,Grow
+,Register,src/state/load_data.cpp,call,Locked::~Locked
+,Register,src/state/load_data.cpp,call,memmove
+,Register,src/state/load_data.cpp,deref_read,*Registered
+,Register,src/state/load_data.cpp,field_read,Registered::native
+,Register,src/state/load_data.cpp,field_write,Registered::kind
+,Register,src/state/load_data.cpp,field_write,Registered::mapIndex
+,Register,src/state/load_data.cpp,field_write,Registered::native
+,Register,src/state/load_data.cpp,field_write,Registered::size
+,Register,src/state/load_data.cpp,function,
+,Register,src/state/load_data.cpp,global_escape,s_registered
+,Register,src/state/load_data.cpp,global_maybe_written,s_registeredCapacity
+,Register,src/state/load_data.cpp,global_read,s_registered
+,Register,src/state/load_data.cpp,global_read,s_registeredCount
+,Register,src/state/load_data.cpp,global_write,s_registeredCount
 ,RegisterConditionsNative,src/game/victory.cpp,call,MissionConditions::RegisterConditions
 ,RegisterConditionsNative,src/game/victory.cpp,function,
 ,RegisterFx,src/harness/harness.cpp,call,Fail
@@ -66983,6 +67248,24 @@ address,function,file,kind,target
 ,ReleaseUnits,src/map/line_of_sight_index.cpp,call,BlockVector::~BlockVector
 ,ReleaseUnits,src/map/line_of_sight_index.cpp,call,operator new
 ,ReleaseUnits,src/map/line_of_sight_index.cpp,function,
+,RelocateGaf,src/state/load_data.cpp,call,Rebase
+,RelocateGaf,src/state/load_data.cpp,call,Slot
+,RelocateGaf,src/state/load_data.cpp,deref_read,*int
+,RelocateGaf,src/state/load_data.cpp,deref_read,*unsigned char
+,RelocateGaf,src/state/load_data.cpp,deref_read,*unsigned int
+,RelocateGaf,src/state/load_data.cpp,deref_read,*unsigned short
+,RelocateGaf,src/state/load_data.cpp,deref_write,*int
+,RelocateGaf,src/state/load_data.cpp,field_read,Registered::native
+,RelocateGaf,src/state/load_data.cpp,function,
+,RelocateTable,src/state/load_data.cpp,call,FatalAddress
+,RelocateTable,src/state/load_data.cpp,call,FindRegistered
+,RelocateTable,src/state/load_data.cpp,call,MapRegistered
+,RelocateTable,src/state/load_data.cpp,deref_read,*unsigned int
+,RelocateTable,src/state/load_data.cpp,deref_read,*unsigned short
+,RelocateTable,src/state/load_data.cpp,deref_write,*unsigned int
+,RelocateTable,src/state/load_data.cpp,field_read,Registered::native
+,RelocateTable,src/state/load_data.cpp,field_read,Registered::size
+,RelocateTable,src/state/load_data.cpp,function,
 ,Remove,src/weapons/weapons.cpp,call,operator->
 ,Remove,src/weapons/weapons.cpp,call,operator=
 ,Remove,src/weapons/weapons.cpp,call,operator==
@@ -67192,6 +67475,7 @@ address,function,file,kind,target
 ,ReplayAddLoadName,src/harness/replay_objects.cpp,global_read,kReplayObjectKinds@src/harness/replay_schema.h
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,AddSiteMember
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,InsideSite
+,ReplayAddObjectName,src/harness/replay_objects.cpp,call,LoadSideNative
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,ReplayAddWeapon
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,ReplayConcreteKind
 ,ReplayAddObjectName,src/harness/replay_objects.cpp,call,ReplayObjectTable::Find
@@ -68281,6 +68565,7 @@ address,function,file,kind,target
 ,ReplayResolveObject,src/harness/replay_objects.cpp,indirect_call,indirect via void *(*)(unsigned int) __attribute__((stdcall)) [alloc]
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,BindCallbackName
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,DecodeQuoted
+,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,LoadAddressIfLoadData
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,ParseHex8
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,ReplayFieldLive
 ,ReplayRestoreObjectField,src/harness/replay_objects.cpp,call,ReplayKindFits
@@ -70553,9 +70838,12 @@ address,function,file,kind,target
 ,SimFree,src/state/block.cpp,indirect_call,indirect via void (*const)(void *) __attribute__((cdecl)) [AllocHooks::removed]
 ,SimFreeImport,src/wasm/module_glue.cpp,call,GlueImportError
 ,SimFreeImport,src/wasm/module_glue.cpp,call,GlueLinear
+,SimFreeImport,src/wasm/module_glue.cpp,call,SimBlockForEach
 ,SimFreeImport,src/wasm/module_glue.cpp,call,SimFree
 ,SimFreeImport,src/wasm/module_glue.cpp,call,SimOwns
+,SimFreeImport,src/wasm/module_glue.cpp,field_read,LiveProbe::found
 ,SimFreeImport,src/wasm/module_glue.cpp,field_read,wasmtime_val_raw::i32
+,SimFreeImport,src/wasm/module_glue.cpp,fn_ref,ProbeLive
 ,SimFreeImport,src/wasm/module_glue.cpp,function,
 ,SimHighWater,src/state/block.cpp,call,Guard::~Guard
 ,SimHighWater,src/state/block.cpp,call,Head
@@ -70626,6 +70914,10 @@ address,function,file,kind,target
 ,SkipTextLines,src/host/win32/net.cpp,function,
 ,Slot,src/harness/block_scan.cpp,function,
 ,Slot,src/harness/block_scan.cpp,global_read,kRegistryBits
+,Slot,src/state/load_data.cpp,call,FatalAddress
+,Slot,src/state/load_data.cpp,field_read,Registered::native
+,Slot,src/state/load_data.cpp,field_read,Registered::size
+,Slot,src/state/load_data.cpp,function,
 ,SlotDpidInUpdateResourceSharing,src/network/net_game.cpp,field_read,Player::id
 ,SlotDpidInUpdateResourceSharing,src/network/net_game.cpp,field_read,Player::type
 ,SlotDpidInUpdateResourceSharing,src/network/net_game.cpp,function,
@@ -70804,7 +71096,7 @@ address,function,file,kind,target
 ,SlotScope::~SlotScope,src/harness/replay.cpp,function,
 ,SlotScope::~SlotScope,src/harness/replay.cpp,global_write,s_nestedSlot
 ,SmokeAt,src/map/features.cpp,call,FootprintCentreSmoke
-,SmokeAt,src/map/features.cpp,call,GetGafSequenceFrame
+,SmokeAt,src/map/features.cpp,call,LoadGetGafSequenceFrame
 ,SmokeAt,src/map/features.cpp,call,Rand
 ,SmokeAt,src/map/features.cpp,field_maybe_written,Spot::anim
 ,SmokeAt,src/map/features.cpp,field_maybe_written,Spot::cell
@@ -70925,14 +71217,18 @@ address,function,file,kind,target
 ,StallsAllowRequest,src/util/x87_compare.h,function,
 ,Start,src/wasm/modules.cpp,call,GlueInstall
 ,Start,src/wasm/modules.cpp,call,GlueModules
+,Start,src/wasm/modules.cpp,call,LoadDataAttach
 ,Start,src/wasm/modules.cpp,call,LoadModule
 ,Start,src/wasm/modules.cpp,call,LoaderFatal
 ,Start,src/wasm/modules.cpp,call,ModulesFatal
 ,Start,src/wasm/modules.cpp,call,SimBlockAttach
 ,Start,src/wasm/modules.cpp,call,SimBlockBase
+,Start,src/wasm/modules.cpp,call,_stricmp
 ,Start,src/wasm/modules.cpp,call,host_file_exe_path
 ,Start,src/wasm/modules.cpp,call,memset
 ,Start,src/wasm/modules.cpp,call,sprintf
+,Start,src/wasm/modules.cpp,call,strchr
+,Start,src/wasm/modules.cpp,call,strcpy
 ,Start,src/wasm/modules.cpp,call,wl_create
 ,Start,src/wasm/modules.cpp,call,wl_create_memory
 ,Start,src/wasm/modules.cpp,call,wl_error
@@ -70940,8 +71236,10 @@ address,function,file,kind,target
 ,Start,src/wasm/modules.cpp,call,wl_load_manifest_file
 ,Start,src/wasm/modules.cpp,call,wl_memory_base
 ,Start,src/wasm/modules.cpp,call,wl_memory_size
-,Start,src/wasm/modules.cpp,call,wl_module_text
+,Start,src/wasm/modules.cpp,call,wl_module_blocked
 ,Start,src/wasm/modules.cpp,deref_read,*GlueModule
+,Start,src/wasm/modules.cpp,deref_read,*char
+,Start,src/wasm/modules.cpp,deref_write,*char
 ,Start,src/wasm/modules.cpp,field_read,GlueModule::def
 ,Start,src/wasm/modules.cpp,field_read,GlueModuleDef::blocked
 ,Start,src/wasm/modules.cpp,field_read,GlueModuleDef::name
@@ -70950,6 +71248,9 @@ address,function,file,kind,target
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::block_max
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::block_size
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::has_block
+,Start,src/wasm/modules.cpp,field_read,wl_layout::has_load_data
+,Start,src/wasm/modules.cpp,field_read,wl_layout::load_data_base
+,Start,src/wasm/modules.cpp,field_read,wl_layout::load_data_size
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::scratch_base
 ,Start,src/wasm/modules.cpp,field_read,wl_layout::scratch_size
 ,Start,src/wasm/modules.cpp,field_write,ModuleMemory::base
@@ -70961,11 +71262,13 @@ address,function,file,kind,target
 ,Start,src/wasm/modules.cpp,field_write,wl_config::on_trap
 ,Start,src/wasm/modules.cpp,field_write,wl_config::open
 ,Start,src/wasm/modules.cpp,field_write,wl_config::symbol
+,Start,src/wasm/modules.cpp,fn_ref,ModulesFatal
 ,Start,src/wasm/modules.cpp,fn_ref,OnTrap
 ,Start,src/wasm/modules.cpp,fn_ref,host_lib_close
 ,Start,src/wasm/modules.cpp,fn_ref,host_lib_open
 ,Start,src/wasm/modules.cpp,fn_ref,host_lib_symbol
 ,Start,src/wasm/modules.cpp,function,
+,Start,src/wasm/modules.cpp,global_read,kLoadedCapacity
 ,Start,src/wasm/modules.cpp,global_read,kSimBlockBytes
 ,Start,src/wasm/modules.cpp,global_read,kSimBlockCeilingBytes
 ,Start,src/wasm/modules.cpp,global_read,s_loader
@@ -71108,6 +71411,12 @@ address,function,file,kind,target
 ,SteepCell,src/map/terrain.cpp,field_read,Game::width
 ,SteepCell,src/map/terrain.cpp,function,
 ,SteepCell,src/map/terrain.cpp,global_read,g_game
+,StepGafSequenceImport,src/wasm/module_glue.cpp,call,GafCursor
+,StepGafSequenceImport,src/wasm/module_glue.cpp,call,GlueLinear
+,StepGafSequenceImport,src/wasm/module_glue.cpp,call,LoadStepGafSequence
+,StepGafSequenceImport,src/wasm/module_glue.cpp,field_read,wasmtime_val_raw::i32
+,StepGafSequenceImport,src/wasm/module_glue.cpp,field_write,wasmtime_val_raw::i32
+,StepGafSequenceImport,src/wasm/module_glue.cpp,function,
 ,StepPage,src/ingame/control_panel.cpp,function,
 ,StepsFor,src/ai/pathfind.cpp,field_read,PathWorldView::SearchStepLimit
 ,StepsFor,src/ai/pathfind.cpp,function,
@@ -71632,9 +71941,11 @@ address,function,file,kind,target
 ,TimingTick,src/wasm/modules.cpp,deref_read,*GlueModule
 ,TimingTick,src/wasm/modules.cpp,field_read,GlueModule::def
 ,TimingTick,src/wasm/modules.cpp,field_read,GlueModuleDef::blocked
+,TimingTick,src/wasm/modules.cpp,field_read,Loaded::glue
 ,TimingTick,src/wasm/modules.cpp,function,
+,TimingTick,src/wasm/modules.cpp,global_read,s_loaded
+,TimingTick,src/wasm/modules.cpp,global_read,s_loadedCount
 ,TimingTick,src/wasm/modules.cpp,global_read,s_timingStarted
-,TimingTick,src/wasm/modules.cpp,global_read,s_wasm
 ,TimingTick,src/wasm/modules.cpp,global_write,s_timingCounter
 ,TimingTick,src/wasm/modules.cpp,global_write,s_timingFirstTick
 ,TimingTick,src/wasm/modules.cpp,global_write,s_timingMs
@@ -73328,6 +73639,7 @@ address,function,file,kind,target
 ,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::cursor
 ,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::flat
 ,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::indices
+,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::loadData
 ,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::pic
 ,ViewFace,src/ingame/info_panel.cpp,field_write,ProjectedFaceView::texIndexed
 ,ViewFace,src/ingame/info_panel.cpp,function,
@@ -73372,6 +73684,8 @@ address,function,file,kind,target
 ,ViewFill,src/harness/view_fill.cpp,global_write,s_seaLevel@src/harness/view_fill.cpp
 ,ViewFill,src/harness/view_fill.cpp,global_write,s_units@src/harness/view_fill.cpp
 ,ViewFill,src/harness/view_fill.cpp,global_write,s_viewer@src/harness/view_fill.cpp
+,ViewFillDebrisGeometry,src/harness/view_fill.cpp,call,DebrisFacePic
+,ViewFillDebrisGeometry,src/harness/view_fill.cpp,call,DebrisFaceSrc
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,call,FillFace
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,call,Plain
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,call,ViewGeometryBegin
@@ -73387,8 +73701,6 @@ address,function,file,kind,target
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,field_read,ViewReportFace::count
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,field_read,ViewReportFace::flags
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,field_read,ViewReportFace::indices
-,ViewFillDebrisGeometry,src/harness/view_fill.cpp,field_read,ViewReportFace::pic
-,ViewFillDebrisGeometry,src/harness/view_fill.cpp,field_read,ViewReportFace::src
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,field_read,ViewReportPiece::faceCount
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,field_read,ViewReportPiece::firstFace
 ,ViewFillDebrisGeometry,src/harness/view_fill.cpp,field_read,ViewReportPiece::vertexCount
@@ -73622,6 +73934,7 @@ address,function,file,kind,target
 ,Visit,src/harness/block_scan.cpp,global_read,g_verify
 ,Visit,src/harness/block_scan.cpp,global_read,g_words
 ,Visit,src/harness/block_scan.cpp,global_write,g_words
+,Visit,src/harness/replay_objects.cpp,call,LoadSideNative
 ,Visit,src/harness/replay_objects.cpp,call,PointerHash
 ,Visit,src/harness/replay_objects.cpp,call,ReplayConcreteKind
 ,Visit,src/harness/replay_objects.cpp,call,ReplayFail

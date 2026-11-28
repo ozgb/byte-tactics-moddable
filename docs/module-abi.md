@@ -56,8 +56,8 @@ any module is loaded. Modules do not create or grow them.
 
 ### 2.1 The memory
 
-- The module imports it as `env.memory`. Its size is `memory_pages` of the manifest (4112 pages of
-  65536 bytes in the game manifest, 269484032 bytes: the block's ceiling and the 1 MiB below it). Its minimum and maximum are both
+- The module imports it as `env.memory`. Its size is `memory_pages` of the manifest (5136 pages of
+  65536 bytes in the game manifest, 336592896 bytes: the 1 MiB below the block, the block up to its ceiling, and the 64 MiB of load data above it). Its minimum and maximum are both
   `memory_pages`, so it never grows and never moves, and an address stays valid for the whole run.
 - A module declares its own minimum in its import. It must be at most `memory_pages`. It must not
   declare a maximum smaller than `memory_pages`. Linking with `--import-memory` and no
@@ -70,15 +70,17 @@ any module is loaded. Modules do not create or grow them.
   | module windows, one per module, `window` bytes each | from each module's `data_base` | `window`, `modules[].data_base` |
   | scratch area, 65536 bytes | 0xF0000 (983040) | `scratch` = `[base, size]` |
   | the state block, 32 MiB to 256 MiB | 0x100000 (1048576) | `block_base`, `block_size`, `block_max` |
+  | load data, 64 MiB | 0x10100000 (269484032), the block's ceiling | `load_data` = `[base, size]` |
 
-  The memory holds the block at its ceiling: `block_base + block_max` equals `memory_pages * 65536`.
+  The load data region starts at the block's ceiling, `block_base + block_max`, and ends at the memory's end:
+  `load_data` base plus size equals `memory_pages * 65536`. Its bytes are read-only load data (section 7.1).
   The block itself is as large as the match needs (`block_size` to `block_max`, a multiple of 65536,
   `docs/state.md`, "The size of the block"): it starts at `block_base`, the engine tells modules
   only addresses inside it, and the bytes after its end are never read or written. A module must not
   assume the block ends at the end of the memory. A manifest without `block_max` has a block of
   `block_size` bytes only.
-- Windows sit below the scratch area. The loader refuses a window that reaches the scratch base or
-  the block base (section 5).
+- Windows sit below the scratch area. The loader refuses a window that reaches the scratch base,
+  the block base or the load data base (section 5).
 - **The state block** holds the whole simulation state. The engine allocates and owns it; modules
   read and write it through the addresses the engine gives them. A module keeps nothing between
   ticks outside the block (section 12).
@@ -273,6 +275,7 @@ manifest per run.
 | `stack_size` | bytes of every module stack | host and checks (the loader checks only that it is a non-negative integer) |
 | `block_base`, `block_size`, `block_max` | the state block: `block_base` needs `block_size` (a `block_size` without `block_base` is ignored, and there is no block); `block_max`, optional, at least `block_size` (the default), is the most the block can grow to | loader |
 | `scratch` | `[base, size]` of the scratch area | loader |
+| `load_data` | `[base, size]` of the load data region, optional: its size is above 0, it starts at or above the block's ceiling and the scratch area's end, and fits the memory | loader |
 | `majors`, `signatures`, `adapters` | section 10 | loader |
 | `modules` | a non-empty list of module entries | loader, required |
 | `tools` | the pinned tool versions: `clang`, `wasm-tools` (game manifest); `clang`, `rustc`, `wasmtime` (fixture manifest) | checks |
@@ -290,7 +293,7 @@ valid JSON to the loader, so the whole manifest is refused as not valid JSON. A 
 | `data_base`, `table_base` | the module's window and table range (section 2) | loader, required |
 | `exports` | the slot names, in the interface's slot order, without the engine slots | loader; checks |
 | `engine` | `{slot: reason}`, the slots of the interface that stay in the engine (section 6): the host calls the native default for them, and the module does not export them | host; checks |
-| `blocked` | the subsystem's default does not build to WASM yet: the reason, or `true` in the data kit, whose manifest leaves the reason out (it names source files). Such an entry has no `.wasm` and no budgets yet, the host runs the native default for every slot, and the gate judges no fuel or size for a module of it until the entry's budgets are set | build and checks; host; gate |
+| `blocked` | the subsystem's default does not build to WASM yet: the reason (a non-empty string), or `true` in the data kit, whose manifest leaves the reason out (it names source files); the loader refuses any other value, `false` included, as a manifest fault, and an entry that is not blocked has no `blocked`. Such an entry has no `.wasm` and no budgets yet, the host runs the native default for every slot, and the gate judges no fuel or size for a module of it until the entry's budgets are set | build and checks; host; gate |
 | `data` | the loader data words (section 8.2), in order: the four every module has, then `g_region` for a module whose slots take its region | loader; checks |
 | `interface` | the interface whose slots the module implements | loader (majors) |
 | `majors` | the major of each interface it uses, section 10 | loader |
@@ -325,10 +328,14 @@ check uses (section 14).
 3. The host defines every import of every group (sections 9 and 10). An import that is not defined
    by the time a module that needs it is loaded is an instantiation error (the loader can stub missing
    imports as traps; the game does not ask for that).
-4. For each module: check the interface majors (section 10); zero its window; compile it; link its
+4. For each module the game loads: check the interface majors (section 10); zero its window; compile it; link its
    imports; instantiate it (this runs the start function); look up each name of `exports` as a
    function export and fill free table entries (2.3); read each name of `data` as an i32 global
    export, whose value is the address of the data word (section 8).
+   The game loads every manifest entry that is not `blocked`, in manifest order, or with
+   `-modules=<name>[,<name>...]` only the entries named; the others run their native defaults. A name
+   that is not in the manifest, that is `blocked` or that is given twice ends the game at start-up. Before
+   step 4 the game checks, for every entry, that the manifest and the glue tables agree on `blocked`.
 5. Before each slot call the host writes the data words (section 8). At the first slot call of a
    tick the host sets the fuel counter (section 11).
 
@@ -341,13 +348,14 @@ them at start-up (section 13). When a manifest has more than one fault, the load
 - A manifest that is not valid JSON (a number with a fraction or an exponent included, section 4.1) or not an
   object; a required field missing; a value that is not a non-negative integer (`stack_size`, and a module's
   `fuel_budget` and `size_budget`, included); `memory_pages` or `window` zero, or `memory_pages` over 65536; a
-  `fuel_budget` of 0 (section 11.3); a `scratch` that is not `[base, size]`.
+  `fuel_budget` of 0 (section 11.3); a `scratch` or a `load_data` that is not `[base, size]`, or a `load_data` of size 0.
 - A block that does not fit the memory; a scratch area that does not fit the memory or that passes
-  the block base.
+  the block base; a load data region that does not fit the memory or that starts below the block's
+  ceiling or the scratch area's end.
 - No modules, a module without a name, a duplicate name, a missing `data_base` or `table_base`,
   `exports` or `data` that is not a list of names.
 - A module whose window does not fit the memory, or whose table range does not fit the table.
-- A window that reaches the block base or the scratch base.
+- A window that reaches the block base, the scratch base or the load data base.
 - Two windows that overlap, or two table ranges that overlap.
 - A module not in the manifest, loaded twice, or loaded before the memory exists.
 - A module that does not compile, or does not instantiate: an import the host did not define, an
@@ -513,8 +521,9 @@ one byte of the record's layout; it is not an argument kind.
   loaded 3DO model data (a face's texture). It reads a frame table and its frames
   (`FrameTable.count`, a frame's size, offsets, transparency and pixels) and never writes them.
   Nothing traps a write: a wasm32 memory has no read-only pages, so this is the module's obligation,
-  not something the host enforces. The host maps frame tables into the shared memory outside the
-  state block (#1208). Of the modules, only los_radar reads frame data as simulation input (the
+  not something the host enforces. The host copies frame tables and frames into the `load_data` region
+  (section 2.1) when a field first points at one, and the fields hold the copy's address; the native
+  build maps nothing and its fields hold native pointers. Of the modules, only los_radar reads frame data as simulation input (the
   sight masks of `Game.losTable`). features uses a sequence only as a timer, and weapons' cursors and
   debris pictures are presentation state kept in the block. units reads one more such field,
   `ModelState.bitmap`, a unit's cached picture: that frame is not load data but the presentation's,
@@ -689,11 +698,12 @@ signatures are below.
 | `GetGafFrame` | `[linear, int] -> linear` | returns the frame of the given index of a frame table (a GAF animation's frames: its count, a 16-bit word at the start, and 8-byte entries from offset 40, each the frame's address and its duration in ticks), or 0 when the index is negative or not below the count; the table and the frame are load data (section 7.1), so the result is an address outside the block that the module reads and never writes; it is a pure query (its result depends on its arguments alone and it changes nothing), so a module may call it as often as it likes and in any order: a replay answers each call by its arguments, and does not compare how many calls there are or where they fall among the other imports (section 15) |
 | `InitGafSequence` | `[linear, linear, int] -> void` | starts a sequence cursor (a 12-byte record of the block: the frame index and the ticks left on it, two 16-bit words, the loop flag, a byte, and at offset 8 the animation's address) on an animation (a frame table, load data of section 7.1, its loop flag the byte at offset 2) at a frame index, the first frame when the index is not below the count, with that frame's duration as its ticks left |
 | `StepGafSequence` | `[linear] -> int` | advances a sequence cursor by a tick: a cursor with no animation stays and returns 0; one with two or more ticks left loses one and returns 0; otherwise it moves to the next frame and its duration and returns 1, and past the last frame it goes back to the first when the animation loops, and when it does not, it drops the animation (address 0) and returns 1 |
+| `GetGafSequenceFrame` | `[linear] -> linear` | returns the frame a sequence cursor shows: the frame of the cursor's animation (its address at offset 8, a frame table of load data, section 7.1) at the cursor's frame index, or 0 when the cursor has no animation or its index is not below the animation's frame count; the result is an address outside the block that the module reads and never writes; it reads the cursor, which `InitGafSequence` and `StepGafSequence` change, so it is not a pure query of its arguments and a replay compares it in the recorded order |
 | `GetSlotDpid` | `[int] -> int` | returns the network id of the player in a slot of the game record, or -1 when the slot is 10 (none) or its player's type is 0 (empty) |
 | `FindSlotByDpid` | `[int] -> int` | returns the lowest slot, 0 to 9, whose network id (as `GetSlotDpid` gives it) is the argument, or 10 when none is or the argument is -1 |
 | `Emit` | `[linear, int] -> void` | publishes an effect (a payload that starts with its interface's event header; the second argument is its size in bytes) to the calling module's outbox, the one of its entry's `interface`, never one an argument names; `Emit` takes any kind a route carries from that outbox, the same set the native `SchedPublish` delivers; the host refuses, as an import error and in this order, a pointer outside the module memory, a size outside 4 to 128 bytes (an effect holds at least its kind, and at most an inbox entry), an effect that runs past the module memory, a kind not in the entry's `publishes` table, a kind of that table that no route takes from the module's outbox (the checks refuse such a manifest, so only one edited by hand gets this far), and a size other than that kind's; a per-kind hook then runs (wind_meteors' SPAWN, a `WindMeteorsSpawn`: the weapon slot must be in the table of weapons); the engine delivers the effect exactly as `SchedPublish` does, as `docs/schedule.md`, "Routes", states (at once on a synchronous route or outside the tick, otherwise from the subscriber's inbox), and the recordings carry the effect's fields as the import's argument |
 
-**A malformed argument changes nothing and does not trap** (ozgb/btm#25). The default modules never pass one, so no
+**A malformed argument changes nothing and does not trap, except as below** (ozgb/btm#25). The default modules never pass one, so no
 recording shows what it does, and this is the contract: an address the import does not trap on (section 7.2) that is not
 what the argument must be, or a number outside its range, makes the call return 0 (null, for an address; `-1` for
 `GetSlotDpid` and `10` for `FindSlotByDpid`, their answers for none) and write nothing. For each service above:
@@ -701,8 +711,13 @@ what the argument must be, or a number outside its range, makes the call return 
 returned); `RecordSimEvent` with a kind that is not
 a kind of `interfaces/sim_events.h`, or with a null array and a count above 0; `SimCaptureAlloc` with a null offset
 address; `GetGafFrame` with a null table; `InitGafSequence` with a null cursor or animation, or a negative index;
-`StepGafSequence` with a null cursor; `GetSlotDpid` with a slot above 10. `SimAllocTagged` takes any tag, null
+`StepGafSequence` with a null cursor; `GetGafSequenceFrame` with a null cursor; `GetSlotDpid` with a slot above 10. `SimAllocTagged` takes any tag, null
 included, since the tag changes nothing.
+
+**The GAF services take load data.** The table of `GetGafFrame`, the animation of `InitGafSequence` and the animation a cursor holds for `GetGafSequenceFrame` and `StepGafSequence` are addresses
+of the `load_data` region (sections 2.1 and 7.1), and a cursor's animation is one too. An address of the memory that is
+not a copy the host made ends the game as a load data error (section 13), not as an import trap; one outside the
+memory is the pointer trap of section 7.2.
 
 **Routes in the recordings.** A recording carries some calls a module makes to the engine under the engine's own
 service names (`docs/replay-format.md`): the scheduler's publishing call and its synchronous calls into another
@@ -768,12 +783,12 @@ value and its size), and the gate judges an effect through what its subscribers 
 `data/replay_schema.json`) is not the module's import list, which is `imports.services` of its manifest entry:
 targeting's names `RandomInt` and `Emit`, and its recordings carry `i services.Emit` lines.
 
-The services interface is at major 4 and minor 2 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
+The services interface is at major 4 and minor 3 in the header (`SERVICES_VERSION_MAJOR`, `SERVICES_VERSION_MINOR` of
 `interfaces/services.h`). The 1.x line added the scheduler's services one minor at a time; major 2 gave every recorder
 of the dump's events and wind_meteors' publishing import the payload's size, and 2.1 and 2.2 added the recorders of orders, movement,
 units and scripts. Major 3 splits the header: `interfaces/services.h` keeps the imports above, the TDF and bank
 members become free functions under their import names, the strings they only read become const, the size
-of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces that wind_meteors-only import with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports the old service, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import. Minor 1 adds the allocation services (`SimAlloc`, `SimAllocTagged`, `SimFree`), the sim event services (`RecordSimEvent`, `SimCaptureAlloc`) and the player slot services (`GetSlotDpid`, `FindSlotByDpid`), services the recordings of the subsystems other than wind_meteors import, so that each module's manifest entry can list them. Minor 2 adds the GAF services (`GetGafFrame`, `InitGafSequence`, `StepGafSequence`), which the recordings of features, los_radar and weapons import, with `linear` kinds: the frame tables they take are load data in the shared memory (section 7.1).
+of `TdfRecord_GetFieldString` becomes an `int`, and the rest moves to the engine header. Since the import names and kinds stay, a module built against major 2 imports the same functions. Major 4 replaces that wind_meteors-only import with the general `Emit` (same kinds, `[linear, int] -> void`; the host takes the outbox from the calling module's entry). A module built against major 3 imports the old service, which no longer exists, so it must be rebuilt against major 4; no adapter covers a renamed import. Minor 1 adds the allocation services (`SimAlloc`, `SimAllocTagged`, `SimFree`), the sim event services (`RecordSimEvent`, `SimCaptureAlloc`) and the player slot services (`GetSlotDpid`, `FindSlotByDpid`), services the recordings of the subsystems other than wind_meteors import, so that each module's manifest entry can list them. Minor 2 adds the GAF services (`GetGafFrame`, `InitGafSequence`, `StepGafSequence`), which the recordings of features, los_radar and weapons import, with `linear` kinds: the frame tables they take are load data in the shared memory (section 7.1). Minor 3 adds `GetGafSequenceFrame`, which features imports to read the frame a smoke spot's cursor shows, with a `linear` cursor and result.
 
 `tools/abidiff.py` judges `services.h` entry by entry: every free function and non-virtual member function, keyed
 `Class::Method` (the name a module imports is `Class_Method`) or by its plain name, with its return type, parameter
@@ -939,6 +954,11 @@ Every error or trap ends the game, in this version. There is no recovery and no 
   `returned a buffer other than the one it was given`, `returned a weapon outside the sim block` (or an `object`, a
   `region` or a `pointer`, by the result's mode), `returned a pointer outside the module memory`, `the world view is not
   set`; `SimFree` adds `the pointer is outside the sim block`; `Emit` adds `the size is outside an effect`, `the effect runs past the module memory`, `the kind is not in the module's publishes table`, `the kind is not routed from the module's outbox` and `the size is not the payload's size of its kind`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is outside the table of weapons`).
+- **Load data errors** end the game with the text itself (not a trap text): `load_data: <hex> is not a load
+  address` (a GAF service was given an address of the memory that is no copy the host made), `load_data: the load
+  data changed at tick <tick>` (a module wrote a byte of a copy, which it must never do), `load_data: the region is
+  full` and `load_data: out of memory`; a manifest without a `load_data` region fails at start-up with
+  `the manifest has no load_data region`.
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`, `slot <name>: the region is not in the
   sim block`, `slot <name>: an object argument is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the
@@ -1015,7 +1035,7 @@ The recordings route names the replay rules it judged under in `rules`:
 - `queries`: the imports answered as pure queries, by their arguments, whenever the module calls them. They are not counted
   and their order among the other imports is not compared, so a module that asks more often, less often or at another point
   of the call is equal. `services.GetGafFrame` is the one (section 9.3); `InitGafSequence` and `StepGafSequence` change the
-  cursor they take, so they stay in the recorded order. A query whose arguments no recorded call has is reported at the
+  cursor they take, and `GetGafSequenceFrame` reads it, so they stay in the recorded order. A query whose arguments no recorded call has is reported at the
   query (`query services.GetGafFrame`), with the arguments the module passed.
 - `unread_arguments`: arguments the callee never reads, which are left out of the comparison of the import's arguments.
   `los_radar.GetMapCellAtPosition pos.y` is the one: the cell lookup reads only `x` and `z`, and the reclaim scan (the
@@ -1080,13 +1100,14 @@ The values below are read from the files named; they are copied here for orienta
 
 | Name | Game manifest | Fixture manifest |
 | --- | --- | --- |
-| `memory_pages` | 4112 | 4 |
+| `memory_pages` | 5136 | 4 |
 | `table_size` | 528 | 64 |
 | `window` | 32768 | 65536 |
 | `table_slots` | 32 | 16 |
 | `stack_size` | 4096 | 4096 |
 | `block_base`, `block_size`, `block_max` | 1048576 (0x100000), 33554432, 268435456 | none |
 | `scratch` | `[983040, 65536]` (0xF0000) | none |
+| `load_data` | `[269484032, 67108864]` (0x10100000) | none |
 | `build_flags` | `-mno-nontrapping-fptoint` | none |
 | `fuel` | version 1 | none |
 | `majors` | one per interface header, as `wasm/modules.json` records them; they move with the headers | none |

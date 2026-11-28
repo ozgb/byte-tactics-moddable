@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T06:05:05+00:00",
+ "generated": "2026-11-28T07:05:04+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -8,8 +8,8 @@
    "total": 65
   },
   "180": {
-   "done": 13,
-   "total": 37
+   "done": 15,
+   "total": 38
   }
  },
  "rows": [
@@ -190,15 +190,15 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 6,
-   "spec": "stale",
+   "spec": "active",
    "spec_pin": 7,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1201,
     "title": "Spec: Move the economy spec and implement it",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1201",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [
@@ -290,16 +290,23 @@
    "recordings": 2,
    "spec": "active",
    "spec_pin": null,
-   "impl": "none",
+   "impl": "active",
    "active": true,
    "issue": {
     "number": 1190,
     "title": "Spec: Write the mission spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1190",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
+    {
+     "number": 62,
+     "title": "Implementer: impl/mission",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/62",
+     "live": true
+    },
     {
      "number": 45,
      "title": "Add: Specify the mission",

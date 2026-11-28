@@ -681,6 +681,20 @@ def csv_dicts(data: bytes) -> list[dict[str, str]]:
     return oraclekit.csv_rows(data)[1]
 
 
+class BlockVectorLayoutTest(unittest.TestCase):
+    def test_the_vector_has_its_padding_and_three_words(self):
+        record = real_layout()["records"]["BlockVector"]
+        self.assertEqual(record["size"], 16)
+        self.assertEqual([(f["name"], f["offset"], f["size"]) for f in record["fields"]],
+                         [("padding", 0, 1), ("firstWord", 4, 4), ("lastWord", 8, 4), ("endWord", 12, 4)])
+
+    def test_a_field_of_a_vector_type_is_as_big_as_the_record(self):
+        records = real_layout()["records"]
+        field = next(f for f in records["FactoryIndexEntry"]["fields"] if f["name"] == "factories")
+        self.assertTrue(field["type"].startswith("BlockVector<"))
+        self.assertEqual(field["size"], records["BlockVector"]["size"])
+
+
 class SimEventKitTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

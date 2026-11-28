@@ -12,6 +12,7 @@ call 4408 UpdateMotion
   r Unit#1.spatialBucket SpatialBucket#117
   r Unit#1.transportPiece 255
   r Unit#1.heading -32671
+  r Unit#1.pitch 0
   r Unit#1.list Order#1
   r Unit#1.flags 0x90e20320
   r Unit#1.carrier Unit#3
@@ -30,6 +31,7 @@ call 4408 UpdateMotion
   r Unit#3.spatialBucket SpatialBucket#116
   r Unit#3.transportPiece 255
   r Unit#3.heading -32671
+  r Unit#3.pitch 0
   r Unit#3.list Order#2
   r Unit#3.flags 0x10242321
   r Unit#3.carrier null
@@ -118,6 +120,7 @@ call 4408 UpdateMotion
   r Unit#251.spatialBucket SpatialBucket#248
   r Unit#251.transportPiece 255
   r Unit#251.heading 32734
+  r Unit#251.pitch 0
   r Unit#251.list Order#3
   r Unit#251.flags 0x90e40021
   r Unit#251.carrier null
@@ -240,10 +243,10 @@ call 4411 Apply
   i pathfinding.Cancel AiSearchGoal#3
   i pathfinding.Submit (Unit#251,60,3,(0,0),0,0,195,202,42,49,AiSearchGoal#3,PointMarker#1,0,(0,0))
   w AiSearchGoal#3.target PointMarker#1
+  w AiSearchGoal#3.points x:1f0c1904700c2003200c2004400c600300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   w AiSearchGoal#3.flags 11
   o result 1
 call 4411 UpdateMotion
-  r AiSearchGoal#3.points x:1f0c1904700c2003200c2004400c600300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#251
   i services.SchedPublish 14 12
   o Unit#251.heading -31772

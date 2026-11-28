@@ -12,6 +12,7 @@ call 8 UpdateMotion
   r Unit#1.spatialBucket SpatialBucket#32
   r Unit#1.transportPiece 255
   r Unit#1.heading 0
+  r Unit#1.pitch 0
   r Unit#1.list Order#1
   r Unit#1.flags 0x90e00021
   r Unit#1.carrier null
@@ -63,6 +64,7 @@ call 8 UpdateMotion
   r Unit#251.spatialBucket SpatialBucket#334
   r Unit#251.transportPiece 255
   r Unit#251.heading 0
+  r Unit#251.pitch 0
   r Unit#251.list Order#2
   r Unit#251.flags 0x90e00321
   r Unit#251.carrier null
@@ -328,6 +330,7 @@ call 10 Apply
   w UnitMotion#7.p2Z 0
   w AiSearchGoal#3.target null
   w AiSearchGoal#3.owner Unit#252
+  w AiSearchGoal#3.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   w AiSearchGoal#3.count 0
   w AiSearchGoal#3.repathClaimTick 0
   w AiSearchGoal#3.flags 8
@@ -340,6 +343,7 @@ call 10 UpdateMotion
   r Unit#2.spatialBucket SpatialBucket#60
   r Unit#2.transportPiece 255
   r Unit#2.heading 0
+  r Unit#2.pitch 0
   r Unit#2.list Order#3
   r Unit#2.flags 0x90240021
   r Unit#2.carrier null
@@ -360,6 +364,7 @@ call 10 UpdateMotion
   r Unit#3.spatialBucket SpatialBucket#61
   r Unit#3.transportPiece 255
   r Unit#3.heading 0
+  r Unit#3.pitch 0
   r Unit#3.list Order#4
   r Unit#3.flags 0x90240021
   r Unit#3.carrier null
@@ -374,6 +379,7 @@ call 10 UpdateMotion
   r Unit#4.spatialBucket SpatialBucket#60
   r Unit#4.transportPiece 255
   r Unit#4.heading 0
+  r Unit#4.pitch 0
   r Unit#4.list Order#5
   r Unit#4.flags 0x90040021
   r Unit#4.carrier null
@@ -393,6 +399,7 @@ call 10 UpdateMotion
   r Unit#5.spatialBucket SpatialBucket#61
   r Unit#5.transportPiece 255
   r Unit#5.heading 0
+  r Unit#5.pitch 0
   r Unit#5.list Order#6
   r Unit#5.flags 0x10e40021
   r Unit#5.carrier null
@@ -415,6 +422,7 @@ call 10 UpdateMotion
   r Unit#252.spatialBucket SpatialBucket#62
   r Unit#252.transportPiece 255
   r Unit#252.heading 0
+  r Unit#252.pitch 0
   r Unit#252.list Order#7
   r Unit#252.flags 0x90240221
   r Unit#252.carrier null
@@ -428,7 +436,6 @@ call 10 UpdateMotion
   r UnitDef#144.moverate1 225442
   r UnitDef#144.moverate2 225442
   r UnitMotion#7.lastMoveTick 0
-  r AiSearchGoal#3.points x:0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#252
   i services.SchedPublish 14 8
 call 11 UpdateMotion
@@ -660,11 +667,11 @@ call 20 Apply
   i pathfinding.Cancel AiSearchGoal#1
   i pathfinding.Submit (Unit#1,60,3,(0,0),0,0,39,46,17,24,AiSearchGoal#1,PointMarker#1,0,(0,0))
   w AiSearchGoal#1.target PointMarker#1
+  w AiSearchGoal#1.points x:3002f000b0029001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   w AiSearchGoal#1.count 2
   w AiSearchGoal#1.flags 11
   o result 1
 call 20 UpdateMotion
-  r AiSearchGoal#1.points x:3002f000b0029001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#1
   i services.SchedPublish 14 12
   o Unit#1.heading -1044

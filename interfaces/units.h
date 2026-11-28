@@ -88,7 +88,7 @@ enum UnitsEventKind {
     UNITS_KILL_ALL = 396,
     // Every unit of a type is killed and the definition of the type is loaded again (UnitsReloadType); outcome 1.
     UNITS_RELOAD_TYPE = 397,
-    // unit forgets who attacked it last: its last attacker slot is reset, its panel is flagged to refresh and its attacker is cleared; the header alone; outcome 1.
+    // unit forgets who attacked it last: its last attacker slot is reset, its dying flag (bit 14 of Unit.flags, 0x4000) is set and its attacker is cleared; the header alone; outcome 1.
     UNITS_FORGET_ATTACKER = 398
 };
 
@@ -424,7 +424,7 @@ struct UnitsSeam {
     unsigned short (__stdcall* FindUnitTypeId)(const char* name);
     // Looks a mission unit up by its name in the caller's table of the units made for the mission units (count entries, indexed by mission unit, and at most the mission's CountMissionUnits; a larger count is clamped to it), starting after the unit after when it is not null, and returns it or null; a count of 0 reads no entry, so the table may then be null. Hooks: none.
     Unit* (__stdcall* FindMissionUnit)(const char* name, const Ref<Unit>* units, int count, Unit* after);
-    // Adds build progress to a unit under construction and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: UnitFinished.
+    // Adds build progress to a unit under construction and returns 1 when the progress was paid for (a positive amount that the economy granted), else 0; synchronous: the builder's order reads the answer in the same statement. Hooks: UnitFinished.
     int (__stdcall* AddBuildProgress)(Unit* builder, Unit* unit, float amount);
     // Adds repair progress to a unit and returns 1 when it is done; synchronous: the builder's order reads the answer in the same statement. Hooks: RepairAmount.
     int (__stdcall* AddRepairProgress)(Unit* builder, Unit* unit, float amount);

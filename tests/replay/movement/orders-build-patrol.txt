@@ -12,6 +12,7 @@ call 148 UpdateMotion
   r Unit#1.spatialBucket SpatialBucket#32
   r Unit#1.transportPiece 255
   r Unit#1.heading -26558
+  r Unit#1.pitch 0
   r Unit#1.list Order#1
   r Unit#1.flags 0x90e00321
   r Unit#1.carrier null
@@ -63,6 +64,7 @@ call 148 UpdateMotion
   r Unit#251.spatialBucket SpatialBucket#306
   r Unit#251.transportPiece 255
   r Unit#251.heading 8311
+  r Unit#251.pitch 0
   r Unit#251.list Order#2
   r Unit#251.flags 0x90e40025
   r Unit#251.carrier null
@@ -176,6 +178,7 @@ call 150 Apply
   i pathfinding.Cancel AiSearchGoal#1
   i pathfinding.Submit (Unit#1,60,1,(43,18),16,0,0,0,0,0,AiSearchGoal#1,ApproachRadius#1,0,(0,0))
   w AiSearchGoal#1.target ApproachRadius#1
+  w AiSearchGoal#1.points x:4902f400c0023001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   w AiSearchGoal#1.flags 11
   o result 1
 call 150 NewRingApproach
@@ -204,9 +207,9 @@ call 150 Apply
   i services.SchedPublish 14 16
   i pathfinding.Submit (Unit#1,60,2,(40,16),47,107,0,0,0,0,AiSearchGoal#1,RingApproach#1,0,(0,0))
   w AiSearchGoal#1.target RingApproach#1
+  w AiSearchGoal#1.points x:4902f4004802f400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   o result 1
 call 150 UpdateMotion
-  r AiSearchGoal#1.points x:4902f4004802f400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   a unit Unit#1
   i services.SchedPublish 14 16
   i pathfinding.Cancel AiSearchGoal#1

@@ -298,5 +298,45 @@
     "host/wind_meteors_gaf_sequence_frame_null_cursor.wasm"
    ]
   ]
+ },
+ {
+  "name": "find_slot_none",
+  "calls": [
+   [
+    "replay",
+    "host/find_slot_none.txt",
+    "host/wind_meteors_find_slot_none.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "class_word_condition",
+  "calls": [
+   [
+    "replay",
+    "host/class_word_condition.txt",
+    "host/players_class_word_condition.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "class_word_condition_base",
+  "calls": [
+   [
+    "replay",
+    "host/class_word_condition_base.txt",
+    "host/players_class_word_condition_base.wasm"
+   ]
+  ]
+ },
+ {
+  "name": "class_word_goal",
+  "calls": [
+   [
+    "replay",
+    "host/class_word_goal.txt",
+    "host/movement_class_word_goal.wasm"
+   ]
+  ]
  }
 ]

@@ -3666,10 +3666,55 @@ void CompareObjects(const ReplaySlotSets* sets)
     value.Free();
 }
 
+void CoreObjectWrites(const char* file, const ReplayReach* reach, unsigned at, unsigned kind, void* object, const ReplaySlotSets* sets,
+                      ReplayText& key, ReplayText& value)
+{
+    for (unsigned i = 0; i < sets->objWriteCount; i++) {
+        const ReplayObjectField& f = kReplayObjectFields[sets->objWrites[i]];
+        if (f.object != kind || f.kind == RK_EMBED || f.kind == RK_EMBEDS || f.kind == RK_UNITID || f.kind == RK_SELF
+            || (reach != nullptr && !ReplayInReach(*reach, at, sets->objWrites[i])))
+            continue;
+        if (!ReplayFieldLive(f, object))
+            continue;
+        ReplayObjectFieldKey(key, g_objects, false, kind, object, f);
+        if (f.kind == RK_VECTOR || f.kind == RK_REFS || f.kind == RK_CSTRINGS || f.kind == RK_BLOB)
+            Fatal(file, g_callIndex, "core mode cannot write vector fields", key.Data());
+        ReplayFormatObjectField(f, object, g_objects, false, value);
+        const char* known = g_known.Get(key.Data());
+        if (known != nullptr && strcmp(known, value.Data()) == 0)
+            continue;
+        g_known.Set(key.Data(), value.Data());
+        CoreJson(g_coreWrites, "w", key.Data(), value.Data());
+    }
+}
+
+void CoreObjectsWrites(const char* file, const ReplaySlotSets* sets)
+{
+    if (sets->objWriteCount == 0)
+        return;
+    ReplayWalk(g_reach, g_objects, true, *sets, g_rootKinds, g_rootObjects, g_rootCount);
+    ReplayText key;
+    ReplayText value;
+    for (unsigned at = 0; at < g_reach.count; at++) {
+        if (!ReplayInDeltaTable(g_reach, g_reach.kind[at], g_reach.object[at]))
+            CoreObjectWrites(file, &g_reach, at, g_reach.kind[at], g_reach.object[at], sets, key, value);
+    }
+    for (unsigned d = 0; d < ReplayDeltaCount(g_reach); d++) {
+        unsigned kind;
+        unsigned char* base;
+        unsigned elements;
+        unsigned stride;
+        if (!ReplayDeltaTable(g_reach, d, &kind, &base, &elements, &stride))
+            continue;
+        for (unsigned e = 0; e < elements; e++)
+            CoreObjectWrites(file, nullptr, 0, kind, base + e * stride, sets, key, value);
+    }
+    key.Free();
+    value.Free();
+}
+
 void CoreWrites(const char* file, const ReplaySlotSets* sets)
 {
-    if (sets->objWriteCount != 0)
-        Fatal(file, g_callIndex, "core mode cannot write object fields", sets->name);
     ReplayText value;
     for (unsigned i = 0; i < sets->writeCount; i++) {
         const ReplayField& f = kReplayFields[sets->writes[i]];
@@ -3687,6 +3732,7 @@ void CoreWrites(const char* file, const ReplaySlotSets* sets)
         CoreJson(g_coreWrites, "w", f.name, value.Data());
     }
     value.Free();
+    CoreObjectsWrites(file, sets);
 }
 
 void CompareWrites(const char* file, const ReplaySlotSets* sets)
@@ -8612,6 +8658,9 @@ void LoadDataMapSelfTest()
     unsigned linear = (unsigned)g_game->losTable;
     Check(table != nullptr && linear != (unsigned)table && LoadNative(linear) == table, "the field holds the table's load address, not the replayer's");
     Check(*(const unsigned short*)ReplayWasmLinear(linear) == 5, "and the module reads the recorded count there");
+    unsigned classWords[256];
+    unsigned classWordCount = ReplayClassWords(classWords, sizeof classWords / sizeof classWords[0]);
+    Check(classWordCount != 0 && linear >= ReplayWasmLoadDataBase() + classWordCount * 4 && memcmp(ReplayWasmLinear(ReplayWasmLoadDataBase()), classWords, classWordCount * 4) == 0, "above the class word table, which stays at the region's base");
     ReplayAnswerHook() = ReplayAnswerImport;
     unsigned frame = LoadGetGafFrame(linear, 4);
     ReplayAnswerHook() = nullptr;
@@ -8656,6 +8705,28 @@ void LoadDataReclaimSelfTest()
     LoadDataUnregister(kept);
     LoadDataAttach(nullptr, 0, 0, nullptr);
     free(kept);
+    free(region);
+}
+
+void LoadDataClassWordsSelfTest()
+{
+    const unsigned regionSize = 4096;
+    const unsigned base = 0x10100000;
+    const unsigned words[3] = {0x401000, 0x402000, 0x403000};
+    unsigned char* region = (unsigned char*)calloc(regionSize, 1);
+    LoadDataAttach(region, base, regionSize, nullptr);
+    LoadDataWriteClassWords(words, 3);
+    Check(memcmp(region, words, sizeof words) == 0, "the class words start the load_data region, in index order");
+    for (int battle = 0; battle < 3; battle++) {
+        unsigned char* frame = (unsigned char*)calloc(64, 1);
+        LoadDataRegisterFrame(frame, 64);
+        Check(LoadAddress(frame) == base + 16, "the bump allocator starts above the class words, at an 8-byte boundary");
+        LoadDataCheck(1);
+        LoadDataUnregister(frame);
+        free(frame);
+    }
+    Check(memcmp(region, words, sizeof words) == 0, "reclaiming the load data leaves the class words");
+    LoadDataAttach(nullptr, 0, 0, nullptr);
     free(region);
 }
 
@@ -9645,6 +9716,7 @@ int SelfTest(const char* file)
     RegionSelfTest();
     LoadDataMapSelfTest();
     LoadDataReclaimSelfTest();
+    LoadDataClassWordsSelfTest();
     UnreadArgumentSelfTest();
     if (file == nullptr)
         return 0;
@@ -9704,6 +9776,20 @@ void CoreError(const char* errorClass, const char* text)
     exit(0);
 }
 
+const char* CoreSubsystem(const char* recording)
+{
+    static char subsystem[64];
+    char line[160];
+    strcpy(subsystem, "wind_meteors");
+    FILE* file = fopen(recording, "rb");
+    if (file == nullptr)
+        return subsystem;
+    if (fgets(line, sizeof line, file) != nullptr && fgets(line, sizeof line, file) != nullptr)
+        sscanf(line, "subsystem %63s", subsystem);
+    fclose(file);
+    return subsystem;
+}
+
 int CoreHost(const char* callsPath, const char* outPath)
 {
     FILE* calls = fopen(callsPath, "rb");
@@ -9719,6 +9805,7 @@ int CoreHost(const char* callsPath, const char* outPath)
     const char* fault = getenv("BT_CORE_FAULT");
     g_core = true;
     g_coreFault = fault != nullptr && strcmp(fault, "host_write") == 0;
+    ReplayWasmNoBudgets();
     ReplayWasmSetTrapHook(CoreError);
     char line[1024];
     while (fgets(line, sizeof line, calls) != nullptr) {
@@ -9735,7 +9822,7 @@ int CoreHost(const char* callsPath, const char* outPath)
         }
         *module++ = '\0';
         recording++;
-        ReplayWasmSelect(module, "wind_meteors");
+        ReplayWasmSelect(module, CoreSubsystem(recording));
         Outcome out;
         ReplayFile(recording, out);
         fprintf(g_coreOut, "replay\t[%s]\n", out.core.Data());

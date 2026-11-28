@@ -5,6 +5,7 @@
 #include "../interfaces/host.h"
 #include "../src/state/block.h"
 #include "../src/state/load_data.h"
+#include "../src/harness/replay_objects.h"
 #include "../src/wasm/modules.h"
 #include "../src/wasm/module_glue.h"
 #include "replay_wasm.h"
@@ -12,6 +13,7 @@
 namespace {
 
 ModuleMemory s_memory;
+unsigned s_loadDataBase;
 GlueModule* s_glue;
 char s_wasmPath[320];
 char s_directory[320];
@@ -216,8 +218,15 @@ void ReplayWasmReload()
     s_memory.scratch = layout->scratch_base;
     s_memory.scratchSize = layout->scratch_size;
     SimBlockAttach(s_memory.base + layout->block_base);
-    if (layout->has_load_data)
-        LoadDataAttach(s_memory.base + layout->load_data_base, layout->load_data_base, layout->load_data_size, ModulesFatal);
+    if (!layout->has_load_data)
+        Stop("the manifest has no load_data region");
+    s_loadDataBase = layout->load_data_base;
+    LoadDataAttach(s_memory.base + layout->load_data_base, layout->load_data_base, layout->load_data_size, ModulesFatal);
+    unsigned classWords[256];
+    unsigned classWordCount = ReplayClassWords(classWords, sizeof classWords / sizeof classWords[0]);
+    if (classWordCount > sizeof classWords / sizeof classWords[0])
+        Stop("the class word table is too long");
+    LoadDataWriteClassWords(classWords, classWordCount);
 
     Check(GlueInstall(s_loader, 0));
     wl_module* module = wl_load_module_bytes(s_loader, s_glue->def->name, bytes, size);
@@ -241,6 +250,11 @@ void ReplayWasmNoBudgets()
 unsigned char* ReplayWasmLinear(unsigned address)
 {
     return s_memory.base + address;
+}
+
+unsigned ReplayWasmLoadDataBase()
+{
+    return s_loadDataBase;
 }
 
 void ReplayWasmUseSeam()

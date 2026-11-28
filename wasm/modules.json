@@ -136,8 +136,8 @@
       "PickRandomReclaimableResourcesInRadius": [["linear", "int", "linear", "linear", "linear", "linear"], "int"],
       "PassMapGet": [["int", "int", "int"], "int"],
       "PassMapInBounds": [["int", "int", "int"], "int"],
-      "RefreshMovedUnits": [["int", "linear"], "void"],
-      "RefreshUnitIfStale": [["int", "linear"], "void"]
+      "RefreshMovedUnits": [["int", "block"], "void"],
+      "RefreshUnitIfStale": [["int", "block"], "void"]
     },
     "mission": {
       "GetGameType": [[], "int"],
@@ -1140,8 +1140,8 @@
         "GetGroundHeight": [["linear"], "int"],
         "PassMapGet": [["int", "int", "int"], "int"],
         "PassMapInBounds": [["int", "int", "int"], "int"],
-        "RefreshMovedUnits": [["int", "linear"], "void"],
-        "RefreshUnitIfStale": [["int", "linear"], "void"]
+        "RefreshMovedUnits": [["int", "block"], "void"],
+        "RefreshUnitIfStale": [["int", "block"], "void"]
       },
       "imports": {
         "los_radar": {

@@ -55561,6 +55561,8 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::IsPadSlotFree
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapGet
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::PassMapInBounds
+,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RefreshMovedUnits
+,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::RefreshUnitIfStale
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::SnapWorldPosToFootprint
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MapSeam::UnitsInRange
 ,HookSeams,src/harness/replay_hooks.inc,field_write,MissionSeam::CountMissionFeatures
@@ -55840,6 +55842,8 @@ address,function,file,kind,target
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapIsPadSlotFree
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapGet
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapPassMapInBounds
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRefreshMovedUnits
+,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapRefreshUnitIfStale
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapSnapWorldPosToFootprint
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMapUnitsInRange
 ,HookSeams,src/harness/replay_hooks.inc,fn_ref,RecMissionCountMissionFeatures
@@ -61188,6 +61192,12 @@ address,function,file,kind,target
 ,OtherPlayer,src/harness/display_replay.cpp,global_write,s_otherPlayer@src/harness/display_replay.cpp
 ,OutOfBlock,src/state/block.cpp,call,Fatal
 ,OutOfBlock,src/state/block.cpp,function,
+,OutsideKind,src/harness/replay_objects.cpp,function,
+,OutsideKind,src/harness/replay_objects.cpp,global_read,kReplayObjectKindCount@src/harness/replay_schema.h
+,OutsideKind,src/harness/replay_objects.cpp,global_read,kReplayOutsideKindCount@src/harness/replay_schema.h
+,OutsideKind,src/harness/replay_objects.cpp,global_read,kReplayOutsideKinds@src/harness/replay_schema.h
+,OutsideTable,src/harness/replay_objects.cpp,call,TableSpan
+,OutsideTable,src/harness/replay_objects.cpp,function,
 ,Overlaps,src/harness/display_log.cpp,field_read,DlNode::x0
 ,Overlaps,src/harness/display_log.cpp,field_read,DlNode::x1
 ,Overlaps,src/harness/display_log.cpp,field_read,DlNode::y0
@@ -64812,6 +64822,26 @@ address,function,file,kind,target
 ,RecMapPassMapInBounds,src/harness/replay_hooks.inc,global_read,s_inner_map
 ,RecMapPassMapInBounds,src/harness/replay_hooks.inc,global_read,s_tail
 ,RecMapPassMapInBounds,src/harness/replay_hooks.inc,indirect_call,"indirect via int (*const)(int, unsigned int, unsigned int) __attribute__((stdcall)) [MapSeam::PassMapInBounds]"
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,call,Add
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,call,ArgObject
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,field_read,MapSeam::RefreshMovedUnits
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,function,
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,global_read,s_call
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,global_read,s_inner_map
+,RecMapRefreshMovedUnits,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, Unit *) __attribute__((stdcall)) [MapSeam::RefreshMovedUnits]"
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,call,Add
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,call,ArgObject
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,call,ArgValue
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,call,SlotScope::Open
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,call,SlotScope::~SlotScope
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,field_read,MapSeam::RefreshUnitIfStale
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,function,
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,global_read,s_call
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,global_read,s_inner_map
+,RecMapRefreshUnitIfStale,src/harness/replay_hooks.inc,indirect_call,"indirect via void (*const)(int, Unit *) __attribute__((stdcall)) [MapSeam::RefreshUnitIfStale]"
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,Add
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOut
 ,RecMapSnapWorldPosToFootprint,src/harness/replay_hooks.inc,call,ArgInOutExit
@@ -67950,6 +67980,8 @@ address,function,file,kind,target
 ,ReplayCompareVector,src/harness/replay_objects.cpp,global_read,kReplayVectors@src/harness/replay_schema.h
 ,ReplayCompareVector,src/harness/replay_objects.cpp,indirect_call,indirect via void (*)(const char *) __attribute__((stdcall)) [hash]
 ,ReplayCompareVector,src/harness/replay_objects.cpp,indirect_call,"indirect via void (*)(const char *, const char *, const char *) __attribute__((stdcall)) [report]"
+,ReplayConcreteKind,src/harness/replay_objects.cpp,call,OutsideKind
+,ReplayConcreteKind,src/harness/replay_objects.cpp,call,OutsideTable
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,call,ReplayFail
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,call,ReplayVtable
 ,ReplayConcreteKind,src/harness/replay_objects.cpp,call,ReplayVtableName
@@ -68280,6 +68312,7 @@ address,function,file,kind,target
 ,ReplayIsArrayText,src/harness/replay_objects.cpp,function,
 ,ReplayIsEmbedded,src/harness/replay_objects.cpp,call,InsideSite
 ,ReplayIsEmbedded,src/harness/replay_objects.cpp,function,
+,ReplayKindFits,src/harness/replay_objects.cpp,call,OutsideKind
 ,ReplayKindFits,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyCount
 ,ReplayKindFits,src/harness/replay_objects.cpp,field_read,ReplayObjectKind::polyFirst
 ,ReplayKindFits,src/harness/replay_objects.cpp,function,

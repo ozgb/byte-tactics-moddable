@@ -5,9 +5,9 @@
 Refuses the module, before anything plays, when `tools/wasm_modules.py check-module` finds a problem in the file: the window,
 table, imports, exports, kinds or size budget of docs/module-abi.md, section 5.2. Then copies the runtime files of the modern build (and objs/objects.rsp, which the block pointer check reads beside the map) into a fresh directory with MODULE.wasm in place of the subsystem's module,
 starts the game on a short scenario to see whether the loader accepts the module, then plays
-`tools/reference.py --check --end-of-tick --tier` (`--full`: without `--tier`) and `tools/replay.py --check --subsystem NAME` on that
-runtime. It writes DIR/result.json, built from the parsed fields of those tools' reports and nothing else: for each scenario
-and recording, `equal` or the first divergence (tick, phase, field name, the module's value), the kit version and the
+`tools/reference.py --check --end-of-tick --tier` (`--full`: without `--tier`) and `tools/replay.py --check --subsystem NAME` (every stored
+recording below tests/replay/NAME/, long/ included) on that runtime. It writes DIR/result.json, built from the parsed fields of those tools' reports and nothing else: for each scenario
+and recording (a recording by its path below tests/replay/ without `.txt`: `mission/long/mission-build-unit`), `equal` or the first divergence (tick, phase, field name, the module's value), the kit version and the
 module's sha256. A failure of another check of the run is `other_checks: failed`, with `reason: block-pointer` when it is
 the block pointer check, which judges the harness's scan and not the module's behaviour. The reference's values never reach it. The raw reports stay in DIR/logs/, which is for the host only.
 
@@ -20,7 +20,7 @@ level. A view that differs is not a failure either: the state stays the verdict.
 
 A module of a subsystem whose manifest entry is `blocked` (its default does not build to WASM, so the game cannot load it in
 a scenario), or any module with `--recordings-only`, takes the recordings route instead: after the same check-module, it
-replays every recording of tests/replay/NAME/ against the module (`replay_native_test.exe --wasm`, one run per recording,
+replays every recording below tests/replay/NAME/, long/ included, against the module (`replay_native_test.exe --wasm`, one run per recording,
 under Wine) and judges it on those alone. Its result has `scope: recordings` and `scenarios: not_judged`, and names the
 replay rules it was judged under in `rules`: the imports answered as pure queries (`services.GetGafFrame`: by its arguments,
 whenever the module asks, in any count or order) and the arguments no callee reads (the `y` of the position the reclaim
@@ -61,6 +61,7 @@ ROOT = Path(__file__).resolve().parent.parent
 FORMAT = 4
 REPLAYER = "replay_native_test.exe"
 MANIFEST = ROOT / "wasm/modules.json"
+RECORDINGS = ROOT / "tests/replay"
 REPLAY_TIMEOUT = 3600
 RULES = {"queries": ["services.GetGafFrame"], "unread_arguments": ["los_radar.GetMapCellAtPosition pos.y"]}
 RUNTIME_FILES = ("TotalA.exe", "TotalA.map", "CMakeCache.txt", "wasmtime_host.dll", "modules.json")
@@ -492,11 +493,12 @@ def build_recordings_result(subsystem: str, module: Path, kit: dict, recordings:
 
 
 def recording_files(subsystem: str) -> list[Path]:
-    return sorted((ROOT / "tests/replay" / subsystem).glob("*.txt"))
+    """Every stored recording below tests/replay/SUBSYSTEM/, long/ included."""
+    return replay.stored_files(RECORDINGS / subsystem)
 
 
 def judge_recordings(module: Path, subsystem: str, build: Path, out: Path, manifest: Path = MANIFEST) -> dict:
-    """Judge the module on the recordings of tests/replay/SUBSYSTEM/ alone, one replayer run per recording; a blocked entry's without its budgets."""
+    """Judge the module on the recordings below tests/replay/SUBSYSTEM/ alone, long/ included, one replayer run per recording; a blocked entry's without its budgets."""
     started = time.time()
     clear_run(out)
     budgets = not blocked(subsystem, manifest)
@@ -513,13 +515,14 @@ def judge_recordings(module: Path, subsystem: str, build: Path, out: Path, manif
     recordings = {}
     for path in files:
         cmd = ["wine", str(build / REPLAYER), "--wasm", str(wasm), *([] if budgets else ["--no-budgets"]), str(path.relative_to(ROOT))]
-        log = out / "logs/recordings" / path.name
+        log = out / "logs/recordings" / path.relative_to(RECORDINGS / subsystem)
+        log.parent.mkdir(parents=True, exist_ok=True)
         try:
             with log.open("w") as f:
                 code = subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, text=True, cwd=ROOT, timeout=REPLAY_TIMEOUT).returncode
         except subprocess.TimeoutExpired:
             code = None
-        recordings[f"{subsystem}/{path.stem}"] = parse_replay(log.read_text(errors="replace"), code)
+        recordings[replay.recording_name(path, RECORDINGS)] = parse_replay(log.read_text(errors="replace"), code)
     return build_recordings_result(subsystem, module, kit, recordings, None, time.time() - started, budgets)
 
 
@@ -555,7 +558,7 @@ def judge(module: Path, subsystem: str, full: bool, build: Path, out: Path, game
     if game_dir:
         play += ["--game-dir", game_dir]
     _, replay_text = stream(play, out / "logs/replay.txt")
-    names = [f"{subsystem}/{p.stem}" for p in replay.scenario_recordings(subsystem)]
+    names = [replay.recording_name(p) for p in replay.scenario_recordings(subsystem)]
     recordings = parse_recordings(json.loads(verdicts.read_text())) if verdicts.is_file() else {}
     for name in names:
         recordings.setdefault(name, {"status": "failed", **game_failure_reason(replay_text)})
@@ -579,7 +582,7 @@ def main() -> int:
     ap.add_argument("--subsystem", required=True)
     route = ap.add_mutually_exclusive_group()
     route.add_argument("--full", action="store_true", help="play the full --check instead of the tier")
-    route.add_argument("--recordings-only", action="store_true", help="judge on the recordings of tests/replay/SUBSYSTEM/ alone (the route of a blocked manifest entry)")
+    route.add_argument("--recordings-only", action="store_true", help="judge on the recordings below tests/replay/SUBSYSTEM/ alone, long/ included (the route of a blocked manifest entry)")
     ap.add_argument("--out", type=Path, default=ROOT / "build/oracle", help="the directory of the run: runtime/, logs/ and result.json (default build/oracle)")
     ap.add_argument("--manifest", type=Path, help="the game manifest to judge against (default wasm/modules.json; recordings route only)")
     ap.add_argument("--build-dir", type=Path, default=ROOT / "build/modern")

@@ -1018,13 +1018,19 @@ earlier result behind. It has two routes, and the result's `scope` names the one
 - **`scenarios`**, the steps below: the suite and the recordings. It is the route of a subsystem whose manifest entry builds
   (no `blocked`), so that the game loads the module in every scenario.
 - **`recordings`**, for a subsystem whose entry is `blocked` (its default does not build to WASM, so no scenario can load a
-  module of it), or any subsystem with `--recordings-only`: step 1, then every recording of `tests/replay/<subsystem>/`
-  replayed against the module, one `replay_native_test.exe --wasm` run per recording (`docs/replay-format.md`, "Against the
+  module of it), or any subsystem with `--recordings-only`: step 1, then every recording below `tests/replay/<subsystem>/`
+  (`long/` included, below) replayed against the module, one `replay_native_test.exe --wasm` run per recording (`docs/replay-format.md`, "Against the
   WASM module"). The scenarios are not played: the result has `scenarios: not_judged`, and the module has met its contract
   on those recordings only. `--manifest` judges against another game manifest than `wasm/modules.json`, on this route only.
   Before the first recording it checks the host: the build must have `replay_native_test.exe` and `wasmtime_host.dll`, and
   `wine replay_native_test.exe` with no arguments must print the replayer's usage line, which proves that wine starts a
   program in its prefix. When a check fails the run plays nothing and its result is an error of the host (below).
+
+**Every stored recording is judged**, on both routes: the files of `tests/replay/<subsystem>/` and those of a directory
+below it. Mission's `long/mission-build-unit` is one: CI does not replay it for its size (`docs/replay-format.md`,
+"Replaying", the recordings of mission), but it is the only recording that reaches `GetMissionUnit`, `CountMissionUnits` and
+`GetMissionFeature`, so the gate judges it beside `console-ilose`. A recording is named by its path below `tests/replay/`
+without `.txt`: `mission/console-ilose`, `mission/long/mission-build-unit`.
 
 **A blocked entry is judged without budgets.** It has no `size_budget` or `fuel_budget` (section 4.2), so check-module does
 not judge the module's size, and the replayer runs it with the largest fuel budget of section 11.3, 2147483647 a tick
@@ -1058,7 +1064,7 @@ The recordings route names the replay rules it judged under in `rules`:
    refused by either step (section 5.2): it is judged like any other, and differs where its data is not where the loader zeroed
    it.
 4. It plays `tools/reference.py --check --end-of-tick --tier` on that runtime (`--full`: the full `--check --end-of-tick`), and then
-   `tools/replay.py --check --subsystem <subsystem>` on the recordings of `tests/replay/<subsystem>/`. The comparisons are theirs.
+   `tools/replay.py --check --subsystem <subsystem>` on every recording below `tests/replay/<subsystem>/`, `long/` included. The comparisons are theirs.
    `--end-of-tick` judges each scenario on its `state` column (the `tick` row, `docs/trace-format.md`, section 6), the state at
    the end of each tick, and reports the `digest` column (every row of the tick) and the `view` column (the `view` row, the player view of the tick, `docs/view.md`, "The recorded view") beside it without failing on either.
    The shared gate lock is kept, a cached pass is not used, and the key of the cache covers the module, so a cached pass could
@@ -1081,7 +1087,7 @@ The recordings route names the replay rules it judged under in `rules`:
 | `seconds` | wall time of the run |
 | `message` | with `refused`: the problems `check-module` found or the loader's message, and no `scenarios` or `recordings` |
 | `scenarios` | `not_judged` with `recordings`; otherwise by scenario name: `status` (the end-of-tick state) and, for `differs`, `tick`, `phase`, `field` and `value`; `digest` and `view`: `status` `equal`, `differs` with the first `tick` whose digest (or view) differs, or `not_judged`; an `other_checks` entry (`failed`) when every scenario is equal and another check of the run failed, with `reason` `block-pointer` when it was the block pointer check: a fault of the harness's scan of the shared state block, not of the module |
-| `recordings` | by `<subsystem>/<recording>`: `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value`; with `recordings`, `call` (the replayer's call index) in place of `line` and `kind`, and `field` is the replayer's key (a field, `import <n> <name>` or `query <name>`) |
+| `recordings` | by the recording's path below `tests/replay/` without `.txt` (`<subsystem>/<recording>`, or `<subsystem>/long/<recording>`): `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value`; with `recordings`, `call` (the replayer's call index) in place of `line` and `kind`, and `field` is the replayer's key (a field, `import <n> <name>` or `query <name>`) |
 | `reason`, `class` | in a scenario or recording whose `status` is `failed`: why it did not run to its end, below |
 
 A `status` is `equal`, `differs`, `failed` (the scenario did not run to its end) or `not_judged` (the run stopped at the first

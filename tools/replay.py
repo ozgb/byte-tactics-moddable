@@ -5,12 +5,13 @@
     uv run tools/replay.py --compare DIR_A DIR_B
 
 `--record` plays each scenario of reference/scenarios/ (a name or a path; with none, the scenarios that
-tests/replay/<subsystem>/ holds a recording of) under Wine, once per subsystem, on a copy that ends with that
-subsystem's `record` line, and writes <DIR>/<subsystem>/<scenario>.txt. `--subsystem` (repeatable) picks the subsystems; the
+tests/replay/<subsystem>/ holds a recording of, in it or in a directory below it such as long/) under Wine, once per subsystem, on a copy that ends with that
+subsystem's `record` line, and writes <DIR>/<subsystem>/<scenario>.txt, or <DIR>/<subsystem>/long/<scenario>.txt when the stored one is there. `--subsystem` (repeatable) picks the subsystems; the
 default is every subsystem that has a tests/replay/<subsystem>/ directory. `--native-modules` plays the modules as
 native code (-modules=native). `--check` records into a temporary directory and fails when a recording differs from
-the one in tests/replay/ (not the play-test recordings that tests/replay/playtests.json lists); `--json FILE` also writes, per recording, `equal` or the first difference as the played run has it
-(call tick, slot, kind and name of the line, and its value; never the stored line), the form tools/oraclegate.py reads. `--compare` fails when two directories do not hold the same files with the same bytes, and
+the one in tests/replay/ (every recording below tests/replay/<subsystem>/, long/ included, but the play-test recordings that
+tests/replay/playtests.json lists), and names each by its path (`mission/long/mission-build-unit.txt`); `--json FILE` also writes, per recording, `equal` or the first difference as the played run has it
+(call tick, slot, kind and name of the line, and its value; never the stored line), keyed by that path without `.txt`, the form tools/oraclegate.py reads. `--compare` fails when two directories do not hold the same files with the same bytes, long/ included, and
 names the first differing line.
 
 The comparison of `--check` frees what #1209 says a module's behaviour does not depend on: `services.GetGafFrame` is a query answered
@@ -78,10 +79,28 @@ def playtest_recordings() -> dict[str, str]:
     return json.loads(PLAYTESTS.read_text())
 
 
+def recording_name(path: Path, root: Path | None = None) -> str:
+    """The name of a stored recording: its path below tests/replay/ (or `root`) without `.txt` (`mission/long/mission-build-unit`)."""
+    return path.relative_to(root or RECORDINGS).with_suffix("").as_posix()
+
+
+def stored_files(directory: Path) -> list[Path]:
+    """Every recording below a directory of recordings, in a subdirectory such as long/ too, but none under a hidden directory."""
+    return sorted(p for p in directory.rglob("*.txt") if not any(part.startswith(".") for part in p.relative_to(directory).parts))
+
+
 def scenario_recordings(subsystem: str) -> list[Path]:
-    """The stored recordings of the subsystem that a scenario of reference/scenarios/ makes."""
+    """The stored recordings of the subsystem that a scenario of reference/scenarios/ makes, long/ included."""
     skipped = playtest_recordings()
-    return [p for p in sorted((RECORDINGS / subsystem).glob("*.txt")) if f"{subsystem}/{p.stem}" not in skipped]
+    return [p for p in stored_files(RECORDINGS / subsystem) if recording_name(p) not in skipped]
+
+
+def stored_recording(subsystem: str, scenario: str) -> Path:
+    """The stored recording of the scenario for the subsystem, in tests/replay/<subsystem>/ or below it; tests/replay/<subsystem>/<scenario>.txt when there is none."""
+    found = [p for p in scenario_recordings(subsystem) if p.stem == scenario]
+    if len(found) > 1:
+        raise Error(f"{subsystem} has {len(found)} stored recordings of {scenario}: " + ", ".join(recording_name(p) for p in found))
+    return found[0] if found else RECORDINGS / subsystem / (scenario + ".txt")
 
 
 def recorded_names(subsystems: list[str]) -> list[str]:
@@ -286,8 +305,9 @@ def record(exe: Path, plan: dict[str, list[str]], game_dir: str | None, native: 
             problems = check_form(text, subsystem)
             if problems:
                 raise Error(f"{scenario.stem}: the {subsystem} recording is malformed: {problems[0]}")
-            (out / subsystem).mkdir(parents=True, exist_ok=True)
-            (out / subsystem / (scenario.stem + ".txt")).write_bytes(text.encode("latin-1"))
+            target = out / stored_recording(subsystem, scenario.stem).relative_to(RECORDINGS)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(text.encode("latin-1"))
             results[(subsystem, scenario.stem)] = text
 
     try:
@@ -300,8 +320,8 @@ def record(exe: Path, plan: dict[str, list[str]], game_dir: str | None, native: 
 
 def compare(a: Path, b: Path) -> list[str]:
     """The differences between two directories of recordings, one line each (empty when they are the same)."""
-    names_a = sorted(str(p.relative_to(a)) for p in a.glob("*/*.txt"))
-    names_b = sorted(str(p.relative_to(b)) for p in b.glob("*/*.txt"))
+    names_a = [p.relative_to(a).as_posix() for p in stored_files(a) if len(p.relative_to(a).parts) > 1]
+    names_b = [p.relative_to(b).as_posix() for p in stored_files(b) if len(p.relative_to(b).parts) > 1]
     found = [f"only in {a}: {n}" for n in names_a if n not in names_b] + [f"only in {b}: {n}" for n in names_b if n not in names_a]
     for name in names_a:
         if name in names_b and (a / name).read_bytes() != (b / name).read_bytes():
@@ -374,12 +394,12 @@ def main() -> int:
             verdicts: dict[str, dict] = {}
             for name, subs in plan.items():
                 for subsystem in subs:
-                    stored = RECORDINGS / subsystem / (scenario_path(name).stem + ".txt")
-                    got = (Path(tmp) / subsystem / stored.name).read_text()
+                    stored = stored_recording(subsystem, scenario_path(name).stem)
+                    got = (Path(tmp) / stored.relative_to(RECORDINGS)).read_text()
                     diff = first_difference(stored.read_text(), got) if stored.is_file() else "no stored recording"
-                    print(f"{subsystem}/{stored.name}: {'equal' if diff is None else 'differs, ' + diff}")
+                    print(f"{stored.relative_to(RECORDINGS).as_posix()}: {'equal' if diff is None else 'differs, ' + diff}")
                     bad += diff is not None
-                    verdicts[f"{subsystem}/{stored.stem}"] = divergence(stored.read_text(), got) if stored.is_file() else {"status": "differs", "line": 0}
+                    verdicts[recording_name(stored)] = divergence(stored.read_text(), got) if stored.is_file() else {"status": "differs", "line": 0}
             if args.json:
                 args.json.parent.mkdir(parents=True, exist_ok=True)
                 args.json.write_text(json.dumps(verdicts, indent=1, sort_keys=True) + "\n")

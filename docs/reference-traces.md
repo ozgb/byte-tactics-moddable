@@ -1,8 +1,8 @@
 # Checking a new engine against the reference traces
 
-The git tag `reference-traces-v57` is the fixed target for anyone writing a new
+The git tag `reference-traces-v58` is the fixed target for anyone writing a new
 engine. Check your engine's game state against it, or take the deterministic
-code as a base. This page names the current tag: **`reference-traces-v57`**.
+code as a base. This page names the current tag: **`reference-traces-v58`**.
 
 ## What the tag holds
 
@@ -22,7 +22,7 @@ code as a base. This page names the current tag: **`reference-traces-v57`**.
 Check the tag out to get all four:
 
 ```sh
-git checkout reference-traces-v57
+git checkout reference-traces-v58
 ```
 
 A tag is never moved. Read this page at the tag you target.
@@ -139,7 +139,7 @@ dumps with `tools/tracediff.py`:
 
 ```sh
 export WINEARCH=win64
-git checkout reference-traces-v57
+git checkout reference-traces-v58
 uv run tools/reference.py HEAD                                # build build/reference/HEAD/TotalA.exe
 uv run tools/tracediff.py --traces ref/trace.txt mine/trace.txt   # first tick and phase that differ
 uv run tools/tracediff.py --dumps ref/dump.txt mine/dump.txt --at <tick> <phase>
@@ -213,14 +213,15 @@ What the code shows about the players fields (the player loader and saver):
 A tag is never moved. A later change to the trace format, the scenario list or
 the digests that should become a target gets a new tag (`reference-traces-v54`
 and so on), and this page is updated to name it. The current tag is
-`reference-traces-v57`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
+`reference-traces-v58`. The oracle kit (`tools/oraclekit.py export`) takes the `interfaces-v*` tag on the commit it is
 exported from and pairs it with the highest `reference-traces-v*` tag merged into that commit, so the two need not be on
 the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `reference-traces-v51`, and the kit at
 `interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it, the kits at `interfaces-v58` to
 `interfaces-v63` pair with `reference-traces-v53`, the kits at `interfaces-v64` and `interfaces-v65` pair with
 `reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it, as do the kits at `interfaces-v67` and
 `interfaces-v68`, the kit at `interfaces-v69`, on the commit of `reference-traces-v56`, pairs with it, as does the kit at `interfaces-v70`,
-and the kit at `interfaces-v71`, on the commit of `reference-traces-v57`, pairs with it, as does the kit at `interfaces-v72`.
+and the kit at `interfaces-v71`, on the commit of `reference-traces-v57`, pairs with it, as do the kits at `interfaces-v72` and
+`interfaces-v73`, and the kit at `interfaces-v74`, on the commit of `reference-traces-v58`, pairs with it.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.
@@ -523,12 +524,17 @@ and the kit at `interfaces-v71`, on the commit of `reference-traces-v57`, pairs 
   the reference tip with that fade. The trace format is still `bt-trace 10`; the traces are those of v56 but for
   their commit line, and the sounds, UI logs, interface commands, events, setup log, frames and views are those of
   v56. The saves decode equal to v56's. Its kit is `interfaces-v71`.
+- `reference-traces-v58` (#1246): the digests, sounds, UI logs, events, frames, views and saves of v57, and the core
+  gate's vectors of v57 with new ones added and none changed (`docs/core-gate.md`): in `host`, the class word vectors
+  (`class_word_condition`, `class_word_condition_base` and `class_word_goal`: a module finds the entry of the class
+  word table, `docs/module-abi.md` section 7.1, that equals an object's word) and `find_slot_none` (`FindSlotByDpid(-1)`
+  answers 10 and leaves an import line). Its kit is `interfaces-v74`.
 
 The reference's save of `save-midgame` is stored in `reference/saves/save-midgame.sav` (#623), beside the
 traces and the sound logs, and `tools/reference.py --check` compares each scenario's `harness.sav` with it
 by decoded contents: `tools/savefile.py` lists the masked bytes, each with its offset and reason.
 
 `bt-trace N` does not name which fields are hashed. v1 to v25 are
-all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v57 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
+all `bt-trace 3`, v26 is `bt-trace 4` and v27, v28 and v29 are `bt-trace 5` and v30 is `bt-trace 6` and v31 is `bt-trace 7` and v32 and v33 are `bt-trace 8` and v34 to v46 are `bt-trace 9` and v47 to v58 are `bt-trace 10`, but v1, v2 and v3 hash different fields, so their digests are not
 comparable. The hashed fields are those of `data/trace_schema.json` at the tag. What makes a new format number is in
 `docs/trace-format.md`, "Format numbers".

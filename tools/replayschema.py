@@ -4354,6 +4354,13 @@ def tagged_class_words() -> tuple[str, list[dict]]:
     return tags[0], parse_class_words(shown.stdout) if shown.returncode == 0 else []
 
 
+def unknown_class_words(rows: list[dict], model: dict) -> list[str]:
+    """Errors for the rows that name no vtable of a kind of the model and are not removed: the rows render_class_words cannot write."""
+    kinds = {o["name"]: o for o in model["objects"] if o.get("vtable") or o.get("vptr")}
+    return ["%s: %s is no vtable of a concrete kind; a removed class keeps its row with removed yes" % (CLASS_WORDS.name, class_word_label(r))
+            for r in rows if r.get("removed") != "yes" and (r["class"] not in kinds or (r["base"] and r["base"] not in list(kinds[r["class"]].get("vtable_secondary") or [])))]
+
+
 def render_class_words(rows: list[dict], model: dict) -> list[str]:
     """ReplayClassWords: the word a native object of each class holds, in the order of data/class_words.csv; a removed class's word is 0."""
     kinds = {o["name"]: o for o in model["objects"] if o.get("vtable") or o.get("vptr")}
@@ -4618,16 +4625,21 @@ def generate(rows: list[dict[str, str]], ann: dict | None = None, assignment: di
         errors += ["%s lists the service %s, which has no spec" % (sub, n) for n in spec.get("services", [])
                    if not any(x["name"] == n or x["name"].startswith(n + "_") for x in services)]
     class_words = read_class_words()
+    vtables = {}
+    for path, m, fixtures in ((FIXTURE_VTABLES_CPP, fixture_model, True), (VTABLES_CPP, model, False)):
+        unknown = unknown_class_words(class_words, m)
+        errors += [e for e in unknown if e not in errors]
+        vtables[path] = "" if unknown else render_vtables(m, fixtures, class_words)
     files = {
         SCHEMA_H: render_schema(ann, model),
         FIXTURE_SCHEMA_H: render_fixture_schema(fixture_ann, fixture_model),
-        FIXTURE_VTABLES_CPP: render_vtables(fixture_model, True, class_words),
+        FIXTURE_VTABLES_CPP: vtables[FIXTURE_VTABLES_CPP],
         HOOKS_H: render_hooks(ann, model),
         SLOTS_H: render_slots(ann, model),
         SERVICES_H: render_service_ids(services, ann.get("loads", {})),
         SERVICES_INC: render_service_end(services),
         SERVICES_SLOTS: render_service_answers(services, linked_services(services)),
-        VTABLES_CPP: render_vtables(model, False, class_words),
+        VTABLES_CPP: vtables[VTABLES_CPP],
         CALLBACKS_H: render_callbacks(model),
         CALLBACKS_SLOTS: render_callback_players(model),
         SHAPES_SLOTS: render_shapes(fixture_ann),

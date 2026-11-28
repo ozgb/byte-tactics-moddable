@@ -532,6 +532,54 @@ class BlockedEntry(unittest.TestCase):
         self.assertEqual((result["verdict"], result["budgets"]), ("refused", "not_judged"))
 
 
+class LongRecordings(unittest.TestCase):
+    """Mission's recordings route, with the replayer mocked: the recording under long/ is judged beside console-ilose."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        self.build = self.dir / "build"
+        self.build.mkdir()
+        for name in ("wasmtime_host.dll", oraclegate.REPLAYER):
+            (self.build / name).write_text("x")
+        self.module = self.dir / "m.wasm"
+        self.module.write_bytes(b"\0asm\1\0\0\0")
+        self.replayed = []
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def fake_run(self, cmd, **kw):
+        if cmd[0] == "wine" and len(cmd) == 2:
+            return subprocess.CompletedProcess(cmd, 2, "usage: replay_native_test\n", "")
+        if cmd[0] == "wine":
+            self.replayed.append(cmd[-1])
+            if cmd[-1].endswith("/long/mission-build-unit.txt"):
+                kw["stdout"].write(REPLAY_DIVERGED.replace("wind_meteors", "mission"))
+                return subprocess.CompletedProcess(cmd, 1)
+            kw["stdout"].write(f"{cmd[-1]}: 10 calls, 3 imports, identical on a second run\nreplay_native_test: all passed\n")
+            return subprocess.CompletedProcess(cmd, 0)
+        if "check-module" in cmd:
+            return subprocess.CompletedProcess(cmd, 0, "mission: ok\n", "")
+        return subprocess.CompletedProcess(cmd, 1, "", "")
+
+    def test_the_files_go_below_the_subsystems_directory(self):
+        names = [oraclegate.replay.recording_name(p) for p in oraclegate.recording_files("mission")]
+        self.assertIn("mission/console-ilose", names)
+        self.assertIn("mission/long/mission-build-unit", names)
+
+    def test_a_long_recording_is_judged_and_named_by_its_path(self):
+        self.assertTrue(oraclegate.blocked("mission"))
+        with mock.patch.object(oraclegate.subprocess, "run", side_effect=self.fake_run):
+            result = oraclegate.judge_recordings(self.module, "mission", self.build, self.dir / "out")
+        self.assertIn("tests/replay/mission/long/mission-build-unit.txt", self.replayed)
+        self.assertEqual(result["recordings"]["mission/console-ilose"], {"status": "equal"})
+        self.assertEqual(result["recordings"]["mission/long/mission-build-unit"]["status"], "differs")
+        self.assertEqual(result["verdict"], "differs")
+        self.assertIn("  mission/long/mission-build-unit: differs at call 2, SimGlobals.g_meteorScheduleGap", oraclegate.summary(result).splitlines())
+        self.assertTrue((self.dir / "out/logs/recordings/long/mission-build-unit.txt").is_file())
+
+
 class StaleResult(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

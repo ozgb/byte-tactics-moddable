@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T04:05:05+00:00",
+ "generated": "2026-11-28T05:05:05+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -8,7 +8,7 @@
    "total": 65
   },
   "180": {
-   "done": 12,
+   "done": 13,
    "total": 35
   }
  },
@@ -255,7 +255,7 @@
    "recordings": 3,
    "spec": "active",
    "spec_pin": null,
-   "impl": "none",
+   "impl": "active",
    "active": true,
    "issue": {
     "number": 1189,
@@ -264,7 +264,22 @@
     "claimed": true,
     "state": "OPEN"
    },
-   "prs": []
+   "prs": [
+    {
+     "number": 60,
+     "title": "Implementer: impl/los_radar",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/60",
+     "live": true
+    },
+    {
+     "number": 59,
+     "title": "Add: Write the los_radar spec",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/59",
+     "live": true
+    }
+   ]
   },
   {
    "id": "mission",
@@ -543,10 +558,18 @@
     "number": 1200,
     "title": "Spec: Write the units spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1200",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
-   "prs": []
+   "prs": [
+    {
+     "number": 58,
+     "title": "Add: Specify the units subsystem",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/58",
+     "live": true
+    }
+   ]
   }
  ]
 }

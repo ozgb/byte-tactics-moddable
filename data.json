@@ -1,15 +1,15 @@
 {
- "generated": "2026-11-28T02:05:04+00:00",
+ "generated": "2026-11-28T03:05:05+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
   "2": {
-   "done": 61,
+   "done": 62,
    "total": 65
   },
   "180": {
-   "done": 11,
-   "total": 30
+   "done": 12,
+   "total": 34
   }
  },
  "rows": [
@@ -136,7 +136,7 @@
     "title": "Presentation layer: Prerequisites for a clean-room rewrite",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1047",
     "claimed": false,
-    "state": "OPEN"
+    "state": "CLOSED"
    },
    "prs": []
   },
@@ -190,15 +190,15 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 6,
-   "spec": "stale",
+   "spec": "active",
    "spec_pin": 7,
    "impl": "none",
-   "active": false,
+   "active": true,
    "issue": {
     "number": 1201,
     "title": "Spec: Move the economy spec and implement it",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1201",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [
@@ -301,31 +301,31 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 5,
-   "spec": "active",
-   "spec_pin": null,
-   "impl": "active",
-   "active": true,
+   "spec": "done",
+   "spec_pin": 68,
+   "impl": "built",
+   "active": false,
    "issue": {
     "number": 1191,
     "title": "Spec: Write the pathfinding spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1191",
-    "claimed": true,
-    "state": "OPEN"
+    "claimed": false,
+    "state": "CLOSED"
    },
    "prs": [
     {
      "number": 55,
      "title": "Implementer: impl/pathfinding",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/55",
-     "live": true
+     "live": false
     },
     {
      "number": 44,
      "title": "Add: Write the pathfinding spec",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/44",
-     "live": true
+     "live": false
     }
    ]
   },
@@ -344,7 +344,7 @@
     "number": 1192,
     "title": "Spec: Write the map spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1192",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [

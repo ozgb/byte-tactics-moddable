@@ -13,8 +13,8 @@ tools/playtest/<name>.txt. Every pair of scenario and
 exe is one run, and `--parallel` runs that many at once. `--trap-stubs` plays
 a copy of an ordinary link whose stubs fault when reached (see stub_traps).
 
-An exe built from this tree runs its modules in WASM and is given wasmtime_host.dll, wind_meteors.wasm and modules.json
-from its directory (`cmake --build <dir> --target wasm_runtime` makes them); `--native-modules` runs it with
+An exe built from this tree runs its modules in WASM and is given wasmtime_host.dll, modules.json and the .wasm of every module
+that manifest builds from its directory (`cmake --build <dir> --target wasm_runtime` makes them); `--native-modules` runs it with
 `-modules=native` instead.
 
 `--record <subsystem>[:first:last]` runs instance 1 of a scenario with the game's `-record` switch and copies the
@@ -87,10 +87,19 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import wasm_modules
+
 ROOT = Path(__file__).resolve().parent.parent
 SCENARIOS = ROOT / "tools/playtest"
 OUT = ROOT / "build/playtest"
-WASM_RUNTIME = ("wasmtime_host.dll", "wind_meteors.wasm", "modules.json")
+def wasm_runtime(directory):
+    """The files an exe of directory needs to run its modules in WASM: the runtime, the manifest and every module it builds."""
+    manifest = directory / "modules.json"
+    with open(manifest if manifest.is_file() else wasm_modules.GAME_MODULES) as f:
+        game = json.load(f)
+    return ["wasmtime_host.dll", "modules.json", *(f"{entry['name']}.wasm" for entry in wasm_modules.built_modules(game))]
+
+
 ACCESS_LOG_FILES = ("accesslog.attr", "accesslog.items", "accesslog.defer")
 NATIVE_MODULES_SWITCH = "-modules=native"
 ZERO_FILL_SWITCH = "-memset=0"
@@ -531,7 +540,7 @@ class Instance:
         exe = self.run.exes[min(self.index, len(self.run.exes)) - 1]
         shutil.copy2(exe, self.game / "TotalA.exe")
         if runs_wasm_modules(exe) and not self.run.native_modules:
-            for name in WASM_RUNTIME:
+            for name in wasm_runtime(exe.parent):
                 shutil.copy2(exe.parent / name, self.game / name)
         for name in ACCESS_LOG_FILES:
             if (exe.parent / name).is_file():
@@ -1748,7 +1757,7 @@ def main() -> None:
     if not args.native_modules:
         for parts in exes:
             for _, path in parts:
-                missing = [n for n in WASM_RUNTIME if runs_wasm_modules(path) and not (path.parent / n).is_file()]
+                missing = [n for n in wasm_runtime(path.parent) if runs_wasm_modules(path) and not (path.parent / n).is_file()]
                 if missing:
                     raise SystemExit(f"{path.parent}: {', '.join(missing)} missing: run `cmake --build {path.parent} --target wasm_runtime` "
                                      "(or pass --native-modules to run the modules as native code)")

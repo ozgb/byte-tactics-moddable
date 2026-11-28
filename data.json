@@ -1,15 +1,15 @@
 {
- "generated": "2026-11-28T05:05:05+00:00",
+ "generated": "2026-11-28T06:05:05+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
   "2": {
-   "done": 63,
+   "done": 64,
    "total": 65
   },
   "180": {
    "done": 13,
-   "total": 35
+   "total": 37
   }
  },
  "rows": [
@@ -261,7 +261,7 @@
     "number": 1189,
     "title": "Spec: Write the los and radar spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1189",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
@@ -296,7 +296,7 @@
     "number": 1190,
     "title": "Spec: Write the mission spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1190",
-    "claimed": false,
+    "claimed": true,
     "state": "OPEN"
    },
    "prs": [
@@ -541,7 +541,15 @@
     "claimed": true,
     "state": "OPEN"
    },
-   "prs": []
+   "prs": [
+    {
+     "number": 61,
+     "title": "Add: Specify the orders subsystem",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/61",
+     "live": true
+    }
+   ]
   },
   {
    "id": "units",

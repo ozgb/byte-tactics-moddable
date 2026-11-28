@@ -827,7 +827,7 @@ int __stdcall GlueAiApply(const AiEventHeader* event, unsigned int size)
     unsigned mark = GlueScratchMark();
     wasmtime_val_raw_t slotArgs[2];
     slotArgs[0].i64 = 0;
-    unsigned eventSize = size > sizeof(AiEventHeader) ? (unsigned)sizeof(AiEventHeader) : (unsigned)size;
+    unsigned eventSize = size > GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(AiEventHeader), sizeof(AiReactToAttack)), sizeof(AiSetSquad)), sizeof(AiPlan)), sizeof(AiWeight)), sizeof(AiLimit)) ? (unsigned)GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(AiEventHeader), sizeof(AiReactToAttack)), sizeof(AiSetSquad)), sizeof(AiPlan)), sizeof(AiWeight)), sizeof(AiLimit)) : (unsigned)size;
     slotArgs[0].i32 = (int)GlueIn(glue, 0, event, eventSize, 1);
     slotArgs[1].i32 = (int)eventSize;
     GlueCall(glue, 0, slotArgs, 2);
@@ -1309,7 +1309,7 @@ int __stdcall GlueWeaponsApply(const WeaponsEventHeader* event, unsigned int siz
     unsigned mark = GlueScratchMark();
     wasmtime_val_raw_t slotArgs[2];
     slotArgs[0].i64 = 0;
-    unsigned eventSize = size > sizeof(WeaponsEventHeader) ? (unsigned)sizeof(WeaponsEventHeader) : (unsigned)size;
+    unsigned eventSize = size > GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(WeaponsEventHeader), sizeof(WeaponsDamage)), sizeof(WeaponsDamage)), sizeof(WeaponsDetonate)), sizeof(WeaponsRelease)), sizeof(WeaponsClaim)), sizeof(WeaponsAimDone)), sizeof(WeaponsExplodePiece)), sizeof(WeaponsAreaDamage)), sizeof(WeaponsSpawn)), sizeof(WeaponsSetStockpiles)), sizeof(WeaponsAddStockpile)) ? (unsigned)GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(WeaponsEventHeader), sizeof(WeaponsDamage)), sizeof(WeaponsDamage)), sizeof(WeaponsDetonate)), sizeof(WeaponsRelease)), sizeof(WeaponsClaim)), sizeof(WeaponsAimDone)), sizeof(WeaponsExplodePiece)), sizeof(WeaponsAreaDamage)), sizeof(WeaponsSpawn)), sizeof(WeaponsSetStockpiles)), sizeof(WeaponsAddStockpile)) : (unsigned)size;
     slotArgs[0].i32 = (int)GlueIn(glue, 0, event, eventSize, 1);
     slotArgs[1].i32 = (int)eventSize;
     GlueCall(glue, 0, slotArgs, 2);
@@ -1761,7 +1761,7 @@ int __stdcall GlueLosRadarApply(const LosRadarEventHeader* event, unsigned int s
     unsigned mark = GlueScratchMark();
     wasmtime_val_raw_t slotArgs[2];
     slotArgs[0].i64 = 0;
-    unsigned eventSize = size > sizeof(LosRadarEventHeader) ? (unsigned)sizeof(LosRadarEventHeader) : (unsigned)size;
+    unsigned eventSize = size > GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(LosRadarEventHeader), sizeof(LosRadarUnit)), sizeof(LosRadarUnit)), sizeof(LosRadarUnit)), sizeof(LosRadarAddEyeball)), sizeof(LosRadarCellHeights)), sizeof(LosRadarRecalculate)), sizeof(LosRadarSharePlayer)), sizeof(LosRadarSharePlayer)), sizeof(LosRadarShareMap)), sizeof(LosRadarUnit)), sizeof(LosRadarSightLoad)), sizeof(LosRadarSetMode)) ? (unsigned)GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(LosRadarEventHeader), sizeof(LosRadarUnit)), sizeof(LosRadarUnit)), sizeof(LosRadarUnit)), sizeof(LosRadarAddEyeball)), sizeof(LosRadarCellHeights)), sizeof(LosRadarRecalculate)), sizeof(LosRadarSharePlayer)), sizeof(LosRadarSharePlayer)), sizeof(LosRadarShareMap)), sizeof(LosRadarUnit)), sizeof(LosRadarSightLoad)), sizeof(LosRadarSetMode)) : (unsigned)size;
     slotArgs[0].i32 = (int)GlueIn(glue, 0, event, eventSize, 1);
     slotArgs[1].i32 = (int)eventSize;
     GlueCall(glue, 0, slotArgs, 2);
@@ -2292,7 +2292,7 @@ int __stdcall GlueOrdersApply(const OrdersEventHeader* event, unsigned int size)
     unsigned mark = GlueScratchMark();
     wasmtime_val_raw_t slotArgs[2];
     slotArgs[0].i64 = 0;
-    unsigned eventSize = size > sizeof(OrdersEventHeader) ? (unsigned)sizeof(OrdersEventHeader) : (unsigned)size;
+    unsigned eventSize = size > GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(OrdersEventHeader), sizeof(OrdersAdd)), sizeof(OrdersQueueBuild)), sizeof(OrdersStop)), sizeof(OrdersStatusFlags)), sizeof(OrdersAttacked)), sizeof(OrdersParalyze)), sizeof(OrdersAdd)), sizeof(OrdersCancel)), sizeof(OrdersGroupCommand)), sizeof(OrdersGroupCommand)) ? (unsigned)GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(OrdersEventHeader), sizeof(OrdersAdd)), sizeof(OrdersQueueBuild)), sizeof(OrdersStop)), sizeof(OrdersStatusFlags)), sizeof(OrdersAttacked)), sizeof(OrdersParalyze)), sizeof(OrdersAdd)), sizeof(OrdersCancel)), sizeof(OrdersGroupCommand)), sizeof(OrdersGroupCommand)) : (unsigned)size;
     slotArgs[0].i32 = (int)GlueIn(glue, 0, event, eventSize, 1);
     slotArgs[1].i32 = (int)eventSize;
     GlueCall(glue, 0, slotArgs, 2);
@@ -2502,7 +2502,7 @@ int __stdcall GlueUnitsApply(const UnitsEventHeader* event, unsigned int size)
     unsigned mark = GlueScratchMark();
     wasmtime_val_raw_t slotArgs[2];
     slotArgs[0].i64 = 0;
-    unsigned eventSize = size > sizeof(UnitsEventHeader) ? (unsigned)sizeof(UnitsEventHeader) : (unsigned)size;
+    unsigned eventSize = size > GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(UnitsEventHeader), sizeof(UnitsSetStateBits)), sizeof(UnitsSetFlags)), sizeof(UnitsSetNetDirty)), sizeof(UnitsSetWorkTime)), sizeof(UnitsSetPosition)), sizeof(UnitsAttachToPiece)), sizeof(UnitsFinishConstruction)), sizeof(UnitsBuildDecay)), sizeof(UnitsRepair)), sizeof(UnitsUnlink)), sizeof(UnitsSetStance)), sizeof(UnitsSetAngles)), sizeof(UnitsSetBuildState)), sizeof(UnitsTurn)), sizeof(UnitsMove)), sizeof(UnitsChangeCell)), sizeof(UnitsSetMoved)), sizeof(UnitsScriptValue)), sizeof(UnitsNotifyRefs)), sizeof(UnitsDamageRecord)), sizeof(UnitsSetHealth)), sizeof(UnitsKill)), sizeof(UnitsSend)), sizeof(UnitsCapture)), sizeof(UnitsCreate)), sizeof(UnitsReloadType)) ? (unsigned)GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(UnitsEventHeader), sizeof(UnitsSetStateBits)), sizeof(UnitsSetFlags)), sizeof(UnitsSetNetDirty)), sizeof(UnitsSetWorkTime)), sizeof(UnitsSetPosition)), sizeof(UnitsAttachToPiece)), sizeof(UnitsFinishConstruction)), sizeof(UnitsBuildDecay)), sizeof(UnitsRepair)), sizeof(UnitsUnlink)), sizeof(UnitsSetStance)), sizeof(UnitsSetAngles)), sizeof(UnitsSetBuildState)), sizeof(UnitsTurn)), sizeof(UnitsMove)), sizeof(UnitsChangeCell)), sizeof(UnitsSetMoved)), sizeof(UnitsScriptValue)), sizeof(UnitsNotifyRefs)), sizeof(UnitsDamageRecord)), sizeof(UnitsSetHealth)), sizeof(UnitsKill)), sizeof(UnitsSend)), sizeof(UnitsCapture)), sizeof(UnitsCreate)), sizeof(UnitsReloadType)) : (unsigned)size;
     slotArgs[0].i32 = (int)GlueIn(glue, 0, event, eventSize, 1);
     slotArgs[1].i32 = (int)eventSize;
     GlueCall(glue, 0, slotArgs, 2);
@@ -3053,7 +3053,7 @@ int __stdcall GluePlayersApply(const PlayersEventHeader* event, unsigned int siz
     unsigned mark = GlueScratchMark();
     wasmtime_val_raw_t slotArgs[2];
     slotArgs[0].i64 = 0;
-    unsigned eventSize = size > sizeof(PlayersEventHeader) ? (unsigned)sizeof(PlayersEventHeader) : (unsigned)size;
+    unsigned eventSize = size > GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(PlayersEventHeader), sizeof(PlayersGiveUnit)), sizeof(PlayersKillUnits)), sizeof(PlayersTransfer)), sizeof(PlayersSetStore)), sizeof(PlayersSetType)), sizeof(PlayersEndGame)), sizeof(PlayersSetCheats)), sizeof(PlayersSetPlayer)), sizeof(PlayersSetPlayer)) ? (unsigned)GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(PlayersEventHeader), sizeof(PlayersGiveUnit)), sizeof(PlayersKillUnits)), sizeof(PlayersTransfer)), sizeof(PlayersSetStore)), sizeof(PlayersSetType)), sizeof(PlayersEndGame)), sizeof(PlayersSetCheats)), sizeof(PlayersSetPlayer)), sizeof(PlayersSetPlayer)) : (unsigned)size;
     slotArgs[0].i32 = (int)GlueIn(glue, 0, event, eventSize, 1);
     slotArgs[1].i32 = (int)eventSize;
     GlueCall(glue, 0, slotArgs, 2);
@@ -3741,7 +3741,7 @@ int __stdcall GlueScriptsApply(const ScriptsEventHeader* event, unsigned int siz
     unsigned mark = GlueScratchMark();
     wasmtime_val_raw_t slotArgs[2];
     slotArgs[0].i64 = 0;
-    unsigned eventSize = size > sizeof(ScriptsEventHeader) ? (unsigned)sizeof(ScriptsEventHeader) : (unsigned)size;
+    unsigned eventSize = size > GlueMax(GlueMax(GlueMax(GlueMax(sizeof(ScriptsEventHeader), sizeof(ScriptsStart)), sizeof(ScriptsDetachPiece)), sizeof(ScriptsState)), sizeof(ScriptsState)) ? (unsigned)GlueMax(GlueMax(GlueMax(GlueMax(sizeof(ScriptsEventHeader), sizeof(ScriptsStart)), sizeof(ScriptsDetachPiece)), sizeof(ScriptsState)), sizeof(ScriptsState)) : (unsigned)size;
     slotArgs[0].i32 = (int)GlueIn(glue, 0, event, eventSize, 1);
     slotArgs[1].i32 = (int)eventSize;
     GlueCall(glue, 0, slotArgs, 2);
@@ -4269,7 +4269,7 @@ int __stdcall GlueMovementApply(const MovementEventHeader* event, unsigned int s
     unsigned mark = GlueScratchMark();
     wasmtime_val_raw_t slotArgs[2];
     slotArgs[0].i64 = 0;
-    unsigned eventSize = size > sizeof(MovementEventHeader) ? (unsigned)sizeof(MovementEventHeader) : (unsigned)size;
+    unsigned eventSize = size > GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(MovementEventHeader), sizeof(MovementLoadState)), sizeof(MovementSetMode)), sizeof(MovementSetSpeed)), sizeof(MovementTarget)), sizeof(MovementTarget)), sizeof(MovementSetMode)), sizeof(MovementTargetValue)), sizeof(MovementTargetValue)), sizeof(MovementTargetValue)) ? (unsigned)GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(GlueMax(sizeof(MovementEventHeader), sizeof(MovementLoadState)), sizeof(MovementSetMode)), sizeof(MovementSetSpeed)), sizeof(MovementTarget)), sizeof(MovementTarget)), sizeof(MovementSetMode)), sizeof(MovementTargetValue)), sizeof(MovementTargetValue)), sizeof(MovementTargetValue)) : (unsigned)size;
     slotArgs[0].i32 = (int)GlueIn(glue, 0, event, eventSize, 1);
     slotArgs[1].i32 = (int)eventSize;
     GlueCall(glue, 0, slotArgs, 2);
@@ -6516,8 +6516,6 @@ const GlueRoute kGlueRoutes[] = {
     {SCHED_ECONOMY, 16},
     {SCHED_ECONOMY, 17},
     {SCHED_ECONOMY, 18},
-    {SCHED_ECONOMY, 134},
-    {SCHED_ECONOMY, 135},
     {SCHED_FEATURES, 4},
     {SCHED_FEATURES, 48},
     {SCHED_FEATURES, 49},

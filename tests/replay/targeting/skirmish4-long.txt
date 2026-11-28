@@ -2,6 +2,7 @@ bt-replay 2
 subsystem targeting 4.0
 call 25750 GetWeaponTargetPos
   r Game.seaLevel 1
+  r Game.poolCount 2501
   r Unit#1.unitDefIndex 34
   r Unit#1.killCount 0
   r Unit#1.weapon0TargetX 0

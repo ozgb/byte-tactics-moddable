@@ -108,6 +108,7 @@ static char s_campaign[0x104];
 static int s_campaignLine = 0;
 static int s_commanderDeathLine = 0;
 static int s_mappingLine = 0;
+static int s_recordLine = 0;
 static int s_lineOfSightLine = 0;
 static int s_losTypeLine = 0;
 static int s_startPositionsLine = 0;
@@ -1093,6 +1094,7 @@ static void ReadKey(int lineNo, const char* key, char* value)
         char detail[200];
         if (!ReplayConfigure(value, detail, sizeof detail))
             FailLine(lineNo, "is not a record spec", key, detail);
+        s_recordLine = 1;
     } else if (strcmp(key, "load") == 0) {
         if (s_loadLine != 0)
             FailLine(lineNo, "is a second load line", key, "");
@@ -1908,13 +1910,13 @@ void HarnessExit()
 #if BT_ACCESS_LOG
     AccessLogFinish();
 #endif
-    if (!s_recordSwitch)
+    if (!s_recordSwitch && !s_recordLine)
         return;
     char error[300];
     error[0] = '\0';
     if (!ReplayWrite(error, sizeof error)) {
         char text[360];
-        sprintf(text, "-record: cannot write a replay file%s%s\n", error[0] == '\0' ? "" : ": ", error);
+        sprintf(text, "%s: cannot write a replay file%s%s\n", s_recordSwitch ? "-record" : "testmode", error[0] == '\0' ? "" : ": ", error);
         Fail(text);
     }
 }

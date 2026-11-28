@@ -1702,8 +1702,6 @@ delivery to the same subscriber. No inbox holds an effect when the tick ends.
 | engine | `LOS_RADAR_SET_MODE` | los_radar | queued |
 | engine | `LOS_RADAR_SHARE_MAPPING` | los_radar | queued |
 | engine | `LOS_RADAR_SHARE_RADAR` | los_radar | queued |
-| economy | `LOS_RADAR_SHARE_MAPPING` | los_radar | queued |
-| economy | `LOS_RADAR_SHARE_RADAR` | los_radar | queued |
 | engine | `LOS_RADAR_SHARE_MAP` | los_radar | synchronous |
 | units | `MAP_ADD_UNIT` | map | synchronous |
 | movement | `MAP_ADD_UNIT` | map | synchronous |

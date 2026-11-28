@@ -49837,6 +49837,7 @@ address,function,file,kind,target
 ,GlueAddressOf,src/wasm/module_glue.cpp,global_maybe_written,s_error
 ,GlueAiApply,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueAiApply,src/wasm/glue_tables.cpp,call,GlueIn
+,GlueAiApply,src/wasm/glue_tables.cpp,call,GlueMax
 ,GlueAiApply,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueAiApply,src/wasm/glue_tables.cpp,call,GlueScratchRelease
 ,GlueAiApply,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
@@ -51643,6 +51644,7 @@ address,function,file,kind,target
 ,GlueLiveOf,src/wasm/module_glue.cpp,global_maybe_written,s_error
 ,GlueLosRadarApply,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueLosRadarApply,src/wasm/glue_tables.cpp,call,GlueIn
+,GlueLosRadarApply,src/wasm/glue_tables.cpp,call,GlueMax
 ,GlueLosRadarApply,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueLosRadarApply,src/wasm/glue_tables.cpp,call,GlueScratchRelease
 ,GlueLosRadarApply,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
@@ -52409,6 +52411,7 @@ address,function,file,kind,target
 ,GlueModules,src/wasm/glue_tables.cpp,global_escape,kGlueModules
 ,GlueMovementApply,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueMovementApply,src/wasm/glue_tables.cpp,call,GlueIn
+,GlueMovementApply,src/wasm/glue_tables.cpp,call,GlueMax
 ,GlueMovementApply,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueMovementApply,src/wasm/glue_tables.cpp,call,GlueScratchRelease
 ,GlueMovementApply,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
@@ -52640,6 +52643,7 @@ address,function,file,kind,target
 ,GlueObject,src/wasm/module_glue.cpp,function,
 ,GlueOrdersApply,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueOrdersApply,src/wasm/glue_tables.cpp,call,GlueIn
+,GlueOrdersApply,src/wasm/glue_tables.cpp,call,GlueMax
 ,GlueOrdersApply,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueOrdersApply,src/wasm/glue_tables.cpp,call,GlueScratchRelease
 ,GlueOrdersApply,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
@@ -52888,6 +52892,7 @@ address,function,file,kind,target
 ,GluePathfindingTimedSubmit,src/wasm/glue_tables.cpp,indirect_call,indirect via void (*const)(const PathRequest *) __attribute__((stdcall)) [PathfindingSeam::Submit]
 ,GluePlayersApply,src/wasm/glue_tables.cpp,call,GlueCall
 ,GluePlayersApply,src/wasm/glue_tables.cpp,call,GlueIn
+,GluePlayersApply,src/wasm/glue_tables.cpp,call,GlueMax
 ,GluePlayersApply,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GluePlayersApply,src/wasm/glue_tables.cpp,call,GlueScratchRelease
 ,GluePlayersApply,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
@@ -53063,6 +53068,7 @@ address,function,file,kind,target
 ,GlueScratchRelease,src/wasm/module_glue.cpp,global_write,s_scratchUsed
 ,GlueScriptsApply,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueScriptsApply,src/wasm/glue_tables.cpp,call,GlueIn
+,GlueScriptsApply,src/wasm/glue_tables.cpp,call,GlueMax
 ,GlueScriptsApply,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueScriptsApply,src/wasm/glue_tables.cpp,call,GlueScratchRelease
 ,GlueScriptsApply,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
@@ -53587,6 +53593,7 @@ address,function,file,kind,target
 ,GlueUnitsAddRepairProgress,src/wasm/glue_tables.cpp,global_escape,s_unitsGlue
 ,GlueUnitsApply,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueUnitsApply,src/wasm/glue_tables.cpp,call,GlueIn
+,GlueUnitsApply,src/wasm/glue_tables.cpp,call,GlueMax
 ,GlueUnitsApply,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueUnitsApply,src/wasm/glue_tables.cpp,call,GlueScratchRelease
 ,GlueUnitsApply,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
@@ -53929,6 +53936,7 @@ address,function,file,kind,target
 ,GlueUseSeam,src/wasm/module_glue.cpp,indirect_call,indirect via void (*const)(GlueModule *) __attribute__((stdcall)) [GlueModuleDef::useSeam]
 ,GlueWeaponsApply,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueWeaponsApply,src/wasm/glue_tables.cpp,call,GlueIn
+,GlueWeaponsApply,src/wasm/glue_tables.cpp,call,GlueMax
 ,GlueWeaponsApply,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueWeaponsApply,src/wasm/glue_tables.cpp,call,GlueScratchRelease
 ,GlueWeaponsApply,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
@@ -54698,6 +54706,7 @@ address,function,file,kind,target
 ,HarnessExit,src/harness/harness.cpp,function,
 ,HarnessExit,src/harness/harness.cpp,global_escape,s_commit@src/harness/harness.cpp
 ,HarnessExit,src/harness/harness.cpp,global_read,s_blockScan@src/harness/harness.cpp
+,HarnessExit,src/harness/harness.cpp,global_read,s_recordLine@src/harness/harness.cpp
 ,HarnessExit,src/harness/harness.cpp,global_read,s_recordSwitch@src/harness/harness.cpp
 ,HarnessFeaturesEvent,src/harness/harness.cpp,call,RecordEvent
 ,HarnessFeaturesEvent,src/harness/harness.cpp,function,
@@ -63116,6 +63125,7 @@ address,function,file,kind,target
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkReachTick@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamper@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_quirkTamperTick@src/harness/harness.cpp
+,ReadKey,src/harness/harness.cpp,global_write,s_recordLine@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_roundTripCount@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_roundTrips@src/harness/harness.cpp
 ,ReadKey,src/harness/harness.cpp,global_write,s_saveLine@src/harness/harness.cpp

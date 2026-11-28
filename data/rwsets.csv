@@ -51617,6 +51617,15 @@ address,function,file,kind,target
 ,GlueInMemory,src/wasm/module_glue.cpp,call,ModulesMemory
 ,GlueInMemory,src/wasm/module_glue.cpp,field_read,ModuleMemory::size
 ,GlueInMemory,src/wasm/module_glue.cpp,function,
+,GlueInPointer,src/wasm/module_glue.cpp,call,GlueStop
+,GlueInPointer,src/wasm/module_glue.cpp,call,GlueText
+,GlueInPointer,src/wasm/module_glue.cpp,call,LinearOffset
+,GlueInPointer,src/wasm/module_glue.cpp,call,ModulesMemory
+,GlueInPointer,src/wasm/module_glue.cpp,call,SimOwns
+,GlueInPointer,src/wasm/module_glue.cpp,deref_read,*void
+,GlueInPointer,src/wasm/module_glue.cpp,deref_write,*void
+,GlueInPointer,src/wasm/module_glue.cpp,field_read,ModuleMemory::base
+,GlueInPointer,src/wasm/module_glue.cpp,function,
 ,GlueInstall,src/wasm/module_glue.cpp,call,ImportAt
 ,GlueInstall,src/wasm/module_glue.cpp,call,ImportCount
 ,GlueInstall,src/wasm/module_glue.cpp,call,wl_define_import
@@ -52255,8 +52264,10 @@ address,function,file,kind,target
 ,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,call,GlueIn
 ,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,call,GlueOut
+,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,call,GlueOutPointer
 ,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,call,GlueScratchRelease
+,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,call,GlueZero
 ,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
 ,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,field_write,wasmtime_val_raw::i32
 ,GlueMissionGetMissionFeature,src/wasm/glue_tables.cpp,field_write,wasmtime_val_raw::i64
@@ -52289,8 +52300,10 @@ address,function,file,kind,target
 ,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,call,GlueCall
 ,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,call,GlueIn
 ,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,call,GlueOut
+,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,call,GlueOutPointer
 ,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,call,GlueScratchRelease
+,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,call,GlueZero
 ,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,field_read,wasmtime_val_raw::i32
 ,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,field_write,wasmtime_val_raw::i32
 ,GlueMissionGetMissionUnit,src/wasm/glue_tables.cpp,field_write,wasmtime_val_raw::i64
@@ -52769,6 +52782,13 @@ address,function,file,kind,target
 ,GlueOutOfFuel,src/wasm/module_glue.cpp,field_read,GlueModule::fuelOpen
 ,GlueOutOfFuel,src/wasm/module_glue.cpp,field_read,GlueModuleDef::name
 ,GlueOutOfFuel,src/wasm/module_glue.cpp,function,
+,GlueOutPointer,src/wasm/module_glue.cpp,call,GlueInMemory
+,GlueOutPointer,src/wasm/module_glue.cpp,call,GlueLinear
+,GlueOutPointer,src/wasm/module_glue.cpp,call,GlueStop
+,GlueOutPointer,src/wasm/module_glue.cpp,call,SimOwns
+,GlueOutPointer,src/wasm/module_glue.cpp,deref_read,*void
+,GlueOutPointer,src/wasm/module_glue.cpp,deref_write,*void
+,GlueOutPointer,src/wasm/module_glue.cpp,function,
 ,GluePathfindingCancel,src/wasm/glue_tables.cpp,call,GlueCall
 ,GluePathfindingCancel,src/wasm/glue_tables.cpp,call,GlueScratchMark
 ,GluePathfindingCancel,src/wasm/glue_tables.cpp,call,GlueScratchRelease
@@ -54190,6 +54210,11 @@ address,function,file,kind,target
 ,GlueWindMeteorsUpdateWind,src/wasm/glue_tables.cpp,field_write,wasmtime_val_raw::i64
 ,GlueWindMeteorsUpdateWind,src/wasm/glue_tables.cpp,function,
 ,GlueWindMeteorsUpdateWind,src/wasm/glue_tables.cpp,global_escape,s_windMeteorsGlue
+,GlueZero,src/wasm/module_glue.cpp,call,ModulesMemory
+,GlueZero,src/wasm/module_glue.cpp,call,SimOwns
+,GlueZero,src/wasm/module_glue.cpp,call,memset
+,GlueZero,src/wasm/module_glue.cpp,field_read,ModuleMemory::base
+,GlueZero,src/wasm/module_glue.cpp,function,
 ,GoalDistSq,src/ai/pathfind_hpa.cpp,field_read,Hdr::W
 ,GoalDistSq,src/ai/pathfind_hpa.cpp,field_read,Hdr::nRaw
 ,GoalDistSq,src/ai/pathfind_hpa.cpp,field_read,PathPoint::x
@@ -58334,6 +58359,7 @@ address,function,file,kind,target
 ,LoadDataAttach,src/state/load_data.cpp,function,
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_base
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_bump
+,LoadDataAttach,src/state/load_data.cpp,global_write,s_classWordsSize
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_fatal
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_region
 ,LoadDataAttach,src/state/load_data.cpp,global_write,s_size
@@ -58348,6 +58374,8 @@ address,function,file,kind,target
 ,LoadDataCheck,src/state/load_data.cpp,field_read,Mapped::size
 ,LoadDataCheck,src/state/load_data.cpp,function,
 ,LoadDataCheck,src/state/load_data.cpp,global_read,s_base
+,LoadDataCheck,src/state/load_data.cpp,global_read,s_classWordsHash
+,LoadDataCheck,src/state/load_data.cpp,global_read,s_classWordsSize
 ,LoadDataCheck,src/state/load_data.cpp,global_read,s_mapped
 ,LoadDataCheck,src/state/load_data.cpp,global_read,s_mappedCount
 ,LoadDataCheck,src/state/load_data.cpp,global_read,s_region
@@ -58389,6 +58417,19 @@ address,function,file,kind,target
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_bump
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_mappedCount
 ,LoadDataUnregister,src/state/load_data.cpp,global_write,s_registeredCount
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,Fatal
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,HashBytes
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,Locked::~Locked
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,memcpy
+,LoadDataWriteClassWords,src/state/load_data.cpp,call,memset
+,LoadDataWriteClassWords,src/state/load_data.cpp,function,
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_read,s_classWordsSize
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_read,s_mappedCount
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_read,s_region
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_read,s_size
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_write,s_bump
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_write,s_classWordsHash
+,LoadDataWriteClassWords,src/state/load_data.cpp,global_write,s_classWordsSize
 ,LoadEntries,src/harness/replay_objects.cpp,call,operator new
 ,LoadEntries,src/harness/replay_objects.cpp,deref_read,*std::vector<LoadEntry >
 ,LoadEntries,src/harness/replay_objects.cpp,function,
@@ -67854,6 +67895,19 @@ address,function,file,kind,target
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,field_read,ReplayReach::object
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,function,
 ,ReplayCaptureObjects,src/harness/replay_objects.cpp,global_read,kReplayObjectFields@src/harness/replay_schema.h
+,ReplayClassWords,src/harness/replay_vtables.cpp,call,ReplayVtable
+,ReplayClassWords,src/harness/replay_vtables.cpp,deref_write,*unsigned int
+,ReplayClassWords,src/harness/replay_vtables.cpp,function,
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_DefeatAllUnitsKilledOfType_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_DefeatAllUnitsKilled_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_DefeatAnyUnitPassesX_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_DefeatAnyUnitPassesZ_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryBuildUnitType_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryKillAllMobileUnits_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryKillAllOfType_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryMoveUnitToRadius_RadiusUnitVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryUnitTypePassesX_UnitScanVisitor
+,ReplayClassWords,src/harness/replay_vtables.cpp,global_escape,g_vtsec_VictoryUnitTypePassesZ_UnitScanVisitor
 ,ReplayClearFailure,src/harness/replay_text.cpp,function,
 ,ReplayClearFailure,src/harness/replay_text.cpp,global_write,s_failure
 ,ReplayCommands,src/harness/harness.cpp,call,CommandBegin
@@ -71262,9 +71316,11 @@ address,function,file,kind,target
 ,Start,src/wasm/modules.cpp,call,GlueInstall
 ,Start,src/wasm/modules.cpp,call,GlueModules
 ,Start,src/wasm/modules.cpp,call,LoadDataAttach
+,Start,src/wasm/modules.cpp,call,LoadDataWriteClassWords
 ,Start,src/wasm/modules.cpp,call,LoadModule
 ,Start,src/wasm/modules.cpp,call,LoaderFatal
 ,Start,src/wasm/modules.cpp,call,ModulesFatal
+,Start,src/wasm/modules.cpp,call,ReplayClassWords
 ,Start,src/wasm/modules.cpp,call,SimBlockAttach
 ,Start,src/wasm/modules.cpp,call,SimBlockBase
 ,Start,src/wasm/modules.cpp,call,_stricmp

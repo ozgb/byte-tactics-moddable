@@ -209,6 +209,7 @@ struct ReplayExtraVtable {
     const void* vtable;
 };
 unsigned ReplayExtraVtables(unsigned kind, ReplayExtraVtable* out);
+unsigned ReplayClassWords(unsigned* out, unsigned capacity);
 void ReplayStoreVtables(unsigned kind, void* object);
 const char* ReplayVtableName(unsigned kind);
 void ReplayFail(const char* message);

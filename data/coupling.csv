@@ -4159,6 +4159,7 @@ platform,game,call,LoadAddress,2
 platform,game,call,LoadDataAttach,1
 platform,game,call,LoadDataCheck,1
 platform,game,call,LoadDataUnregister,1
+platform,game,call,LoadDataWriteClassWords,1
 platform,game,call,LoadGetGafFrame,1
 platform,game,call,LoadGetGafSequenceFrame,1
 platform,game,call,LoadInitGafSequence,1
@@ -4173,7 +4174,7 @@ platform,game,call,SimBlockBase,2
 platform,game,call,SimBlockForEach,1
 platform,game,call,SimCaptureAlloc,1
 platform,game,call,SimFree,5
-platform,game,call,SimOwns,11
+platform,game,call,SimOwns,14
 platform,game,call,SimRealloc,1
 platform,game,indirect,CmdAI,1
 platform,game,indirect,CmdATM,1
@@ -4319,6 +4320,7 @@ platform,game,shared_write,Vec3::z,4
 platform,game,shared_write,WeaponsSeam::UpdateUnitWeapons,1
 platform,harness,call,DisplayLogFont,1
 platform,harness,call,DlFree,1
+platform,harness,call,ReplayClassWords,1
 platform,harness,call,ReplayImport::Dbl,1
 platform,harness,call,ReplayImport::Int,13
 platform,harness,call,ReplayImport::Nested,1

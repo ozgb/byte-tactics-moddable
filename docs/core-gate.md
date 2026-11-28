@@ -46,7 +46,7 @@ the wrong call, or a missing one, is `differs`.
 | `commands` | the delivery of the commands of a tick (`docs/commands.md`, sections 1 and 2): their order and the tick each precedes |
 | `loader` | the manifest and module checks of `docs/module-abi.md`, section 5.2, and the start-up errors and traps of section 13 |
 | `fuel` | the fuel of section 11: the budget set for each tick, the fuel left, and the call at which a module runs out |
-| `host` | hosting a module: the recordings of `tests/replay/wind_meteors/` replayed against a wind_meteors module, as `docs/replay-format.md` states ("Replaying"), and the import refusals and the full handle table of `docs/module-abi.md` sections 8.1 and 13 on fixture modules |
+| `host` | hosting a module: the recordings of `tests/replay/wind_meteors/` replayed against a wind_meteors module, as `docs/replay-format.md` states ("Replaying"), the import refusals and the full handle table of `docs/module-abi.md` sections 8.1 and 13 on fixture modules, and the class word table of section 7.1 on fixtures of players and movement |
 | `files` | the files gate (`docs/files-gate.md`), with its own groups |
 | `console` | reading a console line (`docs/commands.md`, section 3) and the events of the commands of section 4.2 that need nothing but a stated match setup |
 | `runtime` | the results of the runtime calls of the game logic: the entries of the runtime vectors, one call per record |
@@ -304,8 +304,9 @@ The core replays the recording as `docs/replay-format.md` states: it restores ea
 from the `a` lines (an event payload as "Event arguments", "The payload in memory", states), calls the slot of its
 module, answers each import from its `i` and its own `o` lines, and writes, for the call, the fields of the write set
 whose value after the call differs from the last known value, and the closing lines of what the slot wrote through its
-own arguments and returned. The last known value of a field is as `docs/replay-format.md`, "Lines", defines it, with
-the `w` lines the core wrote in place of the withheld ones. The expected values are the lines the gate withheld, which the in-repo engine writes
+own arguments and returned. The write set's fields are the block's and those of each object the call reaches, and
+the `w` lines name an object's field as the recordings do (`w Player#0.type 0`). The last known value of a field is as `docs/replay-format.md`, "Lines", defines it, with
+the `w` lines the core wrote in place of the withheld ones, so a field with no known value is written. The expected values are the lines the gate withheld, which the in-repo engine writes
 when it runs its own wind_meteors module on the same input, so a core passes only by running the module and reading
 what it wrote: the stored lines are not in its input (`tools/test_coregate.py` checks that a core that echoes the lines
 of a recording fails). A trap or running out of fuel ends the run with an error of the loader classes, and two errors
@@ -341,11 +342,25 @@ data words at 0x30000 to 0x3000c and the eight slots, and does in one slot what 
 | `record_event_null_array` | `RecordSimEvent` of kind 1 with a null array and a count of 3 | `o params.radius 7`, with no `i services.RecordSimEvent` line: the host refuses the call before the queue reads the array |
 | `capture_null_offset` | `SimCaptureAlloc(8, 0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.SimCaptureAlloc` line: a null offset address gives a null result |
 | `slot_dpid_above` | `GetSlotDpid(11)` | `o params.radius -1`, with no `services.GetSlotDpid` line: a slot above 10 gives the answer for none |
+| `find_slot_none` | `FindSlotByDpid(-1)`, with no import line in the recording | `i services.FindSlotByDpid -1`, then `o params.radius 0`: `-1` is not refused before the import, so the call leaves an import line (section 9.3), and with the recording's lines run out the replay answers it 0 |
 | `gaf_frame_null_table` | `GetGafFrame(0, 0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.GetGafFrame` line: a null table gives a null frame |
 | `gaf_init_null_animation` | `InitGafSequence` of a cursor of 458755 (index 3, 7 ticks left) with a null animation, then `params.radius` set to the cursor's first word | `o params.radius 458755`, with no `services.InitGafSequence` line: the cursor is unchanged |
 | `gaf_step_null_cursor` | `StepGafSequence(0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.StepGafSequence` line: a null cursor gives 0 |
 | `gaf_sequence_frame_null_cursor` | `GetGafSequenceFrame(0)`, with `params.radius` set to 9 before | `o params.radius 0`, with no `services.GetGafSequenceFrame` line: a null cursor gives a null frame |
 | `emit_size`, `emit_past`, `emit_kind`, `emit_payload_size`, `emit_weapon` | `Emit` of a SPAWN of 3 bytes, of one that runs past the memory, of kind 81, of 40 bytes, and of weapon 256 | section 13's five `Emit` texts; a size of 3 is refused as outside an effect before its kind is read (section 9.3 gives the order of the checks) |
+
+**The class word vectors** (section 7.1 of `docs/module-abi.md`). Each replays a hand-made recording of another entry
+against a fixture of that entry, `<entry>_<vector>.wasm`, shaped as above with that entry's data words and slots. The
+recording's `subsystem` line names the entry, and players and movement, whose entries have no `fuel_budget`, run with the
+largest budget, 2147483647. The fixture follows block offsets from the data words to an object the recording's `r` lines
+make, reads a word of the object, and returns the index of the first entry of the class word table (49 entries) that
+holds the same word, or -1:
+
+| Vector | Slot, and the object | Value |
+| --- | --- | --- |
+| `class_word_condition` | players `Apply`: the word at 0 of `victory[0]` of `Game.list_391ed`, a `VictoryKillAllMobileUnits` | `o result 35`, that class's entry, after the `w` lines of every field of the write set the call reaches, none of which it changed |
+| `class_word_condition_base` | as `class_word_condition`, the word at 12, the class's `UnitScanVisitor` base | `o result 36`, the entry of that base of the class |
+| `class_word_goal` | movement `HasNetState`: the word at 0 of `obj` of the argument's `motion`, a `LiteGoal` | `o result 18`, that class's entry |
 
 The gate never gives the core the in-repo engine's wind_meteors module. The module is the one that comes with the
 core's submission (below): the clean room's own, which the module gate has judged.

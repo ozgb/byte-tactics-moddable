@@ -208,5 +208,33 @@
   ],
   "results": [
    ["replay", [["o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "find_slot_none",
+  "calls": [
+   ["replay", "host/find_slot_none.txt", "host/wind_meteors_find_slot_none.wasm"]
+  ],
+  "results": [
+   ["replay", [["i services.FindSlotByDpid -1", "o params.weapon \"\"", "o params.radius 0", "o params.density f32:0x00000000", "o params.duration f32:0x00000000", "o params.interval f32:0x00000000"]]]
+  ]},
+ {"name": "class_word_condition",
+  "calls": [
+   ["replay", "host/class_word_condition.txt", "host/players_class_word_condition.wasm"]
+  ],
+  "results": [
+   ["replay", [["w Game.uiOptionFlags 0", "w Game.playerIndex 0", "w Game.localPlayer 0", "w Game.endGameFlags 0", "w Game.endGameVictory 0", "w region null", "w Player#0.type 0", "w Player#1.type 0", "w Player#2.type 0", "w Player#3.type 0", "w Player#4.type 0", "w Player#5.type 0", "w Player#6.type 0", "w Player#7.type 0", "w Player#8.type 0", "w Player#9.type 0", "w VictoryKillAllMobileUnits#1.satisfied 0", "w VictoryKillAllMobileUnits#1.celebrated 0", "w VictoryKillAllMobileUnits#1.numUnits 0", "o result 35"]]]
+  ]},
+ {"name": "class_word_condition_base",
+  "calls": [
+   ["replay", "host/class_word_condition_base.txt", "host/players_class_word_condition_base.wasm"]
+  ],
+  "results": [
+   ["replay", [["w Game.uiOptionFlags 0", "w Game.playerIndex 0", "w Game.localPlayer 0", "w Game.endGameFlags 0", "w Game.endGameVictory 0", "w region null", "w Player#0.type 0", "w Player#1.type 0", "w Player#2.type 0", "w Player#3.type 0", "w Player#4.type 0", "w Player#5.type 0", "w Player#6.type 0", "w Player#7.type 0", "w Player#8.type 0", "w Player#9.type 0", "w VictoryKillAllMobileUnits#1.satisfied 0", "w VictoryKillAllMobileUnits#1.celebrated 0", "w VictoryKillAllMobileUnits#1.numUnits 0", "o result 36"]]]
+  ]},
+ {"name": "class_word_goal",
+  "calls": [
+   ["replay", "host/class_word_goal.txt", "host/movement_class_word_goal.wasm"]
+  ],
+  "results": [
+   ["replay", [["o result 18"]]]
   ]}
 ]}

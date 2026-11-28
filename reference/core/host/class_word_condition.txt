@@ -1,0 +1,8 @@
+bt-replay 2
+subsystem players 5.4
+call 0 Apply
+  r Game.list_391ed MissionConditions#1
+  r MissionConditions#1.victory[0] VictoryKillAllMobileUnits#1
+  a event.kind 195
+  a event.unit Unit#1
+  a size 8

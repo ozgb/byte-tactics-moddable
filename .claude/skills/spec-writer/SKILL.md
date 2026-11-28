@@ -11,7 +11,7 @@ The pilot that set this process is #800: `specs/wind_meteors.md` on btm main is 
 
 - **The btm clone:** `~/source/repos/btm`, for writing and pushing specs.
 - **A session directory:** `~/cleanroom/<subsystem>/` (outside `~/source/repos`, which `launch.py` refuses), with `tree/` (a btm clone on the spec branch), `datakit/` (a kit export) and one directory per session.
-- **The modern build** with `wasm_runtime` built, the VM image (`tools/cleanroom/build-image.sh build/scratch/cleanroom-image`), and the credentials of `docs/cleanroom.md`, all in the worktree you run `launch.py` from: the broker gates from that worktree's `build/`. `launch.py` runs the broker with `WINEARCH=win64` (`AGENTS.md`, step 4) whatever your shell sets.
+- **The modern build** with the `replay_native_test` and `wasm_runtime` targets built (`cmake --build build/modern --target replay_native_test wasm_runtime`; the broker's gate answers `host-replayer` without the first), the VM image (`tools/cleanroom/build-image.sh build/scratch/cleanroom-image`), and the credentials of `docs/cleanroom.md`, all in the worktree you run `launch.py` from: the broker gates from that worktree's `build/`. `launch.py` runs the broker with `WINEARCH=win64` (`AGENTS.md`, step 4) whatever your shell sets.
 
 The setup is done when `uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe --game-dir ~/.ta` passes and a smoke session (`docs/cleanroom.md`, "First real session", with `sleep` as the command) returns `equal` for the 3.1c module.
 

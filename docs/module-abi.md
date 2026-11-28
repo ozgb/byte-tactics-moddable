@@ -73,7 +73,8 @@ any module is loaded. Modules do not create or grow them.
   | load data, 64 MiB | 0x10100000 (269484032), the block's ceiling | `load_data` = `[base, size]` |
 
   The load data region starts at the block's ceiling, `block_base + block_max`, and ends at the memory's end:
-  `load_data` base plus size equals `memory_pages * 65536`. Its bytes are read-only load data (section 7.1).
+  `load_data` base plus size equals `memory_pages * 65536`. Its bytes are read-only: the class word table at its
+  start, then the load data (section 7.1).
   The block itself is as large as the match needs (`block_size` to `block_max`, a multiple of 65536):
   it starts at `block_base`, the engine tells modules
   only addresses inside it, and the bytes after its end are never read or written. A module must not
@@ -529,6 +530,28 @@ one byte of the record's layout; it is not an argument kind.
   `ModelState.bitmap`, a unit's cached picture: that frame is not load data but the presentation's,
   which draws it and may replace it while the match runs, and units only tests whether the field is
   null.
+- **The class word table starts the `load_data` region.** Some block objects are told apart only by
+  their first word, which in the engine is the address of their class's code: a native address that
+  differs from one build to the next, so the kit cannot give it. The host writes the build's words,
+  one 32-bit word per entry, at the `load_data` base (0x10100000), before the first slot runs and
+  before any load data is mapped; the load data starts at the next 8-byte boundary after the table.
+  The table's length and order are `class_words` of `layout.json`: entry `index` is at
+  `load_data` base + 4 × `index`, and the table has as many entries as `class_words` lists (49
+  today). Each entry names the object kind (`class`, as the recordings name objects) and the offset
+  in the object of the word (`offset`): 0 for the first word, or, for a class that has a second base
+  with code of its own, that base's offset and its name (`base`); such a class has two entries, the
+  word at 0 and the base's word. The table covers the object kinds of the replay recordings that
+  have a word: the concrete classes a recording names. It leaves out three classes with a word that
+  no recording names as an object: `Callback` (a script's completion handler, which a recording names
+  as a callback), and `PacketManager` and `PacketReceiver` (the network's one instance of each, in the
+  sim globals, which no module reads as an object). An index never changes: a new class is
+  appended, and a class that is gone keeps its entry, with `removed` set and no `offset`, and its
+  word is 0. The words are opaque: a module compares an object's word with an entry to learn its class, and copies an entry
+  into an object it makes so that the engine's slots recognise it; it never computes with a word or
+  calls through it, and never writes the table. The host hashes the table with the load data, so a
+  write to it ends the game (section 13). A replay writes the table of the build that replays, so a
+  recording, which names an object by its class, stays the same from build to build, and a call
+  that writes the table fails the replay.
 - In Milestone 2 every module is WASM and every object the simulation uses is already in the shared
   memory, so no translation happens: the caller passes the address of the object where it lives. The
   two rules together mean that a pointer into the block is an offset when it is stored and an address
@@ -560,7 +583,7 @@ behaviour is the contract the existing module was built against.
   `load`, `pending`, or a pointer with no mode) its address, `region` its address and the `g_region` word (8.2),
   `world` nothing (the host keeps the world view and a module reaches it through the view's imports), an `event` a
   scratch copy of at most the inbox's largest payload, a buffer with its length a scratch copy of that many elements,
-  and a pointer to a record a scratch copy of the record, copied back unless it is only read. An interface import's
+  and a pointer to a record a scratch copy of the record, copied back unless it is only read. Each pointer field of a copied record (a member of pointer type in the interface header's struct) is turned from a native pointer into a linear address on the way in and back into a native pointer on the way out, with 0 staying 0, and an address outside the memory is refused. An interface import's
   pointer argument is checked to lie in the memory, a `handle` one to be live, and an argument the callee writes a pointer
   through has that pointer turned back into an address.
 - **Publishing.** The host hands an `Emit` to the scheduler as the subsystem's native default publishes the same kind:
@@ -712,7 +735,9 @@ returned); `RecordSimEvent` with a kind that is not
 a kind of `interfaces/sim_events.h`, or with a null array and a count above 0; `SimCaptureAlloc` with a null offset
 address; `GetGafFrame` with a null table; `InitGafSequence` with a null cursor or animation, or a negative index;
 `StepGafSequence` with a null cursor; `GetGafSequenceFrame` with a null cursor; `GetSlotDpid` with a slot above 10. `SimAllocTagged` takes any tag, null
-included, since the tag changes nothing.
+included, since the tag changes nothing. `FindSlotByDpid` of `-1` is not malformed: it answers 10 without reading a
+slot, as the engine's lookup does, and leaves an import line (`i services.FindSlotByDpid -1 = 10`) like any other
+argument; `GetSlotDpid` above 10 leaves none.
 
 **The GAF services take load data.** The table of `GetGafFrame`, the animation of `InitGafSequence` and the animation a cursor holds for `GetGafSequenceFrame` and `StepGafSequence` are addresses
 of the `load_data` region (sections 2.1 and 7.1), and a cursor's animation is one too. An address of the memory that is
@@ -956,9 +981,11 @@ Every error or trap ends the game, in this version. There is no recovery and no 
   set`; `SimFree` adds `the pointer is outside the sim block`; `Emit` adds `the size is outside an effect`, `the effect runs past the module memory`, `the kind is not in the module's publishes table`, `the kind is not routed from the module's outbox` and `the size is not the payload's size of its kind`, and a per-kind hook adds its own (wind_meteors' SPAWN: `the weapon slot is outside the table of weapons`).
 - **Load data errors** end the game with the text itself (not a trap text): `load_data: <hex> is not a load
   address` (a GAF service was given an address of the memory that is no copy the host made), `load_data: the load
-  data changed at tick <tick>` (a module wrote a byte of a copy, which it must never do), `load_data: the region is
-  full` and `load_data: out of memory`; a manifest without a `load_data` region fails at start-up with
-  `the manifest has no load_data region`.
+  data changed at tick <tick>` (a module wrote a byte of a copy or of the class word table, which it must never do),
+  `load_data: the region is full`, `load_data: the class words come first in the region` (the host wrote the class
+  word table after mapping load data, or twice) and `load_data: out of memory`; a manifest without a `load_data` region fails at start-up with
+  `the manifest has no load_data region`, and a class word table longer than the host holds with `the class word table
+  is too long`.
 - **Glue errors** name the slot: `slot <name>: g_game is not in the sim block`, `slot <name>: the region is not in the
   sim block`, `slot <name>: an object argument is not in the sim block`,
   `slot <name>: g_simGlobals is not in the sim block`, `slot <name>: the argument does not fit the

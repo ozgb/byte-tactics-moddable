@@ -3998,6 +3998,8 @@ void ReplayCall(const char* file, Outcome& out)
     ReplayAnswerHook() = nullptr;
     if (!ran)
         Fatal(file, g_callIndex, "a slot with no runner", slotText);
+    if (ReplayWasmActive() && !ReplayWasmClassWordsIntact())
+        Fatal(file, g_callIndex, "the module wrote the class word table", slotText);
     for (int k = g_cursor; k < g_callEnd; k++) {
         if (strncmp(g_lines[k], "  i ", 4) == 0 && !IsQueryLine(g_lines[k])) {
             char key[96];

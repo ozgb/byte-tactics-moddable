@@ -11,5 +11,6 @@ void ReplayWasmUseSeam();
 void ReplayWasmNoBudgets();
 unsigned char* ReplayWasmLinear(unsigned address);
 unsigned ReplayWasmLoadDataBase();
+bool ReplayWasmClassWordsIntact();
 
 #endif

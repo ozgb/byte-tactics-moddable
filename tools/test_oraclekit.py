@@ -487,7 +487,7 @@ class ClassWordsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "data").mkdir()
-            (root / oraclekit.CLASS_WORDS).write_text("index,class,base\n" + rows)
+            (root / oraclekit.CLASS_WORDS).write_text("index,class,base,removed\n" + rows)
             (root / oraclekit.REPLAY_SCHEMA).write_text(CLASS_SCHEMA)
             return oraclekit.class_words(root, records)
 
@@ -505,6 +505,10 @@ class ClassWordsTest(unittest.TestCase):
     def test_indexes_out_of_row_order_stop_the_export(self):
         with self.assertRaises(SystemExit):
             self.class_words("1,V,\n0,PlainM,\n", {})
+
+    def test_a_removed_class_keeps_its_index_with_no_offset(self):
+        self.assertEqual(self.class_words("0,Gone,,yes\n1,V,\n", {}),
+                         [{"index": 0, "class": "Gone", "removed": True}, {"index": 1, "class": "V", "offset": 0}])
 
     def test_the_real_layout_lists_every_word_of_the_table(self):
         words = real_layout()["class_words"]

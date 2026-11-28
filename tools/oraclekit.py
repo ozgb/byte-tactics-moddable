@@ -567,12 +567,14 @@ REPLAY_SCHEMA = "data/replay_schema.json"
 
 
 def class_words(root: Path, records: dict[str, dict]) -> list[dict]:
-    """The class word table of docs/module-abi.md, 7.1, in data/class_words.csv's order: each word's index, the kind that holds it, and its offset in the object (with the base whose word it is when that is not 0)."""
+    """The class word table of docs/module-abi.md, 7.1, in data/class_words.csv's order: each word's index, the kind that holds it, and its offset in the object (with the base whose word it is when that is not 0); a removed class has `removed` and no offset, and its word is 0."""
     types = {o["name"]: o["type"] for o in json.loads((root / REPLAY_SCHEMA).read_text())["objects"]}
     out = []
     for row in csv.DictReader(io.StringIO((root / CLASS_WORDS).read_text())):
         entry = {"index": int(row["index"]), "class": row["class"], "offset": 0}
-        if row["base"]:
+        if row.get("removed") == "yes":
+            entry = {"index": entry["index"], "class": row["class"], **({"base": row["base"]} if row["base"] else {}), "removed": True}
+        elif row["base"]:
             found = [b["offset"] for b in records.get(types.get(row["class"], ""), {}).get("bases", []) if b["type"] == row["base"]]
             if len(found) != 1:
                 raise SystemExit("oraclekit: %s: the layout has no base %s of %s" % (CLASS_WORDS, row["base"], row["class"]))

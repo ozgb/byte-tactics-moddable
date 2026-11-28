@@ -218,7 +218,7 @@ exported from and pairs it with the highest `reference-traces-v*` tag merged int
 the same commit: the kits at `interfaces-v55` and `interfaces-v56` pair with `reference-traces-v51`, and the kit at
 `interfaces-v57`, on the commit of `reference-traces-v52`, pairs with it, the kits at `interfaces-v58` to
 `interfaces-v63` pair with `reference-traces-v53`, the kits at `interfaces-v64` and `interfaces-v65` pair with
-`reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it, as does the kit at `interfaces-v67`.
+`reference-traces-v54`, and the kit at `interfaces-v66`, on the commit of `reference-traces-v55`, pairs with it, as do the kits at `interfaces-v67` and `interfaces-v68`.
 
 - `reference-traces-v1`: the map, line of sight and pathfinder, and the
   per-unit heap objects.

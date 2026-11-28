@@ -1,5 +1,6 @@
 #include "win_types.h"
 #include "../../interfaces/host.h"
+#include "../harness/harness.h"
 
 #include "../graphics/display.h"
 #include "../graphics/draw.h"
@@ -4934,7 +4935,7 @@ int __stdcall UpdateMenu(Gui* menu)
     if (menu->layer == 0)
         return 0;
 
-    int now = GetTicks();
+    int now = HarnessMenuTicks(GetTicks());
     menu->animTimer = now - menu->time;
     menu->time = now;
     UpdateCursorAndMouse(menu);
@@ -5130,7 +5131,7 @@ void __stdcall SetCurrentGuiContext(Gui* ctx)
     ctx->str_ab6[0] = 0;
     ctx->str_bb6[0] = 0;
     ctx->pathsReady = 1;
-    ctx->time = GetTicks();
+    ctx->time = HarnessMenuTicks(GetTicks());
     ctx->animTimer = 0;
     ctx->inputEnabled = 1;
     ctx->gaf = 0;

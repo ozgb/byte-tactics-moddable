@@ -2085,6 +2085,8 @@ harness,platform,shared_write,MapSeam::GetGroundHeight,4
 harness,platform,shared_write,MapSeam::IsPadSlotFree,4
 harness,platform,shared_write,MapSeam::PassMapGet,3
 harness,platform,shared_write,MapSeam::PassMapInBounds,3
+harness,platform,shared_write,MapSeam::RefreshMovedUnits,3
+harness,platform,shared_write,MapSeam::RefreshUnitIfStale,3
 harness,platform,shared_write,MapSeam::SnapWorldPosToFootprint,4
 harness,platform,shared_write,MissionSeam::GetGameType,4
 harness,platform,shared_write,MissionSeam::GetMissionName,3
@@ -2432,6 +2434,8 @@ harness,seams,shared_write,MapSeam::GetGroundHeight,1
 harness,seams,shared_write,MapSeam::IsPadSlotFree,1
 harness,seams,shared_write,MapSeam::PassMapGet,2
 harness,seams,shared_write,MapSeam::PassMapInBounds,2
+harness,seams,shared_write,MapSeam::RefreshMovedUnits,2
+harness,seams,shared_write,MapSeam::RefreshUnitIfStale,2
 harness,seams,shared_write,MapSeam::SnapWorldPosToFootprint,1
 harness,seams,shared_write,MissionSeam::GetGameType,1
 harness,seams,shared_write,MissionSeam::GetMissionName,1
@@ -4370,6 +4374,8 @@ platform,harness,shared_write,MapSeam::GetGroundHeight,2
 platform,harness,shared_write,MapSeam::IsPadSlotFree,2
 platform,harness,shared_write,MapSeam::PassMapGet,2
 platform,harness,shared_write,MapSeam::PassMapInBounds,2
+platform,harness,shared_write,MapSeam::RefreshMovedUnits,2
+platform,harness,shared_write,MapSeam::RefreshUnitIfStale,2
 platform,harness,shared_write,MapSeam::SnapWorldPosToFootprint,3
 platform,harness,shared_write,MissionSeam::GetGameType,4
 platform,harness,shared_write,MissionSeam::GetMissionName,2
@@ -6524,6 +6530,8 @@ seams,harness,shared_write,MapSeam::GetGroundHeight,2
 seams,harness,shared_write,MapSeam::IsPadSlotFree,2
 seams,harness,shared_write,MapSeam::PassMapGet,2
 seams,harness,shared_write,MapSeam::PassMapInBounds,2
+seams,harness,shared_write,MapSeam::RefreshMovedUnits,2
+seams,harness,shared_write,MapSeam::RefreshUnitIfStale,2
 seams,harness,shared_write,MapSeam::SnapWorldPosToFootprint,3
 seams,harness,shared_write,MissionSeam::GetGameType,4
 seams,harness,shared_write,MissionSeam::GetMissionName,2

@@ -65,7 +65,7 @@ On WSL without sudo, `wsl -d <distro> -u root` from Windows gives a root shell f
 export WINEARCH=win64
 cmake -S . -B build/modern -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clang-cl-i686.cmake
 cmake --build build/modern
-cmake --build build/modern --target wasm_runtime
+cmake --build build/modern --target wasm_runtime replay_native_test
 uv run tools/reference.py --check --tier --exe build/modern/TotalA.exe
 ```
 

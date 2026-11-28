@@ -74,8 +74,8 @@ any module is loaded. Modules do not create or grow them.
 
   The load data region starts at the block's ceiling, `block_base + block_max`, and ends at the memory's end:
   `load_data` base plus size equals `memory_pages * 65536`. Its bytes are read-only load data (section 7.1).
-  The block itself is as large as the match needs (`block_size` to `block_max`, a multiple of 65536,
-  `docs/state.md`, "The size of the block"): it starts at `block_base`, the engine tells modules
+  The block itself is as large as the match needs (`block_size` to `block_max`, a multiple of 65536):
+  it starts at `block_base`, the engine tells modules
   only addresses inside it, and the bytes after its end are never read or written. A module must not
   assume the block ends at the end of the memory. A manifest without `block_max` has a block of
   `block_size` bytes only.
@@ -1022,6 +1022,9 @@ earlier result behind. It has two routes, and the result's `scope` names the one
   replayed against the module, one `replay_native_test.exe --wasm` run per recording (`docs/replay-format.md`, "Against the
   WASM module"). The scenarios are not played: the result has `scenarios: not_judged`, and the module has met its contract
   on those recordings only. `--manifest` judges against another game manifest than `wasm/modules.json`, on this route only.
+  Before the first recording it checks the host: the build must have `replay_native_test.exe` and `wasmtime_host.dll`, and
+  `wine replay_native_test.exe` with no arguments must print the replayer's usage line, which proves that wine starts a
+  program in its prefix. When a check fails the run plays nothing and its result is an error of the host (below).
 
 **A blocked entry is judged without budgets.** It has no `size_budget` or `fuel_budget` (section 4.2), so check-module does
 not judge the module's size, and the replayer runs it with the largest fuel budget of section 11.3, 2147483647 a tick
@@ -1079,6 +1082,7 @@ The recordings route names the replay rules it judged under in `rules`:
 | `message` | with `refused`: the problems `check-module` found or the loader's message, and no `scenarios` or `recordings` |
 | `scenarios` | `not_judged` with `recordings`; otherwise by scenario name: `status` (the end-of-tick state) and, for `differs`, `tick`, `phase`, `field` and `value`; `digest` and `view`: `status` `equal`, `differs` with the first `tick` whose digest (or view) differs, or `not_judged`; an `other_checks` entry (`failed`) when every scenario is equal and another check of the run failed, with `reason` `block-pointer` when it was the block pointer check: a fault of the harness's scan of the shared state block, not of the module |
 | `recordings` | by `<subsystem>/<recording>`: `status` and, for `differs`, `line`, `tick`, `phase` (the slot), `kind`, `field` and `value`; with `recordings`, `call` (the replayer's call index) in place of `line` and `kind`, and `field` is the replayer's key (a field, `import <n> <name>` or `query <name>`) |
+| `reason`, `class` | in a scenario or recording whose `status` is `failed`: why it did not run to its end, below |
 
 A `status` is `equal`, `differs`, `failed` (the scenario did not run to its end) or `not_judged` (the run stopped at the first
 divergence before this scenario was reported). Only the first divergence of a run carries `phase`, `field` and `value` for a
@@ -1086,11 +1090,42 @@ scenario: the others have their `tick`. A `value` is what the module produced; t
 the build other than the names of the traced fields are never in the file. The raw reports are kept in `DIR/logs/` for the host
 and are not part of the result.
 
+**Why a run failed.** A `failed` scenario or recording has a `reason`, one word of a closed set that says whose fault it is.
+It is parsed from the run's output, and no text of the output (no message of wine, the replayer, the engine or the module, and
+no source name) is in the result.
+
+| `reason` | Whose fault | When |
+| --- | --- | --- |
+| `host-runtime` | the host's | wine did not start the program (its prefix does not load, say), or the replayer could not load `wasmtime_host.dll` |
+| `host-replayer` | the host's | wine found no `replay_native_test.exe` |
+| `host-timeout` | usually the host's (a module that stalls in native code also times out) | the run did not end in its time: the replayer's hour, or a scenario's timeout |
+| `module-load` | the module's | the loader refused the module (section 5.2); `class` is `compile`, `instantiate`, `export` or `major` (an interface-major refusal, section 10), the classes of `docs/core-gate.md`, "loader and fuel" |
+| `module-trap` | the module's | the module trapped or was stopped (section 13); `class` is `unreachable`, `memory_access`, `divide`, `table`, `stack` or `trap` (any other engine trap) for an engine trap, `out_of_fuel`, `import` (an import's refusal), `glue` (a glue error or a full handle table) or `fatal` (the module called `FatalError`) |
+| `unknown` | either | anything else: a crash of the process, a stop of the replayer that is none of the above, or a run that ended without a verdict |
+
+Only `module-load` and `module-trap` have a `class`. A module that traps on a recording gets `failed` with `reason:
+module-trap` and the trap's `class`. The class of an engine trap is read from the engine's cause line (`wasm trap: ...`),
+which comes after the backtrace; the loader keeps the first 400 characters of the message, so when a long backtrace cuts the
+cause off the class is `trap`, never a guess from the frames.
+
+On the scenario route the reason comes from the first line of the game's stop message (section 13), the one line
+`tools/reference.py` quotes for a run that ended early, or from the last lines of a run that failed to start. That line names
+`out_of_fuel`, `import` and `glue`, but an engine trap's cause is on a later line, so its class there is `trap`, and a run whose
+quoted lines hold no stop message is `unknown`. The recordings route gives the full class.
+
+**An error of the host.** When the host check of the recordings route fails, the run writes `DIR/result.json` with only
+`format`, `subsystem`, `reason` (`host-runtime` or `host-replayer`) and `error`, a fixed sentence for the reason that says the
+fault is the host's, and exits 2. The clean room's broker answers such a result with an `error` and its `reason`, never
+a verdict, and passes on no other text: an `error` result whose `reason` is not one of those two is answered with
+`reason: unknown`. The broker's own timeout is an `error` with `reason: host-timeout`. Any other run that writes no usable
+result is an `error` that names only the gate's exit status.
+
 A module that is equal on `state` and differs on `digest` kept the end-of-tick contract with another order of work inside the
 tick: the state at the end of each tick is 3.1c's, and some phase row in between is not. Format 1 had no `digest` and judged
 the scenarios on every row; format 2 had no `view`; format 3 had no `scope` and no recordings route.
 
-Exit status: 0 when everything is equal, 1 when something differs or failed, 2 when the loader refused the module.
+Exit status: 0 when everything is equal, 1 when something differs or failed, 2 when the loader refused the module or the host
+check failed.
 
 #519 wires the tool to the sandbox's mailbox: a submitted module goes in, and `result.json` comes back.
 

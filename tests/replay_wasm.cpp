@@ -68,13 +68,17 @@ void Stop(const char* what)
 void __cdecl OnTrap(void* user, const char* module, const char* message)
 {
     char text[700];
+    unsigned budget;
+    const char* starved;
     (void)user;
     if (GlueFatalPending())
         return;
-    if (s_trapHook != nullptr) {
-        unsigned budget;
-        const char* starved;
-        s_trapHook(TrapClass(message, GlueOutOfFuel(&budget, &starved) != 0), message);
+    int outOfFuel = GlueOutOfFuel(&budget, &starved);
+    if (s_trapHook != nullptr)
+        s_trapHook(TrapClass(message, outOfFuel != 0), message);
+    if (outOfFuel) {
+        sprintf(text, "%s ran out of fuel: it burned more than its fuel_budget of %u in one tick", starved, budget);
+        Stop(text);
     }
     sprintf(text, "%s trapped: %s", module, message);
     Stop(text);

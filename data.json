@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-28T07:05:04+00:00",
+ "generated": "2026-11-28T08:05:04+00:00",
  "interfaces": 64,
  "core_pin": 64,
  "milestones": {
@@ -8,8 +8,8 @@
    "total": 65
   },
   "180": {
-   "done": 15,
-   "total": 38
+   "done": 17,
+   "total": 39
   }
  },
  "rows": [
@@ -198,10 +198,17 @@
     "number": 1201,
     "title": "Spec: Move the economy spec and implement it",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1201",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
+    {
+     "number": 63,
+     "title": "Update: Move economy to interfaces-v72",
+     "state": "OPEN",
+     "url": "https://github.com/ozgb/btm/pull/63",
+     "live": true
+    },
     {
      "number": 9,
      "title": "Add: The economy spec",
@@ -358,31 +365,31 @@
    "kit": "ready",
    "kit_note": "recordings gate",
    "recordings": 5,
-   "spec": "active",
-   "spec_pin": null,
-   "impl": "active",
-   "active": true,
+   "spec": "done",
+   "spec_pin": 69,
+   "impl": "built",
+   "active": false,
    "issue": {
     "number": 1192,
     "title": "Spec: Write the map spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1192",
-    "claimed": true,
-    "state": "OPEN"
+    "claimed": false,
+    "state": "CLOSED"
    },
    "prs": [
     {
      "number": 57,
      "title": "Implementer: impl/map",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/57",
-     "live": true
+     "live": false
     },
     {
      "number": 46,
      "title": "Add: Specify the map subsystem",
-     "state": "OPEN",
+     "state": "MERGED",
      "url": "https://github.com/ozgb/btm/pull/46",
-     "live": true
+     "live": false
     }
    ]
   },
@@ -545,7 +552,7 @@
     "number": 1199,
     "title": "Spec: Write the orders spec for btm",
     "url": "https://github.com/ozgb/byte-tactics-moddable/issues/1199",
-    "claimed": true,
+    "claimed": false,
     "state": "OPEN"
    },
    "prs": [
